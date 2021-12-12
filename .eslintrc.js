@@ -6,7 +6,8 @@ module.exports = {
     es2021: true
   },
   extends: [
-    'eslint:recommended',
+    'standard',
+    'eslint:recommended'
   ],
   overrides: [
     {
