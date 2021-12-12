@@ -5,7 +5,13 @@ import checker from "vite-plugin-checker";
 export default defineConfig({
   plugins: [
     solidPlugin(),
-    checker({ typescript: true }),
+    checker({
+      typescript: true,
+      eslint: {
+        files: ['./src'],
+        extensions: ['.ts', '.tsx'],
+      },
+    }),
   ],
   build: {
     target: "esnext",
