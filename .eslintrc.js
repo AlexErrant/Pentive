@@ -11,19 +11,19 @@ module.exports = {
   ],
   overrides: [
     {
-      files: ["*.ts", "*.tsx"],
+      files: ['*.ts', '*.tsx'],
       extends: [
         'standard-with-typescript',
         'plugin:@typescript-eslint/recommended',
-        'plugin:@typescript-eslint/recommended-requiring-type-checking',
+        'plugin:@typescript-eslint/recommended-requiring-type-checking'
       ],
       plugins: [
-        '@typescript-eslint',
+        '@typescript-eslint'
       ],
       parser: '@typescript-eslint/parser',
       parserOptions: {
-        project: './tsconfig.json',
-      },
+        project: './tsconfig.json'
+      }
     }
   ]
 }

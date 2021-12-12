@@ -1,6 +1,6 @@
-import { defineConfig } from "vite";
-import solidPlugin from "vite-plugin-solid";
-import checker from "vite-plugin-checker";
+import { defineConfig } from 'vite'
+import solidPlugin from 'vite-plugin-solid'
+import checker from 'vite-plugin-checker'
 
 export default defineConfig({
   plugins: [
@@ -9,12 +9,12 @@ export default defineConfig({
       typescript: true,
       eslint: {
         files: ['./src'],
-        extensions: ['.ts', '.tsx'],
-      },
-    }),
+        extensions: ['.ts', '.tsx']
+      }
+    })
   ],
   build: {
-    target: "esnext",
-    polyfillDynamicImport: false,
-  },
-});
+    target: 'esnext',
+    polyfillDynamicImport: false
+  }
+})
