@@ -674,8 +674,8 @@ packages:
       path-parse: 1.0.7
     dev: true
 
-  /rollup/2.61.0:
-    resolution: {integrity: sha512-teQ+T1mUYbyvGyUavCodiyA9hD4DxwYZJwr/qehZGhs1Z49vsmzelMVYMxGU4ZhGRKxYPupHuz5yzm/wj7VpWA==}
+  /rollup/2.61.1:
+    resolution: {integrity: sha512-BbTXlEvB8d+XFbK/7E5doIcRtxWPRiqr0eb5vQ0+2paMM04Ye4PZY5nHOQef2ix24l/L0SpLd5hwcH15QHPdvA==}
     engines: {node: '>=10.0.0'}
     hasBin: true
     optionalDependencies:
@@ -773,7 +773,7 @@ packages:
       esbuild: 0.13.15
       postcss: 8.4.4
       resolve: 1.20.0
-      rollup: 2.61.0
+      rollup: 2.61.1
     optionalDependencies:
       fsevents: 2.3.2
     dev: true
