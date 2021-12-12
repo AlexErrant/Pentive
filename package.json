@@ -8,7 +8,9 @@
     "build": "vite build",
     "serve": "vite preview",
     "lint": "eslint .",
-    "lint:fix": "eslint . --fix"
+    "lintw": "eslint . --fix",
+    "prettier": "prettier --check .",
+    "prettierw": "prettier --write ."
   },
   "license": "MIT",
   "devDependencies": {
