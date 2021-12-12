@@ -7,7 +7,8 @@ module.exports = {
   },
   extends: [
     'standard',
-    'eslint:recommended'
+    'eslint:recommended',
+    'plugin:prettier/recommended' // Last to disable conflicting rules
   ],
   overrides: [
     {
@@ -15,7 +16,8 @@ module.exports = {
       extends: [
         'standard-with-typescript',
         'plugin:@typescript-eslint/recommended',
-        'plugin:@typescript-eslint/recommended-requiring-type-checking'
+        'plugin:@typescript-eslint/recommended-requiring-type-checking',
+        'plugin:prettier/recommended' // Last to disable conflicting rules
       ],
       plugins: [
         '@typescript-eslint'
