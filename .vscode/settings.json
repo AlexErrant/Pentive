@@ -17,5 +17,5 @@
     "**/node_modules": true,
     "pnpm-lock.yaml": true
   },
-  "cSpell.words": ["Pentive", "vite"]
+  "cSpell.words": ["Pentive", "tailwindcss", "vite"]
 }
