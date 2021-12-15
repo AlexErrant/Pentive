@@ -1,5 +1,8 @@
 module.exports = {
-  extends: ["stylelint-config-standard"],
+  extends: [
+    "stylelint-config-standard",
+    "stylelint-config-prettier", // Last to disable conflicting rules
+  ],
   rules: {
     "at-rule-no-unknown": [
       true,
