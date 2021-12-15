@@ -7,10 +7,12 @@
     "dev": "vite",
     "build": "vite build",
     "serve": "vite preview",
-    "lint": "eslint .",
-    "lintw": "eslint . --fix",
+    "eslint": "eslint .",
+    "eslintw": "eslint . --fix",
     "prettier": "prettier --check .",
-    "prettierw": "prettier --write ."
+    "prettierw": "prettier --write .",
+    "stylelint": "stylelint **/*.css",
+    "stylelintw": "stylelint **/*.css --fix"
   },
   "license": "MIT",
   "devDependencies": {
