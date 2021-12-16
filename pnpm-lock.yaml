@@ -13,6 +13,7 @@ specifiers:
   eslint-plugin-promise: ^4.2.1
   postcss: ^8.4.5
   prettier: ^2.5.1
+  solid-app-router: ^0.1.14
   solid-js: ^1.2.6
   standard: ^16.0.4
   stylelint: ^14.1.0
@@ -25,6 +26,7 @@ specifiers:
   vite-plugin-solid: ^2.1.4
 
 dependencies:
+  solid-app-router: 0.1.14_solid-js@1.2.6
   solid-js: 1.2.6
 
 devDependencies:
@@ -2945,6 +2947,14 @@ packages:
       astral-regex: 2.0.0
       is-fullwidth-code-point: 3.0.0
     dev: true
+
+  /solid-app-router/0.1.14_solid-js@1.2.6:
+    resolution: {integrity: sha512-fnX+jCB5sDMbjq3od9qGtQNdlvHP2c6DG5STvMHVXyNuSEN+MdO7WJtZ58OpVpq6zWS4FYeYAh7NMEa7C2CcOA==}
+    peerDependencies:
+      solid-js: ^1.0.0
+    dependencies:
+      solid-js: 1.2.6
+    dev: false
 
   /solid-js/1.2.6:
     resolution: {integrity: sha512-NvPHJ5Vj5f+ZJWIioickrC55seovSkDtm5NzSpnoUk3z4tATv0STpy5iuGNEn51ZORUcwpZzrMAtOCGziXU1XA==}
