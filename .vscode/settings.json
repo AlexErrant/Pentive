@@ -20,5 +20,5 @@
     "**/node_modules": true,
     "pnpm-lock.yaml": true
   },
-  "cSpell.words": ["Pentive", "stylelint", "tailwindcss", "vite"]
+  "cSpell.words": ["Pentive", "rxdb", "stylelint", "tailwindcss", "vite"]
 }
