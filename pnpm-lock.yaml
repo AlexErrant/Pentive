@@ -1,6 +1,7 @@
 lockfileVersion: 5.3
 
 specifiers:
+  '@types/pouchdb-adapter-idb': ^6.1.4
   '@typescript-eslint/eslint-plugin': ^4.0.1
   '@typescript-eslint/parser': ^4.0.0
   autoprefixer: ^10.4.0
@@ -11,6 +12,7 @@ specifiers:
   eslint-plugin-node: ^11.1.0
   eslint-plugin-prettier: ^4.0.0
   eslint-plugin-promise: ^4.2.1
+  events: ^3.3.0
   postcss: ^8.4.5
   pouchdb-adapter-idb: ^7.2.2
   prettier: ^2.5.1
@@ -36,6 +38,7 @@ dependencies:
   solid-js: 1.2.6
 
 devDependencies:
+  '@types/pouchdb-adapter-idb': 6.1.4
   '@typescript-eslint/eslint-plugin': 4.33.0_b77187731987bbf90b17856f1d20b7ae
   '@typescript-eslint/parser': 4.33.0_eslint@7.32.0+typescript@4.5.3
   autoprefixer: 10.4.0_postcss@8.4.5
@@ -46,6 +49,7 @@ devDependencies:
   eslint-plugin-node: 11.1.0_eslint@7.32.0
   eslint-plugin-prettier: 4.0.0_6e6a25a49a944db0fa38418c3ba4bc86
   eslint-plugin-promise: 4.3.1
+  events: 3.3.0
   postcss: 8.4.5
   prettier: 2.5.1
   standard: 16.0.4
@@ -469,7 +473,6 @@ packages:
     resolution: {integrity: sha512-9AonUzyTjXXhEOa0DnqpzZi6VHlqKMswga9EXjpXnnqxwLtdvPPtlO8evrI5D9S6asFRCQ6v+wpiUKbw+vKqyg==}
     dependencies:
       '@types/ms': 0.7.31
-    dev: false
 
   /@types/express-serve-static-core/4.17.26:
     resolution: {integrity: sha512-zeu3tpouA043RHxW0gzRxwCHchMgftE8GArRsvYT0ByDMbn19olQHx5jLue0LxWY6iYtXb7rXmuVtSkhy9YZvQ==}
@@ -515,7 +518,6 @@ packages:
 
   /@types/ms/0.7.31:
     resolution: {integrity: sha512-iiUgKzV9AuaEkZqkOLDIvlQiL6ltuZd9tGcW3gwpnX8JbuiuhFlEGmmFXEXkN50Cvq7Os88IY2v0dkDqXYWVgA==}
-    dev: false
 
   /@types/node/17.0.2:
     resolution: {integrity: sha512-JepeIUPFDARgIs0zD/SKPgFsJEAF0X5/qO80llx59gOxFTboS9Amv3S+QfB7lqBId5sFXJ99BN0J6zFRvL9dDA==}
@@ -533,18 +535,22 @@ packages:
     resolution: {integrity: sha512-//oorEZjL6sbPcKUaCdIGlIUeH26mgzimjBB77G6XRgnDl/L5wOnpyBGRe/Mmf5CVW3PwEBE1NjiMZ/ssFh4wA==}
     dev: true
 
+  /@types/pouchdb-adapter-idb/6.1.4:
+    resolution: {integrity: sha512-KIAXbkF4uYUz0ZwfNEFLtEkK44mEWopAsD76UhucH92XnJloBysav+TjI4FFfYQyTjoW3S1s6V+Z14CUJZ0F6w==}
+    dependencies:
+      '@types/pouchdb-core': 7.0.9
+    dev: true
+
   /@types/pouchdb-core/7.0.9:
     resolution: {integrity: sha512-zzO8wkTztn1wT//mxIpcxSuKWlrHbVeERnPKVNEi9mbuqyLqevH+kRaGCJaEjwLp/tVjwnM/e6ZJoFsdP90pQg==}
     dependencies:
       '@types/debug': 4.1.7
       '@types/pouchdb-find': 6.3.7
-    dev: false
 
   /@types/pouchdb-find/6.3.7:
     resolution: {integrity: sha512-b2dr9xoZRK5Mwl8UiRA9l5j9mmCxNfqXuu63H1KZHwJLILjoIIz7BntCvM0hnlnl7Q8P8wORq0IskuaMq5Nnnw==}
     dependencies:
       '@types/pouchdb-core': 7.0.9
-    dev: false
 
   /@types/qs/6.9.7:
     resolution: {integrity: sha512-FGa1F62FT09qcrueBA6qYTrJPVDzah9a+493+o2PCXsesWHIn27G98TsSMs3WPNbZIEj4+VJf6saSFpvD+3Zsw==}
@@ -2015,6 +2021,11 @@ packages:
     resolution: {integrity: sha512-i/2XbnSz/uxRCU6+NdVJgKWDTM427+MqYbkQzD321DuCQJUqOuJKIA0IM2+W2xtYHdKOmZ4dR6fExsd4SXL+WQ==}
     engines: {node: '>=6'}
     dev: false
+
+  /events/3.3.0:
+    resolution: {integrity: sha512-mQw+2fkQbALzQ7V0MY0IqdnXNOeTtP4r0lN9z7AAawCXgqea7bDii20AYrIBrFd/Hx0M2Ocz6S111CaFkUcb0Q==}
+    engines: {node: '>=0.8.x'}
+    dev: true
 
   /execall/2.0.0:
     resolution: {integrity: sha512-0FU2hZ5Hh6iQnarpRtQurM/aAvp3RIbfvgLHrcqJYzhXyV2KFruhuChf9NC6waAhiUR7FFtlugkI4p7f2Fqlow==}

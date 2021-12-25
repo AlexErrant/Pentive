@@ -16,6 +16,7 @@
   },
   "license": "MIT",
   "devDependencies": {
+    "@types/pouchdb-adapter-idb": "^6.1.4",
     "@typescript-eslint/eslint-plugin": "^4.0.1",
     "@typescript-eslint/parser": "^4.0.0",
     "autoprefixer": "^10.4.0",
@@ -26,6 +27,7 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-promise": "^4.2.1",
+    "events": "^3.3.0",
     "postcss": "^8.4.5",
     "prettier": "^2.5.1",
     "standard": "^16.0.4",
