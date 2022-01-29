@@ -29,6 +29,7 @@
     "eslint-plugin-promise": "^4.2.1",
     "events": "^3.3.0",
     "postcss": "^8.4.5",
+    "pouchdb-adapter-http": "^7.2.2",
     "prettier": "^2.5.1",
     "standard": "^16.0.4",
     "stylelint": "^14.1.0",
