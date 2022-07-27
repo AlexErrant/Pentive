@@ -4,16 +4,24 @@ import {
   RxCollection,
   RxJsonSchema,
   RxDocument,
+  KeyFunctionMap,
 } from "rxdb"
+import { HeroDocType, heroSchema } from "./schemas/hero"
+import * as pouchdbAdapterIdb from "pouchdb-adapter-idb"
+import { getRxStoragePouch, addPouchPlugin } from "rxdb/plugins/pouchdb"
+// @ts-expect-error pouchdb is untyped
+import * as pouchdbAdapterHttp from "pouchdb-adapter-http"
+addPouchPlugin(pouchdbAdapterHttp)
+addPouchPlugin(pouchdbAdapterIdb)
 
-type HeroDocMethods = {
+interface HeroDocMethods extends KeyFunctionMap {
   scream: (v: string) => string
 }
 
 type HeroDocument = RxDocument<HeroDocType, HeroDocMethods>
 
 // we declare one static ORM-method for the collection
-type HeroCollectionMethods = {
+interface HeroCollectionMethods extends KeyFunctionMap {
   countAllDocuments: () => Promise<number>
 }
 
@@ -24,7 +32,7 @@ type HeroCollection = RxCollection<
   HeroCollectionMethods
 >
 
-type MyDatabaseCollections = {
+interface MyDatabaseCollections {
   heroes: HeroCollection
 }
 
@@ -38,30 +46,6 @@ export async function demoFunction(): Promise<void> {
     name: "mydb",
     storage: getRxStoragePouch("memory"),
   })
-
-  const heroSchema: RxJsonSchema<HeroDocType> = {
-    title: "human schema",
-    description: "describes a human being",
-    version: 0,
-    keyCompression: true,
-    primaryKey: "passportId",
-    type: "object",
-    properties: {
-      passportId: {
-        type: "string",
-      },
-      firstName: {
-        type: "string",
-      },
-      lastName: {
-        type: "string",
-      },
-      age: {
-        type: "integer",
-      },
-    },
-    required: ["passportId", "firstName", "lastName"],
-  }
 
   const heroDocMethods: HeroDocMethods = {
     scream: function (this: HeroDocument, what: string) {
@@ -121,5 +105,5 @@ export async function demoFunction(): Promise<void> {
   /**
    * clean up
    */
-  myDatabase.destroy()
+  await myDatabase.destroy()
 }
