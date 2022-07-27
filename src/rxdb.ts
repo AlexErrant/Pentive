@@ -2,7 +2,6 @@ import {
   createRxDatabase,
   RxDatabase,
   RxCollection,
-  RxJsonSchema,
   RxDocument,
   KeyFunctionMap,
 } from "rxdb"
