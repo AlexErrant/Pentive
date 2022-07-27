@@ -1,5 +1,4 @@
-import type { RouteDataFunc } from "solid-app-router"
-import { createResource } from "solid-js"
+import { createResource, Resource } from "solid-js"
 
 async function wait<T>(ms: number, data: T): Promise<T> {
   return await new Promise((resolve) => setTimeout(resolve, ms, data))
@@ -13,7 +12,7 @@ async function fetchName(): Promise<string> {
   return await wait(random(500, 1000), "Solid")
 }
 
-const AboutData: RouteDataFunc = () => {
+function AboutData(): Resource<string | undefined> {
   const [data] = createResource(fetchName)
 
   return data
