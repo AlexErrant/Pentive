@@ -13,9 +13,11 @@ export const heroSchemaLiteral = {
   properties: {
     passportId: {
       type: "string",
+      maxLength: 100, // <- the primary key must have set maxLength
     },
     firstName: {
       type: "string",
+      maxLength: 100, // <- string-fields that are used as an index, must set `maxLength`.
     },
     lastName: {
       type: "string",

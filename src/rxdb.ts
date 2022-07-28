@@ -43,7 +43,7 @@ export async function demoFunction(): Promise<void> {
    */
   const myDatabase: MyDatabase = await createRxDatabase<MyDatabaseCollections>({
     name: "mydb",
-    storage: getRxStoragePouch("memory"),
+    storage: getRxStoragePouch("idb"),
   })
 
   const heroDocMethods: HeroDocMethods = {

@@ -1,4 +1,5 @@
 import { createSignal, JSX } from "solid-js"
+import { demoFunction } from "../rxdb"
 
 export default function Home(): JSX.Element {
   const [count, setCount] = createSignal(0)
@@ -23,6 +24,14 @@ export default function Home(): JSX.Element {
           onClick={() => setCount(count() + 1)}
         >
           +
+        </button>
+      </div>
+      <div class="mt-4">
+        <button
+          class="border rounded-lg px-2 border-gray-900"
+          onClick={async () => await demoFunction()}
+        >
+          demoFunction
         </button>
       </div>
     </section>
