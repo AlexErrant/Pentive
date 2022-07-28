@@ -1,4 +1,5 @@
 import {
+  addRxPlugin,
   createRxDatabase,
   RxDatabase,
   RxCollection,
@@ -7,7 +8,12 @@ import {
 } from "rxdb"
 import { HeroDocType, heroSchema } from "./schemas/hero"
 import * as pouchdbAdapterIdb from "pouchdb-adapter-idb"
-import { getRxStoragePouch, addPouchPlugin } from "rxdb/plugins/pouchdb"
+import {
+  getRxStoragePouch,
+  addPouchPlugin,
+  PouchDB,
+} from "rxdb/plugins/pouchdb"
+import { RxDBLeaderElectionPlugin } from "rxdb/plugins/leader-election"
 // @ts-expect-error pouchdb is untyped
 import * as pouchdbAdapterHttp from "pouchdb-adapter-http"
 addPouchPlugin(pouchdbAdapterHttp)
@@ -114,6 +120,45 @@ export async function demoFunction(): Promise<void> {
 }
 
 export async function remove(): Promise<void> {
+  await loadRxDBPlugins()
   const myDatabase = await createDb()
   await myDatabase.remove()
+}
+
+// https://github.com/pubkey/client-side-databases/blob/a25172c012cef2985d97424a9fad917eb888b9f5/projects/rxdb-pouchdb/src/app/services/database.service.ts#L59-L108
+async function loadRxDBPlugins(): Promise<void> {
+  addRxPlugin(RxDBLeaderElectionPlugin)
+
+  /**
+   * to reduce the build-size,
+   * we use some modules in dev-mode only
+   */
+  const isDevMode = true // TODO inject
+  if (isDevMode) {
+    await Promise.all([
+      /**
+       * Enable the dev mode plugin
+       */
+      import("rxdb/plugins/dev-mode").then((module) =>
+        addRxPlugin(module.RxDBDevModePlugin)
+      ),
+
+      // we use the schema-validation only in dev-mode
+      // this validates each document if it is matching the jsonschema
+      import("rxdb/plugins/validate").then((module) =>
+        addRxPlugin(module.RxDBValidatePlugin)
+      ),
+
+      // enable debug to detect slow queries
+      import("pouchdb-debug" + "").then((module) =>
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        addPouchPlugin(module.default)
+      ),
+    ])
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+    PouchDB.debug.enable("pouchdb:find")
+  } else {
+    // in production we do not use any validation plugin
+    // to reduce the build-size
+  }
 }

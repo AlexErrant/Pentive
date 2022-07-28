@@ -16,6 +16,7 @@ specifiers:
   postcss: ^8.4.14
   pouchdb-adapter-http: ^7.3.0
   pouchdb-adapter-idb: ^7.3.0
+  pouchdb-debug: ^7.2.1
   prettier: ^2.7.1
   rxdb: ^12.7.16
   rxjs: ^7.5.6
@@ -33,6 +34,7 @@ specifiers:
 
 dependencies:
   pouchdb-adapter-idb: 7.3.0
+  pouchdb-debug: 7.2.1
   rxdb: 12.7.16_rxjs@7.5.6
   rxjs: 7.5.6
   solid-app-router: 0.4.2_solid-js@1.4.8
@@ -1294,6 +1296,17 @@ packages:
         optional: true
     dependencies:
       ms: 2.0.0
+
+  /debug/3.1.0:
+    resolution: {integrity: sha512-OX8XqP7/1a9cqkxYw2yXss15f26NKWBpDXQd0/uK/KPqdQhxbPa994hnzjcE2VqQpDslf55723cKPUOGSmMY3g==}
+    peerDependencies:
+      supports-color: '*'
+    peerDependenciesMeta:
+      supports-color:
+        optional: true
+    dependencies:
+      ms: 2.0.0
+    dev: false
 
   /debug/3.2.7:
     resolution: {integrity: sha512-CFjzYYAi4ThfiQvizrFQevTTXHtnCqWfe7x1AhgEscTz6ZbLbfoLRLPugTQyBth6f8ZERVUSyWHFD/7Wu4t1XQ==}
@@ -3635,6 +3648,14 @@ packages:
       pouchdb-utils: 7.3.0
     transitivePeerDependencies:
       - encoding
+    dev: false
+
+  /pouchdb-debug/7.2.1:
+    resolution: {integrity: sha512-eP3ht/AKavLF2RjTzBM6S9gaI2/apcW6xvaKRQhEdOfiANqerFuksFqHCal3aikVQuDO+cB/cw+a4RyJn/glBw==}
+    dependencies:
+      debug: 3.1.0
+    transitivePeerDependencies:
+      - supports-color
     dev: false
 
   /pouchdb-errors/7.3.0:
