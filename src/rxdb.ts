@@ -112,3 +112,8 @@ export async function demoFunction(): Promise<void> {
    */
   await myDatabase.destroy()
 }
+
+export async function remove(): Promise<void> {
+  const myDatabase = await createDb()
+  await myDatabase.remove()
+}
