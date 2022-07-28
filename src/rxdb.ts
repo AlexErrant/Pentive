@@ -37,7 +37,7 @@ interface MyDatabaseCollections {
 
 type MyDatabase = RxDatabase<MyDatabaseCollections>
 
-export async function demoFunction(): Promise<void> {
+export async function createDb(): Promise<MyDatabase> {
   /**
    * create database and collections
    */
@@ -78,6 +78,12 @@ export async function demoFunction(): Promise<void> {
     },
     false // not async
   )
+
+  return myDatabase
+}
+
+export async function demoFunction(): Promise<void> {
+  const myDatabase = await createDb()
 
   /**
    * use the database
