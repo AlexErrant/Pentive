@@ -16,8 +16,10 @@ import {
 import { RxDBLeaderElectionPlugin } from "rxdb/plugins/leader-election"
 // @ts-expect-error pouchdb is untyped
 import * as pouchdbAdapterHttp from "pouchdb-adapter-http"
+import { RxDBReplicationCouchDBPlugin } from "rxdb/plugins/replication-couchdb"
 addPouchPlugin(pouchdbAdapterHttp)
 addPouchPlugin(pouchdbAdapterIdb)
+addRxPlugin(RxDBReplicationCouchDBPlugin)
 
 interface HeroDocMethods extends KeyFunctionMap {
   scream: (v: string) => string
@@ -161,4 +163,25 @@ async function loadRxDBPlugins(): Promise<void> {
     // in production we do not use any validation plugin
     // to reduce the build-size
   }
+}
+
+// https://github.com/pubkey/rxdb/blob/754e489353a2611c98550b6c19c09688787a08e0/docs-src/replication-couchdb.md?plain=1#L27-L39
+export async function sync(): Promise<void> {
+  const myDatabase = await createDb()
+  const user = "admin" // TODO
+  const pass = "password"
+  myDatabase.heroes.syncCouchDB({
+    remote: `http://${user}:${pass}@localhost:5984/xheroes`, // remote database. This can be the serverURL, another RxCollection or a PouchDB-instance
+    waitForLeadership: true, // (optional) [default=true] to save performance, the sync starts on leader-instance only
+    direction: {
+      // direction (optional) to specify sync-directions
+      pull: true, // default=true
+      push: true, // default=true
+    },
+    options: {
+      // sync-options (optional) from https://pouchdb.com/api.html#replication
+      live: true,
+      retry: true,
+    },
+  })
 }
