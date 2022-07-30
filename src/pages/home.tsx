@@ -29,9 +29,9 @@ export default function Home(): JSX.Element {
       <div class="mt-4">
         <button
           class="border rounded-lg px-2 border-gray-900"
-          onClick={async () => await rxdb.demoFunction()}
+          onClick={async () => await rxdb.upsert(count())}
         >
-          demoFunction
+          upsert
         </button>
         <button
           class="border rounded-lg px-2 border-gray-900"

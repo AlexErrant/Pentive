@@ -92,17 +92,12 @@ export async function createDb(): Promise<MyDatabase> {
   return myDatabase
 }
 
-export async function demoFunction(): Promise<void> {
-  /**
-   * use the database
-   */
-
-  // insert a document
-  const hero: HeroDocument = await myDatabase.heroes.insert({
+export async function upsert(i: number): Promise<void> {
+  const hero: HeroDocument = await myDatabase.heroes.upsert({
     passportId: "myId",
     firstName: "piotr",
     lastName: "potter",
-    age: 5,
+    age: i,
   })
 
   // access a property
