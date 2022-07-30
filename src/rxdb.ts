@@ -46,6 +46,8 @@ interface MyDatabaseCollections {
 type MyDatabase = RxDatabase<MyDatabaseCollections>
 
 export async function createDb(): Promise<MyDatabase> {
+  await loadRxDBPlugins()
+
   /**
    * create database and collections
    */
@@ -91,8 +93,6 @@ export async function createDb(): Promise<MyDatabase> {
 }
 
 export async function demoFunction(): Promise<void> {
-  const myDatabase = await createDb()
-
   /**
    * use the database
    */
@@ -114,16 +114,9 @@ export async function demoFunction(): Promise<void> {
   // use a static orm method from the collection
   const amount: number = await myDatabase.heroes.countAllDocuments()
   console.log(amount)
-
-  /**
-   * clean up
-   */
-  await myDatabase.destroy()
 }
 
 export async function remove(): Promise<void> {
-  await loadRxDBPlugins()
-  const myDatabase = await createDb()
   await myDatabase.remove()
 }
 
@@ -166,8 +159,7 @@ async function loadRxDBPlugins(): Promise<void> {
 }
 
 // https://github.com/pubkey/rxdb/blob/754e489353a2611c98550b6c19c09688787a08e0/docs-src/replication-couchdb.md?plain=1#L27-L39
-export async function sync(): Promise<void> {
-  const myDatabase = await createDb()
+export function sync(): void {
   const user = "admin" // TODO
   const pass = "password"
   myDatabase.heroes.syncCouchDB({
@@ -185,3 +177,5 @@ export async function sync(): Promise<void> {
     },
   })
 }
+
+const myDatabase = await createDb()

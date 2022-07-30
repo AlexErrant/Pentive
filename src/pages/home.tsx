@@ -41,7 +41,7 @@ export default function Home(): JSX.Element {
         </button>
         <button
           class="border rounded-lg px-2 border-gray-900"
-          onClick={async () => await rxdb.sync()}
+          onClick={() => rxdb.sync()}
         >
           sync
         </button>
