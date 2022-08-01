@@ -138,6 +138,10 @@ async function loadRxDBPlugins(): Promise<void> {
         addRxPlugin(module.RxDBDevModePlugin)
       ),
 
+      import("rxdb/plugins/ajv-validate").then((module) =>
+        addRxPlugin(module.RxDBAjvValidatePlugin)
+      ),
+
       // we use the schema-validation only in dev-mode
       // this validates each document if it is matching the jsonschema
       import("rxdb/plugins/validate").then((module) =>
