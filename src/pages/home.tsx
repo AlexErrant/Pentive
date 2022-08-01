@@ -1,8 +1,17 @@
-import { createSignal, JSX } from "solid-js"
+import { useRouteData } from "solid-app-router"
+import { createEffect, createSignal, JSX } from "solid-js"
 import * as rxdb from "../rxdb"
+import HomeData from "./home.data"
 
 export default function Home(): JSX.Element {
-  const [count, setCount] = createSignal(0)
+  const [count, setCount] = createSignal(1)
+  const age = useRouteData<typeof HomeData>()
+
+  console.log(count())
+  createEffect(() => {
+    console.log(age())
+    setCount(age())
+  })
 
   return (
     <section class="bg-gray-100 text-gray-700 p-8">

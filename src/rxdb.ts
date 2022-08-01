@@ -111,6 +111,11 @@ export async function upsert(i: number): Promise<void> {
   console.log(amount)
 }
 
+export async function getAge(): Promise<number> {
+  const hero = await myDatabase.heroes.findOne("myId").exec()
+  return hero?.age ?? 3
+}
+
 export async function remove(): Promise<void> {
   await myDatabase.remove()
 }
