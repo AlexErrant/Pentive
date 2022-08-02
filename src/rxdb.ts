@@ -1,6 +1,6 @@
-import { addRxPlugin, createRxDatabase, RxDatabase, RxCollection } from "rxdb"
+import { addRxPlugin, createRxDatabase, RxDatabase } from "rxdb"
 import { HeroDocType, heroSchema } from "./schemas/hero"
-import { TemplateDocType, templateSchema } from "./schemas/template"
+import { templateSchema } from "./schemas/template"
 import * as pouchdbAdapterIdb from "pouchdb-adapter-idb"
 import {
   getRxStoragePouch,
@@ -18,12 +18,15 @@ import {
   heroDocMethods,
   HeroDocument,
 } from "./collections/hero"
-import { TemplateId } from "./domain/ids"
+import {
+  TemplateCollection,
+  templateCollectionMethods,
+  templateDocMethods,
+  templateToDocType,
+} from "./collections/template"
 addPouchPlugin(pouchdbAdapterHttp)
 addPouchPlugin(pouchdbAdapterIdb)
 addRxPlugin(RxDBReplicationCouchDBPlugin)
-
-type TemplateCollection = RxCollection<TemplateDocType>
 
 interface MyDatabaseCollections {
   heroes: HeroCollection
@@ -51,6 +54,8 @@ export async function createDb(): Promise<MyDatabase> {
     },
     templates: {
       schema: templateSchema,
+      methods: templateDocMethods,
+      statics: templateCollectionMethods,
     },
   })
 
@@ -67,14 +72,6 @@ export async function createDb(): Promise<MyDatabase> {
   )
 
   return myDatabase
-}
-
-function templateToDocType(t: Template): TemplateDocType {
-  return {
-    id: t.id,
-    name: t.name,
-    data: t,
-  }
 }
 
 export async function upsert(i: number): Promise<void> {
@@ -103,15 +100,6 @@ export async function upsertTemplate(template: Template): Promise<void> {
 export async function getAge(): Promise<number> {
   const hero = await myDatabase.heroes.findOne("myId").exec()
   return hero?.age ?? 3
-}
-
-export async function getTemplate(
-  templateId: TemplateId
-): Promise<Template | null> {
-  const template = await myDatabase.templates.findOne(templateId).exec()
-  return template?.data as Template | null // todo This is not quite correct! Returning dates are *sometimes* strings.
-  // I think the first return after a page refresh is a string because IndexedDb can't handle Date and serializes it.
-  // After an upsert, the return is a Date Object because RxDB caches the upserted object
 }
 
 export async function remove(): Promise<void> {
@@ -180,4 +168,4 @@ export function sync(): void {
   })
 }
 
-const myDatabase = await createDb()
+export const myDatabase = await createDb()

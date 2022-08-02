@@ -71,7 +71,9 @@ export default function Home(): JSX.Element {
         <button
           class="border rounded-lg px-2 border-gray-900"
           onClick={async () =>
-            setTemplate(await rxdb.getTemplate(defaultTemplate.id))
+            setTemplate(
+              await rxdb.myDatabase.templates.getTemplate(defaultTemplate.id)
+            )
           }
         >
           getTemplate
