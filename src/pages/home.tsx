@@ -1,17 +1,22 @@
 import { useRouteData } from "solid-app-router"
 import { createEffect, createSignal, JSX } from "solid-js"
-import { defaultTemplate } from "../domain/template"
+import { defaultTemplate, Template } from "../domain/template"
 import * as rxdb from "../rxdb"
 import HomeData from "./home.data"
 
 export default function Home(): JSX.Element {
   const [count, setCount] = createSignal(1)
+  const [template, setTemplate] = createSignal<Template | null>(null)
   const age = useRouteData<typeof HomeData>()
 
   console.log(count())
   createEffect(() => {
     console.log(age())
     setCount(age())
+  })
+
+  createEffect(() => {
+    console.log(template())
   })
 
   return (
@@ -65,7 +70,9 @@ export default function Home(): JSX.Element {
         </button>
         <button
           class="border rounded-lg px-2 border-gray-900"
-          onClick={async () => await rxdb.getTemplate()}
+          onClick={async () =>
+            setTemplate(await rxdb.getTemplate(defaultTemplate.id))
+          }
         >
           getTemplate
         </button>

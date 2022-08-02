@@ -18,6 +18,7 @@ import {
   heroDocMethods,
   HeroDocument,
 } from "./collections/hero"
+import { TemplateId } from "./domain/ids"
 addPouchPlugin(pouchdbAdapterHttp)
 addPouchPlugin(pouchdbAdapterIdb)
 addRxPlugin(RxDBReplicationCouchDBPlugin)
@@ -104,11 +105,13 @@ export async function getAge(): Promise<number> {
   return hero?.age ?? 3
 }
 
-export async function getTemplate(): Promise<void> {
-  const template = await myDatabase.templates
-    .findOne("EC2EFBBE-C944-478A-BFC4-023968B38A72")
-    .exec()
-  console.dir(template?.data)
+export async function getTemplate(
+  templateId: TemplateId
+): Promise<Template | null> {
+  const template = await myDatabase.templates.findOne(templateId).exec()
+  return template?.data as Template | null // todo This is not quite correct! Returning dates are *sometimes* strings.
+  // I think the first return after a page refresh is a string because IndexedDb can't handle Date and serializes it.
+  // After an upsert, the return is a Date Object because RxDB caches the upserted object
 }
 
 export async function remove(): Promise<void> {
