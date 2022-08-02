@@ -18,6 +18,6 @@ export const routes: RouteDefinition[] = [
   },
   {
     path: "**",
-    component: lazy(async () => await import("./errors/404")),
+    component: lazy(async () => await import("./pages/404")),
   },
 ]
