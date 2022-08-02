@@ -1,5 +1,6 @@
 import { useRouteData } from "solid-app-router"
 import { createEffect, createSignal, JSX } from "solid-js"
+import { defaultTemplate } from "../domain/template"
 import * as rxdb from "../rxdb"
 import HomeData from "./home.data"
 
@@ -58,7 +59,7 @@ export default function Home(): JSX.Element {
       <div class="mt-4">
         <button
           class="border rounded-lg px-2 border-gray-900"
-          onClick={async () => await rxdb.upsertTemplate(count())}
+          onClick={async () => await rxdb.upsertTemplate(defaultTemplate)}
         >
           upsertTemplate
         </button>
