@@ -7,6 +7,7 @@ import {
   KeyFunctionMap,
 } from "rxdb"
 import { HeroDocType, heroSchema } from "./schemas/hero"
+import { TemplateDocType, templateSchema } from "./schemas/template"
 import * as pouchdbAdapterIdb from "pouchdb-adapter-idb"
 import {
   getRxStoragePouch,
@@ -26,6 +27,7 @@ interface HeroDocMethods extends KeyFunctionMap {
 }
 
 type HeroDocument = RxDocument<HeroDocType, HeroDocMethods>
+type TemplateDocument = RxDocument<TemplateDocType>
 
 // we declare one static ORM-method for the collection
 interface HeroCollectionMethods extends KeyFunctionMap {
@@ -38,9 +40,11 @@ type HeroCollection = RxCollection<
   HeroDocMethods,
   HeroCollectionMethods
 >
+type TemplateCollection = RxCollection<TemplateDocType>
 
 interface MyDatabaseCollections {
   heroes: HeroCollection
+  templates: TemplateCollection
 }
 
 type MyDatabase = RxDatabase<MyDatabaseCollections>
@@ -74,6 +78,9 @@ export async function createDb(): Promise<MyDatabase> {
       schema: heroSchema,
       methods: heroDocMethods,
       statics: heroCollectionMethods,
+    },
+    templates: {
+      schema: templateSchema,
     },
   })
 
