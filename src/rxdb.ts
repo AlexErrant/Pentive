@@ -7,7 +7,7 @@ import {
   KeyFunctionMap,
 } from "rxdb"
 import { HeroDocType, heroSchema } from "./schemas/hero"
-import { Template, TemplateDocType, templateSchema } from "./schemas/template"
+import { TemplateDocType, templateSchema } from "./schemas/template"
 import * as pouchdbAdapterIdb from "pouchdb-adapter-idb"
 import {
   getRxStoragePouch,
@@ -24,6 +24,7 @@ import {
   TemplateOrdinal,
   UserId,
 } from "./domain/ids"
+import { Template } from "./domain/template"
 addPouchPlugin(pouchdbAdapterHttp)
 addPouchPlugin(pouchdbAdapterIdb)
 addRxPlugin(RxDBReplicationCouchDBPlugin)
