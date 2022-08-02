@@ -1,11 +1,4 @@
-import {
-  addRxPlugin,
-  createRxDatabase,
-  RxDatabase,
-  RxCollection,
-  RxDocument,
-  KeyFunctionMap,
-} from "rxdb"
+import { addRxPlugin, createRxDatabase, RxDatabase, RxCollection } from "rxdb"
 import { HeroDocType, heroSchema } from "./schemas/hero"
 import { TemplateDocType, templateSchema } from "./schemas/template"
 import * as pouchdbAdapterIdb from "pouchdb-adapter-idb"
@@ -19,27 +12,16 @@ import { RxDBLeaderElectionPlugin } from "rxdb/plugins/leader-election"
 import * as pouchdbAdapterHttp from "pouchdb-adapter-http"
 import { RxDBReplicationCouchDBPlugin } from "rxdb/plugins/replication-couchdb"
 import { Template } from "./domain/template"
+import {
+  HeroCollection,
+  heroCollectionMethods,
+  heroDocMethods,
+  HeroDocument,
+} from "./collections/hero"
 addPouchPlugin(pouchdbAdapterHttp)
 addPouchPlugin(pouchdbAdapterIdb)
 addRxPlugin(RxDBReplicationCouchDBPlugin)
 
-interface HeroDocMethods extends KeyFunctionMap {
-  scream: (v: string) => string
-}
-
-type HeroDocument = RxDocument<HeroDocType, HeroDocMethods>
-
-// we declare one static ORM-method for the collection
-interface HeroCollectionMethods extends KeyFunctionMap {
-  countAllDocuments: () => Promise<number>
-}
-
-// and then merge all our types
-type HeroCollection = RxCollection<
-  HeroDocType,
-  HeroDocMethods,
-  HeroCollectionMethods
->
 type TemplateCollection = RxCollection<TemplateDocType>
 
 interface MyDatabaseCollections {
@@ -59,19 +41,6 @@ export async function createDb(): Promise<MyDatabase> {
     name: "mydb",
     storage: getRxStoragePouch("idb"),
   })
-
-  const heroDocMethods: HeroDocMethods = {
-    scream: function (this: HeroDocument, what: string) {
-      return this.firstName + " screams: " + what.toUpperCase()
-    },
-  }
-
-  const heroCollectionMethods: HeroCollectionMethods = {
-    countAllDocuments: async function (this: HeroCollection) {
-      const allDocs = await this.find().exec()
-      return allDocs.length
-    },
-  }
 
   await myDatabase.addCollections({
     heroes: {
