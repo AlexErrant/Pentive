@@ -1,5 +1,5 @@
 import { RxCollection, RxDocument, KeyFunctionMap } from "rxdb"
-import { HeroDocType } from "../schemas/hero"
+import { HeroDocType } from "./hero.schema"
 
 interface HeroDocMethods extends KeyFunctionMap {
   scream: (v: string) => string

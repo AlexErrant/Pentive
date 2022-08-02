@@ -1,7 +1,7 @@
 import { KeyFunctionMap, RxCollection, RxDocument } from "rxdb"
 import { TemplateId } from "../domain/ids"
 import { Template } from "../domain/template"
-import { TemplateDocType } from "../schemas/template"
+import { TemplateDocType } from "./template.schema"
 
 export function templateToDocType(t: Template): TemplateDocType {
   return {

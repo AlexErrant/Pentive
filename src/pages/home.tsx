@@ -1,7 +1,7 @@
 import { useRouteData } from "solid-app-router"
 import { createEffect, createSignal, JSX } from "solid-js"
 import { defaultTemplate, Template } from "../domain/template"
-import * as rxdb from "../rxdb"
+import * as rxdb from "../rxdb/rxdb"
 import HomeData from "./home.data"
 
 export default function Home(): JSX.Element {

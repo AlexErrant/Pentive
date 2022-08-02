@@ -1,6 +1,6 @@
 import { addRxPlugin, createRxDatabase, RxDatabase } from "rxdb"
-import { HeroDocType, heroSchema } from "./schemas/hero"
-import { templateSchema } from "./schemas/template"
+import { HeroDocType, heroSchema } from "./hero.schema"
+import { templateSchema } from "./template.schema"
 import * as pouchdbAdapterIdb from "pouchdb-adapter-idb"
 import {
   getRxStoragePouch,
@@ -11,19 +11,19 @@ import { RxDBLeaderElectionPlugin } from "rxdb/plugins/leader-election"
 // @ts-expect-error pouchdb is untyped
 import * as pouchdbAdapterHttp from "pouchdb-adapter-http"
 import { RxDBReplicationCouchDBPlugin } from "rxdb/plugins/replication-couchdb"
-import { Template } from "./domain/template"
+import { Template } from "../domain/template"
 import {
   HeroCollection,
   heroCollectionMethods,
   heroDocMethods,
   HeroDocument,
-} from "./collections/hero"
+} from "./hero.orm"
 import {
   TemplateCollection,
   templateCollectionMethods,
   templateDocMethods,
   templateToDocType,
-} from "./collections/template"
+} from "./template.orm"
 addPouchPlugin(pouchdbAdapterHttp)
 addPouchPlugin(pouchdbAdapterIdb)
 addRxPlugin(RxDBReplicationCouchDBPlugin)
