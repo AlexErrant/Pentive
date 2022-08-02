@@ -7,7 +7,7 @@ import {
   KeyFunctionMap,
 } from "rxdb"
 import { HeroDocType, heroSchema } from "./schemas/hero"
-import { TemplateDocType, templateSchema } from "./schemas/template"
+import { Template, TemplateDocType, templateSchema } from "./schemas/template"
 import * as pouchdbAdapterIdb from "pouchdb-adapter-idb"
 import {
   getRxStoragePouch,
@@ -18,6 +18,12 @@ import { RxDBLeaderElectionPlugin } from "rxdb/plugins/leader-election"
 // @ts-expect-error pouchdb is untyped
 import * as pouchdbAdapterHttp from "pouchdb-adapter-http"
 import { RxDBReplicationCouchDBPlugin } from "rxdb/plugins/replication-couchdb"
+import {
+  CardTemplateId,
+  TemplateId,
+  TemplateOrdinal,
+  UserId,
+} from "./schemas/ids"
 addPouchPlugin(pouchdbAdapterHttp)
 addPouchPlugin(pouchdbAdapterIdb)
 addRxPlugin(RxDBReplicationCouchDBPlugin)
@@ -27,7 +33,6 @@ interface HeroDocMethods extends KeyFunctionMap {
 }
 
 type HeroDocument = RxDocument<HeroDocType, HeroDocMethods>
-type TemplateDocument = RxDocument<TemplateDocType>
 
 // we declare one static ORM-method for the collection
 interface HeroCollectionMethods extends KeyFunctionMap {
@@ -99,6 +104,14 @@ export async function createDb(): Promise<MyDatabase> {
   return myDatabase
 }
 
+function templateToDocType(t: Template): TemplateDocType {
+  return {
+    id: t.id,
+    name: t.name,
+    data: t,
+  }
+}
+
 export async function upsert(i: number): Promise<void> {
   const hero: HeroDocument = await myDatabase.heroes.upsert({
     passportId: "myId",
@@ -118,9 +131,59 @@ export async function upsert(i: number): Promise<void> {
   console.log(amount)
 }
 
+export async function upsertTemplate(_: number): Promise<void> {
+  const t: Template = {
+    id: "EC2EFBBE-C944-478A-BFC4-023968B38A72" as TemplateId,
+    sourceId: null,
+    specimenSourceId: null,
+    authorId: "FA12DB13-7DA3-4CA1-8C46-86379CC34232" as UserId,
+    ordinal: 0 as TemplateOrdinal,
+    name: "New Card Template",
+    css: "",
+    fields: [
+      {
+        name: "Front",
+        isRightToLeft: false,
+        isSticky: false,
+      },
+      {
+        name: "Back",
+        isRightToLeft: false,
+        isSticky: false,
+      },
+    ],
+    createdAt: new Date(),
+    modifiedAt: new Date(),
+    latexPre: "",
+    latexPost: "",
+    templateType: {
+      tag: "standard",
+      templates: [
+        {
+          id: "ED061BC3-B183-4C55-BE0D-0A820F491CE1" as CardTemplateId,
+          name: "Card Template 1",
+          front: "{{Front}}",
+          back: "{{FrontSide}}<hr id=answer>{{Back}}",
+          shortFront: "{{Front}}",
+          shortBack: "{{Back}}",
+        },
+      ],
+    },
+  }
+
+  await myDatabase.templates.upsert(templateToDocType(t))
+}
+
 export async function getAge(): Promise<number> {
   const hero = await myDatabase.heroes.findOne("myId").exec()
   return hero?.age ?? 3
+}
+
+export async function getTemplate(): Promise<void> {
+  const template = await myDatabase.templates
+    .findOne("EC2EFBBE-C944-478A-BFC4-023968B38A72")
+    .exec()
+  console.dir(template?.data)
 }
 
 export async function remove(): Promise<void> {

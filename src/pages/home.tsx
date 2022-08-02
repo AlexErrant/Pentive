@@ -55,6 +55,20 @@ export default function Home(): JSX.Element {
           sync
         </button>
       </div>
+      <div class="mt-4">
+        <button
+          class="border rounded-lg px-2 border-gray-900"
+          onClick={async () => await rxdb.upsertTemplate(count())}
+        >
+          upsertTemplate
+        </button>
+        <button
+          class="border rounded-lg px-2 border-gray-900"
+          onClick={async () => await rxdb.getTemplate()}
+        >
+          getTemplate
+        </button>
+      </div>
     </section>
   )
 }
