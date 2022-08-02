@@ -23,7 +23,7 @@ import {
   TemplateId,
   TemplateOrdinal,
   UserId,
-} from "./schemas/ids"
+} from "./domain/ids"
 addPouchPlugin(pouchdbAdapterHttp)
 addPouchPlugin(pouchdbAdapterIdb)
 addRxPlugin(RxDBReplicationCouchDBPlugin)

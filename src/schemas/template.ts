@@ -10,7 +10,7 @@ import {
   TemplateId,
   TemplateOrdinal,
   UserId,
-} from "./ids"
+} from "../domain/ids"
 
 interface Field {
   name: string
