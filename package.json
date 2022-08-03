@@ -12,7 +12,10 @@
     "prettier": "prettier --check .",
     "prettierw": "prettier --write .",
     "stylelint": "stylelint **/*.css",
-    "stylelintw": "stylelint **/*.css --fix"
+    "stylelintw": "stylelint **/*.css --fix",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:run": "vitest run"
   },
   "license": "MIT",
   "devDependencies": {
@@ -39,7 +42,8 @@
     "typescript": "^4.7.4",
     "vite": "^3.0.3",
     "vite-plugin-checker": "^0.4.9",
-    "vite-plugin-solid": "^2.3.0"
+    "vite-plugin-solid": "^2.3.0",
+    "vitest": "^0.20.3"
   },
   "dependencies": {
     "pouchdb-adapter-idb": "^7.3.0",
