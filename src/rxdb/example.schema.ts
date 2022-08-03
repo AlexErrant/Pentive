@@ -31,7 +31,7 @@ export const exampleSchemaLiteral = {
       type: "object", // https://gitter.im/pubkey/rxdb?at=5a58d78e83152df26d626cb1
     },
   },
-  required: ["id", "title", "created", "modified", "data"],
+  required: ["id", "created", "modified", "data"],
   indexes: ["title", "created", "modified"],
 } as const // <- It is important to set 'as const' to preserve the literal type
 const schemaTyped = toTypedRxJsonSchema(exampleSchemaLiteral)

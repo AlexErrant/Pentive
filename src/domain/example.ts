@@ -71,7 +71,7 @@ export interface Example {
   modified: Date
 }
 
-export const sampleExample = {
+export const sampleExample: Example = {
   id: "B598A95F-2372-45DE-B7A6-29CA67A10D8E" as ExampleId,
   authorId: "FA12DB13-7DA3-4CA1-8C46-86379CC34232" as UserId,
   frontPersonalField: "",

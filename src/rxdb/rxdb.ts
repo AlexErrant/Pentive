@@ -29,7 +29,9 @@ import {
   ExampleCollection,
   exampleCollectionMethods,
   exampleDocMethods,
+  exampleToDocType,
 } from "./example.orm"
+import { Example } from "../domain/example"
 addPouchPlugin(pouchdbAdapterHttp)
 addPouchPlugin(pouchdbAdapterIdb)
 addRxPlugin(RxDBReplicationCouchDBPlugin)
@@ -107,6 +109,10 @@ export async function upsert(i: number): Promise<void> {
 
 export async function upsertTemplate(template: Template): Promise<void> {
   await myDatabase.templates.upsert(templateToDocType(template))
+}
+
+export async function upsertExample(example: Example): Promise<void> {
+  await myDatabase.examples.upsert(exampleToDocType(example))
 }
 
 export async function getAge(): Promise<number> {

@@ -1,5 +1,6 @@
 import { useRouteData } from "solid-app-router"
 import { createEffect, createSignal, JSX } from "solid-js"
+import { sampleExample, Example } from "../domain/example"
 import { defaultTemplate, Template } from "../domain/template"
 import * as rxdb from "../rxdb/rxdb"
 import HomeData from "./home.data"
@@ -7,6 +8,7 @@ import HomeData from "./home.data"
 export default function Home(): JSX.Element {
   const [count, setCount] = createSignal(1)
   const [template, setTemplate] = createSignal<Template | null>(null)
+  const [example, setExample] = createSignal<Example | null>(null)
   const age = useRouteData<typeof HomeData>()
 
   console.log(count())
@@ -17,6 +19,10 @@ export default function Home(): JSX.Element {
 
   createEffect(() => {
     console.log(template())
+  })
+
+  createEffect(() => {
+    console.log(example())
   })
 
   return (
@@ -77,6 +83,24 @@ export default function Home(): JSX.Element {
           }
         >
           getTemplate
+        </button>
+      </div>
+      <div class="mt-4">
+        <button
+          class="border rounded-lg px-2 border-gray-900"
+          onClick={async () => await rxdb.upsertExample(sampleExample)}
+        >
+          upsertExample
+        </button>
+        <button
+          class="border rounded-lg px-2 border-gray-900"
+          onClick={async () =>
+            setExample(
+              await rxdb.myDatabase.examples.getExample(sampleExample.id)
+            )
+          }
+        >
+          getExample
         </button>
       </div>
     </section>
