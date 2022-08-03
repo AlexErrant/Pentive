@@ -1,6 +1,7 @@
 import { addRxPlugin, createRxDatabase, RxDatabase } from "rxdb"
 import { HeroDocType, heroSchema } from "./hero.schema"
 import { templateSchema } from "./template.schema"
+import { exampleSchema } from "./example.schema"
 import * as pouchdbAdapterIdb from "pouchdb-adapter-idb"
 import {
   getRxStoragePouch,
@@ -24,6 +25,11 @@ import {
   templateDocMethods,
   templateToDocType,
 } from "./template.orm"
+import {
+  ExampleCollection,
+  exampleCollectionMethods,
+  exampleDocMethods,
+} from "./example.orm"
 addPouchPlugin(pouchdbAdapterHttp)
 addPouchPlugin(pouchdbAdapterIdb)
 addRxPlugin(RxDBReplicationCouchDBPlugin)
@@ -31,6 +37,7 @@ addRxPlugin(RxDBReplicationCouchDBPlugin)
 interface MyDatabaseCollections {
   heroes: HeroCollection
   templates: TemplateCollection
+  examples: ExampleCollection
 }
 
 type MyDatabase = RxDatabase<MyDatabaseCollections>
@@ -56,6 +63,11 @@ export async function createDb(): Promise<MyDatabase> {
       schema: templateSchema,
       methods: templateDocMethods,
       statics: templateCollectionMethods,
+    },
+    examples: {
+      schema: exampleSchema,
+      methods: exampleDocMethods,
+      statics: exampleCollectionMethods,
     },
   })
 
@@ -168,6 +180,7 @@ export function sync(): void {
   }
   myDatabase.heroes.syncCouchDB(syncOptions)
   myDatabase.templates.syncCouchDB(syncOptions)
+  myDatabase.examples.syncCouchDB(syncOptions)
 }
 
 export const myDatabase = await createDb()
