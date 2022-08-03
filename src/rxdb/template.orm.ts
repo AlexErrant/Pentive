@@ -3,13 +3,14 @@ import { TemplateId } from "../domain/ids"
 import { Template } from "../domain/template"
 import { TemplateDocType } from "./template.schema"
 
-export function templateToDocType(t: Template): TemplateDocType {
+export function templateToDocType(template: Template): TemplateDocType {
+  const { id, name, created, modified, ...shrunken } = template // https://stackoverflow.com/a/66899790
   return {
-    id: t.id,
-    name: t.name,
-    created: t.created.toISOString(),
-    modified: t.modified.toISOString(),
-    data: t,
+    id,
+    name,
+    created: created.toISOString(),
+    modified: modified.toISOString(),
+    data: shrunken,
   }
 }
 
