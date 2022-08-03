@@ -40,8 +40,8 @@ export interface Template {
   name: string // todo limit to 100
   css: string
   fields: Field[]
-  createdAt: Date
-  modifiedAt: Date
+  created: Date
+  modified: Date
   latexPre: string
   latexPost: string
   templateType: TemplateType
@@ -67,8 +67,8 @@ export const defaultTemplate: Template = {
       isSticky: false,
     },
   ],
-  createdAt: new Date(),
-  modifiedAt: new Date(),
+  created: new Date(),
+  modified: new Date(),
   latexPre: "",
   latexPost: "",
   templateType: {

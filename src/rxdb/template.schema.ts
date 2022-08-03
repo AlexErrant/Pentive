@@ -18,12 +18,12 @@ export const templateSchemaLiteral = {
       type: "string",
       maxLength: 100, // <- string-fields that are used as an index, must set `maxLength`.
     },
-    createdAt: {
+    created: {
       type: "string",
       format: "date-time",
       maxLength: 24,
     },
-    modifiedAt: {
+    modified: {
       type: "string",
       format: "date-time",
       maxLength: 24,
@@ -32,8 +32,8 @@ export const templateSchemaLiteral = {
       type: "object", // https://gitter.im/pubkey/rxdb?at=5a58d78e83152df26d626cb1
     },
   },
-  required: ["id", "name", "createdAt", "modifiedAt", "data"],
-  indexes: ["name", "createdAt", "modifiedAt"],
+  required: ["id", "name", "created", "modified", "data"],
+  indexes: ["name", "created", "modified"],
 } as const // <- It is important to set 'as const' to preserve the literal type
 const schemaTyped = toTypedRxJsonSchema(templateSchemaLiteral)
 
