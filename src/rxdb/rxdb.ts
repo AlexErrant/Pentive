@@ -152,7 +152,7 @@ async function loadRxDBPlugins(): Promise<void> {
 export function sync(): void {
   const user = "admin" // TODO
   const pass = "password"
-  myDatabase.heroes.syncCouchDB({
+  const syncOptions = {
     remote: `http://${user}:${pass}@localhost:5984/xheroes`, // remote database. This can be the serverURL, another RxCollection or a PouchDB-instance
     waitForLeadership: true, // (optional) [default=true] to save performance, the sync starts on leader-instance only
     direction: {
@@ -165,7 +165,9 @@ export function sync(): void {
       live: true,
       retry: true,
     },
-  })
+  }
+  myDatabase.heroes.syncCouchDB(syncOptions)
+  myDatabase.templates.syncCouchDB(syncOptions)
 }
 
 export const myDatabase = await createDb()
