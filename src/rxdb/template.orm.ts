@@ -7,6 +7,8 @@ export function templateToDocType(t: Template): TemplateDocType {
   return {
     id: t.id,
     name: t.name,
+    createdAt: t.createdAt.toISOString(),
+    modifiedAt: t.modifiedAt.toISOString(),
     data: t,
   }
 }
