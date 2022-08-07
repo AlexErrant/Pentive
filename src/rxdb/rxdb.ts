@@ -88,7 +88,17 @@ export async function createDb(): Promise<MyDatabase> {
   return myDatabase
 }
 
+let myDatabase: MyDatabase | null = null
+
+export async function getDb(): Promise<MyDatabase> {
+  if (myDatabase == null) {
+    myDatabase = await createDb()
+  }
+  return myDatabase
+}
+
 export async function upsert(i: number): Promise<void> {
+  const myDatabase = await getDb()
   const hero: HeroDocument = await myDatabase.heroes.upsert({
     passportId: "myId",
     firstName: "piotr",
@@ -108,19 +118,23 @@ export async function upsert(i: number): Promise<void> {
 }
 
 export async function upsertTemplate(template: Template): Promise<void> {
+  const myDatabase = await getDb()
   await myDatabase.templates.upsert(templateToDocType(template))
 }
 
 export async function upsertExample(example: Example): Promise<void> {
+  const myDatabase = await getDb()
   await myDatabase.examples.upsert(exampleToDocType(example))
 }
 
 export async function getAge(): Promise<number> {
+  const myDatabase = await getDb()
   const hero = await myDatabase.heroes.findOne("myId").exec()
   return hero?.age ?? 3
 }
 
 export async function remove(): Promise<void> {
+  const myDatabase = await getDb()
   await myDatabase.remove()
 }
 
@@ -167,7 +181,8 @@ async function loadRxDBPlugins(): Promise<void> {
 }
 
 // https://github.com/pubkey/rxdb/blob/754e489353a2611c98550b6c19c09688787a08e0/docs-src/replication-couchdb.md?plain=1#L27-L39
-export function sync(): void {
+export async function sync(): Promise<void> {
+  const myDatabase = await getDb()
   const user = "admin" // TODO
   const pass = "password"
   const syncOptions = {
@@ -188,5 +203,3 @@ export function sync(): void {
   myDatabase.templates.syncCouchDB(syncOptions)
   myDatabase.examples.syncCouchDB(syncOptions)
 }
-
-export const myDatabase = await createDb()
