@@ -76,11 +76,9 @@ export default function Home(): JSX.Element {
         </button>
         <button
           class="border rounded-lg px-2 border-gray-900"
-          onClick={async () =>
-            setTemplate(
-              await rxdb.myDatabase.templates.getTemplate(defaultTemplate.id)
-            )
-          }
+          onClick={rxdb.delay(async (db) =>
+            setTemplate(await db.templates.getTemplate(defaultTemplate.id))
+          )}
         >
           getTemplate
         </button>
@@ -94,11 +92,9 @@ export default function Home(): JSX.Element {
         </button>
         <button
           class="border rounded-lg px-2 border-gray-900"
-          onClick={async () =>
-            setExample(
-              await rxdb.myDatabase.examples.getExample(sampleExample.id)
-            )
-          }
+          onClick={rxdb.delay(async (db) =>
+            setExample(await db.examples.getExample(sampleExample.id))
+          )}
         >
           getExample
         </button>
