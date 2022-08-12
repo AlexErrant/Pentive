@@ -47,6 +47,9 @@ export const cardCollectionMethods: CardCollectionMethods = {
       }
       // @ts-expect-error Unsure why `type` is in `data` - it's not there when inserted. RxDB or PouchDB or something adds it. Removing to make roundtrip testing easier.
       delete r.type
+      if (r.title === undefined) {
+        delete r.title
+      }
       return r as Card
     }
     // return card?.data // todo This is not quite correct! Returning dates are *sometimes* strings.
