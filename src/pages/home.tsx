@@ -1,6 +1,6 @@
 import { useRouteData } from "solid-app-router"
 import { createEffect, createSignal, JSX } from "solid-js"
-import { sampleExample, Example } from "../domain/example"
+import { sampleCard, Card } from "../domain/card"
 import { defaultTemplate, Template } from "../domain/template"
 import * as rxdb from "../rxdb/rxdb"
 import HomeData from "./home.data"
@@ -8,7 +8,7 @@ import HomeData from "./home.data"
 export default function Home(): JSX.Element {
   const [count, setCount] = createSignal(1)
   const [template, setTemplate] = createSignal<Template | null>(null)
-  const [example, setExample] = createSignal<Example | null>(null)
+  const [card, setCard] = createSignal<Card | null>(null)
   const age = useRouteData<typeof HomeData>()
 
   console.log(count())
@@ -22,7 +22,7 @@ export default function Home(): JSX.Element {
   })
 
   createEffect(() => {
-    console.log(example())
+    console.log(card())
   })
 
   return (
@@ -86,17 +86,17 @@ export default function Home(): JSX.Element {
       <div class="mt-4">
         <button
           class="border rounded-lg px-2 border-gray-900"
-          onClick={async () => await rxdb.upsertExample(sampleExample)}
+          onClick={async () => await rxdb.upsertCard(sampleCard)}
         >
-          upsertExample
+          upsertCard
         </button>
         <button
           class="border rounded-lg px-2 border-gray-900"
           onClick={rxdb.delay(async (db) =>
-            setExample(await db.examples.getExample(sampleExample.id))
+            setCard(await db.cards.getCard(sampleCard.id))
           )}
         >
-          getExample
+          getCard
         </button>
       </div>
     </section>

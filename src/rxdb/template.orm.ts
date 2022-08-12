@@ -53,6 +53,6 @@ export const templateCollectionMethods: TemplateCollectionMethods = {
     return template?.data as Template | null // todo This is not quite correct! Returning dates are *sometimes* strings.
     // I think the first return after a page refresh is a string because IndexedDb can't handle Date and serializes it.
     // After an upsert, the return is a Date Object because RxDB caches the upserted object.
-    // Leave this note here until you figure out how due dates are handled in Examples' Cards. Will we have to map over them to deserialize?
+    // Leave this note here until you figure out how due dates are handled in Cards' Cards. Will we have to map over them to deserialize?
   },
 }

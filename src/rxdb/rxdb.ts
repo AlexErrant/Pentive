@@ -1,7 +1,7 @@
 import { addRxPlugin, createRxDatabase, RxDatabase } from "rxdb"
 import { HeroDocType, heroSchema } from "./hero.schema"
 import { templateSchema } from "./template.schema"
-import { exampleSchema } from "./example.schema"
+import { cardSchema } from "./card.schema"
 import * as pouchdbAdapterIdb from "pouchdb-adapter-idb"
 import {
   getRxStoragePouch,
@@ -26,12 +26,12 @@ import {
   templateToDocType,
 } from "./template.orm"
 import {
-  ExampleCollection,
-  exampleCollectionMethods,
-  exampleDocMethods,
-  exampleToDocType,
-} from "./example.orm"
-import { Example } from "../domain/example"
+  CardCollection,
+  cardCollectionMethods,
+  cardDocMethods,
+  cardToDocType,
+} from "./card.orm"
+import { Card } from "../domain/card"
 addPouchPlugin(pouchdbAdapterHttp)
 addPouchPlugin(pouchdbAdapterIdb)
 addRxPlugin(RxDBReplicationCouchDBPlugin)
@@ -39,7 +39,7 @@ addRxPlugin(RxDBReplicationCouchDBPlugin)
 interface MyDatabaseCollections {
   heroes: HeroCollection
   templates: TemplateCollection
-  examples: ExampleCollection
+  cards: CardCollection
 }
 
 type MyDatabase = RxDatabase<MyDatabaseCollections>
@@ -66,10 +66,10 @@ export async function createDb(): Promise<MyDatabase> {
       methods: templateDocMethods,
       statics: templateCollectionMethods,
     },
-    examples: {
-      schema: exampleSchema,
-      methods: exampleDocMethods,
-      statics: exampleCollectionMethods,
+    cards: {
+      schema: cardSchema,
+      methods: cardDocMethods,
+      statics: cardCollectionMethods,
     },
   })
 
@@ -122,9 +122,9 @@ export async function upsertTemplate(template: Template): Promise<void> {
   await myDatabase.templates.upsert(templateToDocType(template))
 }
 
-export async function upsertExample(example: Example): Promise<void> {
+export async function upsertCard(card: Card): Promise<void> {
   const myDatabase = await getDb()
-  await myDatabase.examples.upsert(exampleToDocType(example))
+  await myDatabase.cards.upsert(cardToDocType(card))
 }
 
 export async function getAge(): Promise<number> {
@@ -201,7 +201,7 @@ export async function sync(): Promise<void> {
   }
   myDatabase.heroes.syncCouchDB(syncOptions)
   myDatabase.templates.syncCouchDB(syncOptions)
-  myDatabase.examples.syncCouchDB(syncOptions)
+  myDatabase.cards.syncCouchDB(syncOptions)
 }
 
 async function dbFn<T>(fn: (db: MyDatabase) => T): Promise<T> {

@@ -3,7 +3,7 @@ import {
   ChildTemplateId,
   ClozeIndex,
   DeckId,
-  ExampleId,
+  CardId,
   SpecimenRevisionId,
   TemplateId,
 } from "./ids"
@@ -42,12 +42,12 @@ type Appearance =
     }
   | {
       tag: "child"
-      parentId: ExampleId
+      parentId: CardId
       pointer: ChildTemplateId | ClozeIndex
     }
 
-export interface Example {
-  id: ExampleId
+export interface Card {
+  id: CardId
   deckIds: Set<DeckId>
   tags: Set<string>
   specimenRevisionId?: SpecimenRevisionId
@@ -63,8 +63,8 @@ export interface Example {
   state?: State
 }
 
-export const sampleExample: Example = {
-  id: "B598A95F-2372-45DE-B7A6-29CA67A10D8E" as ExampleId,
+export const sampleCard: Card = {
+  id: "B598A95F-2372-45DE-B7A6-29CA67A10D8E" as CardId,
   deckIds: new Set(),
   tags: new Set(),
   created: new Date(),

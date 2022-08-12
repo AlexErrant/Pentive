@@ -3,8 +3,8 @@ import {
   ExtractDocumentTypeFromTypedRxJsonSchema,
   RxJsonSchema,
 } from "rxdb"
-export const exampleSchemaLiteral = {
-  title: "example schema",
+export const cardSchemaLiteral = {
+  title: "card schema",
   version: 0,
   primaryKey: "id",
   type: "object",
@@ -34,12 +34,12 @@ export const exampleSchemaLiteral = {
   required: ["id", "created", "modified", "data"],
   indexes: ["title", "created", "modified"],
 } as const // <- It is important to set 'as const' to preserve the literal type
-const schemaTyped = toTypedRxJsonSchema(exampleSchemaLiteral)
+const schemaTyped = toTypedRxJsonSchema(cardSchemaLiteral)
 
 // aggregate the document type from the schema
-export type ExampleDocType = ExtractDocumentTypeFromTypedRxJsonSchema<
+export type CardDocType = ExtractDocumentTypeFromTypedRxJsonSchema<
   typeof schemaTyped
 >
 
 // create the typed RxJsonSchema from the literal typed object.
-export const exampleSchema: RxJsonSchema<ExampleDocType> = exampleSchemaLiteral
+export const cardSchema: RxJsonSchema<CardDocType> = cardSchemaLiteral

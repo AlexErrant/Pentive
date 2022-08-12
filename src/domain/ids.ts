@@ -9,7 +9,7 @@ export type TemplateId = Brand<string, "templateId">
 export type ChildTemplateId = Brand<string, "childTemplateId">
 export type ClozeIndex = Brand<number, "clozeIndex">
 
-export type ExampleId = Brand<string, "exampleId">
+export type CardId = Brand<string, "cardId">
 export type CardSettingId = Brand<string, "cardSettingId">
 
 export type DeckId = Brand<string, "deckId">
