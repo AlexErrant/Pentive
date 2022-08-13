@@ -14,6 +14,7 @@ specifiers:
   eslint-plugin-prettier: ^4.2.1
   eslint-plugin-promise: ^6.0.0
   events: ^3.3.0
+  lodash: ^4.17.21
   postcss: ^8.4.14
   pouchdb-adapter-http: ^7.3.0
   pouchdb-adapter-idb: ^7.3.0
@@ -35,6 +36,7 @@ specifiers:
   vitest: ^0.20.3
 
 dependencies:
+  lodash: 4.17.21
   pouchdb-adapter-idb: 7.3.0
   pouchdb-debug: 7.2.1
   rxdb: 12.7.16_rxjs@7.5.6
@@ -3018,6 +3020,10 @@ packages:
   /lodash.truncate/4.4.2:
     resolution: {integrity: sha512-jttmRe7bRse52OsWIMDLaXxWqRAmtIUccAQ3garviCqJjafXOfNMO0yMfNpdD6zbGaTU0P5Nz7e7gAT6cKmJRw==}
     dev: true
+
+  /lodash/4.17.21:
+    resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
+    dev: false
 
   /lokijs/1.5.12:
     resolution: {integrity: sha512-Q5ALD6JiS6xAUWCwX3taQmgwxyveCtIIuL08+ml0nHwT3k0S/GIFJN+Hd38b1qYIMaE5X++iqsqWVksz7SYW+Q==}
