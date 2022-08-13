@@ -88,13 +88,13 @@ export async function createDb(): Promise<MyDatabase> {
   return myDatabase
 }
 
-let myDatabase: MyDatabase | null = null
+let myDatabase: Promise<MyDatabase> | null = null
 
 export async function getDb(): Promise<MyDatabase> {
   if (myDatabase == null) {
-    myDatabase = await createDb()
+    myDatabase = createDb()
   }
-  return myDatabase
+  return await myDatabase
 }
 
 export async function upsert(i: number): Promise<void> {
