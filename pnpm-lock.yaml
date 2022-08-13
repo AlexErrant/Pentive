@@ -1,6 +1,7 @@
 lockfileVersion: 5.4
 
 specifiers:
+  '@playwright/test': ^1.25.0
   '@types/pouchdb-adapter-idb': ^6.1.4
   '@typescript-eslint/eslint-plugin': ^5.31.0
   '@typescript-eslint/parser': ^5.31.0
@@ -42,6 +43,7 @@ dependencies:
   solid-js: 1.4.8
 
 devDependencies:
+  '@playwright/test': 1.25.0
   '@types/pouchdb-adapter-idb': 6.1.4
   '@typescript-eslint/eslint-plugin': 5.31.0_d5zwcxr4bwkhmuo464cb3a2puu
   '@typescript-eslint/parser': 5.31.0_he2ccbldppg44uulnyq4rwocfa
@@ -490,6 +492,15 @@ packages:
     dependencies:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.13.0
+    dev: true
+
+  /@playwright/test/1.25.0:
+    resolution: {integrity: sha512-j4EZhTTQI3dBeWblE21EV//swwmBtOpIrLdOIJIRv4uqsLdHgBg1z+JtTg+AeC5o2bAXIE26kDNW5A0TimG8Bg==}
+    engines: {node: '>=14'}
+    hasBin: true
+    dependencies:
+      '@types/node': 18.6.1
+      playwright-core: 1.25.0
     dev: true
 
   /@types/body-parser/1.19.2:
@@ -3518,6 +3529,12 @@ packages:
     dependencies:
       find-up: 3.0.0
       load-json-file: 5.3.0
+    dev: true
+
+  /playwright-core/1.25.0:
+    resolution: {integrity: sha512-kZ3Jwaf3wlu0GgU0nB8UMQ+mXFTqBIFz9h1svTlNduNKjnbPXFxw7mJanLVjqxHJRn62uBfmgBj93YHidk2N5Q==}
+    engines: {node: '>=14'}
+    hasBin: true
     dev: true
 
   /postcss-import/14.1.0_postcss@8.4.14:
