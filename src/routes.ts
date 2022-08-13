@@ -17,6 +17,10 @@ export const routes: RouteDefinition[] = [
     data: AboutData,
   },
   {
+    path: "/testdb",
+    component: lazy(async () => await import("./pages/testdb")),
+  },
+  {
     path: "**",
     component: lazy(async () => await import("./pages/404")),
   },
