@@ -4,7 +4,7 @@ import _ from "lodash"
 import * as rxdb from "../rxdb/rxdb"
 import { Card, sampleCard } from "../domain/card"
 import { defaultTemplate, Template } from "../domain/template"
-import { createResource, Match, onMount, Switch } from "solid-js"
+import { createResource, Match, Switch } from "solid-js"
 
 async function testTemplate(expected: Template): Promise<boolean> {
   const db = await rxdb.getDb()
@@ -48,10 +48,10 @@ export default function TestDb(): JSX.Element {
       </p>
       <Switch fallback={<p>Loading...</p>}>
         <Match when={testsPassed() === true}>
-          <p>✔ Passed!</p>
+          <p id="testStatus">✔ Passed!</p>
         </Match>
         <Match when={testsPassed() === false}>
-          <p>❌ failed!</p>
+          <p id="testStatus">❌ failed!</p>
         </Match>
       </Switch>
     </section>

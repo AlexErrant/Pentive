@@ -15,7 +15,10 @@
     "stylelintw": "stylelint **/*.css --fix",
     "test": "vitest",
     "test:ui": "vitest --ui",
-    "test:run": "vitest run"
+    "test:run": "vitest run",
+    "playwright": "playwright test",
+    "playwright:debug": "playwright test --debug",
+    "playwright:init": "playwright install"
   },
   "license": "MIT",
   "devDependencies": {
