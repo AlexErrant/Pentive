@@ -36,6 +36,7 @@
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-promise": "^6.0.0",
     "events": "^3.3.0",
+    "fast-check": "^3.1.1",
     "postcss": "^8.4.14",
     "pouchdb-adapter-http": "^7.3.0",
     "prettier": "^2.7.1",
