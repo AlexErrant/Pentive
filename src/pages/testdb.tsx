@@ -2,10 +2,10 @@ import { JSX } from "solid-js/jsx-runtime"
 import _ from "lodash"
 
 import * as rxdb from "../rxdb/rxdb"
-import { Card, sampleCard } from "../domain/card"
 import { createResource, Match, Switch } from "solid-js"
 import fc from "fast-check"
 import { template as arbitraryTemplate } from "../../tests/arbitraryTemplate"
+import { card as arbitraryCard } from "../../tests/arbitraryCard"
 
 async function testTemplate(): Promise<boolean> {
   const db = await rxdb.getDb()
@@ -15,23 +15,30 @@ async function testTemplate(): Promise<boolean> {
       const actual = await db.templates.getTemplate(expected.id)
       const r = _.isEqual(expected, actual)
       console.assert(r, { expected, actual })
+      return r
     }),
     { verbose: true }
   )
   return true
 }
 
-async function testCard(expected: Card): Promise<boolean> {
+async function testCard(): Promise<boolean> {
   const db = await rxdb.getDb()
-  await rxdb.upsertCard(expected)
-  const actual = await db.cards.getCard(expected.id)
-  const r = _.isEqual(expected, actual)
-  console.assert(r, { expected, actual })
-  return r
+  await fc.assert(
+    fc.asyncProperty(arbitraryCard, async (expected) => {
+      await rxdb.upsertCard(expected)
+      const actual = await db.cards.getCard(expected.id)
+      const r = _.isEqual(expected, actual)
+      console.assert(r, { expected, actual })
+      return r
+    }),
+    { verbose: true }
+  )
+  return true
 }
 
 const [template] = createResource(testTemplate)
-const [card] = createResource(sampleCard, testCard)
+const [card] = createResource(testCard)
 
 export default function TestDb(): JSX.Element {
   function testsPassed(): boolean | undefined {

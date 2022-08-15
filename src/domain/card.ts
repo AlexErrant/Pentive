@@ -8,10 +8,10 @@ import {
   TemplateId,
 } from "./ids"
 
-type State = "normal" | "scheduler buried" | "user buried" | "suspended"
-type Score = "again" | "hard" | "good" | "easy"
+export type State = "normal" | "scheduler buried" | "user buried" | "suspended"
+export type Score = "again" | "hard" | "good" | "easy"
 
-interface Review {
+export interface Review {
   score: Score
   created: Date
   ease: number // factor
@@ -42,7 +42,10 @@ export interface Card {
 
 export interface Base {
   templateId: TemplateId
-  fieldValues: Map<string, string>
+
+  // There's a 1:1 relationship between fields and values - order matters. It has this shape to make full text search/indexing easier
+  fields: string[]
+  values: string[]
 }
 
 export interface SoloCard extends Card, Base {
@@ -70,5 +73,6 @@ export const sampleCard: SoloCard = {
   reviews: [],
   type: "solo",
   templateId: "EC2EFBBE-C944-478A-BFC4-023968B38A72" as TemplateId,
-  fieldValues: new Map(),
+  fields: [],
+  values: [],
 }
