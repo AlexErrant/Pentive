@@ -14,25 +14,14 @@ type Score = "again" | "hard" | "good" | "easy"
 interface Review {
   score: Score
   created: Date
-  intervalOrStepsIndex: IntervalOrStepsIndex
-  easeFactor: number
-  millisecondsFromSeeingQuestionToScore: number
-}
+  ease: number // factor
+  time: number // milliseconds from seeing question to score
 
-// needs a better name
-type IntervalOrStepsIndex =
-  | {
-      tag: "new step"
-      index: number
-    }
-  | {
-      tag: "lapsed step"
-      index: number
-    }
-  | {
-      tag: "interval"
-      seconds: number
-    }
+  // the following three are mutually exclusive
+  newStep?: number // index - see card settings
+  lapsed?: number // index - see card settings
+  interval?: number // in seconds
+}
 
 type Appearance =
   | {
