@@ -23,19 +23,8 @@ interface Review {
   interval?: number // in seconds
 }
 
-type Appearance =
-  | {
-      tag: "parent" | "solo" // `parent` means it has children; `solo` means it doesn't. Prevents unnecessary DB lookups.
-      templateId: TemplateId
-      fieldValues: Map<string, string>
-    }
-  | {
-      tag: "child"
-      parentId: CardId
-      pointer: ChildTemplateId | ClozeIndex
-    }
-
 export interface Card {
+  type: "solo" | "parent" | "child"
   id: CardId
   deckIds: Set<DeckId>
   tags: Set<string>
@@ -44,7 +33,6 @@ export interface Card {
   title?: string
   created: Date
   modified: Date
-  appearance: Appearance
   cardSettingId?: CardSettingId
   due: Date
   lapsed?: boolean
@@ -52,17 +40,35 @@ export interface Card {
   state?: State
 }
 
-export const sampleCard: Card = {
+export interface Base {
+  templateId: TemplateId
+  fieldValues: Map<string, string>
+}
+
+export interface SoloCard extends Card, Base {
+  type: "solo"
+}
+
+// `parent` means it has children; `solo` means it doesn't. Prevents unnecessary DB lookups.
+export interface ParentCard extends Card, Base {
+  type: "parent"
+}
+
+export interface ChildCard extends Card {
+  type: "child"
+  parentId: CardId
+  pointer: ChildTemplateId | ClozeIndex
+}
+
+export const sampleCard: SoloCard = {
   id: "B598A95F-2372-45DE-B7A6-29CA67A10D8E" as CardId,
   deckIds: new Set(),
   tags: new Set(),
   created: new Date(),
   modified: new Date(),
-  appearance: {
-    tag: "solo",
-    fieldValues: new Map(),
-    templateId: "EC2EFBBE-C944-478A-BFC4-023968B38A72" as TemplateId,
-  },
   due: new Date(),
   reviews: [],
+  type: "solo",
+  templateId: "EC2EFBBE-C944-478A-BFC4-023968B38A72" as TemplateId,
+  fieldValues: new Map(),
 }
