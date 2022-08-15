@@ -1,13 +1,13 @@
 import { ChildTemplateId, StencilRevisionId, TemplateId } from "./ids"
 
-interface Field {
+export interface Field {
   name: string
   rightToLeft?: boolean
   sticky?: boolean
   private?: boolean
 }
 
-interface ChildTemplate {
+export interface ChildTemplate {
   id: ChildTemplateId
   name: string
   front: string
@@ -16,7 +16,7 @@ interface ChildTemplate {
   shortBack?: string
 }
 
-type TemplateType =
+export type TemplateType =
   | {
       tag: "standard"
       templates: ChildTemplate[]

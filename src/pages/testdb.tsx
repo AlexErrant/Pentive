@@ -3,16 +3,22 @@ import _ from "lodash"
 
 import * as rxdb from "../rxdb/rxdb"
 import { Card, sampleCard } from "../domain/card"
-import { defaultTemplate, Template } from "../domain/template"
 import { createResource, Match, Switch } from "solid-js"
+import fc from "fast-check"
+import { template as arbitraryTemplate } from "../../tests/arbitraryTemplate"
 
-async function testTemplate(expected: Template): Promise<boolean> {
+async function testTemplate(): Promise<boolean> {
   const db = await rxdb.getDb()
-  await rxdb.upsertTemplate(expected)
-  const actual = await db.templates.getTemplate(expected.id)
-  const r = _.isEqual(expected, actual)
-  console.assert(r, { expected, actual })
-  return r
+  await fc.assert(
+    fc.asyncProperty(arbitraryTemplate, async (expected) => {
+      await rxdb.upsertTemplate(expected)
+      const actual = await db.templates.getTemplate(expected.id)
+      const r = _.isEqual(expected, actual)
+      console.assert(r, { expected, actual })
+    }),
+    { verbose: true }
+  )
+  return true
 }
 
 async function testCard(expected: Card): Promise<boolean> {
@@ -24,7 +30,7 @@ async function testCard(expected: Card): Promise<boolean> {
   return r
 }
 
-const [template] = createResource(defaultTemplate, testTemplate)
+const [template] = createResource(testTemplate)
 const [card] = createResource(sampleCard, testCard)
 
 export default function TestDb(): JSX.Element {
