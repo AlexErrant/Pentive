@@ -34,6 +34,40 @@ module.exports = {
             },
           },
         ],
+        // https://typescript-eslint.io/rules/naming-convention/#enforce-the-codebase-follows-eslints-camelcase-conventions
+        camelcase: "off",
+        "@typescript-eslint/naming-convention": [
+          "error",
+          {
+            selector: "default",
+            format: ["camelCase"],
+          },
+          {
+            selector: "variable",
+            format: ["camelCase", "UPPER_CASE"],
+          },
+          {
+            selector: "parameter",
+            format: ["camelCase"],
+            leadingUnderscore: "allow",
+          },
+          {
+            selector: "memberLike",
+            modifiers: ["private"],
+            format: ["camelCase"],
+            leadingUnderscore: "require",
+          },
+          {
+            selector: "typeLike",
+            format: ["PascalCase"],
+          },
+          // Exported function components should be PascalCase
+          {
+            selector: "function",
+            modifiers: ["exported"],
+            format: ["camelCase", "PascalCase"],
+          },
+        ],
       },
     },
   ],
