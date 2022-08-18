@@ -1,9 +1,7 @@
 import type { JSX } from "solid-js"
 import { NavLink, useLocation } from "solid-app-router"
-import { noShadowDOM } from "solid-element"
 
 export default function Nav(): JSX.Element {
-  noShadowDOM()
   const location = useLocation()
   return (
     <nav class="bg-gray-200 text-gray-900 px-4">

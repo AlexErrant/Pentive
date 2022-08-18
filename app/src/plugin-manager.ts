@@ -7,9 +7,9 @@ async function getConfig(): Promise<Record<string, string>> {
 }
 
 const registry = new HTMLElementTagNameMap()
+export const config = await getConfig()
 
 export async function registerWebComponents(): Promise<void> {
-  const config = await getConfig()
   for (const property in registry) {
     if (config[property] === undefined) {
       customElement(property, registry[property as keyof HTMLElementTagNameMap])
