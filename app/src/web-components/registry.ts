@@ -3,12 +3,11 @@
 // https://stackoverflow.com/a/72239265
 // https://github.com/solidjs/solid/issues/616
 
-import { customElement } from "solid-element"
 import { Component } from "solid-js"
 
 import Nav from "./nav"
 
-class HTMLElementTagNameMap {
+export class HTMLElementTagNameMap {
   "pentive-nav" = Nav
 }
 
@@ -21,10 +20,4 @@ declare module "solid-js" {
 
     interface IntrinsicElements extends ElementProps<HTMLElementTagNameMap> {}
   }
-}
-
-const registry = new HTMLElementTagNameMap()
-
-for (const property in registry) {
-  customElement(property, registry[property as keyof HTMLElementTagNameMap])
 }
