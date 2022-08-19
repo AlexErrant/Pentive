@@ -1,38 +1,6 @@
 import { For, JSX } from "solid-js"
 import { NavLink, useLocation } from "solid-app-router"
-
-interface NavLinkData {
-  content: JSX.Element
-  href: string
-  className: string
-  activeClass: string
-  end: boolean
-}
-
-const defaultNavLink = {
-  className: "no-underline hover:underline",
-  activeClass: "font-bold",
-  end: false,
-}
-
-const navLinks: NavLinkData[] = [
-  {
-    ...defaultNavLink,
-    content: "Home",
-    href: "/",
-    end: true,
-  },
-  {
-    ...defaultNavLink,
-    content: "About",
-    href: "/about",
-  },
-  {
-    ...defaultNavLink,
-    content: "Error",
-    href: "/error",
-  },
-]
+import { navLinks } from "../routes"
 
 export default function Nav(): JSX.Element {
   const location = useLocation()
