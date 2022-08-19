@@ -32,27 +32,37 @@ export type CardCollection = RxCollection<
 
 export const cardDocMethods: CardDocMethods = {}
 
+function entityToDomain(
+  card: RxDocument<
+    {
+      id: string
+      created: string
+      modified: string
+      data: unknown
+      title?: string | undefined
+    },
+    CardDocMethods
+  >
+): Card {
+  const r = {
+    id: card.id as CardId,
+    title: card.title,
+    created: new Date(card.created),
+    modified: new Date(card.modified),
+    ...(card.data as object),
+  }
+  if (r.title === undefined) {
+    delete r.title
+  }
+  return r as Card
+  // Returning dates are *sometimes* strings.
+  // The first return after a page refresh is a string because IndexedDb can't handle Date and serializes it.
+  // After an upsert, the return is a Date Object because RxDB caches the upserted object... I think.
+}
+
 export const cardCollectionMethods: CardCollectionMethods = {
   getCard: async function (this: CardCollection, cardId: CardId) {
     const card = await this.findOne(cardId).exec()
-    if (card == null) {
-      return null
-    } else {
-      const r = {
-        id: card.id as CardId,
-        title: card.title,
-        created: new Date(card.created),
-        modified: new Date(card.modified),
-        ...(card.data as object),
-      }
-      if (r.title === undefined) {
-        delete r.title
-      }
-      return r as Card
-    }
-    // return card?.data // todo This is not quite correct! Returning dates are *sometimes* strings.
-    // I think the first return after a page refresh is a string because IndexedDb can't handle Date and serializes it.
-    // After an upsert, the return is a Date Object because RxDB caches the upserted object.
-    // Leave this note here until you figure out how due dates are handled in Cards' Cards. Will we have to map over them to deserialize?
+    return card == null ? null : entityToDomain(card)
   },
 }
