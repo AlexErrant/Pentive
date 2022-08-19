@@ -1,21 +1,15 @@
 import { createResource, Resource } from "solid-js"
+import { Template } from "../domain/template"
+import { getDb } from "../rxdb/rxdb"
 
-async function wait<T>(ms: number, data: T): Promise<T> {
-  return await new Promise((resolve) => setTimeout(resolve, ms, data))
+async function getTemplates(): Promise<Template[]> {
+  const db = await getDb()
+  return await db.templates.getTemplates()
 }
 
-function random(min: number, max: number): number {
-  return Math.floor(Math.random() * (max - min + 1)) + min
-}
-
-async function fetchName(): Promise<string> {
-  return await wait(random(500, 1000), "Solid")
-}
-
-function TemplatesData(): Resource<string | undefined> {
-  const [data] = createResource(fetchName)
-
-  return data
+function TemplatesData(): Resource<Template[]> {
+  const [templates] = createResource(getTemplates, { initialValue: [] })
+  return templates
 }
 
 export default TemplatesData

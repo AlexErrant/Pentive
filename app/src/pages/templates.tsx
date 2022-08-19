@@ -3,10 +3,10 @@ import { useRouteData } from "solid-app-router"
 import TemplatesData from "./templates.data"
 
 export default function Templates(): JSX.Element {
-  const name = useRouteData<typeof TemplatesData>()
+  const templates = useRouteData<typeof TemplatesData>()
 
   createEffect(() => {
-    console.log(name())
+    console.log(templates())
   })
 
   return (
@@ -18,7 +18,7 @@ export default function Templates(): JSX.Element {
       <p>
         <span>We love</span>
         <Suspense fallback={<span>...</span>}>
-          <span>&nbsp;{name()}</span>
+          <span>&nbsp;{templates().length}</span>
         </Suspense>
       </p>
     </section>
