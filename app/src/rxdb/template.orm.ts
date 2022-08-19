@@ -20,6 +20,7 @@ export type TemplateDocument = RxDocument<TemplateDocType, TemplateDocMethods>
 
 interface TemplateCollectionMethods extends KeyFunctionMap {
   getTemplate: (templateId: TemplateId) => Promise<Template | null>
+  getTemplates: () => Promise<Template[]>
 }
 
 export type TemplateCollection = RxCollection<
@@ -64,5 +65,9 @@ export const templateCollectionMethods: TemplateCollectionMethods = {
   ) {
     const template = await this.findOne(templateId).exec()
     return template == null ? null : entityToDomain(template)
+  },
+  getTemplates: async function (this: TemplateCollection) {
+    const allTemplates = await this.find().exec()
+    return allTemplates.map(entityToDomain)
   },
 }

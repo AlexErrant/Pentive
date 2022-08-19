@@ -21,6 +21,7 @@ export type CardDocument = RxDocument<CardDocType, CardDocMethods>
 // we declare one static ORM-method for the collection
 interface CardCollectionMethods extends KeyFunctionMap {
   getCard: (cardId: CardId) => Promise<Card | null>
+  getCards: () => Promise<Card[]>
 }
 
 // and then merge all our types
@@ -64,5 +65,9 @@ export const cardCollectionMethods: CardCollectionMethods = {
   getCard: async function (this: CardCollection, cardId: CardId) {
     const card = await this.findOne(cardId).exec()
     return card == null ? null : entityToDomain(card)
+  },
+  getCards: async function (this: CardCollection) {
+    const allCards = await this.find().exec()
+    return allCards.map(entityToDomain)
   },
 }
