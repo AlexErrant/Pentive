@@ -35,8 +35,6 @@ export interface Template {
   fields: Field[]
   created: Date
   modified: Date
-  latexPre?: string
-  latexPost?: string
   templateType: TemplateType
 }
 

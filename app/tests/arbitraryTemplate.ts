@@ -62,7 +62,5 @@ export const template = recordWithOptionalFields<Template>(
   {
     sourceId: fc.uuidV(4).map((x) => x as StencilRevisionId),
     specimenSourceId: fc.uuidV(4).map((x) => x as StencilRevisionId),
-    latexPre: fc.string(),
-    latexPost: fc.string(),
   }
 )
