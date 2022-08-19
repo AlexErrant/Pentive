@@ -2,6 +2,8 @@ import { For, VoidComponent } from "solid-js"
 import { NavLink, useLocation } from "solid-app-router"
 import { NavLinkData } from "../routes"
 
+const ends = new Set(["/"])
+
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const Nav: VoidComponent<{ navLinks: NavLinkData[] }> = (props) => {
   const location = useLocation()
@@ -9,13 +11,13 @@ const Nav: VoidComponent<{ navLinks: NavLinkData[] }> = (props) => {
     <nav class="bg-gray-200 text-gray-900 px-4">
       <ul class="flex items-center">
         <For each={props.navLinks}>
-          {({ href, className, activeClass, end, content }) => (
+          {({ href, content }) => (
             <li class="py-2 px-4">
               <NavLink
                 href={href}
-                class={className}
-                activeClass={activeClass}
-                end={end}
+                class="no-underline hover:underline"
+                activeClass="font-bold"
+                end={ends.has(href)}
               >
                 {content}
               </NavLink>

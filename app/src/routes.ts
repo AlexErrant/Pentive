@@ -8,31 +8,18 @@ import AboutData from "./pages/about.data"
 export interface NavLinkData {
   content: JSX.Element
   href: string
-  className: string
-  activeClass: string
-  end: boolean
-}
-
-const defaultNavLink = {
-  className: "no-underline hover:underline",
-  activeClass: "font-bold",
-  end: false,
 }
 
 export const navLinks: NavLinkData[] = [
   {
-    ...defaultNavLink,
     content: "Home",
     href: "/",
-    end: true,
   },
   {
-    ...defaultNavLink,
     content: "About",
     href: "/about",
   },
   {
-    ...defaultNavLink,
     content: "Error",
     href: "/error",
   },
