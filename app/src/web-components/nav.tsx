@@ -1,13 +1,14 @@
-import { For, JSX } from "solid-js"
+import { For, VoidComponent } from "solid-js"
 import { NavLink, useLocation } from "solid-app-router"
-import { navLinks } from "../routes"
+import { NavLinkData } from "../routes"
 
-export default function Nav(): JSX.Element {
+// eslint-disable-next-line @typescript-eslint/naming-convention
+const Nav: VoidComponent<{ navLinks: NavLinkData[] }> = (props) => {
   const location = useLocation()
   return (
     <nav class="bg-gray-200 text-gray-900 px-4">
       <ul class="flex items-center">
-        <For each={navLinks}>
+        <For each={props.navLinks}>
           {({ href, className, activeClass, end, content }) => (
             <li class="py-2 px-4">
               <NavLink
@@ -35,3 +36,5 @@ export default function Nav(): JSX.Element {
     </nav>
   )
 }
+
+export default Nav

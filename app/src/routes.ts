@@ -5,7 +5,7 @@ import Home from "./pages/home"
 import HomeData from "./pages/home.data"
 import AboutData from "./pages/about.data"
 
-interface NavLinkData {
+export interface NavLinkData {
   content: JSX.Element
   href: string
   className: string

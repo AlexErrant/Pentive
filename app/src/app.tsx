@@ -1,7 +1,7 @@
 import type { JSX } from "solid-js"
 import { useRoutes } from "solid-app-router"
 
-import { routes } from "./routes"
+import { navLinks, routes } from "./routes"
 import { Plugin } from "./components/plugin-wrapper"
 import Nav from "./web-components/nav"
 
@@ -12,7 +12,7 @@ export default function App(): JSX.Element {
   return (
     <>
       <Plugin name="nav">
-        <Nav />
+        <Nav navLinks={navLinks} />
       </Plugin>
 
       <main>
