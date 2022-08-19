@@ -11,7 +11,7 @@ export default function App(): JSX.Element {
 
   return (
     <>
-      <Plugin name="nav">
+      <Plugin name="nav" attrs={{ navLinks }}>
         <Nav navLinks={navLinks} />
       </Plugin>
 

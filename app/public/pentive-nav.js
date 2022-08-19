@@ -45,6 +45,7 @@ const p = function polyfill() {
 const sharedConfig = {};
 
 const equalFn = (a, b) => a === b;
+const $TRACK = Symbol("solid-track");
 const signalOptions = {
   equals: equalFn
 };
@@ -106,6 +107,16 @@ function createRenderEffect(fn, value, options) {
   const c = createComputation(fn, value, false, STALE);
   updateComputation(c);
 }
+function createMemo(fn, value, options) {
+  options = options ? Object.assign({}, signalOptions, options) : signalOptions;
+  const c = createComputation(fn, value, true, 0);
+  c.pending = NOTPENDING;
+  c.observers = null;
+  c.observerSlots = null;
+  c.comparator = options.equals || undefined;
+  updateComputation(c);
+  return readSignal.bind(c);
+}
 function batch(fn) {
   if (Pending) return fn();
   let result;
@@ -134,6 +145,10 @@ function untrack(fn) {
   result = fn();
   Listener = listener;
   return result;
+}
+function onCleanup(fn) {
+  if (Owner === null) ;else if (Owner.cleanups === null) Owner.cleanups = [fn];else Owner.cleanups.push(fn);
+  return fn;
 }
 function readSignal() {
   const runningTransition = Transition ;
@@ -347,6 +362,124 @@ function handleError(err) {
   throw err;
 }
 
+const FALLBACK = Symbol("fallback");
+function dispose(d) {
+  for (let i = 0; i < d.length; i++) d[i]();
+}
+function mapArray(list, mapFn, options = {}) {
+  let items = [],
+      mapped = [],
+      disposers = [],
+      len = 0,
+      indexes = mapFn.length > 1 ? [] : null;
+  onCleanup(() => dispose(disposers));
+  return () => {
+    let newItems = list() || [],
+        i,
+        j;
+    newItems[$TRACK];
+    return untrack(() => {
+      let newLen = newItems.length,
+          newIndices,
+          newIndicesNext,
+          temp,
+          tempdisposers,
+          tempIndexes,
+          start,
+          end,
+          newEnd,
+          item;
+      if (newLen === 0) {
+        if (len !== 0) {
+          dispose(disposers);
+          disposers = [];
+          items = [];
+          mapped = [];
+          len = 0;
+          indexes && (indexes = []);
+        }
+        if (options.fallback) {
+          items = [FALLBACK];
+          mapped[0] = createRoot(disposer => {
+            disposers[0] = disposer;
+            return options.fallback();
+          });
+          len = 1;
+        }
+      }
+      else if (len === 0) {
+        mapped = new Array(newLen);
+        for (j = 0; j < newLen; j++) {
+          items[j] = newItems[j];
+          mapped[j] = createRoot(mapper);
+        }
+        len = newLen;
+      } else {
+        temp = new Array(newLen);
+        tempdisposers = new Array(newLen);
+        indexes && (tempIndexes = new Array(newLen));
+        for (start = 0, end = Math.min(len, newLen); start < end && items[start] === newItems[start]; start++);
+        for (end = len - 1, newEnd = newLen - 1; end >= start && newEnd >= start && items[end] === newItems[newEnd]; end--, newEnd--) {
+          temp[newEnd] = mapped[end];
+          tempdisposers[newEnd] = disposers[end];
+          indexes && (tempIndexes[newEnd] = indexes[end]);
+        }
+        newIndices = new Map();
+        newIndicesNext = new Array(newEnd + 1);
+        for (j = newEnd; j >= start; j--) {
+          item = newItems[j];
+          i = newIndices.get(item);
+          newIndicesNext[j] = i === undefined ? -1 : i;
+          newIndices.set(item, j);
+        }
+        for (i = start; i <= end; i++) {
+          item = items[i];
+          j = newIndices.get(item);
+          if (j !== undefined && j !== -1) {
+            temp[j] = mapped[i];
+            tempdisposers[j] = disposers[i];
+            indexes && (tempIndexes[j] = indexes[i]);
+            j = newIndicesNext[j];
+            newIndices.set(item, j);
+          } else disposers[i]();
+        }
+        for (j = start; j < newLen; j++) {
+          if (j in temp) {
+            mapped[j] = temp[j];
+            disposers[j] = tempdisposers[j];
+            if (indexes) {
+              indexes[j] = tempIndexes[j];
+              indexes[j](j);
+            }
+          } else mapped[j] = createRoot(mapper);
+        }
+        mapped = mapped.slice(0, len = newLen);
+        items = newItems.slice(0);
+      }
+      return mapped;
+    });
+    function mapper(disposer) {
+      disposers[j] = disposer;
+      if (indexes) {
+        const [s, set] = createSignal(j);
+        indexes[j] = set;
+        return mapFn(newItems[j], s);
+      }
+      return mapFn(newItems[j]);
+    }
+  };
+}
+function createComponent(Comp, props) {
+  return untrack(() => Comp(props || {}));
+}
+
+function For(props) {
+  const fallback = "fallback" in props && {
+    fallback: () => props.fallback
+  };
+  return createMemo(mapArray(() => props.each, props.children, fallback ? fallback : undefined));
+}
+
 function reconcileArrays(parentNode, a, b) {
   let bLength = b.length,
       aEnd = a.length,
@@ -403,8 +536,6 @@ function reconcileArrays(parentNode, a, b) {
     }
   }
 }
-
-const $$EVENTS = "_$DX_DELEGATE";
 function template(html, check, isSVG) {
   const t = document.createElement("template");
   t.innerHTML = html;
@@ -412,49 +543,13 @@ function template(html, check, isSVG) {
   if (isSVG) node = node.firstChild;
   return node;
 }
-function delegateEvents(eventNames, document = window.document) {
-  const e = document[$$EVENTS] || (document[$$EVENTS] = new Set());
-  for (let i = 0, l = eventNames.length; i < l; i++) {
-    const name = eventNames[i];
-    if (!e.has(name)) {
-      e.add(name);
-      document.addEventListener(name, eventHandler);
-    }
-  }
+function setAttribute(node, name, value) {
+  if (value == null) node.removeAttribute(name);else node.setAttribute(name, value);
 }
 function insert(parent, accessor, marker, initial) {
   if (marker !== undefined && !initial) initial = [];
   if (typeof accessor !== "function") return insertExpression(parent, accessor, initial, marker);
   createRenderEffect(current => insertExpression(parent, accessor(), current, marker), initial);
-}
-function eventHandler(e) {
-  const key = `$$${e.type}`;
-  let node = e.composedPath && e.composedPath()[0] || e.target;
-  if (e.target !== node) {
-    Object.defineProperty(e, "target", {
-      configurable: true,
-      value: node
-    });
-  }
-  Object.defineProperty(e, "currentTarget", {
-    configurable: true,
-    get() {
-      return node || document;
-    }
-  });
-  if (sharedConfig.registry && !sharedConfig.done) {
-    sharedConfig.done = true;
-    document.querySelectorAll("[id^=pl-]").forEach(elem => elem.remove());
-  }
-  while (node !== null) {
-    const handler = node[key];
-    if (handler && !node.disabled) {
-      const data = node[`${key}Data`];
-      data !== undefined ? handler.call(node, data, e) : handler.call(node, e);
-      if (e.cancelBubble) return;
-    }
-    node = node.host && node.host !== node && node.host instanceof Node ? node.host : node.parentNode;
-  }
 }
 function insertExpression(parent, value, current, marker, unwrapArray) {
   if (sharedConfig.context && !current) current = [...parent.childNodes];
@@ -819,41 +914,38 @@ function customElement(tag, props, ComponentType) {
     return register(tag, props)(withSolid(ComponentType));
 }
 
-const _tmpl$ = /*#__PURE__*/template(`<div><style>div * {
-          font-size: 200%;
-        }
+const _tmpl$ = /*#__PURE__*/template(`<nav class="bg-gray-200 text-gray-900 px-4"><ul class="flex items-center"></ul></nav>`),
+      _tmpl$2 = /*#__PURE__*/template(`<li class="py-2 px-4"><a class="no-underline hover:underline"></a></li>`);
 
-        span {
-          width: 4rem;
-          display: inline-block;
-          text-align: center;
-        }
-
-        button {
-          width: 4rem;
-          height: 4rem;
-          border: none;
-          border-radius: 10px;
-          background-color: seagreen;
-          color: white;
-        }</style><button>-</button><span></span><button>+</button></div>`);
-customElement("pentive-nav", () => {
-  const [count, setCount] = createSignal(0);
+const Nav = props => {
   return (() => {
     const _el$ = _tmpl$.cloneNode(true),
-          _el$2 = _el$.firstChild,
-          _el$3 = _el$2.nextSibling,
-          _el$4 = _el$3.nextSibling,
-          _el$5 = _el$4.nextSibling;
+          _el$2 = _el$.firstChild;
 
-    _el$3.$$click = () => setCount(count() - 1);
+    insert(_el$2, createComponent(For, {
+      get each() {
+        return props.navLinks;
+      },
 
-    insert(_el$4, count);
+      children: ({
+        href,
+        content
+      }) => (() => {
+        const _el$3 = _tmpl$2.cloneNode(true),
+              _el$4 = _el$3.firstChild;
 
-    _el$5.$$click = () => setCount(count() + 1);
+        setAttribute(_el$4, "href", href);
+
+        insert(_el$4, content);
+
+        return _el$3;
+      })()
+    }));
 
     return _el$;
   })();
-});
+};
 
-delegateEvents(["click"]);
+customElement("pentive-nav", {
+  navLinks: []
+}, Nav);
