@@ -42,7 +42,7 @@ interface MyDatabaseCollections {
   cards: CardCollection
 }
 
-type MyDatabase = RxDatabase<MyDatabaseCollections>
+export type MyDatabase = RxDatabase<MyDatabaseCollections>
 
 export async function createDb(): Promise<MyDatabase> {
   await loadRxDBPlugins()

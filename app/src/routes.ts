@@ -4,7 +4,6 @@ import type { RouteDefinition } from "solid-app-router"
 import Home from "./pages/home"
 import HomeData from "./pages/home.data"
 import AboutData from "./pages/about.data"
-import TemplatesData from "./pages/templates.data"
 
 export interface NavLinkData {
   content: JSX.Element
@@ -44,7 +43,6 @@ export const routes: RouteDefinition[] = [
   {
     path: "/templates",
     component: lazy(async () => await import("./pages/templates")),
-    data: TemplatesData,
   },
   {
     path: "/testdb",
