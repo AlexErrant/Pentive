@@ -53,6 +53,7 @@
     "vitest": "^0.20.3"
   },
   "dependencies": {
+    "@tanstack/solid-table": "^8.5.11",
     "babel-preset-solid": "^1.4.8",
     "lodash": "^4.17.21",
     "pouchdb-adapter-idb": "^7.3.0",
