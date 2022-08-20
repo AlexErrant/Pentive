@@ -7,6 +7,7 @@ import {
 } from "@tanstack/solid-table"
 import { Template } from "../domain/template"
 import { MyDatabase } from "../rxdb/rxdb"
+import _ from "lodash"
 
 function id(id: keyof Template): keyof Template {
   return id
@@ -23,7 +24,7 @@ const columns: Array<ColumnDef<Template>> = [
   },
   {
     header: "Type",
-    accessorFn: (row) => row.templateType.tag,
+    accessorFn: (row) => _.startCase(row.templateType.tag),
   },
   {
     header: "Remote",
