@@ -24,6 +24,7 @@
   "devDependencies": {
     "@babel/core": "^7.18.10",
     "@playwright/test": "^1.25.0",
+    "@types/iframe-resizer": "^3.5.9",
     "@types/lodash": "^4.14.182",
     "@types/pouchdb-adapter-idb": "^6.1.4",
     "@typescript-eslint/eslint-plugin": "^5.31.0",

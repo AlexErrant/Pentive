@@ -4,6 +4,7 @@ specifiers:
   '@babel/core': ^7.18.10
   '@playwright/test': ^1.25.0
   '@tanstack/solid-table': ^8.5.11
+  '@types/iframe-resizer': ^3.5.9
   '@types/lodash': ^4.14.182
   '@types/pouchdb-adapter-idb': ^6.1.4
   '@typescript-eslint/eslint-plugin': ^5.31.0
@@ -59,6 +60,7 @@ dependencies:
 devDependencies:
   '@babel/core': 7.18.10
   '@playwright/test': 1.25.0
+  '@types/iframe-resizer': 3.5.9
   '@types/lodash': 4.14.182
   '@types/pouchdb-adapter-idb': 6.1.4
   '@typescript-eslint/eslint-plugin': 5.31.0_d5zwcxr4bwkhmuo464cb3a2puu
@@ -572,6 +574,10 @@ packages:
       '@types/qs': 6.9.7
       '@types/serve-static': 1.13.10
     dev: false
+
+  /@types/iframe-resizer/3.5.9:
+    resolution: {integrity: sha512-RQUBI75F+uXruB95BFpC/8V8lPgJg4MQ6HxOCtAZYBB/h0FNCfrFfb4I+u2pZJIV7sKeszZbFqy1UnGeBMrvsA==}
+    dev: true
 
   /@types/is-my-json-valid/2.18.0:
     resolution: {integrity: sha512-iVsZirn9cYluADct+CpLx49TTEtHJfcEXD8WcqF3Bq+rfacJBOD9avZOEfNC0k64wCl2dZfXjzzh7KXn6g0N2g==}
