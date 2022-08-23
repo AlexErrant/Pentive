@@ -8,6 +8,8 @@ import {
 import { Template } from "../domain/template"
 import { MyDatabase } from "../rxdb/rxdb"
 import _ from "lodash"
+import { renderTemplate } from "../domain/cardHtml"
+import ResizingIframe from "./resizing-iframe"
 
 function id(id: keyof Template): keyof Template {
   return id
@@ -42,6 +44,17 @@ const columns: Array<ColumnDef<Template>> = [
   {
     header: "Modified",
     accessorKey: id("modified"),
+  },
+  {
+    header: "Preview",
+    cell: (info) => {
+      const srcdoc = renderTemplate(info.row.original)[0]
+      if (srcdoc === null) {
+        return "Error rendering first template of {info.row.original.name}"
+      } else {
+        return <ResizingIframe srcdoc={srcdoc[1]}></ResizingIframe>
+      }
+    },
   },
 ]
 

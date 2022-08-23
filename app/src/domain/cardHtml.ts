@@ -1,5 +1,6 @@
 import _ from "lodash"
 import { ChildTemplateId, ClozeIndex } from "./ids"
+import { Template } from "./template"
 import { strip, throwExp } from "./utility"
 
 // These have hidden state - don't use `match` or `exec`!
@@ -226,4 +227,21 @@ export function html(
   } else {
     return body2.map((x) => buildHtml(x, css)) as [string, string]
   }
+}
+
+export function renderTemplate(
+  template: Template
+): Array<readonly [string, string] | null> {
+  const fields = template.fields.map((f) => [f.name, `(${f.name})`] as const) // medTODO consider adding escape characters so you can do e.g. {{Front}}. Apparently Anki doesn't have escape characters - now would be a good time to introduce this feature.
+  if (template.templateType.tag === "standard") {
+    return template.templateType.templates.map(({ front, back, id }) =>
+      html(fields, front, back, id, template.css)
+    )
+  } else if (template.templateType.tag === "cloze") {
+    const { front, back, id } = template.templateType.template
+    return [html(fields, front, back, id, template.css)]
+  }
+  throw new Error(
+    `No renderer found for Template: ${JSON.stringify(template.templateType)}`
+  )
 }
