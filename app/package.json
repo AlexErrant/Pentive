@@ -56,6 +56,7 @@
   "dependencies": {
     "@tanstack/solid-table": "^8.5.11",
     "babel-preset-solid": "^1.4.8",
+    "iframe-resizer": "^4.3.2",
     "lodash": "^4.17.21",
     "pouchdb-adapter-idb": "^7.3.0",
     "pouchdb-debug": "^7.2.1",

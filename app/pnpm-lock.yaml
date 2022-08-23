@@ -19,6 +19,7 @@ specifiers:
   eslint-plugin-promise: ^6.0.0
   events: ^3.3.0
   fast-check: ^3.1.1
+  iframe-resizer: ^4.3.2
   jsdom: ^20.0.0
   lodash: ^4.17.21
   postcss: ^8.4.14
@@ -45,6 +46,7 @@ specifiers:
 dependencies:
   '@tanstack/solid-table': 8.5.11_solid-js@1.4.8
   babel-preset-solid: 1.4.8_@babel+core@7.18.10
+  iframe-resizer: 4.3.2
   lodash: 4.17.21
   pouchdb-adapter-idb: 7.3.0
   pouchdb-debug: 7.2.1
@@ -2739,6 +2741,11 @@ packages:
     engines: {node: '>=0.10.0'}
     dependencies:
       safer-buffer: 2.1.2
+
+  /iframe-resizer/4.3.2:
+    resolution: {integrity: sha512-gOWo2hmdPjMQsQ+zTKbses08mDfDEMh4NneGQNP4qwePYujY1lguqP6gnbeJkf154gojWlBhIltlgnMfYjGHWA==}
+    engines: {node: '>=0.8.0'}
+    dev: false
 
   /ignore/5.2.0:
     resolution: {integrity: sha512-CmxgYGiEPCLhfLnpPp1MoRmifwEIOgjcHXxOBjv7mY96c+eWScsOP9c112ZyLdWHi0FxHjI+4uVhKYp/gcdRmQ==}
