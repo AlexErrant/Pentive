@@ -172,3 +172,58 @@ $<answer>
     return cloze
   }, template)
 }
+
+function buildHtml(body: string, css: string): string {
+  return `
+<!DOCTYPE html>
+    <head>
+        <style>
+            .cloze-brackets-front {
+                font-size: 150%%;
+                font-family: monospace;
+                font-weight: bolder;
+                color: dodgerblue;
+            }
+            .cloze-filler-front {
+                font-size: 150%%;
+                font-family: monospace;
+                font-weight: bolder;
+                color: dodgerblue;
+            }
+            .cloze-brackets-back {
+                font-size: 150%%;
+                font-family: monospace;
+                font-weight: bolder;
+                color: red;
+            }
+        </style>
+        <style>
+            ${css}
+        </style>
+    </head>
+    <body>
+        ${body}
+    </body>
+</html>
+`
+}
+
+export function html(
+  fieldNameValueMap: Array<readonly [string, string]>,
+  questionTemplate: string,
+  answerTemplate: string,
+  pointer: ChildTemplateId | ClozeIndex,
+  css: string
+): readonly [string, string] | null {
+  const body2 = body(
+    fieldNameValueMap,
+    questionTemplate,
+    answerTemplate,
+    pointer
+  )
+  if (body2 === null) {
+    return null
+  } else {
+    return body2.map((x) => buildHtml(x, css)) as [string, string]
+  }
+}
