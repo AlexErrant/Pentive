@@ -37,9 +37,9 @@ addPouchPlugin(pouchdbAdapterIdb)
 addRxPlugin(RxDBReplicationCouchDBPlugin)
 
 interface MyDatabaseCollections {
-  heroes: HeroCollection
-  templates: TemplateCollection
-  cards: CardCollection
+  readonly heroes: HeroCollection
+  readonly templates: TemplateCollection
+  readonly cards: CardCollection
 }
 
 export type MyDatabase = RxDatabase<MyDatabaseCollections>

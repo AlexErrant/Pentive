@@ -6,11 +6,11 @@ import HomeData from "./pages/home.data"
 import AboutData from "./pages/about.data"
 
 export interface NavLinkData {
-  content: JSX.Element
-  href: string
+  readonly content: JSX.Element
+  readonly href: string
 }
 
-export const navLinks: NavLinkData[] = [
+export const navLinks: readonly NavLinkData[] = [
   {
     content: "Home",
     href: "/",

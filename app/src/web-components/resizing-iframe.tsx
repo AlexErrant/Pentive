@@ -4,7 +4,7 @@ import { VoidComponent } from "solid-js"
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const ResizingIframe: VoidComponent<{
-  srcdoc: string
+  readonly srcdoc: string
 }> = (props) => {
   const srcdoc = props.srcdoc.replace(
     "<body>",

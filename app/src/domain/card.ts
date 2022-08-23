@@ -12,55 +12,55 @@ export type State = "normal" | "scheduler buried" | "user buried" | "suspended"
 export type Score = "again" | "hard" | "good" | "easy"
 
 export interface Review {
-  score: Score
-  created: Date
-  ease: number // factor
-  time: number // milliseconds from seeing question to score
+  readonly score: Score
+  readonly created: Date
+  readonly ease: number // factor
+  readonly time: number // milliseconds from seeing question to score
 
   // the following three are mutually exclusive
-  newStep?: number // index - see card settings
-  lapsed?: number // index - see card settings
-  interval?: number // in seconds
+  readonly newStep?: number // index - see card settings
+  readonly lapsed?: number // index - see card settings
+  readonly interval?: number // in seconds
 }
 
 export interface Card {
-  type: "solo" | "parent" | "child"
-  id: CardId
-  deckIds: Set<DeckId>
-  tags: Set<string>
-  specimenRevisionId?: SpecimenRevisionId
-  ankiNoteId?: number
-  title?: string
-  created: Date
-  modified: Date
-  cardSettingId?: CardSettingId
-  due: Date
-  lapsed?: boolean
-  reviews: Review[]
-  state?: State
+  readonly type: "solo" | "parent" | "child"
+  readonly id: CardId
+  readonly deckIds: ReadonlySet<DeckId>
+  readonly tags: ReadonlySet<string>
+  readonly specimenRevisionId?: SpecimenRevisionId
+  readonly ankiNoteId?: number
+  readonly title?: string
+  readonly created: Date
+  readonly modified: Date
+  readonly cardSettingId?: CardSettingId
+  readonly due: Date
+  readonly lapsed?: boolean
+  readonly reviews: readonly Review[]
+  readonly state?: State
 }
 
 export interface Base {
-  templateId: TemplateId
+  readonly templateId: TemplateId
 
   // There's a 1:1 relationship between fields and values - order matters. It has this shape to make full text search/indexing easier
-  fields: string[]
-  values: string[]
+  readonly fields: readonly string[]
+  readonly values: readonly string[]
 }
 
 export interface SoloCard extends Card, Base {
-  type: "solo"
+  readonly type: "solo"
 }
 
 // `parent` means it has children; `solo` means it doesn't. Prevents unnecessary DB lookups.
 export interface ParentCard extends Card, Base {
-  type: "parent"
+  readonly type: "parent"
 }
 
 export interface ChildCard extends Card {
-  type: "child"
-  parentId: CardId
-  pointer: ChildTemplateId | ClozeIndex
+  readonly type: "child"
+  readonly parentId: CardId
+  readonly pointer: ChildTemplateId | ClozeIndex
 }
 
 export const sampleCard: SoloCard = {

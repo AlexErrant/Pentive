@@ -21,40 +21,40 @@ function isNullOrWhitespace(input: string | undefined): boolean {
 }
 
 export function body(
-  fieldNameValueMap: Array<readonly [string, string]>,
+  fieldNameValueMap: ReadonlyArray<readonly [string, string]>,
   questionTemplate: string,
   answerTemplate: string,
   pointer: ChildTemplateId | ClozeIndex
 ): readonly [string, string] | null {
-  ;[fieldNameValueMap, questionTemplate, answerTemplate] =
+  const [fieldNameValueMap2, questionTemplate2, answerTemplate2] =
     getFieldNameValueMapQuestionTemplateAnswerTemplate(
       fieldNameValueMap,
       questionTemplate,
       answerTemplate,
       pointer
     )
-  const frontSide = replaceFields(fieldNameValueMap, true, questionTemplate)
-  if (frontSide === questionTemplate) {
+  const frontSide = replaceFields(fieldNameValueMap2, true, questionTemplate2)
+  if (frontSide === questionTemplate2) {
     return null
   } else {
     const backSide = replaceFields(
-      fieldNameValueMap,
+      fieldNameValueMap2,
       false,
-      answerTemplate
+      answerTemplate2
     ).replace(
       "{{FrontSide}}",
-      replaceFields(fieldNameValueMap, false, questionTemplate)
+      replaceFields(fieldNameValueMap2, false, questionTemplate2)
     )
     return [frontSide, backSide]
   }
 }
 
 function getFieldNameValueMapQuestionTemplateAnswerTemplate(
-  fieldNameValueMap: Array<readonly [string, string]>,
+  fieldNameValueMap: ReadonlyArray<readonly [string, string]>,
   questionTemplate: string,
   answerTemplate: string,
   pointer: ChildTemplateId | ClozeIndex
-): [Array<readonly [string, string]>, string, string] {
+): readonly [ReadonlyArray<readonly [string, string]>, string, string] {
   if (pointer.brand === "childTemplateId") {
     return [fieldNameValueMap, questionTemplate, answerTemplate]
   } else {
@@ -118,7 +118,7 @@ function getFieldNameValueMapQuestionTemplateAnswerTemplate(
 }
 
 function replaceFields(
-  fieldNameValueMap: Array<readonly [string, string]>,
+  fieldNameValueMap: ReadonlyArray<readonly [string, string]>,
   isFront: boolean,
   template: string
 ): string {
@@ -145,10 +145,12 @@ function replaceFields(
 
     const cloze = (() => {
       if (isFront) {
-        const regexMatches: Array<[string | undefined, string]> = Array.from(
-          value.matchAll(clozeRegex),
-          (x) => [x.groups?.hint, x[0]]
-        )
+        const regexMatches: ReadonlyArray<
+          readonly [string | undefined, string]
+        > = Array.from(value.matchAll(clozeRegex), (x) => [
+          x.groups?.hint,
+          x[0],
+        ])
         const bracketed = regexMatches.reduce((current, [hint, rawCloze]) => {
           const brackets = `
 <span class="cloze-brackets-front">[</span>
@@ -210,7 +212,7 @@ function buildHtml(body: string, css: string): string {
 }
 
 export function html(
-  fieldNameValueMap: Array<readonly [string, string]>,
+  fieldNameValueMap: ReadonlyArray<readonly [string, string]>,
   questionTemplate: string,
   answerTemplate: string,
   pointer: ChildTemplateId | ClozeIndex,
@@ -225,13 +227,13 @@ export function html(
   if (body2 === null) {
     return null
   } else {
-    return body2.map((x) => buildHtml(x, css)) as [string, string]
+    return [buildHtml(body2[0], css), buildHtml(body2[1], css)] as const
   }
 }
 
 export function renderTemplate(
   template: Template
-): Array<readonly [string, string] | null> {
+): ReadonlyArray<readonly [string, string] | null> {
   const fields = template.fields.map((f) => [f.name, `(${f.name})`] as const) // medTODO consider adding escape characters so you can do e.g. {{Front}}. Apparently Anki doesn't have escape characters - now would be a good time to introduce this feature.
   if (template.templateType.tag === "standard") {
     return template.templateType.templates.map(({ front, back, id }) =>

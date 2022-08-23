@@ -8,14 +8,14 @@ import { Component } from "solid-js"
 import Nav from "./nav"
 
 export class HTMLElementTagNameMap {
-  "pentive-nav" = Nav
+  readonly "pentive-nav" = Nav
 }
 
 declare module "solid-js" {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace JSX {
     type ElementProps<T> = {
-      [K in keyof T]: T[K] extends Component<infer P> ? P : never
+      readonly [K in keyof T]: T[K] extends Component<infer P> ? P : never
     }
 
     interface IntrinsicElements extends ElementProps<HTMLElementTagNameMap> {}

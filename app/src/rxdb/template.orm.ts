@@ -19,8 +19,8 @@ interface TemplateDocMethods extends KeyFunctionMap {}
 export type TemplateDocument = RxDocument<TemplateDocType, TemplateDocMethods>
 
 interface TemplateCollectionMethods extends KeyFunctionMap {
-  getTemplate: (templateId: TemplateId) => Promise<Template | null>
-  getTemplates: () => Promise<Template[]>
+  readonly getTemplate: (templateId: TemplateId) => Promise<Template | null>
+  readonly getTemplates: () => Promise<Template[]>
 }
 
 export type TemplateCollection = RxCollection<
@@ -34,11 +34,11 @@ export const templateDocMethods: TemplateDocMethods = {}
 function entityToDomain(
   template: RxDocument<
     {
-      id: string
-      name: string
-      created: string
-      modified: string
-      data: unknown
+      readonly id: string
+      readonly name: string
+      readonly created: string
+      readonly modified: string
+      readonly data: unknown
     },
     TemplateDocMethods
   >

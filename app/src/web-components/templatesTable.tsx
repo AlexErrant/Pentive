@@ -59,9 +59,9 @@ const columns: Array<ColumnDef<Template>> = [
 ]
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
-const TemplatesTable: VoidComponent<{ getDb: () => Promise<MyDatabase> }> = (
-  props
-) => {
+const TemplatesTable: VoidComponent<{
+  readonly getDb: () => Promise<MyDatabase>
+}> = (props) => {
   const [templates] = createResource(
     async () => {
       const db = await props.getDb()

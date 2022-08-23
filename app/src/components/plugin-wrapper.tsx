@@ -19,8 +19,8 @@ function kebabCaseKeys(x: Record<string, unknown>): Record<string, unknown> {
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export const Plugin: ParentComponent<{
-  name: string
-  attrs: Record<string, unknown>
+  readonly name: string
+  readonly attrs: Record<string, unknown>
 }> = (props) => {
   const attrs = kebabCaseKeys(props.attrs)
   const name = "pentive-" + props.name

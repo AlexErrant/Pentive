@@ -20,8 +20,8 @@ export type CardDocument = RxDocument<CardDocType, CardDocMethods>
 
 // we declare one static ORM-method for the collection
 interface CardCollectionMethods extends KeyFunctionMap {
-  getCard: (cardId: CardId) => Promise<Card | null>
-  getCards: () => Promise<Card[]>
+  readonly getCard: (cardId: CardId) => Promise<Card | null>
+  readonly getCards: () => Promise<readonly Card[]>
 }
 
 // and then merge all our types
@@ -36,11 +36,11 @@ export const cardDocMethods: CardDocMethods = {}
 function entityToDomain(
   card: RxDocument<
     {
-      id: string
-      created: string
-      modified: string
-      data: unknown
-      title?: string | undefined
+      readonly id: string
+      readonly created: string
+      readonly modified: string
+      readonly data: unknown
+      readonly title?: string | undefined
     },
     CardDocMethods
   >

@@ -5,7 +5,9 @@ import { NavLinkData } from "../routes"
 const ends = new Set(["/"])
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
-const Nav: VoidComponent<{ navLinks: NavLinkData[] }> = (props) => {
+const Nav: VoidComponent<{ readonly navLinks: readonly NavLinkData[] }> = (
+  props
+) => {
   const location = useLocation()
   return (
     <nav class="bg-gray-200 text-gray-900 px-4">

@@ -1,41 +1,41 @@
 import { ChildTemplateId, StencilRevisionId, TemplateId } from "./ids"
 
 export interface Field {
-  name: string
-  rightToLeft?: boolean
-  sticky?: boolean
-  private?: boolean
+  readonly name: string
+  readonly rightToLeft?: boolean
+  readonly sticky?: boolean
+  readonly private?: boolean
 }
 
 export interface ChildTemplate {
-  id: ChildTemplateId
-  name: string
-  front: string
-  back: string
-  shortFront?: string
-  shortBack?: string
+  readonly id: ChildTemplateId
+  readonly name: string
+  readonly front: string
+  readonly back: string
+  readonly shortFront?: string
+  readonly shortBack?: string
 }
 
 export type TemplateType =
   | {
-      tag: "standard"
-      templates: ChildTemplate[]
+      readonly tag: "standard"
+      readonly templates: readonly ChildTemplate[]
     }
   | {
-      tag: "cloze"
-      template: ChildTemplate
+      readonly tag: "cloze"
+      readonly template: ChildTemplate
     }
 
 export interface Template {
-  id: TemplateId
-  sourceId?: StencilRevisionId
-  specimenSourceId?: StencilRevisionId
-  name: string // todo limit to 100
-  css: string
-  fields: Field[]
-  created: Date
-  modified: Date
-  templateType: TemplateType
+  readonly id: TemplateId
+  readonly sourceId?: StencilRevisionId
+  readonly specimenSourceId?: StencilRevisionId
+  readonly name: string // todo limit to 100
+  readonly css: string
+  readonly fields: readonly Field[]
+  readonly created: Date
+  readonly modified: Date
+  readonly templateType: TemplateType
 }
 
 export const defaultTemplate: Template = {
