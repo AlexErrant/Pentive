@@ -1,6 +1,6 @@
 import { RxCollection, RxDocument, KeyFunctionMap } from "rxdb"
-import { Card } from "../domain/card"
-import { CardId } from "../domain/ids"
+import { Card } from "../../src/domain/card"
+import { CardId } from "../../src/domain/ids"
 import { CardDocType } from "./card.schema"
 
 export function cardToDocType(card: Card): CardDocType {

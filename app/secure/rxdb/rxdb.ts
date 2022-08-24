@@ -12,7 +12,7 @@ import { RxDBLeaderElectionPlugin } from "rxdb/plugins/leader-election"
 // @ts-expect-error pouchdb is untyped
 import * as pouchdbAdapterHttp from "pouchdb-adapter-http"
 import { RxDBReplicationCouchDBPlugin } from "rxdb/plugins/replication-couchdb"
-import { Template } from "../domain/template"
+import { Template } from "../../src/domain/template"
 import {
   HeroCollection,
   heroCollectionMethods,
@@ -31,7 +31,7 @@ import {
   cardDocMethods,
   cardToDocType,
 } from "./card.orm"
-import { Card } from "../domain/card"
+import { Card } from "../../src/domain/card"
 addPouchPlugin(pouchdbAdapterHttp)
 addPouchPlugin(pouchdbAdapterIdb)
 addRxPlugin(RxDBReplicationCouchDBPlugin)
