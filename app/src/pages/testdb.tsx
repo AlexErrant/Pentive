@@ -1,7 +1,7 @@
 import { JSX } from "solid-js/jsx-runtime"
 import _ from "lodash"
 
-import * as rxdb from "../rxdb/rxdb"
+import * as rxdb from "../../secure/rxdb/rxdb"
 import { createResource, Match, Switch } from "solid-js"
 import fc from "fast-check"
 import { template as arbitraryTemplate } from "../../tests/arbitraryTemplate"

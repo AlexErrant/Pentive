@@ -6,7 +6,7 @@ import {
   getCoreRowModel,
 } from "@tanstack/solid-table"
 import { Template } from "../domain/template"
-import { MyDatabase } from "../rxdb/rxdb"
+import { MyDatabase } from "../../secure/rxdb/rxdb"
 import _ from "lodash"
 import { renderTemplate } from "../domain/cardHtml"
 import ResizingIframe from "./resizing-iframe"

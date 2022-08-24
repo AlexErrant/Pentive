@@ -1,6 +1,6 @@
 import { JSX } from "solid-js"
 import TemplatesTable from "../web-components/templatesTable"
-import { getDb } from "../rxdb/rxdb"
+import { getDb } from "../../secure/rxdb/rxdb"
 
 export default function Templates(): JSX.Element {
   return (
