@@ -11,6 +11,7 @@ specifiers:
   '@typescript-eslint/parser': ^5.31.0
   autoprefixer: ^10.4.7
   babel-preset-solid: ^1.4.8
+  comlink: ^4.3.1
   eslint: ^8.20.0
   eslint-config-prettier: ^8.5.0
   eslint-config-standard-with-typescript: ^22.0.0
@@ -47,6 +48,7 @@ specifiers:
 dependencies:
   '@tanstack/solid-table': 8.5.11_solid-js@1.4.8
   babel-preset-solid: 1.4.8_@babel+core@7.18.10
+  comlink: 4.3.1
   iframe-resizer: 4.3.2
   lodash: 4.17.21
   pouchdb-adapter-idb: 7.3.0
@@ -1270,6 +1272,10 @@ packages:
     dependencies:
       delayed-stream: 1.0.0
     dev: true
+
+  /comlink/4.3.1:
+    resolution: {integrity: sha512-+YbhUdNrpBZggBAHWcgQMLPLH1KDF3wJpeqrCKieWQ8RL7atmgsgTQko1XEBK6PsecfopWNntopJ+ByYG1lRaA==}
+    dev: false
 
   /commander/2.20.3:
     resolution: {integrity: sha512-GpVkmM8vF2vQUkj2LvZmD35JxeJOLCwJ9cUkugyk2nuhbv3+mJvpLYYt+0+USMxE+oj+ey/lJEnhZw75x/OMcQ==}
