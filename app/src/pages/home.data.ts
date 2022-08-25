@@ -1,8 +1,11 @@
 import { createResource, Resource } from "solid-js"
-import { getAge } from "../../secure/rxdb/rxdb"
+import { getDb } from "../../secure/rxdb/rxdb"
 
 function HomeData(): Resource<number> {
-  const [age] = createResource(getAge, { initialValue: 2 })
+  const [age] = createResource(
+    async () => await getDb().then(async (db) => await db.heroes.getAge()),
+    { initialValue: 2 }
+  )
   return age
 }
 

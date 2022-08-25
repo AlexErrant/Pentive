@@ -3,7 +3,7 @@ import { TemplateId } from "../../src/domain/ids"
 import { Template } from "../../src/domain/template"
 import { TemplateDocType } from "./template.schema"
 
-export function templateToDocType(template: Template): TemplateDocType {
+function templateToDocType(template: Template): TemplateDocType {
   const { id, name, created, modified, ...shrunken } = template // https://stackoverflow.com/a/66899790
   return {
     id,
@@ -19,6 +19,10 @@ interface TemplateDocMethods extends KeyFunctionMap {}
 export type TemplateDocument = RxDocument<TemplateDocType, TemplateDocMethods>
 
 interface TemplateCollectionMethods extends KeyFunctionMap {
+  readonly upsertTemplate: (
+    this: TemplateCollection,
+    template: Template
+  ) => Promise<void>
   readonly getTemplate: (templateId: TemplateId) => Promise<Template | null>
   readonly getTemplates: () => Promise<Template[]>
 }
@@ -59,6 +63,12 @@ function entityToDomain(
 }
 
 export const templateCollectionMethods: TemplateCollectionMethods = {
+  upsertTemplate: async function (
+    this: TemplateCollection,
+    template: Template
+  ) {
+    await this.upsert(templateToDocType(template))
+  },
   getTemplate: async function (
     this: TemplateCollection,
     templateId: TemplateId

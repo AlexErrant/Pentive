@@ -11,7 +11,7 @@ async function testTemplate(): Promise<boolean> {
   const db = await rxdb.getDb()
   await fc.assert(
     fc.asyncProperty(arbitraryTemplate, async (expected) => {
-      await rxdb.upsertTemplate(expected)
+      await db.templates.upsertTemplate(expected)
       const actual = await db.templates.getTemplate(expected.id)
       const r = _.isEqual(expected, actual)
       console.assert(r, { expected, actual })
@@ -26,7 +26,7 @@ async function testCard(): Promise<boolean> {
   const db = await rxdb.getDb()
   await fc.assert(
     fc.asyncProperty(arbitraryCard, async (expected) => {
-      await rxdb.upsertCard(expected)
+      await db.cards.upsertCard(expected)
       const actual = await db.cards.getCard(expected.id)
       const r = _.isEqual(expected, actual)
       console.assert(r, { expected, actual })

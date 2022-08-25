@@ -50,7 +50,9 @@ export default function Home(): JSX.Element {
       <div class="mt-4">
         <button
           class="border rounded-lg px-2 border-gray-900"
-          onClick={async () => await rxdb.upsert(count())}
+          onClick={rxdb.delay(
+            async (db) => await db.heroes.upsertHero(count())
+          )}
         >
           upsert
         </button>
@@ -70,7 +72,9 @@ export default function Home(): JSX.Element {
       <div class="mt-4">
         <button
           class="border rounded-lg px-2 border-gray-900"
-          onClick={async () => await rxdb.upsertTemplate(defaultTemplate)}
+          onClick={rxdb.delay(
+            async (db) => await db.templates.upsertTemplate(defaultTemplate)
+          )}
         >
           upsertTemplate
         </button>
@@ -86,7 +90,9 @@ export default function Home(): JSX.Element {
       <div class="mt-4">
         <button
           class="border rounded-lg px-2 border-gray-900"
-          onClick={async () => await rxdb.upsertCard(sampleCard)}
+          onClick={rxdb.delay(
+            async (db) => await db.cards.upsertCard(sampleCard)
+          )}
         >
           upsertCard
         </button>

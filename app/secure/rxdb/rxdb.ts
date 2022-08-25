@@ -12,7 +12,6 @@ import { RxDBLeaderElectionPlugin } from "rxdb/plugins/leader-election"
 // @ts-expect-error pouchdb is untyped
 import * as pouchdbAdapterHttp from "pouchdb-adapter-http"
 import { RxDBReplicationCouchDBPlugin } from "rxdb/plugins/replication-couchdb"
-import { Template } from "../../src/domain/template"
 import {
   HeroCollection,
   heroCollectionMethods,
@@ -23,15 +22,12 @@ import {
   TemplateCollection,
   templateCollectionMethods,
   templateDocMethods,
-  templateToDocType,
 } from "./template.orm"
 import {
   CardCollection,
   cardCollectionMethods,
   cardDocMethods,
-  cardToDocType,
 } from "./card.orm"
-import { Card } from "../../src/domain/card"
 addPouchPlugin(pouchdbAdapterHttp)
 addPouchPlugin(pouchdbAdapterIdb)
 addRxPlugin(RxDBReplicationCouchDBPlugin)
@@ -95,42 +91,6 @@ export async function getDb(): Promise<MyDatabase> {
     myDatabase = createDb()
   }
   return await myDatabase
-}
-
-export async function upsert(i: number): Promise<void> {
-  const myDatabase = await getDb()
-  const hero: HeroDocument = await myDatabase.heroes.upsert({
-    passportId: "myId",
-    firstName: "piotr",
-    lastName: "potter",
-    age: i,
-  })
-
-  // access a property
-  console.log(hero.firstName)
-
-  // use a orm method
-  hero.scream("AAH!")
-
-  // use a static orm method from the collection
-  const amount: number = await myDatabase.heroes.countAllDocuments()
-  console.log(amount)
-}
-
-export async function upsertTemplate(template: Template): Promise<void> {
-  const myDatabase = await getDb()
-  await myDatabase.templates.upsert(templateToDocType(template))
-}
-
-export async function upsertCard(card: Card): Promise<void> {
-  const myDatabase = await getDb()
-  await myDatabase.cards.upsert(cardToDocType(card))
-}
-
-export async function getAge(): Promise<number> {
-  const myDatabase = await getDb()
-  const hero = await myDatabase.heroes.findOne("myId").exec()
-  return hero?.age ?? 3
 }
 
 export async function remove(): Promise<void> {
