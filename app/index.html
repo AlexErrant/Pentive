@@ -17,5 +17,27 @@
     <div id="root"></div>
 
     <script src="/src/index.tsx" type="module"></script>
+    <iframe
+      id="secure-root"
+      src="http://secure.local.pentive.com:3014/secure/index.html"
+    ></iframe>
+    <script defer>
+      function delay(time) {
+        return new Promise((resolve) => setTimeout(resolve, time))
+      }
+      delay(1000).then(() => {
+        var thrown = false
+        try {
+          document.getElementById("secure-root").contentWindow.document
+        } catch (e) {
+          thrown = true
+        }
+        if (!thrown) {
+          throw new Error(
+            "Parent page should not be able to access the contents of the Secure iframe!"
+          )
+        }
+      })
+    </script>
   </body>
 </html>
