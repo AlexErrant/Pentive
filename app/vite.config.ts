@@ -15,4 +15,12 @@ export default defineConfig({
   build: {
     target: "esnext",
   },
+  server: {
+    port: 3014,
+    strictPort: true,
+  },
+  preview: {
+    port: 3014,
+    strictPort: true,
+  },
 })
