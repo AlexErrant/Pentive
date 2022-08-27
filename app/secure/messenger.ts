@@ -9,5 +9,5 @@ export const exposed = {
   ...heroCollectionMethods,
 }
 
-const targetOrigin = "*" // highTODO make more limiting
+const targetOrigin = "*" // highTODO make more limiting. Also implement https://stackoverflow.com/q/8169582
 Comlink.expose(exposed, Comlink.windowEndpoint(self.parent, self, targetOrigin))
