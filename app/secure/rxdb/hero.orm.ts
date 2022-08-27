@@ -1,5 +1,6 @@
 import { RxCollection, RxDocument, KeyFunctionMap } from "rxdb"
 import { HeroDocType } from "./hero.schema"
+import { getDb } from "./rxdb"
 
 interface HeroDocMethods extends KeyFunctionMap {
   scream: (v: string) => string
@@ -7,19 +8,8 @@ interface HeroDocMethods extends KeyFunctionMap {
 
 export type HeroDocument = RxDocument<HeroDocType, HeroDocMethods>
 
-// we declare one static ORM-method for the collection
-interface HeroCollectionMethods extends KeyFunctionMap {
-  countAllDocuments: () => Promise<number>
-  upsertHero: (i: number) => Promise<void>
-  getAge: () => Promise<number>
-}
-
 // and then merge all our types
-export type HeroCollection = RxCollection<
-  HeroDocType,
-  HeroDocMethods,
-  HeroCollectionMethods
->
+export type HeroCollection = RxCollection<HeroDocType, HeroDocMethods>
 
 export const heroDocMethods: HeroDocMethods = {
   scream: function (this: HeroDocument, what: string) {
@@ -27,13 +17,15 @@ export const heroDocMethods: HeroDocMethods = {
   },
 }
 
-export const heroCollectionMethods: HeroCollectionMethods = {
-  countAllDocuments: async function (this: HeroCollection) {
-    const allDocs = await this.find().exec()
+export const heroCollectionMethods = {
+  countAllDocuments: async function () {
+    const db = await getDb()
+    const allDocs = await db.heroes.find().exec()
     return allDocs.length
   },
-  upsertHero: async function upsert(this: HeroCollection, i: number) {
-    const hero: HeroDocument = await this.upsert({
+  upsertHero: async function upsert(i: number) {
+    const db = await getDb()
+    const hero: HeroDocument = await db.heroes.upsert({
       passportId: "myId",
       firstName: "piotr",
       lastName: "potter",
@@ -46,12 +38,12 @@ export const heroCollectionMethods: HeroCollectionMethods = {
     // use a orm method
     hero.scream("AAH!")
 
-    // use a static orm method from the collection
     const amount: number = await this.countAllDocuments()
     console.log(amount)
   },
-  getAge: async function getAge(this: HeroCollection) {
-    const hero = await this.findOne("myId").exec()
+  getAge: async function getAge() {
+    const db = await getDb()
+    const hero = await db.heroes.findOne("myId").exec()
     return hero?.age ?? 3
   },
 }

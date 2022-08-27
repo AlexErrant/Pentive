@@ -51,9 +51,7 @@ export default function Home(): JSX.Element {
       <div class="mt-4">
         <button
           class="border rounded-lg px-2 border-gray-900"
-          onClick={rxdb.delay(
-            async (db) => await db.heroes.upsertHero(count())
-          )}
+          onClick={async () => await db.upsertHero(count())}
         >
           upsert
         </button>
