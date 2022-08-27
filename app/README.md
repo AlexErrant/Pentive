@@ -1,34 +1,21 @@
-## Usage
+## Getting Started
 
-Those templates dependencies are maintained via [pnpm](https://pnpm.io) via `pnpm up -Lri`.
+Add the following to your [hosts file](https://www.howtogeek.com/howto/27350/beginner-geek-how-to-edit-your-hosts-file/):
 
-This is the reason you see a `pnpm-lock.yaml`. That being said, any package manager will work. This file can be safely be removed once you clone a template.
-
-```bash
-$ npm install # or pnpm install or yarn install
+```
+127.0.0.1 secure.local.pentive.com
 ```
 
-### Learn more on the [Solid Website](https://solidjs.com) and come chat with us on our [Discord](https://discord.com/invite/solidjs)
+This is to give the `/secure` directory/path the _appearance_ of a different origin, which is necessary for `iframe` security. Someday I may figure out how to make Vite serve two domains with a simple `npm run dev`, but for now I'm avoiding running `npm run dev & npm run dev-secure` because I'm lazy. Based off [this](https://www.gosink.in/vue-js-how-to-handle-multiple-subdomains-on-a-single-app/).
 
-## Available Scripts
+Install [`pnpm`](https://pnpm.io/) then run:
 
-In the project directory, you can run:
+```bash
+$ pnpm install && npm run dev
+```
 
-### `npm dev` or `npm start`
+## Architecture
 
-Runs the app in the development mode.<br>
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+Pentive has an extremely powerful plugin system. There is literally no limit to modding the UI. Any default UI component (I'm using SolidJS) may be overwritten with another custom [Web Component](https://developer.mozilla.org/en-US/docs/Web/Web_Components). However, [Web Components have no security model](https://stackoverflow.com/q/45282601).
 
-The page will reload if you make edits.<br>
-
-### `npm run build`
-
-Builds the app for production to the `dist` folder.<br>
-It correctly bundles Solid in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.<br>
-Your app is ready to be deployed!
-
-## Deployment
-
-You can deploy the `dist` folder to any static host provider (netlify, surge, now, etc.)
+IndexedDB and other secrets are managed from an `iframe`, which is served from `secure.*.pentive.com` to block plugin access. Web workers don't work cross origin, but if someday we really want it on a background thread we can [embed a web worker in the iframe](https://stackoverflow.com/a/22151285) or [use a service worker in an iframe](https://stackoverflow.com/a/31883194).
