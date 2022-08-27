@@ -2,7 +2,6 @@ import { JSX } from "solid-js/jsx-runtime"
 import _ from "lodash"
 import { db } from "./../messenger"
 
-import * as rxdb from "../../secure/rxdb/rxdb"
 import { createResource, Match, Switch } from "solid-js"
 import fc from "fast-check"
 import { template as arbitraryTemplate } from "../../tests/arbitraryTemplate"
@@ -23,11 +22,10 @@ async function testTemplate(): Promise<boolean> {
 }
 
 async function testCard(): Promise<boolean> {
-  const db = await rxdb.getDb()
   await fc.assert(
     fc.asyncProperty(arbitraryCard, async (expected) => {
-      await db.cards.upsertCard(expected)
-      const actual = await db.cards.getCard(expected.id)
+      await db.upsertCard(expected)
+      const actual = await db.getCard(expected.id)
       const r = _.isEqual(expected, actual)
       console.assert(r, { expected, actual })
       return r

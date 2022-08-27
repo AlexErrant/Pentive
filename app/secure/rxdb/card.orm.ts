@@ -2,6 +2,7 @@ import { RxCollection, RxDocument, KeyFunctionMap } from "rxdb"
 import { Card } from "../../src/domain/card"
 import { CardId } from "../../src/domain/ids"
 import { CardDocType } from "./card.schema"
+import { getDb } from "./rxdb"
 
 function cardToDocType(card: Card): CardDocType {
   const { id, title, created, modified, ...shrunken } = card // https://stackoverflow.com/a/66899790
@@ -18,19 +19,8 @@ interface CardDocMethods extends KeyFunctionMap {}
 
 export type CardDocument = RxDocument<CardDocType, CardDocMethods>
 
-// we declare one static ORM-method for the collection
-interface CardCollectionMethods extends KeyFunctionMap {
-  readonly upsertCard: (card: Card) => Promise<void>
-  readonly getCard: (cardId: CardId) => Promise<Card | null>
-  readonly getCards: () => Promise<readonly Card[]>
-}
-
 // and then merge all our types
-export type CardCollection = RxCollection<
-  CardDocType,
-  CardDocMethods,
-  CardCollectionMethods
->
+export type CardCollection = RxCollection<CardDocType, CardDocMethods>
 
 export const cardDocMethods: CardDocMethods = {}
 
@@ -62,16 +52,19 @@ function entityToDomain(
   // After an upsert, the return is a Date Object because RxDB caches the upserted object... I think.
 }
 
-export const cardCollectionMethods: CardCollectionMethods = {
-  upsertCard: async function (this: CardCollection, card: Card) {
-    await this.upsert(cardToDocType(card))
+export const cardCollectionMethods = {
+  upsertCard: async function (card: Card) {
+    const db = await getDb()
+    await db.cards.upsert(cardToDocType(card))
   },
-  getCard: async function (this: CardCollection, cardId: CardId) {
-    const card = await this.findOne(cardId).exec()
+  getCard: async function (cardId: CardId) {
+    const db = await getDb()
+    const card = await db.cards.findOne(cardId).exec()
     return card == null ? null : entityToDomain(card)
   },
   getCards: async function (this: CardCollection) {
-    const allCards = await this.find().exec()
+    const db = await getDb()
+    const allCards = await db.cards.find().exec()
     return allCards.map(entityToDomain)
   },
 }

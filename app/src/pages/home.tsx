@@ -89,17 +89,13 @@ export default function Home(): JSX.Element {
       <div class="mt-4">
         <button
           class="border rounded-lg px-2 border-gray-900"
-          onClick={rxdb.delay(
-            async (db) => await db.cards.upsertCard(sampleCard)
-          )}
+          onClick={async () => await db.upsertCard(sampleCard)}
         >
           upsertCard
         </button>
         <button
           class="border rounded-lg px-2 border-gray-900"
-          onClick={rxdb.delay(async (db) =>
-            setCard(await db.cards.getCard(sampleCard.id))
-          )}
+          onClick={async () => setCard(await db.getCard(sampleCard.id))}
         >
           getCard
         </button>
