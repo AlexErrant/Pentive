@@ -1,3 +1,6 @@
+// https://github.com/GoogleChromeLabs/comlink/issues/37
+// This file and the `#secure-root` iframe must be loaded before the app is loaded!
+
 import * as Comlink from "comlink"
 import { exposed } from "../secure/messenger"
 
