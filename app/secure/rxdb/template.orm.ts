@@ -1,6 +1,7 @@
 import { KeyFunctionMap, RxCollection, RxDocument } from "rxdb"
 import { TemplateId } from "../../src/domain/ids"
 import { Template } from "../../src/domain/template"
+import { getDb } from "./rxdb"
 import { TemplateDocType } from "./template.schema"
 
 function templateToDocType(template: Template): TemplateDocType {
@@ -18,19 +19,9 @@ interface TemplateDocMethods extends KeyFunctionMap {}
 
 export type TemplateDocument = RxDocument<TemplateDocType, TemplateDocMethods>
 
-interface TemplateCollectionMethods extends KeyFunctionMap {
-  readonly upsertTemplate: (
-    this: TemplateCollection,
-    template: Template
-  ) => Promise<void>
-  readonly getTemplate: (templateId: TemplateId) => Promise<Template | null>
-  readonly getTemplates: () => Promise<Template[]>
-}
-
 export type TemplateCollection = RxCollection<
   TemplateDocType,
-  TemplateDocMethods,
-  TemplateCollectionMethods
+  TemplateDocMethods
 >
 
 export const templateDocMethods: TemplateDocMethods = {}
@@ -62,22 +53,19 @@ function entityToDomain(
   // After an upsert, the return is a Date Object because RxDB caches the upserted object... I think.
 }
 
-export const templateCollectionMethods: TemplateCollectionMethods = {
-  upsertTemplate: async function (
-    this: TemplateCollection,
-    template: Template
-  ) {
-    await this.upsert(templateToDocType(template))
+export const templateCollectionMethods = {
+  upsertTemplate: async function (template: Template) {
+    const db = await getDb()
+    await db.templates.upsert(templateToDocType(template))
   },
-  getTemplate: async function (
-    this: TemplateCollection,
-    templateId: TemplateId
-  ) {
-    const template = await this.findOne(templateId).exec()
+  getTemplate: async function (templateId: TemplateId) {
+    const db = await getDb()
+    const template = await db.templates.findOne(templateId).exec()
     return template == null ? null : entityToDomain(template)
   },
-  getTemplates: async function (this: TemplateCollection) {
-    const allTemplates = await this.find().exec()
+  getTemplates: async function () {
+    const db = await getDb()
+    const allTemplates = await db.templates.find().exec()
     return allTemplates.map(entityToDomain)
   },
 }

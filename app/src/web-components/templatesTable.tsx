@@ -6,7 +6,6 @@ import {
   getCoreRowModel,
 } from "@tanstack/solid-table"
 import { Template } from "../domain/template"
-import { MyDatabase } from "../../secure/rxdb/rxdb"
 import _ from "lodash"
 import { renderTemplate } from "../domain/cardHtml"
 import ResizingIframe from "./resizing-iframe"
@@ -60,15 +59,11 @@ const columns: Array<ColumnDef<Template>> = [
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const TemplatesTable: VoidComponent<{
-  readonly getDb: () => Promise<MyDatabase>
+  readonly getTemplates: () => Promise<Template[]>
 }> = (props) => {
-  const [templates] = createResource(
-    async () => {
-      const db = await props.getDb()
-      return await db.templates.getTemplates()
-    },
-    { initialValue: [] }
-  )
+  const [templates] = createResource(async () => await props.getTemplates(), {
+    initialValue: [],
+  })
   const table = createSolidTable({
     get data() {
       return templates()

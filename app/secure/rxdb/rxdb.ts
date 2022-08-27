@@ -163,13 +163,3 @@ export async function sync(): Promise<void> {
   myDatabase.templates.syncCouchDB(syncOptions)
   myDatabase.cards.syncCouchDB(syncOptions)
 }
-
-async function dbFn<T>(fn: (db: MyDatabase) => T): Promise<T> {
-  const db = await getDb()
-  return fn(db)
-}
-
-export const delay =
-  <T>(fn: (db: MyDatabase) => T) =>
-  async () =>
-    await dbFn(fn)

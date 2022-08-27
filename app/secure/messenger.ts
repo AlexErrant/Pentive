@@ -1,7 +1,10 @@
 import * as Comlink from "comlink"
 
-function add(a: number, b: number): number {
-  return a + b
+import { templateCollectionMethods } from "./rxdb/template.orm"
+
+export const exposed = {
+  ...templateCollectionMethods,
 }
 
-Comlink.expose(add, Comlink.windowEndpoint(self.parent))
+const targetOrigin = "*" // highTODO make more limiting
+Comlink.expose(exposed, Comlink.windowEndpoint(self.parent, self, targetOrigin))
