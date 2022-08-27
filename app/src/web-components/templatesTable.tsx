@@ -48,8 +48,8 @@ const columns: Array<ColumnDef<Template>> = [
     header: "Preview",
     cell: (info) => {
       const srcdoc = renderTemplate(info.row.original)[0]
-      if (srcdoc === null) {
-        return "Error rendering first template of {info.row.original.name}"
+      if (srcdoc === null || srcdoc === undefined) {
+        return `Error rendering first template of ${info.row.original.name}`
       } else {
         return <ResizingIframe srcdoc={srcdoc[1]}></ResizingIframe>
       }
