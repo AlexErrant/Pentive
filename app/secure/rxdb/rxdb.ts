@@ -28,14 +28,23 @@ import {
   cardCollectionMethods,
   cardDocMethods,
 } from "./card.orm"
+import { pluginSchema } from "./plugin.schema"
+import {
+  PluginCollection,
+  pluginCollectionMethods,
+  pluginDocMethods,
+} from "./plugin.orm"
+import { RxDBAttachmentsPlugin } from "rxdb/plugins/attachments"
 addPouchPlugin(pouchdbAdapterHttp)
 addPouchPlugin(pouchdbAdapterIdb)
 addRxPlugin(RxDBReplicationCouchDBPlugin)
+addRxPlugin(RxDBAttachmentsPlugin)
 
 interface MyDatabaseCollections {
   readonly heroes: HeroCollection
   readonly templates: TemplateCollection
   readonly cards: CardCollection
+  readonly plugins: PluginCollection
 }
 
 export type MyDatabase = RxDatabase<MyDatabaseCollections>
@@ -66,6 +75,11 @@ export async function createDb(): Promise<MyDatabase> {
       schema: cardSchema,
       methods: cardDocMethods,
       statics: cardCollectionMethods,
+    },
+    plugins: {
+      schema: pluginSchema,
+      methods: pluginDocMethods,
+      statics: pluginCollectionMethods,
     },
   })
 
@@ -162,4 +176,5 @@ export async function sync(): Promise<void> {
   myDatabase.heroes.syncCouchDB(syncOptions)
   myDatabase.templates.syncCouchDB(syncOptions)
   myDatabase.cards.syncCouchDB(syncOptions)
+  myDatabase.plugins.syncCouchDB(syncOptions)
 }

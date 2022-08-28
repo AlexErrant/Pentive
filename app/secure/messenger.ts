@@ -1,12 +1,14 @@
 import * as Comlink from "comlink"
 import { cardCollectionMethods } from "./rxdb/card.orm"
 import { heroCollectionMethods } from "./rxdb/hero.orm"
+import { pluginCollectionMethods } from "./rxdb/plugin.orm"
 import { templateCollectionMethods } from "./rxdb/template.orm"
 
 export const exposed = {
   ...templateCollectionMethods,
   ...cardCollectionMethods,
   ...heroCollectionMethods,
+  ...pluginCollectionMethods,
 }
 
 const targetOrigin = "*" // highTODO make more limiting. Also implement https://stackoverflow.com/q/8169582
