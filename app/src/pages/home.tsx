@@ -109,11 +109,15 @@ export default function Home(): JSX.Element {
           class="border rounded-lg px-2 border-gray-900"
           onClick={async () => {
             const config = await fetch("/pentive-nav.js")
-            const plugin = {
+            const plugin: Plugin = {
               id: "520E5C04-93DF-4DB8-B51A-0B5EAE843356",
               created: new Date().toISOString(),
               modified: new Date().toISOString(),
               name: "plain pentive nav",
+              type: {
+                tag: "web-component",
+                name: "pentive-nav",
+              },
               script: await config.blob(),
             }
             await db.upsertPlugin(plugin)

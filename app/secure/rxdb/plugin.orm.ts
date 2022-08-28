@@ -2,7 +2,7 @@ import { KeyFunctionMap, RxCollection, RxDocument } from "rxdb"
 import { getDb } from "./rxdb"
 import { PluginDocType } from "./plugin.schema"
 import _ from "lodash"
-import { Plugin } from "../../src/domain/plugin"
+import { Plugin, Type } from "../../src/domain/plugin"
 
 export interface WebComponentRegistry extends Record<string, string> {}
 
@@ -24,7 +24,7 @@ export const pluginCollectionMethods = {
       data: script,
     })
   },
-  getPlugins: async function () {
+  getPlugins: async function (): Promise<Plugin[]> {
     const db = await getDb()
     const allPlugins = await db.plugins.find().exec()
     const r = allPlugins.map(async (p) => {
@@ -35,6 +35,7 @@ export const pluginCollectionMethods = {
         name: p.name,
         created: p.created,
         modified: p.modified,
+        type: p.type as Type,
         script: script as Blob,
       }
     })

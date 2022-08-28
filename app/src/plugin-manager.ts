@@ -1,26 +1,27 @@
-import { customElement } from "solid-element"
-import { HTMLElementTagNameMap } from "./web-components/registry"
+import { db } from "./messenger"
 
-async function getConfig(): Promise<Record<string, string>> {
-  const config = await fetch("/plugin-config.json")
-  return (await config.json()) as Record<string, string>
+// https://stackoverflow.com/a/18650249
+async function blobToBase64(blob: Blob): Promise<string> {
+  return await new Promise((resolve) => {
+    const reader = new FileReader()
+    reader.onloadend = () => resolve(reader.result as string)
+    reader.readAsDataURL(blob) // https://developer.mozilla.org/en-US/docs/Web/API/FileReader/readAsDataURL
+  })
 }
 
-const registry = new HTMLElementTagNameMap()
-export const config = await getConfig()
+// Some links for when we decide to support "hot" updates of custom elements
+// https://github.com/WICG/webcomponents/issues/754 https://github.com/caridy/redefine-custom-elements https://stackoverflow.com/q/47805288
+// Be aware that it seems like it's impossible to unregister a custom element https://stackoverflow.com/q/27058648
 
-export async function registerWebComponents(): Promise<void> {
-  for (const property in registry) {
-    if (config[property] === undefined) {
-      customElement(property, registry[property as keyof HTMLElementTagNameMap])
-    } else {
-      let path = config[property]
-      // Workaround for "Assets in public cannot be imported from JavaScript." from https://vitejs.dev/guide/assets.html#the-public-directory
-      // Empirically works in `npm run dev` and `npm run build; npm run serve`
-      if (import.meta.env.MODE === "development") {
-        path = "../public" + path
-      }
-      await import(/* @vite-ignore */ path) // todo parallelize
-    }
-  }
+export async function registerWebComponents(): Promise<Set<string>> {
+  const plugins = await db.getPlugins()
+  const registerCustomElementPromises = plugins // highTODO ensure there are no custom components with the same name
+    .filter((x) => x.type.tag === "web-component")
+    .map(async (p) => {
+      const script = await blobToBase64(p.script)
+      await import(/* @vite-ignore */ script) // The `data:text/javascript;base64,` on `script` from `readAsDataURL` is important https://stackoverflow.com/a/57255653
+      return p.type.name
+    })
+  const registeredNames = await Promise.all(registerCustomElementPromises)
+  return new Set(registeredNames)
 }

@@ -7,7 +7,7 @@ import { Component } from "solid-js"
 
 import Nav from "./nav"
 
-export class HTMLElementTagNameMap {
+class HTMLElementTagNameMap {
   readonly "pentive-nav" = Nav
 }
 

@@ -1,7 +1,7 @@
 import { ParentComponent, Show } from "solid-js"
 import { Dynamic } from "solid-js/web"
-import { config } from "./../plugin-manager"
 import _ from "lodash"
+import { registeredNames } from ".."
 
 // Due to
 //     "Props get assigned as element properties and hyphenated attributes."
@@ -25,7 +25,7 @@ export const Plugin: ParentComponent<{
   const attrs = kebabCaseKeys(props.attrs)
   const name = "pentive-" + props.name
   return (
-    <Show when={config[name]} fallback={props.children}>
+    <Show when={registeredNames.has(name)} fallback={props.children}>
       <Dynamic component={name} {...attrs} />
     </Show>
   )

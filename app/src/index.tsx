@@ -5,7 +5,7 @@ import App from "./app"
 
 import { registerWebComponents } from "./plugin-manager" // register web components
 
-await registerWebComponents()
+export const registeredNames = await registerWebComponents()
 
 render(
   () => (
