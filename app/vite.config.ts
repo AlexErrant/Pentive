@@ -7,6 +7,9 @@ export default defineConfig({
   plugins: [
     solidPlugin(),
     checker({
+      overlay: {
+        initialIsOpen: false,
+      },
       typescript: true,
       eslint: {
         lintCommand: 'eslint "./src/**/*.{ts,tsx}"',
