@@ -3,7 +3,7 @@ import { useRoutes } from "solid-app-router"
 
 import { navLinks, routes } from "./routes"
 import { Plugin } from "./components/plugin-wrapper"
-import Nav from "./web-components/nav"
+import Nav from "./custom-elements/nav"
 
 export default function App(): JSX.Element {
   // eslint-disable-next-line @typescript-eslint/naming-convention

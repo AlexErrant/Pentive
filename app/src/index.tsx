@@ -3,9 +3,9 @@ import { render } from "solid-js/web"
 import { Router } from "solid-app-router"
 import App from "./app"
 
-import { registerWebComponents } from "./plugin-manager" // register web components
+import { registerCustomElements } from "./plugin-manager"
 
-export const registeredNames = await registerWebComponents()
+export const registeredNames = await registerCustomElements()
 
 render(
   () => (

@@ -115,7 +115,7 @@ export default function Home(): JSX.Element {
               modified: new Date().toISOString(),
               name: "plain pentive nav",
               type: {
-                tag: "web-component",
+                tag: "custom-element",
                 name: "pentive-nav",
               },
               script: await config.blob(),

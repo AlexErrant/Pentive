@@ -2,7 +2,7 @@ import { PluginDocType } from "../../secure/rxdb/plugin.schema"
 
 export type Type =
   | {
-      readonly tag: "web-component" // todo `custom-element`
+      readonly tag: "custom-element"
       readonly name: string
     }
   | {

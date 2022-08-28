@@ -1,5 +1,5 @@
 import { JSX } from "solid-js"
-import TemplatesTable from "../web-components/templatesTable"
+import TemplatesTable from "../custom-elements/templatesTable"
 import { db } from "../messenger"
 
 export default function Templates(): JSX.Element {

@@ -4,8 +4,6 @@ import { PluginDocType } from "./plugin.schema"
 import _ from "lodash"
 import { Plugin, Type } from "../../src/domain/plugin"
 
-export interface WebComponentRegistry extends Record<string, string> {}
-
 interface PluginDocMethods extends KeyFunctionMap {}
 
 export type PluginDocument = RxDocument<PluginDocType, PluginDocMethods>
