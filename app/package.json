@@ -55,6 +55,7 @@
     "vitest": "^0.20.3"
   },
   "dependencies": {
+    "@github/time-elements": "^3.1.4",
     "@tanstack/solid-table": "^8.5.11",
     "babel-preset-solid": "^1.4.8",
     "comlink": "^4.3.1",

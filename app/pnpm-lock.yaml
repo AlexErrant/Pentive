@@ -2,6 +2,7 @@ lockfileVersion: 5.4
 
 specifiers:
   '@babel/core': ^7.18.10
+  '@github/time-elements': ^3.1.4
   '@playwright/test': ^1.25.0
   '@tanstack/solid-table': ^8.5.11
   '@types/iframe-resizer': ^3.5.9
@@ -46,6 +47,7 @@ specifiers:
   vitest: ^0.20.3
 
 dependencies:
+  '@github/time-elements': 3.1.4
   '@tanstack/solid-table': 8.5.11_solid-js@1.4.8
   babel-preset-solid: 1.4.8_@babel+core@7.18.10
   comlink: 4.3.1
@@ -422,6 +424,10 @@ packages:
     transitivePeerDependencies:
       - supports-color
     dev: true
+
+  /@github/time-elements/3.1.4:
+    resolution: {integrity: sha512-DTe/w0uKVeciKzGtYadNdfS8D86pXdGF+OrKg+vi8PKlotJ45zAc26zNpmmfCcMblBBg2+uoi3OxmUm7am/0sg==}
+    dev: false
 
   /@humanwhocodes/config-array/0.9.5:
     resolution: {integrity: sha512-ObyMyWxZiCu/yTisA7uzx81s40xR2fD5Cg/2Kq7G02ajkNubJf6BopgDTmDyc3U7sXpNKM8cYOw7s7Tyr+DnCw==}
