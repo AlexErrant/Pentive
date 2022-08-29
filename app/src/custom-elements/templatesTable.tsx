@@ -39,10 +39,16 @@ const columns: Array<ColumnDef<Template>> = [
   {
     header: "Created",
     accessorKey: id("created"),
+    cell: (info) => {
+      return <time-ago attr:datetime={info.getValue<Date>()}></time-ago>
+    },
   },
   {
     header: "Modified",
     accessorKey: id("modified"),
+    cell: (info) => {
+      return <time-ago attr:datetime={info.getValue<Date>()}></time-ago>
+    },
   },
   {
     header: "Preview",

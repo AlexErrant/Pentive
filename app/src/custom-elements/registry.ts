@@ -4,7 +4,7 @@
 // https://github.com/solidjs/solid/issues/616
 
 import { Component } from "solid-js"
-
+import "@github/time-elements"
 import Nav from "./nav"
 
 class HTMLElementTagNameMap {
@@ -18,6 +18,11 @@ declare module "solid-js" {
       readonly [K in keyof T]: T[K] extends Component<infer P> ? P : never
     }
 
-    interface IntrinsicElements extends ElementProps<HTMLElementTagNameMap> {}
+    interface IntrinsicElements extends ElementProps<HTMLElementTagNameMap> {
+      "time-ago": {
+        // A value of `TimeAgoElement` doesn't seem to work, so we gotta do it manually. https://github.com/github/time-elements/issues/163
+        "attr:datetime": Date
+      }
+    }
   }
 }
