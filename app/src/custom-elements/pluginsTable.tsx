@@ -1,41 +1,26 @@
-import { For, JSX, VoidComponent, Suspense, createResource } from "solid-js"
+import { For, VoidComponent, Suspense, createResource } from "solid-js"
 import {
   ColumnDef,
   createSolidTable,
   flexRender,
   getCoreRowModel,
 } from "@tanstack/solid-table"
-import { Template } from "../domain/template"
+import { Plugin } from "../domain/plugin"
 import _ from "lodash"
-import { renderTemplate } from "../domain/cardHtml"
-import ResizingIframe from "./resizing-iframe"
 import "@github/time-elements"
 
-function id(id: keyof Template): keyof Template {
+function id(id: keyof Plugin): keyof Plugin {
   return id
 }
 
-function remoteCell(hasRemote: boolean): JSX.Element {
-  return hasRemote ? "☁" : ""
-}
-
-const columns: Array<ColumnDef<Template>> = [
+const columns: Array<ColumnDef<Plugin>> = [
   {
     header: "Name",
     accessorKey: id("name"),
   },
   {
     header: "Type",
-    accessorFn: (row) => _.startCase(row.templateType.tag),
-  },
-  {
-    header: "Remote",
-    accessorFn: (row) => row.sourceId != null,
-    cell: (info) => remoteCell(info.getValue<boolean>()),
-  },
-  {
-    header: "Fields",
-    accessorFn: (row) => row.fields.map((f) => f.name).join(", "),
+    accessorFn: (row) => _.startCase(row.type.tag),
   },
   {
     header: "Created",
@@ -51,29 +36,18 @@ const columns: Array<ColumnDef<Template>> = [
       return <time-ago attr:datetime={info.getValue<Date>()}></time-ago>
     },
   },
-  {
-    header: "Preview",
-    cell: (info) => {
-      const srcdoc = renderTemplate(info.row.original)[0]
-      if (srcdoc === null || srcdoc === undefined) {
-        return `Error rendering first template of ${info.row.original.name}`
-      } else {
-        return <ResizingIframe srcdoc={srcdoc[1]}></ResizingIframe>
-      }
-    },
-  },
 ]
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
-const TemplatesTable: VoidComponent<{
-  readonly getTemplates: () => Promise<Template[]>
+const PluginsTable: VoidComponent<{
+  readonly getPlugins: () => Promise<Plugin[]>
 }> = (props) => {
-  const [templates] = createResource(async () => await props.getTemplates(), {
+  const [plugins] = createResource(async () => await props.getPlugins(), {
     initialValue: [],
   })
   const table = createSolidTable({
     get data() {
-      return templates()
+      return plugins()
     },
     columns,
     getCoreRowModel: getCoreRowModel(),
@@ -124,4 +98,4 @@ const TemplatesTable: VoidComponent<{
   )
 }
 
-export default TemplatesTable
+export default PluginsTable

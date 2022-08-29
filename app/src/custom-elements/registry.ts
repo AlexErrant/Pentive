@@ -4,7 +4,6 @@
 // https://github.com/solidjs/solid/issues/616
 
 import { Component } from "solid-js"
-import "@github/time-elements"
 import Nav from "./nav"
 
 class HTMLElementTagNameMap {
