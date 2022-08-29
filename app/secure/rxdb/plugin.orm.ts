@@ -1,7 +1,6 @@
 import { KeyFunctionMap, RxCollection, RxDocument } from "rxdb"
 import { getDb } from "./rxdb"
 import { PluginDocType } from "./plugin.schema"
-import _ from "lodash"
 import { Plugin, Type } from "../../src/domain/plugin"
 
 interface PluginDocMethods extends KeyFunctionMap {}
