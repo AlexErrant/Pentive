@@ -19,19 +19,5 @@
     "**/.git": true,
     "**/node_modules": true,
     "pnpm-lock.yaml": true
-  },
-  "cSpell.words": [
-    "comlink",
-    "msedge",
-    "oneof",
-    "Pentive",
-    "resizer",
-    "rxdb",
-    "sandboxed",
-    "stylelint",
-    "tailwindcss",
-    "upserted",
-    "viewports",
-    "vite"
-  ]
+  }
 }
