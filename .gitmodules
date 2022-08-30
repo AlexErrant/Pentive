@@ -1,0 +1,3 @@
+[submodule "pouchdb-quick-search"]
+	path = pouchdb-quick-search
+	url = https://github.com/arc-archive/pouchdb-quick-search
