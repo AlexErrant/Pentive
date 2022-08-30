@@ -23,4 +23,9 @@ echo "Configuring Youch..."
 curl --silent --show-error --output /dev/null --user "${COUCHDB_USER}:${COUCHDB_PASSWORD}" -X PUT "${YOUCH_URL}/_users"
 curl --silent --show-error --output /dev/null --user "${COUCHDB_USER}:${COUCHDB_PASSWORD}" -X PUT "${YOUCH_URL}/_node/_local/_config/couch_peruser/enable" -d '"true"'
 curl --silent --show-error --output /dev/null --user "${COUCHDB_USER}:${COUCHDB_PASSWORD}" -X PUT "${YOUCH_URL}/_node/_local/_config/chttpd_auth/timeout" -d '"86400"'
+curl --silent --show-error --output /dev/null --user "${COUCHDB_USER}:${COUCHDB_PASSWORD}" -X PUT "${YOUCH_URL}/_node/_local/_config/httpd/enable_cors" -d '"true"'
+curl --silent --show-error --output /dev/null --user "${COUCHDB_USER}:${COUCHDB_PASSWORD}" -X PUT "${YOUCH_URL}/_node/_local/_config/cors/credentials" -d '"true"'
+curl --silent --show-error --output /dev/null --user "${COUCHDB_USER}:${COUCHDB_PASSWORD}" -X PUT "${YOUCH_URL}/_node/_local/_config/cors/origins" -d '"*"' # highTODO make more restrictive
+curl --silent --show-error --output /dev/null --user "${COUCHDB_USER}:${COUCHDB_PASSWORD}" -X PUT "${YOUCH_URL}/_node/_local/_config/cors/methods" -d '"GET, PUT, POST, HEAD, DELETE"'
+curl --silent --show-error --output /dev/null --user "${COUCHDB_USER}:${COUCHDB_PASSWORD}" -X PUT "${YOUCH_URL}/_node/_local/_config/cors/headers" -d '"accept, authorization, content-type, origin, referer"'
 echo "...configured!"
