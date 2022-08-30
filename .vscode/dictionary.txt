@@ -1,4 +1,6 @@
+apkg
 comlink
+iframes
 msedge
 oneof
 pentive
@@ -7,6 +9,7 @@ rxdb
 sandboxed
 stylelint
 tailwindcss
+Tauri
 upserted
 viewports
 vite
