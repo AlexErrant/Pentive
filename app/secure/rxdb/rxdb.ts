@@ -7,6 +7,7 @@ import {
   getRxStoragePouch,
   addPouchPlugin,
   PouchDB,
+  getPouchDBOfRxCollection,
 } from "rxdb/plugins/pouchdb"
 import { RxDBLeaderElectionPlugin } from "rxdb/plugins/leader-election"
 // @ts-expect-error pouchdb is untyped
@@ -35,6 +36,21 @@ import {
   pluginDocMethods,
 } from "./plugin.orm"
 import { RxDBAttachmentsPlugin } from "rxdb/plugins/attachments"
+
+// @ts-expect-error pouchdb is untyped
+import * as PouchDbQuickSearch from "@advanced-rest-client/pouchdb-quick-search"
+// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+if (PouchDbQuickSearch.default.default != null) {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+  PouchDbQuickSearch.default.default.search = PouchDbQuickSearch.search
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+  addPouchPlugin(PouchDbQuickSearch.default)
+} else {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+  PouchDbQuickSearch.default.search = PouchDbQuickSearch.search
+  addPouchPlugin(PouchDbQuickSearch)
+}
+
 addPouchPlugin(pouchdbAdapterHttp)
 addPouchPlugin(pouchdbAdapterIdb)
 addRxPlugin(RxDBReplicationCouchDBPlugin)
@@ -95,6 +111,29 @@ export async function createDb(): Promise<MyDatabase> {
     false // not async
   )
 
+  const pouch: any = getPouchDBOfRxCollection(myDatabase.templates)
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment
+  const x: any = await pouch.search({
+    query: "template",
+    fields: ["name"],
+    include_docs: true,
+  })
+  console.log("template name contains `template`:", x)
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment
+  const y: any = await pouch.search({
+    query: "2022",
+    fields: ["created"],
+    include_docs: true,
+  })
+  console.log("template created contains `2022`:", y)
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment
+  const z: any = await pouch.search({
+    query: "2019",
+    fields: ["created"],
+    include_docs: true,
+  })
+  console.log("template created contains `2019`:", z)
+  
   return myDatabase
 }
 
@@ -178,3 +217,5 @@ export async function sync(): Promise<void> {
   myDatabase.cards.syncCouchDB(syncOptions)
   myDatabase.plugins.syncCouchDB(syncOptions)
 }
+// https://github.com/nextapps-de/flexsearch
+// https://github.com/krisk/Fuse
