@@ -1,0 +1,26 @@
+#!/bin/bash
+
+# TODO: automate https://www.shellcheck.net/
+set -euo pipefail # https://stackoverflow.com/a/2871034
+# set -x
+
+source ./Youch/.env
+YOUCH_URL=http://localhost:${YOUCH_HOST_PORT}
+
+YOUCH_HOST_PORT=${YOUCH_HOST_PORT} docker compose down
+YOUCH_HOST_PORT=${YOUCH_HOST_PORT} docker compose up --detach
+
+printf "Connecting to Youch..."
+# https://stackoverflow.com/a/57660677
+# https://stackoverflow.com/a/21189440
+until curl --output /dev/null --silent --head --fail "${YOUCH_URL}"; do
+    printf '.'
+    sleep 1
+done
+printf "\n...connected!\n\n"
+
+echo "Configuring Youch..."
+curl --silent --show-error --output /dev/null --user "${COUCHDB_USER}:${COUCHDB_PASSWORD}" -X PUT "${YOUCH_URL}/_users"
+curl --silent --show-error --output /dev/null --user "${COUCHDB_USER}:${COUCHDB_PASSWORD}" -X PUT "${YOUCH_URL}/_node/_local/_config/couch_peruser/enable" -d '"true"'
+curl --silent --show-error --output /dev/null --user "${COUCHDB_USER}:${COUCHDB_PASSWORD}" -X PUT "${YOUCH_URL}/_node/_local/_config/chttpd_auth/timeout" -d '"86400"'
+echo "...configured!"

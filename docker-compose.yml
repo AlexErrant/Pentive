@@ -1,0 +1,10 @@
+version: "3.9"
+
+services:
+  youch:
+    container_name: Youch
+    build: ./Youch
+    ports:
+      - "${YOUCH_HOST_PORT}:5984"
+    env_file:
+      - ./Youch/.env # due to this, be careful when publishing any images! Don't publish any real secrets!
