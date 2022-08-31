@@ -2,7 +2,6 @@ import { useRouteData } from "solid-app-router"
 import { createEffect, createSignal, JSX } from "solid-js"
 import { sampleCard, Card } from "../domain/card"
 import { defaultTemplate, Template } from "../domain/template"
-import * as rxdb from "../../secure/rxdb/rxdb"
 import HomeData from "./home.data"
 import { db } from "../messenger"
 import { Plugin } from "../../src/domain/plugin"
@@ -63,13 +62,13 @@ export default function Home(): JSX.Element {
         </button>
         <button
           class="border rounded-lg px-2 border-gray-900"
-          onClick={rxdb.remove}
+          onClick={async () => await db.remove()}
         >
           remove
         </button>
         <button
           class="border rounded-lg px-2 border-gray-900"
-          onClick={rxdb.sync}
+          onClick={async () => await db.sync()}
         >
           sync
         </button>
