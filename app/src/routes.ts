@@ -1,4 +1,4 @@
-import { JSX, lazy } from "solid-js"
+import { lazy } from "solid-js"
 import type { RouteDefinition } from "solid-app-router"
 
 import Home from "./pages/home"
@@ -6,29 +6,29 @@ import HomeData from "./pages/home.data"
 import AboutData from "./pages/about.data"
 
 export interface NavLinkData {
-  readonly content: JSX.Element
+  readonly name: string
   readonly href: string
 }
 
 export const navLinks: readonly NavLinkData[] = [
   {
-    content: "Home",
+    name: "Home",
     href: "/",
   },
   {
-    content: "About",
+    name: "About",
     href: "/about",
   },
   {
-    content: "Templates",
+    name: "Templates",
     href: "/templates",
   },
   {
-    content: "Plugins",
+    name: "Plugins",
     href: "/plugins",
   },
   {
-    content: "Error",
+    name: "Error",
     href: "/error",
   },
 ]

@@ -13,7 +13,7 @@ const Nav: VoidComponent<{ readonly navLinks: readonly NavLinkData[] }> = (
     <nav class="bg-gray-200 text-gray-900 px-4">
       <ul class="flex items-center">
         <For each={props.navLinks}>
-          {({ href, content }) => (
+          {({ href, name }) => (
             <li class="py-2 px-4">
               <NavLink
                 href={href}
@@ -21,7 +21,7 @@ const Nav: VoidComponent<{ readonly navLinks: readonly NavLinkData[] }> = (
                 activeClass="font-bold"
                 end={ends.has(href)}
               >
-                {content}
+                {name}
               </NavLink>
             </li>
           )}
