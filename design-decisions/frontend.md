@@ -8,9 +8,9 @@ There are many downsides to using Solid, including questionable SSR and a less m
 # Plugins
 UI plugins are supporting using [custom elements](https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_custom_elements). A significant drawback, however, is that [custom elements have no security model](https://stackoverflow.com/q/45282601).
 
-Function plugins will be executed using Javascript's [Function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function) object. While better than `eval`, it also suffers from having no security model.
+Function plugins will be executed using Javascript's [Function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function) object. While better than `eval`, it also suffers from [having no security model](https://stackoverflow.com/q/18060696).
 
-In the future, Pentive may try to provide better security by wrapping the custom element or function in a sandboxed iframe. Until then, users must accept the risk that plugins may do nefarious things.
+In the future, Pentive may try to provide better security by wrapping the custom element or function in a sandboxed iframe. Until then, users must accept the risk that plugins may do nefarious things. Notably, it looks like [VS Code doesn't sandbox its plugins](https://stackoverflow.com/q/67493012), despite [the risk](https://snyk.io/blog/visual-studio-code-extension-security-vulnerabilities-deep-dive/), so perhaps I should tone down my paranoia. Certainly confining plugins to a browser environment is better than running arbitrary Python modules like Anki. It's a strict improvement.
 
 # Security
 IndexedDB and other secrets are managed from an `iframe`, which is served from `secure.*.pentive.com` to block plugin access. Web workers don't work cross origin, but if someday we really want it on a background thread we can [embed a web worker in the iframe](https://stackoverflow.com/a/22151285) or [use a service worker in an iframe](https://stackoverflow.com/a/31883194).
