@@ -4,13 +4,11 @@ import { sampleCard, Card } from "../domain/card"
 import { defaultTemplate, Template } from "../domain/template"
 import HomeData from "./home.data"
 import { db } from "../messenger"
-import { Plugin } from "../../src/domain/plugin"
 
 export default function Home(): JSX.Element {
   const [count, setCount] = createSignal(1)
   const [template, setTemplate] = createSignal<Template | null>(null)
   const [card, setCard] = createSignal<Card | null>(null)
-  const [plugins, setPlugins] = createSignal<Plugin[]>([])
   const age = useRouteData<typeof HomeData>()
 
   console.log(count())
@@ -25,10 +23,6 @@ export default function Home(): JSX.Element {
 
   createEffect(() => {
     console.log(card())
-  })
-
-  createEffect(() => {
-    console.log(plugins())
   })
 
   return (
@@ -101,34 +95,6 @@ export default function Home(): JSX.Element {
           onClick={async () => setCard(await db.getCard(sampleCard.id))}
         >
           getCard
-        </button>
-      </div>
-      <div class="mt-4">
-        <button
-          class="border rounded-lg px-2 border-gray-900"
-          onClick={async () => {
-            const config = await fetch("/pentive-nav.js")
-            const plugin: Plugin = {
-              id: "520E5C04-93DF-4DB8-B51A-0B5EAE843356",
-              created: new Date().toISOString(),
-              modified: new Date().toISOString(),
-              name: "plain pentive nav",
-              type: {
-                tag: "custom-element",
-                name: "pentive-nav",
-              },
-              script: await config.blob(),
-            }
-            await db.upsertPlugin(plugin)
-          }}
-        >
-          upsertPlugin
-        </button>
-        <button
-          class="border rounded-lg px-2 border-gray-900"
-          onClick={async () => await db.getPlugins().then(setPlugins)}
-        >
-          getPlugin
         </button>
       </div>
     </section>
