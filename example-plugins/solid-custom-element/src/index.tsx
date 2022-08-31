@@ -2,11 +2,7 @@
 
 import { For, VoidComponent } from "solid-js"
 import { customElement } from "solid-element"
-
-interface NavLinkData {
-  readonly name: string
-  readonly href: string
-}
+import { NavLinkData } from "../../../app/src/custom-elements/contracts"
 
 const Nav: VoidComponent<{ navLinks: NavLinkData[] }> = (props) => {
   return (
