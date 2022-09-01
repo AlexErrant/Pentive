@@ -1,0 +1,4 @@
+# https://stackoverflow.com/a/68187315
+*           text=auto
+*.sh        text eol=lf
+.env        text eol=lf
