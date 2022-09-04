@@ -8,6 +8,7 @@ namespace Test {
   public class ApiWebApplicationFactory : WebApplicationFactory<Program> {
     protected override void ConfigureWebHost(IWebHostBuilder builder) {
       builder.ConfigureAppConfiguration(config => { });
+      // highTODO use a different connection string
       builder.ConfigureTestServices(services => { });
     }
   }
