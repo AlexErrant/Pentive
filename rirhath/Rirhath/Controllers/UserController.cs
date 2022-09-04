@@ -18,9 +18,9 @@ namespace Rirhath.Controllers {
   [Route("[controller]")]
   public class UserController : ControllerBase {
 
-    private readonly DapperContext _context;
+    private readonly IDapperContext _context;
 
-    public UserController(DapperContext context) {
+    public UserController(IDapperContext context) {
       _context = context;
     }
 
