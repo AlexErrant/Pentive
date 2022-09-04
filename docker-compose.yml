@@ -15,3 +15,8 @@ services:
       - "${IVY_HOST_PORT}:5432"
     env_file:
       - ./ivy/.env # due to this, be careful when publishing any images! Don't publish any real secrets! TODO figure out how real devs manage this
+  rirhath:
+    container_name: Rirhath
+    build:
+      context: ./rirhath
+      dockerfile: ./Rirhath/Dockerfile
