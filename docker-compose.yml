@@ -3,8 +3,15 @@ version: "3.9"
 services:
   youch:
     container_name: Youch
-    build: ./Youch
+    build: ./youch
     ports:
       - "${YOUCH_HOST_PORT}:5984"
     env_file:
-      - ./Youch/.env # due to this, be careful when publishing any images! Don't publish any real secrets!
+      - ./youch/.env # due to this, be careful when publishing any images! Don't publish any real secrets! TODO figure out how real devs manage this
+  ivy:
+    container_name: Ivy
+    build: ./ivy
+    ports:
+      - "${IVY_HOST_PORT}:5432"
+    env_file:
+      - ./ivy/.env # due to this, be careful when publishing any images! Don't publish any real secrets! TODO figure out how real devs manage this

@@ -8,11 +8,12 @@
 set -euo pipefail # https://stackoverflow.com/a/2871034
 # set -x
 
-source ./Youch/.env
+source ./youch/.env
+source ./ivy/.env
 YOUCH_URL=http://localhost:${YOUCH_HOST_PORT}
 
-YOUCH_HOST_PORT=${YOUCH_HOST_PORT} docker compose down
-YOUCH_HOST_PORT=${YOUCH_HOST_PORT} docker compose up --detach
+YOUCH_HOST_PORT=${YOUCH_HOST_PORT} IVY_HOST_PORT=${IVY_HOST_PORT} docker compose down
+YOUCH_HOST_PORT=${YOUCH_HOST_PORT} IVY_HOST_PORT=${IVY_HOST_PORT} docker compose up --detach
 
 printf "Connecting to Youch..."
 # https://stackoverflow.com/a/57660677
