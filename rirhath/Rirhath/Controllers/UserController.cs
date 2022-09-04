@@ -4,10 +4,14 @@ using Microsoft.AspNetCore.Mvc;
 namespace Rirhath.Controllers {
 
   public class Padawan {
-    public string Name { get; }
-    public DateTimeOffset Created { get; }
-    public string[] Notifications { get; }
-    public string Nooks { get; }
+    public string Name { get; set; }
+    public DateTimeOffset Created { get; set; }
+    public string[] Notifications { get; set; }
+    public string Nooks { get; set; }
+  }
+
+  public class NewUser {
+    public string Name { get; set; }
   }
 
   [ApiController]
@@ -26,6 +30,18 @@ namespace Rirhath.Controllers {
       var query = "SELECT * FROM padawan where name = @name";
       using var connection = _context.CreateConnection();
       return await connection.QuerySingleAsync<Padawan>(query, new { name });
+    }
+
+    // highTODO needs auth and validation
+    [HttpPost]
+    public async Task Post(NewUser user) {
+      using var connection = _context.CreateConnection();
+      await connection.ExecuteAsync(
+        @"INSERT INTO padawan (name,  created, notifications, nooks)
+                       VALUES(@Name, @Created,          '{}', '[]')", new {
+          Name = user.Name,
+          Created = DateTime.UtcNow
+        });
     }
 
   }
