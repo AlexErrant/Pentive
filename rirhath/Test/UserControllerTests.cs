@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
+using System.Transactions;
 using Microsoft.AspNetCore.WebUtilities;
 using Rirhath.Controllers;
 
@@ -9,6 +10,7 @@ namespace Test {
 
     [Fact]
     public async Task POST_then_GET_retrieves_user() {
+      using var transactionScope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
       await using var application = new ApiWebApplicationFactory();
       using var client = application.CreateClient();
 
@@ -31,6 +33,7 @@ namespace Test {
       Assert.Equal(name, u.Name);
       Assert.Equal(Array.Empty<string>(), u.Notifications);
       Assert.Equal("[]", u.Nooks);
+      transactionScope.Dispose();
     }
 
   }
