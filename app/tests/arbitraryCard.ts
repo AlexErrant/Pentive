@@ -14,7 +14,8 @@ import {
   ChildTemplateId,
   ClozeIndex,
   DeckId,
-  SpecimenRevisionId,
+  RemoteCardId,
+  RemoteTemplateId,
   TemplateId,
 } from "../src/domain/ids"
 
@@ -45,7 +46,9 @@ const required = {
 }
 
 const optional = {
-  specimenRevisionId: fc.uuidV(4).map((x) => x as SpecimenRevisionId),
+  pushId: fc.uuidV(4).map((x) => x as RemoteCardId),
+  pushTemplateId: fc.uuidV(4).map((x) => x as RemoteTemplateId),
+  push: fc.boolean(),
   ankiNoteId: fc.integer(),
   title: fc.string(),
   cardSettingId: fc.uuidV(4).map((x) => x as CardSettingId),

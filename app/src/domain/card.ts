@@ -4,8 +4,9 @@ import {
   ClozeIndex,
   DeckId,
   CardId,
-  SpecimenRevisionId,
   TemplateId,
+  RemoteCardId,
+  RemoteTemplateId,
 } from "./ids"
 
 export type State = "normal" | "scheduler buried" | "user buried" | "suspended"
@@ -28,7 +29,9 @@ export interface Card {
   readonly id: CardId
   readonly deckIds: ReadonlySet<DeckId>
   readonly tags: ReadonlySet<string>
-  readonly specimenRevisionId?: SpecimenRevisionId
+  readonly pushId?: RemoteCardId
+  readonly pushTemplateId?: RemoteTemplateId
+  readonly push?: boolean
   readonly ankiNoteId?: number
   readonly title?: string
   readonly created: Date

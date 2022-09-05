@@ -28,12 +28,22 @@ export const templateSchemaLiteral = {
       format: "date-time",
       maxLength: 24,
     },
+    pushId: {
+      type: "string",
+      maxLength: 36,
+    },
+    push: {
+      type: "integer",
+      minimum: 0,
+      maximum: 1,
+      multipleOf: 1,
+    },
     data: {
       type: "object", // https://gitter.im/pubkey/rxdb?at=5a58d78e83152df26d626cb1
     },
   },
   required: ["id", "name", "created", "modified", "data"],
-  indexes: ["name", "created", "modified"],
+  indexes: ["name", "created", "modified", "push", "pushId"],
 } as const // <- It is important to set 'as const' to preserve the literal type
 const schemaTyped = toTypedRxJsonSchema(templateSchemaLiteral)
 

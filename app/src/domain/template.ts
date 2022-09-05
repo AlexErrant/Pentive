@@ -1,4 +1,4 @@
-import { ChildTemplateId, StencilRevisionId, TemplateId } from "./ids"
+import { ChildTemplateId, RemoteTemplateId, TemplateId } from "./ids"
 
 export interface Field {
   readonly name: string
@@ -28,8 +28,8 @@ export type TemplateType =
 
 export interface Template {
   readonly id: TemplateId
-  readonly sourceId?: StencilRevisionId
-  readonly specimenSourceId?: StencilRevisionId
+  readonly pushId?: RemoteTemplateId
+  readonly push?: boolean
   readonly name: string // todo limit to 100
   readonly css: string
   readonly fields: readonly Field[]

@@ -2,7 +2,7 @@ import fc from "fast-check"
 
 import {
   ChildTemplateId,
-  StencilRevisionId,
+  RemoteTemplateId,
   TemplateId,
 } from "../src/domain/ids"
 import {
@@ -60,7 +60,7 @@ export const template = recordWithOptionalFields<Template>(
     templateType,
   },
   {
-    sourceId: fc.uuidV(4).map((x) => x as StencilRevisionId),
-    specimenSourceId: fc.uuidV(4).map((x) => x as StencilRevisionId),
+    pushId: fc.uuidV(4).map((x) => x as RemoteTemplateId),
+    push: fc.boolean(),
   }
 )

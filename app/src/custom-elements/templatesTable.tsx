@@ -15,8 +15,10 @@ function id(id: keyof Template): keyof Template {
   return id
 }
 
-function remoteCell(hasRemote: boolean): JSX.Element {
-  return hasRemote ? "☁" : ""
+function remoteCell(template: Template): JSX.Element {
+  const url = `https://pentive.com/t/${template.pushId as string}`
+  const content = template.push === true ? "☁" : "🔗"
+  return <a href={url}>{content}</a>
 }
 
 const columns: Array<ColumnDef<Template>> = [
@@ -29,9 +31,8 @@ const columns: Array<ColumnDef<Template>> = [
     accessorFn: (row) => _.startCase(row.templateType.tag),
   },
   {
-    header: "Remote",
-    accessorFn: (row) => row.sourceId != null,
-    cell: (info) => remoteCell(info.getValue<boolean>()),
+    header: "Upload",
+    cell: (info) => remoteCell(info.row.original),
   },
   {
     header: "Fields",
