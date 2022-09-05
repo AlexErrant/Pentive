@@ -1,4 +1,4 @@
-import fc from "fast-check"
+import fc, { Arbitrary } from "fast-check"
 import {
   ChildCard,
   ParentCard,
@@ -48,7 +48,8 @@ const required = {
 const optional = {
   pushId: fc.uuidV(4).map((x) => x as RemoteCardId),
   pushTemplateId: fc.uuidV(4).map((x) => x as RemoteTemplateId),
-  push: fc.boolean(),
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+  push: fc.constant(true) as Arbitrary<true>,
   ankiNoteId: fc.integer(),
   title: fc.string(),
   cardSettingId: fc.uuidV(4).map((x) => x as CardSettingId),

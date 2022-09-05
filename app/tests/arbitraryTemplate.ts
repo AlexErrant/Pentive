@@ -61,6 +61,6 @@ export const template = recordWithOptionalFields<Template>(
   },
   {
     pushId: fc.uuidV(4).map((x) => x as RemoteTemplateId),
-    push: fc.boolean(),
+    push: fc.constant(true),
   }
 )

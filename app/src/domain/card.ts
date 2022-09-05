@@ -31,7 +31,7 @@ export interface Card {
   readonly tags: ReadonlySet<string>
   readonly pushId?: RemoteCardId
   readonly pushTemplateId?: RemoteTemplateId
-  readonly push?: boolean
+  readonly push?: true
   readonly ankiNoteId?: number
   readonly title?: string
   readonly created: Date

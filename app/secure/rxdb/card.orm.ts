@@ -5,12 +5,24 @@ import { CardDocType } from "./card.schema"
 import { getDb } from "./rxdb"
 
 function cardToDocType(card: Card): CardDocType {
-  const { id, title, created, modified, ...shrunken } = card // https://stackoverflow.com/a/66899790
+  const {
+    id,
+    title,
+    created,
+    modified,
+    push,
+    pushId,
+    pushTemplateId,
+    ...shrunken
+  } = card // https://stackoverflow.com/a/66899790
   return {
     id,
     title: title ?? undefined,
     created: created.toISOString(),
     modified: modified.toISOString(),
+    push: push === true ? 1 : 0,
+    pushId,
+    pushTemplateId,
     data: shrunken,
   }
 }
@@ -24,27 +36,28 @@ export type CardCollection = RxCollection<CardDocType, CardDocMethods>
 
 export const cardDocMethods: CardDocMethods = {}
 
-function entityToDomain(
-  card: RxDocument<
-    {
-      readonly id: string
-      readonly created: string
-      readonly modified: string
-      readonly data: unknown
-      readonly title?: string | undefined
-    },
-    CardDocMethods
-  >
-): Card {
+function entityToDomain(card: CardDocument): Card {
   const r = {
     id: card.id as CardId,
     title: card.title,
     created: new Date(card.created),
     modified: new Date(card.modified),
+    push: card.push === 1 ? true : undefined,
+    pushId: card.pushId,
+    pushTemplateId: card.pushTemplateId,
     ...(card.data as object),
   }
   if (r.title === undefined) {
     delete r.title
+  }
+  if (r.push === undefined) {
+    delete r.push
+  }
+  if (r.pushId === undefined) {
+    delete r.pushId
+  }
+  if (r.pushTemplateId === undefined) {
+    delete r.pushTemplateId
   }
   return r as Card
   // Returning dates are *sometimes* strings.

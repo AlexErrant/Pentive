@@ -5,12 +5,14 @@ import { getDb } from "./rxdb"
 import { TemplateDocType } from "./template.schema"
 
 function templateToDocType(template: Template): TemplateDocType {
-  const { id, name, created, modified, ...shrunken } = template // https://stackoverflow.com/a/66899790
+  const { id, name, created, modified, push, pushId, ...shrunken } = template // https://stackoverflow.com/a/66899790
   return {
     id,
     name,
     created: created.toISOString(),
     modified: modified.toISOString(),
+    push: push === true ? 1 : 0,
+    pushId,
     data: shrunken,
   }
 }
@@ -26,27 +28,24 @@ export type TemplateCollection = RxCollection<
 
 export const templateDocMethods: TemplateDocMethods = {}
 
-function entityToDomain(
-  template: RxDocument<
-    {
-      readonly id: string
-      readonly name: string
-      readonly created: string
-      readonly modified: string
-      readonly data: unknown
-    },
-    TemplateDocMethods
-  >
-): Template {
+function entityToDomain(template: TemplateDocument): Template {
   const r = {
     id: template.id as TemplateId,
     name: template.name,
     created: new Date(template.created),
     modified: new Date(template.modified),
+    push: template.push === 1 ? true : undefined,
+    pushId: template.pushId,
     ...(template.data as object),
   }
   // @ts-expect-error Unsure why `type` is in `data` - it's not there when inserted. RxDB or PouchDB or something adds it. Removing to make roundtrip testing easier.
   delete r.type
+  if (r.push === undefined) {
+    delete r.push
+  }
+  if (r.pushId === undefined) {
+    delete r.pushId
+  }
   return r as Template
   // Returning dates are *sometimes* strings.
   // The first return after a page refresh is a string because IndexedDb can't handle Date and serializes it.

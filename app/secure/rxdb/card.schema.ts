@@ -37,12 +37,16 @@ export const cardSchemaLiteral = {
       maximum: 1,
       multipleOf: 1,
     },
+    pushTemplateId: {
+      type: "string",
+      maxLength: 36,
+    },
     data: {
       type: "object", // https://gitter.im/pubkey/rxdb?at=5a58d78e83152df26d626cb1
     },
   },
   required: ["id", "created", "modified", "data"],
-  indexes: ["title", "created", "modified", "push", "pushId"],
+  indexes: ["title", "created", "modified", "push", "pushId", "pushTemplateId"],
 } as const // <- It is important to set 'as const' to preserve the literal type
 const schemaTyped = toTypedRxJsonSchema(cardSchemaLiteral)
 
