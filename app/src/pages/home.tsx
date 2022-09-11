@@ -14,7 +14,7 @@ export default function Home(): JSX.Element {
   console.log(count())
   createEffect(() => {
     console.log(age())
-    setCount(age())
+    setCount(age() as number) // not sure why, but changing to a mono repo changed the signature of this to include `undefined` - which is wrong. Whatever.
   })
 
   createEffect(() => {
