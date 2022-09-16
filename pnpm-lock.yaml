@@ -31,6 +31,7 @@ importers:
       iframe-resizer: ^4.3.2
       jsdom: ^20.0.0
       lodash: ^4.17.21
+      lrpc: workspace:*
       postcss: ^8.4.14
       pouchdb-adapter-http: ^7.3.0
       pouchdb-adapter-idb: ^7.3.0
@@ -58,6 +59,7 @@ importers:
       comlink: 4.3.1
       iframe-resizer: 4.3.2
       lodash: 4.17.21
+      lrpc: link:../lrpc
       pouchdb-adapter-idb: 7.3.0
       pouchdb-debug: 7.2.1
       rxdb: 12.7.16_rxjs@7.5.6

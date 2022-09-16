@@ -1,7 +1,6 @@
 {
-  "name": "vite-template-solid",
+  "name": "app",
   "version": "0.0.0",
-  "description": "",
   "scripts": {
     "start": "vite",
     "dev": "vite",
@@ -20,7 +19,6 @@
     "playwright:debug": "playwright test --debug",
     "playwright:init": "playwright install"
   },
-  "license": "MIT",
   "devDependencies": {
     "@babel/core": "^7.18.10",
     "@playwright/test": "^1.25.0",
@@ -61,6 +59,7 @@
     "comlink": "^4.3.1",
     "iframe-resizer": "^4.3.2",
     "lodash": "^4.17.21",
+    "lrpc": "workspace:*",
     "pouchdb-adapter-idb": "^7.3.0",
     "pouchdb-debug": "^7.2.1",
     "rxdb": "^12.7.16",
