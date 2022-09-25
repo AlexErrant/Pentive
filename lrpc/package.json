@@ -1,5 +1,5 @@
 {
-  "name": "@examples/lambda-api-gateway",
+  "name": "lrpc",
   "private": true,
   "version": "9.27.2",
   "main": "index.js",

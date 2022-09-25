@@ -1,6 +1,7 @@
 apkg
 comlink
 iframes
+lrpc
 msedge
 oneof
 passwordless
@@ -11,6 +12,7 @@ sandboxed
 stylelint
 tailwindcss
 Tauri
+trpc
 upserted
 viewports
 vite
