@@ -6,6 +6,7 @@
     "@trpc/client": "^9.27.2",
     "@trpc/server": "^9.27.2",
     "aws-lambda": "^1.0.7",
+    "aws-sdk": "^2.1223.0",
     "node-fetch": "^2.6.1",
     "ts-node": "^10.3.0",
     "zod": "^3.19.1"

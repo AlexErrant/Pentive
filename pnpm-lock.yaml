@@ -106,6 +106,7 @@ importers:
       '@types/node': ^18.7.21
       '@types/node-fetch': ^2.6.2
       aws-lambda: ^1.0.7
+      aws-sdk: ^2.1223.0
       node-fetch: ^2.6.1
       serverless: ^3.22.0
       serverless-dynamodb-local: ^0.2.40
@@ -118,6 +119,7 @@ importers:
       '@trpc/client': 9.27.2_@trpc+server@9.27.2
       '@trpc/server': 9.27.2
       aws-lambda: 1.0.7
+      aws-sdk: 2.1223.0
       node-fetch: 2.6.7
       ts-node: 10.9.1_xtqs6kgm66nfdh2owzzcckeyxm
       zod: 3.19.1
