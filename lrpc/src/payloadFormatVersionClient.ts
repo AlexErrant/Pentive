@@ -15,13 +15,13 @@ const restApiClient = createTRPCClient<AppRouter>({
   try {
     // A Very simple client to test showcase both APIGW v1(Rest API) and v2(HTTP API) support with serverless-offline
     const queryForVersion2 = await httpApiClient.query(
-      'payloadFormatVersion',
-      {},
+      'greet',
+      {name:"bob's your uncle"},
     );
     console.log(queryForVersion2);
     const queryForVersion1 = await restApiClient.query(
-      'payloadFormatVersion',
-      {},
+      'greet',
+      {name:"bob's your uncle"},
     );
     console.log(queryForVersion1);
   } catch (error) {

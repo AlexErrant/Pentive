@@ -22,7 +22,7 @@
     "typescript": "4.4.4"
   },
   "scripts": {
-    "build": "yarn tsc",
+    "build": "npx tsc",
     "start-server": "npx serverless offline --httpPort 4050",
     "start-client": "yarn ts-node src/client.ts",
     "http-rest-client": "yarn ts-node src/payloadFormatVersionClient.ts"
