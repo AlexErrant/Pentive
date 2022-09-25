@@ -7,10 +7,15 @@
   "dependencies": {
     "@trpc/client": "^9.27.2",
     "@trpc/server": "^9.27.2",
+    "aws-lambda": "^1.0.7",
     "node-fetch": "^2.6.1",
-    "ts-node": "^10.3.0"
+    "ts-node": "^10.3.0",
+    "zod": "^3.19.1"
   },
   "devDependencies": {
+    "@types/aws-lambda": "^8.10.106",
+    "@types/node": "^18.7.21",
+    "@types/node-fetch": "^2.6.2",
     "serverless": "^3.18.1",
     "serverless-offline": "^8.8.0",
     "serverless-plugin-typescript": "^2.1.2",
