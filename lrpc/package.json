@@ -26,6 +26,10 @@
     "build": "npx tsc",
     "start-server": "npx serverless offline --httpPort 4050",
     "start-client": "yarn ts-node src/client.ts",
-    "http-rest-client": "yarn ts-node src/payloadFormatVersionClient.ts"
+    "http-rest-client": "yarn ts-node src/payloadFormatVersionClient.ts",
+    "eslint": "eslint .",
+    "eslint:write": "eslint . --fix",
+    "prettier": "prettier --check .",
+    "prettier:write": "prettier --write ."
   }
 }
