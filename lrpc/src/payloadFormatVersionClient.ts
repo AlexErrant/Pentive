@@ -2,7 +2,8 @@ import { createTRPCClient } from "@trpc/client"
 import fetch from "node-fetch"
 import type { AppRouter } from "./server"
 
-global.fetch = fetch as any
+// @ts-expect-error lowTodo fix whenever we move off node-fetch
+global.fetch = fetch
 
 const httpApiClient = createTRPCClient<AppRouter>({
   url: "http://127.0.0.1:4050",
@@ -11,7 +12,7 @@ const restApiClient = createTRPCClient<AppRouter>({
   url: "http://127.0.0.1:4050/dev",
 })
 
-;(async () => {
+await (async () => {
   try {
     // A Very simple client to test showcase both APIGW v1(Rest API) and v2(HTTP API) support with serverless-offline
     const queryForVersion2 = await httpApiClient.query("greet", {
