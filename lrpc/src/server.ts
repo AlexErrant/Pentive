@@ -9,7 +9,7 @@ function createContext({
   context,
 }: CreateAWSLambdaContextOptions<APIGatewayProxyEvent>) {
   return {
-    event: event,
+    event,
     apiVersion: (event as { version?: string }).version || "1.0",
     user: event.headers["x-user"],
   }
