@@ -107,6 +107,7 @@ importers:
       '@types/node-fetch': ^2.6.2
       aws-lambda: ^1.0.7
       aws-sdk: ^2.1223.0
+      dotenv: ^16.0.2
       node-fetch: ^2.6.1
       serverless: ^3.22.0
       serverless-dynamodb-local: ^0.2.40
@@ -121,6 +122,7 @@ importers:
       '@trpc/server': 9.27.2
       aws-lambda: 1.0.7
       aws-sdk: 2.1223.0
+      dotenv: 16.0.2
       node-fetch: 2.6.7
       ts-node: 10.9.1_xtqs6kgm66nfdh2owzzcckeyxm
       zod: 3.19.1
@@ -2727,6 +2729,11 @@ packages:
     resolution: {integrity: sha512-rlBi9d8jpv9Sf1klPjNfFAuWDjKLwTIJJ/VxtoTwIR6hnZxcEOQCZg2oIL3MWBYw5GpUDKOEnND7LXTbIpQ03Q==}
     engines: {node: '>=10'}
     dev: true
+
+  /dotenv/16.0.2:
+    resolution: {integrity: sha512-JvpYKUmzQhYoIFgK2MOnF3bciIZoItIIoryihy0rIA+H4Jy0FmgyKYAHCTN98P5ybGSJcIFbh6QKeJdtZd1qhA==}
+    engines: {node: '>=12'}
+    dev: false
 
   /duration/0.2.2:
     resolution: {integrity: sha512-06kgtea+bGreF5eKYgI/36A6pLXggY7oR4p1pq4SmdFBn1ReOL5D8RhG64VrqfTTKNucqqtBAwEj8aB88mcqrg==}
