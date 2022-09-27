@@ -1,6 +1,6 @@
 import { createTRPCClient } from "@trpc/client"
 import fetch from "node-fetch"
-import type { AppRouter } from "./server"
+import type { AppRouter } from "./appRouter"
 
 // @ts-expect-error lowTodo fix whenever we move off node-fetch
 global.fetch = fetch
