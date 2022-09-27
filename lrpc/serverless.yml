@@ -28,11 +28,11 @@ provider:
 
 functions:
   http-api:
-    handler: .build/src/server.handler
+    handler: .build/src/lambdaHandler.handler
     events:
       - httpApi: "*"
   rest-api:
-    handler: .build/src/server.handler
+    handler: .build/src/lambdaHandler.handler
     events:
       - http:
           path: /{proxy+}
