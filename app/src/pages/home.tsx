@@ -4,6 +4,16 @@ import { sampleCard, Card } from "../domain/card"
 import { defaultTemplate, Template } from "../domain/template"
 import HomeData from "./home.data"
 import { db } from "../messenger"
+import { lrpc } from "../lrpcClient"
+
+async function uploadNewTemplates(): Promise<void> {
+  await lrpc.mutation("addTemplate", {
+    id: "aRandomId",
+    name: "a template name",
+  })
+  const r = await lrpc.query("getTemplate", "aRandomId")
+  console.log(r)
+}
 
 export default function Home(): JSX.Element {
   const [count, setCount] = createSignal(1)
@@ -81,6 +91,12 @@ export default function Home(): JSX.Element {
           }
         >
           getTemplate
+        </button>
+        <button
+          class="border rounded-lg px-2 border-gray-900"
+          onClick={uploadNewTemplates}
+        >
+          uploadNewTemplates
         </button>
       </div>
       <div class="mt-4">

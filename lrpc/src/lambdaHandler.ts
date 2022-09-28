@@ -4,6 +4,8 @@ import type { APIGatewayProxyEventV2 } from "aws-lambda"
 import * as trpc from "@trpc/server"
 import { appRouter } from "./appRouter"
 
+// highTODO https://github.com/trpc/trpc/discussions/2371
+
 function createContext({
   event,
   context,
