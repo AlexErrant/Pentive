@@ -1,15 +1,11 @@
 /* eslint-disable @typescript-eslint/naming-convention */
+import config from "./config"
 import * as trpc from "@trpc/server"
 import { z } from "zod"
 import AWS, { Credentials, DynamoDB } from "aws-sdk"
-import * as dotenv from "dotenv"
 
-dotenv.config({ path: ".env.dev" })
-
-const IVY_TABLE = process.env.IVY_TABLE as string
-if (IVY_TABLE === undefined) throw new Error("`IVY_TABLE` should be defined")
 const dynamoDbClientParams: DynamoDB.Types.ClientConfiguration = {}
-if (process.env.IS_OFFLINE === "true") {
+if (config.IS_OFFLINE === "true") {
   dynamoDbClientParams.region = "localhost"
   dynamoDbClientParams.endpoint = "http://localhost:8000"
   dynamoDbClientParams.credentials = new Credentials(
@@ -45,7 +41,7 @@ export function appRouter<TContext extends Context>() {
       async resolve(req) {
         await dynamoDbClient
           .put({
-            TableName: IVY_TABLE,
+            TableName: config.IVY_TABLE,
             Item: {
               PK: req.input.id,
               SK: req.input.id,
@@ -60,7 +56,7 @@ export function appRouter<TContext extends Context>() {
       async resolve(req) {
         const r = await dynamoDbClient
           .get({
-            TableName: IVY_TABLE,
+            TableName: config.IVY_TABLE,
             Key: {
               PK: req.input,
               SK: req.input,
