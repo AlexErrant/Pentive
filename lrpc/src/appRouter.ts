@@ -2,6 +2,9 @@
 import * as trpc from "@trpc/server"
 import { z } from "zod"
 import AWS, { Credentials, DynamoDB } from "aws-sdk"
+import * as dotenv from "dotenv"
+
+dotenv.config({ path: ".env.dev" })
 
 const IVY_TABLE = process.env.IVY_TABLE as string
 if (IVY_TABLE === undefined) throw new Error("`IVY_TABLE` should be defined")

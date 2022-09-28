@@ -26,6 +26,8 @@
   "scripts": {
     "init-local": "serverless dynamodb install",
     "build": "npx tsc",
+    "dev": "ts-node-dev src/dev.ts",
+    "dev-db": "serverless dynamodb start",
     "start-offline": "npx serverless offline start --httpPort 4050",
     "rebuild-offline": "npm run build && npm run start-offline",
     "start-client": "yarn ts-node src/client.ts",
