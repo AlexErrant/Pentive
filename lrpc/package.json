@@ -8,6 +8,7 @@
     "aws-lambda": "^1.0.7",
     "aws-sdk": "^2.1223.0",
     "dotenv": "^16.0.2",
+    "dynamodb-toolbox": "^0.4.3",
     "node-fetch": "^2.6.1",
     "ts-node": "^10.3.0",
     "zod": "^3.19.1"

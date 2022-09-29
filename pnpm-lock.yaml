@@ -114,6 +114,7 @@ importers:
       aws-lambda: ^1.0.7
       aws-sdk: ^2.1223.0
       dotenv: ^16.0.2
+      dynamodb-toolbox: ^0.4.3
       node-fetch: ^2.6.1
       serverless: ^3.22.0
       serverless-dynamodb-local: ^0.2.40
@@ -129,6 +130,7 @@ importers:
       aws-lambda: 1.0.7
       aws-sdk: 2.1223.0
       dotenv: 16.0.2
+      dynamodb-toolbox: 0.4.3
       node-fetch: 2.6.7
       ts-node: 10.9.1_ke6ijd35va4xbeayrnhu4zwagm
       zod: 3.19.1
@@ -2765,6 +2767,12 @@ packages:
       rimraf: 2.7.1
       tar: 4.4.19
     dev: true
+
+  /dynamodb-toolbox/0.4.3:
+    resolution: {integrity: sha512-z5WuDj+g5ZBKiDrNRbxg5hEpTDwR/9MsnE2A3+t0FuRyPbEegmUmauHWcnK/JxwTE2JcUMQvDzMgCAJW5BAj/g==}
+    dependencies:
+      ts-toolbelt: 6.15.5
+    dev: false
 
   /eastasianwidth/0.2.0:
     resolution: {integrity: sha512-I88TYZWc9XiYHRQ4/3c5rjjfgkjhLyW2luGIheGERbNQ6OY7yTybanSpDXZa8y7VUP9YmDcYa+eyq4ca7iLqWA==}
@@ -7812,6 +7820,10 @@ packages:
       typescript: 4.8.3
       v8-compile-cache-lib: 3.0.1
       yn: 3.1.1
+
+  /ts-toolbelt/6.15.5:
+    resolution: {integrity: sha512-FZIXf1ksVyLcfr7M317jbB67XFJhOO1YqdTcuGaq9q5jLUoTikukZ+98TPjKiP2jC5CgmYdWWYs0s2nLSU0/1A==}
+    dev: false
 
   /ts-toolbelt/9.6.0:
     resolution: {integrity: sha512-nsZd8ZeNUzukXPlJmTBwUAuABDe/9qtVDelJeT/qW0ow3ZS3BsQJtNkan1802aM9Uf68/Y8ljw86Hu0h5IUW3w==}
