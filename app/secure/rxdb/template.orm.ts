@@ -1,6 +1,8 @@
+import { CreateRemoteTemplate } from "lrpc/src/appRouter"
 import { KeyFunctionMap, RxCollection, RxDocument } from "rxdb"
 import { TemplateId } from "../../src/domain/ids"
-import { Template } from "../../src/domain/template"
+import { Template, TemplateType } from "../../src/domain/template"
+import { assertNever } from "../../src/domain/utility"
 import { getDb } from "./rxdb"
 import { TemplateDocType } from "./template.schema"
 
@@ -52,6 +54,32 @@ function entityToDomain(template: TemplateDocument): Template {
   // After an upsert, the return is a Date Object because RxDB caches the upserted object... I think.
 }
 
+function stringifyTemplates(t: TemplateType): string {
+  switch (t.tag) {
+    case "standard":
+      return JSON.stringify(t.templates)
+    case "cloze":
+      return JSON.stringify(t.template)
+    default:
+      return assertNever(t)
+  }
+}
+
+function domainToCreateRemote(
+  { id, name, css, templateType, fields }: Template,
+  nook: string
+): CreateRemoteTemplate {
+  return {
+    id,
+    name,
+    css,
+    nook,
+    templateType: templateType.tag,
+    fields: fields.map((x) => x.name),
+    childTemplates: stringifyTemplates(templateType),
+  }
+}
+
 export const templateCollectionMethods = {
   upsertTemplate: async function (template: Template) {
     const db = await getDb()
@@ -66,5 +94,23 @@ export const templateCollectionMethods = {
     const db = await getDb()
     const allTemplates = await db.templates.find().exec()
     return allTemplates.map(entityToDomain)
+  },
+  getNewTemplatesToUpload: async function (nook: string) {
+    const db = await getDb()
+    const newTemplates = await db.templates
+      .find({
+        selector: {
+          push: {
+            $eq: 1,
+          },
+          pushId: {
+            $exists: false,
+          },
+        },
+      })
+      .exec()
+    return newTemplates
+      .map(entityToDomain)
+      .map((x) => domainToCreateRemote(x, nook))
   },
 }
