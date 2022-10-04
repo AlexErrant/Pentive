@@ -11,7 +11,11 @@
     "test:e2e": "testcafe chrome -e test/ --hostname localhost",
     "test:pouchdb": "STORAGE=pouchdb concurrently \"npm run server\" \"npm run build:serve\" \"sleep 10 && npm run test:e2e\" --kill-others --success first",
     "test:lokijs": "STORAGE=lokijs concurrently \"npm run server\" \"npm run build:serve\" \"sleep 10 && npm run test:e2e\" --kill-others --success first",
-    "test:dexie": "STORAGE=dexie concurrently \"npm run server\" \"npm run build:serve\" \"sleep 10 && npm run test:e2e\" --kill-others --success first"
+    "test:dexie": "STORAGE=dexie concurrently \"npm run server\" \"npm run build:serve\" \"sleep 10 && npm run test:e2e\" --kill-others --success first",
+    "eslint": "eslint .",
+    "eslint:write": "eslint . --fix",
+    "prettier": "prettier --check .",
+    "prettier:write": "prettier --write ."
   },
   "browser": {
     "fs": false
