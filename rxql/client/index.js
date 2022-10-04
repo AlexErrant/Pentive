@@ -10,11 +10,6 @@ import {
 } from 'rxdb/plugins/pouchdb';
 
 import {
-    getRxStorageLoki
-} from 'rxdb/plugins/lokijs';
-const LokiIncrementalIndexedDBAdapter = require('lokijs/src/incremental-indexeddb-adapter');
-
-import {
     getRxStorageDexie
 } from 'rxdb/plugins/dexie';
 
@@ -138,18 +133,6 @@ function getStorage() {
 
     if (storageKey === 'pouchdb') {
         return getRxStoragePouch('idb');
-    } else if (storageKey === 'lokijs') {
-        return getRxStorageLoki({
-            adapter: new LokiIncrementalIndexedDBAdapter(),
-            autosaveInterval: 999999999,
-            autoload: false,
-            autocallback() {
-                console.log('autoload done');
-            },
-            autosaveCallback() {
-                console.log('Autosave done!');
-            }
-        });
     } else if (storageKey === 'dexie') {
         return getRxStorageDexie();
     } else if (storageKey === 'memory') {
