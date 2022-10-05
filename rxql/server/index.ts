@@ -1,7 +1,8 @@
+/* eslint-disable */
+// @ts-nocheck
+
 import express from "express"
 import * as path from "path"
-const { graphqlHTTP } = require("express-graphql")
-const cors = require("cors")
 import { PubSub } from "graphql-subscriptions"
 import { buildSchema, execute, subscribe } from "graphql"
 
@@ -21,6 +22,8 @@ import {
 import { graphQLSchemaFromRxSchema } from "rxdb/plugins/replication-graphql"
 
 import { lastOfArray } from "rxdb"
+import { graphqlHTTP } from "express-graphql"
+import cors from "cors"
 
 function log(msg) {
   const prefix = "# GraphQL Server: "
@@ -141,7 +144,7 @@ export async function run() {
       authenticateRequest(request)
 
       const rows = args.heroPushRow
-      let lastCheckpoint = {
+      const lastCheckpoint = {
         id: "",
         updatedAt: 0,
       }
@@ -208,7 +211,7 @@ export async function run() {
   app.use(
     GRAPHQL_PATH,
     graphqlHTTP({
-      schema: schema,
+      schema,
       rootValue: root,
       graphiql: true,
     })
