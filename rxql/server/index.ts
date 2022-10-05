@@ -49,10 +49,9 @@ function sortByUpdatedAtAndPrimary(a: Hero, b: Hero): 1 | 0 | -1 {
  * In a real world app you would parse and validate the bearer token.
  * @link https://graphql.org/graphql-js/authentication-and-express-middleware/
  */
-export function authenticateRequest(request: {
-  header: (arg0: string) => string
-}): void {
+export function authenticateRequest(request: express.Request): void {
   const authHeader = request.header("authorization")
+  if (authHeader === undefined) throw new Error("not authenticated")
   const splitted = authHeader.split(" ")
   const token = splitted[1]
   validateBearerToken(token)
@@ -90,9 +89,7 @@ export function run(): void {
         checkpoint?: { id: string; updatedAt: number }
         limit: number
       },
-      request: {
-        header: (arg0: string) => string
-      }
+      request: express.Request
     ) => {
       log("## pullHero()")
       log(args)
@@ -132,7 +129,7 @@ export function run(): void {
       const ret = {
         documents: limitedDocs,
         checkpoint:
-          last != null
+          last !== undefined
             ? {
                 id: last.id,
                 updatedAt: last.updatedAt,
@@ -148,9 +145,7 @@ export function run(): void {
     },
     pushHero: (
       args: { heroPushRow: Array<RxReplicationWriteToMasterRow<Hero>> },
-      request: {
-        header: (arg0: string) => string
-      }
+      request: express.Request
     ) => {
       log("## pushHero()")
       log(args)
