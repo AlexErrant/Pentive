@@ -1,5 +1,3 @@
-/* eslint-disable */
-
 import express from "express"
 import * as path from "path"
 import { buildSchema } from "graphql"
@@ -24,7 +22,7 @@ interface Hero {
   updatedAt: number
 }
 
-function log(msg: Object) {
+function log(msg: unknown): void {
   const prefix = "# GraphQL Server: "
   if (typeof msg === "string") {
     console.log(prefix + msg)
@@ -33,7 +31,7 @@ function log(msg: Object) {
   }
 }
 
-function sortByUpdatedAtAndPrimary(a: Hero, b: Hero) {
+function sortByUpdatedAtAndPrimary(a: Hero, b: Hero): 1 | 0 | -1 {
   if (a.updatedAt > b.updatedAt) return 1
   if (a.updatedAt < b.updatedAt) return -1
 
@@ -53,14 +51,14 @@ function sortByUpdatedAtAndPrimary(a: Hero, b: Hero) {
  */
 export function authenticateRequest(request: {
   header: (arg0: string) => string
-}) {
+}): void {
   const authHeader = request.header("authorization")
   const splitted = authHeader.split(" ")
   const token = splitted[1]
   validateBearerToken(token)
 }
 
-export function validateBearerToken(token: string) {
+export function validateBearerToken(token: string): boolean {
   if (token === JWT_BEARER_TOKEN) {
     return true
   } else {
@@ -69,7 +67,7 @@ export function validateBearerToken(token: string) {
   }
 }
 
-export async function run() {
+export function run(): void {
   let documents: Hero[] = []
   const app = express()
   app.use(cors())
@@ -89,24 +87,26 @@ export async function run() {
   const root = {
     pullHero: (
       args: {
-        checkpoint: { id: string; updatedAt: number }
+        checkpoint?: { id: string; updatedAt: number }
         limit: number
       },
-      request: any
+      request: {
+        header: (arg0: string) => string
+      }
     ) => {
       log("## pullHero()")
       log(args)
       authenticateRequest(request)
 
-      const lastId = args.checkpoint ? args.checkpoint.id : ""
-      const minUpdatedAt = args.checkpoint ? args.checkpoint.updatedAt : 0
+      const lastId = args.checkpoint?.id ?? ""
+      const minUpdatedAt = args.checkpoint?.updatedAt ?? 0
 
       // sorted by updatedAt and primary
       const sortedDocuments = documents.sort(sortByUpdatedAtAndPrimary)
 
       // only return where updatedAt >= minUpdatedAt
       const filterForMinUpdatedAtAndId = sortedDocuments.filter((doc) => {
-        if (!args.checkpoint) {
+        if (args.checkpoint == null) {
           return true
         }
         if (doc.updatedAt < minUpdatedAt) {
@@ -122,29 +122,36 @@ export async function run() {
             return false
           }
         }
+        throw new Error("impossible")
       })
 
       // apply limit
       const limitedDocs = filterForMinUpdatedAtAndId.slice(0, args.limit)
 
-      const last = lastOfArray(limitedDocs)
+      const last = lastOfArray(limitedDocs) as Hero | undefined
       const ret = {
         documents: limitedDocs,
-        checkpoint: last
-          ? {
-              id: last.id,
-              updatedAt: last.updatedAt,
-            }
-          : {
-              id: lastId,
-              updatedAt: minUpdatedAt,
-            },
+        checkpoint:
+          last != null
+            ? {
+                id: last.id,
+                updatedAt: last.updatedAt,
+              }
+            : {
+                id: lastId,
+                updatedAt: minUpdatedAt,
+              },
       }
       console.log("pullHero() ret:")
       console.log(JSON.stringify(ret, null, 4))
       return ret
     },
-    pushHero: (args: { heroPushRow: any }, request: any) => {
+    pushHero: (
+      args: { heroPushRow: Array<RxReplicationWriteToMasterRow<Hero>> },
+      request: {
+        header: (arg0: string) => string
+      }
+    ) => {
       log("## pushHero()")
       log(args)
       authenticateRequest(request)
@@ -166,8 +173,8 @@ export async function run() {
          * Detect conflicts.
          */
         if (
-          docCurrentMaster &&
-          row.assumedMasterState &&
+          docCurrentMaster != null &&
+          row.assumedMasterState != null &&
           docCurrentMaster.updatedAt !== row.assumedMasterState.updatedAt
         ) {
           conflicts.push(docCurrentMaster)
@@ -207,9 +214,7 @@ export async function run() {
 
   app.listen(GRAPHQL_PORT, function () {
     log(
-      "Started graphql-endpoint at http://localhost:" +
-        GRAPHQL_PORT +
-        GRAPHQL_PATH
+      `Started graphql-endpoint at http://localhost:${GRAPHQL_PORT}${GRAPHQL_PATH}`
     )
   })
 }
