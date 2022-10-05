@@ -1,31 +1,30 @@
 /* eslint-disable */
-// @ts-nocheck
 
 import express from "express"
 import * as path from "path"
-import { PubSub } from "graphql-subscriptions"
-import { buildSchema, execute, subscribe } from "graphql"
-
-import * as ws from "ws"
-import { useServer } from "graphql-ws/lib/use/ws"
-import { createServer } from "http"
+import { buildSchema } from "graphql"
 
 import {
   GRAPHQL_PORT,
   GRAPHQL_PATH,
-  GRAPHQL_SUBSCRIPTION_PORT,
-  GRAPHQL_SUBSCRIPTION_PATH,
   graphQLGenerationInput,
   JWT_BEARER_TOKEN,
 } from "../shared"
 
 import { graphQLSchemaFromRxSchema } from "rxdb/plugins/replication-graphql"
 
-import { lastOfArray } from "rxdb"
+import { lastOfArray, RxReplicationWriteToMasterRow } from "rxdb"
 import { graphqlHTTP } from "express-graphql"
 import cors from "cors"
 
-function log(msg) {
+interface Hero {
+  id: string
+  name: string
+  color: string
+  updatedAt: number
+}
+
+function log(msg: Object) {
   const prefix = "# GraphQL Server: "
   if (typeof msg === "string") {
     console.log(prefix + msg)
@@ -34,7 +33,7 @@ function log(msg) {
   }
 }
 
-function sortByUpdatedAtAndPrimary(a, b) {
+function sortByUpdatedAtAndPrimary(a: Hero, b: Hero) {
   if (a.updatedAt > b.updatedAt) return 1
   if (a.updatedAt < b.updatedAt) return -1
 
@@ -43,6 +42,7 @@ function sortByUpdatedAtAndPrimary(a, b) {
     if (a.id < b.id) return -1
     else return 0
   }
+  throw Error("Impossible")
 }
 
 /**
@@ -51,14 +51,16 @@ function sortByUpdatedAtAndPrimary(a, b) {
  * In a real world app you would parse and validate the bearer token.
  * @link https://graphql.org/graphql-js/authentication-and-express-middleware/
  */
-export function authenticateRequest(request) {
+export function authenticateRequest(request: {
+  header: (arg0: string) => string
+}) {
   const authHeader = request.header("authorization")
   const splitted = authHeader.split(" ")
   const token = splitted[1]
   validateBearerToken(token)
 }
 
-export function validateBearerToken(token) {
+export function validateBearerToken(token: string) {
   if (token === JWT_BEARER_TOKEN) {
     return true
   } else {
@@ -68,7 +70,7 @@ export function validateBearerToken(token) {
 }
 
 export async function run() {
-  let documents = []
+  let documents: Hero[] = []
   const app = express()
   app.use(cors())
 
@@ -83,11 +85,15 @@ export async function run() {
   console.log(graphQLSchema)
   const schema = buildSchema(graphQLSchema)
 
-  const pubsub = new PubSub()
-
   // The root provides a resolver function for each API endpoint
   const root = {
-    pullHero: (args, request) => {
+    pullHero: (
+      args: {
+        checkpoint: { id: string; updatedAt: number }
+        limit: number
+      },
+      request: any
+    ) => {
       log("## pullHero()")
       log(args)
       authenticateRequest(request)
@@ -138,7 +144,7 @@ export async function run() {
       console.log(JSON.stringify(ret, null, 4))
       return ret
     },
-    pushHero: (args, request) => {
+    pushHero: (args: { heroPushRow: any }, request: any) => {
       log("## pushHero()")
       log(args)
       authenticateRequest(request)
@@ -149,10 +155,10 @@ export async function run() {
         updatedAt: 0,
       }
 
-      const conflicts = []
+      const conflicts: Hero[] = []
 
-      const writtenDocs = []
-      rows.forEach((row) => {
+      const writtenDocs: Hero[] = []
+      rows.forEach((row: RxReplicationWriteToMasterRow<Hero>) => {
         const docId = row.newDocumentState.id
         const docCurrentMaster = documents.find((d) => d.id === docId)
 
@@ -177,30 +183,12 @@ export async function run() {
         writtenDocs.push(doc)
       })
 
-      pubsub.publish("streamHero", {
-        streamHero: {
-          documents: writtenDocs,
-          checkpoint: lastCheckpoint,
-        },
-      })
-
       console.log("## current documents:")
       console.log(JSON.stringify(documents, null, 4))
       console.log("## conflicts:")
       console.log(JSON.stringify(conflicts, null, 4))
 
       return conflicts
-    },
-    streamHero: (args) => {
-      log("## streamHero()")
-
-      console.dir(args)
-      const authHeaderValue = args.headers.Authorization
-      const bearerToken = authHeaderValue.split(" ")[1]
-
-      validateBearerToken(bearerToken)
-
-      return pubsub.asyncIterator("streamHero")
     },
   }
 
@@ -224,55 +212,6 @@ export async function run() {
         GRAPHQL_PATH
     )
   })
-
-  const appSubscription = express()
-  appSubscription.use(cors)
-  const serverSubscription = createServer(appSubscription)
-  serverSubscription.listen(GRAPHQL_SUBSCRIPTION_PORT, () => {
-    log(
-      "Started graphql-subscription endpoint at http://localhost:" +
-        GRAPHQL_SUBSCRIPTION_PORT +
-        GRAPHQL_SUBSCRIPTION_PATH
-    )
-    const wsServer = new ws.Server({
-      server: serverSubscription,
-      path: GRAPHQL_SUBSCRIPTION_PATH,
-    })
-
-    const subServer = useServer(
-      {
-        schema,
-        execute,
-        subscribe,
-        roots: {
-          subscription: {
-            streamHero: root.streamHero,
-          },
-        },
-      },
-      wsServer
-    )
-    return subServer
-  })
-
-  // comment this in for testing of the subscriptions
-  /* setInterval(() => {
-        const flag = new Date().getTime();
-        pubsub.publish('streamHero', {
-            streamHero: {
-                documents: [{
-                    id: 'foobar-' + flag,
-                    name: 'name-' + flag,
-                    color: 'green'
-                }],
-                checkpoint: {
-                    id: 'foobar-' + flag,
-                    updatedAt: flag
-                },
-            },
-        });
-        console.log('published streamHero ' + flag);
-    }, 1000); */
 }
 
 run()

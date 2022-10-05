@@ -14,7 +14,6 @@ import {
   RxDBReplicationGraphQLPlugin,
   pullQueryBuilderFromRxSchema,
   pushQueryBuilderFromRxSchema,
-  pullStreamBuilderFromRxSchema,
 } from "rxdb/plugins/replication-graphql"
 addRxPlugin(RxDBReplicationGraphQLPlugin)
 
@@ -33,8 +32,6 @@ addRxPlugin(RxDBQueryBuilderPlugin)
 import {
   GRAPHQL_PORT,
   GRAPHQL_PATH,
-  GRAPHQL_SUBSCRIPTION_PORT,
-  GRAPHQL_SUBSCRIPTION_PATH,
   heroSchema,
   graphQLGenerationInput,
   JWT_BEARER_TOKEN,
@@ -51,7 +48,6 @@ console.log("hostname: " + window.location.hostname)
 const syncUrls = {
   http:
     "http://" + window.location.hostname + ":" + GRAPHQL_PORT + GRAPHQL_PATH,
-  ws: "ws://localhost:" + GRAPHQL_SUBSCRIPTION_PORT + GRAPHQL_SUBSCRIPTION_PATH,
 }
 
 const batchSize = 50
@@ -62,11 +58,6 @@ const pullQueryBuilder = pullQueryBuilderFromRxSchema(
   batchSize
 )
 const pushQueryBuilder = pushQueryBuilderFromRxSchema(
-  "hero",
-  graphQLGenerationInput.hero
-)
-
-const pullStreamBuilder = pullStreamBuilderFromRxSchema(
   "hero",
   graphQLGenerationInput.hero
 )
@@ -172,9 +163,7 @@ async function run() {
       pull: {
         batchSize,
         queryBuilder: pullQueryBuilder,
-        streamQueryBuilder: pullStreamBuilder,
       },
-      live: true,
       deletedField: "deleted",
     })
 
