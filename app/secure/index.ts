@@ -1,15 +1,14 @@
 /* eslint-disable */
-// @ts-nocheck
+
+declare global {
+  interface Window {
+    deleteHero: Function
+  }
+}
 
 import "./style.css"
 import { addRxPlugin, createRxDatabase } from "rxdb"
-
 import { addPouchPlugin, getRxStoragePouch } from "rxdb/plugins/pouchdb"
-
-import { getRxStorageDexie } from "rxdb/plugins/dexie"
-
-import { getRxStorageMemory } from "rxdb/plugins/memory"
-
 import { filter } from "rxjs/operators"
 
 addPouchPlugin(require("pouchdb-adapter-idb"))
@@ -38,13 +37,15 @@ import {
   heroSchema,
   graphQLGenerationInput,
   JWT_BEARER_TOKEN,
-} from "../shared"
+} from "rxql/shared"
 
-const insertButton = document.querySelector("#insert-button")
-const heroesList = document.querySelector("#heroes-list")
-const leaderIcon = document.querySelector("#leader-icon")
-const storageField = document.querySelector("#storage-key")
-const databaseNameField = document.querySelector("#database-name")
+const insertButton = document.querySelector(
+  "#insert-button"
+) as HTMLButtonElement
+const heroesList = document.querySelector("#heroes-list")!
+const leaderIcon = document.querySelector("#leader-icon") as HTMLDivElement
+const storageField = document.querySelector("#storage-key")!
+const databaseNameField = document.querySelector("#database-name")!
 
 console.log("hostname: " + window.location.hostname)
 
@@ -57,8 +58,7 @@ const batchSize = 50
 
 const pullQueryBuilder = pullQueryBuilderFromRxSchema(
   "hero",
-  graphQLGenerationInput.hero,
-  batchSize
+  graphQLGenerationInput.hero
 )
 const pushQueryBuilder = pushQueryBuilderFromRxSchema(
   "hero",
@@ -103,23 +103,6 @@ function getStorageKey() {
   return storageKey
 }
 
-/**
- * Easy toggle of the storage engine via query parameter.
- */
-function getStorage() {
-  const storageKey = getStorageKey()
-
-  if (storageKey === "pouchdb") {
-    return getRxStoragePouch("idb")
-  } else if (storageKey === "dexie") {
-    return getRxStorageDexie()
-  } else if (storageKey === "memory") {
-    return getRxStorageMemory()
-  } else {
-    throw new Error("storage key not defined " + storageKey)
-  }
-}
-
 async function run() {
   storageField.innerHTML = getStorageKey()
   databaseNameField.innerHTML = getDatabaseName()
@@ -127,11 +110,10 @@ async function run() {
   const db = await createRxDatabase({
     name: getDatabaseName(),
     storage: wrappedValidateAjvStorage({
-      storage: getStorage(),
+      storage: getRxStoragePouch("idb"),
     }),
     multiInstance: getStorageKey() !== "memory",
   })
-  window.db = db
 
   // display crown when tab is leader
   db.waitForLeadership().then(function () {
@@ -148,7 +130,7 @@ async function run() {
 
   db.hero.preSave(function (docData) {
     docData.updatedAt = new Date().getTime()
-  })
+  }, true)
 
   // set up replication
   if (doSync()) {
@@ -220,7 +202,7 @@ async function run() {
     })
 
   // set up click handlers
-  window.deleteHero = async (id) => {
+  window.deleteHero = async (id: string) => {
     console.log("delete doc " + id)
     const doc = await db.hero.findOne(id).exec()
     if (doc) {
@@ -234,8 +216,14 @@ async function run() {
     }
   }
   insertButton.onclick = async function () {
-    const name = document.querySelector('input[name="name"]').value
-    const color = document.querySelector('input[name="color"]').value
+    let inputName = document.querySelector(
+      'input[name="name"]'
+    ) as HTMLInputElement
+    let inputColor = document.querySelector(
+      'input[name="color"]'
+    ) as HTMLInputElement
+    const name = inputName.value
+    const color = inputColor.value
     const obj = {
       id: name,
       name: name,
@@ -246,8 +234,8 @@ async function run() {
     console.dir(obj)
 
     await db.hero.insert(obj)
-    document.querySelector('input[name="name"]').value = ""
-    document.querySelector('input[name="color"]').value = ""
+    inputName.value = ""
+    inputColor.value = ""
   }
 }
 run().catch((err) => {

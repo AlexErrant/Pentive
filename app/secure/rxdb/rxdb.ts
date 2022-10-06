@@ -1,4 +1,4 @@
-import { addRxPlugin, createRxDatabase, RxDatabase } from "rxdb"
+import { addRxPlugin, createRxDatabase, RxDatabase, RxStorage } from "rxdb"
 import { HeroDocType, heroSchema } from "./hero.schema"
 import { templateSchema } from "./template.schema"
 import { cardSchema } from "./card.schema"
@@ -7,6 +7,8 @@ import {
   getRxStoragePouch,
   addPouchPlugin,
   PouchDB,
+  PouchStorageInternals,
+  PouchSettings,
 } from "rxdb/plugins/pouchdb"
 import { RxDBLeaderElectionPlugin } from "rxdb/plugins/leader-election"
 // @ts-expect-error pouchdb is untyped
@@ -55,9 +57,19 @@ export async function createDb(): Promise<MyDatabase> {
   /**
    * create database and collections
    */
+  let storage: RxStorage<PouchStorageInternals, PouchSettings> =
+    getRxStoragePouch("idb")
+  if (isDevMode) {
+    // we use the schema-validation only in dev-mode
+    // this validates each document if it is matching the jsonschema
+    const { wrappedValidateAjvStorage } = await import(
+      "rxdb/plugins/validate-ajv"
+    )
+    storage = wrappedValidateAjvStorage({ storage })
+  }
   const myDatabase: MyDatabase = await createRxDatabase<MyDatabaseCollections>({
     name: "mydb",
-    storage: getRxStoragePouch("idb"),
+    storage,
   })
 
   await myDatabase.addCollections({
@@ -112,6 +124,8 @@ export async function remove(): Promise<void> {
   await myDatabase.remove()
 }
 
+const isDevMode = true // TODO inject
+
 // https://github.com/pubkey/client-side-databases/blob/a25172c012cef2985d97424a9fad917eb888b9f5/projects/rxdb-pouchdb/src/app/services/database.service.ts#L59-L108
 async function loadRxDBPlugins(): Promise<void> {
   addRxPlugin(RxDBLeaderElectionPlugin)
@@ -120,7 +134,6 @@ async function loadRxDBPlugins(): Promise<void> {
    * to reduce the build-size,
    * we use some modules in dev-mode only
    */
-  const isDevMode = true // TODO inject
   if (isDevMode) {
     await Promise.all([
       /**
@@ -128,16 +141,6 @@ async function loadRxDBPlugins(): Promise<void> {
        */
       import("rxdb/plugins/dev-mode").then((module) =>
         addRxPlugin(module.RxDBDevModePlugin)
-      ),
-
-      import("rxdb/plugins/ajv-validate").then((module) =>
-        addRxPlugin(module.RxDBAjvValidatePlugin)
-      ),
-
-      // we use the schema-validation only in dev-mode
-      // this validates each document if it is matching the jsonschema
-      import("rxdb/plugins/validate").then((module) =>
-        addRxPlugin(module.RxDBValidatePlugin)
       ),
 
       // enable debug to detect slow queries

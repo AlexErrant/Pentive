@@ -62,6 +62,7 @@
     "iframe-resizer": "^4.3.2",
     "lodash": "^4.17.21",
     "lrpc": "workspace:*",
+    "rxql": "workspace:*",
     "pouchdb-adapter-idb": "^7.3.0",
     "pouchdb-debug": "^7.2.1",
     "rxdb": "^13.4.4",

@@ -1,5 +1,5 @@
 {
-  "name": "graphql",
+  "name": "rxql",
   "version": "0.0.0",
   "scripts": {
     "dev": "webpack serve",
