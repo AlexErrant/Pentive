@@ -1,7 +1,7 @@
 import express from "express"
 import * as path from "path"
 import { buildSchema } from "graphql"
-
+import _ from "lodash"
 import {
   GRAPHQL_PORT,
   GRAPHQL_PATH,
@@ -11,7 +11,7 @@ import {
 
 import { graphQLSchemaFromRxSchema } from "rxdb/plugins/replication-graphql"
 
-import { lastOfArray, RxReplicationWriteToMasterRow } from "rxdb"
+import { RxReplicationWriteToMasterRow } from "rxdb"
 import { graphqlHTTP } from "express-graphql"
 import cors from "cors"
 
@@ -140,8 +140,7 @@ export function run(): void {
 
       // apply limit
       const limitedDocs = filterForMinUpdatedAtAndId.slice(0, args.limit)
-
-      const last = lastOfArray(limitedDocs) as Hero | undefined
+      const last = _.last(limitedDocs)
       const ret = {
         documents: limitedDocs,
         checkpoint:
