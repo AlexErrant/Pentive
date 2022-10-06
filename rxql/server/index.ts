@@ -1,5 +1,4 @@
 import express from "express"
-import * as path from "path"
 import { buildSchema } from "graphql"
 import _ from "lodash"
 import {
@@ -208,9 +207,6 @@ export function run(): void {
       return conflicts
     },
   }
-
-  // server multitab.html - used in the e2e test
-  app.use("/static", express.static(path.join(__dirname, "/static")))
 
   // server graphql-endpoint
   app.use(
