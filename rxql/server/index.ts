@@ -22,6 +22,8 @@ interface Hero {
   updatedAt: number
 }
 
+type HeroCheckpoint = Pick<Hero, "id" | "updatedAt">
+
 function log(msg: unknown): void {
   const prefix = "# GraphQL Server: "
   if (typeof msg === "string") {
@@ -86,11 +88,14 @@ export function run(): void {
   const root = {
     pullHero: (
       args: {
-        checkpoint?: { id: string; updatedAt: number }
+        checkpoint?: HeroCheckpoint
         limit: number
       },
       request: express.Request
-    ) => {
+    ): {
+      checkpoint: HeroCheckpoint
+      documents: Hero[]
+    } => {
       log("## pullHero()")
       log(args)
       authenticateRequest(request)
@@ -146,7 +151,7 @@ export function run(): void {
     pushHero: (
       args: { heroPushRow: Array<RxReplicationWriteToMasterRow<Hero>> },
       request: express.Request
-    ) => {
+    ): Hero[] => {
       log("## pushHero()")
       log(args)
       authenticateRequest(request)
