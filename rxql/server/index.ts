@@ -22,7 +22,10 @@ interface Hero {
   updatedAt: number
 }
 
-type HeroCheckpoint = Pick<Hero, "id" | "updatedAt">
+type HeroCheckpoint = Pick<
+  Hero,
+  typeof graphQLGenerationInput.hero.checkpointFields[number]
+>
 
 function log(msg: unknown): void {
   const prefix = "# GraphQL Server: "
@@ -68,6 +71,12 @@ export function validateBearerToken(token: string): boolean {
   }
 }
 
+// https://stackoverflow.com/a/58716315
+type DeepMutable<T> = T extends object
+  ? { -readonly [K in keyof T]: DeepMutable<T[K]> }
+  : T
+const deepMutable = <T>(t: T): DeepMutable<T> => t as DeepMutable<T>
+
 export function run(): void {
   let documents: Hero[] = []
   const app = express()
@@ -77,7 +86,9 @@ export function run(): void {
    * In this example we generate the GraphQL schema from the RxDB schema.
    * Of course you could also write it by hand or extend and existing one.
    */
-  const generatedSchema = graphQLSchemaFromRxSchema(graphQLGenerationInput)
+  const generatedSchema = graphQLSchemaFromRxSchema(
+    deepMutable(graphQLGenerationInput)
+  )
   const graphQLSchema = generatedSchema.asString
 
   console.log("Server side GraphQL Schema:")

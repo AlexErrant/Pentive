@@ -45,4 +45,4 @@ export const graphQLGenerationInput = {
     deletedField: "deleted",
     headerFields: ["Authorization"],
   },
-}
+} as const
