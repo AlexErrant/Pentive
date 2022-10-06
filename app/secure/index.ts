@@ -11,7 +11,8 @@ import { addRxPlugin, createRxDatabase } from "rxdb"
 import { addPouchPlugin, getRxStoragePouch } from "rxdb/plugins/pouchdb"
 import { filter } from "rxjs/operators"
 
-addPouchPlugin(require("pouchdb-adapter-idb"))
+import * as pouchdbAdapter from "pouchdb-adapter-idb"
+addPouchPlugin(pouchdbAdapter)
 import {
   RxDBReplicationGraphQLPlugin,
   pullQueryBuilderFromRxSchema,
@@ -21,8 +22,9 @@ addRxPlugin(RxDBReplicationGraphQLPlugin)
 
 // TODO import these only in non-production build
 
-import { RxDBDevModePlugin } from "rxdb/plugins/dev-mode"
-addRxPlugin(RxDBDevModePlugin)
+// already loaded in rxdb.ts
+// import { RxDBDevModePlugin } from "rxdb/plugins/dev-mode"
+// addRxPlugin(RxDBDevModePlugin)
 import { wrappedValidateAjvStorage } from "rxdb/plugins/validate-ajv"
 
 import { RxDBUpdatePlugin } from "rxdb/plugins/update"

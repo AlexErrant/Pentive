@@ -7,7 +7,7 @@ export const heroSchemaLiteral = {
   title: "hero schema",
   description: "describes a human being",
   version: 0,
-  keyCompression: true,
+  // keyCompression: true,
   primaryKey: "passportId",
   type: "object",
   properties: {
