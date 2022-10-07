@@ -18,6 +18,7 @@ importers:
       '@types/pouchdb-adapter-idb': ^6.1.4
       '@typescript-eslint/eslint-plugin': ^5.31.0
       '@typescript-eslint/parser': ^5.31.0
+      '@zip.js/zip.js': ^2.6.41
       autoprefixer: ^10.4.7
       babel-preset-solid: ^1.4.8
       comlink: ^4.3.1
@@ -61,6 +62,7 @@ importers:
       '@tanstack/solid-table': 8.5.13_solid-js@1.5.4
       '@trpc/client': 9.27.2_@trpc+server@9.27.2
       '@trpc/server': 9.27.2
+      '@zip.js/zip.js': 2.6.41
       babel-preset-solid: 1.5.4_@babel+core@7.19.0
       comlink: 4.3.1
       iframe-resizer: 4.3.2
@@ -2797,6 +2799,11 @@ packages:
   /@xtuc/long/4.2.2:
     resolution: {integrity: sha512-NuHqBY1PB/D8xU6s/thBgOAiAP7HOYDQ32+BFZILJ8ivkUkAHQnWfn6WhL79Owj1qmUnoN/YPhktdIoucipkAQ==}
     dev: true
+
+  /@zip.js/zip.js/2.6.41:
+    resolution: {integrity: sha512-dfcWyvDt5GfzuOX3yeUNoT1VhChaEeAX0Oq4Xv4ekLi7WldZE2fDLR/FBI59c1kJIKOqa7fMOXHM1GDPE/fRTw==}
+    engines: {deno: '>=1.0.0', node: '>=16.5.0'}
+    dev: false
 
   /abab/2.0.6:
     resolution: {integrity: sha512-j2afSsaIENvHZN2B8GOpF566vZ5WVk5opAiMTvWgaQT8DkbOqsTfvNAvHoRGU2zzP8cPoqys+xHTRDWW8L+/BA==}
