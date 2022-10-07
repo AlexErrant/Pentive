@@ -1,5 +1,6 @@
 apkg
 comlink
+graphiql
 iframes
 lrpc
 msedge
