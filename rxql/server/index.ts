@@ -1,13 +1,17 @@
 import express from "express"
 import { buildSchema } from "graphql"
-import { GRAPHQL_PORT, GRAPHQL_PATH, graphQLGenerationInput } from "../shared"
+import {
+  GRAPHQL_PORT,
+  GRAPHQL_PATH,
+  mutableGraphQLGenerationInput,
+} from "../shared"
 
 import { graphQLSchemaFromRxSchema } from "rxdb/plugins/replication-graphql"
 
 import { graphqlHTTP } from "express-graphql"
 import cors from "cors"
 import { heroSync } from "./hero"
-import { deepMutable, log } from "./util"
+import { log } from "./util"
 
 export function run(): void {
   const app = express()
@@ -18,7 +22,7 @@ export function run(): void {
    * Of course you could also write it by hand or extend and existing one.
    */
   const generatedSchema = graphQLSchemaFromRxSchema(
-    deepMutable(graphQLGenerationInput)
+    mutableGraphQLGenerationInput
   )
   const graphQLSchema = generatedSchema.asString
 

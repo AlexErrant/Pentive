@@ -2,6 +2,7 @@ import {
   ExtractDocumentTypeFromTypedRxJsonSchema,
   toTypedRxJsonSchema,
 } from "rxdb"
+import { deepMutable } from "./server/util"
 
 export const GRAPHQL_PORT = 10102
 export const GRAPHQL_PATH = "/graphql"
@@ -54,3 +55,5 @@ export const graphQLGenerationInput = {
     headerFields: ["Authorization"],
   },
 } as const
+
+export const mutableGraphQLGenerationInput = deepMutable(graphQLGenerationInput)

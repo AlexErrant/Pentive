@@ -37,7 +37,7 @@ import {
   GRAPHQL_PORT,
   GRAPHQL_PATH,
   heroSchema,
-  graphQLGenerationInput,
+  mutableGraphQLGenerationInput,
   JWT_BEARER_TOKEN,
 } from "rxql/shared"
 
@@ -60,11 +60,11 @@ const batchSize = 50
 
 const pullQueryBuilder = pullQueryBuilderFromRxSchema(
   "hero",
-  graphQLGenerationInput.hero
+  mutableGraphQLGenerationInput.hero
 )
 const pushQueryBuilder = pushQueryBuilderFromRxSchema(
   "hero",
-  graphQLGenerationInput.hero
+  mutableGraphQLGenerationInput.hero
 )
 
 /**
