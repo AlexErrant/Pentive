@@ -62,13 +62,14 @@
     "iframe-resizer": "^4.3.2",
     "lodash": "^4.17.21",
     "lrpc": "workspace:*",
-    "rxql": "workspace:*",
     "pouchdb-adapter-idb": "^7.3.0",
     "pouchdb-debug": "^7.2.1",
     "rxdb": "^13.4.4",
     "rxjs": "^7.5.6",
+    "rxql": "workspace:*",
     "solid-app-router": "^0.4.2",
     "solid-element": "^1.4.8",
-    "solid-js": "^1.4.8"
+    "solid-js": "^1.4.8",
+    "sql.js": "^1.8.0"
   }
 }
