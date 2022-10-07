@@ -11,16 +11,18 @@ type HeroCheckpoint = Pick<
   typeof graphQLGenerationInput.hero.checkpointFields[number]
 >
 
-function sortByUpdatedAtAndPrimary(a: Hero, b: Hero): 1 | 0 | -1 {
+function sortByUpdatedAtAndPrimary(
+  a: HeroCheckpoint,
+  b: HeroCheckpoint
+): 1 | 0 | -1 {
   if (a.updatedAt > b.updatedAt) return 1
   if (a.updatedAt < b.updatedAt) return -1
 
   if (a.updatedAt === b.updatedAt) {
     if (a.id > b.id) return 1
     if (a.id < b.id) return -1
-    else return 0
   }
-  throw Error("Impossible")
+  return 0
 }
 
 export const heroSync = {
@@ -46,7 +48,7 @@ export const heroSync = {
 
     // only return where updatedAt >= minUpdatedAt
     const filterForMinUpdatedAtAndId = sortedDocuments.filter((doc) => {
-      if (args.checkpoint == null) {
+      if (args.checkpoint === undefined) {
         return true
       }
       if (doc.updatedAt < minUpdatedAt) {
@@ -55,14 +57,7 @@ export const heroSync = {
       if (doc.updatedAt > minUpdatedAt) {
         return true
       }
-      if (doc.updatedAt === minUpdatedAt) {
-        if (doc.id > lastId) {
-          return true
-        } else {
-          return false
-        }
-      }
-      throw new Error("impossible")
+      return doc.id > lastId
     })
 
     // apply limit
