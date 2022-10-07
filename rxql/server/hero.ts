@@ -2,16 +2,9 @@ import { RxReplicationWriteToMasterRow } from "rxdb"
 import _ from "lodash"
 import express from "express"
 import { authenticateRequest, log } from "./util"
-import { graphQLGenerationInput } from "../shared"
+import { graphQLGenerationInput, Hero } from "../shared"
 
 let documents: Hero[] = []
-
-interface Hero {
-  id: string
-  name: string
-  color: string
-  updatedAt: number
-}
 
 type HeroCheckpoint = Pick<
   Hero,

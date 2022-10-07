@@ -1,3 +1,8 @@
+import {
+  ExtractDocumentTypeFromTypedRxJsonSchema,
+  toTypedRxJsonSchema,
+} from "rxdb"
+
 export const GRAPHQL_PORT = 10102
 export const GRAPHQL_PATH = "/graphql"
 
@@ -36,7 +41,10 @@ export const heroSchema = {
   },
   indexes: ["name", "color", "updatedAt"],
   required: ["id", "color", "updatedAt"],
-}
+} as const
+
+const schemaTyped = toTypedRxJsonSchema(heroSchema)
+export type Hero = ExtractDocumentTypeFromTypedRxJsonSchema<typeof schemaTyped>
 
 export const graphQLGenerationInput = {
   hero: {
