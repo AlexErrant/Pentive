@@ -22,29 +22,26 @@ export async function importAnki(
 }
 
 async function getDb(ankiExport: File): Promise<Database> {
-  const sql = await getSql()
-  const sqliteBuffer = await getSqliteBlob(ankiExport)
-    .then(async (b) => await b.arrayBuffer())
-    .then((b) => Buffer.from(new Uint8Array(b)))
+  const [sql, sqliteBuffer] = await Promise.all([
+    initSqlJs({
+      // Required to load the wasm binary asynchronously. Of course, you can host it wherever you want
+      locateFile: (file) => `https://sql.js.org/dist/${file}`,
+    }),
+    getSqliteBuffer(ankiExport),
+  ])
   return new sql.Database(sqliteBuffer)
 }
 
-async function getSqliteBlob(ankiExport: File): Promise<Blob> {
+async function getSqliteBuffer(ankiExport: File): Promise<Buffer> {
   const ankiEntries = await new ZipReader(
     new BlobReader(ankiExport)
   ).getEntries()
   const sqlite =
     ankiEntries.find((e) => e.filename === "collection.anki2") ??
     throwExp("`collection.anki2` not found!")
-  return (
+  const blob =
     (await sqlite.getData?.(new BlobWriter())) ??
     throwExp("todo - I don't understand why `getData` is nullable")
-  )
-}
-
-async function getSql(): Promise<initSqlJs.SqlJsStatic> {
-  return await initSqlJs({
-    // Required to load the wasm binary asynchronously. Of course, you can host it wherever you want
-    locateFile: (file) => `https://sql.js.org/dist/${file}`,
-  })
+  const arrayBuffer = await blob.arrayBuffer()
+  return Buffer.from(new Uint8Array(arrayBuffer))
 }
