@@ -6,6 +6,7 @@ import { Buffer } from "buffer"
 import { BlobReader, BlobWriter, ZipReader } from "@zip.js/zip.js"
 import { throwExp } from "../../domain/utility"
 import initSqlJs, { Database } from "sql.js"
+import { checkCol } from "./typeChecker"
 
 export async function importAnki(
   event: Event & {
@@ -22,7 +23,7 @@ export async function importAnki(
     const cols = db.prepare("select * from col")
     while (cols.step()) {
       const row = cols.getAsObject()
-      console.log(row)
+      console.log(checkCol(row))
     }
   } finally {
     db.close()

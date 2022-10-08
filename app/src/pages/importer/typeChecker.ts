@@ -1,0 +1,159 @@
+import { z } from "zod"
+
+const tmpl = z.object({
+  name: z.string(),
+  ord: z.number(),
+  qfmt: z.string(),
+  afmt: z.string(),
+  bqfmt: z.string(),
+  bafmt: z.string(),
+  did: z.number().nullable(),
+})
+
+const fld = z.object({
+  name: z.string(),
+  ord: z.number(),
+  sticky: z.boolean(),
+  rtl: z.boolean(),
+  font: z.string(),
+  size: z.number(),
+  // media: z.array(z.unknown()),
+})
+
+const model = z.object({
+  id: z.number(),
+  name: z.string(),
+  type: z.number(),
+  mod: z.number(),
+  usn: z.number(),
+  sortf: z.number(),
+  did: z.number(),
+  tmpls: z.array(tmpl),
+  flds: z.array(fld),
+  css: z.string(),
+  latexPre: z.string(),
+  latexPost: z.string(),
+  // latexsvg: z.boolean(),
+  // req: z.array(z.unknown()),
+  // tags: z.array(z.unknown()),
+  // vers: z.array(z.unknown()),
+})
+
+const conf = z.object({
+  estTimes: z.boolean(),
+  curModel: z.number(),
+  activeDecks: z.array(z.number()),
+  // schedVer: z.number(),
+  newSpread: z.number(),
+  addToCur: z.boolean(),
+  sortType: z.string(),
+  timeLim: z.number(),
+  sortBackwards: z.boolean(),
+  collapseTime: z.number(),
+  dayLearnFirst: z.boolean(),
+  dueCounts: z.boolean(),
+  nextPos: z.number(),
+  curDeck: z.number(),
+})
+
+const deck = z.object({
+  id: z.number(),
+  mod: z.number(),
+  name: z.string(),
+  usn: z.number(),
+  lrnToday: z.tuple([z.number(), z.number()]),
+  revToday: z.tuple([z.number(), z.number()]),
+  newToday: z.tuple([z.number(), z.number()]),
+  timeToday: z.tuple([z.number(), z.number()]),
+  collapsed: z.boolean(),
+  browserCollapsed: z.boolean(),
+  desc: z.string(),
+  dyn: z.number(),
+  conf: z.number(),
+  extendNew: z.number(),
+  extendRev: z.number(),
+})
+
+const dconfSingle = z.object({
+  id: z.number(),
+  mod: z.number(),
+  name: z.string(),
+  usn: z.number(),
+  maxTaken: z.number(),
+  autoplay: z.boolean(),
+  timer: z.number(),
+  replayq: z.boolean(),
+  new: z.object({
+    bury: z.boolean(),
+    delays: z.array(z.number()),
+    initialFactor: z.number(),
+    ints: z.array(z.number()),
+    order: z.number(),
+    perDay: z.number(),
+  }),
+  rev: z.object({
+    bury: z.boolean(),
+    ease4: z.number(),
+    ivlFct: z.number(),
+    maxIvl: z.number(),
+    perDay: z.number(),
+    hardFactor: z.number(),
+  }),
+  lapse: z.object({
+    delays: z.array(z.number()),
+    leechAction: z.number(),
+    leechFails: z.number(),
+    minInt: z.number(),
+    mult: z.number(),
+  }),
+  dyn: z.boolean(),
+})
+
+const dconf = z.record(z.string(), dconfSingle)
+
+const col = z.object({
+  id: z.number(),
+  crt: z.number(),
+  mod: z.number(),
+  scm: z.number(),
+  ver: z.number(),
+  dty: z.number(),
+  usn: z.number(),
+  ls: z.number(),
+  conf: z.string(),
+  models: z.string(),
+  decks: z.string(),
+  dconf: z.string(),
+  tags: z.string(),
+})
+
+const models = z.record(z.string(), model)
+const decks = z.record(z.string(), deck)
+
+type Col = z.infer<typeof col>
+type Conf = z.infer<typeof conf>
+type Dconf = z.infer<typeof dconf>
+type Models = z.infer<typeof models>
+type Decks = z.infer<typeof decks>
+
+type MergedCol = Omit<Col, "conf" | "decks" | "models" | "dconf"> & {
+  conf: Conf
+  models: Models
+  decks: Decks
+  dconf: Dconf
+}
+
+export function checkCol(raw: Record<string, unknown>): MergedCol {
+  const parsedCol = col.parse(raw)
+  const parsedConf = conf.parse(JSON.parse(parsedCol.conf))
+  const parsedModels = models.parse(JSON.parse(parsedCol.models))
+  const parsedDecks = decks.parse(JSON.parse(parsedCol.decks))
+  const parsedDconf = dconf.parse(JSON.parse(parsedCol.dconf))
+  return {
+    ...parsedCol,
+    conf: parsedConf,
+    models: parsedModels,
+    decks: parsedDecks,
+    dconf: parsedDconf,
+  }
+}
