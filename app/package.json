@@ -73,6 +73,7 @@
     "solid-app-router": "^0.4.2",
     "solid-element": "^1.4.8",
     "solid-js": "^1.4.8",
-    "sql.js": "^1.8.0"
+    "sql.js": "^1.8.0",
+    "zod": "^3.19.1"
   }
 }

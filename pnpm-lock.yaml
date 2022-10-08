@@ -59,6 +59,7 @@ importers:
       vite-plugin-checker: ^0.4.9
       vite-plugin-solid: ^2.3.0
       vitest: ^0.20.3
+      zod: ^3.19.1
     dependencies:
       '@github/time-elements': 3.1.4
       '@tanstack/solid-table': 8.5.13_solid-js@1.5.4
@@ -80,6 +81,7 @@ importers:
       solid-element: 1.5.4_solid-js@1.5.4
       solid-js: 1.5.4
       sql.js: 1.8.0
+      zod: 3.19.1
     devDependencies:
       '@babel/core': 7.19.0
       '@playwright/test': 1.25.2
@@ -159,6 +161,7 @@ importers:
     specifiers:
       '@types/cors': ^2.8.12
       '@types/express': ^4.17.14
+      '@types/lodash': ^4.14.182
       '@types/node': ^18.7.21
       async-test-util: 2.0.0
       concurrently: 7.3.0
@@ -171,6 +174,7 @@ importers:
       graphql: ^15.3.0
       graphql-client: 2.0.1
       html-webpack-plugin: 5.5.0
+      lodash: ^4.17.21
       mini-css-extract-plugin: 2.6.1
       ncp: 2.0.0
       normalize.css: 8.0.1
@@ -196,6 +200,7 @@ importers:
       express-graphql: 0.12.0_graphql@15.8.0
       graphql: 15.8.0
       graphql-client: 2.0.1
+      lodash: 4.17.21
       normalize.css: 8.0.1
       pouchdb-adapter-idb: 7.2.2
       process: 0.11.10
@@ -205,6 +210,7 @@ importers:
     devDependencies:
       '@types/cors': 2.8.12
       '@types/express': 4.17.14
+      '@types/lodash': 4.14.185
       '@types/node': 18.7.21
       async-test-util: 2.0.0
       css-loader: 6.7.1_webpack@5.74.0
