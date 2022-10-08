@@ -23,11 +23,10 @@ export async function importAnki(
 
 async function getDb(ankiExport: File): Promise<Database> {
   const sql = await getSql()
-  const sqliteBlob = await getSqliteBlob(ankiExport)
-  const db = new sql.Database(
-    Buffer.from(new Uint8Array(await sqliteBlob.arrayBuffer()))
-  )
-  return db
+  const sqliteBuffer = await getSqliteBlob(ankiExport)
+    .then(async (b) => await b.arrayBuffer())
+    .then((b) => Buffer.from(new Uint8Array(b)))
+  return new sql.Database(sqliteBuffer)
 }
 
 async function getSqliteBlob(ankiExport: File): Promise<Blob> {
@@ -37,10 +36,10 @@ async function getSqliteBlob(ankiExport: File): Promise<Blob> {
   const sqlite =
     ankiEntries.find((e) => e.filename === "collection.anki2") ??
     throwExp("`collection.anki2` not found!")
-  const sqliteBlob =
+  return (
     (await sqlite.getData?.(new BlobWriter())) ??
     throwExp("todo - I don't understand why `getData` is nullable")
-  return sqliteBlob
+  )
 }
 
 async function getSql(): Promise<initSqlJs.SqlJsStatic> {
