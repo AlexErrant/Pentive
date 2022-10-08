@@ -18,12 +18,15 @@ export async function importAnki(
     (event.target as HTMLInputElement).files?.item(0) ??
     throwExp("Impossible - there should be a file selected")
   const db = await getDb(ankiExport)
-  const cols = db.prepare("select * from col")
-  while (cols.step()) {
-    const row = cols.getAsObject()
-    console.log(row)
+  try {
+    const cols = db.prepare("select * from col")
+    while (cols.step()) {
+      const row = cols.getAsObject()
+      console.log(row)
+    }
+  } finally {
+    db.close()
   }
-  db.close()
 }
 
 async function getDb(ankiExport: File): Promise<Database> {
