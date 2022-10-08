@@ -5,6 +5,7 @@ import { defaultTemplate, Template } from "../domain/template"
 import HomeData from "./home.data"
 import { db } from "../messenger"
 import { lrpc } from "../lrpcClient"
+import { importAnki } from "./importer/importer"
 
 async function uploadNewTemplates(): Promise<void> {
   await lrpc.mutation("addTemplate", {
@@ -119,6 +120,9 @@ export default function Home(): JSX.Element {
         >
           getCard
         </button>
+      </div>
+      <div class="mt-4">
+        <input type="file" onchange={importAnki} accept=".apkg"></input>
       </div>
     </section>
   )
