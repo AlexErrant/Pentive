@@ -19,9 +19,9 @@ export async function importAnki(
     // My mental static analysis says to use `currentTarget`, but it seems to randomly be null, hence `target`. I'm confused but whatever.
     (event.target as HTMLInputElement).files?.item(0) ??
     throwExp("Impossible - there should be a file selected")
-  const db = await getDb(ankiExport)
+  const ankiDb = await getAnkiDb(ankiExport)
   try {
-    const cols = db.prepare("select * from col")
+    const cols = ankiDb.prepare("select * from col")
     while (cols.step()) {
       const row = cols.getAsObject()
       const col = checkCol(row)
@@ -29,11 +29,11 @@ export async function importAnki(
       console.log(templates)
     }
   } finally {
-    db.close()
+    ankiDb.close()
   }
 }
 
-async function getDb(ankiExport: File): Promise<Database> {
+async function getAnkiDb(ankiExport: File): Promise<Database> {
   const [sql, sqliteBuffer] = await Promise.all([
     initSqlJs({
       // Required to load the wasm binary asynchronously. Of course, you can host it wherever you want
