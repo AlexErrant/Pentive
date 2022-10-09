@@ -1,0 +1,13 @@
+{
+    "version": "0.2",
+    "language": "en",
+    "dictionaryDefinitions": [
+        {
+            "name": "importer",
+            "path": "./importer.txt"
+        }
+    ],
+    "dictionaries": [
+        "importer"
+    ]
+}

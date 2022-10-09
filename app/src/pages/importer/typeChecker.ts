@@ -133,7 +133,10 @@ const decks = z.record(z.string(), deck)
 type Col = z.infer<typeof col>
 type Conf = z.infer<typeof conf>
 type Dconf = z.infer<typeof dconf>
-type Models = z.infer<typeof models>
+export type Models = z.infer<typeof models>
+export type Model = z.infer<typeof model>
+export type Fld = z.infer<typeof fld>
+export type Tmpl = z.infer<typeof tmpl>
 type Decks = z.infer<typeof decks>
 
 type MergedCol = Omit<Col, "conf" | "decks" | "models" | "dconf"> & {
