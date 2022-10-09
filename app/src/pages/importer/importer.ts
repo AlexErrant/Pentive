@@ -8,6 +8,7 @@ import { throwExp } from "../../domain/utility"
 import initSqlJs, { Database } from "sql.js"
 import { checkCol } from "./typeChecker"
 import { parseTemplates } from "./parser"
+import { db } from "../../messenger"
 
 export async function importAnki(
   event: Event & {
@@ -26,6 +27,7 @@ export async function importAnki(
       const row = cols.getAsObject()
       const col = checkCol(row)
       const templates = parseTemplates(col.models)
+      await db.bulkUpsertTemplate(templates)
       console.log(templates)
     }
   } finally {

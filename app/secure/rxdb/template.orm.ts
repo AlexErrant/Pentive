@@ -85,6 +85,10 @@ export const templateCollectionMethods = {
     const db = await getDb()
     await db.templates.upsert(templateToDocType(template))
   },
+  bulkUpsertTemplate: async function (templates: Template[]) {
+    const db = await getDb()
+    await db.templates.bulkUpsert(templates.map(templateToDocType))
+  },
   getTemplate: async function (templateId: TemplateId) {
     const db = await getDb()
     const template = await db.templates.findOne(templateId).exec()
