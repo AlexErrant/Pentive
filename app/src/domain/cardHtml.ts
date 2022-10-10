@@ -21,29 +21,29 @@ function isNullOrWhitespace(input: string | undefined): boolean {
 }
 
 export function body(
-  fieldNameValueMap: ReadonlyArray<readonly [string, string]>,
-  questionTemplate: string,
-  answerTemplate: string,
+  fieldsAndValues: ReadonlyArray<readonly [string, string]>,
+  frontTemplate: string,
+  backTemplate: string,
   pointer: ChildTemplateId | ClozeIndex
 ): readonly [string, string] | null {
-  const [fieldNameValueMap2, questionTemplate2, answerTemplate2] =
-    getFieldNameValueMapQuestionTemplateAnswerTemplate(
-      fieldNameValueMap,
-      questionTemplate,
-      answerTemplate,
+  const [fieldsAndValues2, frontTemplate2, backTemplate2] =
+    getFieldsValuesFrontTemplateBackTemplate(
+      fieldsAndValues,
+      frontTemplate,
+      backTemplate,
       pointer
     )
-  const frontSide = replaceFields(fieldNameValueMap2, true, questionTemplate2)
-  if (frontSide === questionTemplate2) {
+  const frontSide = replaceFields(fieldsAndValues2, true, frontTemplate2)
+  if (frontSide === frontTemplate2) {
     return null
   } else {
     const backSide = replaceFields(
-      fieldNameValueMap2,
+      fieldsAndValues2,
       false,
-      answerTemplate2
+      backTemplate2
     ).replace(
       "{{FrontSide}}",
-      replaceFields(fieldNameValueMap2, false, questionTemplate2)
+      replaceFields(fieldsAndValues2, false, frontTemplate2)
     )
     return [frontSide, backSide]
   }
@@ -60,19 +60,19 @@ function getClozeFields(frontTemplate: string): string[] {
   )
 }
 
-function getFieldNameValueMapQuestionTemplateAnswerTemplate(
-  fieldNameValueMap: ReadonlyArray<readonly [string, string]>,
-  questionTemplate: string,
-  answerTemplate: string,
+function getFieldsValuesFrontTemplateBackTemplate(
+  fieldsAndValues: ReadonlyArray<readonly [string, string]>,
+  frontTemplate: string,
+  backTemplate: string,
   pointer: ChildTemplateId | ClozeIndex
 ): readonly [ReadonlyArray<readonly [string, string]>, string, string] {
   if (pointer.brand === "childTemplateId") {
-    return [fieldNameValueMap, questionTemplate, answerTemplate]
+    return [fieldsAndValues, frontTemplate, backTemplate]
   } else {
     const i = (pointer.valueOf() + 1).toString()
-    const clozeFields = getClozeFields(questionTemplate)
-    const [fieldNameValueMap2, unusedFields] = _.partition(
-      fieldNameValueMap,
+    const clozeFields = getClozeFields(frontTemplate)
+    const [fieldsAndValues2, unusedFields] = _.partition(
+      fieldsAndValues,
       ([fieldName, value]) => {
         const indexMatch = Array.from(
           value.matchAll(clozeRegex),
@@ -83,7 +83,7 @@ function getFieldNameValueMapQuestionTemplateAnswerTemplate(
         return indexMatch || !clozeFields.includes(fieldName)
       }
     )
-    const fieldNameValueMap3 = fieldNameValueMap2.map(([fieldName, value]) => {
+    const fieldsAndValues3 = fieldsAndValues2.map(([fieldName, value]) => {
       const value2 = Array.from(value.matchAll(clozeRegex))
         .filter(
           (x) =>
@@ -108,25 +108,25 @@ function getFieldNameValueMapQuestionTemplateAnswerTemplate(
     const [qt, at] = unusedFields
       .map(([k]) => k)
       .reduce(
-        ([qt, at], fieldName) => {
+        ([ft, bt], fieldName) => {
           const irrelevantCloze = `{{cloze:${fieldName}}}`
           return [
-            qt.replace(irrelevantCloze, ""),
-            at.replace(irrelevantCloze, ""),
+            ft.replace(irrelevantCloze, ""),
+            bt.replace(irrelevantCloze, ""),
           ]
         },
-        [questionTemplate, answerTemplate]
+        [frontTemplate, backTemplate]
       )
-    return [fieldNameValueMap3, qt, at]
+    return [fieldsAndValues3, qt, at]
   }
 }
 
 function replaceFields(
-  fieldNameValueMap: ReadonlyArray<readonly [string, string]>,
+  fieldsAndValues: ReadonlyArray<readonly [string, string]>,
   isFront: boolean,
   template: string
 ): string {
-  return fieldNameValueMap.reduce((previous, [fieldName, value]) => {
+  return fieldsAndValues.reduce((previous, [fieldName, value]) => {
     const simple = previous.replace(`{{${fieldName}}}`, value)
 
     const showIfHasText = (() => {
@@ -216,18 +216,13 @@ function buildHtml(body: string, css: string): string {
 }
 
 export function html(
-  fieldNameValueMap: ReadonlyArray<readonly [string, string]>,
-  questionTemplate: string,
-  answerTemplate: string,
+  fieldsAndValues: ReadonlyArray<readonly [string, string]>,
+  frontTemplate: string,
+  backTemplate: string,
   pointer: ChildTemplateId | ClozeIndex,
   css: string
 ): readonly [string, string] | null {
-  const body2 = body(
-    fieldNameValueMap,
-    questionTemplate,
-    answerTemplate,
-    pointer
-  )
+  const body2 = body(fieldsAndValues, frontTemplate, backTemplate, pointer)
   if (body2 === null) {
     return null
   } else {

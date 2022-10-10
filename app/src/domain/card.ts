@@ -16,7 +16,7 @@ export interface Review {
   readonly score: Score
   readonly created: Date
   readonly ease: number // factor
-  readonly time: number // milliseconds from seeing question to score
+  readonly time: number // milliseconds from seeing front to score
 
   // the following three are mutually exclusive
   readonly newStep?: number // index - see card settings

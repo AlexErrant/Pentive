@@ -5,8 +5,8 @@ import { strip, throwExp } from "./utility"
 
 function testBody(
   fieldValues: Array<readonly [string, string]>,
-  questionTemplate: string,
-  answerTemplate: string,
+  frontTemplate: string,
+  backTemplate: string,
   pointer: string | number,
   expectedFront: string,
   expectedBack: string
@@ -16,7 +16,7 @@ function testBody(
       ? (pointer as ChildTemplateId)
       : (pointer as ClozeIndex)
   const [front, back] =
-    body(fieldValues, questionTemplate, answerTemplate, typedPointer) ??
+    body(fieldValues, frontTemplate, backTemplate, typedPointer) ??
     throwExp("should never happen")
   expect(front).toBe(expectedFront)
   expect(back).toBe(expectedBack)
@@ -24,8 +24,8 @@ function testBody(
 
 function testStrippedBody(
   fieldValues: Array<readonly [string, string]>,
-  questionTemplate: string,
-  answerTemplate: string,
+  frontTemplate: string,
+  backTemplate: string,
   pointer: string | number,
   expectedFront: string,
   expectedBack: string
@@ -35,7 +35,7 @@ function testStrippedBody(
       ? (pointer as ChildTemplateId)
       : (pointer as ClozeIndex)
   const [front, back] =
-    body(fieldValues, questionTemplate, answerTemplate, pointer2) ??
+    body(fieldValues, frontTemplate, backTemplate, pointer2) ??
     throwExp("should never happen")
   expectStrippedToBe(front, expectedFront)
   expectStrippedToBe(back, expectedBack)
@@ -48,13 +48,13 @@ function expectStrippedToBe(html: string, expected: string): void {
 
 function testBodyIsNull(
   fieldValues: Array<readonly [string, string]>,
-  questionTemplate: string,
-  answerTemplate: string,
+  frontTemplate: string,
+  backTemplate: string,
   pointer: string | ClozeIndex
 ): void {
   const pointer2 =
     typeof pointer === "string" ? (pointer as ChildTemplateId) : pointer
-  const result = body(fieldValues, questionTemplate, answerTemplate, pointer2)
+  const result = body(fieldValues, frontTemplate, backTemplate, pointer2)
   expect(result).toBeNull()
 }
 
