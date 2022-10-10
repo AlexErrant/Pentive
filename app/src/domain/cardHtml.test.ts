@@ -1,5 +1,5 @@
 import { expect, test } from "vitest"
-import { body } from "./cardHtml"
+import { body, renderTemplate } from "./cardHtml"
 import { ChildTemplateId, ClozeIndex } from "./ids"
 import { strip, throwExp } from "./utility"
 
@@ -37,9 +37,13 @@ function testStrippedBody(
   const [front, back] =
     body(fieldValues, questionTemplate, answerTemplate, pointer2) ??
     throwExp("should never happen")
+  expectStrippedToBe(front, expectedFront)
+  expectStrippedToBe(back, expectedBack)
+}
+
+function expectStrippedToBe(html: string, expected: string): void {
   const newline = /[\r\n]/g
-  expect(strip(front).replace(newline, "")).toBe(expectedFront)
-  expect(strip(back).replace(newline, "")).toBe(expectedBack)
+  expect(strip(html).replace(newline, "").trim()).toBe(expected)
 }
 
 function testBodyIsNull(
@@ -386,4 +390,151 @@ test("CardHtml renders multiple cloze templates properly 4 with hint", () => {
     "[person] first crossed the Atlantic in [year]",
     "[Columbus] first crossed the Atlantic in [1492]Some extra info"
   )
+})
+
+function expectTemplate(
+  template: readonly [string, string] | null,
+  expectedFront: string,
+  expectedBack: string
+): void {
+  expect(template).not.toBeNull()
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const [front, back] = template!
+  expectStrippedToBe(front, expectedFront)
+  expectStrippedToBe(back, expectedBack)
+}
+
+test("renderTemplate works for 1 cloze", () => {
+  const cloze = {
+    css: "",
+    fields: [
+      {
+        name: "Text",
+      },
+      {
+        name: "Extra",
+      },
+    ],
+    templateType: {
+      tag: "cloze" as const,
+      template: {
+        id: "0" as ChildTemplateId,
+        name: "Cloze",
+        front: "{{cloze:Text}}",
+        back: "{{cloze:Text}}{{Extra}}",
+      },
+    },
+  }
+  const templates = renderTemplate(cloze)
+  expect(templates.length).toBe(1)
+  const [template] = templates
+  expectTemplate(
+    template,
+    "This is a cloze deletion for [...].",
+    "This is a cloze deletion for [Text].(Extra)"
+  )
+})
+
+test("renderTemplate works for 2 cloze deletions", () => {
+  const cloze = {
+    css: "",
+    fields: [
+      {
+        name: "Text1",
+      },
+      {
+        name: "Text2",
+      },
+      {
+        name: "Extra",
+      },
+    ],
+    templateType: {
+      tag: "cloze" as const,
+      template: {
+        id: "0" as ChildTemplateId,
+        name: "Cloze",
+        front: "{{cloze:Text1}}{{cloze:Text2}}",
+        back: "{{cloze:Text1}}{{cloze:Text2}}{{Extra}}",
+      },
+    },
+  }
+  const templates = renderTemplate(cloze)
+  expect(templates.length).toBe(2)
+  const [template1, template2] = templates
+  expectTemplate(
+    template1,
+    "This is a cloze deletion for [...].",
+    "This is a cloze deletion for [Text1].(Extra)"
+  )
+  expectTemplate(
+    template2,
+    "This is a cloze deletion for [...].",
+    "This is a cloze deletion for [Text2].(Extra)"
+  )
+})
+
+test("renderTemplate works for standard with 1 child template", () => {
+  const standard = {
+    css: "",
+    fields: [
+      {
+        name: "English",
+      },
+      {
+        name: "Spanish",
+      },
+    ],
+    templateType: {
+      tag: "standard" as const,
+      templates: [
+        {
+          id: "0" as ChildTemplateId,
+          name: "e2s",
+          front: "{{English}}",
+          back: "{{English}}-{{Spanish}}",
+        },
+      ],
+    },
+  }
+  const templates = renderTemplate(standard)
+  expect(templates.length).toBe(1)
+  const [template] = templates
+  expectTemplate(template, "(English)", "(English)-(Spanish)")
+})
+
+test("renderTemplate works for standard with 2 child templates", () => {
+  const standard = {
+    css: "",
+    fields: [
+      {
+        name: "English",
+      },
+      {
+        name: "Spanish",
+      },
+    ],
+    templateType: {
+      tag: "standard" as const,
+      templates: [
+        {
+          id: "0" as ChildTemplateId,
+          name: "e2s",
+          front: "{{English}}",
+          back: "{{English}}-{{Spanish}}",
+        },
+        {
+          id: "1" as ChildTemplateId,
+          name: "s2e",
+          front: "{{Spanish}}",
+          back: "{{Spanish}}-{{English}}",
+        },
+      ],
+    },
+  }
+  const templates = renderTemplate(standard)
+  expect(templates.length).toBe(2)
+  const [template1, template2] = templates
+  expectTemplate(template1, "(English)", "(English)-(Spanish)")
+  expectTemplate(template2, "(Spanish)", "(Spanish)-(English)")
 })

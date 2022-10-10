@@ -1,6 +1,6 @@
 import _ from "lodash"
 import { ChildTemplateId, ClozeIndex } from "./ids"
-import { Template } from "./template"
+import { Field, Template } from "./template"
 import { strip, throwExp } from "./utility"
 
 // These have hidden state - don't use `match` or `exec`!
@@ -49,6 +49,17 @@ export function body(
   }
 }
 
+function getClozeFields(frontTemplate: string): string[] {
+  return Array.from(
+    frontTemplate.matchAll(clozeTemplateRegex),
+    (x) =>
+      x.groups?.fieldName ??
+      throwExp(
+        "This error should never occur - is `clozeTemplateRegex` broken?"
+      )
+  )
+}
+
 function getFieldNameValueMapQuestionTemplateAnswerTemplate(
   fieldNameValueMap: ReadonlyArray<readonly [string, string]>,
   questionTemplate: string,
@@ -59,14 +70,7 @@ function getFieldNameValueMapQuestionTemplateAnswerTemplate(
     return [fieldNameValueMap, questionTemplate, answerTemplate]
   } else {
     const i = (pointer.valueOf() + 1).toString()
-    const clozeFields = Array.from(
-      questionTemplate.matchAll(clozeTemplateRegex),
-      (x) =>
-        x.groups?.fieldName ??
-        throwExp(
-          "This error should never occur - is `clozeTemplateRegex` broken?"
-        )
-    )
+    const clozeFields = getClozeFields(questionTemplate)
     const [fieldNameValueMap2, unusedFields] = _.partition(
       fieldNameValueMap,
       ([fieldName, value]) => {
@@ -232,16 +236,41 @@ export function html(
 }
 
 export function renderTemplate(
-  template: Template
+  template: Pick<Template, "fields" | "templateType" | "css">
 ): ReadonlyArray<readonly [string, string] | null> {
-  const fields = template.fields.map((f) => [f.name, `(${f.name})`] as const) // medTODO consider adding escape characters so you can do e.g. {{Front}}. Apparently Anki doesn't have escape characters - now would be a good time to introduce this feature.
+  const getStandardFieldAndValue = (
+    field: Field
+  ): readonly [string, string] => {
+    return [field.name, `(${field.name})`] as const
+  }
+  const fieldsAndValues = template.fields.map(getStandardFieldAndValue) // medTODO consider adding escape characters so you can do e.g. {{Front}}. Apparently Anki doesn't have escape characters - now would be a good time to introduce this feature.
   if (template.templateType.tag === "standard") {
     return template.templateType.templates.map(({ front, back, id }) =>
-      html(fields, front, back, id, template.css)
+      html(fieldsAndValues, front, back, id, template.css)
     )
   } else if (template.templateType.tag === "cloze") {
-    const { front, back, id } = template.templateType.template
-    return [html(fields, front, back, id, template.css)]
+    const getFieldsAndValues = (
+      clozeField: string,
+      i: number
+    ): Array<readonly [string, string]> =>
+      template.fields.map((f) => {
+        return f.name === clozeField
+          ? ([
+              f.name,
+              `This is a cloze deletion for {{c${i + 1}::${f.name}}}.`,
+            ] as const)
+          : getStandardFieldAndValue(f)
+      })
+    const { front, back } = template.templateType.template
+    return getClozeFields(front).map((clozeField, i) =>
+      html(
+        getFieldsAndValues(clozeField, i),
+        front,
+        back,
+        i as ClozeIndex,
+        template.css
+      )
+    )
   }
   throw new Error(
     `No renderer found for Template: ${JSON.stringify(template.templateType)}`
