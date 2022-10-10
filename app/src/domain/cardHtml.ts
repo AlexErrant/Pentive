@@ -7,7 +7,15 @@ import { strip, throwExp } from "./utility"
 // https://www.tsmean.com/articles/regex/javascript-regex-match-vs-exec-vs-matchall/
 const clozeRegex =
   /{{c(?<clozeIndex>\d+)::(?<answer>.*?)(?:::(?<hint>.*?))?}}/gi
-const clozeTemplateRegex = /{{cloze:(?<fieldName>.*?)}}/gi
+const clozeTemplateRegex = /{{cloze:(?<fieldName>.+?)}}/gi
+function clozeTemplateFor(fieldName: string): RegExp {
+  const escapedFieldName = escapeRegExp(fieldName)
+  const r = clozeTemplateRegex.source.replace(
+    "(?<fieldName>.+?)",
+    escapedFieldName
+  )
+  return new RegExp(r, clozeTemplateRegex.flags)
+}
 
 // https://stackoverflow.com/a/6969486
 function escapeRegExp(string: string): string {
@@ -109,7 +117,7 @@ function getFieldsValuesFrontTemplateBackTemplate(
       .map(([k]) => k)
       .reduce(
         ([ft, bt], fieldName) => {
-          const irrelevantCloze = `{{cloze:${fieldName}}}`
+          const irrelevantCloze = clozeTemplateFor(fieldName)
           return [
             ft.replace(irrelevantCloze, ""),
             bt.replace(irrelevantCloze, ""),
@@ -163,7 +171,7 @@ function replaceFields(
 `
           return current.replace(rawCloze, brackets)
         }, value)
-        return stripHtml.replace(`{{cloze:${fieldName}}}`, bracketed)
+        return stripHtml.replace(clozeTemplateFor(fieldName), bracketed)
       } else {
         const answer = value.replace(
           clozeRegex,
@@ -173,7 +181,7 @@ $<answer>
 <span class="cloze-brackets-back">]</span>
 `
         )
-        return stripHtml.replace(`{{cloze:${fieldName}}}`, answer)
+        return stripHtml.replace(clozeTemplateFor(fieldName), answer)
       }
     })()
     return cloze
