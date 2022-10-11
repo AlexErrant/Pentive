@@ -6,6 +6,8 @@ import AWS, { AWSError, Credentials, DynamoDB } from "aws-sdk"
 import { Table, Entity } from "dynamodb-toolbox"
 import { DocumentClient } from "aws-sdk/clients/dynamodb"
 import { PromiseResult } from "aws-sdk/lib/request"
+import { createRemoteTemplate } from "./schemas/template"
+import { id } from "./schemas/core"
 
 const dynamoDbClientParams: DocumentClient.DocumentClientOptions &
   DynamoDB.Types.ClientConfiguration = {
@@ -44,21 +46,6 @@ const template = new Entity({
   },
   table: ivy,
 } as const)
-
-const id = z.string().uuid() // highTODO are we doing ULIDs, KSUID, or neither?
-
-const createRemoteTemplate = z.object({
-  id,
-  name: z.string(),
-  nook: z.string(),
-  templateType: z.literal("standard").or(z.literal("cloze")),
-  fields: z.array(z.string()),
-  css: z.string(),
-  childTemplates: z.string(),
-  ankiId: z.number().positive().optional(),
-})
-
-export type CreateRemoteTemplate = z.infer<typeof createRemoteTemplate>
 
 interface Context {
   user: string | undefined

@@ -1,4 +1,4 @@
-import { CreateRemoteTemplate } from "lrpc/src/appRouter"
+import { CreateRemoteTemplate } from "lrpc/src/schemas/template"
 import { KeyFunctionMap, RxCollection, RxDocument } from "rxdb"
 import { TemplateId } from "../../src/domain/ids"
 import { Template, TemplateType } from "../../src/domain/template"
