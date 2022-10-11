@@ -123,6 +123,7 @@ importers:
       '@trpc/client': ^9.27.2
       '@trpc/server': ^9.27.2
       '@types/aws-lambda': ^8.10.106
+      '@types/jsonwebtoken': ^8.5.9
       '@types/node': ^18.7.21
       '@types/node-fetch': ^2.6.2
       aws-lambda: ^1.0.7
@@ -154,6 +155,7 @@ importers:
       zod: 3.19.1
     devDependencies:
       '@types/aws-lambda': 8.10.106
+      '@types/jsonwebtoken': 8.5.9
       '@types/node': 18.7.21
       '@types/node-fetch': 2.6.2
       serverless: 3.22.0
@@ -2418,6 +2420,12 @@ packages:
 
   /@types/json5/0.0.29:
     resolution: {integrity: sha512-dRLjCWHYg4oaA77cxO64oO+7JwCwnIzkZPdrrC71jQmQtlhM556pwKo5bUzqvZndkVbeFLIIi+9TC40JNF5hNQ==}
+    dev: true
+
+  /@types/jsonwebtoken/8.5.9:
+    resolution: {integrity: sha512-272FMnFGzAVMGtu9tkr29hRL6bZj4Zs1KZNeHLnKqAvp06tAIcarTMwOh8/8bz4FmKRcMxZhZNeUAQsNLoiPhg==}
+    dependencies:
+      '@types/node': 18.7.21
     dev: true
 
   /@types/keyv/3.1.4:
