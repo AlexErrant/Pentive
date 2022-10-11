@@ -15,6 +15,7 @@ export const createRemoteTemplate = z.object({
 export type CreateRemoteTemplate = z.infer<typeof createRemoteTemplate>
 
 export const remoteTemplate = createRemoteTemplate.extend({
+  author: z.string(),
   created: dateSchema,
   modified: dateSchema,
 })

@@ -11,3 +11,8 @@ export function getUser(auth: string | undefined): string | undefined {
   }
   return undefined
 }
+
+// https://stackoverflow.com/a/65666402
+export function throwExp(errorMessage: string): never {
+  throw new Error(errorMessage)
+}

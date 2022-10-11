@@ -9,6 +9,7 @@ import { PromiseResult } from "aws-sdk/lib/request"
 import { createRemoteTemplate, remoteTemplate } from "./schemas/template"
 import { id } from "./schemas/core"
 import superjson from "superjson"
+import { throwExp } from "./core"
 
 const dynamoDbClientParams: DocumentClient.DocumentClientOptions &
   DynamoDB.Types.ClientConfiguration = {
@@ -38,6 +39,7 @@ const template = new Entity({
     id: { type: "string", partitionKey: true },
     sk: { type: "string", sortKey: true, hidden: true },
     nook: { type: "string", required: true },
+    author: { type: "string", required: true },
     name: { type: "string", required: true },
     templateType: { type: "string", required: true },
     fields: { type: "list", required: true },
@@ -92,6 +94,7 @@ export function appRouter<TContext extends Context>() {
         const templatePuts = req.input.map((t) =>
           template.putBatch({
             sk: "a",
+            author: req.ctx.user ?? throwExp("user not found"), // highTODO put this route behind protected middleware upon TRPCv10
             ...t,
           })
         )
