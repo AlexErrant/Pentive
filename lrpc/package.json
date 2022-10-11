@@ -9,6 +9,7 @@
     "aws-sdk": "^2.1223.0",
     "dotenv": "^16.0.2",
     "dynamodb-toolbox": "^0.4.3",
+    "jsonwebtoken": "^8.5.1",
     "node-fetch": "^2.6.1",
     "superjson": "^1.10.1",
     "ts-node": "^10.3.0",
