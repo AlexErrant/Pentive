@@ -53,6 +53,7 @@ importers:
       stylelint: ^14.9.1
       stylelint-config-prettier: ^9.0.3
       stylelint-config-standard: ^26.0.0
+      superjson: ^1.10.1
       tailwindcss: ^3.1.6
       typescript: ^4.7.4
       vite: ^3.0.3
@@ -81,6 +82,7 @@ importers:
       solid-element: 1.5.4_solid-js@1.5.4
       solid-js: 1.5.4
       sql.js: 1.8.0
+      superjson: 1.10.1
       zod: 3.19.1
     devDependencies:
       '@babel/core': 7.19.0
@@ -132,6 +134,7 @@ importers:
       serverless-dynamodb-local: ^0.2.40
       serverless-offline: ^10.2.1
       serverless-plugin-typescript: ^2.1.2
+      superjson: ^1.10.1
       ts-node: ^10.3.0
       ts-node-dev: ^2.0.0
       typescript: ^4.7.4
@@ -144,6 +147,7 @@ importers:
       dotenv: 16.0.2
       dynamodb-toolbox: 0.4.3
       node-fetch: 2.6.7
+      superjson: 1.10.1
       ts-node: 10.9.1_ke6ijd35va4xbeayrnhu4zwagm
       zod: 3.19.1
     devDependencies:
@@ -4186,6 +4190,13 @@ packages:
     resolution: {integrity: sha512-JxbCBUdrfr6AQjOXrxoTvAMJO4HBTUIlBzslcJPAz+/KT8yk53fXun51u+RenNYvad/+Vc2DIz5o9UxlCDymFQ==}
     dev: true
 
+  /copy-anything/3.0.2:
+    resolution: {integrity: sha512-CzATjGXzUQ0EvuvgOCI6A4BGOo2bcVx8B+eC2nF862iv9fopnPQwlrbACakNCHRIJbCSBj+J/9JeDf60k64MkA==}
+    engines: {node: '>=12.13'}
+    dependencies:
+      is-what: 4.1.7
+    dev: false
+
   /core-js-compat/3.25.5:
     resolution: {integrity: sha512-ovcyhs2DEBUIE0MGEKHP4olCUW/XYte3Vroyxuh38rD1wAO4dHohsovUC4eAOuzFxE6b+RXvBU3UZ9o0YhUTkA==}
     dependencies:
@@ -7430,7 +7441,6 @@ packages:
   /is-what/4.1.7:
     resolution: {integrity: sha512-DBVOQNiPKnGMxRMLIYSwERAS5MVY1B7xYiGnpgctsOFvVDz9f9PFXXxMcTOHuoqYp4NK9qFYQaIC1NRRxLMpBQ==}
     engines: {node: '>=12.13'}
-    dev: true
 
   /is-wsl/2.2.0:
     resolution: {integrity: sha512-fKzAra0rGJUUBwGBgNkHZuToZcn+TtXHpeCgmkMJMMYx1sQDYaCSyjJBSCa2nH1DGm7s3n1oBnohoVTBaN7Lww==}
@@ -11113,6 +11123,13 @@ packages:
     transitivePeerDependencies:
       - supports-color
     dev: true
+
+  /superjson/1.10.1:
+    resolution: {integrity: sha512-7fvPVDHmkTKg6641B9c6vr6Zz5CwPtF9j0XFExeLxJxrMaeLU2sqebY3/yrI3l0K5zJ+H9QA3H+lIYj5ooCOkg==}
+    engines: {node: '>=10'}
+    dependencies:
+      copy-anything: 3.0.2
+    dev: false
 
   /supports-color/5.5.0:
     resolution: {integrity: sha512-QjVjwdXIt408MIiAqCX4oUKsgU2EqAGzs2Ppkm4aQYbjm+ZEWEcW4SfFNTr4uMNZma0ey4f5lgLrkB0aX0QMow==}

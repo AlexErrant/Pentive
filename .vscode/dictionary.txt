@@ -12,6 +12,7 @@ rxdb
 rxql
 sandboxed
 stylelint
+superjson
 tailwindcss
 Tauri
 trpc
