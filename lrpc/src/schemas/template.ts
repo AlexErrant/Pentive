@@ -1,5 +1,5 @@
 import { z } from "zod"
-import { id } from "./core"
+import { dateSchema, id } from "./core"
 
 export const createRemoteTemplate = z.object({
   id,
@@ -13,3 +13,8 @@ export const createRemoteTemplate = z.object({
 })
 
 export type CreateRemoteTemplate = z.infer<typeof createRemoteTemplate>
+
+export const remoteTemplate = createRemoteTemplate.extend({
+  created: dateSchema,
+  modified: dateSchema,
+})

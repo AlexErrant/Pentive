@@ -6,7 +6,7 @@ import AWS, { AWSError, Credentials, DynamoDB } from "aws-sdk"
 import { Table, Entity } from "dynamodb-toolbox"
 import { DocumentClient } from "aws-sdk/clients/dynamodb"
 import { PromiseResult } from "aws-sdk/lib/request"
-import { createRemoteTemplate } from "./schemas/template"
+import { createRemoteTemplate, remoteTemplate } from "./schemas/template"
 import { id } from "./schemas/core"
 
 const dynamoDbClientParams: DocumentClient.DocumentClientOptions &
@@ -129,7 +129,7 @@ export function appRouter<TContext extends Context>() {
           PromiseResult<DocumentClient.BatchGetItemOutput, AWSError>
         >)
         const r = batch.Responses?.[config.IVY_TABLE] ?? []
-        return z.array(createRemoteTemplate).parse(r)
+        return z.array(remoteTemplate).parse(r)
       },
     })
 }
