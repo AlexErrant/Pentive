@@ -3,8 +3,11 @@ import type { CreateAWSLambdaContextOptions } from "@trpc/server/adapters/aws-la
 import type { APIGatewayProxyEventV2 } from "aws-lambda"
 import * as trpc from "@trpc/server"
 import { appRouter } from "./appRouter"
+import { getUser } from "./core"
 
 // highTODO https://github.com/trpc/trpc/discussions/2371
+
+// run with `npm run rebuild-offline`
 
 function createContext({
   event,
@@ -12,8 +15,9 @@ function createContext({
 }: CreateAWSLambdaContextOptions<APIGatewayProxyEventV2>): {
   user: string | undefined
 } {
+  const user = getUser(event.headers.authorization)
   return {
-    user: event.headers["x-user"],
+    user,
   }
 }
 type Context = trpc.inferAsyncReturnType<typeof createContext>

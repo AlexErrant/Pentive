@@ -5,6 +5,9 @@ import http, { IncomingMessage, ServerResponse } from "http"
 import { NodeHTTPCreateContextFnOptions } from "@trpc/server/dist/declarations/src/adapters/node-http/types"
 import * as trpc from "@trpc/server"
 import { appRouter } from "./appRouter"
+import { getUser } from "./core"
+
+// run with `npm run dev`
 
 function createContext(
   x: NodeHTTPCreateContextFnOptions<
@@ -14,7 +17,8 @@ function createContext(
 ): {
   user: string | undefined
 } {
-  return { user: undefined }
+  const user = getUser(x.req.headers.authorization)
+  return { user }
 }
 type Context = trpc.inferAsyncReturnType<typeof createContext>
 
