@@ -8,6 +8,7 @@ import { DocumentClient } from "aws-sdk/clients/dynamodb"
 import { PromiseResult } from "aws-sdk/lib/request"
 import { createRemoteTemplate, remoteTemplate } from "./schemas/template"
 import { id } from "./schemas/core"
+import superjson from "superjson"
 
 const dynamoDbClientParams: DocumentClient.DocumentClientOptions &
   DynamoDB.Types.ClientConfiguration = {
@@ -55,6 +56,7 @@ interface Context {
 export function appRouter<TContext extends Context>() {
   return trpc
     .router<TContext>()
+    .transformer(superjson)
     .query("greet", {
       input: z.object({
         name: z.string(),
