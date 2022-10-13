@@ -8,14 +8,14 @@ import { strip, throwExp } from "./utility"
 // https://www.tsmean.com/articles/regex/javascript-regex-match-vs-exec-vs-matchall/
 export const clozeRegex =
   /{{c(?<clozeIndex>\d+)::(?<answer>.*?)(?:::(?<hint>.*?))?}}/gi
-const clozeTemplateRegex = /{{cloze:(?<fieldName>.+?)}}/gi
+export const clozeTemplateRegex = /{{cloze:(?<fieldName>.+?)}}/gi
 function clozeTemplateFor(fieldName: string): RegExp {
   const escapedFieldName = escapeRegExp(fieldName)
-  const r = clozeTemplateRegex.source.replace(
+  const r = C.clozeTemplateRegex.source.replace(
     "(?<fieldName>.+?)",
     escapedFieldName
   )
-  return new RegExp(r, clozeTemplateRegex.flags)
+  return new RegExp(r, C.clozeTemplateRegex.flags)
 }
 
 // https://stackoverflow.com/a/6969486
@@ -60,7 +60,7 @@ export function body(
 
 function getClozeFields(frontTemplate: string): string[] {
   return Array.from(
-    frontTemplate.matchAll(clozeTemplateRegex),
+    frontTemplate.matchAll(C.clozeTemplateRegex),
     (x) =>
       x.groups?.fieldName ??
       throwExp(

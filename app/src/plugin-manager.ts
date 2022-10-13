@@ -1,4 +1,5 @@
-import { db } from "./messenger"
+import { Plugin } from "./domain/plugin"
+import { Ct, PluginExports, register } from "./services"
 
 // https://stackoverflow.com/a/18650249
 async function blobToBase64(blob: Blob): Promise<string> {
@@ -13,8 +14,9 @@ async function blobToBase64(blob: Blob): Promise<string> {
 // https://github.com/WICG/webcomponents/issues/754 https://github.com/caridy/redefine-custom-elements https://stackoverflow.com/q/47805288
 // Be aware that it seems like it's impossible to unregister a custom element https://stackoverflow.com/q/27058648
 
-export async function registerCustomElements(): Promise<Set<string>> {
-  const plugins = await db.getPlugins()
+export async function registerCustomElements(
+  plugins: Plugin[]
+): Promise<Set<string>> {
   const registerCustomElementPromises = plugins // highTODO ensure there are no custom elements with the same name
     .filter((x) => x.type.tag === "custom-element")
     .map(async (p) => {
@@ -24,4 +26,12 @@ export async function registerCustomElements(): Promise<Set<string>> {
     })
   const registeredNames = await Promise.all(registerCustomElementPromises)
   return new Set(registeredNames)
+}
+
+export async function registerPluginService(plugin: Plugin): Promise<void> {
+  const script = await blobToBase64(plugin.script)
+  const exports = (await import(/* @vite-ignore */ script)) as PluginExports // The `data:text/javascript;base64,` on `script` from `readAsDataURL` is important https://stackoverflow.com/a/57255653
+  Object.entries(exports.services).forEach(([serviceName, serviceImpl]) => {
+    register(serviceName as keyof Ct, serviceImpl)
+  })
 }
