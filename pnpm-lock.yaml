@@ -34,6 +34,7 @@ importers:
       events: ^3.3.0
       fast-check: ^3.1.1
       iframe-resizer: ^4.3.2
+      immer: ^9.0.15
       jsdom: ^20.0.0
       lodash: ^4.17.21
       lrpc: workspace:*
@@ -71,6 +72,7 @@ importers:
       buffer: 6.0.3
       comlink: 4.3.1
       iframe-resizer: 4.3.2
+      immer: 9.0.15
       lodash: 4.17.21
       lrpc: link:../lrpc
       pouchdb-adapter-idb: 7.3.0
@@ -7011,6 +7013,10 @@ packages:
 
   /immediate/3.3.0:
     resolution: {integrity: sha512-HR7EVodfFUdQCTIeySw+WDRFJlPcLOJbXfwwZ7Oom6tjsvZ3bOkCDJHehQC3nxJrv7+f9XecwazynjU8e4Vw3Q==}
+
+  /immer/9.0.15:
+    resolution: {integrity: sha512-2eB/sswms9AEUSkOm4SbV5Y7Vmt/bKRwByd52jfLkW4OLYeaTP3EEiJ9agqU0O/tq6Dk62Zfj+TJSqfm1rLVGQ==}
+    dev: false
 
   /import-fresh/3.3.0:
     resolution: {integrity: sha512-veYYhQa+D1QBKznvhUHxb8faxlrwUnxseDAbAp457E0wLNio2bOSKnjYDhMj+YiAq61xrMGhQk9iXVk5FzgQMw==}

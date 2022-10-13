@@ -63,6 +63,7 @@
     "buffer": "^6.0.3",
     "comlink": "^4.3.1",
     "iframe-resizer": "^4.3.2",
+    "immer": "^9.0.15",
     "lodash": "^4.17.21",
     "lrpc": "workspace:*",
     "pouchdb-adapter-idb": "^7.3.0",
