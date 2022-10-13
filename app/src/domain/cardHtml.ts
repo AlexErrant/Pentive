@@ -1,11 +1,12 @@
 import _ from "lodash"
+import { C } from "../services"
 import { ChildTemplateId, ClozeIndex } from "./ids"
 import { Field, Template } from "./template"
 import { strip, throwExp } from "./utility"
 
 // These have hidden state - don't use `match` or `exec`!
 // https://www.tsmean.com/articles/regex/javascript-regex-match-vs-exec-vs-matchall/
-const clozeRegex =
+export const clozeRegex =
   /{{c(?<clozeIndex>\d+)::(?<answer>.*?)(?:::(?<hint>.*?))?}}/gi
 const clozeTemplateRegex = /{{cloze:(?<fieldName>.+?)}}/gi
 function clozeTemplateFor(fieldName: string): RegExp {
@@ -83,7 +84,7 @@ function getFieldsValuesFrontTemplateBackTemplate(
       fieldsAndValues,
       ([fieldName, value]) => {
         const indexMatch = Array.from(
-          value.matchAll(clozeRegex),
+          value.matchAll(C.clozeRegex),
           (x) =>
             x.groups?.clozeIndex ??
             throwExp("This error should never occur - is `clozeRegex` broken?")
@@ -92,7 +93,7 @@ function getFieldsValuesFrontTemplateBackTemplate(
       }
     )
     const fieldsAndValues3 = fieldsAndValues2.map(([fieldName, value]) => {
-      const value2 = Array.from(value.matchAll(clozeRegex))
+      const value2 = Array.from(value.matchAll(C.clozeRegex))
         .filter(
           (x) =>
             (x.groups?.clozeIndex ??
@@ -159,7 +160,7 @@ function replaceFields(
       if (isFront) {
         const regexMatches: ReadonlyArray<
           readonly [string | undefined, string]
-        > = Array.from(value.matchAll(clozeRegex), (x) => [
+        > = Array.from(value.matchAll(C.clozeRegex), (x) => [
           x.groups?.hint,
           x[0],
         ])
@@ -174,7 +175,7 @@ function replaceFields(
         return stripHtml.replace(clozeTemplateFor(fieldName), bracketed)
       } else {
         const answer = value.replace(
-          clozeRegex,
+          C.clozeRegex,
           `
 <span class="cloze-brackets-back">[</span>
 $<answer>

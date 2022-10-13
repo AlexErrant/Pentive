@@ -1,3 +1,4 @@
+import "../services" // side effect to initialize C
 import { expect, test } from "vitest"
 import { body, renderTemplate } from "./cardHtml"
 import { ChildTemplateId, ClozeIndex } from "./ids"
