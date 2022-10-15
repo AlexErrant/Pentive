@@ -1,20 +1,22 @@
-import { clozeRegex, clozeTemplateRegex } from "./domain/cardHtml"
+import {
+  body,
+  clozeRegex,
+  clozeTemplateRegex,
+  html,
+  renderTemplate,
+} from "./domain/cardHtml"
 
 // the DI container
 export const C = {
   clozeRegex,
   clozeTemplateRegex,
-} as const
+  body,
+  renderTemplate,
+  html,
+}
 
 export type Ct = typeof C
 
 export interface PluginExports {
-  services: Partial<Ct>
-}
-
-export function register<K extends keyof Ct, V extends Ct[K]>(
-  serviceName: K,
-  serviceImpl: V
-): void {
-  C[serviceName] = serviceImpl
+  services: (c: Ct) => Partial<Ct>
 }

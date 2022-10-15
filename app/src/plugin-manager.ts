@@ -1,5 +1,5 @@
 import { Plugin } from "./domain/plugin"
-import { Ct, PluginExports, register } from "./services"
+import { C, Ct, PluginExports } from "./services"
 
 // https://stackoverflow.com/a/18650249
 async function blobToBase64(blob: Blob): Promise<string> {
@@ -28,10 +28,18 @@ export async function registerCustomElements(
   return new Set(registeredNames)
 }
 
-export async function registerPluginService(plugin: Plugin): Promise<void> {
+async function registerPluginService(c: Ct, plugin: Plugin): Promise<Ct> {
   const script = await blobToBase64(plugin.script)
   const exports = (await import(/* @vite-ignore */ script)) as PluginExports // The `data:text/javascript;base64,` on `script` from `readAsDataURL` is important https://stackoverflow.com/a/57255653
-  Object.entries(exports.services).forEach(([serviceName, serviceImpl]) => {
-    register(serviceName as keyof Ct, serviceImpl)
-  })
+  const rExports = exports.services(c)
+  return {
+    ...c,
+    ...rExports,
+  }
+}
+
+export async function registerPluginServices(plugins: Plugin[]): Promise<Ct> {
+  return await plugins.reduce(async (previousC, plugin) => {
+    return await registerPluginService(await previousC, plugin)
+  }, Promise.resolve(C))
 }

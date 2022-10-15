@@ -1,10 +1,9 @@
 import "../services" // side effect to initialize C
 import { expect, test } from "vitest"
-import { renderTemplate } from "./cardHtml"
 import { ChildTemplateId } from "./ids"
 import { strip } from "./utility"
 import { Plugin } from "./plugin"
-import { registerPluginService } from "../plugin-manager"
+import { registerPluginServices } from "../plugin-manager"
 
 function expectStrippedToBe(html: string, expected: string): void {
   const newline = /[\r\n]/g
@@ -27,11 +26,20 @@ test("renderTemplate works with plugin that requires `edit` syntax", async () =>
   const plugin: Plugin = {
     script: new Blob(
       [
-        `export default {
-          services: {
-            clozeTemplateRegex: /{{edit:cloze:(?<fieldName>.+?)}}/gi,
-          },
-        }`,
+        `
+"use strict";
+function clozeTemplateRegex(c) {
+    return new RegExp(c.clozeTemplateRegex.source.replace("cloze:", "edit:cloze:"), c.clozeTemplateRegex.flags);
+}
+var exports = {
+    services: function (c) {
+        return {
+            clozeTemplateRegex: clozeTemplateRegex(c)
+        };
+    }
+};
+export default exports;
+        `,
       ],
       {
         type: "text/javascript",
@@ -46,7 +54,7 @@ test("renderTemplate works with plugin that requires `edit` syntax", async () =>
     created: "",
     modified: "",
   }
-  await registerPluginService(plugin)
+  const c = await registerPluginServices([plugin])
   const cloze = {
     css: "",
     fields: [
@@ -67,7 +75,7 @@ test("renderTemplate works with plugin that requires `edit` syntax", async () =>
       },
     },
   }
-  const templates = renderTemplate(cloze)
+  const templates = c.renderTemplate(cloze)
   expect(templates.length).toBe(1)
   const [template] = templates
   expectTemplate(

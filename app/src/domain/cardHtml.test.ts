@@ -1,6 +1,5 @@
-import "../services" // side effect to initialize C
+import { C } from "../services"
 import { expect, test } from "vitest"
-import { body, renderTemplate } from "./cardHtml"
 import { ChildTemplateId, ClozeIndex } from "./ids"
 import { strip, throwExp } from "./utility"
 
@@ -17,7 +16,7 @@ function testBody(
       ? (pointer as ChildTemplateId)
       : (pointer as ClozeIndex)
   const [front, back] =
-    body(fieldValues, frontTemplate, backTemplate, typedPointer) ??
+    C.body(fieldValues, frontTemplate, backTemplate, typedPointer) ??
     throwExp("should never happen")
   expect(front).toBe(expectedFront)
   expect(back).toBe(expectedBack)
@@ -36,7 +35,7 @@ function testStrippedBody(
       ? (pointer as ChildTemplateId)
       : (pointer as ClozeIndex)
   const [front, back] =
-    body(fieldValues, frontTemplate, backTemplate, pointer2) ??
+    C.body(fieldValues, frontTemplate, backTemplate, pointer2) ??
     throwExp("should never happen")
   expectStrippedToBe(front, expectedFront)
   expectStrippedToBe(back, expectedBack)
@@ -55,7 +54,7 @@ function testBodyIsNull(
 ): void {
   const pointer2 =
     typeof pointer === "string" ? (pointer as ChildTemplateId) : pointer
-  const result = body(fieldValues, frontTemplate, backTemplate, pointer2)
+  const result = C.body(fieldValues, frontTemplate, backTemplate, pointer2)
   expect(result).toBeNull()
 }
 
@@ -426,7 +425,7 @@ test("renderTemplate works for 1 cloze", () => {
       },
     },
   }
-  const templates = renderTemplate(cloze)
+  const templates = C.renderTemplate(cloze)
   expect(templates.length).toBe(1)
   const [template] = templates
   expectTemplate(
@@ -460,7 +459,7 @@ test("renderTemplate works for 2 cloze deletions", () => {
       },
     },
   }
-  const templates = renderTemplate(cloze)
+  const templates = C.renderTemplate(cloze)
   expect(templates.length).toBe(2)
   const [template1, template2] = templates
   expectTemplate(
@@ -498,7 +497,7 @@ test("renderTemplate works for standard with 1 child template", () => {
       ],
     },
   }
-  const templates = renderTemplate(standard)
+  const templates = C.renderTemplate(standard)
   expect(templates.length).toBe(1)
   const [template] = templates
   expectTemplate(template, "(English)", "(English)-(Spanish)")
@@ -533,7 +532,7 @@ test("renderTemplate works for standard with 2 child templates", () => {
       ],
     },
   }
-  const templates = renderTemplate(standard)
+  const templates = C.renderTemplate(standard)
   expect(templates.length).toBe(2)
   const [template1, template2] = templates
   expectTemplate(template1, "(English)", "(English)-(Spanish)")

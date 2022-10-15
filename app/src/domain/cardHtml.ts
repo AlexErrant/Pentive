@@ -1,5 +1,5 @@
 import _ from "lodash"
-import { C } from "../services"
+import { Ct } from "../services"
 import { ChildTemplateId, ClozeIndex } from "./ids"
 import { Field, Template } from "./template"
 import { strip, throwExp } from "./utility"
@@ -9,13 +9,13 @@ import { strip, throwExp } from "./utility"
 export const clozeRegex =
   /{{c(?<clozeIndex>\d+)::(?<answer>.*?)(?:::(?<hint>.*?))?}}/gi
 export const clozeTemplateRegex = /{{cloze:(?<fieldName>.+?)}}/gi
-function clozeTemplateFor(fieldName: string): RegExp {
+function clozeTemplateFor(this: Ct, fieldName: string): RegExp {
   const escapedFieldName = escapeRegExp(fieldName)
-  const r = C.clozeTemplateRegex.source.replace(
+  const r = this.clozeTemplateRegex.source.replace(
     "(?<fieldName>.+?)",
     escapedFieldName
   )
-  return new RegExp(r, C.clozeTemplateRegex.flags)
+  return new RegExp(r, this.clozeTemplateRegex.flags)
 }
 
 // https://stackoverflow.com/a/6969486
@@ -30,37 +30,42 @@ function isNullOrWhitespace(input: string | undefined): boolean {
 }
 
 export function body(
+  this: Ct,
   fieldsAndValues: ReadonlyArray<readonly [string, string]>,
   frontTemplate: string,
   backTemplate: string,
   pointer: ChildTemplateId | ClozeIndex
 ): readonly [string, string] | null {
   const [fieldsAndValues2, frontTemplate2, backTemplate2] =
-    getFieldsValuesFrontTemplateBackTemplate(
+    getFieldsValuesFrontTemplateBackTemplate.call(
+      this,
       fieldsAndValues,
       frontTemplate,
       backTemplate,
       pointer
     )
-  const frontSide = replaceFields(fieldsAndValues2, true, frontTemplate2)
+  const frontSide = replaceFields.call(
+    this,
+    fieldsAndValues2,
+    true,
+    frontTemplate2
+  )
   if (frontSide === frontTemplate2) {
     return null
   } else {
-    const backSide = replaceFields(
-      fieldsAndValues2,
-      false,
-      backTemplate2
-    ).replace(
-      "{{FrontSide}}",
-      replaceFields(fieldsAndValues2, false, frontTemplate2)
-    )
+    const backSide = replaceFields
+      .call(this, fieldsAndValues2, false, backTemplate2)
+      .replace(
+        "{{FrontSide}}",
+        replaceFields.call(this, fieldsAndValues2, false, frontTemplate2)
+      )
     return [frontSide, backSide]
   }
 }
 
-function getClozeFields(frontTemplate: string): string[] {
+function getClozeFields(this: Ct, frontTemplate: string): string[] {
   return Array.from(
-    frontTemplate.matchAll(C.clozeTemplateRegex),
+    frontTemplate.matchAll(this.clozeTemplateRegex),
     (x) =>
       x.groups?.fieldName ??
       throwExp(
@@ -70,6 +75,7 @@ function getClozeFields(frontTemplate: string): string[] {
 }
 
 function getFieldsValuesFrontTemplateBackTemplate(
+  this: Ct,
   fieldsAndValues: ReadonlyArray<readonly [string, string]>,
   frontTemplate: string,
   backTemplate: string,
@@ -79,12 +85,12 @@ function getFieldsValuesFrontTemplateBackTemplate(
     return [fieldsAndValues, frontTemplate, backTemplate]
   } else {
     const i = (pointer.valueOf() + 1).toString()
-    const clozeFields = getClozeFields(frontTemplate)
+    const clozeFields = getClozeFields.call(this, frontTemplate)
     const [fieldsAndValues2, unusedFields] = _.partition(
       fieldsAndValues,
       ([fieldName, value]) => {
         const indexMatch = Array.from(
-          value.matchAll(C.clozeRegex),
+          value.matchAll(this.clozeRegex),
           (x) =>
             x.groups?.clozeIndex ??
             throwExp("This error should never occur - is `clozeRegex` broken?")
@@ -93,7 +99,7 @@ function getFieldsValuesFrontTemplateBackTemplate(
       }
     )
     const fieldsAndValues3 = fieldsAndValues2.map(([fieldName, value]) => {
-      const value2 = Array.from(value.matchAll(C.clozeRegex))
+      const value2 = Array.from(value.matchAll(this.clozeRegex))
         .filter(
           (x) =>
             (x.groups?.clozeIndex ??
@@ -118,7 +124,7 @@ function getFieldsValuesFrontTemplateBackTemplate(
       .map(([k]) => k)
       .reduce(
         ([ft, bt], fieldName) => {
-          const irrelevantCloze = clozeTemplateFor(fieldName)
+          const irrelevantCloze = clozeTemplateFor.call(this, fieldName)
           return [
             ft.replace(irrelevantCloze, ""),
             bt.replace(irrelevantCloze, ""),
@@ -131,6 +137,7 @@ function getFieldsValuesFrontTemplateBackTemplate(
 }
 
 function replaceFields(
+  this: Ct,
   fieldsAndValues: ReadonlyArray<readonly [string, string]>,
   isFront: boolean,
   template: string
@@ -160,7 +167,7 @@ function replaceFields(
       if (isFront) {
         const regexMatches: ReadonlyArray<
           readonly [string | undefined, string]
-        > = Array.from(value.matchAll(C.clozeRegex), (x) => [
+        > = Array.from(value.matchAll(this.clozeRegex), (x) => [
           x.groups?.hint,
           x[0],
         ])
@@ -172,17 +179,20 @@ function replaceFields(
 `
           return current.replace(rawCloze, brackets)
         }, value)
-        return stripHtml.replace(clozeTemplateFor(fieldName), bracketed)
+        return stripHtml.replace(
+          clozeTemplateFor.call(this, fieldName),
+          bracketed
+        )
       } else {
         const answer = value.replace(
-          C.clozeRegex,
+          this.clozeRegex,
           `
 <span class="cloze-brackets-back">[</span>
 $<answer>
 <span class="cloze-brackets-back">]</span>
 `
         )
-        return stripHtml.replace(clozeTemplateFor(fieldName), answer)
+        return stripHtml.replace(clozeTemplateFor.call(this, fieldName), answer)
       }
     })()
     return cloze
@@ -225,13 +235,14 @@ function buildHtml(body: string, css: string): string {
 }
 
 export function html(
+  this: Ct,
   fieldsAndValues: ReadonlyArray<readonly [string, string]>,
   frontTemplate: string,
   backTemplate: string,
   pointer: ChildTemplateId | ClozeIndex,
   css: string
 ): readonly [string, string] | null {
-  const body2 = body(fieldsAndValues, frontTemplate, backTemplate, pointer)
+  const body2 = this.body(fieldsAndValues, frontTemplate, backTemplate, pointer)
   if (body2 === null) {
     return null
   } else {
@@ -240,6 +251,7 @@ export function html(
 }
 
 export function renderTemplate(
+  this: Ct,
   template: Pick<Template, "fields" | "templateType" | "css">
 ): ReadonlyArray<readonly [string, string] | null> {
   const getStandardFieldAndValue = (
@@ -250,7 +262,7 @@ export function renderTemplate(
   const fieldsAndValues = template.fields.map(getStandardFieldAndValue) // medTODO consider adding escape characters so you can do e.g. {{Front}}. Apparently Anki doesn't have escape characters - now would be a good time to introduce this feature.
   if (template.templateType.tag === "standard") {
     return template.templateType.templates.map(({ front, back, id }) =>
-      html(fieldsAndValues, front, back, id, template.css)
+      this.html(fieldsAndValues, front, back, id, template.css)
     )
   } else if (template.templateType.tag === "cloze") {
     const getFieldsAndValues = (
@@ -266,15 +278,17 @@ export function renderTemplate(
           : getStandardFieldAndValue(f)
       })
     const { front, back } = template.templateType.template
-    return getClozeFields(front).map((clozeField, i) =>
-      html(
-        getFieldsAndValues(clozeField, i),
-        front,
-        back,
-        i as ClozeIndex,
-        template.css
+    return getClozeFields
+      .call(this, front)
+      .map((clozeField, i) =>
+        this.html(
+          getFieldsAndValues(clozeField, i),
+          front,
+          back,
+          i as ClozeIndex,
+          template.css
+        )
       )
-    )
   }
   throw new Error(
     `No renderer found for Template: ${JSON.stringify(template.templateType)}`
