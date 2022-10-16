@@ -90,15 +90,18 @@ test("renderTemplate works with plugin that requires `.bind(this)` because it in
 function clozeTemplateRegex(c) {
   return new RegExp(c.clozeTemplateRegex.source.replace("cloze:", "edit:cloze:"), c.clozeTemplateRegex.flags);
 }
+function renderTemplate(c) {
+  return function (template) {
+      var original = c.renderTemplate.bind(this)(template);
+      return original.map(function (x) {
+          return x !== null ? [x[0].toUpperCase(), x[1].toUpperCase()] : null;
+      });
+  };
+}
 var services = function (c) {
   return {
       clozeTemplateRegex: clozeTemplateRegex(c),
-      renderTemplate: function (template) {
-          var original = c.renderTemplate.bind(this)(template);
-          return original.map(function (x) {
-              return x !== null ? [x[0].toUpperCase(), x[1].toUpperCase()] : null;
-          });
-      }
+      renderTemplate: renderTemplate(c)
   };
 };
 var exports = {
@@ -122,15 +125,18 @@ test("ensure that the above test fails if the indirect call disappears, renderin
 function clozeTemplateRegex(c) {
   return new RegExp(c.clozeTemplateRegex.source.replace("cloze:", "edit:cloze:"), c.clozeTemplateRegex.flags);
 }
+function renderTemplate(c) {
+  return function (template) {
+      var original = c.renderTemplate(template);
+      return original.map(function (x) {
+          return x !== null ? [x[0].toUpperCase(), x[1].toUpperCase()] : null;
+      });
+  };
+}
 var services = function (c) {
   return {
       clozeTemplateRegex: clozeTemplateRegex(c),
-      renderTemplate: function (template) {
-          var original = c.renderTemplate(template);
-          return original.map(function (x) {
-              return x !== null ? [x[0].toUpperCase(), x[1].toUpperCase()] : null;
-          });
-      }
+      renderTemplate: renderTemplate(c)
   };
 };
 var exports = {

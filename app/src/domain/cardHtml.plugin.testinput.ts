@@ -1,5 +1,5 @@
 // npx tsc .\cardHtml.plugin.testinput.ts
-import { Ct, PluginExports } from "../services"
+import { C, Ct, PluginExports } from "../services"
 
 function clozeTemplateRegex(c: Ct): RegExp {
   return new RegExp(
@@ -8,15 +8,19 @@ function clozeTemplateRegex(c: Ct): RegExp {
   )
 }
 
+function renderTemplate(c: Ct): typeof C.renderTemplate {
+  return function (template) {
+    const original = c.renderTemplate.bind(this)(template)
+    return original.map((x) =>
+      x !== null ? ([x[0].toUpperCase(), x[1].toUpperCase()] as const) : null
+    )
+  }
+}
+
 const services = (c: Ct): Partial<Ct> => {
   return {
     clozeTemplateRegex: clozeTemplateRegex(c),
-    renderTemplate: function (template) {
-      const original = c.renderTemplate.bind(this)(template)
-      return original.map((x) =>
-        x !== null ? ([x[0].toUpperCase(), x[1].toUpperCase()] as const) : null
-      )
-    },
+    renderTemplate: renderTemplate(c),
   }
 }
 
