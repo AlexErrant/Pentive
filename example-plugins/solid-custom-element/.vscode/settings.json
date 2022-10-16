@@ -1,7 +1,4 @@
 {
-  "eslint.workingDirectories": [
-    "./app"
-  ],
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": true
   },
@@ -13,6 +10,10 @@
     "typescript",
     "typescriptreact"
   ],
+  "css.validate": false,
+  // "less.validate": false,
+  // "scss.validate": false, // uncomment when/if stylelint takes over
+  "typescript.tsdk": "./node_modules/typescript/lib",
   "files.exclude": {
     "**/.DS_Store": true,
     "**/.git": true,

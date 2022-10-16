@@ -1,14 +1,17 @@
 {
   "compilerOptions": {
-    "target": "ESNext",
+    "strict": true,
+    "target": "ES2017",
     "module": "ESNext",
     "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
     "jsx": "preserve",
     "jsxImportSource": "solid-js",
-    "types": ["vite/client"],
-    "noEmit": true,
-    "isolatedModules": true
+    "types": [
+      "vite/client"
+    ]
   }
 }
