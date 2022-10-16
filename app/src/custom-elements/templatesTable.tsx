@@ -7,9 +7,9 @@ import {
 } from "@tanstack/solid-table"
 import { Template } from "../domain/template"
 import _ from "lodash"
-import { renderTemplate } from "../domain/cardHtml"
 import ResizingIframe from "./resizing-iframe"
 import "@github/time-elements"
+import { C } from ".."
 
 function id(id: keyof Template): keyof Template {
   return id
@@ -55,7 +55,7 @@ const columns: Array<ColumnDef<Template>> = [
   {
     header: "Preview",
     cell: (info) => {
-      const srcdoc = renderTemplate(info.row.original)[0]
+      const srcdoc = C.renderTemplate(info.row.original)[0]
       if (srcdoc === null || srcdoc === undefined) {
         return `Error rendering first template of ${info.row.original.name}`
       } else {

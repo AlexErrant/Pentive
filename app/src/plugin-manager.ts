@@ -39,7 +39,9 @@ async function registerPluginService(c: Ct, plugin: Plugin): Promise<Ct> {
 }
 
 export async function registerPluginServices(plugins: Plugin[]): Promise<Ct> {
-  return await plugins.reduce(async (previousC, plugin) => {
-    return await registerPluginService(await previousC, plugin)
-  }, Promise.resolve(Ci))
+  return await plugins
+    .filter((x) => x.type.tag === "function")
+    .reduce(async (previousC, plugin) => {
+      return await registerPluginService(await previousC, plugin)
+    }, Promise.resolve(Ci))
 }
