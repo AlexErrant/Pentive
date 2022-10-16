@@ -9,5 +9,10 @@ export default defineConfig({
   build: {
     minify: false,
     target: "esnext",
+    lib: {
+      entry: "src/index.ts",
+      fileName: "index",
+      formats: ["es"],
+    },
   },
 })

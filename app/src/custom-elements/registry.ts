@@ -6,8 +6,8 @@
 import { Component } from "solid-js"
 import Nav from "./nav"
 
-class HTMLElementTagNameMap {
-  readonly "pentive-nav" = Nav
+export interface HTMLElementTagNameMap {
+  "pentive-nav": typeof Nav
 }
 
 declare module "solid-js" {

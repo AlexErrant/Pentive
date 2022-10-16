@@ -21,7 +21,14 @@ export async function registerCustomElements(
     .filter((x) => x.type.tag === "custom-element")
     .map(async (p) => {
       const script = await blobToBase64(p.script)
-      await import(/* @vite-ignore */ script) // The `data:text/javascript;base64,` on `script` from `readAsDataURL` is important https://stackoverflow.com/a/57255653
+      // The `data:text/javascript;base64,` on `script` from `readAsDataURL` is important https://stackoverflow.com/a/57255653
+      const exports = (await import(/* @vite-ignore */ script)) as {
+        default: PluginExports
+      }
+      if (exports.default.customElements !== undefined)
+        Object.values(exports.default.customElements).forEach((register) => {
+          register()
+        })
       return p.type.name
     })
   const registeredNames = await Promise.all(registerCustomElementPromises)
@@ -31,6 +38,7 @@ export async function registerCustomElements(
 async function registerPluginService(c: Ct, plugin: Plugin): Promise<Ct> {
   const script = await blobToBase64(plugin.script)
   const exports = (await import(/* @vite-ignore */ script)) as PluginExports // The `data:text/javascript;base64,` on `script` from `readAsDataURL` is important https://stackoverflow.com/a/57255653
+  if (exports.services === undefined) return c
   const rExports = exports.services(c)
   return {
     ...c,
