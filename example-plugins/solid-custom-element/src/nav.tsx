@@ -1,11 +1,10 @@
 // todo - investigate a less trash build setup. https://www.reddit.com/r/solidjs/comments/gym0ed/bundling_a_web_components/
 
 import { For, VoidComponent } from "solid-js"
-import { customElement } from "solid-element"
 import { NavLinkData } from "../../../app/src/custom-elements/contracts"
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
-const Nav: VoidComponent<{ navLinks: NavLinkData[] }> = (props) => {
+export const Nav: VoidComponent<{ navLinks: NavLinkData[] }> = (props) => {
   return (
     <nav class="bg-gray-200 text-gray-900 px-4">
       <ul class="flex items-center">
@@ -22,5 +21,3 @@ const Nav: VoidComponent<{ navLinks: NavLinkData[] }> = (props) => {
     </nav>
   )
 }
-
-customElement("pentive-nav", { navLinks: [] }, Nav)
