@@ -1,4 +1,4 @@
-let myNav = document.querySelector("#myNav");
+const myNav = document.querySelector("#myNav")
 myNav.navLinks = [
   {
     name: "Home",
@@ -20,4 +20,4 @@ myNav.navLinks = [
     name: "Error",
     href: "/error",
   },
-];
+]
