@@ -5,7 +5,13 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "serve": "vite preview"
+    "serve": "vite preview",
+    "eslint": "eslint .",
+    "eslintw": "eslint . --fix",
+    "prettier": "prettier --check .",
+    "prettierw": "prettier --write .",
+    "stylelint": "stylelint **/*.css",
+    "stylelintw": "stylelint **/*.css --fix"
   },
   "license": "MIT",
   "devDependencies": {
