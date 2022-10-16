@@ -2,3 +2,4 @@ packages:
   - 'app/'
   - 'lrpc/'
   - 'rxql/'
+  - 'example-plugins/*'
