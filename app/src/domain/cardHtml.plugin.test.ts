@@ -10,6 +10,43 @@ function expectStrippedToBe(html: string, expected: string): void {
   expect(strip(html).replace(newline, "").trim()).toBe(expected)
 }
 
+const clozeWithRequiredEdit = {
+  css: "",
+  fields: [
+    {
+      name: "Text",
+    },
+    {
+      name: "Extra",
+    },
+  ],
+  templateType: {
+    tag: "cloze" as const,
+    template: {
+      id: "0" as ChildTemplateId,
+      name: "Cloze",
+      front: "{{edit:cloze:Text}}",
+      back: "{{edit:cloze:Text}}{{Extra}}",
+    },
+  },
+}
+
+function buildPlugin(src: string): Plugin {
+  return {
+    script: new Blob([src], {
+      type: "text/javascript",
+    }),
+    type: {
+      tag: "function",
+      name: "",
+    },
+    id: "",
+    name: "",
+    created: "",
+    modified: "",
+  }
+}
+
 function expectTemplate(
   template: readonly [string, string] | null,
   expectedFront: string,
@@ -23,10 +60,7 @@ function expectTemplate(
 }
 
 test("renderTemplate works with plugin that requires `edit` syntax", async () => {
-  const plugin: Plugin = {
-    script: new Blob(
-      [
-        `
+  const plugin = buildPlugin(`
 "use strict";
 function clozeTemplateRegex(c) {
     return new RegExp(c.clozeTemplateRegex.source.replace("cloze:", "edit:cloze:"), c.clozeTemplateRegex.flags);
@@ -38,44 +72,9 @@ var exports = {
         };
     }
 };
-export default exports;
-        `,
-      ],
-      {
-        type: "text/javascript",
-      }
-    ),
-    type: {
-      tag: "function",
-      name: "",
-    },
-    id: "",
-    name: "",
-    created: "",
-    modified: "",
-  }
+export default exports;`)
   const c = await registerPluginServices([plugin])
-  const cloze = {
-    css: "",
-    fields: [
-      {
-        name: "Text",
-      },
-      {
-        name: "Extra",
-      },
-    ],
-    templateType: {
-      tag: "cloze" as const,
-      template: {
-        id: "0" as ChildTemplateId,
-        name: "Cloze",
-        front: "{{edit:cloze:Text}}",
-        back: "{{edit:cloze:Text}}{{Extra}}",
-      },
-    },
-  }
-  const templates = c.renderTemplate(cloze)
+  const templates = c.renderTemplate(clozeWithRequiredEdit)
   expect(templates.length).toBe(1)
   const [template] = templates
   expectTemplate(
@@ -86,10 +85,7 @@ export default exports;
 })
 
 test("renderTemplate works with plugin that requires `.bind(this)` because it indirectly calls its custom `edit` syntax", async () => {
-  const plugin: Plugin = {
-    script: new Blob(
-      [
-        `
+  const plugin = buildPlugin(`
 "use strict";
 function clozeTemplateRegex(c) {
   return new RegExp(c.clozeTemplateRegex.source.replace("cloze:", "edit:cloze:"), c.clozeTemplateRegex.flags);
@@ -108,44 +104,9 @@ var services = function (c) {
 var exports = {
   services: services
 };
-export default exports;
-        `,
-      ],
-      {
-        type: "text/javascript",
-      }
-    ),
-    type: {
-      tag: "function",
-      name: "",
-    },
-    id: "",
-    name: "",
-    created: "",
-    modified: "",
-  }
+export default exports;`)
   const c = await registerPluginServices([plugin])
-  const cloze = {
-    css: "",
-    fields: [
-      {
-        name: "Text",
-      },
-      {
-        name: "Extra",
-      },
-    ],
-    templateType: {
-      tag: "cloze" as const,
-      template: {
-        id: "0" as ChildTemplateId,
-        name: "Cloze",
-        front: "{{edit:cloze:Text}}",
-        back: "{{edit:cloze:Text}}{{Extra}}",
-      },
-    },
-  }
-  const templates = c.renderTemplate(cloze)
+  const templates = c.renderTemplate(clozeWithRequiredEdit)
   expect(templates.length).toBe(1)
   const [template] = templates
   expectTemplate(
@@ -153,4 +114,30 @@ export default exports;
     "THIS IS A CLOZE DELETION FOR [...].",
     "THIS IS A CLOZE DELETION FOR [TEXT].(EXTRA)"
   )
+})
+
+test("ensure that the above test fails if the indirect call disappears, rendering `bind(this)` moot", async () => {
+  const plugin = buildPlugin(`
+"use strict";
+function clozeTemplateRegex(c) {
+  return new RegExp(c.clozeTemplateRegex.source.replace("cloze:", "edit:cloze:"), c.clozeTemplateRegex.flags);
+}
+var services = function (c) {
+  return {
+      clozeTemplateRegex: clozeTemplateRegex(c),
+      renderTemplate: function (template) {
+          var original = c.renderTemplate(template);
+          return original.map(function (x) {
+              return x !== null ? [x[0].toUpperCase(), x[1].toUpperCase()] : null;
+          });
+      }
+  };
+};
+var exports = {
+  services: services
+};
+export default exports;`)
+  const c = await registerPluginServices([plugin])
+  const templates = c.renderTemplate(clozeWithRequiredEdit)
+  expect(templates.length).toBe(0)
 })
