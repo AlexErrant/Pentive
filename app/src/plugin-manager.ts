@@ -1,5 +1,5 @@
 import { Plugin } from "./domain/plugin"
-import { C, Ct, PluginExports } from "./services"
+import { Ci, Ct, PluginExports } from "./services"
 
 // https://stackoverflow.com/a/18650249
 async function blobToBase64(blob: Blob): Promise<string> {
@@ -41,5 +41,5 @@ async function registerPluginService(c: Ct, plugin: Plugin): Promise<Ct> {
 export async function registerPluginServices(plugins: Plugin[]): Promise<Ct> {
   return await plugins.reduce(async (previousC, plugin) => {
     return await registerPluginService(await previousC, plugin)
-  }, Promise.resolve(C))
+  }, Promise.resolve(Ci))
 }

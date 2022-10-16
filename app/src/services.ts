@@ -6,8 +6,9 @@ import {
   renderTemplate,
 } from "./domain/cardHtml"
 
-// the DI container
-export const C = {
+// the DI container. Stands for "Container, initial".
+// eslint-disable-next-line @typescript-eslint/naming-convention
+export const Ci = {
   clozeRegex,
   clozeTemplateRegex,
   body,
@@ -15,7 +16,7 @@ export const C = {
   html,
 }
 
-export type Ct = typeof C
+export type Ct = typeof Ci
 
 export interface PluginExports {
   services: (c: Ct) => Partial<Ct>
