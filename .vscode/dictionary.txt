@@ -13,6 +13,7 @@ rxql
 sandboxed
 stylelint
 superjson
+sveltejs
 tailwindcss
 Tauri
 trpc
