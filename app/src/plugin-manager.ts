@@ -1,3 +1,4 @@
+import { PentiveElement } from "./custom-elements/registry"
 import { Plugin } from "./domain/plugin"
 import { Ci, Ct, PluginExports } from "./services"
 
@@ -7,37 +8,58 @@ async function blobToBase64(blob: Blob): Promise<string> {
     const reader = new FileReader()
     reader.onloadend = () => resolve(reader.result as string)
     reader.readAsDataURL(blob) // https://developer.mozilla.org/en-US/docs/Web/API/FileReader/readAsDataURL
+    // The `data:text/javascript;base64,` on the return value of from `readAsDataURL` is used by this function's callers https://stackoverflow.com/a/57255653
   })
 }
 
 // Some links for when we decide to support "hot" updates of custom elements
-// https://github.com/WICG/webcomponents/issues/754 https://github.com/caridy/redefine-custom-elements https://stackoverflow.com/q/47805288
+// https://github.com/WICG/webcomponents/issues/754 https://github.com/caridy/redefine-custom-elements https://stackoverflow.com/q/47805288 https://github.com/ryansolid/component-register#hot-module-replacement-new
 // Be aware that it seems like it's impossible to unregister a custom element https://stackoverflow.com/q/27058648
 
-export async function registerCustomElements(
-  plugins: Plugin[]
-): Promise<Set<string>> {
-  const registerCustomElementPromises = plugins // highTODO ensure there are no custom elements with the same name
-    .filter((x) => x.type.tag === "custom-element")
-    .map(async (p) => {
-      const script = await blobToBase64(p.script)
-      // The `data:text/javascript;base64,` on `script` from `readAsDataURL` is important https://stackoverflow.com/a/57255653
-      const exports = (await import(/* @vite-ignore */ script)) as {
-        default: PluginExports
-      }
-      if (exports.default.customElements !== undefined)
-        Object.values(exports.default.customElements).forEach((register) => {
-          register()
-        })
-      return p.type.name
-    })
-  const registeredNames = await Promise.all(registerCustomElementPromises)
-  return new Set(registeredNames)
+type ElementRegistry = Partial<
+  Record<PentiveElement, Array<[string, () => void]>>
+> // [plugin's name, lazy registration] Lazy because you can't unregister a custom element.
+
+function applyForElement(
+  elementRegistry: ElementRegistry,
+  element: PentiveElement,
+  pluginName: string,
+  register: () => void
+): ElementRegistry {
+  const olderRegistrations = elementRegistry[element] ?? []
+  return {
+    ...elementRegistry,
+    [element]: [...olderRegistrations, [pluginName, register]],
+  }
 }
 
-async function registerPluginService(c: Ct, plugin: Plugin): Promise<Ct> {
+function resolveRegistrations(er: ElementRegistry): Set<string> {
+  const registeredElements = Object.entries(er).map(
+    ([elementName, applicants]) => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const [pluginName, register] = applicants[0] // arbitrary pick the first applicant. highTODO handle multiple
+      register()
+      return elementName
+    }
+  )
+  return new Set(registeredElements)
+}
+
+async function registerPluginService(
+  [c, er]: [Ct, ElementRegistry],
+  plugin: Plugin
+): Promise<[Ct, ElementRegistry]> {
   const script = await blobToBase64(plugin.script)
-  const exports = (await import(/* @vite-ignore */ script)) as PluginExports // The `data:text/javascript;base64,` on `script` from `readAsDataURL` is important https://stackoverflow.com/a/57255653
+  const exports = (await import(/* @vite-ignore */ script)) as {
+    default: PluginExports
+  }
+  return [
+    getC(c, exports.default),
+    getElementRegistry(plugin.name, er, exports.default),
+  ]
+}
+
+function getC(c: Ct, exports: PluginExports): Ct {
   if (exports.services === undefined) return c
   const rExports = exports.services(c)
   return {
@@ -46,10 +68,33 @@ async function registerPluginService(c: Ct, plugin: Plugin): Promise<Ct> {
   }
 }
 
-export async function registerPluginServices(plugins: Plugin[]): Promise<Ct> {
-  return await plugins
-    .filter((x) => x.type.tag === "function")
-    .reduce(async (previousC, plugin) => {
-      return await registerPluginService(await previousC, plugin)
-    }, Promise.resolve(Ci))
+function getElementRegistry(
+  pluginName: string,
+  priorRegistry: ElementRegistry,
+  exports: PluginExports
+): ElementRegistry {
+  return exports.customElements !== undefined
+    ? Object.entries(exports.customElements).reduce(
+        (priorEr, [element, register]) => {
+          return applyForElement(
+            priorEr,
+            element as PentiveElement,
+            pluginName,
+            register
+          )
+        },
+        priorRegistry
+      )
+    : priorRegistry
+}
+
+export async function registerPluginServices(
+  plugins: Plugin[]
+): Promise<[Ct, Set<string>]> {
+  const seed: [Ct, ElementRegistry] = [Ci, {}]
+  const [c, er] = await plugins.reduce(async (prior, plugin) => {
+    return await registerPluginService(await prior, plugin)
+  }, Promise.resolve(seed))
+  const registeredElements = resolveRegistrations(er)
+  return [c, registeredElements]
 }

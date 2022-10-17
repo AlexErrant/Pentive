@@ -10,6 +10,8 @@ export interface HTMLElementTagNameMap {
   "pentive-nav": typeof Nav
 }
 
+export type PentiveElement = keyof HTMLElementTagNameMap
+
 declare module "solid-js" {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace JSX {

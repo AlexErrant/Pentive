@@ -73,7 +73,7 @@ var exports = {
     }
 };
 export default exports;`)
-  const c = await registerPluginServices([plugin])
+  const [c] = await registerPluginServices([plugin])
   const templates = c.renderTemplate(clozeWithRequiredEdit)
   expect(templates.length).toBe(1)
   const [template] = templates
@@ -108,7 +108,7 @@ var exports = {
   services: services
 };
 export default exports;`)
-  const c = await registerPluginServices([plugin])
+  const [c] = await registerPluginServices([plugin])
   const templates = c.renderTemplate(clozeWithRequiredEdit)
   expect(templates.length).toBe(1)
   const [template] = templates
@@ -143,7 +143,7 @@ var exports = {
   services: services
 };
 export default exports;`)
-  const c = await registerPluginServices([plugin])
+  const [c] = await registerPluginServices([plugin])
   const templates = c.renderTemplate(clozeWithRequiredEdit)
   expect(templates.length).toBe(0)
 })
