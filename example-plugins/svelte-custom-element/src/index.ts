@@ -1,7 +1,21 @@
-import type { PluginExports } from "../../../app/src/services"
+import type { Ct, PluginExports } from "../../../app/src/services"
 import App from "./App.svelte"
 
+function clozeTemplateRegex(c: Ct): RegExp {
+  return new RegExp(
+    c.clozeTemplateRegex.source.replace("cloze:", "(?:edit:)?cloze:"),
+    c.clozeTemplateRegex.flags
+  )
+}
+
+const services = (c: Ct): Partial<Ct> => {
+  return {
+    clozeTemplateRegex: clozeTemplateRegex(c),
+  }
+}
+
 const exports: PluginExports = {
+  services,
   customElements: {
     // eslint-disable-next-line @typescript-eslint/naming-convention
     "pentive-nav": () => {
