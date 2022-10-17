@@ -19,10 +19,6 @@ export default function Plugins(): JSX.Element {
             created: new Date().toISOString(),
             modified: new Date().toISOString(),
             name: "plain pentive nav",
-            type: {
-              tag: "custom-element",
-              name: "pentive-nav",
-            },
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             script: target.files![0],
           }

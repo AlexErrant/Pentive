@@ -1,7 +1,7 @@
 import { KeyFunctionMap, RxCollection, RxDocument } from "rxdb"
 import { getDb } from "./rxdb"
 import { PluginDocType } from "./plugin.schema"
-import { Plugin, Type } from "../../src/domain/plugin"
+import { Plugin } from "../../src/domain/plugin"
 
 interface PluginDocMethods extends KeyFunctionMap {}
 
@@ -32,7 +32,6 @@ export const pluginCollectionMethods = {
         name: p.name,
         created: p.created,
         modified: p.modified,
-        type: p.type as Type,
         script: script as Blob,
       }
     })

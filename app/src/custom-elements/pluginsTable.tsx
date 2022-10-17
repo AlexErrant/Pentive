@@ -6,7 +6,6 @@ import {
   getCoreRowModel,
 } from "@tanstack/solid-table"
 import { Plugin } from "../domain/plugin"
-import _ from "lodash"
 import "@github/time-elements"
 
 function id(id: keyof Plugin): keyof Plugin {
@@ -17,10 +16,6 @@ const columns: Array<ColumnDef<Plugin>> = [
   {
     header: "Name",
     accessorKey: id("name"),
-  },
-  {
-    header: "Type",
-    accessorFn: (row) => _.startCase(row.type.tag),
   },
   {
     header: "Created",

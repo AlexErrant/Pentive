@@ -36,10 +36,6 @@ function buildPlugin(src: string): Plugin {
     script: new Blob([src], {
       type: "text/javascript",
     }),
-    type: {
-      tag: "function",
-      name: "",
-    },
     id: "",
     name: "",
     created: "",

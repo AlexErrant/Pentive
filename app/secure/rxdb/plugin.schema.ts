@@ -27,11 +27,8 @@ export const pluginSchemaLiteral = {
       format: "date-time",
       maxLength: 24,
     },
-    type: {
-      type: "object", // https://gitter.im/pubkey/rxdb?at=5a58d78e83152df26d626cb1
-    },
   },
-  required: ["id", "name", "created", "modified", "type"],
+  required: ["id", "name", "created", "modified"],
   indexes: ["name", "created", "modified"],
   attachments: {},
 } as const // <- It is important to set 'as const' to preserve the literal type
