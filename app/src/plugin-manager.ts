@@ -1,3 +1,4 @@
+import { freeze } from "immer"
 import { PentiveElement } from "./custom-elements/registry"
 import { Plugin } from "./domain/plugin"
 import { Ci, Ct, PluginExports } from "./services"
@@ -61,7 +62,7 @@ async function registerPluginService(
 
 function getC(c: Ct, exports: PluginExports): Ct {
   if (exports.services === undefined) return c
-  const rExports = exports.services(c)
+  const rExports = exports.services(freeze(c, true))
   return {
     ...c,
     ...rExports,

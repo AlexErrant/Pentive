@@ -2,6 +2,7 @@ apkg
 comlink
 graphiql
 iframes
+immer
 lrpc
 msedge
 oneof
