@@ -8,7 +8,7 @@ import { registerPluginServices } from "./plugin-manager"
 
 const plugins = await db.getPlugins()
 
-export const [C, registeredNames] = await registerPluginServices(plugins)
+export const [C, registeredElements] = await registerPluginServices(plugins)
 
 render(
   () => (
