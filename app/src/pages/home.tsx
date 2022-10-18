@@ -1,6 +1,7 @@
 import { useRouteData } from "solid-app-router"
 import { createEffect, createSignal, JSX } from "solid-js"
 import { sampleCard, Card } from "../domain/card"
+import { sampleNote, Note } from "../domain/note"
 import { defaultTemplate, Template } from "../domain/template"
 import HomeData from "./home.data"
 import { db } from "../messenger"
@@ -27,6 +28,7 @@ export default function Home(): JSX.Element {
   const [count, setCount] = createSignal(1)
   const [template, setTemplate] = createSignal<Template | null>(null)
   const [card, setCard] = createSignal<Card | null>(null)
+  const [note, setNote] = createSignal<Note | null>(null)
   const age = useRouteData<typeof HomeData>()
 
   console.log(count())
@@ -41,6 +43,10 @@ export default function Home(): JSX.Element {
 
   createEffect(() => {
     console.log(card())
+  })
+
+  createEffect(() => {
+    console.log(note())
   })
 
   return (
@@ -105,6 +111,20 @@ export default function Home(): JSX.Element {
           onClick={uploadNewTemplates}
         >
           uploadNewTemplates
+        </button>
+      </div>
+      <div class="mt-4">
+        <button
+          class="border rounded-lg px-2 border-gray-900"
+          onClick={async () => await db.upsertNote(sampleNote)}
+        >
+          upsertNote
+        </button>
+        <button
+          class="border rounded-lg px-2 border-gray-900"
+          onClick={async () => setNote(await db.getNote(sampleNote.id))}
+        >
+          getNote
         </button>
       </div>
       <div class="mt-4">

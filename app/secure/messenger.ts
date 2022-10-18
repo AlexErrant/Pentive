@@ -1,6 +1,7 @@
 import * as Comlink from "comlink"
 import { cardCollectionMethods } from "./rxdb/card.orm"
 import { heroCollectionMethods } from "./rxdb/hero.orm"
+import { noteCollectionMethods } from "./rxdb/note.orm"
 import { pluginCollectionMethods } from "./rxdb/plugin.orm"
 import { remove, sync } from "./rxdb/rxdb"
 import { templateCollectionMethods } from "./rxdb/template.orm"
@@ -8,6 +9,7 @@ import { templateCollectionMethods } from "./rxdb/template.orm"
 export const exposed = {
   ...templateCollectionMethods,
   ...cardCollectionMethods,
+  ...noteCollectionMethods,
   ...heroCollectionMethods,
   ...pluginCollectionMethods,
   remove,

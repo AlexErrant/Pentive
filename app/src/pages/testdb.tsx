@@ -6,12 +6,27 @@ import { createResource, Match, Switch } from "solid-js"
 import fc from "fast-check"
 import { template as arbitraryTemplate } from "../../tests/arbitraryTemplate"
 import { card as arbitraryCard } from "../../tests/arbitraryCard"
+import { note as arbitraryNote } from "../../tests/arbitraryNote"
 
 async function testTemplate(): Promise<boolean> {
   await fc.assert(
     fc.asyncProperty(arbitraryTemplate, async (expected) => {
       await db.upsertTemplate(expected)
       const actual = await db.getTemplate(expected.id)
+      const r = _.isEqual(expected, actual)
+      console.assert(r, { expected, actual })
+      return r
+    }),
+    { verbose: true }
+  )
+  return true
+}
+
+async function testNote(): Promise<boolean> {
+  await fc.assert(
+    fc.asyncProperty(arbitraryNote, async (expected) => {
+      await db.upsertNote(expected)
+      const actual = await db.getNote(expected.id)
       const r = _.isEqual(expected, actual)
       console.assert(r, { expected, actual })
       return r
@@ -37,10 +52,11 @@ async function testCard(): Promise<boolean> {
 
 const [template] = createResource(testTemplate)
 const [card] = createResource(testCard)
+const [note] = createResource(testNote)
 
 export default function TestDb(): JSX.Element {
   function testsPassed(): boolean | undefined {
-    const statuses = [template(), card()]
+    const statuses = [template(), note(), card()]
     if (statuses.some((a) => a === undefined)) {
       return undefined
     }

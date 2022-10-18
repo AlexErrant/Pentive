@@ -1,28 +1,17 @@
 import { RxCollection, RxDocument, KeyFunctionMap } from "rxdb"
 import { Card } from "../../src/domain/card"
-import { CardId } from "../../src/domain/ids"
+import { CardId, NoteId } from "../../src/domain/ids"
 import { CardDocType } from "./card.schema"
 import { getDb } from "./rxdb"
 
 function cardToDocType(card: Card): CardDocType {
-  const {
-    id,
-    title,
-    created,
-    modified,
-    push,
-    pushId,
-    pushTemplateId,
-    ...shrunken
-  } = card // https://stackoverflow.com/a/66899790
+  const { id, noteId, created, modified, due, ...shrunken } = card // https://stackoverflow.com/a/66899790
   return {
     id,
-    title: title ?? undefined,
+    noteId,
     created: created.toISOString(),
     modified: modified.toISOString(),
-    push: push === true ? 1 : 0,
-    pushId,
-    pushTemplateId,
+    due: due.toISOString(),
     data: shrunken,
   }
 }
@@ -39,26 +28,14 @@ export const cardDocMethods: CardDocMethods = {}
 function entityToDomain(card: CardDocument): Card {
   const r = {
     id: card.id as CardId,
-    title: card.title,
+    noteId: card.noteId as NoteId,
     created: new Date(card.created),
     modified: new Date(card.modified),
-    push: card.push === 1 ? true : undefined,
-    pushId: card.pushId,
-    pushTemplateId: card.pushTemplateId,
+    due: new Date(card.due),
     ...(card.data as object),
   }
-  if (r.title === undefined) {
-    delete r.title
-  }
-  if (r.push === undefined) {
-    delete r.push
-  }
-  if (r.pushId === undefined) {
-    delete r.pushId
-  }
-  if (r.pushTemplateId === undefined) {
-    delete r.pushTemplateId
-  }
+  // @ts-expect-error Unsure why `type` is in `data` - it's not there when inserted. RxDB or PouchDB or something adds it. Removing to make roundtrip testing easier.
+  delete r.type
   return r as Card
   // Returning dates are *sometimes* strings.
   // The first return after a page refresh is a string because IndexedDb can't handle Date and serializes it.

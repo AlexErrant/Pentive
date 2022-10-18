@@ -2,6 +2,7 @@ import { addRxPlugin, createRxDatabase, RxDatabase, RxStorage } from "rxdb"
 import { HeroDocType, heroSchema } from "./hero.schema"
 import { templateSchema } from "./template.schema"
 import { cardSchema } from "./card.schema"
+import { noteSchema } from "./note.schema"
 import * as pouchdbAdapterIdb from "pouchdb-adapter-idb"
 import {
   getRxStoragePouch,
@@ -30,6 +31,11 @@ import {
   cardCollectionMethods,
   cardDocMethods,
 } from "./card.orm"
+import {
+  NoteCollection,
+  noteCollectionMethods,
+  noteDocMethods,
+} from "./note.orm"
 import { pluginSchema } from "./plugin.schema"
 import {
   PluginCollection,
@@ -46,6 +52,7 @@ interface MyDatabaseCollections {
   readonly heroes: HeroCollection
   readonly templates: TemplateCollection
   readonly cards: CardCollection
+  readonly notes: NoteCollection
   readonly plugins: PluginCollection
 }
 
@@ -87,6 +94,11 @@ export async function createDb(): Promise<MyDatabase> {
       schema: cardSchema,
       methods: cardDocMethods,
       statics: cardCollectionMethods,
+    },
+    notes: {
+      schema: noteSchema,
+      methods: noteDocMethods,
+      statics: noteCollectionMethods,
     },
     plugins: {
       schema: pluginSchema,
@@ -179,5 +191,6 @@ export async function sync(): Promise<void> {
   myDatabase.heroes.syncCouchDB(syncOptions)
   myDatabase.templates.syncCouchDB(syncOptions)
   myDatabase.cards.syncCouchDB(syncOptions)
+  myDatabase.notes.syncCouchDB(syncOptions)
   myDatabase.plugins.syncCouchDB(syncOptions)
 }

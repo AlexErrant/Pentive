@@ -10,6 +10,7 @@ export type ChildTemplateId = Brand<string, "childTemplateId">
 export type ClozeIndex = Brand<number, "clozeIndex">
 
 export type CardId = Brand<string, "cardId">
+export type NoteId = Brand<string, "noteId">
 export type CardSettingId = Brand<string, "cardSettingId">
 
 export type DeckId = Brand<string, "deckId">
