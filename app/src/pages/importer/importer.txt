@@ -1,7 +1,12 @@
 afmt
 bafmt
 bqfmt
+csum
+dconf
 flds
+odid
+odue
 qfmt
+sfld
 tmpl
 tmpls

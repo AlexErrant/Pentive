@@ -1,3 +1,4 @@
+import _ from "lodash"
 import { RxCollection, RxDocument, KeyFunctionMap } from "rxdb"
 import { Card } from "../../src/domain/card"
 import { CardId, NoteId } from "../../src/domain/ids"
@@ -46,6 +47,14 @@ export const cardCollectionMethods = {
   upsertCard: async function (card: Card) {
     const db = await getDb()
     await db.cards.upsert(cardToDocType(card))
+  },
+  bulkUpsertCards: async function (cards: Card[]) {
+    const db = await getDb()
+    const batches = _.chunk(cards.map(cardToDocType), 1000)
+    for (let i = 0; i < batches.length; i++) {
+      console.log("card batch", i)
+      await db.cards.bulkUpsert(batches[i])
+    }
   },
   getCard: async function (cardId: CardId) {
     const db = await getDb()

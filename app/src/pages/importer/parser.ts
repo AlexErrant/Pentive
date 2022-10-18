@@ -1,4 +1,11 @@
-import { ChildTemplateId, TemplateId } from "../../domain/ids"
+import {
+  CardId,
+  CardSettingId,
+  DeckId,
+  ChildTemplateId,
+  NoteId,
+  TemplateId,
+} from "../../domain/ids"
 import {
   ChildTemplate,
   Field,
@@ -6,7 +13,16 @@ import {
   TemplateType,
 } from "../../domain/template"
 import { throwExp } from "../../domain/utility"
-import { Fld, Model, Models, Tmpl } from "./typeChecker"
+import { Card as PCard } from "../../domain/card"
+import { Note as PNote } from "../../domain/note"
+import {
+  Card as ACard,
+  Fld,
+  Model,
+  Models,
+  Note as ANote,
+  Tmpl,
+} from "./typeChecker"
 
 function parseField(fld: Fld): Field {
   return {
@@ -64,4 +80,33 @@ export function parseTemplates(models: Models): Template[] {
       templateType: parseTemplateType(m),
     }
   })
+}
+
+export function parseNote(
+  note: ANote,
+  templates: Record<TemplateId, Template>
+): PNote {
+  const templateId = note.mid.toString() as TemplateId // medTODO
+  return {
+    id: note.id.toString() as NoteId, // medTODO
+    created: new Date(note.id),
+    modified: new Date(note.mod),
+    ankiNoteId: note.id,
+    templateId,
+    fields: templates[templateId].fields.map((f) => f.name),
+    values: note.flds.split("\x1f"),
+    tags: new Set(note.tags.split(" ")),
+  }
+}
+
+export function parseCard(card: ACard): PCard {
+  return {
+    id: card.id.toString() as CardId, // medTODO
+    noteId: card.nid.toString() as NoteId, // medTODO
+    deckIds: new Set([card.did.toString() as DeckId]), // medTODO
+    created: new Date(card.id),
+    modified: new Date(card.mod),
+    due: new Date(card.due), // highTODO
+    cardSettingId: card.did.toString() as CardSettingId, // medTODO
+  }
 }

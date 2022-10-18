@@ -14,6 +14,7 @@ export const note = recordWithOptionalFields<Note>(
     templateId: fc.uuidV(4).map((x) => x as TemplateId),
     fields: fc.array(fc.string()),
     values: fc.array(fc.string()),
+    tags: fc.array(fc.string()).map((x) => new Set(x)),
     created: reasonableDates,
     modified: reasonableDates,
   },

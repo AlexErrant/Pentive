@@ -3,6 +3,7 @@ import { Note } from "../../src/domain/note"
 import { NoteId } from "../../src/domain/ids"
 import { NoteDocType } from "./note.schema"
 import { getDb } from "./rxdb"
+import _ from "lodash"
 
 function noteToDocType(note: Note): NoteDocType {
   const { id, created, modified, push, pushId, pushTemplateId, ...shrunken } =
@@ -58,6 +59,14 @@ export const noteCollectionMethods = {
   upsertNote: async function (note: Note) {
     const db = await getDb()
     await db.notes.upsert(noteToDocType(note))
+  },
+  bulkUpsertNotes: async function (notes: Note[]) {
+    const db = await getDb()
+    const batches = _.chunk(notes.map(noteToDocType), 1000)
+    for (let i = 0; i < batches.length; i++) {
+      console.log("note batch", i)
+      await db.notes.bulkUpsert(batches[i])
+    }
   },
   getNote: async function (noteId: NoteId) {
     const db = await getDb()

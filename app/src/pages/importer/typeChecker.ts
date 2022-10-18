@@ -160,3 +160,49 @@ export function checkCol(raw: Record<string, unknown>): MergedCol {
     dconf: parsedDconf,
   }
 }
+
+const note = z.object({
+  id: z.number(),
+  // guid: z.string(),
+  mid: z.number(),
+  mod: z.number(),
+  // usn: z.number(),
+  tags: z.string(),
+  flds: z.string(),
+  // sfld: z.string(),
+  // csum: z.number(),
+  // flags: z.number(),
+  // data: z.string(),
+})
+
+const card = z.object({
+  id: z.number(),
+  nid: z.number(),
+  did: z.number(),
+  ord: z.number(),
+  mod: z.number(),
+  // usn: z.number(),
+  type: z.number(),
+  queue: z.number(),
+  due: z.number(),
+  ivl: z.number(),
+  factor: z.number(),
+  reps: z.number(),
+  lapses: z.number(),
+  left: z.number(),
+  odue: z.number(),
+  // odid: z.number(),
+  flags: z.number(),
+  // data: z.string(),
+})
+
+export type Note = z.infer<typeof note>
+export type Card = z.infer<typeof card>
+
+export function checkNote(raw: Record<string, unknown>): Note {
+  return note.parse(raw)
+}
+
+export function checkCard(raw: Record<string, unknown>): Card {
+  return card.parse(raw)
+}

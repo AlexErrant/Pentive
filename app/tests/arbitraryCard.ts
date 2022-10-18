@@ -24,11 +24,9 @@ export const card = recordWithOptionalFields<Card>(
     id: fc.uuidV(4).map((x) => x as CardId),
     noteId: fc.uuidV(4).map((x) => x as NoteId),
     deckIds: fc.array(fc.uuidV(4)).map((x) => new Set(x) as Set<DeckId>),
-    tags: fc.array(fc.string()).map((x) => new Set(x)),
     created: reasonableDates,
     modified: reasonableDates,
     due: reasonableDates,
-    reviews: fc.array(review),
   },
   {
     cardSettingId: fc.uuidV(4).map((x) => x as CardSettingId),
