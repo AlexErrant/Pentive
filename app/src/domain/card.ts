@@ -6,6 +6,8 @@ import {
   ClozeIndex,
   ChildTemplateId,
 } from "./ids"
+import { Note } from "./note"
+import { Template } from "./template"
 
 export type State = "normal" | "scheduler buried" | "user buried" | "suspended"
 export type Score = "again" | "hard" | "good" | "easy"
@@ -42,4 +44,10 @@ export const sampleCard: Card = {
   modified: new Date(),
   due: new Date(),
   pointer: "ED061BC3-B183-4C55-BE0D-0A820F491CE1" as ChildTemplateId,
+}
+
+export interface NoteCard {
+  template: Template
+  note: Note
+  card: Card
 }

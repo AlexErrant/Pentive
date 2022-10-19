@@ -20,6 +20,10 @@ export const navLinks: readonly NavLinkData[] = [
     href: "/templates",
   },
   {
+    name: "Cards",
+    href: "/cards",
+  },
+  {
     name: "Plugins",
     href: "/plugins",
   },
@@ -43,6 +47,10 @@ export const routes: RouteDefinition[] = [
   {
     path: "/templates",
     component: lazy(async () => await import("./pages/templates")),
+  },
+  {
+    path: "/cards",
+    component: lazy(async () => await import("./pages/cards")),
   },
   {
     path: "/plugins",
