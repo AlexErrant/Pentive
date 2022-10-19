@@ -1,7 +1,13 @@
 import fc from "fast-check"
 import { Card, Review, Score, State } from "../src/domain/card"
 
-import { CardId, CardSettingId, DeckId, NoteId } from "../src/domain/ids"
+import {
+  CardId,
+  CardSettingId,
+  ChildTemplateId,
+  DeckId,
+  NoteId,
+} from "../src/domain/ids"
 
 import { reasonableDates, recordWithOptionalFields } from "./arbitrary"
 
@@ -27,6 +33,7 @@ export const card = recordWithOptionalFields<Card>(
     created: reasonableDates,
     modified: reasonableDates,
     due: reasonableDates,
+    pointer: fc.uuidV(4).map((x) => x as ChildTemplateId),
   },
   {
     cardSettingId: fc.uuidV(4).map((x) => x as CardSettingId),

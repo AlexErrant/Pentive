@@ -1,4 +1,11 @@
-import { CardSettingId, DeckId, CardId, NoteId } from "./ids"
+import {
+  CardSettingId,
+  DeckId,
+  CardId,
+  NoteId,
+  ClozeIndex,
+  ChildTemplateId,
+} from "./ids"
 
 export type State = "normal" | "scheduler buried" | "user buried" | "suspended"
 export type Score = "again" | "hard" | "good" | "easy"
@@ -17,6 +24,7 @@ export interface Review {
 
 export interface Card {
   readonly id: CardId
+  readonly pointer: ChildTemplateId | ClozeIndex
   readonly noteId: NoteId
   readonly deckIds: ReadonlySet<DeckId>
   readonly created: Date
@@ -33,4 +41,5 @@ export const sampleCard: Card = {
   created: new Date(),
   modified: new Date(),
   due: new Date(),
+  pointer: "ED061BC3-B183-4C55-BE0D-0A820F491CE1" as ChildTemplateId,
 }

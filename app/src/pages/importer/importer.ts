@@ -26,7 +26,7 @@ export async function importAnki(
     throwExp("Impossible - there should be a file selected")
   const ankiDb = await getAnkiDb(ankiExport)
   const templatesDict: Record<TemplateId, Template> = {}
-  const notesList: PNote[] = []
+  const notesDict: Record<number, PNote> = {}
   const cardsList: PCard[] = []
   try {
     const cols = ankiDb.prepare("select * from col") // lowTODO select exact columns
@@ -43,15 +43,15 @@ export async function importAnki(
     while (notes.step()) {
       const row = notes.getAsObject()
       const note = checkNote(row)
-      notesList.push(parseNote(note, templatesDict))
+      notesDict[note.id] = parseNote(note, templatesDict)
     }
     notes.free()
-    await db.bulkUpsertNotes(notesList)
+    await db.bulkUpsertNotes(Object.values(notesDict))
     const cards = ankiDb.prepare("select * from cards") // lowTODO select exact columns
     while (cards.step()) {
       const row = cards.getAsObject()
       const card = checkCard(row)
-      cardsList.push(parseCard(card))
+      cardsList.push(parseCard(card, notesDict, templatesDict))
     }
     cards.free()
     await db.bulkUpsertCards(cardsList)

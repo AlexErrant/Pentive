@@ -5,6 +5,7 @@ import {
   ChildTemplateId,
   NoteId,
   TemplateId,
+  ClozeIndex,
 } from "../../domain/ids"
 import {
   ChildTemplate,
@@ -99,7 +100,17 @@ export function parseNote(
   }
 }
 
-export function parseCard(card: ACard): PCard {
+export function parseCard(
+  card: ACard,
+  notes: Record<number, PNote>,
+  templates: Record<TemplateId, Template>
+): PCard {
+  const note = notes[card.nid]
+  const template = templates[note.templateId]
+  const pointer =
+    template.templateType.tag === "standard"
+      ? (card.ord.toString() as ChildTemplateId)
+      : (card.ord as ClozeIndex)
   return {
     id: card.id.toString() as CardId, // medTODO
     noteId: card.nid.toString() as NoteId, // medTODO
@@ -108,5 +119,6 @@ export function parseCard(card: ACard): PCard {
     modified: new Date(card.mod),
     due: new Date(card.due), // highTODO
     cardSettingId: card.did.toString() as CardSettingId, // medTODO
+    pointer,
   }
 }
