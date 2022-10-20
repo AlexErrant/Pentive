@@ -73,9 +73,11 @@ export const noteCollectionMethods = {
     const note = await db.notes.findOne(noteId).exec()
     return note == null ? null : entityToDomain(note)
   },
-  getNotes: async function () {
+  getNotes: async function (exclusiveStartId?: NoteId, limit?: number) {
     const db = await getDb()
-    const allNotes = await db.notes.find().exec()
+    const selector =
+      exclusiveStartId === undefined ? {} : { id: { $gt: exclusiveStartId } }
+    const allNotes = await db.notes.find({ selector, limit }).exec()
     return allNotes.map(entityToDomain)
   },
 }

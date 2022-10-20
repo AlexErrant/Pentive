@@ -61,9 +61,11 @@ export const cardCollectionMethods = {
     const card = await db.cards.findOne(cardId).exec()
     return card == null ? null : entityToDomain(card)
   },
-  getCards: async function () {
+  getCards: async function (exclusiveStartId?: CardId, limit?: number) {
     const db = await getDb()
-    const allCards = await db.cards.find().exec()
+    const selector =
+      exclusiveStartId === undefined ? {} : { id: { $gt: exclusiveStartId } }
+    const allCards = await db.cards.find({ selector, limit }).exec()
     return allCards.map(entityToDomain)
   },
 }
