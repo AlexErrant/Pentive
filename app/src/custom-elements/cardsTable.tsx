@@ -4,11 +4,14 @@ import _ from "lodash"
 import ResizingIframe from "./resizing-iframe"
 import "@github/time-elements"
 import { C } from ".."
-import AgGridSolid from "ag-grid-solid"
+import AgGridSolid, { AgGridSolidRef } from "ag-grid-solid"
 import "ag-grid-community/styles/ag-grid.css"
 import "ag-grid-community/styles/ag-theme-alpine.css"
-import { ColDef, ICellRendererParams } from "ag-grid-community"
+import { ColDef, GetRowIdParams, ICellRendererParams } from "ag-grid-community"
 import { throwExp } from "../domain/utility"
+import { CardId } from "../domain/ids"
+
+let gridRef: AgGridSolidRef
 
 const cardPreview = (p: ICellRendererParams<NoteCard>): JSX.Element => {
   if (p.data === undefined) {
@@ -38,6 +41,9 @@ const columnDefs: Array<ColDef<NoteCard>> = [
 
 const defaultColDef: ColDef<NoteCard> = { sortable: true }
 
+const getRowId = (params: GetRowIdParams<NoteCard>): CardId =>
+  params.data.card.id
+
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const CardsTable: VoidComponent<{
   readonly getNoteCards: () => Promise<NoteCard[]>
@@ -53,6 +59,8 @@ const CardsTable: VoidComponent<{
           rowData={noteCards()}
           defaultColDef={defaultColDef}
           getRowHeight={() => 500}
+          ref={gridRef}
+          getRowId={getRowId}
         />
       </div>
     </Suspense>
