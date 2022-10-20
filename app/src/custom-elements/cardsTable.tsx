@@ -10,6 +10,7 @@ import "ag-grid-community/styles/ag-theme-alpine.css"
 import { ColDef, GetRowIdParams, ICellRendererParams } from "ag-grid-community"
 import { throwExp } from "../domain/utility"
 import { CardId } from "../domain/ids"
+import { db } from "../messenger"
 
 let gridRef: AgGridSolidRef
 
@@ -45,10 +46,8 @@ const getRowId = (params: GetRowIdParams<NoteCard>): CardId =>
   params.data.card.id
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
-const CardsTable: VoidComponent<{
-  readonly getNoteCards: () => Promise<NoteCard[]>
-}> = (props) => {
-  const [noteCards] = createResource(async () => await props.getNoteCards(), {
+const CardsTable: VoidComponent = () => {
+  const [noteCards] = createResource(async () => await db.getNoteCards(), {
     initialValue: [],
   })
   return (
