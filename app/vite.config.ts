@@ -2,6 +2,7 @@ import { resolve } from "path"
 import { defineConfig } from "vite"
 import solidPlugin from "vite-plugin-solid"
 import checker from "vite-plugin-checker"
+import fs from "fs"
 
 export default defineConfig({
   plugins: [
@@ -29,9 +30,17 @@ export default defineConfig({
   server: {
     port: 3014,
     strictPort: true,
+    https: {
+      key: fs.readFileSync("./.cert/key.pem"),
+      cert: fs.readFileSync("./.cert/cert.pem"),
+    },
   },
   preview: {
     port: 3014,
     strictPort: true,
+    https: {
+      key: fs.readFileSync("./.cert/key.pem"),
+      cert: fs.readFileSync("./.cert/cert.pem"),
+    },
   },
 })

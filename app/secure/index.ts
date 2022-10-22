@@ -53,7 +53,7 @@ console.log("hostname: " + window.location.hostname)
 
 const syncUrls = {
   http:
-    "http://" + window.location.hostname + ":" + GRAPHQL_PORT + GRAPHQL_PATH,
+    "https://" + window.location.hostname + ":" + GRAPHQL_PORT + GRAPHQL_PATH,
 }
 
 const batchSize = 50
