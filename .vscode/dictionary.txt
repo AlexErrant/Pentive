@@ -8,6 +8,8 @@ msedge
 oneof
 passwordless
 pentive
+precache
+precaching
 resizer
 rxdb
 rxql

@@ -1,4 +1,5 @@
 node_modules
+dev-dist
 dist
 /test-results/
 /playwright-report/

@@ -3,10 +3,16 @@ import { defineConfig } from "vite"
 import solidPlugin from "vite-plugin-solid"
 import checker from "vite-plugin-checker"
 import fs from "fs"
+import { VitePWA } from "vite-plugin-pwa"
 
 export default defineConfig({
   plugins: [
     solidPlugin(),
+    VitePWA({
+      strategies: "injectManifest",
+      srcDir: "src",
+      filename: "service-worker.ts",
+    }),
     checker({
       overlay: {
         initialIsOpen: false,

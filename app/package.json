@@ -5,6 +5,8 @@
     "start": "vite",
     "dev": "vite",
     "build": "vite build",
+    "build-watch": "vite build --watch",
+    "//serve": "IMPORTANT: open https://localhost:3014/ since the cert is for localhost",
     "serve": "vite preview",
     "//generate-cert": "requires installing https://github.com/FiloSottile/mkcert ",
     "generate-cert": "mkdir .cert && mkcert -key-file ./.cert/key.pem -cert-file ./.cert/cert.pem localhost secure.local.pentive.com",
