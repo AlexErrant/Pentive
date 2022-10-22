@@ -64,6 +64,7 @@ importers:
       vite-plugin-pwa: ^0.13.1
       vite-plugin-solid: ^2.3.0
       vitest: ^0.20.3
+      workbox-precaching: ^6.5.4
       zod: ^3.19.1
     dependencies:
       '@github/time-elements': 3.1.4
@@ -125,6 +126,7 @@ importers:
       vite-plugin-pwa: 0.13.1_vite@3.1.0
       vite-plugin-solid: 2.3.0_solid-js@1.5.4+vite@3.1.0
       vitest: 0.20.3_jsdom@20.0.0
+      workbox-precaching: 6.5.4
 
   example-plugins/solid-custom-element:
     specifiers:
