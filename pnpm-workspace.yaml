@@ -1,5 +1,6 @@
 packages:
-  - 'app/'
-  - 'lrpc/'
-  - 'rxql/'
-  - 'example-plugins/*'
+  - "app/"
+  - "app-ugc/"
+  - "lrpc/"
+  - "rxql/"
+  - "example-plugins/*"

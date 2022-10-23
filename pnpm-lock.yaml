@@ -128,6 +128,55 @@ importers:
       vitest: 0.20.3_jsdom@20.0.0
       workbox-precaching: 6.5.4
 
+  app-ugc:
+    specifiers:
+      '@types/iframe-resizer': ^3.5.9
+      '@typescript-eslint/eslint-plugin': ^5.31.0
+      '@typescript-eslint/parser': ^5.31.0
+      comlink: ^4.3.1
+      eslint: ^8.20.0
+      eslint-config-prettier: ^8.5.0
+      eslint-config-standard-with-typescript: ^22.0.0
+      eslint-plugin-import: ^2.26.0
+      eslint-plugin-n: ^15.2.4
+      eslint-plugin-prettier: ^4.2.1
+      eslint-plugin-promise: ^6.0.0
+      iframe-resizer: ^4.3.2
+      prettier: ^2.7.1
+      standard: ^17.0.0
+      stylelint: ^14.9.1
+      stylelint-config-prettier: ^9.0.3
+      stylelint-config-standard: ^26.0.0
+      typescript: ^4.7.4
+      vite: ^3.0.3
+      vite-plugin-checker: ^0.4.9
+      vite-plugin-pwa: ^0.13.1
+      workbox-precaching: ^6.5.4
+    dependencies:
+      comlink: 4.3.1
+      iframe-resizer: 4.3.2
+    devDependencies:
+      '@types/iframe-resizer': 3.5.9
+      '@typescript-eslint/eslint-plugin': 5.37.0_22c5fnooleyfkzrkkgdmel5kmi
+      '@typescript-eslint/parser': 5.37.0_irgkl5vooow2ydyo6aokmferha
+      eslint: 8.23.1
+      eslint-config-prettier: 8.5.0_eslint@8.23.1
+      eslint-config-standard-with-typescript: 22.0.0_cv3m3cig3fksofysybwqosz4h4
+      eslint-plugin-import: 2.26.0_uzffwd2kxyy6gwinwkcp25zmz4
+      eslint-plugin-n: 15.2.5_eslint@8.23.1
+      eslint-plugin-prettier: 4.2.1_cabrci5exjdaojcvd6xoxgeowu
+      eslint-plugin-promise: 6.0.1_eslint@8.23.1
+      prettier: 2.7.1
+      standard: 17.0.0_6ejv3wyyij2h5dfkigulguqcpe
+      stylelint: 14.11.0
+      stylelint-config-prettier: 9.0.3_stylelint@14.11.0
+      stylelint-config-standard: 26.0.0_stylelint@14.11.0
+      typescript: 4.8.3
+      vite: 3.1.0
+      vite-plugin-checker: 0.4.9_vite@3.1.0
+      vite-plugin-pwa: 0.13.1_vite@3.1.0
+      workbox-precaching: 6.5.4
+
   example-plugins/solid-custom-element:
     specifiers:
       solid-element: ^1.4.8

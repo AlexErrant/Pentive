@@ -1,0 +1,46 @@
+{
+  "name": "app-ugc",
+  "version": "0.0.0",
+  "scripts": {
+    "start": "vite",
+    "dev": "vite",
+    "build": "vite build",
+    "build-watch": "vite build --watch",
+    "//serve": "IMPORTANT: open https://localhost:3015/ since the cert is for localhost. Not sure why you'd ever look at this outside an iframe though.",
+    "serve": "vite preview",
+    "//generate-cert": "requires installing https://github.com/FiloSottile/mkcert ",
+    "generate-cert": "mkdir .cert && mkcert -key-file ./.cert/key.pem -cert-file ./.cert/cert.pem localhost user-generated-content.local.pentive.com",
+    "eslint": "eslint .",
+    "eslintw": "eslint . --fix",
+    "prettier": "prettier --check .",
+    "prettierw": "prettier --write .",
+    "stylelint": "stylelint **/*.css",
+    "stylelintw": "stylelint **/*.css --fix"
+  },
+  "devDependencies": {
+    "@types/iframe-resizer": "^3.5.9",
+    "@typescript-eslint/eslint-plugin": "^5.31.0",
+    "@typescript-eslint/parser": "^5.31.0",
+    "eslint": "^8.20.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-config-standard-with-typescript": "^22.0.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-n": "^15.2.4",
+    "eslint-plugin-prettier": "^4.2.1",
+    "eslint-plugin-promise": "^6.0.0",
+    "prettier": "^2.7.1",
+    "standard": "^17.0.0",
+    "stylelint": "^14.9.1",
+    "stylelint-config-prettier": "^9.0.3",
+    "stylelint-config-standard": "^26.0.0",
+    "typescript": "^4.7.4",
+    "vite": "^3.0.3",
+    "vite-plugin-checker": "^0.4.9",
+    "vite-plugin-pwa": "^0.13.1",
+    "workbox-precaching": "^6.5.4"
+  },
+  "dependencies": {
+    "comlink": "^4.3.1",
+    "iframe-resizer": "^4.3.2"
+  }
+}
