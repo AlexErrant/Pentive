@@ -3,8 +3,8 @@ import {
   DeckId,
   CardId,
   NoteId,
-  ClozeIndex,
   ChildTemplateId,
+  Pointer,
 } from "./ids"
 import { Note } from "./note"
 import { Template } from "./template"
@@ -26,7 +26,7 @@ export interface Review {
 
 export interface Card {
   readonly id: CardId
-  readonly pointer: ChildTemplateId | ClozeIndex
+  readonly pointer: Pointer
   readonly noteId: NoteId
   readonly deckIds: ReadonlySet<DeckId>
   readonly created: Date

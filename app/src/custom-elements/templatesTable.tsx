@@ -9,7 +9,6 @@ import { Template } from "../domain/template"
 import _ from "lodash"
 import ResizingIframe from "./resizing-iframe"
 import "@github/time-elements"
-import { C } from ".."
 
 function id(id: keyof Template): keyof Template {
   return id
@@ -55,12 +54,13 @@ const columns: Array<ColumnDef<Template>> = [
   {
     header: "Preview",
     cell: (info) => {
-      const srcdoc = C.renderTemplate(info.row.original)[0]
-      if (srcdoc === null || srcdoc === undefined) {
-        return `Error rendering first template of ${info.row.original.name}`
-      } else {
-        return <ResizingIframe srcdoc={srcdoc[1]}></ResizingIframe>
-      }
+      return (
+        // nextTODO iterate over all templates
+        <ResizingIframe
+          side="front"
+          templateId={info.row.original.id}
+        ></ResizingIframe>
+      )
     },
   },
 ]

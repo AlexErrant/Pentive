@@ -1,6 +1,6 @@
 import _ from "lodash"
 import { Ct } from "../services"
-import { ChildTemplateId, ClozeIndex } from "./ids"
+import { ClozeIndex, Pointer } from "./ids"
 import { Field, Template } from "./template"
 import { strip, throwExp } from "./utility"
 
@@ -34,7 +34,7 @@ export function body(
   fieldsAndValues: ReadonlyArray<readonly [string, string]>,
   frontTemplate: string,
   backTemplate: string,
-  pointer: ChildTemplateId | ClozeIndex
+  pointer: Pointer
 ): readonly [string, string] | null {
   const [fieldsAndValues2, frontTemplate2, backTemplate2] =
     getFieldsValuesFrontTemplateBackTemplate.call(
@@ -79,7 +79,7 @@ function getFieldsValuesFrontTemplateBackTemplate(
   fieldsAndValues: ReadonlyArray<readonly [string, string]>,
   frontTemplate: string,
   backTemplate: string,
-  pointer: ChildTemplateId | ClozeIndex
+  pointer: Pointer
 ): readonly [ReadonlyArray<readonly [string, string]>, string, string] {
   if (pointer.brand === "childTemplateId") {
     return [fieldsAndValues, frontTemplate, backTemplate]
@@ -239,7 +239,7 @@ export function html(
   fieldsAndValues: ReadonlyArray<readonly [string, string]>,
   frontTemplate: string,
   backTemplate: string,
-  pointer: ChildTemplateId | ClozeIndex,
+  pointer: Pointer,
   css: string
 ): readonly [string, string] | null {
   const body2 = this.body(fieldsAndValues, frontTemplate, backTemplate, pointer)
@@ -262,7 +262,7 @@ export function renderTemplate(
   const fieldsAndValues = template.fields.map(getStandardFieldAndValue) // medTODO consider adding escape characters so you can do e.g. {{Front}}. Apparently Anki doesn't have escape characters - now would be a good time to introduce this feature.
   if (template.templateType.tag === "standard") {
     return template.templateType.templates.map(({ front, back, id }) =>
-      this.html(fieldsAndValues, front, back, id, template.css)
+      this.body(fieldsAndValues, front, back, id)
     )
   } else if (template.templateType.tag === "cloze") {
     const getFieldsAndValues = (
@@ -281,12 +281,11 @@ export function renderTemplate(
     return getClozeFields
       .call(this, front)
       .map((clozeField, i) =>
-        this.html(
+        this.body(
           getFieldsAndValues(clozeField, i),
           front,
           back,
-          i as ClozeIndex,
-          template.css
+          i as ClozeIndex
         )
       )
   }

@@ -1,18 +1,36 @@
 import { iframeResizer } from "iframe-resizer"
-import contentWindowJs from "iframe-resizer/js/iframeResizer.contentWindow.js?raw" // https://vitejs.dev/guide/assets.html#importing-asset-as-string
 import { VoidComponent } from "solid-js"
+import { NoteId, Pointer, Side, TemplateId } from "../domain/ids"
+import * as Comlink from "comlink"
+import { appExpose } from "../appMessenger"
+
+const targetOrigin = "*" // highTODO make more limiting. Also implement https://stackoverflow.com/q/8169582
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const ResizingIframe: VoidComponent<{
-  readonly srcdoc: string
+  readonly side: Side
+  readonly templateId: TemplateId
+  readonly noteId?: NoteId
+  readonly pointer?: Pointer
 }> = (props) => {
-  const srcdoc = props.srcdoc.replace(
-    "<body>",
-    `<body><script>${contentWindowJs}</script>` // lowTODO make `iframeResizer.contentWindow.js` a literal file in /public - could improve perf by making less work for the JS parser?
-  )
+  const usp = new URLSearchParams({
+    side: props.side,
+    templateId: props.templateId,
+  })
+  if (props.noteId != null) usp.append("noteId", props.noteId)
+  if (props.pointer != null) usp.append("pointer", props.pointer.toString())
   return (
     <iframe
       onload={(e) => {
+        Comlink.expose(
+          appExpose,
+          Comlink.windowEndpoint(
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            e.currentTarget.contentWindow!,
+            self,
+            targetOrigin
+          )
+        )
         iframeResizer(
           {
             // log: true,
@@ -28,8 +46,10 @@ const ResizingIframe: VoidComponent<{
           e.currentTarget
         )
       }}
-      sandbox="allow-scripts" // Changing this has security ramifications! https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe#attr-sandbox
-      srcdoc={srcdoc} // It inherits the parent page's domain. Reconsider if you add `allow-same-origin` to `sandbox`! https://stackoverflow.com/a/41800811
+      sandbox="allow-scripts allow-same-origin" // Changing this has security ramifications! https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe#attr-sandbox
+      // "When the embedded document has the same origin as the embedding page, it is strongly discouraged to use both allow-scripts and allow-same-origin"
+      // Since this iframe is hosted on `user-generated-content` and this component is hosted on `app`, resulting in different origins, we should be safe. https://web.dev/sandboxed-iframes/ https://stackoverflow.com/q/35208161
+      src={`https://user-generated-content.local.pentive.com:3015?${usp.toString()}`}
     />
   )
 }

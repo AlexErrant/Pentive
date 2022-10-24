@@ -8,6 +8,8 @@ export type RemoteCardId = Brand<string, "remoteCardId">
 export type TemplateId = Brand<string, "templateId">
 export type ChildTemplateId = Brand<string, "childTemplateId">
 export type ClozeIndex = Brand<number, "clozeIndex">
+export type Pointer = ChildTemplateId | ClozeIndex
+export type Side = "front" | "back"
 
 export type CardId = Brand<string, "cardId">
 export type NoteId = Brand<string, "noteId">

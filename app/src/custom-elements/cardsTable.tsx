@@ -8,7 +8,6 @@ import AgGridSolid, { AgGridSolidRef } from "ag-grid-solid"
 import "ag-grid-community/styles/ag-grid.css"
 import "ag-grid-community/styles/ag-theme-alpine.css"
 import {
-  BodyScrollEndEvent,
   ColDef,
   GetRowIdParams,
   ICellRendererParams,
@@ -43,7 +42,13 @@ const cardPreview = (p: ICellRendererParams<NoteCard>): JSX.Element => {
   if (frontBack === null) {
     return <span>Card is invalid!</span>
   }
-  return <ResizingIframe srcdoc={frontBack[0]}></ResizingIframe>
+  // return srcdoc={frontBack[0]}
+  return (
+    <ResizingIframe
+      side="front"
+      templateId={p.data.template.id} // nextTODO
+    ></ResizingIframe>
+  )
 }
 
 const columnDefs: Array<ColDef<NoteCard>> = [
