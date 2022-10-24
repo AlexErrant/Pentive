@@ -7,6 +7,7 @@ export default defineConfig({
   plugins: [
     VitePWA({
       strategies: "injectManifest",
+      injectRegister: null,
       srcDir: "src",
       filename: "service-worker.ts",
     }),

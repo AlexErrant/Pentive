@@ -1,3 +1,4 @@
+import "./register-service-worker"
 import * as Comlink from "comlink"
 import { NoteId, Pointer, Side, TemplateId } from "app/src/domain/ids"
 import type { appExpose } from "app/src/appMessenger"
