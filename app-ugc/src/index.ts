@@ -1,14 +1,12 @@
 import "./register-service-worker"
-import * as Comlink from "comlink"
 import { NoteId, Pointer, Side, TemplateId } from "app/src/domain/ids"
-import type { appExpose } from "app/src/appMessenger"
 import contentWindowJs from "iframe-resizer/js/iframeResizer.contentWindow.js?raw" // https://vitejs.dev/guide/assets.html#importing-asset-as-string https://github.com/davidjbradshaw/iframe-resizer/issues/513
+import { appMessenger } from "../appMessenger"
 
 // https://stackoverflow.com/a/901144
 const urlSearchParams = new URLSearchParams(window.location.search)
-const app = Comlink.wrap<typeof appExpose>(Comlink.windowEndpoint(self.parent))
 
-const { body, css } = await app.renderBody(
+const { body, css } = await appMessenger.renderBody(
   urlSearchParams.get("side") as Side,
   urlSearchParams.get("templateId") as TemplateId,
   urlSearchParams.get("noteId") as NoteId,

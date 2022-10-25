@@ -36,6 +36,12 @@ async function renderBody(
   return { body: "!!!" } // nextTODO
 }
 
+async function getLocalResource(id: string): Promise<Blob> {
+  const response = await fetch(id)
+  return await response.blob()
+}
+
 export const appExpose = {
+  getLocalResource,
   renderBody,
 }
