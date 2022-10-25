@@ -3,7 +3,7 @@
 // pagination https://stackoverflow.com/q/14468586
 
 import { Buffer } from "buffer"
-import { BlobReader, BlobWriter, ZipReader } from "@zip.js/zip.js"
+import { BlobReader, BlobWriter, Entry, ZipReader } from "@zip.js/zip.js"
 import { throwExp } from "../../domain/utility"
 import initSqlJs, { Database } from "sql.js"
 import { checkCard, checkCol, checkNote } from "./typeChecker"
@@ -24,7 +24,17 @@ export async function importAnki(
     // My mental static analysis says to use `currentTarget`, but it seems to randomly be null, hence `target`. I'm confused but whatever.
     (event.target as HTMLInputElement).files?.item(0) ??
     throwExp("Impossible - there should be a file selected")
-  const ankiDb = await getAnkiDb(ankiExport)
+  const ankiEntries = await new ZipReader(
+    new BlobReader(ankiExport)
+  ).getEntries()
+  const sqlite =
+    ankiEntries.find((e) => e.filename === "collection.anki2") ??
+    throwExp("`collection.anki2` not found!")
+  await importAnkiDb(sqlite)
+}
+
+async function importAnkiDb(sqlite: Entry): Promise<void> {
+  const ankiDb = await getAnkiDb(sqlite)
   const templatesDict: Record<TemplateId, Template> = {}
   const notesDict: Record<number, PNote> = {}
   const cardsList: PCard[] = []
@@ -63,24 +73,18 @@ export async function importAnki(
   console.log("import done!")
 }
 
-async function getAnkiDb(ankiExport: File): Promise<Database> {
+async function getAnkiDb(sqlite: Entry): Promise<Database> {
   const [sql, sqliteBuffer] = await Promise.all([
     initSqlJs({
       // Required to load the wasm binary asynchronously. Of course, you can host it wherever you want
       locateFile: (file) => `https://sql.js.org/dist/${file}`,
     }),
-    getSqliteBuffer(ankiExport),
+    getSqliteBuffer(sqlite),
   ])
   return new sql.Database(sqliteBuffer)
 }
 
-async function getSqliteBuffer(ankiExport: File): Promise<Buffer> {
-  const ankiEntries = await new ZipReader(
-    new BlobReader(ankiExport)
-  ).getEntries()
-  const sqlite =
-    ankiEntries.find((e) => e.filename === "collection.anki2") ??
-    throwExp("`collection.anki2` not found!")
+async function getSqliteBuffer(sqlite: Entry): Promise<Buffer> {
   const blob =
     (await sqlite.getData?.(new BlobWriter())) ??
     throwExp(
