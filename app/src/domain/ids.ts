@@ -4,6 +4,7 @@ export type UserId = Brand<string, "userId">
 
 export type RemoteTemplateId = Brand<string, "remoteTemplateId">
 export type RemoteCardId = Brand<string, "remoteCardId">
+export type RemoteResourceId = Brand<string, "remoteResourceId">
 
 export type TemplateId = Brand<string, "templateId">
 export type ChildTemplateId = Brand<string, "childTemplateId">
@@ -16,3 +17,5 @@ export type NoteId = Brand<string, "noteId">
 export type CardSettingId = Brand<string, "cardSettingId">
 
 export type DeckId = Brand<string, "deckId">
+
+export type ResourceId = Brand<string, "resourceId">

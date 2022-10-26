@@ -4,17 +4,17 @@ import {
   RxJsonSchema,
 } from "rxdb"
 
-export const pluginSchemaLiteral = {
-  title: "plugin schema",
+export const resourceSchemaLiteral = {
+  title: "resource schema",
   version: 0,
   primaryKey: "id",
   type: "object",
   properties: {
     id: {
       type: "string",
-      maxLength: 36, // <- the primary key must have set maxLength
+      maxLength: 100, // <- the primary key must have set maxLength
     },
-    name: {
+    remoteId: {
       type: "string",
       maxLength: 100, // <- string-fields that are used as an index, must set `maxLength`.
     },
@@ -23,23 +23,19 @@ export const pluginSchemaLiteral = {
       format: "date-time",
       maxLength: 24,
     },
-    modified: {
-      type: "string",
-      format: "date-time",
-      maxLength: 24,
-    },
   },
-  required: ["id", "name", "created", "modified"],
-  indexes: ["name", "created", "modified"],
+  required: ["id", "remoteId", "created"],
+  indexes: ["remoteId", "created"],
   attachments: {},
 } as const // <- It is important to set 'as const' to preserve the literal type
 
-const schemaTyped = toTypedRxJsonSchema(pluginSchemaLiteral)
+const schemaTyped = toTypedRxJsonSchema(resourceSchemaLiteral)
 
 // aggregate the document type from the schema
-export type PluginDocType = ExtractDocumentTypeFromTypedRxJsonSchema<
+export type ResourceDocType = ExtractDocumentTypeFromTypedRxJsonSchema<
   typeof schemaTyped
 >
 
 // create the typed RxJsonSchema from the literal typed object.
-export const pluginSchema: RxJsonSchema<PluginDocType> = pluginSchemaLiteral
+export const resourceSchema: RxJsonSchema<ResourceDocType> =
+  resourceSchemaLiteral

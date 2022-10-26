@@ -5,9 +5,11 @@ import { noteCollectionMethods } from "./rxdb/note.orm"
 import { pluginCollectionMethods } from "./rxdb/plugin.orm"
 import { remove, sync } from "./rxdb/rxdb"
 import { templateCollectionMethods } from "./rxdb/template.orm"
+import { resourceCollectionMethods } from "./rxdb/resource.orm"
 
 export const exposed = {
   ...templateCollectionMethods,
+  ...resourceCollectionMethods,
   ...cardCollectionMethods,
   ...noteCollectionMethods,
   ...heroCollectionMethods,
