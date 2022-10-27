@@ -7,6 +7,8 @@ import HomeData from "./home.data"
 import { db } from "../messenger"
 import { lrpc } from "../lrpcClient"
 import { importAnki } from "./importer/importer"
+import { throwExp } from "../domain/utility"
+import { CardId, RemoteResourceId, ResourceId } from "../domain/ids"
 
 async function uploadNewTemplates(): Promise<void> {
   await lrpc.mutation("addTemplate", {
@@ -142,8 +144,35 @@ export default function Home(): JSX.Element {
         </button>
       </div>
       <div class="mt-4">
-        <input type="file" onchange={importAnki} accept=".apkg"></input>
+        <label>
+          Import Anki apkg
+          <input type="file" onchange={importAnki} accept=".apkg"></input>
+        </label>
+      </div>
+      <div class="mt-4">
+        <label>
+          Upload Resource
+          <input type="file" onchange={uploadResource} accept=".png"></input>
+        </label>
       </div>
     </section>
   )
+}
+
+async function uploadResource(
+  event: Event & {
+    currentTarget: HTMLInputElement
+    target: Element
+  }
+): Promise<void> {
+  const file =
+    // My mental static analysis says to use `currentTarget`, but it seems to randomly be null, hence `target`. I'm confused but whatever.
+    (event.target as HTMLInputElement).files?.item(0) ??
+    throwExp("Impossible - there should be a file selected")
+  await db.upsertResource({
+    id: file.name as ResourceId,
+    created: new Date(),
+    remoteId: "" as RemoteResourceId,
+    data: await file.arrayBuffer(),
+  })
 }

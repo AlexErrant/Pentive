@@ -1,3 +1,4 @@
+import { ResourceId } from "app/src/domain/ids"
 import * as Comlink from "comlink" // https://github.com/GoogleChromeLabs/comlink/tree/main/docs/examples/05-serviceworker-example
 import { appMessenger } from "../appMessenger"
 
@@ -7,7 +8,7 @@ export interface ComlinkInit {
 }
 
 // explicit because Comlink can't clone functions
-async function getLocalResource(id: string): Promise<Blob> {
+async function getLocalResource(id: ResourceId): Promise<Blob | undefined> {
   return await appMessenger.getLocalResource(id)
 }
 

@@ -1,5 +1,5 @@
 import { C } from "."
-import { NoteId, Pointer, Side, TemplateId } from "./domain/ids"
+import { NoteId, Pointer, ResourceId, Side, TemplateId } from "./domain/ids"
 import { db } from "./messenger"
 
 async function renderBody(
@@ -15,7 +15,7 @@ async function renderBody(
         body: `Template ${templateId} not found.`,
       }
     const result = C.renderTemplate(template)[0] // nextTODO
-    if (result === null) {
+    if (result == null) {
       return {
         body: `Error rendering Template ${templateId}: "${template.name}".`,
         css: template.css,
@@ -36,9 +36,9 @@ async function renderBody(
   return { body: "!!!" } // nextTODO
 }
 
-async function getLocalResource(id: string): Promise<Blob> {
-  const response = await fetch(id)
-  return await response.blob()
+async function getLocalResource(id: ResourceId): Promise<Blob | undefined> {
+  const r = await db.getResource(id)
+  return r?.data
 }
 
 export const appExpose = {

@@ -5,10 +5,16 @@ import { getDb } from "./rxdb"
 import { ResourceDocType } from "./resource.schema"
 import { throwExp } from "../../src/domain/utility"
 
+// `idPrefix` is here because PouchDB document ids can't start with an underscore, so I make them all start with "a".
+// medTODO find a better way. Also, are there any other limitations on doc ids?
+// I can't find official docs on doc id limitations, but this issue mentions it https://github.com/pouchdb/pouchdb/issues/1369
+const idPrefix = "a"
+
 function resourceToDocType(resource: Omit<Resource, "data">): ResourceDocType {
   const { created } = resource // https://stackoverflow.com/a/66899790
   return {
     ...resource,
+    id: idPrefix + resource.id,
     created: created.toISOString(),
   }
 }
@@ -26,7 +32,7 @@ export const resourceDocMethods: ResourceDocMethods = {}
 
 function entityToDomain(resource: ResourceDocument): Resource {
   const r = {
-    id: resource.id as ResourceId,
+    id: resource.id.substring(1) as ResourceId,
     remoteId: resource.remoteId as RemoteResourceId,
     created: new Date(resource.created),
   }
@@ -46,13 +52,13 @@ export const resourceCollectionMethods = {
     const upserted = await db.resources.upsert(resourceToDocType(resource))
     await upserted.putAttachment({
       id: attachmentId,
-      type: "", // nextTODO
+      type: "unknown", // what is this even used for?
       data: new Blob([data]),
     })
   },
   getResource: async function (resourceId: ResourceId) {
     const db = await getDb()
-    const resource = await db.resources.findOne(resourceId).exec()
+    const resource = await db.resources.findOne(idPrefix + resourceId).exec()
     if (resource == null) {
       return resource
     } else {

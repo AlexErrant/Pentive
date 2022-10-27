@@ -1,6 +1,7 @@
 import { cleanupOutdatedCaches, precacheAndRoute } from "workbox-precaching"
 import * as Comlink from "comlink"
 import type { ComlinkInit, Exposed } from "./register-service-worker"
+import type { ResourceId } from "app/src/domain/ids"
 
 declare let self: ServiceWorkerGlobalScope
 
@@ -24,7 +25,7 @@ async function sleep(ms: number): Promise<void> {
   return await new Promise((resolve) => setTimeout(resolve, ms))
 }
 
-async function getLocalResource(resourceName: string): Promise<Response> {
+async function getLocalResource(resourceId: ResourceId): Promise<Response> {
   let i = 0
   // eslint-disable-next-line no-unmodified-loop-condition
   while (messenger == null) {
@@ -37,13 +38,17 @@ async function getLocalResource(resourceName: string): Promise<Response> {
     }
     await sleep(10)
   }
-  const resource = await messenger.getLocalResource(resourceName)
-  return new Response(resource)
+  const resource = await messenger.getLocalResource(resourceId)
+  return resource == null
+    ? new Response(resource, { status: 404 })
+    : new Response(resource)
 }
 
 self.addEventListener("fetch", (fetch) => {
   if (fetch.request.url.startsWith(localResourcePrefix)) {
-    const resourceName = fetch.request.url.substring(localResourcePrefix.length)
-    fetch.respondWith(getLocalResource(resourceName))
+    const resourceId = fetch.request.url.substring(
+      localResourcePrefix.length
+    ) as ResourceId
+    fetch.respondWith(getLocalResource(resourceId))
   }
 })
