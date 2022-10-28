@@ -206,3 +206,7 @@ export function checkNote(raw: Record<string, unknown>): Note {
 export function checkCard(raw: Record<string, unknown>): Card {
   return card.parse(raw)
 }
+
+export function checkMedia(raw: unknown): Record<string, string> {
+  return z.record(z.string()).parse(raw)
+}

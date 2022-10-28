@@ -8,7 +8,7 @@ import { db } from "../messenger"
 import { lrpc } from "../lrpcClient"
 import { importAnki } from "./importer/importer"
 import { throwExp } from "../domain/utility"
-import { CardId, RemoteResourceId, ResourceId } from "../domain/ids"
+import { RemoteResourceId, ResourceId } from "../domain/ids"
 
 async function uploadNewTemplates(): Promise<void> {
   await lrpc.mutation("addTemplate", {

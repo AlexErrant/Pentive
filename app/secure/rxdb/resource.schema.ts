@@ -12,7 +12,7 @@ export const resourceSchemaLiteral = {
   properties: {
     id: {
       type: "string",
-      maxLength: 100, // <- the primary key must have set maxLength
+      maxLength: 200, // <- the primary key must have set maxLength
     },
     remoteId: {
       type: "string",

@@ -3,16 +3,24 @@
 // pagination https://stackoverflow.com/q/14468586
 
 import { Buffer } from "buffer"
-import { BlobReader, BlobWriter, Entry, ZipReader } from "@zip.js/zip.js"
+import {
+  BlobReader,
+  BlobWriter,
+  Entry,
+  TextWriter,
+  Uint8ArrayWriter,
+  ZipReader,
+} from "@zip.js/zip.js"
 import { throwExp } from "../../domain/utility"
 import initSqlJs, { Database } from "sql.js"
-import { checkCard, checkCol, checkNote } from "./typeChecker"
+import { checkCard, checkCol, checkMedia, checkNote } from "./typeChecker"
 import { parseNote, parseCard, parseTemplates } from "./parser"
 import { Card as PCard } from "../../domain/card"
 import { Note as PNote } from "../../domain/note"
 import { Template } from "../../domain/template"
-import { TemplateId } from "../../domain/ids"
+import { RemoteResourceId, ResourceId, TemplateId } from "../../domain/ids"
 import { db } from "../../messenger"
+import { resourceSchemaLiteral } from "../../../secure/rxdb/resource.schema"
 
 export async function importAnki(
   event: Event & {
@@ -30,7 +38,46 @@ export async function importAnki(
   const sqlite =
     ankiEntries.find((e) => e.filename === "collection.anki2") ??
     throwExp("`collection.anki2` not found!")
-  await importAnkiDb(sqlite)
+  await Promise.all([importAnkiDb(sqlite), importAnkiMedia(ankiEntries)])
+}
+
+async function importAnkiMedia(ankiEntries: Entry[]): Promise<void> {
+  const media =
+    ankiEntries.find((e) => e.filename === "media") ??
+    throwExp("`media` not found.")
+  const mediaText =
+    (await media.getData?.(new TextWriter())) ??
+    throwExp(
+      "Impossible since we're using `getEntries` https://github.com/gildas-lormeau/zip.js/issues/371"
+    )
+  const parsed = checkMedia(JSON.parse(mediaText))
+  const max = resourceSchemaLiteral.properties.id.maxLength - 1 // account for idPrefix
+  for (const i in parsed) {
+    const fileName = parsed[i]
+    if (fileName.length >= max) {
+      console.error(
+        `The filename '${fileName}' is too long. Must be less than ${max} characters.`
+      )
+    }
+  }
+  for (const i in parsed) {
+    const id = parsed[i] as ResourceId
+    console.log({ i, id }) //
+    const resourceEntry =
+      ankiEntries.find((e) => e.filename === i) ??
+      throwExp(`Anki media '${i}' (${id}) not found.`)
+    const array =
+      (await resourceEntry.getData?.(new Uint8ArrayWriter())) ??
+      throwExp(
+        "Impossible since we're using `getEntries` https://github.com/gildas-lormeau/zip.js/issues/371"
+      )
+    await db.upsertResource({
+      id,
+      created: new Date(),
+      remoteId: "" as RemoteResourceId,
+      data: array.buffer,
+    })
+  }
 }
 
 async function importAnkiDb(sqlite: Entry): Promise<void> {
