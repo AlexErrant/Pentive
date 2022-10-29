@@ -21,26 +21,8 @@ import { Template } from "../../domain/template"
 import { TemplateId } from "../../domain/ids"
 import { db } from "../../messenger"
 import { resourceSchemaLiteral } from "../../../secure/rxdb/resource.schema"
-import { Dexie } from "dexie"
 import _ from "lodash"
-
-class DexieDb extends Dexie {
-  resources!: Dexie.Table<Resource, string>
-
-  constructor() {
-    super("MyAppDatabase")
-    this.version(1).stores({
-      resources: "name",
-    })
-  }
-}
-
-interface Resource {
-  name: string
-  data: ArrayBuffer
-}
-
-export const ddb = new DexieDb()
+import { Resource } from "../../../secure/dexie/dexie"
 
 export async function importAnki(
   event: Event & {
@@ -108,7 +90,7 @@ async function addMediaBatch(
     })
   )
   const resources = resourcesAndNulls.filter((r) => r != null) as Resource[]
-  await ddb.resources.bulkAdd(resources)
+  await db.bulkAddResources(resources)
 }
 
 async function importAnkiDb(sqlite: Entry): Promise<void> {

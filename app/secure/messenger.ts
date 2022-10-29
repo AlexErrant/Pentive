@@ -6,6 +6,7 @@ import { pluginCollectionMethods } from "./rxdb/plugin.orm"
 import { remove, sync } from "./rxdb/rxdb"
 import { templateCollectionMethods } from "./rxdb/template.orm"
 import { resourceCollectionMethods } from "./rxdb/resource.orm"
+import { dexieMethods } from "./dexie/dexie"
 
 export const exposed = {
   ...templateCollectionMethods,
@@ -14,6 +15,7 @@ export const exposed = {
   ...noteCollectionMethods,
   ...heroCollectionMethods,
   ...pluginCollectionMethods,
+  ...dexieMethods,
   remove,
   sync,
 }
