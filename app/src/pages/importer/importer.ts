@@ -58,6 +58,7 @@ async function importAnkiMedia(ankiEntries: Entry[]): Promise<void> {
     console.log(`media ${i}/${entryChunks.length}`)
     await addMediaBatch(entryChunks[i], parsed)
   }
+  console.log("Anki media import done!")
 }
 
 async function addMediaBatch(

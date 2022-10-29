@@ -23,6 +23,7 @@ export default function Plugins(): JSX.Element {
             script: target.files![0],
           }
           await db.upsertPlugin(plugin)
+          console.log("Plugin upserted!")
         }}
       />
       <PluginTable getPlugins={db.getPlugins} />
