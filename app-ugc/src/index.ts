@@ -1,16 +1,13 @@
 import "./register-service-worker"
-import { NoteId, Pointer, Side, TemplateId } from "app/src/domain/ids"
 import contentWindowJs from "iframe-resizer/js/iframeResizer.contentWindow.js?raw" // https://vitejs.dev/guide/assets.html#importing-asset-as-string https://github.com/davidjbradshaw/iframe-resizer/issues/513
 import { appMessenger } from "../appMessenger"
+import { RenderBodyInput } from "app/src/appMessenger"
 
 // https://stackoverflow.com/a/901144
 const urlSearchParams = new URLSearchParams(window.location.search)
 
 const { body, css } = await appMessenger.renderBody(
-  urlSearchParams.get("side") as Side,
-  urlSearchParams.get("templateId") as TemplateId,
-  urlSearchParams.get("noteId") as NoteId,
-  urlSearchParams.get("pointer") as Pointer
+  Object.fromEntries(urlSearchParams) as RenderBodyInput
 )
 
 document.getElementsByTagName("body")[0].innerHTML = body

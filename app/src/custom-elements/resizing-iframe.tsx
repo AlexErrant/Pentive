@@ -1,24 +1,15 @@
 import { iframeResizer } from "iframe-resizer"
 import { VoidComponent } from "solid-js"
-import { NoteId, Pointer, Side, TemplateId } from "../domain/ids"
 import * as Comlink from "comlink"
-import { appExpose } from "../appMessenger"
+import { appExpose, RenderBodyInput } from "../appMessenger"
 
 const targetOrigin = "*" // highTODO make more limiting. Also implement https://stackoverflow.com/q/8169582
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const ResizingIframe: VoidComponent<{
-  readonly side: Side
-  readonly templateId: TemplateId
-  readonly noteId?: NoteId
-  readonly pointer?: Pointer
+  readonly i: RenderBodyInput
 }> = (props) => {
-  const usp = new URLSearchParams({
-    side: props.side,
-    templateId: props.templateId,
-  })
-  if (props.noteId != null) usp.append("noteId", props.noteId)
-  if (props.pointer != null) usp.append("pointer", props.pointer.toString())
+  const usp = new URLSearchParams(props.i)
   return (
     <iframe
       onload={(e) => {

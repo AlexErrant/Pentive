@@ -1,39 +1,56 @@
 import { C } from "."
-import { NoteId, Pointer, ResourceId, Side, TemplateId } from "./domain/ids"
+import {
+  ChildTemplateId,
+  NoteId,
+  ResourceId,
+  Side,
+  TemplateId,
+} from "./domain/ids"
+import { assertNever } from "./domain/utility"
 import { db } from "./messenger"
 
+export type RenderBodyInput =
+  | {
+      readonly tag: "template"
+      readonly side: Side
+      readonly templateId: TemplateId
+    }
+  | {
+      readonly tag: "card"
+      readonly noteId: NoteId
+      readonly pointer: ChildTemplateId | string // string is when its a clozeIndex. Necessary for `new URLSearchParams()`, which expects everything to be a string.
+    }
+
 async function renderBody(
-  side: Side,
-  templateId: TemplateId,
-  noteId?: NoteId | null,
-  pointer?: Pointer | null
+  i: RenderBodyInput
 ): Promise<{ body: string; css?: string }> {
-  if (noteId == null && pointer == null) {
-    const template = await db.getTemplate(templateId)
-    if (template === null)
-      return {
-        body: `Template ${templateId} not found.`,
-      }
-    const result = C.renderTemplate(template)[0] // nextTODO
-    if (result == null) {
-      return {
-        body: `Error rendering Template ${templateId}: "${template.name}".`,
-        css: template.css,
-      }
-    } else {
-      return {
-        body: side === "front" ? result[0] : result[1],
-        css: template.css,
+  switch (i.tag) {
+    case "template": {
+      const template = await db.getTemplate(i.templateId)
+      if (template == null)
+        return {
+          body: `Template ${i.templateId} not found.`,
+        }
+      const result = C.renderTemplate(template)[0] // nextTODO
+      if (result == null) {
+        return {
+          body: `Error rendering Template ${i.templateId}: "${template.name}".`,
+          css: template.css,
+        }
+      } else {
+        return {
+          body: i.side === "front" ? result[0] : result[1],
+          css: template.css,
+        }
       }
     }
-  } else if (noteId != null && pointer != null) {
-    const note = await db.getNote(noteId) // nextTODO
-  } else {
-    return {
-      body: "One of NoteId or Pointer is null, which should be impossible. Open a bug report if you see this!",
+    case "card": {
+      const note = await db.getNote(i.noteId)
+      return { body: "!!!" } // nextTODO
     }
+    default:
+      return assertNever(i)
   }
-  return { body: "!!!" } // nextTODO
 }
 
 async function getLocalResource(id: ResourceId): Promise<Blob | undefined> {

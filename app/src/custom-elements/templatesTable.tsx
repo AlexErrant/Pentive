@@ -57,8 +57,11 @@ const columns: Array<ColumnDef<Template>> = [
       return (
         // nextTODO iterate over all templates
         <ResizingIframe
-          side="front"
-          templateId={info.row.original.id}
+          i={{
+            tag: "template",
+            side: "front",
+            templateId: info.row.original.id,
+          }}
         ></ResizingIframe>
       )
     },
