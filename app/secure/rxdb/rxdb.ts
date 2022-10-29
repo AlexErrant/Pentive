@@ -1,7 +1,6 @@
 import { addRxPlugin, createRxDatabase, RxDatabase, RxStorage } from "rxdb"
 import { HeroDocType, heroSchema } from "./hero.schema"
 import { templateSchema } from "./template.schema"
-import { resourceSchema } from "./resource.schema"
 import { cardSchema } from "./card.schema"
 import { noteSchema } from "./note.schema"
 import * as pouchdbAdapterIdb from "pouchdb-adapter-idb"
@@ -28,11 +27,6 @@ import {
   templateDocMethods,
 } from "./template.orm"
 import {
-  ResourceCollection,
-  resourceCollectionMethods,
-  resourceDocMethods,
-} from "./resource.orm"
-import {
   CardCollection,
   cardCollectionMethods,
   cardDocMethods,
@@ -42,12 +36,6 @@ import {
   noteCollectionMethods,
   noteDocMethods,
 } from "./note.orm"
-import { pluginSchema } from "./plugin.schema"
-import {
-  PluginCollection,
-  pluginCollectionMethods,
-  pluginDocMethods,
-} from "./plugin.orm"
 import { RxDBAttachmentsPlugin } from "rxdb/plugins/attachments"
 addPouchPlugin(pouchdbAdapterHttp)
 addPouchPlugin(pouchdbAdapterIdb)
@@ -57,10 +45,8 @@ addRxPlugin(RxDBAttachmentsPlugin)
 interface MyDatabaseCollections {
   readonly heroes: HeroCollection
   readonly templates: TemplateCollection
-  readonly resources: ResourceCollection
   readonly cards: CardCollection
   readonly notes: NoteCollection
-  readonly plugins: PluginCollection
 }
 
 export type MyDatabase = RxDatabase<MyDatabaseCollections>
@@ -97,11 +83,6 @@ export async function createDb(): Promise<MyDatabase> {
       methods: templateDocMethods,
       statics: templateCollectionMethods,
     },
-    resources: {
-      schema: resourceSchema,
-      methods: resourceDocMethods,
-      statics: resourceCollectionMethods,
-    },
     cards: {
       schema: cardSchema,
       methods: cardDocMethods,
@@ -111,11 +92,6 @@ export async function createDb(): Promise<MyDatabase> {
       schema: noteSchema,
       methods: noteDocMethods,
       statics: noteCollectionMethods,
-    },
-    plugins: {
-      schema: pluginSchema,
-      methods: pluginDocMethods,
-      statics: pluginCollectionMethods,
     },
   })
 
@@ -202,8 +178,6 @@ export async function sync(): Promise<void> {
   }
   myDatabase.heroes.syncCouchDB(syncOptions)
   myDatabase.templates.syncCouchDB(syncOptions)
-  myDatabase.resources.syncCouchDB(syncOptions)
   myDatabase.cards.syncCouchDB(syncOptions)
   myDatabase.notes.syncCouchDB(syncOptions)
-  myDatabase.plugins.syncCouchDB(syncOptions)
 }

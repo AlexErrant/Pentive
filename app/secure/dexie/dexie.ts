@@ -1,5 +1,6 @@
 import { Dexie } from "dexie"
 import { ResourceId } from "../../src/domain/ids"
+import { Plugin } from "../../src/domain/plugin"
 
 class DexieDb extends Dexie {
   resources!: Dexie.Table<Resource, string>
@@ -17,14 +18,6 @@ class DexieDb extends Dexie {
 export interface Resource {
   name: string
   data: ArrayBuffer
-}
-
-interface Plugin {
-  readonly name: string
-  readonly id: string
-  readonly created: string
-  readonly modified: string
-  readonly script: Blob
 }
 
 const ddb = new DexieDb()

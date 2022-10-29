@@ -20,7 +20,6 @@ import { Note as PNote } from "../../domain/note"
 import { Template } from "../../domain/template"
 import { TemplateId } from "../../domain/ids"
 import { db } from "../../messenger"
-import { resourceSchemaLiteral } from "../../../secure/rxdb/resource.schema"
 import _ from "lodash"
 import { Resource } from "../../../secure/dexie/dexie"
 
@@ -54,15 +53,6 @@ async function importAnkiMedia(ankiEntries: Entry[]): Promise<void> {
       "Impossible since we're using `getEntries` https://github.com/gildas-lormeau/zip.js/issues/371"
     )
   const parsed = checkMedia(JSON.parse(mediaText))
-  const max = resourceSchemaLiteral.properties.id.maxLength - 1 // account for idPrefix
-  for (const i in parsed) {
-    const fileName = parsed[i]
-    if (fileName.length >= max) {
-      console.error(
-        `The filename '${fileName}' is too long. Must be less than ${max} characters.`
-      )
-    }
-  }
   const entryChunks = _.chunk(ankiEntries, 1000)
   for (let i = 0; i < entryChunks.length; i++) {
     console.log(`media ${i}/${entryChunks.length}`)

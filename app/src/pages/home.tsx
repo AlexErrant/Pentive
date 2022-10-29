@@ -169,10 +169,12 @@ async function uploadResource(
     // My mental static analysis says to use `currentTarget`, but it seems to randomly be null, hence `target`. I'm confused but whatever.
     (event.target as HTMLInputElement).files?.item(0) ??
     throwExp("Impossible - there should be a file selected")
-  await db.upsertResource({
-    id: file.name as ResourceId,
-    created: new Date(),
-    remoteId: "" as RemoteResourceId,
-    data: await file.arrayBuffer(),
-  })
+  await db.bulkAddResources([
+    {
+      name: file.name as ResourceId, // nextTODO
+      // created: new Date(),
+      // remoteId: "" as RemoteResourceId,
+      data: await file.arrayBuffer(),
+    },
+  ])
 }
