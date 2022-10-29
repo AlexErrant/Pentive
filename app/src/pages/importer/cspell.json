@@ -5,9 +5,14 @@
         {
             "name": "importer",
             "path": "./importer.txt"
+        },
+        {
+            "name": "dictionary",
+            "path": "../../../../.vscode/dictionary.txt"
         }
     ],
     "dictionaries": [
-        "importer"
+        "importer",
+        "dictionary"
     ]
 }

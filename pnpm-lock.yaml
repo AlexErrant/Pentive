@@ -26,6 +26,7 @@ importers:
       babel-preset-solid: ^1.4.8
       buffer: ^6.0.3
       comlink: ^4.3.1
+      dexie: ^3.2.2
       eslint: ^8.20.0
       eslint-config-prettier: ^8.5.0
       eslint-config-standard-with-typescript: ^22.0.0
@@ -77,6 +78,7 @@ importers:
       babel-preset-solid: 1.5.4_@babel+core@7.19.0
       buffer: 6.0.3
       comlink: 4.3.1
+      dexie: 3.2.2
       iframe-resizer: 4.3.2
       immer: 9.0.15
       lodash: 4.17.21
@@ -4986,6 +4988,11 @@ packages:
   /device-specs/1.0.0:
     resolution: {integrity: sha512-fYXbFSeilT7bnKWFi4OERSPHdtaEoDGn4aUhV5Nly6/I+Tp6JZ/6Icmd7LVIF5euyodGpxz2e/bfUmDnIdSIDw==}
     dev: true
+
+  /dexie/3.2.2:
+    resolution: {integrity: sha512-q5dC3HPmir2DERlX+toCBbHQXW5MsyrFqPFcovkH9N2S/UW/H3H5AWAB6iEOExeraAu+j+zRDG+zg/D7YhH0qg==}
+    engines: {node: '>=6.0'}
+    dev: false
 
   /dexie/4.0.0-alpha.4:
     resolution: {integrity: sha512-xYABeT5ctG7WAJtyr/6gKhWXD6NY8ydZieQlvLQkFV6KXY33I+ShE39pToGzQw+3/xs760rW+opxhoVZ/yzVxQ==}

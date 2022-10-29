@@ -1,5 +1,6 @@
 apkg
 comlink
+dexie
 graphiql
 iframe
 iframes
