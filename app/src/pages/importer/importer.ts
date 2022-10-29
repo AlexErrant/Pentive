@@ -40,7 +40,8 @@ export async function importAnki(
   const sqlite =
     ankiEntries.find((e) => e.filename === "collection.anki2") ??
     throwExp("`collection.anki2` not found!")
-  await Promise.all([importAnkiDb(sqlite), importAnkiMedia(ankiEntries)])
+  await importAnkiDb(sqlite)
+  await importAnkiMedia(ankiEntries)
 }
 
 async function importAnkiMedia(ankiEntries: Entry[]): Promise<void> {
