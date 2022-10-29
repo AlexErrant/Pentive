@@ -1,6 +1,7 @@
 import { Dexie } from "dexie"
 import { ResourceId } from "../../src/domain/ids"
 import { Plugin } from "../../src/domain/plugin"
+import { Resource } from "../../src/domain/resource"
 
 class DexieDb extends Dexie {
   resources!: Dexie.Table<Resource, string>
@@ -9,15 +10,10 @@ class DexieDb extends Dexie {
   constructor() {
     super("MyAppDatabase")
     this.version(1).stores({
-      resources: "name",
+      resources: "id",
       plugins: "id",
     })
   }
-}
-
-export interface Resource {
-  name: string
-  data: ArrayBuffer
 }
 
 const ddb = new DexieDb()

@@ -8,7 +8,7 @@ import { db } from "../messenger"
 import { lrpc } from "../lrpcClient"
 import { importAnki } from "./importer/importer"
 import { throwExp } from "../domain/utility"
-import { RemoteResourceId, ResourceId } from "../domain/ids"
+import { ResourceId } from "../domain/ids"
 
 async function uploadNewTemplates(): Promise<void> {
   await lrpc.mutation("addTemplate", {
@@ -171,9 +171,8 @@ async function uploadResource(
     throwExp("Impossible - there should be a file selected")
   await db.bulkAddResources([
     {
-      name: file.name as ResourceId, // nextTODO
-      // created: new Date(),
-      // remoteId: "" as RemoteResourceId,
+      id: file.name as ResourceId,
+      created: new Date(),
       data: await file.arrayBuffer(),
     },
   ])

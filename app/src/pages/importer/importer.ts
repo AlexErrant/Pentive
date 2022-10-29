@@ -18,10 +18,10 @@ import { parseNote, parseCard, parseTemplates } from "./parser"
 import { Card as PCard } from "../../domain/card"
 import { Note as PNote } from "../../domain/note"
 import { Template } from "../../domain/template"
-import { TemplateId } from "../../domain/ids"
+import { ResourceId, TemplateId } from "../../domain/ids"
 import { db } from "../../messenger"
 import _ from "lodash"
-import { Resource } from "../../../secure/dexie/dexie"
+import { Resource } from "../../domain/resource"
 
 export async function importAnki(
   event: Event & {
@@ -75,7 +75,8 @@ async function addMediaBatch(
       return name == null // occurs for entries that aren't media, e.g. collection.anki2
         ? null
         : {
-            name,
+            id: name as ResourceId,
+            created: new Date(),
             data: array.buffer,
           }
     })
