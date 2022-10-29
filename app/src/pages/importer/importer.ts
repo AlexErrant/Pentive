@@ -18,9 +18,29 @@ import { parseNote, parseCard, parseTemplates } from "./parser"
 import { Card as PCard } from "../../domain/card"
 import { Note as PNote } from "../../domain/note"
 import { Template } from "../../domain/template"
-import { RemoteResourceId, ResourceId, TemplateId } from "../../domain/ids"
+import { TemplateId } from "../../domain/ids"
 import { db } from "../../messenger"
 import { resourceSchemaLiteral } from "../../../secure/rxdb/resource.schema"
+import { Dexie } from "dexie"
+import _ from "lodash"
+
+class DexieDb extends Dexie {
+  resources!: Dexie.Table<Resource, string>
+
+  constructor() {
+    super("MyAppDatabase")
+    this.version(1).stores({
+      resources: "name",
+    })
+  }
+}
+
+interface Resource {
+  name: string
+  data: ArrayBuffer
+}
+
+export const ddb = new DexieDb()
 
 export async function importAnki(
   event: Event & {
@@ -60,24 +80,35 @@ async function importAnkiMedia(ankiEntries: Entry[]): Promise<void> {
       )
     }
   }
-  for (const i in parsed) {
-    const id = parsed[i] as ResourceId
-    console.log({ i, id }) //
-    const resourceEntry =
-      ankiEntries.find((e) => e.filename === i) ??
-      throwExp(`Anki media '${i}' (${id}) not found.`)
-    const array =
-      (await resourceEntry.getData?.(new Uint8ArrayWriter())) ??
-      throwExp(
-        "Impossible since we're using `getEntries` https://github.com/gildas-lormeau/zip.js/issues/371"
-      )
-    await db.upsertResource({
-      id,
-      created: new Date(),
-      remoteId: "" as RemoteResourceId,
-      data: array.buffer,
-    })
+  const entryChunks = _.chunk(ankiEntries, 1000)
+  for (let i = 0; i < entryChunks.length; i++) {
+    console.log(`media ${i}/${entryChunks.length}`)
+    await addMediaBatch(entryChunks[i], parsed)
   }
+}
+
+async function addMediaBatch(
+  entries: Entry[],
+  nameByI: Record<string, string>
+): Promise<void> {
+  const resourcesAndNulls = await Promise.all(
+    entries.map(async (entry) => {
+      const array =
+        (await entry.getData?.(new Uint8ArrayWriter())) ??
+        throwExp(
+          "Impossible since we're using `getEntries` https://github.com/gildas-lormeau/zip.js/issues/371"
+        )
+      const name = nameByI[entry.filename]
+      return name == null // occurs for entries that aren't media, e.g. collection.anki2
+        ? null
+        : {
+            name,
+            data: array.buffer,
+          }
+    })
+  )
+  const resources = resourcesAndNulls.filter((r) => r != null) as Resource[]
+  await ddb.resources.bulkAdd(resources)
 }
 
 async function importAnkiDb(sqlite: Entry): Promise<void> {
@@ -117,7 +148,7 @@ async function importAnkiDb(sqlite: Entry): Promise<void> {
   } finally {
     ankiDb.close()
   }
-  console.log("import done!")
+  console.log("AnkiDB import done!")
 }
 
 async function getAnkiDb(sqlite: Entry): Promise<Database> {

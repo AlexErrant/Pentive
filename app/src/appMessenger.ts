@@ -1,6 +1,7 @@
 import { C } from "."
 import { NoteId, Pointer, ResourceId, Side, TemplateId } from "./domain/ids"
 import { db } from "./messenger"
+import { ddb } from "./pages/importer/importer"
 
 async function renderBody(
   side: Side,
@@ -37,8 +38,8 @@ async function renderBody(
 }
 
 async function getLocalResource(id: ResourceId): Promise<Blob | undefined> {
-  const r = await db.getResource(id)
-  return r?.data
+  const r = await ddb.resources.get(id)
+  return r == null ? undefined : new Blob([r.data])
 }
 
 export const appExpose = {
