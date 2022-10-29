@@ -49,6 +49,7 @@ const cardPreview = (p: ICellRendererParams<NoteCard>): JSX.Element => {
         tag: "template",
         side: "front",
         templateId: p.data.template.id,
+        index: "0",
       }} // nextTODO
     ></ResizingIframe>
   )

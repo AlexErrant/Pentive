@@ -14,6 +14,7 @@ export type RenderBodyInput =
       readonly tag: "template"
       readonly side: Side
       readonly templateId: TemplateId
+      readonly index: string
     }
   | {
       readonly tag: "card"
@@ -31,7 +32,7 @@ async function renderBody(
         return {
           body: `Template ${i.templateId} not found.`,
         }
-      const result = C.renderTemplate(template)[0] // nextTODO
+      const result = C.renderTemplate(template)[parseInt(i.index)]
       if (result == null) {
         return {
           body: `Error rendering Template ${i.templateId}: "${template.name}".`,

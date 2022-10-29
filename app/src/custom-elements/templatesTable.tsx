@@ -55,12 +55,13 @@ const columns: Array<ColumnDef<Template>> = [
     header: "Preview",
     cell: (info) => {
       return (
-        // nextTODO iterate over all templates
+        // lowTODO: iterate over all templates... or not. If there are 10 it'll look ugly
         <ResizingIframe
           i={{
             tag: "template",
             side: "front",
             templateId: info.row.original.id,
+            index: "0",
           }}
         ></ResizingIframe>
       )
