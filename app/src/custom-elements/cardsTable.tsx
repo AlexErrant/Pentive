@@ -29,28 +29,15 @@ const cardPreview = (p: ICellRendererParams<NoteCard>): JSX.Element => {
   ) {
     return <span>Loading...</span>
   }
-  const { note, card, template } = p.data
-  const { fields, values } = note
-  const fv = _.zip(fields, values) as ReadonlyArray<readonly [string, string]>
-  const { front, back } =
-    template.templateType.tag === "standard"
-      ? template.templateType.templates.find((t) => t.id === card.pointer) ??
-        throwExp(`Invalid pointer ${card.pointer} for template ${template.id}`)
-      : template.templateType.template
-
-  const frontBack = C.html(fv, front, back, card.pointer, template.css)
-  if (frontBack === null) {
-    return <span>Card is invalid!</span>
-  }
-  // return srcdoc={frontBack[0]}
   return (
     <ResizingIframe
       i={{
-        tag: "template",
+        tag: "card",
         side: "front",
         templateId: p.data.template.id,
-        index: "0",
-      }} // nextTODO
+        noteId: p.data.note.id,
+        cardId: p.data.card.id,
+      }}
     ></ResizingIframe>
   )
 }

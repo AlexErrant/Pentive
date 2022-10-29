@@ -1,12 +1,7 @@
+import _ from "lodash"
 import { C } from "."
-import {
-  ChildTemplateId,
-  NoteId,
-  ResourceId,
-  Side,
-  TemplateId,
-} from "./domain/ids"
-import { assertNever } from "./domain/utility"
+import { CardId, NoteId, ResourceId, Side, TemplateId } from "./domain/ids"
+import { assertNever, throwExp } from "./domain/utility"
 import { db } from "./messenger"
 
 export type RenderBodyInput =
@@ -14,12 +9,14 @@ export type RenderBodyInput =
       readonly tag: "template"
       readonly side: Side
       readonly templateId: TemplateId
-      readonly index: string
+      readonly index: string // string due to `new URLSearchParams()`, which expects everything to be a string.
     }
   | {
       readonly tag: "card"
+      readonly side: Side
+      readonly templateId: TemplateId
       readonly noteId: NoteId
-      readonly pointer: ChildTemplateId | string // string is when its a clozeIndex. Necessary for `new URLSearchParams()`, which expects everything to be a string.
+      readonly cardId: CardId
     }
 
 async function renderBody(
@@ -46,8 +43,37 @@ async function renderBody(
       }
     }
     case "card": {
+      const template = await db.getTemplate(i.templateId)
       const note = await db.getNote(i.noteId)
-      return { body: "!!!" } // nextTODO
+      const card = await db.getCard(i.cardId)
+      if (template == null) {
+        return { body: `Template ${i.templateId} not found!` }
+      }
+      if (note == null) {
+        return { body: `Note ${i.noteId} not found!` }
+      }
+      if (card == null) {
+        return { body: `Card ${i.cardId} not found!` }
+      }
+      const { fields, values } = note
+      const fv = _.zip(fields, values) as ReadonlyArray<
+        readonly [string, string]
+      >
+      const { front, back } =
+        template.templateType.tag === "standard"
+          ? template.templateType.templates.find(
+              (t) => t.id === card.pointer
+            ) ??
+            throwExp(
+              `Invalid pointer ${card.pointer} for template ${template.id}`
+            )
+          : template.templateType.template
+      const frontBack = C.html(fv, front, back, card.pointer, template.css)
+      if (frontBack == null) {
+        return { body: "Card is invalid!" }
+      }
+      const body = i.side === "front" ? frontBack[0] : frontBack[1]
+      return { body }
     }
     default:
       return assertNever(i)
