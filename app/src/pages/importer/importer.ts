@@ -40,7 +40,7 @@ export async function importAnki(
     ankiEntries.find((e) => e.filename === "collection.anki2") ??
     throwExp("`collection.anki2` not found!")
   await importAnkiDb(sqlite)
-  await importAnkiMedia(ankiEntries)
+  await importAnkiMedia(ankiEntries) // running in parallel causes ERR_OUT_OF_MEMORY
 }
 
 async function importAnkiMedia(ankiEntries: Entry[]): Promise<void> {

@@ -3,7 +3,6 @@ import { Card, NoteCard } from "../domain/card"
 import _ from "lodash"
 import ResizingIframe from "./resizing-iframe"
 import "@github/time-elements"
-import { C } from ".."
 import AgGridSolid, { AgGridSolidRef } from "ag-grid-solid"
 import "ag-grid-community/styles/ag-grid.css"
 import "ag-grid-community/styles/ag-theme-alpine.css"
@@ -22,11 +21,7 @@ import { Template } from "../domain/template"
 let gridRef: AgGridSolidRef
 
 const cardPreview = (p: ICellRendererParams<NoteCard>): JSX.Element => {
-  if (
-    p.data === undefined ||
-    p.data.note === undefined ||
-    p.data.template === undefined
-  ) {
+  if (p.data?.note == null || p.data.template == null) {
     return <span>Loading...</span>
   }
   return (
@@ -125,6 +120,7 @@ async function onBodyScrollEnd(): Promise<void> {
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const CardsTable: VoidComponent = () => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [noteCards] = createResource(fillGrid)
   return (
     <div class="ag-grid-alpine" style="height: 500px">
