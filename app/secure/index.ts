@@ -8,11 +8,8 @@ declare global {
 
 import "./style.css"
 import { addRxPlugin, createRxDatabase } from "rxdb"
-import { addPouchPlugin, getRxStoragePouch } from "rxdb/plugins/pouchdb"
 import { filter } from "rxjs/operators"
-
-import * as pouchdbAdapter from "pouchdb-adapter-idb"
-addPouchPlugin(pouchdbAdapter)
+import { getRxStorageDexie } from "rxdb/plugins/dexie"
 import {
   RxDBReplicationGraphQLPlugin,
   pullQueryBuilderFromRxSchema,
@@ -112,7 +109,7 @@ async function run() {
   const db = await createRxDatabase({
     name: getDatabaseName(),
     storage: wrappedValidateAjvStorage({
-      storage: getRxStoragePouch("idb"),
+      storage: getRxStorageDexie(),
     }),
     multiInstance: getStorageKey() !== "memory",
   })

@@ -1,20 +1,10 @@
-import { addRxPlugin, createRxDatabase, RxDatabase, RxStorage } from "rxdb"
+import { addRxPlugin, createRxDatabase, RxDatabase } from "rxdb"
 import { HeroDocType, heroSchema } from "./hero.schema"
 import { templateSchema } from "./template.schema"
 import { cardSchema } from "./card.schema"
 import { noteSchema } from "./note.schema"
-import * as pouchdbAdapterIdb from "pouchdb-adapter-idb"
-import {
-  getRxStoragePouch,
-  addPouchPlugin,
-  PouchDB,
-  PouchStorageInternals,
-  PouchSettings,
-} from "rxdb/plugins/pouchdb"
 import { RxDBLeaderElectionPlugin } from "rxdb/plugins/leader-election"
-// @ts-expect-error pouchdb is untyped
-import * as pouchdbAdapterHttp from "pouchdb-adapter-http"
-import { RxDBReplicationCouchDBPlugin } from "rxdb/plugins/replication-couchdb"
+import { getRxStorageDexie } from "rxdb/plugins/dexie"
 import {
   HeroCollection,
   heroCollectionMethods,
@@ -36,11 +26,6 @@ import {
   noteCollectionMethods,
   noteDocMethods,
 } from "./note.orm"
-import { RxDBAttachmentsPlugin } from "rxdb/plugins/attachments"
-addPouchPlugin(pouchdbAdapterHttp)
-addPouchPlugin(pouchdbAdapterIdb)
-addRxPlugin(RxDBReplicationCouchDBPlugin)
-addRxPlugin(RxDBAttachmentsPlugin)
 
 interface MyDatabaseCollections {
   readonly heroes: HeroCollection
@@ -57,20 +42,24 @@ export async function createDb(): Promise<MyDatabase> {
   /**
    * create database and collections
    */
-  let storage: RxStorage<PouchStorageInternals, PouchSettings> =
-    getRxStoragePouch("idb")
+  const storage = getRxStorageDexie()
+  let myDatabase
   if (isDevMode) {
     // we use the schema-validation only in dev-mode
     // this validates each document if it is matching the jsonschema
     const { wrappedValidateAjvStorage } = await import(
       "rxdb/plugins/validate-ajv"
     )
-    storage = wrappedValidateAjvStorage({ storage })
+    myDatabase = await createRxDatabase<MyDatabaseCollections>({
+      name: "mydb",
+      storage: wrappedValidateAjvStorage({ storage }),
+    })
+  } else {
+    myDatabase = await createRxDatabase<MyDatabaseCollections>({
+      name: "mydb",
+      storage,
+    })
   }
-  const myDatabase: MyDatabase = await createRxDatabase<MyDatabaseCollections>({
-    name: "mydb",
-    storage,
-  })
 
   await myDatabase.addCollections({
     heroes: {
@@ -142,42 +131,13 @@ async function loadRxDBPlugins(): Promise<void> {
       import("rxdb/plugins/dev-mode").then((module) =>
         addRxPlugin(module.RxDBDevModePlugin)
       ),
-
-      // enable debug to detect slow queries
-      import("pouchdb-debug" + "").then((module) =>
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        addPouchPlugin(module.default)
-      ),
     ])
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-    PouchDB.debug.enable("pouchdb:find")
   } else {
     // in production we do not use any validation plugin
     // to reduce the build-size
   }
 }
 
-// https://github.com/pubkey/rxdb/blob/754e489353a2611c98550b6c19c09688787a08e0/docs-src/replication-couchdb.md?plain=1#L27-L39
-export async function sync(): Promise<void> {
-  const myDatabase = await getDb()
-  const user = "admin" // TODO
-  const pass = "password"
-  const syncOptions = {
-    remote: `http://${user}:${pass}@localhost:5984/xheroes`, // remote database. This can be the serverURL, another RxCollection or a PouchDB-instance
-    waitForLeadership: true, // (optional) [default=true] to save performance, the sync starts on leader-instance only
-    direction: {
-      // direction (optional) to specify sync-directions
-      pull: true, // default=true
-      push: true, // default=true
-    },
-    options: {
-      // sync-options (optional) from https://pouchdb.com/api.html#replication
-      live: true,
-      retry: true,
-    },
-  }
-  myDatabase.heroes.syncCouchDB(syncOptions)
-  myDatabase.templates.syncCouchDB(syncOptions)
-  myDatabase.cards.syncCouchDB(syncOptions)
-  myDatabase.notes.syncCouchDB(syncOptions)
+export function sync(): void {
+  console.log("not implemented")
 }
