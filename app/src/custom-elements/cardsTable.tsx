@@ -6,12 +6,7 @@ import "@github/time-elements"
 import AgGridSolid, { AgGridSolidRef } from "ag-grid-solid"
 import "ag-grid-community/styles/ag-grid.css"
 import "ag-grid-community/styles/ag-theme-alpine.css"
-import {
-  ColDef,
-  GetRowIdParams,
-  ICellRendererParams,
-  RowNode,
-} from "ag-grid-community"
+import { ColDef, GetRowIdParams, RowNode } from "ag-grid-community"
 import { throwExp } from "../domain/utility"
 import { CardId, NoteId, TemplateId } from "../domain/ids"
 import { db } from "../messenger"
@@ -20,27 +15,9 @@ import { Template } from "../domain/template"
 
 let gridRef: AgGridSolidRef
 
-const cardPreview = (p: ICellRendererParams<NoteCard>): JSX.Element => {
-  if (p.data?.note == null || p.data.template == null) {
-    return <span>Loading...</span>
-  }
-  return (
-    <ResizingIframe
-      i={{
-        tag: "card",
-        side: "front",
-        templateId: p.data.template.id,
-        noteId: p.data.note.id,
-        cardId: p.data.card.id,
-      }}
-    ></ResizingIframe>
-  )
-}
-
 const columnDefs: Array<ColDef<NoteCard>> = [
   { field: "card.id" },
   { field: "note.id" },
-  { field: "preview", cellRenderer: cardPreview },
 ]
 
 let cache: {
@@ -119,7 +96,9 @@ async function onBodyScrollEnd(): Promise<void> {
 }
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
-const CardsTable: VoidComponent = () => {
+const CardsTable: VoidComponent<{
+  readonly onSelectionChanged: (noteCards: NoteCard[]) => void
+}> = (props) => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [noteCards] = createResource(fillGrid)
   return (
@@ -127,10 +106,14 @@ const CardsTable: VoidComponent = () => {
       <AgGridSolid
         columnDefs={columnDefs}
         defaultColDef={defaultColDef}
-        getRowHeight={() => 500}
         ref={gridRef}
         getRowId={getRowId}
         onBodyScrollEnd={onBodyScrollEnd}
+        rowSelection="multiple"
+        onSelectionChanged={(event) => {
+          const ncs = event.api.getSelectedRows() as NoteCard[]
+          props.onSelectionChanged(ncs)
+        }}
       />
     </div>
   )
