@@ -29,14 +29,25 @@ const cardPreview = ({ template, note, card }: NoteCard): JSX.Element => {
     return <span>Loading...</span>
   }
   return (
-    <ResizingIframe
-      i={{
-        tag: "card",
-        side: "front",
-        templateId: template.id,
-        noteId: note.id,
-        cardId: card.id,
-      }}
-    ></ResizingIframe>
+    <>
+      <ResizingIframe
+        i={{
+          tag: "card",
+          side: "front",
+          templateId: template.id,
+          noteId: note.id,
+          cardId: card.id,
+        }}
+      ></ResizingIframe>
+      <ResizingIframe
+        i={{
+          tag: "card",
+          side: "back",
+          templateId: template.id,
+          noteId: note.id,
+          cardId: card.id,
+        }}
+      ></ResizingIframe>
+    </>
   )
 }
