@@ -46,8 +46,8 @@ async function getLocalResource(resourceId: ResourceId): Promise<Response> {
 
 self.addEventListener("fetch", (fetch) => {
   if (fetch.request.url.startsWith(localResourcePrefix)) {
-    const resourceId = fetch.request.url.substring(
-      localResourcePrefix.length
+    const resourceId = decodeURI(
+      fetch.request.url.substring(localResourcePrefix.length)
     ) as ResourceId
     fetch.respondWith(getLocalResource(resourceId))
   }
