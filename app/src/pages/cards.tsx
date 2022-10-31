@@ -3,8 +3,9 @@ import CardsTable from "../custom-elements/cardsTable"
 import ResizingIframe from "../custom-elements/resizing-iframe"
 import { NoteCard } from "../domain/card"
 
+const [selected, setSelected] = createSignal<NoteCard>()
+
 export default function Cards(): JSX.Element {
-  const [detail, setDetail] = createSignal(<></>)
   return (
     <>
       <section class="bg-pink-100 text-gray-700 p-8">
@@ -13,18 +14,22 @@ export default function Cards(): JSX.Element {
       <CardsTable
         onSelectionChanged={(ncs) => {
           if (ncs.length > 0) {
-            setDetail(cardPreview(ncs[0]))
+            setSelected(ncs[0])
           } else {
-            setDetail(<></>)
+            setSelected(undefined)
           }
         }}
       />
-      {detail()}
+      {cardPreview()}
     </>
   )
 }
 
-const cardPreview = ({ template, note, card }: NoteCard): JSX.Element => {
+const cardPreview = (): JSX.Element => {
+  if (selected() == null) {
+    return <></>
+  }
+  const { note, card, template } = selected() as NoteCard
   if (note == null || template == null) {
     return <span>Loading...</span>
   }
