@@ -80,9 +80,9 @@ async function renderBody(
   }
 }
 
-async function getLocalResource(id: ResourceId): Promise<Blob | undefined> {
+async function getLocalResource(id: ResourceId): Promise<ArrayBuffer | null> {
   const r = await db.getResource(id)
-  return r == null ? undefined : new Blob([r.data])
+  return r?.data ?? null
 }
 
 export const appExpose = {
