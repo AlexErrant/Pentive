@@ -3,6 +3,7 @@ import { C } from "."
 import { CardId, NoteId, ResourceId, Side, TemplateId } from "./domain/ids"
 import { assertNever, throwExp } from "./domain/utility"
 import { db } from "./messenger"
+import * as Comlink from "comlink"
 
 export type RenderBodyInput =
   | {
@@ -81,8 +82,13 @@ async function renderBody(
 }
 
 async function getLocalResource(id: ResourceId): Promise<ArrayBuffer | null> {
-  const r = await db.getResource(id)
-  return r?.data ?? null
+  const resource = await db.getResource(id)
+  const data = resource?.data ?? null
+  if (data == null) {
+    return data
+  } else {
+    return Comlink.transfer(data, [data])
+  }
 }
 
 export const appExpose = {

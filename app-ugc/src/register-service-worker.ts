@@ -20,7 +20,12 @@ export type PostMessageTypes = ComlinkInit | ComlinkClose
 
 // explicit because Comlink can't clone functions
 async function getLocalResource(id: ResourceId): Promise<ArrayBuffer | null> {
-  return await appMessenger.getLocalResource(id)
+  const data = await appMessenger.getLocalResource(id)
+  if (data == null) {
+    return data
+  } else {
+    return Comlink.transfer(data, [data])
+  }
 }
 
 const exposed = {

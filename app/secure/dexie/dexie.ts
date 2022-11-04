@@ -2,6 +2,7 @@ import { Dexie } from "dexie"
 import { ResourceId } from "../../src/domain/ids"
 import { Plugin } from "../../src/domain/plugin"
 import { Resource } from "../../src/domain/resource"
+import * as Comlink from "comlink"
 
 class DexieDb extends Dexie {
   resources!: Dexie.Table<Resource, string>
@@ -23,7 +24,13 @@ export const dexieMethods = {
     await ddb.resources.bulkAdd(resources)
   },
   async getResource(id: ResourceId) {
-    return await ddb.resources.get(id)
+    const resource = await ddb.resources.get(id)
+    const data = resource?.data ?? undefined
+    if (data == null) {
+      return data
+    } else {
+      return Comlink.transfer(resource, [data])
+    }
   },
   upsertPlugin: async function (plugin: Plugin) {
     await ddb.plugins.put(plugin)
