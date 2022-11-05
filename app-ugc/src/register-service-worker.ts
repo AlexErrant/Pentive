@@ -62,7 +62,7 @@ function initComlink(serviceWorker: ServiceWorker | null): void {
   }
 }
 
-addEventListener("beforeunload", () => {
+addEventListener("unload", () => {
   const close: ComlinkClose = {
     type: "ComlinkClose",
   }
