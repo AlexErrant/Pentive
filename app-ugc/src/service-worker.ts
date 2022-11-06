@@ -6,6 +6,7 @@ import type {
   PostMessageTypes,
 } from "./register-service-worker"
 import type { ResourceId } from "app/src/domain/ids"
+import { throwExp } from "app/src/domain/utility"
 
 declare let self: ServiceWorkerGlobalScope
 
@@ -78,6 +79,18 @@ async function getMessenger(
   let i = 0
   let m = messengers.get(clientId)
   while (m == null) {
+    if (messengers.size > 0) {
+      const firstClientId = messengers.keys().next().value as string
+      console.warn(
+        `Client '${clientId}' not found. Defaulting to '${firstClientId}'. This message is expected if you open a resource by itself, i.e. "right click > Open image in new tab".`
+      )
+      return (
+        messengers.get(firstClientId) ??
+        throwExp(
+          "Impossible because we got it from the `messengers` map above."
+        )
+      )
+    }
     i++
     // console.info("messenger is null - loop ", i)
     if (i > 100) {
