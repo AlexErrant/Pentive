@@ -76,8 +76,8 @@ async function getMessenger(
   clientId: string
 ): Promise<Comlink.Remote<Exposed>> {
   let i = 0
-  // eslint-disable-next-line no-unmodified-loop-condition
-  while (messengers.get(clientId) == null) {
+  let m = messengers.get(clientId)
+  while (m == null) {
     i++
     // console.info("messenger is null - loop ", i)
     if (i > 100) {
@@ -86,9 +86,9 @@ async function getMessenger(
       )
     }
     await sleep(10)
+    m = messengers.get(clientId)
   }
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  return messengers.get(clientId)!
+  return m
 }
 
 self.addEventListener("fetch", (fetch) => {
