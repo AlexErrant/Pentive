@@ -65,6 +65,16 @@ async function getLocalResource(
   resourceId: ResourceId,
   clientId: string
 ): Promise<Response> {
+  const messenger = await getMessenger(clientId)
+  const resource = await messenger.getLocalResource(resourceId)
+  return resource == null
+    ? new Response(resource, { status: 404 })
+    : new Response(resource)
+}
+
+async function getMessenger(
+  clientId: string
+): Promise<Comlink.Remote<Exposed>> {
   let i = 0
   // eslint-disable-next-line no-unmodified-loop-condition
   while (messengers.get(clientId) == null) {
@@ -78,11 +88,7 @@ async function getLocalResource(
     await sleep(10)
   }
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const messenger = messengers.get(clientId)!
-  const resource = await messenger.getLocalResource(resourceId)
-  return resource == null
-    ? new Response(resource, { status: 404 })
-    : new Response(resource)
+  return messengers.get(clientId)!
 }
 
 self.addEventListener("fetch", (fetch) => {
