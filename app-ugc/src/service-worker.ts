@@ -31,6 +31,19 @@ function close(clientId: string): void {
   messengers.delete(clientId)
 }
 
+async function closeRemaining(): Promise<void> {
+  const activeClients = await self.clients.matchAll()
+  const activeClientIds = new Set(activeClients.map((c) => c.id))
+  Array.from(messengers.keys()).forEach((id) => {
+    if (!activeClientIds.has(id)) {
+      close(id)
+      console.warn(
+        `No Client was found for Messenger '${id}', so it was closed. (How did this occur?)`
+      )
+    }
+  })
+}
+
 self.addEventListener("message", (event) => {
   const data = event.data as PostMessageTypes | null // force a null check in case some other message occurs
   if (data?.type === "ComlinkInit") {
@@ -79,6 +92,7 @@ async function getMessenger(
   let i = 0
   let m = messengers.get(clientId)
   while (m == null) {
+    await closeRemaining() // ensure that we don't get a messenger with a missing Client
     if (messengers.size > 0) {
       const firstClientId = messengers.keys().next().value as string
       console.warn(
@@ -95,7 +109,7 @@ async function getMessenger(
     // console.info("messenger is null - loop ", i)
     if (i > 100) {
       console.error(
-        "Messenger has been null for more than 1 second. Was ComlinkInit called?"
+        "Messenger has been null for more than 1 second. Are there any active Pentive windows/clients? Was ComlinkInit called?"
       )
     }
     await sleep(10)
