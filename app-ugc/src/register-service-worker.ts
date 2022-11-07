@@ -62,6 +62,7 @@ function initComlink(serviceWorker: ServiceWorker | null): void {
   }
 }
 
+// https://stackoverflow.com/a/39710575
 addEventListener("unload", () => {
   const close: ComlinkClose = {
     type: "ComlinkClose",

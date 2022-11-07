@@ -24,6 +24,8 @@ export const dexieMethods = {
     await ddb.resources.bulkAdd(resources)
   },
   async getResource(id: ResourceId) {
+    // highTODO perf is abysmal https://stackoverflow.com/q/20809832
+    // Consider using Origin Private File System once it's on Android Chrome https://chromestatus.com/feature/5079634203377664 https://bugs.chromium.org/p/chromium/issues/detail?id=1011535#c9
     const resource = await ddb.resources.get(id)
     const data = resource?.data ?? undefined
     if (data == null) {

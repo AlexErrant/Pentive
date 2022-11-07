@@ -5,6 +5,7 @@ import { VitePWA } from "vite-plugin-pwa"
 
 export default defineConfig({
   plugins: [
+    // if we ever move off this plugin https://github.com/vitejs/vite/issues/2248
     VitePWA({
       strategies: "injectManifest",
       injectRegister: null,
