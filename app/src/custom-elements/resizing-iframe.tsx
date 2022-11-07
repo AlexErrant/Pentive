@@ -1,5 +1,5 @@
-import { iframeResizer } from "iframe-resizer"
-import { VoidComponent } from "solid-js"
+import { iframeResizer, IFrameComponent } from "iframe-resizer"
+import { onCleanup, VoidComponent } from "solid-js"
 import * as Comlink from "comlink"
 import { appExpose, RenderBodyInput } from "../appMessenger"
 
@@ -9,9 +9,14 @@ const targetOrigin = "*" // highTODO make more limiting. Also implement https://
 const ResizingIframe: VoidComponent<{
   readonly i: RenderBodyInput
 }> = (props) => {
+  let iframeReference: HTMLIFrameElement
   const usp = new URLSearchParams(props.i)
+  onCleanup(() => {
+    ;(iframeReference as IFrameComponent).iFrameResizer.close()
+  })
   return (
     <iframe
+      ref={(x) => (iframeReference = x)}
       onload={(e) => {
         Comlink.expose(
           appExpose,
