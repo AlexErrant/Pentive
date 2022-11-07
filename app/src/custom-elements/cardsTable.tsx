@@ -1,7 +1,6 @@
-import { JSX, VoidComponent, createResource } from "solid-js"
+import { VoidComponent, createResource } from "solid-js"
 import { Card, NoteCard } from "../domain/card"
 import _ from "lodash"
-import ResizingIframe from "./resizing-iframe"
 import "@github/time-elements"
 import AgGridSolid, { AgGridSolidRef } from "ag-grid-solid"
 import "ag-grid-community/styles/ag-grid.css"

@@ -31,13 +31,13 @@ const ResizingIframe: VoidComponent<{
           {
             // log: true,
 
-            // Don't need to remove event listeners as per https://github.com/davidjbradshaw/iframe-resizer/blob/master/docs/parent_page/methods.md
-
             // If perf becomes an issue consider debouncing https://github.com/davidjbradshaw/iframe-resizer/issues/816
 
-            // lowTODO: Figure out how to inject the domain https://github.com/davidjbradshaw/iframe-resizer/blob/master/docs/parent_page/options.md#checkorigin
+            // Figure out how to inject the domain https://github.com/davidjbradshaw/iframe-resizer/blob/master/docs/parent_page/options.md#checkorigin
             // `import.meta.env.BASE_URL` could work with some elbow grease, but I'm too lazy to play with https://vitejs.dev/guide/build.html#public-base-path
-            checkOrigin: false,
+            checkOrigin: [
+              "https://user-generated-content.local.pentive.com:3015",
+            ],
           },
           e.currentTarget
         )
