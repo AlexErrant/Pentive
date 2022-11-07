@@ -36,10 +36,35 @@ export type Exposed = typeof exposed
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("DOMContentLoaded", async () => {
-    await navigator.serviceWorker.register("/service-worker.js")
-    const registration = await navigator.serviceWorker.ready
-    initComlink(registration.active)
+    const registration = await navigator.serviceWorker.register(
+      "/service-worker.js"
+    )
+    if (registration.installing != null) {
+      firstServiceWorkerInstall(registration.installing)
+    } else {
+      const registration = await navigator.serviceWorker.ready
+      initComlink(registration.active)
+    }
   })
+} else {
+  alert(
+    "Your browser doesn't support Service Workers. Pentive won't work properly without them."
+  )
+}
+
+function firstServiceWorkerInstall(sw: ServiceWorker): void {
+  // https://stackoverflow.com/a/70311720
+  sw.onstatechange = function () {
+    if (sw.state === "installed") {
+      removeEventListener("unload", closeComlink)
+      window.location.reload()
+    }
+  }
+  // Don't `initComlink` if installing - it will cause a memory leak in the service worker.
+  // `navigator.serviceWorker.controller` in `closeComlink` will be null, making it difficult to communicate with the service worker during `unload`
+  // ref: https://web.dev/service-worker-lifecycle/#activate:~:text=You%20can%20detect%20if%20a%20client%20is%20controlled%20via%20navigator.serviceWorker.controller%20which%20will%20be%20null%20or%20a%20service%20worker%20instance
+  // This occurs during the first service worker install since the first page load is uncontrolled by the service worker.
+  // There's no point to init-ing Comlink for the first install anyway since it's uncontrolled.
 }
 
 function initComlink(serviceWorker: ServiceWorker | null): void {
@@ -63,7 +88,9 @@ function initComlink(serviceWorker: ServiceWorker | null): void {
 }
 
 // https://stackoverflow.com/a/39710575
-addEventListener("unload", () => {
+addEventListener("unload", closeComlink)
+
+function closeComlink(): void {
   const close: ComlinkClose = {
     type: "ComlinkClose",
   }
@@ -74,4 +101,4 @@ addEventListener("unload", () => {
   } else {
     navigator.serviceWorker.controller.postMessage(close)
   }
-})
+}

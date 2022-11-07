@@ -15,3 +15,8 @@ Good luck, you poor SOB.
 
 [Some "best practices".](https://www.thecodeship.com/web-development/guide-service-worker-pitfalls-best-practices/)
 [Some more tips.](https://gist.github.com/mmazzarolo/e87a11d24f85b952ee30792316f56d47)
+
+# Know the service worker lifecycle!
+
+- https://web.dev/service-worker-lifecycle/
+- https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API/Using_Service_Workers#basic_architecture
