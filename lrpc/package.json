@@ -20,6 +20,7 @@
     "@types/jsonwebtoken": "^8.5.9",
     "@types/node": "^18.7.21",
     "@types/node-fetch": "^2.6.2",
+    "prisma": "^4.6.0",
     "serverless": "^3.22.0",
     "serverless-dynamodb-local": "^0.2.40",
     "serverless-offline": "^10.2.1",
