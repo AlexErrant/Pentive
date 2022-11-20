@@ -10,6 +10,8 @@ import { createRemoteTemplate, remoteTemplate } from "./schemas/template"
 import { id } from "./schemas/core"
 import superjson from "superjson"
 import { throwExp } from "./core"
+import { ulid } from "ulid"
+import _ from "lodash"
 
 const dynamoDbClientParams: DocumentClient.DocumentClientOptions &
   DynamoDB.Types.ClientConfiguration = {
@@ -91,13 +93,19 @@ export function appRouter<TContext extends Context>() {
       input: z.array(createRemoteTemplate),
       async resolve(req) {
         // highTODO batch in chunks of 25
-        const templatePuts = req.input.map((t) =>
-          template.putBatch({
-            sk: "a",
-            author: req.ctx.user ?? throwExp("user not found"), // highTODO put this route behind protected middleware upon TRPCv10
-            ...t,
-          })
-        )
+        const templatePutsAndIds = req.input.map((t) => {
+          const remoteId = ulid()
+          return [
+            template.putBatch({
+              sk: "a",
+              author: req.ctx.user ?? throwExp("user not found"), // highTODO put this route behind protected middleware upon TRPCv10
+              ...t,
+            }),
+            [t.id, remoteId] as [string, string],
+          ] as const
+        })
+        const templatePuts = templatePutsAndIds.map((x) => x[0])
+        const remoteIdByLocal = _.fromPairs(templatePutsAndIds.map((x) => x[1]))
         // highTODO run to completion (pull on `next`), handle errors, add exponential back off https://github.com/jeremydaly/dynamodb-toolbox/issues/152 https://stackoverflow.com/q/42911223
         const result = await (ivy.batchWrite(templatePuts) as Promise<
           | DocumentClient.BatchWriteItemInput
@@ -106,6 +114,7 @@ export function appRouter<TContext extends Context>() {
             })
         >)
         console.log("Batch puts result", result)
+        return remoteIdByLocal
       },
     })
     .query("getTemplate", {

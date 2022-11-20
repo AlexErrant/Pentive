@@ -17,7 +17,7 @@ async function uploadNewTemplates(): Promise<void> {
   })
   const r = await lrpc.query("getTemplate", "aRandomId")
   const newTemplates = await db.getNewTemplatesToUpload("aRandomNook")
-  await lrpc.mutation("addTemplates", newTemplates)
+  const remoteIdByLocal = await lrpc.mutation("addTemplates", newTemplates)
   const getBatch = await lrpc.query(
     "getTemplates",
     newTemplates.map((t) => t.id)
