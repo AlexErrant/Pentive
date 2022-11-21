@@ -9,6 +9,8 @@ import { getUser } from "./core"
 
 // run with `npm run rebuild-offline`
 
+// move to Cloudflare when this is complete https://github.com/prisma/prisma/issues/15265
+
 function createContext({
   event,
   context,
