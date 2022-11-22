@@ -13,7 +13,6 @@ void (async () => {
     console.log(q)
     await client.mutation("addTemplate", {
       name: "my first template",
-      id: "13",
     })
     const template = await client.query("getTemplate", "13")
     console.log(template)

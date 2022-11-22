@@ -77,15 +77,14 @@ export function appRouter<TContext extends Context>() {
     })
     .mutation("addTemplate", {
       input: z.object({
-        id: z.string(),
         name: z.string(),
       }),
       async resolve(req) {
-        const hexId = Ulid.fromCanonical(req.input.id).toRaw()
+        const id = Ulid.generate()
         await prisma.template.create({
           data: {
-            id: Buffer.from(hexId, "hex"),
-            name: "name",
+            ...req.input,
+            id: Buffer.from(id.toRaw(), "hex"),
             nook: "nook",
             authorId: req.ctx.user ?? throwExp("user not found"), // highTODO put this route behind protected middleware upon TRPCv10
             type: "type",
@@ -95,7 +94,7 @@ export function appRouter<TContext extends Context>() {
             ankiId: 0,
           },
         })
-        return req.input.id
+        return id.toCanonical()
       },
     })
     .mutation("addTemplates", {

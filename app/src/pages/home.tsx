@@ -11,10 +11,10 @@ import { throwExp } from "../domain/utility"
 import { ResourceId } from "../domain/ids"
 
 async function uploadNewTemplates(): Promise<void> {
-  await lrpc.mutation("addTemplate", {
-    id: "01GJDZNX7YJ0EGYKGWE0CA2ZZR",
+  const id = await lrpc.mutation("addTemplate", {
     name: "a template name",
   })
+  console.log("id is", id)
   const r = await lrpc.query("getTemplate", "aRandomId")
   const newTemplates = await db.getNewTemplatesToUpload("aRandomNook")
   const remoteIdByLocal = await lrpc.mutation("addTemplates", newTemplates)
