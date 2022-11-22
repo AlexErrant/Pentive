@@ -10,6 +10,7 @@
     "aws-sdk": "^2.1223.0",
     "dotenv": "^16.0.2",
     "dynamodb-toolbox": "^0.4.3",
+    "id128": "^1.6.6",
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.21",
     "node-fetch": "^2.6.1",
