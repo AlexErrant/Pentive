@@ -12,7 +12,7 @@ import { ResourceId } from "../domain/ids"
 
 async function uploadNewTemplates(): Promise<void> {
   await lrpc.mutation("addTemplate", {
-    id: "aRandomId",
+    id: "01GJDZNX7YJ0EGYKGWE0CA2ZZR",
     name: "a template name",
   })
   const r = await lrpc.query("getTemplate", "aRandomId")

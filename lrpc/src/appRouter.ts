@@ -12,6 +12,10 @@ import superjson from "superjson"
 import { throwExp } from "./core"
 import { ulid } from "ulid"
 import _ from "lodash"
+import { Ulid } from "id128"
+import { PrismaClient } from "@prisma/client"
+
+const prisma = new PrismaClient()
 
 const dynamoDbClientParams: DocumentClient.DocumentClientOptions &
   DynamoDB.Types.ClientConfiguration = {
@@ -77,16 +81,21 @@ export function appRouter<TContext extends Context>() {
         name: z.string(),
       }),
       async resolve(req) {
-        await dynamoDbClient
-          .put({
-            TableName: config.IVY_TABLE,
-            Item: {
-              PK: req.input.id,
-              SK: req.input.id,
-              name: req.input.name,
-            },
-          })
-          .promise()
+        const hexId = Ulid.fromCanonical(req.input.id).toRaw()
+        await prisma.template.create({
+          data: {
+            id: Buffer.from(hexId, "hex"),
+            name: "name",
+            nook: "nook",
+            authorId: req.ctx.user ?? throwExp("user not found"), // highTODO put this route behind protected middleware upon TRPCv10
+            type: "type",
+            fields: "fields",
+            css: "css",
+            childTemplates: "childTemplates",
+            ankiId: 0,
+          },
+        })
+        return req.input.id
       },
     })
     .mutation("addTemplates", {

@@ -1,11 +1,42 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-generator client {
-  provider = "prisma-client-js"
+datasource db {
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
 }
 
-datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+generator js {
+  provider        = "prisma-client-js"
+  previewFeatures = ["referentialIntegrity"]
+}
+
+model User {
+  id                    String     @id @db.VarChar(21) // lowercase // highTODO test increasing the length
+  displayName           String     @db.VarChar(21) // cased as user input
+  createdAt             DateTime   @default(now())
+  templates             Template[]
+  templateSubscriptions Template[] @relation("Template_Subscribers")
+}
+
+model Template {
+  id             Bytes    @id @db.Binary(16)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  name           String   @db.VarChar(255)
+  nook           String   @db.VarChar(21)
+  author         User     @relation(fields: [authorId], references: [id])
+  authorId       String   @db.VarChar(21)
+  type           String   @db.VarChar(21)
+  fields         String   @db.Text
+  css            String   @db.Text
+  childTemplates String   @db.Text
+  // history        String   @db.Text
+  // comments       String   @db.Text
+  ankiId         BigInt?   @db.UnsignedBigInt
+  subscribers    User[]   @relation("Template_Subscribers")
+
+  @@index([authorId]) // do we need this? it's never gonna be used...
+  @@index([ankiId])
 }
