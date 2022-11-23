@@ -12,7 +12,7 @@ import superjson from "superjson"
 import { throwExp } from "./core"
 import _ from "lodash"
 import { Ulid } from "id128"
-import { PrismaClient, Prisma } from "@prisma/client"
+import { PrismaClient, Prisma, Template } from "@prisma/client"
 
 const prisma = new PrismaClient()
 
@@ -55,6 +55,33 @@ const template = new Entity({
   table: ivy,
 } as const)
 
+export interface ClientTemplate {
+  id: string
+  createdAt: Date
+  updatedAt: Date
+  name: string
+  nook: string
+  authorId: string
+  type: string
+  fields: string
+  css: string
+  childTemplates: string
+  ankiId: bigint | null
+}
+
+function ulidStringToBuffer(id: string): Buffer {
+  return ulidToBuffer(Ulid.fromCanonical(id))
+}
+
+function ulidToBuffer(id: Ulid): Buffer {
+  return Buffer.from(id.toRaw(), "hex")
+}
+
+function mapTemplate(t: Template): ClientTemplate {
+  const id = Ulid.fromRaw(t.id.toString("hex")).toCanonical()
+  return { ...t, id }
+}
+
 interface Context {
   user: string | undefined
 }
@@ -83,7 +110,7 @@ export function appRouter<TContext extends Context>() {
         await prisma.template.create({
           data: {
             ...req.input,
-            id: Buffer.from(id.toRaw(), "hex"),
+            id: ulidToBuffer(id),
             nook: "nook",
             authorId: req.ctx.user ?? throwExp("user not found"), // highTODO put this route behind protected middleware upon TRPCv10
             type: "type",
@@ -106,7 +133,7 @@ export function appRouter<TContext extends Context>() {
               ...t,
               type: templateType,
               fields: JSON.stringify(t.fields),
-              id: Buffer.from(remoteId.toRaw(), "hex"),
+              id: ulidToBuffer(remoteId),
               authorId: req.ctx.user ?? throwExp("user not found"), // highTODO put this route behind protected middleware upon TRPCv10
             }
             return [
@@ -126,32 +153,23 @@ export function appRouter<TContext extends Context>() {
       },
     })
     .query("getTemplate", {
-      input: z.string(),
+      input: id,
       async resolve(req) {
-        const r = await dynamoDbClient
-          .get({
-            TableName: config.IVY_TABLE,
-            Key: {
-              PK: req.input,
-              SK: req.input,
-            },
-          })
-          .promise()
-        return r.Item
+        const id = ulidStringToBuffer(req.input)
+        const template = await prisma.template.findUnique({ where: { id } })
+        if (template != null) {
+          return mapTemplate(template)
+        }
+        return template
       },
     })
     .query("getTemplates", {
       input: z.array(id),
       async resolve(req) {
-        const getBatches = req.input.map((id) =>
-          template.getBatch({ id, sk: "a" })
-        )
-        // highTODO paginate, handle errors and missing ids https://github.com/jeremydaly/dynamodb-toolbox/issues/197
-        const batch = await (ivy.batchGet(getBatches) as Promise<
-          PromiseResult<DocumentClient.BatchGetItemOutput, AWSError>
-        >)
-        const r = batch.Responses?.[config.IVY_TABLE] ?? []
-        return z.array(remoteTemplate).parse(r)
+        const r = await prisma.template.findMany({
+          where: { id: { in: req.input.map(ulidStringToBuffer) } },
+        })
+        return r.map(mapTemplate)
       },
     })
 }
