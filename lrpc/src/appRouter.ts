@@ -10,10 +10,9 @@ import { createRemoteTemplate, remoteTemplate } from "./schemas/template"
 import { id } from "./schemas/core"
 import superjson from "superjson"
 import { throwExp } from "./core"
-import { ulid } from "ulid"
 import _ from "lodash"
 import { Ulid } from "id128"
-import { PrismaClient } from "@prisma/client"
+import { PrismaClient, Prisma } from "@prisma/client"
 
 const prisma = new PrismaClient()
 
@@ -100,28 +99,29 @@ export function appRouter<TContext extends Context>() {
     .mutation("addTemplates", {
       input: z.array(createRemoteTemplate),
       async resolve(req) {
-        // highTODO batch in chunks of 25
-        const templatePutsAndIds = req.input.map((t) => {
-          const remoteId = ulid()
-          return [
-            template.putBatch({
-              sk: "a",
-              author: req.ctx.user ?? throwExp("user not found"), // highTODO put this route behind protected middleware upon TRPCv10
+        const templateCreatesAndIds = req.input.map(
+          ({ templateType, ...t }) => {
+            const remoteId = Ulid.generate()
+            const t2: Prisma.TemplateCreateManyInput = {
               ...t,
-            }),
-            [t.id, remoteId] as [string, string],
-          ] as const
+              type: templateType,
+              fields: JSON.stringify(t.fields),
+              id: Buffer.from(remoteId.toRaw(), "hex"),
+              authorId: req.ctx.user ?? throwExp("user not found"), // highTODO put this route behind protected middleware upon TRPCv10
+            }
+            return [
+              t2,
+              [t.id, remoteId.toCanonical()] as [string, string],
+            ] as const
+          }
+        )
+        const templateCreates = templateCreatesAndIds.map((x) => x[0])
+        const remoteIdByLocal = _.fromPairs(
+          templateCreatesAndIds.map((x) => x[1])
+        )
+        await prisma.template.createMany({
+          data: templateCreates,
         })
-        const templatePuts = templatePutsAndIds.map((x) => x[0])
-        const remoteIdByLocal = _.fromPairs(templatePutsAndIds.map((x) => x[1]))
-        // highTODO run to completion (pull on `next`), handle errors, add exponential back off https://github.com/jeremydaly/dynamodb-toolbox/issues/152 https://stackoverflow.com/q/42911223
-        const result = await (ivy.batchWrite(templatePuts) as Promise<
-          | DocumentClient.BatchWriteItemInput
-          | (PromiseResult<DocumentClient.BatchWriteItemOutput, AWSError> & {
-              next?: () => boolean
-            })
-        >)
-        console.log("Batch puts result", result)
         return remoteIdByLocal
       },
     })
