@@ -1,11 +1,6 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import config from "./config"
 import * as trpc from "@trpc/server"
 import { z } from "zod"
-import AWS, { AWSError, Credentials, DynamoDB } from "aws-sdk"
-import { Table, Entity } from "dynamodb-toolbox"
-import { DocumentClient } from "aws-sdk/clients/dynamodb"
-import { PromiseResult } from "aws-sdk/lib/request"
 import { createRemoteTemplate, remoteTemplate } from "./schemas/template"
 import { id } from "./schemas/core"
 import superjson from "superjson"
@@ -15,45 +10,6 @@ import { Ulid } from "id128"
 import { PrismaClient, Prisma, Template } from "@prisma/client"
 
 const prisma = new PrismaClient()
-
-const dynamoDbClientParams: DocumentClient.DocumentClientOptions &
-  DynamoDB.Types.ClientConfiguration = {
-  convertEmptyValues: false, // https://stackoverflow.com/q/37479586
-}
-
-if (config.IS_OFFLINE === "true") {
-  dynamoDbClientParams.region = "localhost"
-  dynamoDbClientParams.endpoint = "http://localhost:8000"
-  dynamoDbClientParams.credentials = new Credentials(
-    "DEFAULT_ACCESS_KEY",
-    "DEFAULT_SECRET"
-  )
-}
-const dynamoDbClient = new AWS.DynamoDB.DocumentClient(dynamoDbClientParams)
-
-const ivy = new Table({
-  name: config.IVY_TABLE,
-  partitionKey: "PK",
-  sortKey: "SK",
-  DocumentClient: dynamoDbClient,
-})
-
-const template = new Entity({
-  name: "t",
-  attributes: {
-    id: { type: "string", partitionKey: true },
-    sk: { type: "string", sortKey: true, hidden: true },
-    nook: { type: "string", required: true },
-    author: { type: "string", required: true },
-    name: { type: "string", required: true },
-    templateType: { type: "string", required: true },
-    fields: { type: "list", required: true },
-    css: { type: "string", required: true },
-    childTemplates: { type: "string", required: true },
-    ankiId: { type: "number" },
-  },
-  table: ivy,
-} as const)
 
 export interface ClientTemplate {
   id: string
