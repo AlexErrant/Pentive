@@ -14,7 +14,6 @@
     "node-fetch": "^2.6.1",
     "superjson": "^1.10.1",
     "ts-node": "^10.3.0",
-    "ulid": "^2.3.0",
     "zod": "^3.19.1"
   },
   "devDependencies": {
