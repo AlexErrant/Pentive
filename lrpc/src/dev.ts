@@ -2,10 +2,10 @@
 
 import { createHTTPHandler } from "@trpc/server/adapters/standalone"
 import http, { IncomingMessage, ServerResponse } from "http"
-import { NodeHTTPCreateContextFnOptions } from "@trpc/server/dist/declarations/src/adapters/node-http/types"
-import * as trpc from "@trpc/server"
+import { NodeHTTPCreateContextFnOptions } from "@trpc/server/adapters/node-http"
 import { appRouter } from "./appRouter"
 import { getUser } from "./core"
+import { Context } from "./trpc"
 
 // run with `npm run dev`
 
@@ -14,16 +14,13 @@ function createContext(
     IncomingMessage,
     ServerResponse<IncomingMessage>
   >
-): {
-  user: string | undefined
-} {
+): Context {
   const user = getUser(x.req.headers.authorization)
   return { user }
 }
-type Context = trpc.inferAsyncReturnType<typeof createContext>
 
 const handler = createHTTPHandler({
-  router: appRouter<Context>(),
+  router: appRouter,
   createContext,
 })
 

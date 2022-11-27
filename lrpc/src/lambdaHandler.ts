@@ -1,9 +1,9 @@
 import { awsLambdaRequestHandler } from "@trpc/server/adapters/aws-lambda"
 import type { CreateAWSLambdaContextOptions } from "@trpc/server/adapters/aws-lambda"
 import type { APIGatewayProxyEventV2 } from "aws-lambda"
-import * as trpc from "@trpc/server"
 import { appRouter } from "./appRouter"
 import { getUser } from "./core"
+import { Context } from "./trpc"
 
 // highTODO https://github.com/trpc/trpc/discussions/2371
 
@@ -14,17 +14,14 @@ import { getUser } from "./core"
 function createContext({
   event,
   context,
-}: CreateAWSLambdaContextOptions<APIGatewayProxyEventV2>): {
-  user: string | undefined
-} {
+}: CreateAWSLambdaContextOptions<APIGatewayProxyEventV2>): Context {
   const user = getUser(event.headers.authorization)
   return {
     user,
   }
 }
-type Context = trpc.inferAsyncReturnType<typeof createContext>
 
 export const handler = awsLambdaRequestHandler({
-  router: appRouter<Context>(),
+  router: appRouter,
   createContext,
 })

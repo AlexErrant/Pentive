@@ -11,8 +11,8 @@ importers:
       '@github/time-elements': ^3.1.4
       '@playwright/test': ^1.25.0
       '@tanstack/solid-table': ^8.5.11
-      '@trpc/client': ^9.27.2
-      '@trpc/server': ^9.27.2
+      '@trpc/client': ^10.2.0
+      '@trpc/server': ^10.2.0
       '@types/iframe-resizer': ^3.5.9
       '@types/lodash': ^4.14.182
       '@types/sql.js': ^1.4.4
@@ -66,8 +66,8 @@ importers:
     dependencies:
       '@github/time-elements': 3.1.4
       '@tanstack/solid-table': 8.5.13_solid-js@1.5.4
-      '@trpc/client': 9.27.2_@trpc+server@9.27.2
-      '@trpc/server': 9.27.2
+      '@trpc/client': 10.2.0_@trpc+server@10.2.0
+      '@trpc/server': 10.2.0
       '@zip.js/zip.js': 2.6.41
       ag-grid-community: 28.2.0
       ag-grid-solid: 28.2.0_r456abjkktdu6n3n64bymge7xa
@@ -211,8 +211,8 @@ importers:
   lrpc:
     specifiers:
       '@prisma/client': ^4.6.1
-      '@trpc/client': ^9.27.2
-      '@trpc/server': ^9.27.2
+      '@trpc/client': ^10.2.0
+      '@trpc/server': ^10.2.0
       '@types/aws-lambda': ^8.10.106
       '@types/jsonwebtoken': ^8.5.9
       '@types/lodash': ^4.14.182
@@ -235,8 +235,8 @@ importers:
       zod: ^3.19.1
     dependencies:
       '@prisma/client': 4.6.1_prisma@4.6.1
-      '@trpc/client': 9.27.2_@trpc+server@9.27.2
-      '@trpc/server': 9.27.2
+      '@trpc/client': 10.2.0_@trpc+server@10.2.0
+      '@trpc/server': 10.2.0
       aws-lambda: 1.0.7
       dotenv: 16.0.2
       id128: 1.6.6
@@ -1675,6 +1675,7 @@ packages:
     engines: {node: '>=6.9.0'}
     dependencies:
       regenerator-runtime: 0.13.9
+    dev: true
 
   /@babel/runtime/7.18.9:
     resolution: {integrity: sha512-lkqXDcvlFT5rvEjiu6+QYO+1GXrEHRo2LOtS7E4GtX5ESIZOgepqsZBVIj6Pv+a6zqsya9VCgiK1KAK4BvJDAw==}
@@ -2450,17 +2451,16 @@ packages:
     engines: {node: '>= 10'}
     dev: true
 
-  /@trpc/client/9.27.2_@trpc+server@9.27.2:
-    resolution: {integrity: sha512-rpsgJJMalOtki5VjcyheL0zdft23mDnoBHn5cJMZLf3ssymCZq2crbvCiUmCRU289lYHrqffaaZ+9PqCSsVKfg==}
+  /@trpc/client/10.2.0_@trpc+server@10.2.0:
+    resolution: {integrity: sha512-Mehf6euqMzAak+Umay1LKol9nC716yBjHNqrF6blWY/n2hwSICrLXQwveNaHK7qjKXJ86b4aDW39KR02WCQP4A==}
     peerDependencies:
-      '@trpc/server': 9.27.2
+      '@trpc/server': 10.2.0
     dependencies:
-      '@babel/runtime': 7.18.6
-      '@trpc/server': 9.27.2
+      '@trpc/server': 10.2.0
     dev: false
 
-  /@trpc/server/9.27.2:
-    resolution: {integrity: sha512-LcXCC004SYWVdHqjSZVpoKkcM0tJNwWtvmjmE2Jir36F0siY1CCbr7g2vz6LcOtA/q7Jj5G2/x1qMWzlPq/Bwg==}
+  /@trpc/server/10.2.0:
+    resolution: {integrity: sha512-WGOA2bk6JOnOywUu1gkAgwqnxZ5g+vNkL9EpCGLgKYwwMcjAwgNRgYzLPsDsR1XL48wmdYOzfWzJ0G575+g/jA==}
     dev: false
 
   /@tsconfig/node10/1.0.9:

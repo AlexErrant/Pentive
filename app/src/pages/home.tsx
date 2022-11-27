@@ -11,15 +11,15 @@ import { throwExp } from "../domain/utility"
 import { ResourceId } from "../domain/ids"
 
 async function uploadNewTemplates(): Promise<void> {
-  const id = await lrpc.mutation("addTemplate", {
+  const id = await lrpc.addTemplate.mutate({
     name: "a template name",
   })
   console.log("id is", id)
-  const r = await lrpc.query("getTemplate", id)
+  const r = await lrpc.getTemplate.query(id)
   const newTemplates = await db.getNewTemplatesToUpload("aRandomNook")
-  const remoteIdByLocal = await lrpc.mutation("addTemplates", newTemplates)
+  const remoteIdByLocal = await lrpc.addTemplates.mutate(newTemplates)
   const remoteIds = Object.values(remoteIdByLocal)
-  const getBatch = await lrpc.query("getTemplates", remoteIds)
+  const getBatch = await lrpc.getTemplates.query(remoteIds)
   console.log("getTemplates", getBatch)
   console.log(r)
 }

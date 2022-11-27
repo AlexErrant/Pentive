@@ -60,8 +60,8 @@
   "dependencies": {
     "@github/time-elements": "^3.1.4",
     "@tanstack/solid-table": "^8.5.11",
-    "@trpc/client": "^9.27.2",
-    "@trpc/server": "^9.27.2",
+    "@trpc/client": "^10.2.0",
+    "@trpc/server": "^10.2.0",
     "@zip.js/zip.js": "^2.6.41",
     "ag-grid-community": "^28.2.0",
     "ag-grid-solid": "^28.2.0",
