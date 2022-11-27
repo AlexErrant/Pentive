@@ -1,4 +1,5 @@
 apkg
+authed
 comlink
 dexie
 graphiql

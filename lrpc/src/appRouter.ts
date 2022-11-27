@@ -4,22 +4,10 @@ import { id } from "./schemas/core"
 import _ from "lodash"
 import { Ulid } from "id128"
 import { Prisma, Template } from "@prisma/client"
-import { protectedProcedure, publicProcedure, router } from "./trpc"
+import { authedProcedure, publicProcedure, router } from "./trpc"
 import { prisma, ulidStringToBuffer, ulidToBuffer } from "./prisma"
 
-export interface ClientTemplate {
-  id: string
-  createdAt: Date
-  updatedAt: Date
-  name: string
-  nook: string
-  authorId: string
-  type: string
-  fields: string
-  css: string
-  childTemplates: string
-  ankiId: bigint | null
-}
+export type ClientTemplate = Omit<Template, "id"> & { id: string }
 
 function mapTemplate(t: Template): ClientTemplate {
   const id = Ulid.fromRaw(t.id.toString("hex")).toCanonical()
@@ -30,7 +18,7 @@ export const appRouter = router({
   greeting: publicProcedure
     .input(z.string())
     .query(({ input }) => `hello ${input}!`),
-  addTemplate: protectedProcedure
+  addTemplate: authedProcedure
     .input(
       z.object({
         name: z.string(),
@@ -53,7 +41,7 @@ export const appRouter = router({
       })
       return id.toCanonical()
     }),
-  addTemplates: protectedProcedure
+  addTemplates: authedProcedure
     .input(z.array(createRemoteTemplate))
     .mutation(async (req) => {
       const templateCreatesAndIds = req.input.map(({ templateType, ...t }) => {
