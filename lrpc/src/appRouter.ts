@@ -3,10 +3,9 @@ import { createRemoteTemplate, remoteTemplate } from "./schemas/template"
 import { id } from "./schemas/core"
 import _ from "lodash"
 import { Ulid } from "id128"
-import { PrismaClient, Prisma, Template } from "@prisma/client"
+import { Prisma, Template } from "@prisma/client"
 import { protectedProcedure, publicProcedure, router } from "./trpc"
-
-const prisma = new PrismaClient()
+import { prisma, ulidStringToBuffer, ulidToBuffer } from "./prisma"
 
 export interface ClientTemplate {
   id: string
@@ -20,14 +19,6 @@ export interface ClientTemplate {
   css: string
   childTemplates: string
   ankiId: bigint | null
-}
-
-function ulidStringToBuffer(id: string): Buffer {
-  return ulidToBuffer(Ulid.fromCanonical(id))
-}
-
-function ulidToBuffer(id: Ulid): Buffer {
-  return Buffer.from(id.toRaw(), "hex")
 }
 
 function mapTemplate(t: Template): ClientTemplate {
