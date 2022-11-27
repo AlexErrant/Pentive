@@ -6,6 +6,7 @@ import { Ulid } from "id128"
 import { Prisma, Template } from "@prisma/client"
 import { authedProcedure, publicProcedure } from "./trpc"
 import { prisma, ulidStringToBuffer, ulidToBuffer } from "./prisma"
+import { optionMap } from "./core"
 
 type ClientTemplate = Omit<Template, "id"> & { id: string }
 
@@ -64,10 +65,7 @@ export const templateRouter = {
   getTemplate: publicProcedure.input(id).query(async (req) => {
     const id = ulidStringToBuffer(req.input)
     const template = await prisma.template.findUnique({ where: { id } })
-    if (template != null) {
-      return mapTemplate(template)
-    }
-    return template
+    return optionMap(template, mapTemplate)
   }),
   getTemplates: publicProcedure.input(z.array(id)).query(async (req) => {
     const r = await prisma.template.findMany({

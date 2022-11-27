@@ -16,3 +16,13 @@ export function getUser(auth: string | undefined): string | undefined {
 export function throwExp(errorMessage: string): never {
   throw new Error(errorMessage)
 }
+
+export function optionMap<T, R>(
+  t: T | null | undefined,
+  f: (_: T) => R
+): R | null | undefined {
+  if (t == null) {
+    return t as null | undefined
+  }
+  return f(t)
+}
