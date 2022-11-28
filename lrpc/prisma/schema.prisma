@@ -9,7 +9,7 @@ datasource db {
 
 generator js {
   provider        = "prisma-client-js"
-  previewFeatures = ["referentialIntegrity"]
+  previewFeatures = ["referentialIntegrity", "fullTextSearch", "fullTextIndex"]
 }
 
 model User {
@@ -54,6 +54,7 @@ model Note {
   author      User     @relation(fields: [authorId], references: [id])
   authorId    String   @db.VarChar(21)
   fieldValues String   @db.Text
+  fts         String   @db.Text
   tags        String   @db.Text
 
   // history        String   @db.Text
@@ -63,4 +64,5 @@ model Note {
 
   @@index([authorId])
   @@index([ankiId])
+  @@fulltext([fts])
 }

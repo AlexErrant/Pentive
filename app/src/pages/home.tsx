@@ -38,8 +38,14 @@ async function uploadNewNotes(): Promise<void> {
   console.log(r)
 }
 
+async function searchNotes(search: string): Promise<void> {
+  const searchBatch = await lrpc.searchNotes.query(search)
+  console.log(searchBatch)
+}
+
 export default function Home(): JSX.Element {
   const [count, setCount] = createSignal(1)
+  const [search, setSearch] = createSignal("")
   const [template, setTemplate] = createSignal<Template | null>(null)
   const [card, setCard] = createSignal<Card | null>(null)
   const [note, setNote] = createSignal<Note | null>(null)
@@ -146,6 +152,24 @@ export default function Home(): JSX.Element {
         >
           uploadNewNotes
         </button>
+        <button
+          class="border rounded-lg px-2 border-gray-900"
+          onClick={async () => await searchNotes(search())}
+        >
+          searchNotes
+        </button>
+        <form
+          onSubmit={async (e) => {
+            e.preventDefault()
+            await searchNotes(search())
+          }}
+        >
+          <input
+            class="w-75px p-1 bg-white text-sm rounded-lg"
+            type="text"
+            onInput={(e) => setSearch(e.currentTarget.value)}
+          />
+        </form>
       </div>
       <div class="mt-4">
         <button

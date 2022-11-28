@@ -7,13 +7,16 @@ import { Prisma, Note } from "@prisma/client"
 import { authedProcedure, publicProcedure } from "./trpc"
 import { prisma, ulidStringToBuffer, ulidToBuffer } from "./prisma"
 import { optionMap } from "./core"
+import { compile } from "html-to-text"
 
-type ClientNote = Omit<Omit<Note, "id">, "templateId"> & {
+const convert = compile({})
+
+type ClientNote = Omit<Note, "id" | "templateId" | "fts"> & {
   id: string
   templateId: string
 }
 
-function mapNote(t: Note): ClientNote {
+function mapNote({ fts, ...t }: Note): ClientNote {
   const id = Ulid.fromRaw(t.id.toString("hex")).toCanonical()
   const templateId = Ulid.fromRaw(t.templateId.toString("hex")).toCanonical()
   return { ...t, id, templateId }
@@ -35,6 +38,7 @@ export const noteRouter = {
           templateId: ulidToBuffer(id),
           authorId: req.ctx.user,
           fieldValues: "fieldValues",
+          fts: "fts",
           ankiId: 0,
           tags: "tags",
         },
@@ -49,9 +53,13 @@ export const noteRouter = {
         const t2: Prisma.NoteCreateManyInput = {
           ...t,
           fieldValues: JSON.stringify(t.fieldValues),
+          fts: Object.values(t.fieldValues)
+            .map(convert)
+            .concat(t.tags)
+            .join(" "),
           id: ulidToBuffer(remoteId),
           templateId: ulidStringToBuffer(t.templateId),
-          tags: "tags",
+          tags: JSON.stringify(t.tags),
           authorId: req.ctx.user,
         }
         return [t2, [t.id, remoteId.toCanonical()] as [string, string]] as const
@@ -71,6 +79,12 @@ export const noteRouter = {
   getNotes: publicProcedure.input(z.array(id)).query(async (req) => {
     const r = await prisma.note.findMany({
       where: { id: { in: req.input.map(ulidStringToBuffer) } },
+    })
+    return r.map(mapNote)
+  }),
+  searchNotes: publicProcedure.input(z.string()).query(async (req) => {
+    const r = await prisma.note.findMany({
+      where: { fts: { search: req.input } },
     })
     return r.map(mapNote)
   }),
