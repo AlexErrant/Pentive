@@ -7,22 +7,34 @@ import {
   TemplateId,
 } from "../src/domain/ids"
 import { reasonableDates, recordWithOptionalFields } from "./arbitrary"
+import { Ulid } from "id128"
 
-export const note = recordWithOptionalFields<Note>(
-  {
-    id: fc.uuidV(4).map((x) => x as NoteId),
-    templateId: fc.uuidV(4).map((x) => x as TemplateId),
-    fields: fc.array(fc.string()),
-    values: fc.array(fc.string()),
-    tags: fc.array(fc.string()).map((x) => new Set(x)),
-    created: reasonableDates,
-    modified: reasonableDates,
-  },
-  {
-    pushId: fc.uuidV(4).map((x) => x as RemoteCardId),
-    pushTemplateId: fc.uuidV(4).map((x) => x as RemoteTemplateId),
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
-    push: fc.constant(true) as Arbitrary<true>,
-    ankiNoteId: fc.integer(),
+export const note = fc.nat(100).chain((length) => {
+  const exactLength = {
+    minLength: length,
+    maxLength: length,
   }
-)
+  return recordWithOptionalFields<Note>(
+    {
+      id: fc.uuidV(4).map((x) => x as NoteId),
+      templateId: fc
+        .date({
+          min: new Date(1970, 0, 1),
+          max: new Date(10889, 7, 2),
+        })
+        .map((time) => Ulid.generate({ time }).toCanonical() as TemplateId),
+      fields: fc.array(fc.string(), exactLength),
+      values: fc.array(fc.string(), exactLength),
+      tags: fc.array(fc.string()).map((x) => new Set(x)),
+      created: reasonableDates,
+      modified: reasonableDates,
+    },
+    {
+      pushId: fc.uuidV(4).map((x) => x as RemoteCardId),
+      pushTemplateId: fc.uuidV(4).map((x) => x as RemoteTemplateId),
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+      push: fc.constant(true) as Arbitrary<true>,
+      ankiNoteId: fc.integer(),
+    }
+  )
+})

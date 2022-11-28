@@ -24,6 +24,20 @@ async function uploadNewTemplates(): Promise<void> {
   console.log(r)
 }
 
+async function uploadNewNotes(): Promise<void> {
+  const id = await lrpc.addNote.mutate({
+    nook: "aRandomNook",
+  })
+  console.log("id is", id)
+  const r = await lrpc.getNote.query(id)
+  const newNotes = await db.getNewNotesToUpload("aRandomNook")
+  const remoteIdByLocal = await lrpc.addNotes.mutate(newNotes)
+  const remoteIds = Object.values(remoteIdByLocal)
+  const getBatch = await lrpc.getNotes.query(remoteIds)
+  console.log("getNotes", getBatch)
+  console.log(r)
+}
+
 export default function Home(): JSX.Element {
   const [count, setCount] = createSignal(1)
   const [template, setTemplate] = createSignal<Template | null>(null)
@@ -125,6 +139,12 @@ export default function Home(): JSX.Element {
           onClick={async () => setNote(await db.getNote(sampleNote.id))}
         >
           getNote
+        </button>
+        <button
+          class="border rounded-lg px-2 border-gray-900"
+          onClick={uploadNewNotes}
+        >
+          uploadNewNotes
         </button>
       </div>
       <div class="mt-4">
