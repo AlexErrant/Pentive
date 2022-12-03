@@ -24,8 +24,8 @@ async function createDb(): Promise<sqliteWasm.DB> {
       name TEXT,
       css TEXT,
       fields TEXT,
-      created INT,
-      modified INT,
+      created, -- https://github.com/vlcn-io/cr-sqlite/issues/85
+      modified,
       templateType TEXT
   );`,
     `CREATE TABLE IF NOT EXISTS note (
@@ -35,8 +35,8 @@ async function createDb(): Promise<sqliteWasm.DB> {
       pushTemplateId BLOB,
       push INT,
       ankiNoteId INT,
-      created INT,
-      modified INT,
+      created, -- https://github.com/vlcn-io/cr-sqlite/issues/85
+      modified,
       tags TEXT,
       fieldValues TEXT
   );`,
