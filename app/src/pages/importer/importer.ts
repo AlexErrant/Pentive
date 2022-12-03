@@ -94,6 +94,7 @@ async function importAnkiDb(sqlite: Entry): Promise<void> {
   const notesDict: Record<number, PNote> = {}
   const cardsList: PCard[] = []
   try {
+    // highTODO wrap in a transaction
     const cols = ankiDb.prepare("select * from col") // lowTODO select exact columns
     while (cols.step()) {
       const row = cols.getAsObject()

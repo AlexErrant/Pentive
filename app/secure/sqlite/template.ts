@@ -126,10 +126,11 @@ export const templateCollectionMethods = {
       ]
     )
   },
-  // bulkUpsertTemplate: async function (templates: Template[]) {
-  //   const db = await getDb()
-  //   await db.templates.bulkUpsert(templates.map(templateToDocType))
-  // },
+  bulkUpsertTemplate: async function (templates: Template[]) {
+    for (const t of templates) {
+      await this.insertTemplate(t) // medTODO could probably make this better
+    }
+  },
   getTemplate: async function (templateId: TemplateId) {
     const db = await getDb()
     const template = await db.execO<TemplateEntity>(
@@ -138,27 +139,22 @@ export const templateCollectionMethods = {
     )
     return undefinedMap(template.at(0), entityToDomain) ?? null
   },
-  // getTemplates: async function () {
-  //   const db = await getDb()
-  //   const allTemplates = await db.templates.find().exec()
-  //   return allTemplates.map(entityToDomain)
-  // },
-  // getNewTemplatesToUpload: async function (nook: string) {
-  //   const db = await getDb()
-  //   const newTemplates = await db.templates
-  //     .find({
-  //       selector: {
-  //         push: {
-  //           $eq: 1,
-  //         },
-  //         pushId: {
-  //           $exists: false,
-  //         },
-  //       },
-  //     })
-  //     .exec()
-  //   return newTemplates
-  //     .map(entityToDomain)
-  //     .map((x) => domainToCreateRemote(x, nook))
-  // },
+  getTemplates: async function () {
+    const db = await getDb()
+    const allTemplates = await db.execO<TemplateEntity>(
+      `SELECT * FROM template`
+    )
+    return allTemplates.map(entityToDomain)
+  },
+  getNewTemplatesToUpload: async function (nook: string) {
+    const db = await getDb()
+    const newTemplates = await db.execO<TemplateEntity>(
+      `SELECT * FROM template
+       WHERE push = 1
+       AND pushId IS NULL;`
+    )
+    return newTemplates
+      .map(entityToDomain)
+      .map((x) => domainToCreateRemote(x, nook))
+  },
 }
