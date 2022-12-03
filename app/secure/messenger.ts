@@ -3,13 +3,11 @@ import { cardCollectionMethods } from "./rxdb/card.orm"
 import { heroCollectionMethods } from "./rxdb/hero.orm"
 import { noteCollectionMethods } from "./rxdb/note.orm"
 import { remove, sync } from "./rxdb/rxdb"
-import { templateCollectionMethods } from "./rxdb/template.orm"
+import { templateCollectionMethods } from "./sqlite/template"
 import { dexieMethods } from "./dexie/dexie"
-import { templateCollectionMethodsX } from "./sqlite/template"
 
 export const exposed = {
   ...templateCollectionMethods,
-  ...templateCollectionMethodsX,
   ...cardCollectionMethods,
   ...noteCollectionMethods,
   ...heroCollectionMethods,

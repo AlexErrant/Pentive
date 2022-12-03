@@ -114,9 +114,9 @@ export default function Home(): JSX.Element {
       <div class="mt-4">
         <button
           class="border rounded-lg px-2 border-gray-900"
-          onClick={async () => await db.upsertTemplate(defaultTemplate)}
+          onClick={async () => await db.insertTemplate(defaultTemplate)}
         >
-          upsertTemplate
+          insertTemplate
         </button>
         <button
           class="border rounded-lg px-2 border-gray-900"
@@ -125,28 +125,6 @@ export default function Home(): JSX.Element {
           }
         >
           getTemplate
-        </button>
-        <button
-          class="border rounded-lg px-2 border-gray-900"
-          onClick={uploadNewTemplates}
-        >
-          uploadNewTemplates
-        </button>
-      </div>
-      <div class="mt-4">
-        <button
-          class="border rounded-lg px-2 border-gray-900"
-          onClick={async () => await db.insertTemplateX(defaultTemplate)}
-        >
-          insertTemplateX
-        </button>
-        <button
-          class="border rounded-lg px-2 border-gray-900"
-          onClick={async () =>
-            setTemplate(await db.getTemplateX(defaultTemplate.id))
-          }
-        >
-          getTemplateX
         </button>
         <button
           class="border rounded-lg px-2 border-gray-900"

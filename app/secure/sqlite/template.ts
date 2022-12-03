@@ -61,7 +61,7 @@ function entityToDomain(template: TemplateEntity): Template {
     modified: new Date(template.modified),
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
     push: (template.push === 1 ? true : undefined) as true | undefined,
-    pushId: template.pushId as RemoteTemplateId | undefined,
+    pushId: (template.pushId ?? undefined) as RemoteTemplateId | undefined,
     fields: JSON.parse(template.fields) as Field[],
     css: template.css,
     templateType: JSON.parse(template.templateType) as TemplateType,
@@ -106,8 +106,8 @@ function domainToCreateRemote(
   }
 }
 
-export const templateCollectionMethodsX = {
-  insertTemplateX: async function (template: Template) {
+export const templateCollectionMethods = {
+  insertTemplate: async function (template: Template) {
     const t = templateToDocType(template)
     const db = await getDb()
     await db.exec(
@@ -130,7 +130,7 @@ export const templateCollectionMethodsX = {
   //   const db = await getDb()
   //   await db.templates.bulkUpsert(templates.map(templateToDocType))
   // },
-  getTemplateX: async function (templateId: TemplateId) {
+  getTemplate: async function (templateId: TemplateId) {
     const db = await getDb()
     const template = await db.execO<TemplateEntity>(
       `SELECT * FROM template WHERE id = ?`,
