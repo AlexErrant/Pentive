@@ -1,6 +1,8 @@
 apkg
 authed
 comlink
+crsql
+crsqlite
 dexie
 graphiql
 iframe
@@ -27,3 +29,4 @@ trpc
 upserted
 viewports
 vite
+vlcn
