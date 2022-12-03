@@ -128,7 +128,8 @@ export const templateCollectionMethods = {
   },
   bulkUpsertTemplate: async function (templates: Template[]) {
     for (const t of templates) {
-      await this.insertTemplate(t) // medTODO could probably make this better
+      await this.insertTemplate(t) // medTODO could probably make this better. Can't seem to find anything for parameterized bulk inserts.
+      // https://stackoverflow.com/q/1711631 https://stackoverflow.com/q/45562747 https://stackoverflow.com/q/3447842 https://stackoverflow.com/q/15858466 https://stackoverflow.com/q/1609637
     }
   },
   getTemplate: async function (templateId: TemplateId) {
