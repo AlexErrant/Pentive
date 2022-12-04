@@ -25,12 +25,6 @@ function log(...data: any[]): void {
  */
 export interface PokeProtocol {
   /**
-   * Tell all connected sites that we have updates from this site
-   * ending at `pokerVersion`
-   */
-  poke: (poker: SiteIDWire, pokerVersion: bigint) => void
-
-  /**
    * Receive a poke from a given site.
    * In response, we'll compute what changes we're missing from that site
    * and request those changes.
@@ -77,11 +71,10 @@ export type Changeset = [
 
 const api = {
   async install(
-    siteId: SiteIDLocal,
     db: DB | DBAsync,
     network: PokeProtocol
   ): Promise<WholeDbReplicator> {
-    const ret = new WholeDbReplicator(siteId, db, network)
+    const ret = new WholeDbReplicator(db, network)
     await ret.init()
     return ret
   },
@@ -92,20 +85,12 @@ const api = {
 
 export class WholeDbReplicator {
   private _crrs: string[] = []
-  private _pendingNotification = false
-  private readonly _siteId: SiteIDLocal
-  private readonly _siteIdWire: SiteIDWire
 
   constructor(
-    siteId: SiteIDLocal,
     private readonly _db: DB | DBAsync,
     private readonly _network: PokeProtocol
   ) {
     this._db = _db
-    _db.createFunction("crsql_wdbreplicator", () => this._crrChanged())
-
-    this._siteId = siteId
-    this._siteIdWire = uuidStringify(this._siteId)
 
     this._network.onPoked(this._onPoked)
     this._network.onNewConnection(this._onNewConnection)
@@ -174,24 +159,6 @@ export class WholeDbReplicator {
     )
   }
 
-  private _crrChanged(): void {
-    if (this._pendingNotification) {
-      return
-    }
-
-    this._pendingNotification = true
-    queueMicrotask(async () => {
-      const r = await this._db.execA<[number | bigint]>(
-        "SELECT crsql_dbversion()"
-      )
-      const dbv = r[0][0]
-      this._pendingNotification = false
-      // TODO: maybe wait for network before setting pending to false
-      log("poking across the network")
-      this._network.poke(this._siteIdWire, BigInt(dbv))
-    })
-  }
-
   private readonly _onPoked = async (
     pokedBy: SiteIDWire,
     pokerVersion: bigint
@@ -226,8 +193,6 @@ export class WholeDbReplicator {
       "INSERT OR IGNORE INTO __crsql_wdbreplicator_peers VALUES (?, ?)",
       [uuidParse(siteId), 0]
     )
-    // treat it as a crr change so we can kick off sync
-    this._crrChanged()
   }
 
   // if we fail to apply, re-request
