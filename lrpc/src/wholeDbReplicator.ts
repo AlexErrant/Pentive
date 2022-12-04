@@ -31,23 +31,12 @@ export interface PokeProtocol {
   poke: (poker: SiteIDWire, pokerVersion: bigint) => void
 
   /**
-   * Push changes to the given site in response to their request for changes.
-   */
-  pushChanges: (to: SiteIDWire, changesets: readonly Changeset[]) => void
-
-  /**
-   * Request changes from a given site since a given version
-   * in response to a poke from that site.
-   */
-  requestChanges: (from: SiteIDWire, since: bigint) => void
-
-  /**
-   * Receive a poke froma given site.
+   * Receive a poke from a given site.
    * In response, we'll compute what changes we're missing from that site
    * and request those changes.
    */
   onPoked: (
-    cb: (pokedBy: SiteIDWire, pokerVersion: bigint) => Promise<void>
+    cb: (pokedBy: SiteIDWire, pokerVersion: bigint) => Promise<bigint | null>
   ) => void
 
   /**
@@ -60,7 +49,7 @@ export interface PokeProtocol {
    * A peer has requested changes from us.
    */
   onChangesRequested: (
-    cb: (from: SiteIDWire, since: bigint) => Promise<void>
+    cb: (from: SiteIDWire, since: bigint) => Promise<Changeset[]>
   ) => void
 
   /**
@@ -206,7 +195,7 @@ export class WholeDbReplicator {
   private readonly _onPoked = async (
     pokedBy: SiteIDWire,
     pokerVersion: bigint
-  ): Promise<void> => {
+  ): Promise<bigint | null> => {
     log("received a poke from ", pokedBy)
     const rows = await this._db.execA(
       "SELECT CAST(version as TEXT) FROM __crsql_wdbreplicator_peers WHERE site_id = ?",
@@ -222,12 +211,12 @@ export class WholeDbReplicator {
     // the poker version can be less than our version for poker if a set of
     // poke messages were queued up behind a sync.
     if (pokerVersion <= ourVersionForPoker) {
-      return
+      return null
     }
 
     // ask the poker for changes since our version
     log("requesting changes from ", pokedBy)
-    this._network.requestChanges(pokedBy, ourVersionForPoker)
+    return ourVersionForPoker
   }
 
   private readonly _onNewConnection = async (
@@ -290,7 +279,7 @@ export class WholeDbReplicator {
   private readonly _onChangesRequested = async (
     from: SiteIDWire,
     since: bigint
-  ): Promise<void> => {
+  ): Promise<Changeset[]> => {
     const fromAsBlob = uuidParse(from)
     // The casting is due to bigint support problems in various wasm builds of sqlite
     const changes: Changeset[] = await this._db.execA<Changeset>(
@@ -302,12 +291,9 @@ export class WholeDbReplicator {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-explicit-any
     changes.forEach((c) => (c[5] = uuidStringify(c[5] as any)))
 
-    if (changes.length === 0) {
-      return
-    }
     log("pushing changesets across the network", changes)
     // console.log(changes);
-    this._network.pushChanges(from, changes)
+    return changes
   }
 }
 
