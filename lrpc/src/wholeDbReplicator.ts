@@ -152,14 +152,14 @@ export class WholeDbReplicator {
       "SELECT name FROM sqlite_master WHERE name LIKE '%__crsql_clock'"
     )
 
-    const baseTableNames = crrs.map((crr) => {
+    const baseTableNamesPromises = crrs.map(async (crr) => {
       const fullTblName = crr[0]
       const baseTblName = fullTblName.substring(
         0,
         fullTblName.lastIndexOf("__crsql_clock")
       )
-      ;["INSERT", "UPDATE", "DELETE"].map((verb) => {
-        this._db.exec(
+      const ps = ["INSERT", "UPDATE", "DELETE"].map((verb) => {
+        return this._db.exec(
           `CREATE TEMP TRIGGER IF NOT EXISTS "${baseTblName}__crsql_wdbreplicator_${verb.toLowerCase()}" AFTER ${verb} ON "${baseTblName}"
           BEGIN
             select crsql_wdbreplicator() WHERE crsql_internal_sync_bit() = 0;
@@ -167,9 +167,11 @@ export class WholeDbReplicator {
         `
         )
       })
+      await Promise.all(ps)
 
       return baseTblName
     })
+    const baseTableNames = await Promise.all(baseTableNamesPromises)
     this._crrs = baseTableNames
   }
 
@@ -223,8 +225,10 @@ export class WholeDbReplicator {
     this._network.requestChanges(pokedBy, ourVersionForPoker)
   }
 
-  private readonly _newConnection = (siteId: SiteIDWire): void => {
-    this._db.exec(
+  private readonly _newConnection = async (
+    siteId: SiteIDWire
+  ): Promise<void> => {
+    await this._db.exec(
       "INSERT OR IGNORE INTO __crsql_wdbreplicator_peers VALUES (?, ?)",
       [uuidParse(siteId), 0]
     )
