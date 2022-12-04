@@ -118,10 +118,10 @@ export class WholeDbReplicator {
     this._siteId = siteId
     this._siteIdWire = uuidStringify(this._siteId)
 
-    this._network.onPoked(this._poked)
-    this._network.onNewConnection(this._newConnection)
-    this._network.onChangesReceived(this._changesReceived)
-    this._network.onChangesRequested(this._changesRequested)
+    this._network.onPoked(this._onPoked)
+    this._network.onNewConnection(this._onNewConnection)
+    this._network.onChangesReceived(this._onChangesReceived)
+    this._network.onChangesRequested(this._onChangesRequested)
   }
 
   async init(): Promise<void> {
@@ -203,7 +203,7 @@ export class WholeDbReplicator {
     })
   }
 
-  private readonly _poked = async (
+  private readonly _onPoked = async (
     pokedBy: SiteIDWire,
     pokerVersion: bigint
   ): Promise<void> => {
@@ -230,7 +230,7 @@ export class WholeDbReplicator {
     this._network.requestChanges(pokedBy, ourVersionForPoker)
   }
 
-  private readonly _newConnection = async (
+  private readonly _onNewConnection = async (
     siteId: SiteIDWire
   ): Promise<void> => {
     await this._db.exec(
@@ -244,7 +244,7 @@ export class WholeDbReplicator {
   // if we fail to apply, re-request
   // TODO: other retry mechanisms
   // todo: need to know who received from. cs site id can be a forwarded site id
-  private readonly _changesReceived = async (
+  private readonly _onChangesReceived = async (
     fromSiteId: SiteIDWire,
     changesets: readonly Changeset[]
   ): Promise<void> => {
@@ -287,7 +287,7 @@ export class WholeDbReplicator {
     })
   }
 
-  private readonly _changesRequested = async (
+  private readonly _onChangesRequested = async (
     from: SiteIDWire,
     since: bigint
   ): Promise<void> => {
