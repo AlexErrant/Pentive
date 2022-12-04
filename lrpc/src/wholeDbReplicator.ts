@@ -6,11 +6,14 @@ type CID = string
 type QuoteConcatedPKs = string | number
 type TableName = string
 type Version = number | string
-type TODO = any
 
+// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
 const isDebug = (globalThis as any).__vlcn_whole_db_dbg
-function log(...data: any[]) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function log(...data: any[]): void {
+  // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
   if (isDebug) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     console.log("whole-db: ", ...data)
   }
 }
@@ -77,6 +80,7 @@ export type Changeset = [
   TableName,
   QuoteConcatedPKs,
   CID,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   any, // val,
   Version,
   SiteIDWire // site_id
@@ -211,6 +215,7 @@ export class WholeDbReplicator {
     let ourVersionForPoker = 0n
     if (rows != null && rows.length > 0) {
       // ensure it is a bigint. sqlite will return number if in js int range and bigint if out of range.
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/strict-boolean-expressions
       ourVersionForPoker = BigInt(rows[0][0] || 0)
     }
 
@@ -264,6 +269,7 @@ export class WholeDbReplicator {
             cs[2],
             cs[3],
             v.toString(),
+            // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
             cs[5] ? uuidParse(cs[5]) : 0
           )
         }
@@ -293,6 +299,7 @@ export class WholeDbReplicator {
     )
 
     // TODO: temporary. better to `quote` out of db and `unquote` (to implement) into db
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-explicit-any
     changes.forEach((c) => (c[5] = uuidStringify(c[5] as any)))
 
     if (changes.length === 0) {
