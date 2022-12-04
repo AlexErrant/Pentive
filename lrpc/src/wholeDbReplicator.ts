@@ -89,7 +89,7 @@ const api = {
     network: PokeProtocol
   ): Promise<WholeDbReplicator> {
     const ret = new WholeDbReplicator(siteId, db, network)
-    await ret._init()
+    await ret.init()
     return ret
   },
 }
@@ -98,39 +98,39 @@ const api = {
 // Well, that should be easy. Just poke people on connect.
 
 export class WholeDbReplicator {
-  private crrs: string[] = []
-  private pendingNotification = false
-  private readonly siteId: SiteIDLocal
-  private readonly siteIdWire: SiteIDWire
+  private _crrs: string[] = []
+  private _pendingNotification = false
+  private readonly _siteId: SiteIDLocal
+  private readonly _siteIdWire: SiteIDWire
 
   constructor(
     siteId: SiteIDLocal,
-    private readonly db: DB | DBAsync,
-    private readonly network: PokeProtocol
+    private readonly _db: DB | DBAsync,
+    private readonly _network: PokeProtocol
   ) {
-    this.db = db
-    db.createFunction("crsql_wdbreplicator", () => this.crrChanged())
+    this._db = _db
+    _db.createFunction("crsql_wdbreplicator", () => this._crrChanged())
 
-    this.siteId = siteId
-    this.siteIdWire = uuidStringify(this.siteId)
+    this._siteId = siteId
+    this._siteIdWire = uuidStringify(this._siteId)
 
-    this.network.onPoked(this.poked)
-    this.network.onNewConnection(this.newConnection)
-    this.network.onChangesReceived(this.changesReceived)
-    this.network.onChangesRequested(this.changesRequested)
+    this._network.onPoked(this._poked)
+    this._network.onNewConnection(this._newConnection)
+    this._network.onChangesReceived(this._changesReceived)
+    this._network.onChangesRequested(this._changesRequested)
   }
 
-  async _init() {
-    await this.installTriggers()
-    await this.createPeerTrackingTable()
+  async init(): Promise<void> {
+    await this._installTriggers()
+    await this._createPeerTrackingTable()
   }
 
-  dispose() {
+  dispose(): void {
     // remove trigger(s)
     // function extension is fine to stay, it'll get removed on connection termination
-    this.crrs.forEach((crr) => {
+    this._crrs.forEach((crr) => {
       ;["INSERT", "UPDATE", "DELETE"].forEach((verb) =>
-        this.db.exec(
+        this._db.exec(
           `DROP TRIGGER IF EXISTS "${crr}__crsql_wdbreplicator_${verb.toLowerCase()}";`
         )
       )
@@ -138,17 +138,17 @@ export class WholeDbReplicator {
   }
 
   async schemaChanged(): Promise<void> {
-    return await this.installTriggers()
+    return await this._installTriggers()
   }
 
-  private async installTriggers() {
+  private async _installTriggers(): Promise<void> {
     // find all crr tables
     // TODO: ensure we are not notified
     // if we're in the process of applying sync changes.
     // TODO: we can also just track that internally.
     // well we do want to pass on to sites that are not the site
     // that just send the patch.
-    const crrs: string[][] = await this.db.execA(
+    const crrs: string[][] = await this._db.execA(
       "SELECT name FROM sqlite_master WHERE name LIKE '%__crsql_clock'"
     )
 
@@ -159,7 +159,7 @@ export class WholeDbReplicator {
         fullTblName.lastIndexOf("__crsql_clock")
       )
       ;["INSERT", "UPDATE", "DELETE"].map((verb) => {
-        this.db.exec(
+        this._db.exec(
           `CREATE TEMP TRIGGER IF NOT EXISTS "${baseTblName}__crsql_wdbreplicator_${verb.toLowerCase()}" AFTER ${verb} ON "${baseTblName}"
           BEGIN
             select crsql_wdbreplicator() WHERE crsql_internal_sync_bit() = 0;
@@ -170,39 +170,39 @@ export class WholeDbReplicator {
 
       return baseTblName
     })
-    this.crrs = baseTableNames
+    this._crrs = baseTableNames
   }
 
-  private async createPeerTrackingTable() {
-    await this.db.exec(
+  private async _createPeerTrackingTable(): Promise<void> {
+    await this._db.exec(
       "CREATE TABLE IF NOT EXISTS __crsql_wdbreplicator_peers (site_id primary key, version)"
     )
   }
 
-  private crrChanged() {
-    if (this.pendingNotification) {
+  private _crrChanged(): void {
+    if (this._pendingNotification) {
       return
     }
 
-    this.pendingNotification = true
+    this._pendingNotification = true
     queueMicrotask(async () => {
-      const r = await this.db.execA<[number | bigint]>(
+      const r = await this._db.execA<[number | bigint]>(
         "SELECT crsql_dbversion()"
       )
       const dbv = r[0][0]
-      this.pendingNotification = false
+      this._pendingNotification = false
       // TODO: maybe wait for network before setting pending to false
       log("poking across the network")
-      this.network.poke(this.siteIdWire, BigInt(dbv))
+      this._network.poke(this._siteIdWire, BigInt(dbv))
     })
   }
 
-  private readonly poked = async (
+  private readonly _poked = async (
     pokedBy: SiteIDWire,
     pokerVersion: bigint
-  ) => {
+  ): Promise<void> => {
     log("received a poke from ", pokedBy)
-    const rows = await this.db.execA(
+    const rows = await this._db.execA(
       "SELECT CAST(version as TEXT) FROM __crsql_wdbreplicator_peers WHERE site_id = ?",
       [uuidParse(pokedBy)]
     )
@@ -220,29 +220,29 @@ export class WholeDbReplicator {
 
     // ask the poker for changes since our version
     log("requesting changes from ", pokedBy)
-    this.network.requestChanges(pokedBy, ourVersionForPoker)
+    this._network.requestChanges(pokedBy, ourVersionForPoker)
   }
 
-  private readonly newConnection = (siteId: SiteIDWire) => {
-    this.db.exec(
+  private readonly _newConnection = (siteId: SiteIDWire): void => {
+    this._db.exec(
       "INSERT OR IGNORE INTO __crsql_wdbreplicator_peers VALUES (?, ?)",
       [uuidParse(siteId), 0]
     )
     // treat it as a crr change so we can kick off sync
-    this.crrChanged()
+    this._crrChanged()
   }
 
   // if we fail to apply, re-request
   // TODO: other retry mechanisms
   // todo: need to know who received from. cs site id can be a forwarded site id
-  private readonly changesReceived = async (
+  private readonly _changesReceived = async (
     fromSiteId: SiteIDWire,
     changesets: readonly Changeset[]
-  ) => {
-    await this.db.transaction(async () => {
+  ): Promise<void> => {
+    await this._db.transaction(async () => {
       let maxVersion = 0n
       log("inserting changesets in tx", changesets)
-      const stmt = await this.db.prepare(
+      const stmt = await this._db.prepare(
         'INSERT INTO crsql_changes ("table", "pk", "cid", "val", "version", "site_id") VALUES (?, ?, ?, ?, CAST(? as INTEGER), ?)'
       )
       // TODO: may want to chunk
@@ -270,20 +270,20 @@ export class WholeDbReplicator {
         stmt.finalize()
       }
 
-      await this.db.exec(
+      await this._db.exec(
         `INSERT OR REPLACE INTO __crsql_wdbreplicator_peers (site_id, version) VALUES (?, CAST(? as INTEGER))`,
         [uuidParse(fromSiteId), maxVersion.toString()]
       )
     })
   }
 
-  private readonly changesRequested = async (
+  private readonly _changesRequested = async (
     from: SiteIDWire,
     since: bigint
-  ) => {
+  ): Promise<void> => {
     const fromAsBlob = uuidParse(from)
     // The casting is due to bigint support problems in various wasm builds of sqlite
-    const changes: Changeset[] = await this.db.execA<Changeset>(
+    const changes: Changeset[] = await this._db.execA<Changeset>(
       `SELECT "table", "pk", "cid", "val", CAST("version" as TEXT), "site_id" FROM crsql_changes WHERE site_id != ? AND version > CAST(? as INTEGER)`,
       [fromAsBlob, since.toString()]
     )
@@ -291,12 +291,12 @@ export class WholeDbReplicator {
     // TODO: temporary. better to `quote` out of db and `unquote` (to implement) into db
     changes.forEach((c) => (c[5] = uuidStringify(c[5] as any)))
 
-    if (changes.length == 0) {
+    if (changes.length === 0) {
       return
     }
     log("pushing changesets across the network", changes)
     // console.log(changes);
-    this.network.pushChanges(from, changes)
+    this._network.pushChanges(from, changes)
   }
 }
 
