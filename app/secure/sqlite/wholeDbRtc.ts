@@ -123,24 +123,7 @@ export class WholeDbRtc implements PokeProtocol {
   }
 
   private readonly _newConnection = (conn: DataConnection) => {
-    const siteId = conn.peer
-    this.pendingConnections.delete(conn.peer)
-
-    conn.on("data", (data) => this._dataReceived(siteId, data as Msg))
-    conn.on("close", () => {
-      this.establishedConnections.delete(conn.peer)
-      this._connectionsChanged()
-    })
-    conn.on("error", (e) => {
-      // TODO: more reporting to the callers of us
-      console.error(e)
-      this.establishedConnections.delete(conn.peer)
-      this._connectionsChanged()
-    })
-
-    this.establishedConnections.set(conn.peer, conn)
-    this._connectionsChanged()(this._onNewConnection != null) &&
-      this._onNewConnection(conn.peer)
+    conn.on("data", (data) => this._dataReceived(conn.peer, data as Msg))
   }
 
   private _dataReceived(from: SiteIDWire, data: Msg): void {
