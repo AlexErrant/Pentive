@@ -6,7 +6,6 @@ import WDB, {
   WholeDbReplicator,
 } from "./wholeDbReplicator"
 import { DB, DBAsync } from "@vlcn.io/xplat-api"
-import { stringify as uuidStringify } from "uuid"
 
 type Msg = PokeMsg | ChangesMsg | RequestChangesMsg
 /**
@@ -60,11 +59,11 @@ export class WholeDbRtc implements PokeProtocol {
   }
 
   async init(): Promise<void> {
-    this._replicator = await WDB.install(this.siteId, this._db, this)
+    this._replicator = await WDB.install(this._db, this)
   }
 
   async schemaChanged(): Promise<void> {
-    await this._replicator.schemaChanged()
+    await this._replicator?.schemaChanged()
   }
 
   poke(poker: SiteIDWire, pokerVersion: bigint): void {
@@ -118,7 +117,7 @@ export class WholeDbRtc implements PokeProtocol {
   }
 
   dispose(): void {
-    this._replicator.dispose()
+    this._replicator?.dispose()
   }
 
   private readonly _newConnection = (conn: DataConnection) => {
