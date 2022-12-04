@@ -31,21 +31,7 @@ interface RequestChangesMsg {
 }
 
 export class WholeDbRtc implements PokeProtocol {
-  private readonly site: Peer
-  private readonly establishedConnections: Map<SiteIDWire, DataConnection> =
-    new Map()
-
-  private readonly pendingConnections: Map<SiteIDWire, DataConnection> =
-    new Map()
-
   private _replicator?: WholeDbReplicator
-
-  public onConnectionsChanged:
-    | ((
-        pending: Map<SiteIDWire, DataConnection>,
-        established: Map<SiteIDWire, DataConnection>
-      ) => void)
-    | null = null
 
   private _onPoked:
     | ((pokedBy: SiteIDWire, pokerVersion: bigint) => void)
@@ -80,20 +66,6 @@ export class WholeDbRtc implements PokeProtocol {
 
   async schemaChanged(): Promise<void> {
     await this._replicator!.schemaChanged()
-  }
-
-  connectTo(other: SiteIDWire) {
-    if (this.pendingConnections.has(other)) {
-      const c = this.pendingConnections.get(other)
-      c?.close()
-    }
-
-    const conn = this.site.connect(other)
-    this.pendingConnections.set(other, conn)
-    this._connectionsChanged()
-    conn.on("open", () => {
-      this._newConnection(conn)
-    })
   }
 
   poke(poker: SiteIDWire, pokerVersion: bigint): void {
@@ -147,8 +119,7 @@ export class WholeDbRtc implements PokeProtocol {
   }
 
   dispose(): void {
-    this.replicator!.dispose()
-    this.site.destroy()
+    this._replicator!.dispose()
   }
 
   private readonly _newConnection = (conn: DataConnection) => {
@@ -185,61 +156,17 @@ export class WholeDbRtc implements PokeProtocol {
         break
     }
   }
-
-  private _connectionsChanged(): void {
-    this.onConnectionsChanged?.(
-      this.pendingConnections,
-      this.establishedConnections
-    )
-  }
 }
 
 class WholeDbRtcPublic {
-  private readonly _listeners = new Set<
-    (pending: SiteIDWire[], established: SiteIDWire[]) => void
-  >()
-
-  constructor(private readonly _wdbRtc: WholeDbRtc) {
-    _wdbRtc.onConnectionsChanged = this._connectionsChanged
-  }
+  constructor(private readonly _wdbRtc: WholeDbRtc) {}
 
   get siteId(): SiteIDLocal {
     return this._wdbRtc.siteId
   }
 
-  connectTo(other: SiteIDWire): void {
-    this._wdbRtc.connectTo(other)
-  }
-
-  onConnectionsChanged(
-    cb: (pending: SiteIDWire[], established: SiteIDWire[]) => void
-  ): () => boolean {
-    this._listeners.add(cb)
-    return () => this._listeners.delete(cb)
-  }
-
-  offConnectionsChanged(
-    cb: (pending: SiteIDWire[], established: SiteIDWire[]) => void
-  ): void {
-    this._listeners.delete(cb)
-  }
-
   async schemaChanged(): Promise<void> {
     await this._wdbRtc.schemaChanged()
-  }
-
-  private readonly _connectionsChanged = (
-    pending: Map<SiteIDWire, DataConnection>,
-    established: Map<SiteIDWire, DataConnection>
-  ): void => {
-    // notify listeners
-    for (const l of this._listeners) {
-      try {
-        l([...pending.keys()], [...established.keys()])
-      } catch (e) {
-        console.error(e)
-      }
-    }
   }
 
   dispose(): void {
