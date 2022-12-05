@@ -32,16 +32,19 @@ export class WholeDbRtc implements PokeProtocol {
   private _replicator?: WholeDbReplicator
 
   private _onPoked:
-    | ((pokedBy: SiteIDWire, pokerVersion: bigint) => void)
+    | ((pokedBy: SiteIDWire, pokerVersion: bigint) => Promise<bigint | null>)
     | null = null
 
   private _onNewConnection: ((siteID: SiteIDWire) => void) | null = null
   private _onChangesRequested:
-    | ((from: SiteIDWire, since: bigint) => void)
+    | ((from: SiteIDWire, since: bigint) => Promise<Changeset[]>)
     | null = null
 
   private _onChangesReceived:
-    | ((fromSiteId: SiteIDWire, changesets: readonly Changeset[]) => void)
+    | ((
+        fromSiteId: SiteIDWire,
+        changesets: readonly Changeset[]
+      ) => Promise<void>)
     | null = null
 
   constructor(
@@ -98,7 +101,9 @@ export class WholeDbRtc implements PokeProtocol {
     }
   }
 
-  onPoked(cb: (pokedBy: SiteIDWire, pokerVersion: bigint) => void): void {
+  onPoked(
+    cb: (pokedBy: SiteIDWire, pokerVersion: bigint) => Promise<bigint | null>
+  ): void {
     this._onPoked = cb
   }
 
@@ -106,12 +111,17 @@ export class WholeDbRtc implements PokeProtocol {
     this._onNewConnection = cb
   }
 
-  onChangesRequested(cb: (from: SiteIDWire, since: bigint) => void): void {
+  onChangesRequested(
+    cb: (from: SiteIDWire, since: bigint) => Promise<Changeset[]>
+  ): void {
     this._onChangesRequested = cb
   }
 
   onChangesReceived(
-    cb: (fromSiteId: SiteIDWire, changesets: readonly Changeset[]) => void
+    cb: (
+      fromSiteId: SiteIDWire,
+      changesets: readonly Changeset[]
+    ) => Promise<void>
   ): void {
     this._onChangesReceived = cb
   }
@@ -124,16 +134,16 @@ export class WholeDbRtc implements PokeProtocol {
     conn.on("data", (data) => this._dataReceived(conn.peer, data as Msg))
   }
 
-  private _dataReceived(from: SiteIDWire, data: Msg): void {
+  private async _dataReceived(from: SiteIDWire, data: Msg): Promise<void> {
     switch (data.tag) {
       case "poke":
-        this._onPoked?.(from, BigInt(data.version))
+        await this._onPoked?.(from, BigInt(data.version))
         break
       case "apply-changes":
-        this._onChangesReceived?.(from, data.changes)
+        await this._onChangesReceived?.(from, data.changes)
         break
       case "request-changes":
-        this._onChangesRequested?.(from, BigInt(data.since))
+        await this._onChangesRequested?.(from, BigInt(data.since))
         break
     }
   }
