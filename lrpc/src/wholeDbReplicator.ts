@@ -34,12 +34,6 @@ export interface PokeProtocol {
   ) => void
 
   /**
-   * When someone new connects we can just poke them to kick off
-   * initial sync. Simple.
-   */
-  onNewConnection: (cb: (siteID: SiteIDWire) => void) => void
-
-  /**
    * A peer has requested changes from us.
    */
   onChangesRequested: (
@@ -93,7 +87,6 @@ export class WholeDbReplicator {
     this._db = _db
 
     this._network.onPoked(this._onPoked)
-    this._network.onNewConnection(this._onNewConnection)
     this._network.onChangesReceived(this._onChangesReceived)
     this._network.onChangesRequested(this._onChangesRequested)
   }

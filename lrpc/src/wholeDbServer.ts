@@ -9,7 +9,7 @@ import { DB, DBAsync } from "@vlcn.io/xplat-api"
 
 type Msg = PokeMsg | ChangesMsg | RequestChangesMsg
 /**
- * TODO: we can improve the poke msg to facilitate daisy chaning of updates among peers.
+ * TODO: we can improve the poke msg to facilitate daisy chaining of updates among peers.
  * If the poke is the result of a sync it should include:
  * - poker id (if we are proxying)
  * - max version for that id
@@ -35,7 +35,6 @@ export class WholeDbRtc implements PokeProtocol {
     | ((pokedBy: SiteIDWire, pokerVersion: bigint) => Promise<bigint | null>)
     | null = null
 
-  private _onNewConnection: ((siteID: SiteIDWire) => void) | null = null
   private _onChangesRequested:
     | ((from: SiteIDWire, since: bigint) => Promise<Changeset[]>)
     | null = null
@@ -69,46 +68,10 @@ export class WholeDbRtc implements PokeProtocol {
     await this._replicator?.schemaChanged()
   }
 
-  poke(poker: SiteIDWire, pokerVersion: bigint): void {
-    const msg: PokeMsg = {
-      tag: "poke",
-      version: pokerVersion.toString(),
-    }
-    this.establishedConnections.forEach((conn) => {
-      conn.send(msg)
-    })
-  }
-
-  pushChanges(to: SiteIDWire, changesets: readonly Changeset[]): void {
-    const msg: ChangesMsg = {
-      tag: "apply-changes",
-      changes: changesets,
-    }
-    const conn = this.establishedConnections.get(to)
-    if (conn) {
-      conn.send(msg)
-    }
-  }
-
-  requestChanges(from: SiteIDWire, since: bigint): void {
-    const msg: RequestChangesMsg = {
-      tag: "request-changes",
-      since: since.toString(),
-    }
-    const conn = this.establishedConnections.get(from)
-    if (conn) {
-      conn.send(msg)
-    }
-  }
-
   onPoked(
     cb: (pokedBy: SiteIDWire, pokerVersion: bigint) => Promise<bigint | null>
   ): void {
     this._onPoked = cb
-  }
-
-  onNewConnection(cb: (siteID: SiteIDWire) => void): void {
-    this._onNewConnection = cb
   }
 
   onChangesRequested(
@@ -128,10 +91,6 @@ export class WholeDbRtc implements PokeProtocol {
 
   dispose(): void {
     this._replicator?.dispose()
-  }
-
-  private readonly _newConnection = (conn: DataConnection) => {
-    conn.on("data", (data) => this._dataReceived(conn.peer, data as Msg))
   }
 
   private async _dataReceived(from: SiteIDWire, data: Msg): Promise<void> {
