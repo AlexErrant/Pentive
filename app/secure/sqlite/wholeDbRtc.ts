@@ -6,8 +6,6 @@ import WDB, {
   WholeDbReplicator,
 } from "@vlcn.io/replicator-wholedb"
 import { DB, DBAsync } from "@vlcn.io/xplat-api"
-import { stringify as uuidStringify } from "uuid"
-import { lrpc } from "../../src/lrpcClient"
 
 type Msg = PokeMsg | ChangesMsg | RequestChangesMsg
 /**
@@ -49,16 +47,7 @@ export class WholeDbRtc implements PokeProtocol {
   constructor(
     public readonly siteId: SiteIDLocal,
     private readonly _db: DB | DBAsync
-  ) {
-    this.site = new Peer(uuidStringify(siteId), {
-      host: "localhost",
-      port: 9000,
-      path: "/examples",
-    })
-    this.site.on("connection", (c) => {
-      c.on("open", () => this._newConnection(c))
-    })
-  }
+  ) {}
 
   async init(): Promise<void> {
     this._replicator = await WDB.install(this.siteId, this._db, this)
@@ -73,9 +62,9 @@ export class WholeDbRtc implements PokeProtocol {
       tag: "poke",
       version: pokerVersion.toString(),
     }
-    this.establishedConnections.forEach((conn) => {
-      conn.send(msg)
-    })
+    // this.establishedConnections.forEach((conn) => {
+    //   conn.send(msg)
+    // })
   }
 
   pushChanges(to: SiteIDWire, changesets: readonly Changeset[]): void {
@@ -83,10 +72,10 @@ export class WholeDbRtc implements PokeProtocol {
       tag: "apply-changes",
       changes: changesets,
     }
-    const conn = this.establishedConnections.get(to)
-    if (conn) {
-      conn.send(msg)
-    }
+    // const conn = this.establishedConnections.get(to)
+    // if (conn) {
+    //   conn.send(msg)
+    // }
   }
 
   requestChanges(from: SiteIDWire, since: bigint): void {
@@ -94,10 +83,10 @@ export class WholeDbRtc implements PokeProtocol {
       tag: "request-changes",
       since: since.toString(),
     }
-    const conn = this.establishedConnections.get(from)
-    if (conn) {
-      conn.send(msg)
-    }
+    // const conn = this.establishedConnections.get(from)
+    // if (conn) {
+    //   conn.send(msg)
+    // }
   }
 
   onPoked(cb: (pokedBy: SiteIDWire, pokerVersion: bigint) => void): void {
@@ -122,8 +111,9 @@ export class WholeDbRtc implements PokeProtocol {
     this._replicator!.dispose()
   }
 
-  private readonly _newConnection = (conn: DataConnection) => {
-    conn.on("data", (data) => this._dataReceived(conn.peer, data as Msg))
+  private readonly _newConnection = (siteId: SiteIDWire): void => {
+    this._onNewConnection?.(siteId)
+    // conn.on("data", (data) => this._dataReceived(conn.peer, data as Msg))
   }
 
   private _dataReceived(from: SiteIDWire, data: Msg): void {

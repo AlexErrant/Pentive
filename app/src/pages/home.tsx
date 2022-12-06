@@ -9,6 +9,8 @@ import { lrpc } from "../lrpcClient"
 import { importAnki } from "./importer/importer"
 import { throwExp } from "../domain/utility"
 import { ResourceId } from "../domain/ids"
+import { getDb } from "../../secure/sqlite/crsqlite"
+import { stringify as uuidStringify } from "uuid"
 
 async function uploadNewTemplates(): Promise<void> {
   const id = await lrpc.addTemplate.mutate({
@@ -196,6 +198,27 @@ export default function Home(): JSX.Element {
           Upload Resource
           <input type="file" onchange={uploadResource} accept=".png"></input>
         </label>
+      </div>
+      <div class="mt-4">
+        <button
+          class="border rounded-lg px-2 border-gray-900"
+          onClick={async () => {
+            const db = await getDb()
+            const siteId = (
+              await db.execA<[Uint8Array]>("SELECT crsql_siteid();")
+            )[0][0]
+            const dbVersion = (
+              await db.execA<[number]>(`SELECT crsql_dbversion();`)
+            )[0][0]
+            const poke = await lrpc.poke.query({
+              pokedBy: uuidStringify(siteId),
+              pokerVersion: BigInt(dbVersion),
+            })
+            console.log("poke response:", poke)
+          }}
+        >
+          sync
+        </button>
       </div>
     </section>
   )
