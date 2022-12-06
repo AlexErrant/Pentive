@@ -22,4 +22,4 @@ IndexedDB and other secrets are managed from an `iframe`, which is served from `
 * [Rescript](https://rescript-lang.org/) only supports React. Sadly [it seems unlikely](https://github.com/rescript-lang/rescript-compiler/issues/4783) that Rescript will support Solid. HyperScript is a possibility, but [it's ugly as sin](https://github.com/solidjs/solid/issues/245#issuecomment-719905295) and [not recommended for perf reasons](https://www.solidjs.com/docs/1.0.0#6.-i-really-dislike-jsx%2C-any-chance-of-a-template-dsl%3F-oh%2C-i-see-you-have-tagged-template-literals%2Fhyperscript.-maybe-i-will-use-those...).
 
 # Undecided
-Capacitor vs Electron vs Tauri. The only non-web API Pentive really need is filesystem access. This allows for importing Anki `apkg`s and automated creation of local backups. There may be perf advantages to moving to SQLite.
+Capacitor vs Electron vs Tauri. The only non-web API Pentive really need is filesystem access. This allows for importing Anki `apkg`s and automated creation of local backups. There may be perf/interop advantages with moving to SQLite.
