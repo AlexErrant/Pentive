@@ -1,7 +1,7 @@
 import { z } from "zod"
-import { noteRouter } from "./noteRouter"
-import { templateRouter } from "./templateRouter"
-import { publicProcedure, router } from "./trpc"
+import { noteRouter } from "./noteRouter.js"
+import { templateRouter } from "./templateRouter.js"
+import { publicProcedure, router } from "./trpc.js"
 
 export const appRouter = router({
   greeting: publicProcedure

@@ -1,15 +1,16 @@
-import { createRemoteNote, remoteNote } from "./schemas/note"
-import { id } from "./schemas/core"
+import { createRemoteNote, remoteNote } from "./schemas/note.js"
+import { id } from "./schemas/core.js"
 import { z } from "zod"
 import _ from "lodash"
-import { Ulid } from "id128"
+import id128 from "id128"
 import { Prisma, Note } from "@prisma/client"
-import { authedProcedure, publicProcedure } from "./trpc"
-import { prisma, ulidStringToBuffer, ulidToBuffer } from "./prisma"
-import { optionMap } from "./core"
+import { authedProcedure, publicProcedure } from "./trpc.js"
+import { prisma, ulidStringToBuffer, ulidToBuffer } from "./prisma.js"
+import { optionMap } from "./core.js"
 import { compile } from "html-to-text"
 
 const convert = compile({})
+const ulid = id128.Ulid
 
 type ClientNote = Omit<Note, "id" | "templateId" | "fts"> & {
   id: string
@@ -17,8 +18,8 @@ type ClientNote = Omit<Note, "id" | "templateId" | "fts"> & {
 }
 
 function mapNote({ fts, ...t }: Note): ClientNote {
-  const id = Ulid.fromRaw(t.id.toString("hex")).toCanonical()
-  const templateId = Ulid.fromRaw(t.templateId.toString("hex")).toCanonical()
+  const id = ulid.fromRaw(t.id.toString("hex")).toCanonical()
+  const templateId = ulid.fromRaw(t.templateId.toString("hex")).toCanonical()
   return { ...t, id, templateId }
 }
 
@@ -30,7 +31,7 @@ export const noteRouter = {
       })
     )
     .mutation(async (req) => {
-      const id = Ulid.generate()
+      const id = ulid.generate()
       await prisma.note.create({
         data: {
           ...req.input,
@@ -49,7 +50,7 @@ export const noteRouter = {
     .input(z.array(createRemoteNote))
     .mutation(async (req) => {
       const noteCreatesAndIds = req.input.map((t) => {
-        const remoteId = Ulid.generate()
+        const remoteId = ulid.generate()
         const t2: Prisma.NoteCreateManyInput = {
           ...t,
           fieldValues: JSON.stringify(t.fieldValues),

@@ -3,9 +3,9 @@
 import { createHTTPHandler } from "@trpc/server/adapters/standalone"
 import http, { IncomingMessage, ServerResponse } from "http"
 import { NodeHTTPCreateContextFnOptions } from "@trpc/server/adapters/node-http"
-import { appRouter } from "./appRouter"
-import { getUser } from "./core"
-import { Context } from "./trpc"
+import { appRouter } from "./appRouter.js"
+import { getUser } from "./core.js"
+import { Context } from "./trpc.js"
 
 // run with `npm run dev`
 

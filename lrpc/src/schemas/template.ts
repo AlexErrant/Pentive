@@ -1,5 +1,5 @@
 import { z } from "zod"
-import { dateSchema, id } from "./core"
+import { dateSchema, id } from "./core.js"
 
 export const createRemoteTemplate = z.object({
   id,

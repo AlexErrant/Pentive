@@ -1,17 +1,19 @@
-import { createRemoteTemplate, remoteTemplate } from "./schemas/template"
-import { id } from "./schemas/core"
+import { createRemoteTemplate, remoteTemplate } from "./schemas/template.js"
+import { id } from "./schemas/core.js"
 import { z } from "zod"
 import _ from "lodash"
-import { Ulid } from "id128"
+import id128 from "id128"
 import { Prisma, Template } from "@prisma/client"
-import { authedProcedure, publicProcedure } from "./trpc"
-import { prisma, ulidStringToBuffer, ulidToBuffer } from "./prisma"
-import { optionMap } from "./core"
+import { authedProcedure, publicProcedure } from "./trpc.js"
+import { prisma, ulidStringToBuffer, ulidToBuffer } from "./prisma.js"
+import { optionMap } from "./core.js"
+
+const ulid = id128.Ulid
 
 type ClientTemplate = Omit<Template, "id"> & { id: string }
 
 function mapTemplate(t: Template): ClientTemplate {
-  const id = Ulid.fromRaw(t.id.toString("hex")).toCanonical()
+  const id = ulid.fromRaw(t.id.toString("hex")).toCanonical()
   return { ...t, id }
 }
 
@@ -23,7 +25,7 @@ export const templateRouter = {
       })
     )
     .mutation(async (req) => {
-      const id = Ulid.generate()
+      const id = ulid.generate()
       await prisma.template.create({
         data: {
           ...req.input,
@@ -43,7 +45,7 @@ export const templateRouter = {
     .input(z.array(createRemoteTemplate))
     .mutation(async (req) => {
       const templateCreatesAndIds = req.input.map(({ templateType, ...t }) => {
-        const remoteId = Ulid.generate()
+        const remoteId = ulid.generate()
         const t2: Prisma.TemplateCreateManyInput = {
           ...t,
           type: templateType,
