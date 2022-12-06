@@ -3,4 +3,5 @@ packages:
   - "app-ugc/"
   - "lrpc/"
   - "rxql/"
+  - "shared/"
   - "example-plugins/*"

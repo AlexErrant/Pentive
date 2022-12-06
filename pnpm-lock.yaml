@@ -354,6 +354,34 @@ importers:
       webpack-cli: 4.10.0_ezh4bzjwobyx56vff2mud7fd7e
       webpack-dev-server: 4.7.4_5v66e2inugklgvlh4huuavolfq
 
+  shared:
+    specifiers:
+      '@typescript-eslint/eslint-plugin': ^5.31.0
+      '@typescript-eslint/parser': ^5.31.0
+      eslint: ^8.20.0
+      eslint-config-prettier: ^8.5.0
+      eslint-config-standard-with-typescript: ^22.0.0
+      eslint-plugin-import: ^2.26.0
+      eslint-plugin-n: ^15.2.4
+      eslint-plugin-prettier: ^4.2.1
+      eslint-plugin-promise: ^6.0.0
+      prettier: ^2.7.1
+      standard: ^17.0.0
+      typescript: ^4.7.4
+    devDependencies:
+      '@typescript-eslint/eslint-plugin': 5.37.0_22c5fnooleyfkzrkkgdmel5kmi
+      '@typescript-eslint/parser': 5.37.0_irgkl5vooow2ydyo6aokmferha
+      eslint: 8.23.1
+      eslint-config-prettier: 8.5.0_eslint@8.23.1
+      eslint-config-standard-with-typescript: 22.0.0_cv3m3cig3fksofysybwqosz4h4
+      eslint-plugin-import: 2.26.0_uzffwd2kxyy6gwinwkcp25zmz4
+      eslint-plugin-n: 15.2.5_eslint@8.23.1
+      eslint-plugin-prettier: 4.2.1_cabrci5exjdaojcvd6xoxgeowu
+      eslint-plugin-promise: 6.0.1_eslint@8.23.1
+      prettier: 2.7.1
+      standard: 17.0.0_6ejv3wyyij2h5dfkigulguqcpe
+      typescript: 4.8.3
+
 packages:
 
   /2-thenable/1.0.0:
@@ -4471,7 +4499,7 @@ packages:
     dev: true
 
   /concat-map/0.0.1:
-    resolution: {integrity: sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==}
+    resolution: {integrity: sha1-2Klr13/Wjfd5OnMDajug1UBdR3s=}
 
   /concurrently/7.3.0:
     resolution: {integrity: sha512-IiDwm+8DOcFEInca494A8V402tNTQlJaYq78RF2rijOrKEk/AOHTxhN4U1cp7GYKYX5Q6Ymh1dLTBlzIMN0ikA==}
