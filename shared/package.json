@@ -13,6 +13,7 @@
     "prettierw": "prettier --write ."
   },
   "devDependencies": {
+    "@types/uuid": "^9.0.0",
     "@typescript-eslint/eslint-plugin": "^5.31.0",
     "@typescript-eslint/parser": "^5.31.0",
     "eslint": "^8.20.0",
@@ -26,5 +27,8 @@
     "standard": "^17.0.0",
     "typescript": "^4.7.4"
   },
-  "dependencies": {}
+  "dependencies": {
+    "@vlcn.io/xplat-api": "^0.3.0",
+    "uuid": "^9.0.0"
+  }
 }
