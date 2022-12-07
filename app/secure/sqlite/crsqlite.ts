@@ -1,5 +1,5 @@
 import * as sqliteWasm from "@vlcn.io/wa-crsqlite"
-import { initSql } from "shared"
+import { initSql, wholeDbRtc } from "shared"
 import { lrpc } from "../../src/lrpcClient"
 import { stringify as uuidStringify } from "uuid"
 
@@ -25,13 +25,30 @@ async function createDb(): Promise<sqliteWasm.DB> {
 
 export async function sync(): Promise<void> {
   const db = await getDb()
-  const siteId = (await db.execA<[Uint8Array]>("SELECT crsql_siteid();"))[0][0]
+  const siteIdRaw = (
+    await db.execA<[Uint8Array]>("SELECT crsql_siteid();")
+  )[0][0]
+  const siteId = uuidStringify(siteIdRaw)
   const dbVersion = (
     await db.execA<[number]>(`SELECT crsql_dbversion();`)
   )[0][0]
   const poke = await lrpc.poke.query({
-    pokedBy: uuidStringify(siteId),
+    pokedBy: siteId,
     pokerVersion: BigInt(dbVersion),
   })
   console.log("poke response:", poke)
+  const wdb = await wholeDbRtc(db)
+  if (poke.version != null) {
+    const changeSets = await wdb.changesRequested(poke.siteId, poke.version)
+    console.log("changeSets", changeSets)
+    await lrpc.receiveChanges.mutate({
+      changeSets,
+      fromSiteId: siteId,
+    })
+    console.log("Should be pushing changes, but is failing in 2 ways:")
+    console.log("1. 'SqliteError: Failed inserting changeset'")
+    console.log(
+      "2. The above error isn't being propagated, so tRPC is giving me a 200 OK."
+    )
+  }
 }

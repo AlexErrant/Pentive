@@ -4,6 +4,23 @@ import { templateRouter } from "./templateRouter.js"
 import { authedProcedure, publicProcedure, router } from "./trpc.js"
 import aio from "@vlcn.io/crsqlite-allinone"
 import { initSql, wholeDbRtc } from "shared"
+import { stringify as uuidStringify } from "uuid"
+
+const tableName = z.string()
+const quoteConcatedPKs = z.string().or(z.number())
+const cid = z.string()
+const val = z.any()
+const version = z.string().or(z.number())
+const siteIdWire = z.string()
+
+const changeSet = z.tuple([
+  tableName,
+  quoteConcatedPKs,
+  cid,
+  val,
+  version,
+  siteIdWire,
+])
 
 export const appRouter = router({
   greeting: publicProcedure
@@ -20,8 +37,31 @@ export const appRouter = router({
       const db = aio.open(`${ctx.user}.db`)
       try {
         db.execMany(initSql)
+        const siteId = uuidStringify(
+          db.execA<[Uint8Array]>("SELECT crsql_siteid();")[0][0]
+        )
         const wdb = await wholeDbRtc(db)
-        return await wdb.poked(input.pokedBy, input.pokerVersion)
+        const version = await wdb.poked(input.pokedBy, input.pokerVersion)
+        return {
+          version,
+          siteId,
+        }
+      } finally {
+        db.close()
+      }
+    }),
+  receiveChanges: authedProcedure
+    .input(
+      z.object({
+        changeSets: z.array(changeSet),
+        fromSiteId: siteIdWire,
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const db = aio.open(`${ctx.user}.db`)
+      try {
+        const wdb = await wholeDbRtc(db)
+        await wdb.changesReceived(input.fromSiteId, input.changeSets)
       } finally {
         db.close()
       }

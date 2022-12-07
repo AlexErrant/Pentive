@@ -91,6 +91,20 @@ class WholeDbRtc implements PokeProtocol {
     return await this._onPoked(pokedBy, pokerVersion)
   }
 
+  async changesRequested(
+    from: SiteIDWire,
+    since: bigint
+  ): Promise<Changeset[]> {
+    return await this._onChangesRequested(from, since)
+  }
+
+  async changesReceived(
+    fromSiteId: SiteIDWire,
+    changesets: readonly Changeset[]
+  ): Promise<void> {
+    return await this._onChangesReceived(fromSiteId, changesets)
+  }
+
   private async _dataReceived(from: SiteIDWire, data: Msg): Promise<void> {
     switch (data.tag) {
       case "poke":
