@@ -28,24 +28,23 @@ interface RequestChangesMsg {
   tag: "request-changes"
   since: string | number
 }
+class WholeDbRtc implements PokeProtocol {
+  private _replicator!: WholeDbReplicator
 
-export class WholeDbRtc implements PokeProtocol {
-  private _replicator?: WholeDbReplicator
+  private _onPoked!: (
+    pokedBy: SiteIDWire,
+    pokerVersion: bigint
+  ) => Promise<bigint | null>
 
-  private _onPoked:
-    | ((pokedBy: SiteIDWire, pokerVersion: bigint) => Promise<bigint | null>)
-    | null = null
+  private _onChangesRequested!: (
+    from: SiteIDWire,
+    since: bigint
+  ) => Promise<Changeset[]>
 
-  private _onChangesRequested:
-    | ((from: SiteIDWire, since: bigint) => Promise<Changeset[]>)
-    | null = null
-
-  private _onChangesReceived:
-    | ((
-        fromSiteId: SiteIDWire,
-        changesets: readonly Changeset[]
-      ) => Promise<void>)
-    | null = null
+  private _onChangesReceived!: (
+    fromSiteId: SiteIDWire,
+    changesets: readonly Changeset[]
+  ) => Promise<void>
 
   constructor(
     public readonly siteId: SiteIDLocal,
@@ -57,7 +56,7 @@ export class WholeDbRtc implements PokeProtocol {
   }
 
   async schemaChanged(): Promise<void> {
-    await this._replicator?.schemaChanged()
+    await this._replicator.schemaChanged()
   }
 
   onPoked(
@@ -82,27 +81,26 @@ export class WholeDbRtc implements PokeProtocol {
   }
 
   dispose(): void {
-    this._replicator?.dispose()
+    this._replicator.dispose()
   }
 
   async poked(
     pokedBy: SiteIDWire,
     pokerVersion: bigint
   ): Promise<bigint | null> {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    return await this._onPoked!(pokedBy, pokerVersion)
+    return await this._onPoked(pokedBy, pokerVersion)
   }
 
   private async _dataReceived(from: SiteIDWire, data: Msg): Promise<void> {
     switch (data.tag) {
       case "poke":
-        await this._onPoked?.(from, BigInt(data.version))
+        await this._onPoked(from, BigInt(data.version))
         break
       case "apply-changes":
-        await this._onChangesReceived?.(from, data.changes)
+        await this._onChangesReceived(from, data.changes)
         break
       case "request-changes":
-        await this._onChangesRequested?.(from, BigInt(data.since))
+        await this._onChangesRequested(from, BigInt(data.since))
         break
     }
   }
