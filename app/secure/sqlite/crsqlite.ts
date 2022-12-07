@@ -1,4 +1,5 @@
 import * as sqliteWasm from "@vlcn.io/wa-crsqlite"
+import { initSql } from "shared"
 
 let myDatabase: Promise<sqliteWasm.DB> | null = null
 
@@ -16,32 +17,6 @@ async function createDb(): Promise<sqliteWasm.DB> {
       "https://esm.sh/@vlcn.io/wa-crsqlite@0.4.1/dist/wa-sqlite-async.wasm"
   )
   const db = await sqlite.open("username.db")
-  await db.execMany([
-    `CREATE TABLE IF NOT EXISTS template (
-      id BLOB PRIMARY KEY,
-      pushId BLOB,
-      push INT,
-      name TEXT,
-      css TEXT,
-      fields TEXT,
-      created, -- https://github.com/vlcn-io/cr-sqlite/issues/85
-      modified,
-      templateType TEXT
-  );`,
-    `CREATE TABLE IF NOT EXISTS note (
-      id BLOB PRIMARY KEY,
-      templateId BLOB,
-      pushId BLOB,
-      pushTemplateId BLOB,
-      push INT,
-      ankiNoteId INT,
-      created, -- https://github.com/vlcn-io/cr-sqlite/issues/85
-      modified,
-      tags TEXT,
-      fieldValues TEXT
-  );`,
-    `SELECT crsql_as_crr('template');`,
-    `SELECT crsql_as_crr('note');`,
-  ])
+  await db.execMany(initSql)
   return db
 }

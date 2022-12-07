@@ -50,6 +50,7 @@ importers:
       rxdb: ^13.4.4
       rxjs: ^7.5.6
       rxql: workspace:*
+      shared: workspace:*
       solid-app-router: ^0.4.2
       solid-element: ^1.4.8
       solid-js: ^1.4.8
@@ -92,6 +93,7 @@ importers:
       rxdb: 13.4.4_rxjs@7.5.6
       rxjs: 7.5.6
       rxql: link:../rxql
+      shared: link:../shared
       solid-app-router: 0.4.2_solid-js@1.5.4
       solid-element: 1.5.4_solid-js@1.5.4
       solid-js: 1.5.4
@@ -245,6 +247,7 @@ importers:
       serverless: ^3.22.0
       serverless-offline: ^10.2.1
       serverless-plugin-typescript: ^2.1.2
+      shared: workspace:*
       superjson: ^1.10.1
       ts-node: ^10.9.1
       typescript: ^4.7.4
@@ -263,6 +266,7 @@ importers:
       jsonwebtoken: 8.5.1
       lodash: 4.17.21
       node-fetch: 2.6.7
+      shared: link:../shared
       superjson: 1.10.1
       uuid: 9.0.0
       zod: 3.19.1
