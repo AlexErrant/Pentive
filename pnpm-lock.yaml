@@ -19,9 +19,7 @@ importers:
       '@types/uuid': ^9.0.0
       '@typescript-eslint/eslint-plugin': ^5.31.0
       '@typescript-eslint/parser': ^5.31.0
-      '@vlcn.io/replicator-wholedb': ^0.3.0
       '@vlcn.io/wa-crsqlite': ^0.4.1
-      '@vlcn.io/xplat-api': ^0.3.0
       '@zip.js/zip.js': ^2.6.41
       ag-grid-community: ^28.2.0
       ag-grid-solid: ^28.2.0
@@ -75,9 +73,7 @@ importers:
       '@tanstack/solid-table': 8.5.13_solid-js@1.5.4
       '@trpc/client': 10.2.0_@trpc+server@10.2.0
       '@trpc/server': 10.2.0
-      '@vlcn.io/replicator-wholedb': 0.3.0
       '@vlcn.io/wa-crsqlite': 0.4.1
-      '@vlcn.io/xplat-api': 0.3.0
       '@zip.js/zip.js': 2.6.41
       ag-grid-community: 28.2.0
       ag-grid-solid: 28.2.0_r456abjkktdu6n3n64bymge7xa
@@ -235,7 +231,6 @@ importers:
       '@types/node-fetch': ^2.6.2
       '@types/uuid': ^9.0.0
       '@vlcn.io/crsqlite-allinone': ^0.3.2
-      '@vlcn.io/xplat-api': ^0.3.0
       aws-lambda: ^1.0.7
       dotenv: ^16.0.2
       html-to-text: ^8.2.1
@@ -258,7 +253,6 @@ importers:
       '@trpc/client': 10.2.0_@trpc+server@10.2.0
       '@trpc/server': 10.2.0
       '@vlcn.io/crsqlite-allinone': 0.3.3
-      '@vlcn.io/xplat-api': 0.3.0
       aws-lambda: 1.0.7
       dotenv: 16.0.2
       html-to-text: 8.2.1
@@ -2870,10 +2864,6 @@ packages:
     resolution: {integrity: sha512-F5DIZ36YVLE+PN+Zwws4kJogq47hNgX3Nx6WyDJ3kcplxyke3XIzB8uK5n/Lpm1HBsbGzd6nmGehL8cPekP+Tg==}
     dev: true
 
-  /@types/uuid/8.3.4:
-    resolution: {integrity: sha512-c/I8ZRb51j+pYGAu5CrFMRxqZ2ke4y2grEBO5AUjgSkSk+qT2Ea+OdWElz/OiMf5MNpn2b17kuVBwZLQJXzihw==}
-    dev: false
-
   /@types/uuid/9.0.0:
     resolution: {integrity: sha512-kr90f+ERiQtKWMz5rP32ltJ/BtULDI5RVO0uavn1HQUOwjx0R1h0rnDYNL0CepF1zL5bSY6FISAfd9tOdDhU5Q==}
     dev: true
@@ -3027,14 +3017,6 @@ packages:
     dependencies:
       bindings: 1.5.0
       prebuild-install: 7.1.1
-    dev: false
-
-  /@vlcn.io/replicator-wholedb/0.3.0:
-    resolution: {integrity: sha512-bboAqlqC6EPBY/ub3KqVCGjzzH+IS3A4xO/O1oItpxFCV9+6NEhJnHaoXdPiKLcdakBl48MXym5h25TZGmj+BQ==}
-    dependencies:
-      '@types/uuid': 8.3.4
-      '@vlcn.io/xplat-api': 0.3.0
-      uuid: 9.0.0
     dev: false
 
   /@vlcn.io/wa-crsqlite/0.4.1:
