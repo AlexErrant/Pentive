@@ -27,3 +27,4 @@ export const initSql = [
 ]
 
 export * from "./wholeDbReplicator.js"
+export * from "./wholeDbServerClient.js"

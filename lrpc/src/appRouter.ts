@@ -3,8 +3,7 @@ import { noteRouter } from "./noteRouter.js"
 import { templateRouter } from "./templateRouter.js"
 import { authedProcedure, publicProcedure, router } from "./trpc.js"
 import aio from "@vlcn.io/crsqlite-allinone"
-import wholeDbRtc from "./wholeDbServer.js"
-import { initSql } from "shared"
+import { initSql, wholeDbRtc } from "shared"
 
 export const appRouter = router({
   greeting: publicProcedure

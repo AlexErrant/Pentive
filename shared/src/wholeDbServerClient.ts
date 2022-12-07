@@ -5,7 +5,7 @@ import {
   SiteIDLocal,
   SiteIDWire,
   WholeDbReplicator,
-} from "shared"
+} from "./wholeDbReplicator.js"
 import { DB, DBAsync } from "@vlcn.io/xplat-api"
 
 type Msg = PokeMsg | ChangesMsg | RequestChangesMsg
@@ -108,9 +108,7 @@ export class WholeDbRtc implements PokeProtocol {
   }
 }
 
-export default async function wholeDbRtc(
-  db: DB | DBAsync
-): Promise<WholeDbRtc> {
+export async function wholeDbRtc(db: DB | DBAsync): Promise<WholeDbRtc> {
   const siteId = (await db.execA<[Uint8Array]>("SELECT crsql_siteid();"))[0][0]
   const wdb = new WholeDbRtc(siteId, db)
   await wdb.init()
