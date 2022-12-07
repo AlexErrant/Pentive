@@ -1,5 +1,7 @@
 import * as sqliteWasm from "@vlcn.io/wa-crsqlite"
 import { initSql } from "shared"
+import { lrpc } from "../../src/lrpcClient"
+import { stringify as uuidStringify } from "uuid"
 
 let myDatabase: Promise<sqliteWasm.DB> | null = null
 
@@ -19,4 +21,17 @@ async function createDb(): Promise<sqliteWasm.DB> {
   const db = await sqlite.open("username.db")
   await db.execMany(initSql)
   return db
+}
+
+export async function sync(): Promise<void> {
+  const db = await getDb()
+  const siteId = (await db.execA<[Uint8Array]>("SELECT crsql_siteid();"))[0][0]
+  const dbVersion = (
+    await db.execA<[number]>(`SELECT crsql_dbversion();`)
+  )[0][0]
+  const poke = await lrpc.poke.query({
+    pokedBy: uuidStringify(siteId),
+    pokerVersion: BigInt(dbVersion),
+  })
+  console.log("poke response:", poke)
 }
