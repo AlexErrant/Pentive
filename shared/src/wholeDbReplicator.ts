@@ -63,7 +63,7 @@ export type Changeset = [
   SiteIDWire // site_id
 ]
 
-const api = {
+export const api = {
   async install(
     db: DB | DBAsync,
     network: PokeProtocol
@@ -254,5 +254,3 @@ export class WholeDbReplicator {
     return changes
   }
 }
-
-export default api

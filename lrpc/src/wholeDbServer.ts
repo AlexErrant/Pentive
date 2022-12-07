@@ -1,10 +1,11 @@
-import WDB, {
+import {
+  api,
   Changeset,
   PokeProtocol,
   SiteIDLocal,
   SiteIDWire,
   WholeDbReplicator,
-} from "./wholeDbReplicator.js"
+} from "shared"
 import { DB, DBAsync } from "@vlcn.io/xplat-api"
 
 type Msg = PokeMsg | ChangesMsg | RequestChangesMsg
@@ -52,7 +53,7 @@ export class WholeDbRtc implements PokeProtocol {
   ) {}
 
   async init(): Promise<void> {
-    this._replicator = await WDB.install(this._db, this)
+    this._replicator = await api.install(this._db, this)
   }
 
   async schemaChanged(): Promise<void> {

@@ -25,3 +25,5 @@ export const initSql = [
   `SELECT crsql_as_crr('template');`,
   `SELECT crsql_as_crr('note');`,
 ]
+
+export * from "./wholeDbReplicator.js"

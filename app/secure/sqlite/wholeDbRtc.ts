@@ -1,10 +1,12 @@
-import WDB, {
+import {
+  api,
   Changeset,
   PokeProtocol,
   SiteIDLocal,
   SiteIDWire,
   WholeDbReplicator,
-} from "@vlcn.io/replicator-wholedb"
+} from "shared"
+
 import { DB, DBAsync } from "@vlcn.io/xplat-api"
 
 type Msg = PokeMsg | ChangesMsg | RequestChangesMsg
@@ -29,7 +31,7 @@ interface RequestChangesMsg {
 }
 
 export class WholeDbRtc implements PokeProtocol {
-  private _replicator?: WholeDbReplicator
+  private _replicator!: WholeDbReplicator
 
   private _onPoked:
     | ((pokedBy: SiteIDWire, pokerVersion: bigint) => void)
@@ -50,11 +52,11 @@ export class WholeDbRtc implements PokeProtocol {
   ) {}
 
   async init(): Promise<void> {
-    this._replicator = await WDB.install(this.siteId, this._db, this)
+    this._replicator = await api.install(this._db, this)
   }
 
   async schemaChanged(): Promise<void> {
-    await this._replicator!.schemaChanged()
+    await this._replicator.schemaChanged()
   }
 
   poke(poker: SiteIDWire, pokerVersion: bigint): void {
@@ -108,7 +110,7 @@ export class WholeDbRtc implements PokeProtocol {
   }
 
   dispose(): void {
-    this._replicator!.dispose()
+    this._replicator.dispose()
   }
 
   private readonly _newConnection = (siteId: SiteIDWire): void => {
@@ -131,27 +133,11 @@ export class WholeDbRtc implements PokeProtocol {
   }
 }
 
-class WholeDbRtcPublic {
-  constructor(private readonly _wdbRtc: WholeDbRtc) {}
-
-  get siteId(): SiteIDLocal {
-    return this._wdbRtc.siteId
-  }
-
-  async schemaChanged(): Promise<void> {
-    await this._wdbRtc.schemaChanged()
-  }
-
-  dispose(): void {
-    this._wdbRtc.dispose()
-  }
-}
-
 export default async function wholeDbRtc(
   db: DB | DBAsync
-): Promise<WholeDbRtcPublic> {
+): Promise<WholeDbRtc> {
   const siteId = (await db.execA<[Uint8Array]>("SELECT crsql_siteid();"))[0][0]
   const internal = new WholeDbRtc(siteId, db)
   await internal.init()
-  return new WholeDbRtcPublic(internal)
+  return internal
 }
