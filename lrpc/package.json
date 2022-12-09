@@ -28,6 +28,7 @@
     "@types/node": "^18.7.21",
     "@types/node-fetch": "^2.6.2",
     "@types/uuid": "^9.0.0",
+    "nodemon": "^2.0.20",
     "prisma": "^4.6.1",
     "serverless": "^3.22.0",
     "serverless-offline": "^10.2.1",
