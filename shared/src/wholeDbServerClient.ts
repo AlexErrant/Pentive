@@ -55,10 +55,6 @@ class WholeDbRtc implements PokeProtocol {
     this._replicator = await api.install(this._db, this)
   }
 
-  async schemaChanged(): Promise<void> {
-    await this._replicator.schemaChanged()
-  }
-
   onPoked(
     cb: (pokedBy: SiteIDWire, pokerVersion: bigint) => Promise<bigint | null>
   ): void {

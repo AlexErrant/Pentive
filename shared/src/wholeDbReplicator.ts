@@ -92,7 +92,6 @@ export class WholeDbReplicator {
   }
 
   async init(): Promise<void> {
-    await this._installTriggers()
     await this._createPeerTrackingTable()
   }
 
@@ -106,44 +105,6 @@ export class WholeDbReplicator {
         )
       )
     })
-  }
-
-  async schemaChanged(): Promise<void> {
-    return await this._installTriggers()
-  }
-
-  private async _installTriggers(): Promise<void> {
-    // find all crr tables
-    // TODO: ensure we are not notified
-    // if we're in the process of applying sync changes.
-    // TODO: we can also just track that internally.
-    // well we do want to pass on to sites that are not the site
-    // that just send the patch.
-    const crrs: string[][] = await this._db.execA(
-      "SELECT name FROM sqlite_master WHERE name LIKE '%__crsql_clock'"
-    )
-
-    const baseTableNamesPromises = crrs.map(async (crr) => {
-      const fullTblName = crr[0]
-      const baseTblName = fullTblName.substring(
-        0,
-        fullTblName.lastIndexOf("__crsql_clock")
-      )
-      const ps = ["INSERT", "UPDATE", "DELETE"].map((verb) => {
-        return this._db.exec(
-          `CREATE TEMP TRIGGER IF NOT EXISTS "${baseTblName}__crsql_wdbreplicator_${verb.toLowerCase()}" AFTER ${verb} ON "${baseTblName}"
-          BEGIN
-            select crsql_wdbreplicator() WHERE crsql_internal_sync_bit() = 0;
-          END;
-        `
-        )
-      })
-      await Promise.all(ps)
-
-      return baseTblName
-    })
-    const baseTableNames = await Promise.all(baseTableNamesPromises)
-    this._crrs = baseTableNames
   }
 
   private async _createPeerTrackingTable(): Promise<void> {
