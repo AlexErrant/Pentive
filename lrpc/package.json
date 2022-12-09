@@ -38,7 +38,8 @@
   },
   "scripts": {
     "build": "npx tsc",
-    "dev": "ts-node src/dev.ts",
+    "dev": "nodemon src/dev.ts",
+    "//dev-comment": "maybe someday https://typestrong.org/ts-node/docs/swc/ https://github.com/privatenumber/ts-runtime-comparison abandoned ts-node-dev because of https://github.com/wclr/ts-node-dev/issues/265",
     "start-offline": "npx serverless offline start --httpPort 4050",
     "rebuild-offline": "npm run build && npm run start-offline",
     "start-client": "yarn ts-node src/client.ts",
