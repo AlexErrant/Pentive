@@ -18,41 +18,6 @@ function log(...data: any[]): void {
   }
 }
 
-/**
- * The `poke` protocol is the simplest option in terms of
- * - causal delivery of messages
- * - retry on drop
- */
-export interface PokeProtocol {
-  /**
-   * Receive a poke from a given site.
-   * In response, we'll compute what changes we're missing from that site
-   * and request those changes.
-   */
-  onPoked: (
-    cb: (pokedBy: SiteIDWire, pokerVersion: bigint) => Promise<bigint | null>
-  ) => void
-
-  /**
-   * A peer has requested changes from us.
-   */
-  onChangesRequested: (
-    cb: (from: SiteIDWire, since: bigint) => Promise<Changeset[]>
-  ) => void
-
-  /**
-   * We have received changes from a peer.
-   */
-  onChangesReceived: (
-    cb: (
-      fromSiteId: SiteIDWire,
-      changesets: readonly Changeset[]
-    ) => Promise<void>
-  ) => void
-
-  dispose: () => void
-}
-
 export type Changeset = [
   TableName,
   QuoteConcatedPKs,
@@ -64,11 +29,8 @@ export type Changeset = [
 ]
 
 export const api = {
-  async install(
-    db: DB | DBAsync,
-    network: PokeProtocol
-  ): Promise<WholeDbReplicator> {
-    const ret = new WholeDbReplicator(db, network)
+  async install(db: DB | DBAsync): Promise<WholeDbReplicator> {
+    const ret = new WholeDbReplicator(db)
     await ret.init()
     return ret
   },
@@ -78,17 +40,10 @@ export const api = {
 // Well, that should be easy. Just poke people on connect.
 
 export class WholeDbReplicator {
-  private _crrs: string[] = []
+  private readonly _crrs: string[] = []
 
-  constructor(
-    private readonly _db: DB | DBAsync,
-    private readonly _network: PokeProtocol
-  ) {
+  constructor(private readonly _db: DB | DBAsync) {
     this._db = _db
-
-    this._network.onPoked(this._onPoked)
-    this._network.onChangesReceived(this._onChangesReceived)
-    this._network.onChangesRequested(this._onChangesRequested)
   }
 
   async init(): Promise<void> {
@@ -113,7 +68,7 @@ export class WholeDbReplicator {
     )
   }
 
-  private readonly _onPoked = async (
+  onPoked = async (
     pokedBy: SiteIDWire,
     pokerVersion: bigint
   ): Promise<bigint | null> => {
@@ -140,9 +95,7 @@ export class WholeDbReplicator {
     return ourVersionForPoker
   }
 
-  private readonly _onNewConnection = async (
-    siteId: SiteIDWire
-  ): Promise<void> => {
+  onNewConnection = async (siteId: SiteIDWire): Promise<void> => {
     await this._db.exec(
       "INSERT OR IGNORE INTO __crsql_wdbreplicator_peers VALUES (?, ?)",
       [uuidParse(siteId), 0]
@@ -152,7 +105,7 @@ export class WholeDbReplicator {
   // if we fail to apply, re-request
   // TODO: other retry mechanisms
   // todo: need to know who received from. cs site id can be a forwarded site id
-  private readonly _onChangesReceived = async (
+  onChangesReceived = async (
     fromSiteId: SiteIDWire,
     changesets: readonly Changeset[]
   ): Promise<void> => {
@@ -195,7 +148,7 @@ export class WholeDbReplicator {
     })
   }
 
-  private readonly _onChangesRequested = async (
+  onChangesRequested = async (
     from: SiteIDWire,
     since: bigint
   ): Promise<Changeset[]> => {

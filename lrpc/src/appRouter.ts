@@ -41,7 +41,7 @@ export const appRouter = router({
           db.execA<[Uint8Array]>("SELECT crsql_siteid();")[0][0]
         )
         const wdb = await wholeDbRtc(db)
-        const version = await wdb.poked(input.pokedBy, input.pokerVersion)
+        const version = await wdb.onPoked(input.pokedBy, input.pokerVersion)
         return {
           version,
           siteId,
@@ -61,7 +61,7 @@ export const appRouter = router({
       const db = aio.open(`${ctx.user}.db`)
       try {
         const wdb = await wholeDbRtc(db)
-        await wdb.changesReceived(input.fromSiteId, input.changeSets)
+        await wdb.onChangesReceived(input.fromSiteId, input.changeSets)
       } finally {
         db.close()
       }

@@ -39,7 +39,7 @@ export async function sync(): Promise<void> {
   console.log("poke response:", poke)
   const wdb = await wholeDbRtc(db)
   if (poke.version != null) {
-    const changeSets = await wdb.changesRequested(poke.siteId, poke.version)
+    const changeSets = await wdb.onChangesRequested(poke.siteId, poke.version)
     console.log("changeSets", changeSets)
     await lrpc.receiveChanges.mutate({
       changeSets,
