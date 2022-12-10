@@ -38,4 +38,4 @@ const server = http.createServer(async (req, res) => {
   await handler(req, res)
 })
 
-server.listen(4050)
+server.listen(4050, () => console.log("listening to 4050"))
