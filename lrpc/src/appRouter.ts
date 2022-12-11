@@ -3,7 +3,7 @@ import { noteRouter } from "./noteRouter.js"
 import { templateRouter } from "./templateRouter.js"
 import { authedProcedure, publicProcedure, router } from "./trpc.js"
 import aio from "@vlcn.io/crsqlite-allinone"
-import { initSql, wholeDbRtc } from "shared"
+import { initSql, wholeDbReplicator } from "shared"
 import { stringify as uuidStringify } from "uuid"
 
 const tableName = z.string()
@@ -40,7 +40,7 @@ export const appRouter = router({
         const siteId = uuidStringify(
           db.execA<[Uint8Array]>("SELECT crsql_siteid();")[0][0]
         )
-        const wdb = await wholeDbRtc(db)
+        const wdb = await wholeDbReplicator(db)
         const version = await wdb.onPoked(input.pokedBy, input.pokerVersion)
         const changes = await wdb.onChangesRequested(
           input.pokedBy,
@@ -65,7 +65,7 @@ export const appRouter = router({
     .mutation(async ({ input, ctx }) => {
       const db = aio.open(`${ctx.user}.db`)
       try {
-        const wdb = await wholeDbRtc(db)
+        const wdb = await wholeDbReplicator(db)
         await wdb.onChangesReceived(input.fromSiteId, input.changeSets)
       } finally {
         db.close()

@@ -1,7 +1,6 @@
 import { DB, DBAsync } from "@vlcn.io/xplat-api"
 import { parse as uuidParse, stringify as uuidStringify } from "uuid"
-export type SiteIDWire = string
-export type SiteIDLocal = Uint8Array
+type SiteIDWire = string
 type CID = string
 type QuoteConcatedPKs = string | number
 type TableName = string
@@ -28,38 +27,14 @@ export type Changeset = [
   SiteIDWire // site_id
 ]
 
-export const api = {
-  async install(db: DB | DBAsync): Promise<WholeDbReplicator> {
-    const ret = new WholeDbReplicator(db)
-    await ret.init()
-    return ret
-  },
-}
-
 // TODO: we need to handle initial sync.
 // Well, that should be easy. Just poke people on connect.
 
-export class WholeDbReplicator {
-  private readonly _crrs: string[] = []
-
-  constructor(private readonly _db: DB | DBAsync) {
-    this._db = _db
-  }
+class WholeDbReplicator {
+  constructor(private readonly _db: DB | DBAsync) {}
 
   async init(): Promise<void> {
     await this._createPeerTrackingTable()
-  }
-
-  dispose(): void {
-    // remove trigger(s)
-    // function extension is fine to stay, it'll get removed on connection termination
-    this._crrs.forEach((crr) => {
-      ;["INSERT", "UPDATE", "DELETE"].forEach((verb) =>
-        this._db.exec(
-          `DROP TRIGGER IF EXISTS "${crr}__crsql_wdbreplicator_${verb.toLowerCase()}";`
-        )
-      )
-    })
   }
 
   private async _createPeerTrackingTable(): Promise<void> {
@@ -162,8 +137,10 @@ export class WholeDbReplicator {
   }
 }
 
-export async function wholeDbRtc(db: DB | DBAsync): Promise<WholeDbReplicator> {
-  const wdb = await api.install(db)
+export async function wholeDbReplicator(
+  db: DB | DBAsync
+): Promise<WholeDbReplicator> {
+  const wdb = new WholeDbReplicator(db)
   await wdb.init()
   return wdb
 }

@@ -1,5 +1,5 @@
 import * as sqliteWasm from "@vlcn.io/wa-crsqlite"
-import { initSql, wholeDbRtc } from "shared"
+import { initSql, wholeDbReplicator } from "shared"
 import { lrpc } from "../../src/lrpcClient"
 import { stringify as uuidStringify } from "uuid"
 
@@ -37,7 +37,7 @@ export async function sync(): Promise<void> {
     pokerVersion: BigInt(dbVersion),
   })
   console.log("poke response:", poke)
-  const wdb = await wholeDbRtc(db)
+  const wdb = await wholeDbReplicator(db)
   await wdb.onChangesReceived(poke.siteId, poke.changes)
   if (poke.version != null) {
     const changeSets = await wdb.onChangesRequested(poke.siteId, poke.version)
