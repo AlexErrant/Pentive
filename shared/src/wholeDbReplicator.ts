@@ -95,13 +95,6 @@ export class WholeDbReplicator {
     return ourVersionForPoker
   }
 
-  onNewConnection = async (siteId: SiteIDWire): Promise<void> => {
-    await this._db.exec(
-      "INSERT OR IGNORE INTO __crsql_wdbreplicator_peers VALUES (?, ?)",
-      [uuidParse(siteId), 0]
-    )
-  }
-
   // if we fail to apply, re-request
   // TODO: other retry mechanisms
   // todo: need to know who received from. cs site id can be a forwarded site id
@@ -167,4 +160,10 @@ export class WholeDbReplicator {
     // console.log(changes);
     return changes
   }
+}
+
+export async function wholeDbRtc(db: DB | DBAsync): Promise<WholeDbReplicator> {
+  const wdb = await api.install(db)
+  await wdb.init()
+  return wdb
 }
