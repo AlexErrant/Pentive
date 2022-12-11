@@ -42,9 +42,14 @@ export const appRouter = router({
         )
         const wdb = await wholeDbRtc(db)
         const version = await wdb.onPoked(input.pokedBy, input.pokerVersion)
+        const changes = await wdb.onChangesRequested(
+          input.pokedBy,
+          input.pokerVersion
+        )
         return {
           version,
           siteId,
+          changes,
         }
       } finally {
         db.close()

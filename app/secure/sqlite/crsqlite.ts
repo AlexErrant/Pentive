@@ -38,6 +38,7 @@ export async function sync(): Promise<void> {
   })
   console.log("poke response:", poke)
   const wdb = await wholeDbRtc(db)
+  await wdb.onChangesReceived(poke.siteId, poke.changes)
   if (poke.version != null) {
     const changeSets = await wdb.onChangesRequested(poke.siteId, poke.version)
     console.log("changeSets", changeSets)
@@ -50,5 +51,7 @@ export async function sync(): Promise<void> {
     console.log(
       "2. The above error isn't being propagated, so tRPC is giving me a 200 OK."
     )
+  } else {
+    console.log("No changes to push!")
   }
 }
