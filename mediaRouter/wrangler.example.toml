@@ -1,3 +1,8 @@
 name = "mediarouter"
 main = "src/index.ts"
 compatibility_date = "2022-12-14"
+
+[[d1_databases]]
+binding = "DB" # i.e. available in your Worker on env.DB
+database_name = "myDb"
+database_id = "some guid"
