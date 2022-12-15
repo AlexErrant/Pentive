@@ -24,6 +24,35 @@ export interface Env {
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const app = new Hono<{ Bindings: Env }>()
 
-app.get("/", (c) => c.text("Hono!!"))
+app
+  .get("/", (c) => c.text("Hono!!"))
+  // highTODO needs sanitization and stripping of EXIF
+  .post("/:filename", async (c) => {
+    if (c.req.body === null) {
+      return c.text("Missing body", 400)
+    }
+    const contentLength = c.req.headers.get("content-length")
+    if (contentLength === null) {
+      return c.text("Missing `content-length` header", 400)
+    }
+    const contentLengthInt = parseInt(contentLength)
+    if (isNaN(contentLengthInt)) {
+      return c.text("`content-length` must be an int", 400)
+    } else if (contentLengthInt <= 0) {
+      return c.text("`content-length` must be larger than 0", 400)
+    }
+
+    const { readable, writable } = new FixedLengthStream(
+      parseInt(contentLength)
+    )
+    void c.req.body.pipeTo(writable)
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    const headers = new Headers({ "content-length": contentLength })
+    const filename = c.req.param("filename") // highTODO needs validation
+    await c.env.mediaBucket.put(filename, readable, {
+      httpMetadata: headers,
+    })
+    return c.text("OK")
+  })
 
 export default app
