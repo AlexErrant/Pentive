@@ -8,6 +8,8 @@
  * Learn more at https://developers.cloudflare.com/workers/
  */
 
+import { Hono } from "hono"
+
 export interface Env {
   // Example binding to KV. Learn more at https://developers.cloudflare.com/workers/runtime-apis/kv/
   // MY_KV_NAMESPACE: KVNamespace;
@@ -19,13 +21,9 @@ export interface Env {
   mediaBucket: R2Bucket
   mediaDb: D1Database
 }
+// eslint-disable-next-line @typescript-eslint/naming-convention
+const app = new Hono<{ Bindings: Env }>()
 
-export default {
-  async fetch(
-    request: Request,
-    env: Env,
-    ctx: ExecutionContext
-  ): Promise<Response> {
-    return new Response("Hello World!")
-  },
-}
+app.get("/", (c) => c.text("Hono!!"))
+
+export default app
