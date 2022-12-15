@@ -54,5 +54,15 @@ app
     })
     return c.text("OK")
   })
+  .get("/:filename", async (c) => {
+    const filename = c.req.param("filename")
+    const file = await c.env.mediaBucket.get(filename)
+    if (file === null) {
+      return await c.notFound()
+    }
+    const { readable, writable } = new TransformStream()
+    void file.body.pipeTo(writable) // https://developers.cloudflare.com/workers/learning/using-streams
+    return c.body(readable)
+  })
 
 export default app
