@@ -1,6 +1,6 @@
 import { createTRPCProxyClient, httpBatchLink } from "@trpc/client"
 import { AppRouter } from "lrpc/src/appRouter"
-import { JWT_BEARER_TOKEN } from "rxql/shared"
+import { JWT_BEARER_TOKEN } from "shared"
 import superjson from "superjson"
 
 export const lrpc = createTRPCProxyClient<AppRouter>({
