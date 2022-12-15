@@ -2,7 +2,6 @@ packages:
   - "app/"
   - "app-ugc/"
   - "lrpc/"
-  - "rxql/"
   - "shared/"
   - "mediaRouter/"
   - "example-plugins/*"

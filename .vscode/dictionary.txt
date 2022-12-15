@@ -18,7 +18,6 @@ precache
 precaching
 resizer
 rxdb
-rxql
 sandboxed
 stylelint
 superjson
