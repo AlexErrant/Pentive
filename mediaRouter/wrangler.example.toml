@@ -2,7 +2,13 @@ name = "mediarouter"
 main = "src/index.ts"
 compatibility_date = "2022-12-14"
 
+account_id = ""
+
+[[r2_buckets]]
+binding = 'mediaBucket'
+bucket_name = 'media'
+
 [[d1_databases]]
-binding = "DB" # i.e. available in your Worker on env.DB
-database_name = "myDb"
+binding = "mediaDb"
+database_name = "mediaDb"
 database_id = "some guid"
