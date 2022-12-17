@@ -26,7 +26,9 @@ const app = new Hono<{ Bindings: Env }>()
 
 app
   .get("/", (c) => c.text("Hono!!"))
-  // highTODO needs sanitization and stripping of EXIF
+  // highTODO needs sanitization and stripping of EXIF https://developers.cloudflare.com/workers/tutorials/generate-youtube-thumbnails-with-workers-and-images/ https://github.com/hMatoba/piexifjs https://github.com/hMatoba/exif-library
+  // Someday B2? https://walshy.dev/blog/21_09_10-handling-file-uploads-with-cloudflare-workers https://news.ycombinator.com/item?id=28687181
+  // Other alternatives https://bunny.net/ https://www.gumlet.com/ https://news.ycombinator.com/item?id=29474743
   .post("/:filename", async (c) => {
     if (c.req.body === null) {
       return c.text("Missing body", 400)
@@ -40,12 +42,17 @@ app
       return c.text("`content-length` must be an int", 400)
     } else if (contentLengthInt <= 0) {
       return c.text("`content-length` must be larger than 0", 400)
+    } else if (contentLengthInt > 2097152) {
+      return c.text(
+        "`content-length` must be less than 2,097,152 bytes (2 MB).",
+        400
+      )
     }
 
-    const { readable, writable } = new FixedLengthStream(
+    const { readable, writable } = new FixedLengthStream( // validates length
       parseInt(contentLength)
     )
-    void c.req.body.pipeTo(writable)
+    void c.req.body.pipeTo(writable) // https://developers.cloudflare.com/workers/learning/using-streams
     // eslint-disable-next-line @typescript-eslint/naming-convention
     const headers = new Headers({ "content-length": contentLength })
     const filename = c.req.param("filename") // highTODO needs validation
@@ -60,9 +67,7 @@ app
     if (file === null) {
       return await c.notFound()
     }
-    const { readable, writable } = new TransformStream()
-    void file.body.pipeTo(writable) // https://developers.cloudflare.com/workers/learning/using-streams
-    return c.body(readable)
+    return c.body(file.body)
   })
 
 export default app
