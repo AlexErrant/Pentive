@@ -8,7 +8,14 @@
 set -euo pipefail # https://stackoverflow.com/a/2871034
 # set -x
 
-source ./ivy/.env
+# https://www.scottbrady91.com/jose/jwts-which-signing-algorithm-should-i-use
+# Ed448 doesn't work on cloudflare, but that's okay. https://soatok.blog/2022/05/19/guidance-for-choosing-an-elliptic-curve-signature-algorithm-in-2022/
+openssl genpkey -algorithm ed25519 -out jws_private.pem
+openssl pkey -in jws_private.pem -pubout -out jws_public.pem
+jws_public=$(<jws_public.pem)
+jws_private=$(<jws_private.pem)
+echo "jwsPublicKey=\"$jws_public\"" > ./mediaRouter/.dev.vars
+echo "jwsPrivateKey=\"$jws_private\"" >> ./mediaRouter/.dev.vars
 
-IVY_HOST_PORT=${IVY_HOST_PORT} docker compose down
-IVY_HOST_PORT=${IVY_HOST_PORT} docker compose up --detach
+echo $jws_public | wrangler secret put jwsPublicKey --name mediarouter
+echo $jws_private | wrangler secret put jwsPrivateKey --name mediarouter

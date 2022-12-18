@@ -12,3 +12,11 @@ bucket_name = 'media'
 binding = "mediaDb"
 database_name = "mediaDb"
 database_id = "some guid"
+
+# https://developers.cloudflare.com/workers/wrangler/configuration/#environmental-variables
+# https://developers.cloudflare.com/workers/platform/environment-variables/#adding-secrets-via-wrangler
+
+# The necessary secrets are:
+# - jwsPublicKey
+# - jwsPrivateKey
+# Run `echo <VALUE> | wrangler secret put <NAME>` for each of these

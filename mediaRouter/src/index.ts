@@ -20,6 +20,8 @@ export interface Env {
   // Example binding to R2. Learn more at https://developers.cloudflare.com/workers/runtime-apis/r2/
   mediaBucket: R2Bucket
   mediaDb: D1Database
+  jwsPublicKey: string
+  jwsPrivateKey: string
 }
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const app = new Hono<{ Bindings: Env }>()
