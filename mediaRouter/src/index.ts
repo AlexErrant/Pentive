@@ -53,13 +53,17 @@ app
       parseInt(contentLength)
     )
     void c.req.body.pipeTo(writable) // https://developers.cloudflare.com/workers/learning/using-streams
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    const headers = new Headers({ "content-length": contentLength })
+    const headers = new Headers()
+    const ct = c.req.headers.get("Content-Type")
+    if (ct != null) headers.set("Content-Type", ct)
+    const ce = c.req.headers.get("Content-Encoding")
+    if (ce != null) headers.set("Content-Encoding", ce)
     const filename = c.req.param("filename") // highTODO needs validation
-    await c.env.mediaBucket.put(filename, readable, {
+    const object = await c.env.mediaBucket.put(filename, readable, {
       httpMetadata: headers,
     })
-    return c.text("OK")
+    c.header("ETag", object.httpEtag)
+    return c.body(null, 201)
   })
   .get("/:filename", async (c) => {
     const filename = c.req.param("filename")
@@ -67,6 +71,15 @@ app
     if (file === null) {
       return await c.notFound()
     }
+    c.header("ETag", file.httpEtag)
+    c.header("Expires", new Date(31536000 * 1000 + Date.now()).toUTCString())
+    // eslint-disable-next-line no-constant-condition
+    const p = true ? "public" : "private" // nextTODO fix
+    c.header("Cache-Control", `${p}, max-age=31536000, immutable`)
+    if (file.httpMetadata?.contentType != null)
+      c.header("Content-Type", file.httpMetadata.contentType)
+    if (file.httpMetadata?.contentEncoding != null)
+      c.header("Content-Encoding", file.httpMetadata.contentEncoding)
     return c.body(file.body)
   })
 
