@@ -10,12 +10,12 @@ set -euo pipefail # https://stackoverflow.com/a/2871034
 
 # https://www.scottbrady91.com/jose/jwts-which-signing-algorithm-should-i-use
 # Ed448 doesn't work on cloudflare, but that's okay. https://soatok.blog/2022/05/19/guidance-for-choosing-an-elliptic-curve-signature-algorithm-in-2022/
-openssl genpkey -algorithm ed25519 -out jws_private.pem
-openssl pkey -in jws_private.pem -pubout -out jws_public.pem
-jws_public=$(<jws_public.pem)
-jws_private=$(<jws_private.pem)
-echo "jwsPublicKey=\"$jws_public\"" > ./mediaRouter/.dev.vars
-echo "jwsPrivateKey=\"$jws_private\"" >> ./mediaRouter/.dev.vars
+openssl genpkey -algorithm ed25519 -out jwsPrivateKey.key
+openssl pkey -in jwsPrivateKey.key -pubout -out jwsPublicKey.pem
+export jwsPublicKey=$(<jwsPublicKey.pem)
+export jwsPrivateKey=$(<jwsPrivateKey.key)
 
-echo $jws_public | wrangler secret put jwsPublicKey --name mediarouter
-echo $jws_private | wrangler secret put jwsPrivateKey --name mediarouter
+envsubst < ./mediaRouter/.example.dev.vars > ./mediaRouter/.dev.vars
+
+echo $jwsPublicKey | wrangler secret put jwsPublicKey --name mediarouter
+echo $jwsPrivateKey | wrangler secret put jwsPrivateKey --name mediarouter
