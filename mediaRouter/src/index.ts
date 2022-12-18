@@ -23,6 +23,7 @@ export interface Env {
   mediaBucket: R2Bucket
   jwsPublicKey: string
   jwsPrivateKey: string
+  planetscaleDbUrl: string
 }
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const app = new Hono<{ Bindings: Env }>()
