@@ -8,11 +8,6 @@ account_id = ""
 binding = 'mediaBucket'
 bucket_name = 'media'
 
-[[d1_databases]]
-binding = "mediaDb"
-database_name = "mediaDb"
-database_id = "some guid"
-
 # https://developers.cloudflare.com/workers/wrangler/configuration/#environmental-variables
 # https://developers.cloudflare.com/workers/platform/environment-variables/#adding-secrets-via-wrangler
 
