@@ -3,6 +3,7 @@ type Brand<T, B> = T & { readonly brand: B } // https://medium.com/@KevinBGreene
 export type UserId = Brand<string, "userId">
 export type AppMediaIdSecretBase64 = Brand<string, "appMediaIdSecretBase64">
 export type IvEncryptedDigestBase64 = Brand<string, "ivEncryptedDigestBase64">
+export type Digest = Brand<ArrayBuffer, "digest">
 
 export const ivLength = 12 // https://crypto.stackexchange.com/q/41601
 
@@ -53,7 +54,7 @@ function splitIvDigest(
 
 export async function encryptDigest(
   appMediaIdSecret: AppMediaIdSecretBase64,
-  digest: ArrayBuffer
+  digest: Digest
 ): Promise<IvEncryptedDigestBase64> {
   const iv = crypto.getRandomValues(new Uint8Array(ivLength))
   const key = await generateKey(appMediaIdSecret, "encrypt")
