@@ -10,7 +10,15 @@
 
 import { Hono } from "hono"
 
-import { importPKCS8, importSPKI, SignJWT, jwtVerify } from "jose"
+import {
+  importPKCS8,
+  importSPKI,
+  SignJWT,
+  jwtVerify,
+  JWTVerifyResult,
+} from "jose"
+
+import { connect } from "@planetscale/database"
 
 export interface Env {
   // Example binding to KV. Learn more at https://developers.cloudflare.com/workers/runtime-apis/kv/
@@ -57,6 +65,22 @@ app
     )
     return c.body(null, 200)
   })
+  .get("/logJwt/:sub", async (c) => {
+    const privateKey = await importPKCS8(c.env.jwsPrivateKey, alg)
+    const sub = c.req.param("sub")
+    const jwt = await new SignJWT({})
+      .setProtectedHeader({ alg })
+      .setSubject(sub)
+      // .setJti() // highTODO
+      // .setNotBefore()
+      // .setIssuedAt()
+      // .setIssuer("urn:example:issuer")
+      // .setAudience("urn:example:audience")
+      // .setExpirationTime("2h")
+      .sign(privateKey)
+    console.log("jwt:", jwt)
+    return c.body(null)
+  })
   // highTODO needs sanitization and stripping of EXIF https://developers.cloudflare.com/workers/tutorials/generate-youtube-thumbnails-with-workers-and-images/ https://github.com/hMatoba/piexifjs https://github.com/hMatoba/exif-library
   // Someday B2? https://walshy.dev/blog/21_09_10-handling-file-uploads-with-cloudflare-workers https://news.ycombinator.com/item?id=28687181
   // Other alternatives https://bunny.net/ https://www.gumlet.com/ https://news.ycombinator.com/item?id=29474743
@@ -79,22 +103,72 @@ app
         400
       )
     }
+    let userId: string
+    const jwt = c.req.headers.get("Authorization")
+    if (jwt == null) {
+      return c.text("Missing `Authorization` header", 401)
+    } else {
+      const publicKey = await importSPKI(c.env.jwsPublicKey, alg)
+      let verifyResult: JWTVerifyResult
+      try {
+        verifyResult = await jwtVerify(jwt, publicKey)
+      } catch {
+        return c.text("Failed to verify JWT in `Authorization` header.", 401)
+      }
+      if (verifyResult.payload.sub == null) {
+        return c.text("There's no sub claim, ya goof.", 401)
+      } else {
+        userId = verifyResult.payload.sub
+      }
+    }
 
+    const [responseBody, hashBody] = c.req.body.tee()
     const { readable, writable } = new FixedLengthStream( // validates length
       parseInt(contentLength)
     )
-    void c.req.body.pipeTo(writable) // https://developers.cloudflare.com/workers/learning/using-streams
+    void responseBody.pipeTo(writable) // https://developers.cloudflare.com/workers/learning/using-streams
     const headers = new Headers()
     const ct = c.req.headers.get("Content-Type")
     if (ct != null) headers.set("Content-Type", ct)
     const ce = c.req.headers.get("Content-Encoding")
     if (ce != null) headers.set("Content-Encoding", ce)
     const filename = c.req.param("filename") // highTODO needs validation
-    const object = await c.env.mediaBucket.put(filename, readable, {
-      httpMetadata: headers,
+
+    const digestStream = new crypto.DigestStream("SHA-256") // https://developers.cloudflare.com/workers/runtime-apis/web-crypto/#constructors
+    void hashBody.pipeTo(digestStream)
+    const digest = await digestStream.digest
+    const hexString = [...new Uint8Array(digest)]
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join("")
+
+    const txResponse = await connect({
+      url: c.env.planetscaleDbUrl,
+    }).transaction(async (tx) => {
+      // Not a "real" transaction since the final `COMMIT` still needs to be sent as a fetch, but whatever.
+      // Just means we could PUT something into the mediaBucket and have no record of it in PlanetScale. Not great, but _fine_.
+      // lowTODO brainstorm a better architecture
+      const countResponse = await tx.execute(
+        "SELECT count(*) from Media_User WHERE mediaId=UNHEX(?) AND userId=?",
+        [hexString, userId],
+        { as: "array" }
+      )
+      const count = (countResponse.rows[0] as string[])[0]
+      if (count !== "0") {
+        return c.text(
+          "You've already uploaded this, or something exactly like it.", // Users can only upload an object exactly once. Otherwise, we won't know when it's safe to delete that object from R2.
+          400
+        )
+      }
+      await tx.execute(
+        "INSERT INTO Media_User (mediaId, userId) VALUES (UNHEX(?), ?)",
+        [hexString, userId]
+      )
+      const object = await c.env.mediaBucket.put(hexString, readable, {
+        httpMetadata: headers,
+      })
+      c.header("ETag", object.httpEtag)
     })
-    c.header("ETag", object.httpEtag)
-    return c.body(null, 201)
+    return txResponse ?? c.body(null, 201)
   })
   .get("/:filename", async (c) => {
     const filename = c.req.param("filename")
