@@ -62,10 +62,10 @@ export function base64ToArrayBuffer(base64: string): ArrayBuffer {
 }
 
 // https://gist.github.com/72lions/4528834
-function prependIvToDigest(iv: Uint8Array, digest: ArrayBuffer): ArrayBuffer {
-  const tmp = new Uint8Array(iv.byteLength + digest.byteLength)
-  tmp.set(iv, 0)
-  tmp.set(new Uint8Array(digest), iv.byteLength)
+function concat(a1: Uint8Array, a2: ArrayBuffer): ArrayBuffer {
+  const tmp = new Uint8Array(a1.byteLength + a2.byteLength)
+  tmp.set(a1, 0)
+  tmp.set(new Uint8Array(a2), a1.byteLength)
   return tmp.buffer
 }
 
@@ -79,10 +79,11 @@ function splitIvDigest(
 
 export async function encryptDigest(
   appMediaIdSecret: AppMediaIdSecretBase64,
-  digest: Digest
+  digest: Digest,
+  userId: UserId
 ): Promise<IvEncryptedDigestBase64> {
   const iv = crypto.getRandomValues(new Uint8Array(ivLength))
-  const key = await generateKey(appMediaIdSecret, "encrypt")
+  const key = await generateKey(appMediaIdSecret, "encrypt", userId)
   const encryptedDigest = await crypto.subtle.encrypt(
     {
       name: "AES-GCM",
@@ -91,18 +92,19 @@ export async function encryptDigest(
     key,
     digest
   )
-  const ivEncryptedDigest = prependIvToDigest(iv, encryptedDigest)
+  const ivEncryptedDigest = concat(iv, encryptedDigest)
   return arrayBufferToBase64(ivEncryptedDigest) as IvEncryptedDigestBase64
 }
 
 export async function decryptDigest(
   ivEncryptedDigest: IvEncryptedDigestBase64,
-  appMediaIdSecret: AppMediaIdSecretBase64
+  appMediaIdSecret: AppMediaIdSecretBase64,
+  userId: UserId
 ): Promise<DigestBase64> {
   const [iv, encryptedDigest] = splitIvDigest(
     base64ToArrayBuffer(ivEncryptedDigest)
   )
-  const key = await generateKey(appMediaIdSecret, "decrypt")
+  const key = await generateKey(appMediaIdSecret, "decrypt", userId)
   const digest = (await crypto.subtle.decrypt(
     {
       name: "AES-GCM",
@@ -116,11 +118,19 @@ export async function decryptDigest(
 
 async function generateKey(
   appMediaIdSecret: AppMediaIdSecretBase64,
-  keyUsage: "decrypt" | "encrypt"
+  keyUsage: "decrypt" | "encrypt",
+  userId: UserId
 ): Promise<CryptoKey> {
+  const userIdBytes = new TextEncoder().encode(userId)
+  const aesKey = await crypto.subtle.digest(
+    {
+      name: "SHA-256",
+    },
+    concat(userIdBytes, base64ToArrayBuffer(appMediaIdSecret))
+  )
   return await crypto.subtle.importKey(
     "raw",
-    base64ToArrayBuffer(appMediaIdSecret),
+    aesKey,
     {
       name: "AES-GCM",
     },

@@ -173,7 +173,8 @@ app
 
     const ivEncryptedDigest = await encryptDigest(
       c.env.appMediaIdSecret,
-      digest
+      digest,
+      userId
     )
     const txResponse = await connect({
       url: c.env.planetscaleDbUrl,
@@ -213,7 +214,8 @@ app
       fromBase64URL(
         c.req.param("ivEncryptedDigest")
       ) as IvEncryptedDigestBase64,
-      c.env.appMediaIdSecret
+      c.env.appMediaIdSecret,
+      userId
     )
     const file = await c.env.mediaBucket.get(digest)
     if (file === null) {
