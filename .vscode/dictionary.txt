@@ -1,5 +1,6 @@
 apkg
 authed
+ciphertext
 comlink
 crsql
 crsqlite

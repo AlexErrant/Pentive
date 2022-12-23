@@ -15,12 +15,15 @@ openssl pkey -in jwsPrivateKey.key -pubout -out jwsPublicKey.pem
 export jwsPublicKey=$(<jwsPublicKey.pem)
 export jwsPrivateKey=$(<jwsPrivateKey.key)
 
+export appMediaIdSecret=$(openssl rand -base64 32)
+
 source ../PentiveSecrets/secrets.sh
 
 # Uncomment if you wanna
 # echo $jwsPublicKey     | wrangler secret put jwsPublicKey     --name mediarouter
 # echo $jwsPrivateKey    | wrangler secret put jwsPrivateKey    --name mediarouter
 # echo $planetscaleDbUrl | wrangler secret put planetscaleDbUrl --name mediarouter
+# echo $appMediaIdSecret | wrangler secret put appMediaIdSecret --name mediarouter
 
 envsubst < ./mediaRouter/.example.dev.vars     > ./mediaRouter/.dev.vars
 envsubst < ./mediaRouter/example.wrangler.toml > ./mediaRouter/wrangler.toml

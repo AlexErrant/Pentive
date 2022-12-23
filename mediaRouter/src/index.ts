@@ -9,6 +9,7 @@
  */
 
 import { Hono } from "hono"
+import { encryptDigest, decryptDigest, arrayBufferToBase64 } from "../util"
 
 import {
   importPKCS8,
@@ -31,6 +32,7 @@ export interface Env {
   mediaBucket: R2Bucket
   jwsPublicKey: string
   jwsPrivateKey: string
+  appMediaIdSecret: string
   planetscaleDbUrl: string
 }
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -137,10 +139,12 @@ app
     const digestStream = new crypto.DigestStream("SHA-256") // https://developers.cloudflare.com/workers/runtime-apis/web-crypto/#constructors
     void hashBody.pipeTo(digestStream)
     const digest = await digestStream.digest
-    const hexString = [...new Uint8Array(digest)]
-      .map((b) => b.toString(16).padStart(2, "0"))
-      .join("")
+    const digestBase64 = arrayBufferToBase64(digest)
 
+    const ivEncryptedDigest = await encryptDigest(
+      c.env.appMediaIdSecret,
+      digest
+    )
     const txResponse = await connect({
       url: c.env.planetscaleDbUrl,
     }).transaction(async (tx) => {
@@ -148,31 +152,35 @@ app
       // Just means we could PUT something into the mediaBucket and have no record of it in PlanetScale. Not great, but _fine_.
       // lowTODO brainstorm a better architecture
       const countResponse = await tx.execute(
-        "SELECT count(*) from Media_User WHERE mediaId=UNHEX(?) AND userId=?",
-        [hexString, userId],
+        "SELECT count(*) from Media_User WHERE mediaId=FROM_BASE64(?) AND userId=?",
+        [digestBase64, userId],
         { as: "array" }
       )
       const count = (countResponse.rows[0] as string[])[0]
       if (count !== "0") {
         return c.text(
-          "You've already uploaded this, or something exactly like it.", // Users can only upload an object exactly once. Otherwise, we won't know when it's safe to delete that object from R2.
+          "You've already uploaded this, or something exactly like it. See: " +
+            ivEncryptedDigest, // Users can only upload an object exactly once. Otherwise, we won't know when it's safe to delete that object from R2.
           400
         )
       }
       await tx.execute(
-        "INSERT INTO Media_User (mediaId, userId) VALUES (UNHEX(?), ?)",
-        [hexString, userId]
+        "INSERT INTO Media_User (mediaId, userId) VALUES (FROM_BASE64(?), ?)",
+        [digestBase64, userId]
       )
-      const object = await c.env.mediaBucket.put(hexString, readable, {
+      const object = await c.env.mediaBucket.put(digestBase64, readable, {
         httpMetadata: headers,
       })
       c.header("ETag", object.httpEtag)
     })
-    return txResponse ?? c.body(null, 201)
+    return txResponse ?? c.text(ivEncryptedDigest, 201)
   })
-  .get("/:filename", async (c) => {
-    const filename = c.req.param("filename")
-    const file = await c.env.mediaBucket.get(filename)
+  .get("/:ivEncryptedDigest", async (c) => {
+    const digest = await decryptDigest(
+      c.req.param("ivEncryptedDigest"),
+      c.env.appMediaIdSecret
+    )
+    const file = await c.env.mediaBucket.get(digest)
     if (file === null) {
       return await c.notFound()
     }
