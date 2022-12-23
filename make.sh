@@ -19,3 +19,7 @@ envsubst < ./mediaRouter/.example.dev.vars > ./mediaRouter/.dev.vars
 
 echo $jwsPublicKey | wrangler secret put jwsPublicKey --name mediarouter
 echo $jwsPrivateKey | wrangler secret put jwsPrivateKey --name mediarouter
+
+source ../PentiveSecrets/secrets.sh
+
+envsubst < ./mediaRouter/example.wrangler.toml > ./mediaRouter/wrangler.toml

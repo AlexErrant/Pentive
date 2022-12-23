@@ -2,11 +2,12 @@ name = "mediarouter"
 main = "src/index.ts"
 compatibility_date = "2022-12-14"
 
-account_id = ""
+account_id = "$cloudflareAccountId"
 
 [[r2_buckets]]
 binding = 'mediaBucket'
 bucket_name = 'media'
+preview_bucket_name = 'media-dev'
 
 # https://developers.cloudflare.com/workers/wrangler/configuration/#environmental-variables
 # https://developers.cloudflare.com/workers/platform/environment-variables/#adding-secrets-via-wrangler
