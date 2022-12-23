@@ -50,15 +50,7 @@ export async function encryptDigest(
   digest: ArrayBuffer
 ): Promise<string> {
   const iv = crypto.getRandomValues(new Uint8Array(ivLength))
-  const key = await crypto.subtle.importKey(
-    "raw",
-    base64ToArrayBuffer(appMediaIdSecret),
-    {
-      name: "AES-GCM",
-    },
-    false,
-    ["encrypt"]
-  )
+  const key = await generateKey(appMediaIdSecret, "encrypt")
   const encryptedDigest = await crypto.subtle.encrypt(
     {
       name: "AES-GCM",
@@ -78,15 +70,7 @@ export async function decryptDigest(
   const [iv, encryptedDigest] = splitIvDigest(
     base64ToArrayBuffer(ivEncryptedDigest)
   )
-  const key = await crypto.subtle.importKey(
-    "raw",
-    base64ToArrayBuffer(appMediaIdSecret),
-    {
-      name: "AES-GCM",
-    },
-    false,
-    ["decrypt"]
-  )
+  const key = await generateKey(appMediaIdSecret, "decrypt")
   const digest = await crypto.subtle.decrypt(
     {
       name: "AES-GCM",
@@ -96,4 +80,19 @@ export async function decryptDigest(
     encryptedDigest
   )
   return arrayBufferToBase64(digest)
+}
+
+async function generateKey(
+  appMediaIdSecret: string,
+  keyUsage: "decrypt" | "encrypt"
+): Promise<CryptoKey> {
+  return await crypto.subtle.importKey(
+    "raw",
+    base64ToArrayBuffer(appMediaIdSecret),
+    {
+      name: "AES-GCM",
+    },
+    false,
+    [keyUsage]
+  )
 }
