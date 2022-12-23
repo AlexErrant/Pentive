@@ -8,7 +8,7 @@
  * Learn more at https://developers.cloudflare.com/workers/
  */
 
-import { Hono } from "hono"
+import { Context, Hono } from "hono"
 import {
   encryptDigest,
   decryptDigest,
@@ -20,6 +20,9 @@ import {
   IvEncryptedDigestBase64,
   Digest,
   DigestBase64,
+  Result,
+  toOk,
+  toError,
 } from "../util"
 
 import {
@@ -31,6 +34,37 @@ import {
 } from "jose"
 
 import { connect } from "@planetscale/database"
+
+async function getUserId(
+  c: Context<
+    "filename",
+    {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      Bindings: Env
+    },
+    unknown
+  >
+): Promise<Result<UserId, Response>> {
+  const jwt = c.req.headers.get("Authorization")
+  if (jwt == null) {
+    return toError(c.text("Missing `Authorization` header", 401))
+  } else {
+    const publicKey = await importSPKI(c.env.jwsPublicKey, alg)
+    let verifyResult: JWTVerifyResult
+    try {
+      verifyResult = await jwtVerify(jwt, publicKey)
+    } catch {
+      return toError(
+        c.text("Failed to verify JWT in `Authorization` header.", 401)
+      )
+    }
+    if (verifyResult.payload.sub == null) {
+      return toError(c.text("There's no sub claim, ya goof.", 401))
+    } else {
+      return toOk(verifyResult.payload.sub as UserId)
+    }
+  }
+}
 
 export interface Env {
   // Example binding to KV. Learn more at https://developers.cloudflare.com/workers/runtime-apis/kv/
@@ -116,24 +150,9 @@ app
         400
       )
     }
-    let userId: UserId
-    const jwt = c.req.headers.get("Authorization")
-    if (jwt == null) {
-      return c.text("Missing `Authorization` header", 401)
-    } else {
-      const publicKey = await importSPKI(c.env.jwsPublicKey, alg)
-      let verifyResult: JWTVerifyResult
-      try {
-        verifyResult = await jwtVerify(jwt, publicKey)
-      } catch {
-        return c.text("Failed to verify JWT in `Authorization` header.", 401)
-      }
-      if (verifyResult.payload.sub == null) {
-        return c.text("There's no sub claim, ya goof.", 401)
-      } else {
-        userId = verifyResult.payload.sub as UserId
-      }
-    }
+    const authResult = await getUserId(c)
+    if (authResult.tag === "Error") return authResult.error
+    const userId = authResult.ok
 
     const [responseBody, hashBody] = c.req.body.tee()
     const { readable, writable } = new FixedLengthStream( // validates length

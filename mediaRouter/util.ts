@@ -6,6 +6,30 @@ export type IvEncryptedDigestBase64 = Brand<string, "ivEncryptedDigestBase64">
 export type Digest = Brand<ArrayBuffer, "digest">
 export type DigestBase64 = Brand<string, "digestBase64">
 
+export type Result<TOk, TError> =
+  | {
+      readonly tag: "Ok"
+      readonly ok: TOk
+    }
+  | {
+      readonly tag: "Error"
+      readonly error: TError
+    }
+
+export function toOk<T>(ok: T): { tag: "Ok"; ok: T } {
+  return {
+    tag: "Ok",
+    ok,
+  }
+}
+
+export function toError<T>(error: T): { tag: "Error"; error: T } {
+  return {
+    tag: "Error",
+    error,
+  }
+}
+
 export const ivLength = 12 // https://crypto.stackexchange.com/q/41601
 
 export function toBase64URL(base64: string): string {
