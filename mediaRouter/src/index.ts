@@ -17,6 +17,7 @@ import {
   fromBase64URL,
   UserId,
   AppMediaIdSecretBase64,
+  IvEncryptedDigestBase64,
 } from "../util"
 
 import {
@@ -185,7 +186,9 @@ app
   })
   .get("/:ivEncryptedDigest", async (c) => {
     const digest = await decryptDigest(
-      fromBase64URL(c.req.param("ivEncryptedDigest")),
+      fromBase64URL(
+        c.req.param("ivEncryptedDigest")
+      ) as IvEncryptedDigestBase64,
       c.env.appMediaIdSecret
     )
     const file = await c.env.mediaBucket.get(digest)
