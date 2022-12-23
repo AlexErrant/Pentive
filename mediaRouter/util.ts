@@ -1,5 +1,13 @@
 export const ivLength = 12 // https://crypto.stackexchange.com/q/41601
 
+export function toBase64URL(base64: string): string {
+  return base64.replaceAll("+", "-").replaceAll("/", "_")
+}
+
+export function fromBase64URL(base64url: string): string {
+  return base64url.replaceAll("-", "+").replaceAll("_", "/")
+}
+
 // https://stackoverflow.com/a/38858127/
 export function arrayBufferToBase64(buffer: ArrayBuffer): string {
   let binary = ""

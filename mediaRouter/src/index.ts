@@ -9,7 +9,13 @@
  */
 
 import { Hono } from "hono"
-import { encryptDigest, decryptDigest, arrayBufferToBase64 } from "../util"
+import {
+  encryptDigest,
+  decryptDigest,
+  arrayBufferToBase64,
+  toBase64URL,
+  fromBase64URL,
+} from "../util"
 
 import {
   importPKCS8,
@@ -173,11 +179,11 @@ app
       })
       c.header("ETag", object.httpEtag)
     })
-    return txResponse ?? c.text(ivEncryptedDigest, 201)
+    return txResponse ?? c.text(toBase64URL(ivEncryptedDigest), 201)
   })
   .get("/:ivEncryptedDigest", async (c) => {
     const digest = await decryptDigest(
-      c.req.param("ivEncryptedDigest"),
+      fromBase64URL(c.req.param("ivEncryptedDigest")),
       c.env.appMediaIdSecret
     )
     const file = await c.env.mediaBucket.get(digest)
