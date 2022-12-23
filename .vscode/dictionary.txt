@@ -1,11 +1,15 @@
+allinone
 apkg
 authed
 ciphertext
 comlink
+concated
 crsql
 crsqlite
 dexie
+Exif
 graphiql
+hono
 iframe
 iframes
 immer
@@ -21,6 +25,7 @@ precaching
 resizer
 rxdb
 sandboxed
+siteid
 stylelint
 superjson
 sveltejs
@@ -31,3 +36,5 @@ upserted
 viewports
 vite
 vlcn
+wdbreplicator
+xplat
