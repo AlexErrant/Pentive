@@ -100,20 +100,27 @@ export async function decryptDigest(
   ivEncryptedDigest: IvEncryptedDigestBase64,
   appMediaIdSecret: AppMediaIdSecretBase64,
   userId: UserId
-): Promise<DigestBase64> {
+): Promise<Result<DigestBase64, string>> {
   const [iv, encryptedDigest] = splitIvDigest(
     base64ToArrayBuffer(ivEncryptedDigest)
   )
   const key = await generateKey(appMediaIdSecret, "decrypt", userId)
-  const digest = (await crypto.subtle.decrypt(
-    {
-      name: "AES-GCM",
-      iv,
-    },
-    key,
-    encryptedDigest
-  )) as Digest
-  return arrayBufferToBase64(digest) as DigestBase64
+  try {
+    const digest = (await crypto.subtle.decrypt(
+      {
+        name: "AES-GCM",
+        iv,
+      },
+      key,
+      encryptedDigest
+    )) as Digest
+    return toOk(arrayBufferToBase64(digest) as DigestBase64)
+  } catch (error) {
+    if (error instanceof DOMException) {
+      return toError(`Failed to decrypt input.`)
+    }
+    throw error
+  }
 }
 
 async function generateKey(

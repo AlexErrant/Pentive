@@ -217,7 +217,8 @@ app
       c.env.appMediaIdSecret,
       userId
     )
-    const file = await c.env.mediaBucket.get(digest)
+    if (digest.tag === "Error") return c.text(digest.error, 400)
+    const file = await c.env.mediaBucket.get(digest.ok)
     if (file === null) {
       return await c.notFound()
     }
