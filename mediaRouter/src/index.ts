@@ -37,7 +37,7 @@ import { connect } from "@planetscale/database"
 
 async function getUserId(
   c: Context<
-    "filename",
+    never,
     {
       // eslint-disable-next-line @typescript-eslint/naming-convention
       Bindings: Env
@@ -206,6 +206,9 @@ app
     return txResponse ?? c.text(toBase64URL(ivEncryptedDigest), 201)
   })
   .get("/:ivEncryptedDigest", async (c) => {
+    const authResult = await getUserId(c)
+    if (authResult.tag === "Error") return authResult.error
+    const userId = authResult.ok
     const digest = await decryptDigest(
       fromBase64URL(
         c.req.param("ivEncryptedDigest")
