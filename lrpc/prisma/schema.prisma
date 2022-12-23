@@ -66,3 +66,10 @@ model Note {
   @@index([ankiId])
   @@fulltext([fts])
 }
+
+model Media_User {
+  mediaId Bytes  @db.Binary(32)
+  userId  String @db.VarChar(21)
+
+  @@id([mediaId, userId])
+}
