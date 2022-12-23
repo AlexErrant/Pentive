@@ -19,6 +19,7 @@ import {
   AppMediaIdSecretBase64,
   IvEncryptedDigestBase64,
   Digest,
+  DigestBase64,
 } from "../util"
 
 import {
@@ -149,7 +150,7 @@ app
     const digestStream = new crypto.DigestStream("SHA-256") // https://developers.cloudflare.com/workers/runtime-apis/web-crypto/#constructors
     void hashBody.pipeTo(digestStream)
     const digest = (await digestStream.digest) as Digest
-    const digestBase64 = arrayBufferToBase64(digest)
+    const digestBase64 = arrayBufferToBase64(digest) as DigestBase64
 
     const ivEncryptedDigest = await encryptDigest(
       c.env.appMediaIdSecret,

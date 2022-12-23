@@ -4,6 +4,7 @@ export type UserId = Brand<string, "userId">
 export type AppMediaIdSecretBase64 = Brand<string, "appMediaIdSecretBase64">
 export type IvEncryptedDigestBase64 = Brand<string, "ivEncryptedDigestBase64">
 export type Digest = Brand<ArrayBuffer, "digest">
+export type DigestBase64 = Brand<string, "digestBase64">
 
 export const ivLength = 12 // https://crypto.stackexchange.com/q/41601
 
@@ -73,20 +74,20 @@ export async function encryptDigest(
 export async function decryptDigest(
   ivEncryptedDigest: IvEncryptedDigestBase64,
   appMediaIdSecret: AppMediaIdSecretBase64
-): Promise<string> {
+): Promise<DigestBase64> {
   const [iv, encryptedDigest] = splitIvDigest(
     base64ToArrayBuffer(ivEncryptedDigest)
   )
   const key = await generateKey(appMediaIdSecret, "decrypt")
-  const digest = await crypto.subtle.decrypt(
+  const digest = (await crypto.subtle.decrypt(
     {
       name: "AES-GCM",
       iv,
     },
     key,
     encryptedDigest
-  )
-  return arrayBufferToBase64(digest)
+  )) as Digest
+  return arrayBufferToBase64(digest) as DigestBase64
 }
 
 async function generateKey(
