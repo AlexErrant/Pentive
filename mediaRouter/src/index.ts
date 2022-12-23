@@ -10,6 +10,8 @@
 
 import { Hono } from "hono"
 
+import { importPKCS8, importSPKI, SignJWT, jwtVerify } from "jose"
+
 export interface Env {
   // Example binding to KV. Learn more at https://developers.cloudflare.com/workers/runtime-apis/kv/
   // MY_KV_NAMESPACE: KVNamespace;
@@ -25,9 +27,36 @@ export interface Env {
 }
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const app = new Hono<{ Bindings: Env }>()
+const alg = "EdDSA"
 
 app
   .get("/", (c) => c.text("Hono!!"))
+  .get("/testJws", async (c) => {
+    const publicKey = await importSPKI(c.env.jwsPublicKey, alg)
+    const privateKey = await importPKCS8(c.env.jwsPrivateKey, alg)
+    const jwt = await new SignJWT({})
+      .setProtectedHeader({ alg })
+      .setSubject("someUserName")
+      // .setJti() // highTODO
+      // .setNotBefore()
+      // .setIssuedAt()
+      // .setIssuer("urn:example:issuer")
+      // .setAudience("urn:example:audience")
+      // .setExpirationTime("2h")
+      .sign(privateKey)
+    const verifyResult = await jwtVerify(jwt, publicKey)
+    console.log(
+      JSON.stringify(
+        {
+          ...verifyResult,
+          jwt,
+        },
+        null,
+        4
+      )
+    )
+    return c.body(null, 200)
+  })
   // highTODO needs sanitization and stripping of EXIF https://developers.cloudflare.com/workers/tutorials/generate-youtube-thumbnails-with-workers-and-images/ https://github.com/hMatoba/piexifjs https://github.com/hMatoba/exif-library
   // Someday B2? https://walshy.dev/blog/21_09_10-handling-file-uploads-with-cloudflare-workers https://news.ycombinator.com/item?id=28687181
   // Other alternatives https://bunny.net/ https://www.gumlet.com/ https://news.ycombinator.com/item?id=29474743
