@@ -282,11 +282,13 @@ importers:
   mediaRouter:
     specifiers:
       '@cloudflare/workers-types': ^4.20221111.1
+      '@planetscale/database': ^1.5.0
       hono: ^2.6.2
       jose: ^4.11.1
       typescript: ^4.9.4
       wrangler: 2.6.2
     dependencies:
+      '@planetscale/database': 1.5.0
       hono: 2.6.2
       jose: 4.11.1
     devDependencies:
@@ -2184,6 +2186,11 @@ packages:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.13.0
     dev: true
+
+  /@planetscale/database/1.5.0:
+    resolution: {integrity: sha512-Qwh7Or1W5dB5mZ9EQqDkgvkDKhBBmQe58KIVUy0SGocNtr5fP4JAWtvZ6EdLAV6C6hVpzNlCA2xIg9lKTswm1Q==}
+    engines: {node: '>=16'}
+    dev: false
 
   /@playwright/test/1.25.2:
     resolution: {integrity: sha512-6qPznIR4Fw02OMbqXUPMG6bFFg1hDVNEdihKy0t9K0dmRbus1DyP5Q5XFQhGwEHQkLG5hrSfBuu9CW/foqhQHQ==}
