@@ -15,6 +15,7 @@ import {
   arrayBufferToBase64,
   toBase64URL,
   fromBase64URL,
+  UserId,
 } from "../util"
 
 import {
@@ -111,7 +112,7 @@ app
         400
       )
     }
-    let userId: string
+    let userId: UserId
     const jwt = c.req.headers.get("Authorization")
     if (jwt == null) {
       return c.text("Missing `Authorization` header", 401)
@@ -126,7 +127,7 @@ app
       if (verifyResult.payload.sub == null) {
         return c.text("There's no sub claim, ya goof.", 401)
       } else {
-        userId = verifyResult.payload.sub
+        userId = verifyResult.payload.sub as UserId
       }
     }
 
