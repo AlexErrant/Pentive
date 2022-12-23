@@ -1,6 +1,7 @@
 type Brand<T, B> = T & { readonly brand: B } // https://medium.com/@KevinBGreene/surviving-the-typescript-ecosystem-branding-and-type-tagging-6cf6e516523d
 
 export type UserId = Brand<string, "userId">
+export type AppMediaIdSecretBase64 = Brand<string, "appMediaIdSecretBase64">
 
 export const ivLength = 12 // https://crypto.stackexchange.com/q/41601
 
@@ -50,7 +51,7 @@ function splitIvDigest(
 }
 
 export async function encryptDigest(
-  appMediaIdSecret: string,
+  appMediaIdSecret: AppMediaIdSecretBase64,
   digest: ArrayBuffer
 ): Promise<string> {
   const iv = crypto.getRandomValues(new Uint8Array(ivLength))
@@ -69,7 +70,7 @@ export async function encryptDigest(
 
 export async function decryptDigest(
   ivEncryptedDigest: string,
-  appMediaIdSecret: string
+  appMediaIdSecret: AppMediaIdSecretBase64
 ): Promise<string> {
   const [iv, encryptedDigest] = splitIvDigest(
     base64ToArrayBuffer(ivEncryptedDigest)
@@ -87,7 +88,7 @@ export async function decryptDigest(
 }
 
 async function generateKey(
-  appMediaIdSecret: string,
+  appMediaIdSecret: AppMediaIdSecretBase64,
   keyUsage: "decrypt" | "encrypt"
 ): Promise<CryptoKey> {
   return await crypto.subtle.importKey(

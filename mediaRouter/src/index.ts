@@ -16,6 +16,7 @@ import {
   toBase64URL,
   fromBase64URL,
   UserId,
+  AppMediaIdSecretBase64,
 } from "../util"
 
 import {
@@ -39,7 +40,7 @@ export interface Env {
   mediaBucket: R2Bucket
   jwsPublicKey: string
   jwsPrivateKey: string
-  appMediaIdSecret: string
+  appMediaIdSecret: AppMediaIdSecretBase64
   planetscaleDbUrl: string
 }
 // eslint-disable-next-line @typescript-eslint/naming-convention
