@@ -24,6 +24,7 @@ model User {
   noteSubscriptions     NoteSubscriber[]
   posts                 Post[]
   postComments          PostComment[]
+  postSubscriptions     PostSubscriber[]
 }
 
 model Template {
@@ -172,14 +173,15 @@ model Nook {
 }
 
 model Post {
-  id       Bytes         @id @db.Binary(16)
-  title    String        @db.VarChar(255)
-  text     String        @db.Text
-  nook     String        @db.VarChar(21)
-  nookRef  Nook          @relation(fields: [nook], references: [id])
-  author   User          @relation(fields: [authorId], references: [id])
-  authorId String        @db.VarChar(21)
-  comments PostComment[]
+  id          Bytes            @id @db.Binary(16)
+  title       String           @db.VarChar(255)
+  text        String           @db.Text
+  nook        String           @db.VarChar(21)
+  nookRef     Nook             @relation(fields: [nook], references: [id])
+  author      User             @relation(fields: [authorId], references: [id])
+  authorId    String           @db.VarChar(21)
+  comments    PostComment[]
+  subscribers PostSubscriber[]
 
   @@index([authorId])
   @@index([nook])
@@ -198,4 +200,16 @@ model PostComment {
 
   @@index([authorId])
   @@index([postId])
+}
+
+model PostSubscriber {
+  postId Bytes    @db.Binary(16)
+  post   Post     @relation(fields: [postId], references: [id])
+  userId String   @db.VarChar(21)
+  user   User     @relation(fields: [userId], references: [id])
+  til    DateTime
+
+  @@id([postId, userId])
+  @@index([postId])
+  @@index([userId])
 }
