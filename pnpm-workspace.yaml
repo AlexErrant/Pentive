@@ -1,6 +1,7 @@
 packages:
   - "app/"
   - "app-ugc/"
+  - "hub/"
   - "lrpc/"
   - "shared/"
   - "mediaRouter/"
