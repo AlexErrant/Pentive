@@ -1,8 +1,8 @@
-import { Component, createResource, For, Show } from "solid-js";
-import { A, RouteDataArgs, useRouteData } from "solid-start";
-import Story from "~/components/story";
-import fetchAPI from "~/lib/api";
-import { IStory } from "~/types";
+import { Component, createResource, For, Show } from "solid-js"
+import { A, RouteDataArgs, useRouteData } from "solid-start"
+import Story from "~/components/story"
+import fetchAPI from "~/lib/api"
+import { IStory } from "~/types"
 
 const mapStories = {
   top: "news",
@@ -10,22 +10,22 @@ const mapStories = {
   show: "show",
   ask: "ask",
   job: "jobs",
-} as const;
+} as const
 
 export const routeData = ({ location, params }: RouteDataArgs) => {
-  const page = () => +location.query.page || 1;
-  const type = () => (params.stories || "top") as keyof typeof mapStories;
+  const page = () => +location.query.page || 1
+  const type = () => (params.stories || "top") as keyof typeof mapStories
 
   const [stories] = createResource<IStory[], string>(
     () => `${mapStories[type()]}?page=${page()}`,
     fetchAPI
-  );
+  )
 
-  return { type, stories, page };
-};
+  return { type, stories, page }
+}
 
 const Stories: Component = () => {
-  const { page, type, stories } = useRouteData<typeof routeData>();
+  const { page, type, stories } = useRouteData<typeof routeData>()
   return (
     <div class="news-view">
       <div class="news-list-nav">
@@ -47,7 +47,7 @@ const Stories: Component = () => {
         </Show>
         <span>page {page()}</span>
         <Show
-          when={stories() && stories()!.length >= 29}
+          when={stories() != null && stories()!.length >= 29}
           fallback={
             <span class="page-link disabled" aria-disabled="true">
               more {">"}
@@ -71,7 +71,7 @@ const Stories: Component = () => {
         </Show>
       </main>
     </div>
-  );
-};
+  )
+}
 
-export default Stories;
+export default Stories

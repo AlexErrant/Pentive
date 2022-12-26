@@ -1,7 +1,7 @@
-import { createSignal } from "solid-js";
+import { createSignal } from "solid-js"
 
 export default function Toggle(props: { children: any }) {
-  const [open, setOpen] = createSignal(true);
+  const [open, setOpen] = createSignal(true)
 
   return (
     <>
@@ -17,5 +17,5 @@ export default function Toggle(props: { children: any }) {
         {props.children}
       </ul>
     </>
-  );
+  )
 }

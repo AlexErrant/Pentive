@@ -1,4 +1,4 @@
-import { A } from "solid-start";
+import { A } from "solid-start"
 
 function Nav() {
   return (
@@ -29,7 +29,7 @@ function Nav() {
         </a>
       </nav>
     </header>
-  );
+  )
 }
 
-export default Nav;
+export default Nav

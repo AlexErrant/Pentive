@@ -1,7 +1,7 @@
-import { Component, For, Show } from "solid-js";
-import { A } from "solid-start";
-import { IComment } from "~/types";
-import Toggle from "./toggle";
+import { Component, For, Show } from "solid-js"
+import { A } from "solid-start"
+import { IComment } from "~/types"
+import Toggle from "./toggle"
 
 const Comment: Component<{ comment: IComment }> = (props) => {
   return (
@@ -19,7 +19,7 @@ const Comment: Component<{ comment: IComment }> = (props) => {
         </Toggle>
       </Show>
     </li>
-  );
-};
+  )
+}
 
-export default Comment;
+export default Comment

@@ -1,7 +1,7 @@
-import { Component, Show } from "solid-js";
-import { A } from "solid-start";
+import { Component, Show } from "solid-js"
+import { A } from "solid-start"
 
-import type { IStory } from "../types";
+import type { IStory } from "../types"
 
 const Story: Component<{ story: IStory }> = (props) => {
   return (
@@ -40,7 +40,7 @@ const Story: Component<{ story: IStory }> = (props) => {
         <span class="label">{props.story.type}</span>
       </Show>
     </li>
-  );
-};
+  )
+}
 
-export default Story;
+export default Story
