@@ -13,35 +13,65 @@ generator js {
 }
 
 model User {
-  id                    String     @id @db.VarChar(21) // lowercase // highTODO test increasing the length
-  displayName           String     @db.VarChar(21) // cased as user input
-  createdAt             DateTime   @default(now())
+  id                    String               @id @db.VarChar(21) // lowercase // highTODO test increasing the length
+  displayName           String               @db.VarChar(21) // cased as user input
+  createdAt             DateTime             @default(now())
   templates             Template[]
-  templateSubscriptions Template[] @relation("Template_Subscribers")
+  templateSubscriptions TemplateSubscriber[]
   notes                 Note[]
-  noteSubscriptions     Note[]     @relation("Note_Subscribers")
+  noteSubscriptions     Note[]               @relation("Note_Subscribers")
 }
 
 model Template {
-  id             Bytes    @id @db.Binary(16)
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-  name           String   @db.VarChar(255)
-  nook           String   @db.VarChar(21)
-  author         User     @relation(fields: [authorId], references: [id])
-  authorId       String   @db.VarChar(21)
-  type           String   @db.VarChar(21)
-  fields         String   @db.Text
-  css            String   @db.Text
-  childTemplates String   @db.Text
-  // history        String   @db.Text
+  id             Bytes                @id @db.Binary(16)
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
+  name           String               @db.VarChar(255)
+  nook           String               @db.VarChar(21)
+  author         User                 @relation(fields: [authorId], references: [id])
+  authorId       String               @db.VarChar(21)
+  type           String               @db.VarChar(21)
+  fields         String               @db.Text
+  css            String               @db.Text
+  childTemplates String               @db.Text
+  history        TemplateHistory[]
   // comments       String   @db.Text
-  ankiId         BigInt?  @db.UnsignedBigInt
-  subscribers    User[]   @relation("Template_Subscribers")
+  ankiId         BigInt?              @db.UnsignedBigInt // should be its own table
+  subscribers    TemplateSubscriber[]
   Note           Note[]
 
   @@index([authorId]) // do we need this? it's never gonna be used...
   @@index([ankiId])
+}
+
+model TemplateSubscriber {
+  templateId Bytes    @db.Binary(16)
+  template   Template @relation(fields: [templateId], references: [id])
+  userId     String   @db.VarChar(21)
+  user       User     @relation(fields: [userId], references: [id])
+  til        DateTime
+
+  @@id([templateId, userId])
+  @@index([templateId])
+  @@index([userId])
+}
+
+model TemplateHistory {
+  templateId Bytes    @db.Binary(16)
+  template   Template @relation(fields: [templateId], references: [id])
+  createdAt  DateTime @default(now())
+
+  name           String? @db.VarChar(255)
+  nook           String? @db.VarChar(21)
+  // author         User?   @relation(fields: [authorId], references: [id]) // no query patterns need this... yet
+  authorId       String? @db.VarChar(21)
+  type           String? @db.VarChar(21)
+  fields         String? @db.Text
+  css            String? @db.Text
+  childTemplates String? @db.Text
+
+  @@id([templateId, createdAt])
+  @@index([templateId])
 }
 
 model Note {
@@ -59,11 +89,12 @@ model Note {
 
   // history        String   @db.Text
   // comments       String   @db.Text
-  ankiId      BigInt? @db.UnsignedBigInt
+  ankiId      BigInt? @db.UnsignedBigInt // should be its own table
   subscribers User[]  @relation("Note_Subscribers")
 
   @@index([authorId])
   @@index([ankiId])
+  @@index([templateId])
   @@fulltext([fts])
 }
 
