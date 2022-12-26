@@ -20,6 +20,7 @@ model User {
   templateComments      TemplateComment[]
   templateSubscriptions TemplateSubscriber[]
   notes                 Note[]
+  noteComments          NoteComment[]
   noteSubscriptions     NoteSubscriber[]
 }
 
@@ -104,7 +105,7 @@ model Note {
   tags        String   @db.Text
 
   history     NoteHistory[]
-  // comments       String   @db.Text
+  comments    NoteComment[]
   ankiId      BigInt?          @db.UnsignedBigInt // should be its own table
   subscribers NoteSubscriber[]
 
@@ -112,6 +113,21 @@ model Note {
   @@index([ankiId])
   @@index([templateId])
   @@fulltext([fts])
+}
+
+model NoteComment {
+  id       Bytes   @id @db.Binary(16)
+  parentId Bytes?  @db.Binary(16)
+  noteId   Bytes   @db.Binary(16)
+  note     Note    @relation(fields: [noteId], references: [id])
+  text     String  @db.Text
+  author   User    @relation(fields: [authorId], references: [id])
+  authorId String  @db.VarChar(21)
+  history  String? @db.Text
+  votes    String  @db.Text
+
+  @@index([authorId])
+  @@index([noteId])
 }
 
 model NoteSubscriber {
