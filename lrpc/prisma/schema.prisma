@@ -20,7 +20,7 @@ model User {
   templateComments      TemplateComment[]
   templateSubscriptions TemplateSubscriber[]
   notes                 Note[]
-  noteSubscriptions     Note[]               @relation("Note_Subscribers")
+  noteSubscriptions     NoteSubscriber[]
 }
 
 model Template {
@@ -39,7 +39,7 @@ model Template {
   comments       TemplateComment[]
   ankiId         BigInt?              @db.UnsignedBigInt // should be its own table
   subscribers    TemplateSubscriber[]
-  Note           Note[]
+  notes          Note[]
 
   @@index([authorId]) // do we need this? it's never gonna be used...
   @@index([ankiId])
@@ -103,15 +103,40 @@ model Note {
   fts         String   @db.Text
   tags        String   @db.Text
 
-  // history        String   @db.Text
+  history     NoteHistory[]
   // comments       String   @db.Text
-  ankiId      BigInt? @db.UnsignedBigInt // should be its own table
-  subscribers User[]  @relation("Note_Subscribers")
+  ankiId      BigInt?          @db.UnsignedBigInt // should be its own table
+  subscribers NoteSubscriber[]
 
   @@index([authorId])
   @@index([ankiId])
   @@index([templateId])
   @@fulltext([fts])
+}
+
+model NoteSubscriber {
+  noteId Bytes    @db.Binary(16)
+  note   Note     @relation(fields: [noteId], references: [id])
+  userId String   @db.VarChar(21)
+  user   User     @relation(fields: [userId], references: [id])
+  til    DateTime
+
+  @@id([noteId, userId])
+  @@index([noteId])
+  @@index([userId])
+}
+
+model NoteHistory {
+  noteId    Bytes    @db.Binary(16)
+  note      Note     @relation(fields: [noteId], references: [id])
+  createdAt DateTime @default(now())
+
+  templateId  Bytes? @db.Binary(16)
+  fieldValues String @db.Text
+  tags        String @db.Text
+
+  @@id([noteId, createdAt])
+  @@index([noteId])
 }
 
 model Media_User {
