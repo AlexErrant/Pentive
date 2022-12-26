@@ -3,12 +3,31 @@
   "scripts": {
     "dev": "solid-start dev",
     "build": "solid-start build",
-    "start": "solid-start start"
+    "start": "solid-start start",
+    "eslint": "eslint .",
+    "eslintw": "eslint . --fix",
+    "prettier": "prettier --check .",
+    "prettierw": "prettier --write .",
+    "stylelint": "stylelint **/*.css",
+    "stylelintw": "stylelint **/*.css --fix"
   },
   "type": "module",
   "main": "./dist/index.js",
   "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.31.0",
+    "@typescript-eslint/parser": "^5.31.0",
+    "eslint": "^8.20.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-config-standard-with-typescript": "^22.0.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-n": "^15.2.4",
+    "eslint-plugin-prettier": "^4.2.1",
+    "eslint-plugin-promise": "^6.0.0",
+    "prettier": "^2.7.1",
     "solid-start-node": "^0.2.0",
+    "stylelint": "^14.9.1",
+    "stylelint-config-prettier": "^9.0.3",
+    "stylelint-config-standard": "^26.0.0",
     "typescript": "^4.8.4",
     "vite": "^3.1.8"
   },
