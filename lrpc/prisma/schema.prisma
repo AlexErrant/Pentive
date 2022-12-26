@@ -22,6 +22,7 @@ model User {
   notes                 Note[]
   noteComments          NoteComment[]
   noteSubscriptions     NoteSubscriber[]
+  posts                 Post[]
 }
 
 model Template {
@@ -165,5 +166,19 @@ model Nook {
   displayName String     @db.VarChar(21) // cased as user input
   createdAt   DateTime   @default(now())
   templates   Template[]
+  posts       Post[]
   moderators  String     @db.Text
+}
+
+model Post {
+  id       Bytes  @id @db.Binary(16)
+  title    String @db.VarChar(255)
+  text     String @db.Text
+  nook     String @db.VarChar(21)
+  nookRef  Nook   @relation(fields: [nook], references: [id])
+  author   User   @relation(fields: [authorId], references: [id])
+  authorId String @db.VarChar(21)
+
+  @@index([authorId])
+  @@index([nook])
 }
