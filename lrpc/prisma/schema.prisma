@@ -17,6 +17,7 @@ model User {
   displayName           String               @db.VarChar(21) // cased as user input
   createdAt             DateTime             @default(now())
   templates             Template[]
+  templateComments      TemplateComment[]
   templateSubscriptions TemplateSubscriber[]
   notes                 Note[]
   noteSubscriptions     Note[]               @relation("Note_Subscribers")
@@ -35,13 +36,28 @@ model Template {
   css            String               @db.Text
   childTemplates String               @db.Text
   history        TemplateHistory[]
-  // comments       String   @db.Text
+  comments       TemplateComment[]
   ankiId         BigInt?              @db.UnsignedBigInt // should be its own table
   subscribers    TemplateSubscriber[]
   Note           Note[]
 
   @@index([authorId]) // do we need this? it's never gonna be used...
   @@index([ankiId])
+}
+
+model TemplateComment {
+  id         Bytes    @id @db.Binary(16)
+  parentId   Bytes?   @db.Binary(16)
+  templateId Bytes    @db.Binary(16)
+  template   Template @relation(fields: [templateId], references: [id])
+  text       String   @db.Text
+  author     User     @relation(fields: [authorId], references: [id])
+  authorId   String   @db.VarChar(21)
+  history    String?  @db.Text
+  votes      String   @db.Text
+
+  @@index([authorId])
+  @@index([templateId])
 }
 
 model TemplateSubscriber {
