@@ -1,6 +1,6 @@
 export interface IComment {
   user: string
-  time_ago: string
+  timeAgo: string
   content: string
   comments: IComment[]
 }
@@ -12,8 +12,8 @@ export interface IStory {
   title: string
   domain: string
   type: string
-  time_ago: string
+  timeAgo: string
   user: string
-  comments_count: number
+  commentsCount: number
   comments: IComment[]
 }

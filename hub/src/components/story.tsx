@@ -23,14 +23,14 @@ const Story: Component<{ story: IStory }> = (props) => {
         <Show
           when={props.story.type !== "job"}
           fallback={
-            <A href={`/stories/${props.story.id}`}>{props.story.time_ago}</A>
+            <A href={`/stories/${props.story.id}`}>{props.story.timeAgo}</A>
           }
         >
           by <A href={`/users/${props.story.user}`}>{props.story.user}</A>{" "}
-          {props.story.time_ago} |{" "}
+          {props.story.timeAgo} |{" "}
           <A href={`/stories/${props.story.id}`}>
-            {props.story.comments_count !== 0
-              ? `${props.story.comments_count} comments`
+            {props.story.commentsCount !== 0
+              ? `${props.story.commentsCount} comments`
               : "discuss"}
           </A>
         </Show>

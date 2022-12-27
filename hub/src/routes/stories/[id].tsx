@@ -27,13 +27,13 @@ const Story: Component = () => {
           <p class="meta">
             {story()!.points} points | by{" "}
             <A href={`/users/${story()!.user}`}>{story()!.user}</A>{" "}
-            {story()!.time_ago} ago
+            {story()!.timeAgo} ago
           </p>
         </div>
         <div class="item-view-comments">
           <p class="item-view-comments-header">
-            {story()!.comments_count !== 0
-              ? `${story()!.comments_count} comments`
+            {story()!.commentsCount !== 0
+              ? `${story()!.commentsCount} comments`
               : "No comments yet."}
           </p>
           <ul class="comment-children">
