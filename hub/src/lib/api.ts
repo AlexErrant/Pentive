@@ -1,12 +1,16 @@
 import { isServer } from "solid-js/web"
 
-const story = (path: string) => `https://node-hnapi.herokuapp.com/${path}`
-const user = (path: string) =>
+const story = (path: string): string =>
+  `https://node-hnapi.herokuapp.com/${path}`
+const user = (path: string): string =>
   `https://hacker-news.firebaseio.com/v0/${path}.json`
 
-export default async function fetchAPI(path: string) {
+export default async function fetchAPI(path: string): Promise<any> {
   const url = path.startsWith("user") ? user(path) : story(path)
-  const headers = isServer ? { "User-Agent": "chrome" } : {}
+  const headers: Record<string, string> = isServer
+    ? // eslint-disable-next-line @typescript-eslint/naming-convention
+      { "User-Agent": "chrome" }
+    : {}
 
   try {
     const response = await fetch(url, { headers })
@@ -17,7 +21,7 @@ export default async function fetchAPI(path: string) {
       }
       return JSON.parse(text)
     } catch (e) {
-      console.error(`Recevied from API: ${text}`)
+      console.error(`Received from API: ${text}`)
       console.error(e)
       return { error: e }
     }

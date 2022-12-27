@@ -12,9 +12,11 @@ const mapStories = {
   job: "jobs",
 } as const
 
-export const routeData = ({ location, params }: RouteDataArgs) => {
+/* eslint-disable */
+export function routeData({ location, params }: RouteDataArgs) {
   const page = () => +location.query.page || 1
   const type = () => (params.stories || "top") as keyof typeof mapStories
+  /* eslint-enable */
 
   const [stories] = createResource<IStory[], string>(
     () => `${mapStories[type()]}?page=${page()}`,

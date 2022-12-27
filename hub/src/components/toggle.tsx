@@ -1,6 +1,6 @@
-import { createSignal } from "solid-js"
+import { createSignal, JSX } from "solid-js"
 
-export default function Toggle(props: { children: any }) {
+export default function Toggle(props: { children: any }): JSX.Element {
   const [open, setOpen] = createSignal(true)
 
   return (

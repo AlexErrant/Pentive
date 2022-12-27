@@ -1,4 +1,4 @@
-import { Component, createResource, Show } from "solid-js"
+import { Component, createResource, Resource, Show } from "solid-js"
 import { RouteDataArgs, useRouteData } from "solid-start"
 import fetchAPI from "~/lib/api"
 
@@ -10,7 +10,7 @@ interface IUser {
   about: string
 }
 
-export const routeData = (props: RouteDataArgs) => {
+export function routeData(props: RouteDataArgs): Resource<IUser> {
   const [user] = createResource<IUser, string>(
     () => `user/${props.params.id}`,
     fetchAPI
@@ -23,7 +23,7 @@ const User: Component = () => {
   return (
     <div class="user-view">
       <Show when={user()}>
-        <Show when={!user()!.error} fallback={<h1>User not found.</h1>}>
+        <Show when={user()!.error === ""} fallback={<h1>User not found.</h1>}>
           <h1>User : {user()!.id}</h1>
           <ul class="meta">
             <li>

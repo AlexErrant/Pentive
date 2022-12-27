@@ -29,7 +29,7 @@ const Story: Component<{ story: IStory }> = (props) => {
           by <A href={`/users/${props.story.user}`}>{props.story.user}</A>{" "}
           {props.story.time_ago} |{" "}
           <A href={`/stories/${props.story.id}`}>
-            {props.story.comments_count
+            {props.story.comments_count !== 0
               ? `${props.story.comments_count} comments`
               : "discuss"}
           </A>

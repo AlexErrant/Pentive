@@ -1,6 +1,7 @@
+import { JSX } from "solid-js"
 import { A } from "solid-start"
 
-function Nav() {
+function Nav(): JSX.Element {
   return (
     <header class="header">
       <nav class="inner">
