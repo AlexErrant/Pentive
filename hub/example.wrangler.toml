@@ -1,0 +1,8 @@
+name = "hub"
+compatibility_date = "2022-12-29"
+
+main = "./dist/server.js"
+account_id = "$cloudflareAccountId"
+
+[site]
+bucket= "./dist/public"
