@@ -232,6 +232,7 @@ importers:
       prettier: ^2.7.1
       solid-js: ^1.6.2
       solid-start: ^0.2.0
+      solid-start-cloudflare-workers: ^0.2.9
       solid-start-node: ^0.2.0
       stylelint: ^14.9.1
       stylelint-config-prettier: ^9.0.3
@@ -256,6 +257,7 @@ importers:
       eslint-plugin-prettier: 4.2.1_cabrci5exjdaojcvd6xoxgeowu
       eslint-plugin-promise: 6.0.1_eslint@8.23.1
       prettier: 2.7.1
+      solid-start-cloudflare-workers: 0.2.9_gee6uuoq5ihyvsutn2wqymygpi
       solid-start-node: 0.2.8_nyfisbfebexrxkkwy5hrobpvye
       stylelint: 14.11.0
       stylelint-config-prettier: 9.0.3_stylelint@14.11.0
@@ -1754,6 +1756,10 @@ packages:
       mime: 3.0.0
     dev: true
 
+  /@cloudflare/workers-types/3.18.0:
+    resolution: {integrity: sha512-ehKOJVLMeR+tZkYhWEaLYQxl0TaIZu/kE86HF3/RidR8Xv5LuQxpbh+XXAoKVqsaphWLhIgBhgnlN5HGdheXSQ==}
+    dev: true
+
   /@cloudflare/workers-types/4.20221111.1:
     resolution: {integrity: sha512-BNV2wN8V6Zduvo7UzxcdjBbLQ906D2KhS804PDufLgx/sanGJCHVJMOIaLvS/b61JKtot1U7P/l1fjrjZ7/E3A==}
     dev: true
@@ -2989,6 +2995,12 @@ packages:
 
   /@types/uuid/9.0.0:
     resolution: {integrity: sha512-kr90f+ERiQtKWMz5rP32ltJ/BtULDI5RVO0uavn1HQUOwjx0R1h0rnDYNL0CepF1zL5bSY6FISAfd9tOdDhU5Q==}
+    dev: true
+
+  /@types/ws/8.5.3:
+    resolution: {integrity: sha512-6YOoWjruKj1uLf3INHH7D3qTXwFfEsg1kf3c0uDdSBJwfa/llkwIjrAGV7j7mVgGNbzTQ3HiHKKDXl6bJPD97w==}
+    dependencies:
+      '@types/node': 18.7.21
     dev: true
 
   /@typescript-eslint/eslint-plugin/5.37.0_22c5fnooleyfkzrkkgdmel5kmi:
@@ -6006,7 +6018,7 @@ packages:
       eslint-import-resolver-webpack:
         optional: true
     dependencies:
-      '@typescript-eslint/parser': 5.37.0_irgkl5vooow2ydyo6aokmferha
+      '@typescript-eslint/parser': 5.37.0_id2eilsndvzhjjktb64trvy3gu
       debug: 3.2.7
       eslint: 8.23.1
       eslint-import-resolver-node: 0.3.6
@@ -6035,7 +6047,7 @@ packages:
       '@typescript-eslint/parser':
         optional: true
     dependencies:
-      '@typescript-eslint/parser': 5.37.0_irgkl5vooow2ydyo6aokmferha
+      '@typescript-eslint/parser': 5.37.0_id2eilsndvzhjjktb64trvy3gu
       array-includes: 3.1.5
       array.prototype.flat: 1.3.0
       debug: 2.6.9
@@ -10369,6 +10381,36 @@ packages:
       '@babel/helper-module-imports': 7.18.6
       '@babel/types': 7.20.7
       solid-js: 1.6.6
+
+  /solid-start-cloudflare-workers/0.2.9_gee6uuoq5ihyvsutn2wqymygpi:
+    resolution: {integrity: sha512-m7S56+F/Feze8AImsp/ASewP6Mrw0oNP8bsMHXcOpdAgJSnmJfvhE6sqoN3TycpJ3FE9xuCIJbjviHCWXaxg9w==}
+    peerDependencies:
+      solid-start: '*'
+      vite: '*'
+    dependencies:
+      '@cloudflare/kv-asset-handler': 0.2.0
+      '@cloudflare/workers-types': 3.18.0
+      '@miniflare/core': 2.10.0
+      '@miniflare/http-server': 2.10.0
+      '@miniflare/shared': 2.10.0
+      '@miniflare/web-sockets': 2.10.0
+      '@rollup/plugin-commonjs': 22.0.2_rollup@2.79.1
+      '@rollup/plugin-json': 4.1.0_rollup@2.79.1
+      '@rollup/plugin-node-resolve': 13.3.0_rollup@2.79.1
+      '@types/ws': 8.5.3
+      miniflare: 2.10.0
+      rollup: 2.79.1
+      solid-start: 0.2.8_7g4juq64zsg2futgalxovnqs54
+      terser: 5.15.1
+      vite: 3.2.5
+      ws: 8.9.0
+    transitivePeerDependencies:
+      - '@miniflare/storage-redis'
+      - bufferutil
+      - cron-schedule
+      - ioredis
+      - utf-8-validate
+    dev: true
 
   /solid-start-node/0.2.8_nyfisbfebexrxkkwy5hrobpvye:
     resolution: {integrity: sha512-Hlgch9kkTmlgpCfQsSmt73ZrUapWUlSAb6BE5E1Z0/1DDujp0m5jepBXXQs6VIBRMJUWgS0YXuYo/Vr94TJNIg==}
