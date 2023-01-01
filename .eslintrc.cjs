@@ -85,6 +85,12 @@ module.exports = {
       },
       rules: {
         "@typescript-eslint/no-non-null-assertion": "off",
+        "@typescript-eslint/explicit-function-return-type": [
+          "error",
+          {
+            allowedNames: ["routeData"],
+          },
+        ],
         "@typescript-eslint/no-misused-promises": [
           "error",
           {
