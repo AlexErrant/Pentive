@@ -1,26 +1,26 @@
-import { redirect } from "solid-start/server";
-import { createCookieSessionStorage } from "solid-start/session";
-import { db } from ".";
-type LoginForm = {
-  username: string;
-  password: string;
-};
+import { redirect } from "solid-start/server"
+import { createCookieSessionStorage } from "solid-start/session"
+import { db } from "."
+interface LoginForm {
+  username: string
+  password: string
+}
 
 export async function register({ username, password }: LoginForm) {
-  return db.user.create({
-    data: { username: username, password },
-  });
+  return await db.user.create({
+    data: { username, password },
+  })
 }
 
 export async function login({ username, password }: LoginForm) {
-  const user = await db.user.findUnique({ where: { username } });
-  if (!user) return null;
-  const isCorrectPassword = password === user.password;
-  if (!isCorrectPassword) return null;
-  return user;
+  const user = await db.user.findUnique({ where: { username } })
+  if (user == null) return null
+  const isCorrectPassword = password === user.password
+  if (!isCorrectPassword) return null
+  return user
 }
 
-const sessionSecret = import.meta.env.SESSION_SECRET;
+const sessionSecret = import.meta.env.SESSION_SECRET
 
 const storage = createCookieSessionStorage({
   cookie: {
@@ -34,61 +34,61 @@ const storage = createCookieSessionStorage({
     maxAge: 60 * 60 * 24 * 30,
     httpOnly: true,
   },
-});
+})
 
-export function getUserSession(request: Request) {
-  return storage.getSession(request.headers.get("Cookie"));
+export async function getUserSession(request: Request) {
+  return await storage.getSession(request.headers.get("Cookie"))
 }
 
 export async function getUserId(request: Request) {
-  const session = await getUserSession(request);
-  const userId = session.get("userId");
-  if (!userId || typeof userId !== "string") return null;
-  return userId;
+  const session = await getUserSession(request)
+  const userId = session.get("userId")
+  if (!userId || typeof userId !== "string") return null
+  return userId
 }
 
 export async function requireUserId(
   request: Request,
   redirectTo: string = new URL(request.url).pathname
 ) {
-  const session = await getUserSession(request);
-  const userId = session.get("userId");
+  const session = await getUserSession(request)
+  const userId = session.get("userId")
   if (!userId || typeof userId !== "string") {
-    const searchParams = new URLSearchParams([["redirectTo", redirectTo]]);
-    throw redirect(`/login?${searchParams}`);
+    const searchParams = new URLSearchParams([["redirectTo", redirectTo]])
+    throw redirect(`/login?${searchParams}`)
   }
-  return userId;
+  return userId
 }
 
 export async function getUser(request: Request) {
-  const userId = await getUserId(request);
+  const userId = await getUserId(request)
   if (typeof userId !== "string") {
-    return null;
+    return null
   }
 
   try {
-    const user = await db.user.findUnique({ where: { id: Number(userId) } });
-    return user;
+    const user = await db.user.findUnique({ where: { id: Number(userId) } })
+    return user
   } catch {
-    throw logout(request);
+    throw logout(request)
   }
 }
 
 export async function logout(request: Request) {
-  const session = await storage.getSession(request.headers.get("Cookie"));
+  const session = await storage.getSession(request.headers.get("Cookie"))
   return redirect("/login", {
     headers: {
       "Set-Cookie": await storage.destroySession(session),
     },
-  });
+  })
 }
 
 export async function createUserSession(userId: string, redirectTo: string) {
-  const session = await storage.getSession();
-  session.set("userId", userId);
+  const session = await storage.getSession()
+  session.set("userId", userId)
   return redirect(redirectTo, {
     headers: {
       "Set-Cookie": await storage.commitSession(session),
     },
-  });
+  })
 }
