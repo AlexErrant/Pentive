@@ -82,6 +82,7 @@ export default function Login(): JSX.Element {
       }
     }
   })
+  const error = loggingIn.error as undefined | FormError
 
   return (
     <main>
@@ -106,19 +107,19 @@ export default function Login(): JSX.Element {
           <label for="username-input">Username</label>
           <input name="username" placeholder="kody" />
         </div>
-        <Show when={loggingIn.error?.fieldErrors?.username}>
-          <p role="alert">{loggingIn.error.fieldErrors.username}</p>
+        <Show when={error?.fieldErrors?.username}>
+          <p role="alert">{error!.fieldErrors!.username}</p>
         </Show>
         <div>
           <label for="password-input">Password</label>
           <input name="password" type="password" placeholder="twixrox" />
         </div>
-        <Show when={loggingIn.error?.fieldErrors?.password}>
-          <p role="alert">{loggingIn.error.fieldErrors.password}</p>
+        <Show when={error?.fieldErrors?.password}>
+          <p role="alert">{error!.fieldErrors!.password}</p>
         </Show>
-        <Show when={loggingIn.error}>
+        <Show when={error}>
           <p role="alert" id="error-message">
-            {loggingIn.error.message}
+            {error!.message}
           </p>
         </Show>
         <button type="submit">{data() != null ? "Login" : ""}</button>
