@@ -12,7 +12,7 @@ export function routeData() {
     const user = await getUser(request)
 
     if (user == null) {
-      throw redirect("/login")
+      throw redirect("/login") as unknown
     }
 
     return user

@@ -85,6 +85,12 @@ module.exports = {
       },
       rules: {
         "@typescript-eslint/no-non-null-assertion": "off",
+        "@typescript-eslint/no-throw-literal": [
+          "error",
+          {
+            allowThrowingUnknown: true,
+          },
+        ],
         "@typescript-eslint/explicit-function-return-type": [
           "error",
           {

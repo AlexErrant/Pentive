@@ -63,7 +63,7 @@ export async function requireUserId(
   const userId = session.get("userId") as unknown
   if (typeof userId !== "string" || userId.length === 0) {
     const searchParams = new URLSearchParams([["redirectTo", redirectTo]])
-    throw redirect(`/login?${searchParams}`)
+    throw redirect(`/login?${searchParams.toString()}`) as unknown
   }
   return userId
 }
