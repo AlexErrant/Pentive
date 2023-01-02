@@ -1,4 +1,4 @@
-import { Component, createResource, For, Show } from "solid-js"
+import { Component, createResource, For, JSX, Show } from "solid-js"
 import { A, RouteDataArgs, useRouteData } from "solid-start"
 import Story from "~/components/story"
 import fetchAPI from "~/lib/api"
@@ -68,7 +68,9 @@ const Stories: Component = () => {
       <main class="news-list">
         <Show when={stories()}>
           <ul>
-            <For each={stories()}>{(story) => <Story story={story} />}</For>
+            <For each={stories()}>
+              {(story): JSX.Element => <Story story={story} />}
+            </For>
           </ul>
         </Show>
       </main>

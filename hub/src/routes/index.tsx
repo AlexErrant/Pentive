@@ -1,3 +1,4 @@
+import { JSX } from "solid-js"
 import { useRouteData } from "solid-start"
 import {
   createServerAction$,
@@ -18,7 +19,7 @@ export function routeData() {
   })
 }
 
-export default function Home() {
+export default function Home(): JSX.Element {
   const user = useRouteData<typeof routeData>()
   const [, { Form }] = createServerAction$(
     async (f: FormData, { request }) => await logout(request)

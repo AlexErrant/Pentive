@@ -1,4 +1,4 @@
-import { Show } from "solid-js"
+import { JSX, Show } from "solid-js"
 import { useParams, useRouteData } from "solid-start"
 import { FormError } from "solid-start/data"
 import {
@@ -9,13 +9,13 @@ import {
 import { db } from "~/db"
 import { createUserSession, getUser, login, register } from "~/db/session"
 
-function validateUsername(username: unknown) {
+function validateUsername(username: unknown): string | undefined {
   if (typeof username !== "string" || username.length < 3) {
     return `Usernames must be at least 3 characters long`
   }
 }
 
-function validatePassword(password: unknown) {
+function validatePassword(password: unknown): string | undefined {
   if (typeof password !== "string" || password.length < 6) {
     return `Passwords must be at least 6 characters long`
   }
@@ -30,7 +30,7 @@ export function routeData() {
   })
 }
 
-export default function Login() {
+export default function Login(): JSX.Element {
   const data = useRouteData<typeof routeData>()
   const params = useParams()
 
@@ -38,7 +38,7 @@ export default function Login() {
     const loginType = form.get("loginType")
     const username = form.get("username")
     const password = form.get("password")
-    const redirectTo = form.get("redirectTo") || "/"
+    const redirectTo = form.get("redirectTo") ?? "/"
     if (
       typeof loginType !== "string" ||
       typeof username !== "string" ||
@@ -75,14 +75,6 @@ export default function Login() {
           })
         }
         const user = await register({ username, password })
-        if (!user) {
-          throw new FormError(
-            `Something went wrong trying to create a new user.`,
-            {
-              fields,
-            }
-          )
-        }
         return await createUserSession(`${user.id}`, redirectTo)
       }
       default: {
