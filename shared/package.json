@@ -24,12 +24,15 @@
     "eslint-plugin-n": "^15.2.4",
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-promise": "^6.0.0",
+    "kysely-codegen": "^0.9.0",
+    "mysql2": "^2.3.3",
     "prettier": "^2.7.1",
     "standard": "^17.0.0",
     "typescript": "^4.7.4"
   },
   "dependencies": {
     "@vlcn.io/xplat-api": "^0.3.1",
+    "kysely": "^0.23.3",
     "uuid": "^9.0.0"
   }
 }
