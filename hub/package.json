@@ -37,6 +37,7 @@
   "dependencies": {
     "@solidjs/meta": "^0.28.0",
     "@solidjs/router": "^0.6.0",
+    "shared": "workspace:*",
     "solid-js": "^1.6.2",
     "solid-start": "^0.2.0",
     "undici": "^5.11.0"

@@ -231,6 +231,7 @@ importers:
       eslint-plugin-prettier: ^4.2.1
       eslint-plugin-promise: ^6.0.0
       prettier: ^2.7.1
+      shared: workspace:*
       solid-js: ^1.6.2
       solid-start: ^0.2.0
       solid-start-cloudflare-workers: ^0.2.9
@@ -245,6 +246,7 @@ importers:
     dependencies:
       '@solidjs/meta': 0.28.2_solid-js@1.6.6
       '@solidjs/router': 0.6.0_solid-js@1.6.6
+      shared: link:../shared
       solid-js: 1.6.6
       solid-start: 0.2.8_7g4juq64zsg2futgalxovnqs54
       undici: 5.14.0
