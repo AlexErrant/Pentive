@@ -351,6 +351,7 @@ importers:
 
   shared:
     specifiers:
+      '@planetscale/database': ^1.5.0
       '@types/uuid': ^9.0.0
       '@typescript-eslint/eslint-plugin': ^5.31.0
       '@typescript-eslint/parser': ^5.31.0
@@ -364,14 +365,17 @@ importers:
       eslint-plugin-promise: ^6.0.0
       kysely: ^0.23.3
       kysely-codegen: ^0.9.0
+      kysely-planetscale: ^1.2.1
       mysql2: ^2.3.3
       prettier: ^2.7.1
       standard: ^17.0.0
       typescript: ^4.7.4
       uuid: ^9.0.0
     dependencies:
+      '@planetscale/database': 1.5.0
       '@vlcn.io/xplat-api': 0.3.1
       kysely: 0.23.3
+      kysely-planetscale: 1.2.1_z7hkwvucbgukbaukm7lodlcsym
       uuid: 9.0.0
     devDependencies:
       '@types/uuid': 9.0.0
@@ -4547,6 +4551,11 @@ packages:
       whatwg-url: 11.0.0
     dev: true
 
+  /date-fns/2.29.3:
+    resolution: {integrity: sha512-dDCnyH2WnnKusqvZZ6+jA1O51Ibt8ZMRNkDZdyAyK4YfbDwa/cEmuztzG5pk6hqlp9aSBPYcjOlktquahGwGeA==}
+    engines: {node: '>=0.11'}
+    dev: false
+
   /dayjs/1.11.5:
     resolution: {integrity: sha512-CAdX5Q3YW3Gclyo5Vpqkgpj8fSdLQcRuzfX6mC6Phy0nfJ0eGYOeS7m4mt2plDWLAtA4TqTakvbboHvUxfe4iA==}
     dev: true
@@ -7949,6 +7958,17 @@ packages:
       minimist: 1.2.7
       mysql2: 2.3.3
     dev: true
+
+  /kysely-planetscale/1.2.1_z7hkwvucbgukbaukm7lodlcsym:
+    resolution: {integrity: sha512-tPgyTSSkU0dwFbwSnWITU4VcuuQfsBA+HfGMYPFcUDBIjMDrzWE4Lbky7ue1NqqF58GyYPn9kOm2e61T9BVwww==}
+    peerDependencies:
+      '@planetscale/database': '*'
+      kysely: '*'
+    dependencies:
+      '@planetscale/database': 1.5.0
+      date-fns: 2.29.3
+      kysely: 0.23.3
+    dev: false
 
   /kysely/0.23.3:
     resolution: {integrity: sha512-spRhosWRLkI0Ox8PRBdstskdRfvoLPsJ5GEpDA/PPrX6NwuiygdsFxHBrMkdU3CX+VxLhj4Wn5P7rFAwaf7JuA==}
