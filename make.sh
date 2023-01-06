@@ -15,11 +15,13 @@ source ../PentiveSecrets/secrets.sh
 # echo $jwsPrivateKey    | wrangler secret put jwsPrivateKey    --name mediarouter
 # echo $planetscaleDbUrl | wrangler secret put planetscaleDbUrl --name mediarouter
 # echo $appMediaIdSecret | wrangler secret put appMediaIdSecret --name mediarouter
+# echo $planetscaleDbUrl | wrangler secret put planetscaleDbUrl --name hub
 
 # https://developers.cloudflare.com/workers/wrangler/configuration/#environmental-variables
 # https://developers.cloudflare.com/workers/platform/environment-variables/#adding-secrets-via-wrangler
 
 envsubst < ./mediaRouter/.example.dev.vars     > ./mediaRouter/.dev.vars
 envsubst < ./mediaRouter/example.wrangler.toml > ./mediaRouter/wrangler.toml
+envsubst < ./hub/.example.env                  > ./hub/.env
 envsubst < ./hub/example.wrangler.toml         > ./hub/wrangler.toml
 envsubst < ./lrpc/.example.env                 > ./lrpc/.env
