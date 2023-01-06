@@ -33,3 +33,4 @@ export const initSql = [
 ]
 
 export * from "./wholeDbReplicator.js"
+export * from "./kysely.js"

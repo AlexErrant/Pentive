@@ -12,7 +12,7 @@ async function fetchName(): Promise<string> {
   return await wait(random(500, 1000), "Solid")
 }
 
-function AboutData(): Resource<string | undefined> {
+function AboutData(): Resource<string> {
   const [data] = createResource(fetchName)
 
   return data
