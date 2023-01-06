@@ -1,6 +1,7 @@
-import { Kysely as RealKysely } from "kysely"
+import { Kysely as RealKysely, sql } from "kysely"
 import { PlanetScaleDialect } from "kysely-planetscale"
 import { DB, Post } from "./database"
+import { Base64 } from "./brand"
 
 export class Kysely {
   #db: RealKysely<DB>
@@ -13,11 +14,20 @@ export class Kysely {
     })
   }
 
-  async getPost({ nook }: { nook: string }): Promise<Post[]> {
+  async getPost({
+    nook,
+  }: {
+    nook: string
+  }): Promise<Array<Omit<Post, "nook">>> {
     return await this.#db
       .selectFrom("Post")
+      .select([
+        sql<Base64>`TO_BASE64(id)`.as("id"),
+        "title",
+        "text",
+        "authorId",
+      ])
       .where("nook", "=", nook)
-      .selectAll()
       .execute()
   }
 }

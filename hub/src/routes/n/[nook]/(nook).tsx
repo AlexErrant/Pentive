@@ -1,5 +1,5 @@
 import { Component, For, Show, JSX } from "solid-js"
-import { RouteDataArgs, useRouteData } from "solid-start"
+import { A, RouteDataArgs, useRouteData } from "solid-start"
 import { createServerData$ } from "solid-start/server"
 import { Kysely } from "shared"
 
@@ -22,7 +22,11 @@ const Threads: Component = () => {
       <Show when={posts()}>
         <ul>
           <For each={posts()}>
-            {(post): JSX.Element => <li>{post.title}</li>}
+            {(post): JSX.Element => (
+              <li>
+                <A href={post.id}>{post.title}</A>
+              </li>
+            )}
           </For>
         </ul>
       </Show>

@@ -1,12 +1,13 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import type { ColumnType } from "kysely"
+import type { Base64 } from "./brand"
 
 export type Generated<T> = T extends ColumnType<infer S, infer I, infer U>
   ? ColumnType<S, I | undefined, U>
   : ColumnType<T, T | undefined, T>
 
 export interface MediaUser {
-  mediaId: Buffer
+  mediaId: Base64
   userId: string
 }
 
@@ -18,8 +19,8 @@ export interface Nook {
 }
 
 export interface Note {
-  id: Buffer
-  templateId: Buffer
+  id: Base64
+  templateId: Base64
   createdAt: Generated<Date>
   updatedAt: Date
   authorId: string
@@ -30,9 +31,9 @@ export interface Note {
 }
 
 export interface NoteComment {
-  id: Buffer
-  parentId: Buffer | null
-  noteId: Buffer
+  id: Base64
+  parentId: Base64 | null
+  noteId: Base64
   text: string
   authorId: string
   history: string | null
@@ -40,21 +41,21 @@ export interface NoteComment {
 }
 
 export interface NoteHistory {
-  noteId: Buffer
+  noteId: Base64
   createdAt: Generated<Date>
-  templateId: Buffer | null
+  templateId: Base64 | null
   fieldValues: string
   tags: string
 }
 
 export interface NoteSubscriber {
-  noteId: Buffer
+  noteId: Base64
   userId: string
   til: Date
 }
 
 export interface Post {
-  id: Buffer
+  id: Base64
   title: string
   text: string
   nook: string
@@ -62,9 +63,9 @@ export interface Post {
 }
 
 export interface PostComment {
-  id: Buffer
-  parentId: Buffer | null
-  postId: Buffer
+  id: Base64
+  parentId: Base64 | null
+  postId: Base64
   text: string
   authorId: string
   history: string | null
@@ -72,13 +73,13 @@ export interface PostComment {
 }
 
 export interface PostSubscriber {
-  postId: Buffer
+  postId: Base64
   userId: string
   til: Date
 }
 
 export interface Template {
-  id: Buffer
+  id: Base64
   createdAt: Generated<Date>
   updatedAt: Date
   name: string
@@ -91,9 +92,9 @@ export interface Template {
 }
 
 export interface TemplateComment {
-  id: Buffer
-  parentId: Buffer | null
-  templateId: Buffer
+  id: Base64
+  parentId: Base64 | null
+  templateId: Base64
   text: string
   authorId: string
   history: string | null
@@ -101,7 +102,7 @@ export interface TemplateComment {
 }
 
 export interface TemplateHistory {
-  templateId: Buffer
+  templateId: Base64
   createdAt: Generated<Date>
   name: string | null
   authorId: string | null
@@ -112,7 +113,7 @@ export interface TemplateHistory {
 }
 
 export interface TemplateSubscriber {
-  templateId: Buffer
+  templateId: Base64
   userId: string
   til: Date
 }
