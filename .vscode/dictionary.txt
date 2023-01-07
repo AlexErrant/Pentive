@@ -10,6 +10,7 @@ dexie
 Exif
 graphiql
 hono
+idempotency
 iframe
 iframes
 immer
@@ -33,6 +34,7 @@ sveltejs
 tailwindcss
 Tauri
 trpc
+unhex
 upserted
 viewports
 vite
