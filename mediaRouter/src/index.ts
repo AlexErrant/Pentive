@@ -13,8 +13,6 @@ import {
   encryptDigest,
   decryptDigest,
   arrayBufferToBase64,
-  toBase64URL,
-  fromBase64URL,
   UserId,
   AppMediaIdSecretBase64,
   IvEncryptedDigestBase64,
@@ -24,6 +22,8 @@ import {
   toOk,
   toError,
 } from "../util"
+
+import { toBase64URL, fromBase64URL } from "shared"
 
 import {
   importPKCS8,
