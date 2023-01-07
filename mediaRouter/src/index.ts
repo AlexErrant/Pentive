@@ -23,7 +23,7 @@ import {
   toError,
 } from "../util"
 
-import { toBase64URL, fromBase64URL } from "shared"
+import { toBase64URL, fromBase64URL, Base64, Base64Url } from "shared"
 
 import {
   importPKCS8,
@@ -204,7 +204,7 @@ app
       })
       c.header("ETag", object.httpEtag)
     })
-    return txResponse ?? c.text(toBase64URL(ivEncryptedDigest), 201)
+    return txResponse ?? c.text(toBase64URL(ivEncryptedDigest as Base64), 201)
   })
   .get("/:ivEncryptedDigest", async (c) => {
     const authResult = await getUserId(c)
@@ -212,7 +212,7 @@ app
     const userId = authResult.ok
     const digest = await decryptDigest(
       fromBase64URL(
-        c.req.param("ivEncryptedDigest")
+        c.req.param("ivEncryptedDigest") as Base64Url
       ) as IvEncryptedDigestBase64,
       c.env.appMediaIdSecret,
       userId

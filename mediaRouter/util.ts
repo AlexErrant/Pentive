@@ -1,10 +1,16 @@
 import { Brand } from "shared"
 
 export type UserId = Brand<string, "userId">
-export type AppMediaIdSecretBase64 = Brand<string, "appMediaIdSecretBase64">
-export type IvEncryptedDigestBase64 = Brand<string, "ivEncryptedDigestBase64">
+export type AppMediaIdSecretBase64 = Brand<
+  string,
+  "appMediaIdSecretBase64" | "base64"
+>
+export type IvEncryptedDigestBase64 = Brand<
+  string,
+  "ivEncryptedDigestBase64" | "base64"
+>
 export type Digest = Brand<ArrayBuffer, "digest">
-export type DigestBase64 = Brand<string, "digestBase64">
+export type DigestBase64 = Brand<string, "digestBase64" | "base64">
 
 export type Result<TOk, TError> =
   | {
