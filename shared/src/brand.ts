@@ -2,3 +2,4 @@ type Brand<T, B> = T & { readonly brand: B } // https://medium.com/@KevinBGreene
 
 export type Base64 = Brand<string, "base64">
 export type Hex = Brand<string, "hex">
+export type DbId = Brand<string, "dbId">

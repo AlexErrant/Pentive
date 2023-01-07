@@ -1,7 +1,9 @@
 import { Kysely as RealKysely, sql, InsertResult, RawBuilder } from "kysely"
 import { PlanetScaleDialect } from "kysely-planetscale"
-import { DB, Post } from "./database"
-import { Base64, Hex } from "./brand"
+import { DB } from "./database"
+import { Base64, DbId, Hex } from "./brand"
+
+const id = sql<Base64>`TO_BASE64(id)`.as("id")
 
 export class Kysely {
   #db: RealKysely<DB>
@@ -14,19 +16,17 @@ export class Kysely {
     })
   }
 
-  async getPost({
-    nook,
-  }: {
-    nook: string
-  }): Promise<Array<Omit<Post, "nook">>> {
+  async getPost({ nook }: { nook: string }): Promise<
+    Array<{
+      id: Base64
+      title: string
+      text: string
+      authorId: string
+    }>
+  > {
     return await this.#db
       .selectFrom("Post")
-      .select([
-        sql<Base64>`TO_BASE64(id)`.as("id"),
-        "title",
-        "text",
-        "authorId",
-      ])
+      .select([id, "title", "text", "authorId"])
       .where("nook", "=", nook)
       .execute()
   }
@@ -57,6 +57,6 @@ export class Kysely {
   }
 }
 
-function unhex(id: Hex): RawBuilder<Base64> {
-  return sql<Base64>`UNHEX(${id})` // nextTODO fix
+function unhex(id: Hex): RawBuilder<DbId> {
+  return sql<DbId>`UNHEX(${id})`
 }

@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import type { ColumnType } from "kysely"
-import type { Base64 } from "./brand"
+import type { DbId } from "./brand"
 
 export type Generated<T> = T extends ColumnType<infer S, infer I, infer U>
   ? ColumnType<S, I | undefined, U>
   : ColumnType<T, T | undefined, T>
 
 export interface MediaUser {
-  mediaId: Base64
+  mediaId: DbId
   userId: string
 }
 
@@ -19,8 +19,8 @@ export interface Nook {
 }
 
 export interface Note {
-  id: Base64
-  templateId: Base64
+  id: DbId
+  templateId: DbId
   createdAt: Generated<Date>
   updatedAt: Date
   authorId: string
@@ -31,9 +31,9 @@ export interface Note {
 }
 
 export interface NoteComment {
-  id: Base64
-  parentId: Base64 | null
-  noteId: Base64
+  id: DbId
+  parentId: DbId | null
+  noteId: DbId
   text: string
   authorId: string
   history: string | null
@@ -41,21 +41,21 @@ export interface NoteComment {
 }
 
 export interface NoteHistory {
-  noteId: Base64
+  noteId: DbId
   createdAt: Generated<Date>
-  templateId: Base64 | null
+  templateId: DbId | null
   fieldValues: string
   tags: string
 }
 
 export interface NoteSubscriber {
-  noteId: Base64
+  noteId: DbId
   userId: string
   til: Date
 }
 
 export interface Post {
-  id: Base64
+  id: DbId
   title: string
   text: string
   nook: string
@@ -63,9 +63,9 @@ export interface Post {
 }
 
 export interface PostComment {
-  id: Base64
-  parentId: Base64 | null
-  postId: Base64
+  id: DbId
+  parentId: DbId | null
+  postId: DbId
   text: string
   authorId: string
   history: string | null
@@ -73,13 +73,13 @@ export interface PostComment {
 }
 
 export interface PostSubscriber {
-  postId: Base64
+  postId: DbId
   userId: string
   til: Date
 }
 
 export interface Template {
-  id: Base64
+  id: DbId
   createdAt: Generated<Date>
   updatedAt: Date
   name: string
@@ -92,9 +92,9 @@ export interface Template {
 }
 
 export interface TemplateComment {
-  id: Base64
-  parentId: Base64 | null
-  templateId: Base64
+  id: DbId
+  parentId: DbId | null
+  templateId: DbId
   text: string
   authorId: string
   history: string | null
@@ -102,7 +102,7 @@ export interface TemplateComment {
 }
 
 export interface TemplateHistory {
-  templateId: Base64
+  templateId: DbId
   createdAt: Generated<Date>
   name: string | null
   authorId: string | null
@@ -113,7 +113,7 @@ export interface TemplateHistory {
 }
 
 export interface TemplateSubscriber {
-  templateId: Base64
+  templateId: DbId
   userId: string
   til: Date
 }
