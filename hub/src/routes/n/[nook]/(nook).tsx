@@ -8,7 +8,7 @@ export function routeData({ params }: RouteDataArgs) {
     nook: (): string => params.nook,
     posts: createServerData$(
       async (nook, { env }) => {
-        return await new Kysely(env.planetscaleDbUrl).getPost({ nook })
+        return await new Kysely(env.planetscaleDbUrl).getPosts({ nook })
       },
       { key: () => params.nook }
     ),

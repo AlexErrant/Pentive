@@ -17,7 +17,7 @@ export class Kysely {
     })
   }
 
-  async getPost({ nook }: { nook: string }): Promise<
+  async getPosts({ nook }: { nook: string }): Promise<
     Array<{
       id: Base64Url
       title: string
