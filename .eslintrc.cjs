@@ -95,6 +95,7 @@ module.exports = {
           "error",
           {
             allowedNames: ["routeData"],
+            allowExpressions: true,
           },
         ],
         "@typescript-eslint/no-misused-promises": [

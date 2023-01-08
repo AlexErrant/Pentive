@@ -31,7 +31,6 @@ export const templateRouter = {
           ...req.input,
           id: ulidToBuffer(id),
           nook: "nook",
-          authorId: req.ctx.user,
           type: "type",
           fields: "fields",
           css: "css",
@@ -51,7 +50,6 @@ export const templateRouter = {
           type: templateType,
           fields: JSON.stringify(t.fields),
           id: ulidToBuffer(remoteId),
-          authorId: req.ctx.user,
         }
         return [t2, [t.id, remoteId.toCanonical()] as [string, string]] as const
       })
