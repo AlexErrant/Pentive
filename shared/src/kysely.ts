@@ -2,7 +2,7 @@ import { Kysely as RealKysely, sql, InsertResult, RawBuilder } from "kysely"
 import { PlanetScaleDialect } from "kysely-planetscale"
 import { DB } from "./database"
 import { Base64, Base64Url, DbId, Hex } from "./brand"
-import { binary16fromBase64URL, binary16toBase64URL } from "./util"
+import { binary16fromBase64URL, binary16toBase64URL } from "./convertBinary"
 
 export class Kysely {
   #db: RealKysely<DB>
