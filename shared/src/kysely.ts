@@ -1,7 +1,8 @@
 import { Kysely as RealKysely, sql, InsertResult, RawBuilder } from "kysely"
 import { PlanetScaleDialect } from "kysely-planetscale"
 import { DB } from "./database"
-import { Base64, DbId, Hex } from "./brand"
+import { Base64, Base64Url, DbId, Hex } from "./brand"
+import { binary16toBase64URL } from "./util"
 
 const id = sql<Base64>`TO_BASE64(id)`.as("id")
 
@@ -18,7 +19,7 @@ export class Kysely {
 
   async getPost({ nook }: { nook: string }): Promise<
     Array<{
-      id: Base64
+      id: Base64Url
       title: string
       text: string
       authorId: string
@@ -29,6 +30,7 @@ export class Kysely {
       .select([id, "title", "text", "authorId"])
       .where("nook", "=", nook)
       .execute()
+      .then((ps) => ps.map((p) => ({ ...p, id: binary16toBase64URL(p.id) })))
   }
 
   async insertPost({
