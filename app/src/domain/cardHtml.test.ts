@@ -1,7 +1,8 @@
 import { Ci } from "../services"
 import { expect, test } from "vitest"
 import { ChildTemplateId, ClozeIndex } from "./ids"
-import { strip, throwExp } from "./utility"
+import { strip } from "./utility"
+import { throwExp } from "shared"
 
 function testBody(
   fieldValues: Array<readonly [string, string]>,

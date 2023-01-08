@@ -2,7 +2,7 @@ import { CreateRemoteTemplate } from "lrpc/src/schemas/template"
 import { KeyFunctionMap, RxCollection, RxDocument } from "rxdb"
 import { TemplateId } from "../../src/domain/ids"
 import { Template, TemplateType } from "../../src/domain/template"
-import { assertNever } from "../../src/domain/utility"
+import { assertNever } from "shared"
 import { getDb } from "./rxdb"
 import { TemplateDocType } from "./template.schema"
 

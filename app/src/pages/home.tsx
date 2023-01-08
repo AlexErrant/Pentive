@@ -7,7 +7,7 @@ import HomeData from "./home.data"
 import { db } from "../messenger"
 import { lrpc } from "../lrpcClient"
 import { importAnki } from "./importer/importer"
-import { throwExp } from "../domain/utility"
+import { throwExp } from "shared"
 import { ResourceId } from "../domain/ids"
 
 async function uploadNewTemplates(): Promise<void> {

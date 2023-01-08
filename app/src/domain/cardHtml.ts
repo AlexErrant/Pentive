@@ -2,7 +2,8 @@ import _ from "lodash"
 import { Ct } from "../services"
 import { ClozeIndex, Pointer } from "./ids"
 import { Field, Template } from "./template"
-import { strip, throwExp } from "./utility"
+import { strip } from "./utility"
+import { throwExp } from "shared"
 
 // These have hidden state - don't use `match` or `exec`!
 // https://www.tsmean.com/articles/regex/javascript-regex-match-vs-exec-vs-matchall/

@@ -11,7 +11,7 @@ import {
   Uint8ArrayWriter,
   ZipReader,
 } from "@zip.js/zip.js"
-import { throwExp } from "../../domain/utility"
+import { throwExp } from "shared"
 import initSqlJs, { Database } from "sql.js"
 import { checkCard, checkCol, checkMedia, checkNote } from "./typeChecker"
 import { parseNote, parseCard, parseTemplates } from "./parser"

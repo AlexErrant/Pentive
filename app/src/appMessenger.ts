@@ -1,7 +1,7 @@
 import _ from "lodash"
 import { C } from "."
 import { CardId, NoteId, ResourceId, Side, TemplateId } from "./domain/ids"
-import { assertNever, throwExp } from "./domain/utility"
+import { assertNever, throwExp } from "shared"
 import { db } from "./messenger"
 import * as Comlink from "comlink"
 

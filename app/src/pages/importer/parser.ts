@@ -13,7 +13,7 @@ import {
   Template,
   TemplateType,
 } from "../../domain/template"
-import { throwExp } from "../../domain/utility"
+import { throwExp } from "shared"
 import { Card as PCard } from "../../domain/card"
 import { Note as PNote } from "../../domain/note"
 import {
