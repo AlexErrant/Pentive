@@ -1,5 +1,5 @@
-import { Component, Show } from "solid-js"
-import { A, RouteDataArgs, useRouteData } from "solid-start"
+import { Component, Show, Suspense } from "solid-js"
+import ErrorBoundary, { RouteDataArgs, useRouteData } from "solid-start"
 import { createServerData$ } from "solid-start/server"
 import { Base64Url, Kysely } from "shared"
 
@@ -20,10 +20,14 @@ export function routeData({ params }: RouteDataArgs) {
 const Thread: Component = () => {
   const { thread } = useRouteData<typeof routeData>()
   return (
-    <Show when={thread()}>
-      <h1>{thread()!.title}</h1>
-      {thread()!.text}
-    </Show>
+    <ErrorBoundary fallback={() => <p>Error loading thread.</p>}>
+      <Suspense fallback={<p>Loading thread...</p>}>
+        <Show when={thread()} fallback={<p>"404 Not Found"</p>}>
+          <h1>{thread()!.title}</h1>
+          <p>{thread()!.text}</p>
+        </Show>
+      </Suspense>
+    </ErrorBoundary>
   )
 }
 

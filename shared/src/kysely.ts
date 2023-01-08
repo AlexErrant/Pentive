@@ -3,6 +3,7 @@ import { PlanetScaleDialect } from "kysely-planetscale"
 import { DB } from "./database"
 import { Base64, Base64Url, DbId, Hex } from "./brand"
 import { binary16fromBase64URL, binary16toBase64URL } from "./convertBinary"
+import { undefinedMap } from "./utility"
 
 export class Kysely {
   #db: RealKysely<DB>
@@ -31,18 +32,21 @@ export class Kysely {
       .then((ps) => ps.map(mapIdToBase64Url))
   }
 
-  async getPost(id: Base64Url): Promise<{
-    id: Base64Url
-    title: string
-    text: string
-    authorId: string
-  }> {
+  async getPost(id: Base64Url): Promise<
+    | {
+        id: Base64Url
+        title: string
+        text: string
+        authorId: string
+      }
+    | undefined
+  > {
     return await this.#db
       .selectFrom("Post")
       .select([selectId, "title", "text", "authorId"])
       .where("id", "=", fromBase64Url(id))
-      .executeTakeFirstOrThrow()
-      .then(mapIdToBase64Url)
+      .executeTakeFirst()
+      .then((x) => undefinedMap(x, mapIdToBase64Url))
   }
 
   async insertPost({
