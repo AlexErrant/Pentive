@@ -24,7 +24,7 @@ const Threads: Component = () => {
           <For each={posts()}>
             {(post): JSX.Element => (
               <li>
-                <A href={post.id}>{post.title}</A>
+                <A href={`thread/${post.id}`}>{post.title}</A>
               </li>
             )}
           </For>
