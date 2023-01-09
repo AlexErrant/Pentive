@@ -20,8 +20,12 @@ export function throwExp(errorMessage: string): never {
 
 // https://stackoverflow.com/a/38858127/
 export function arrayBufferToBase64(buffer: ArrayBuffer): string {
-  let binary = ""
   const bytes = new Uint8Array(buffer)
+  return uint8ArrayToBase64(bytes)
+}
+
+export function uint8ArrayToBase64(bytes: Uint8Array): string {
+  let binary = ""
   const len = bytes.byteLength
   for (let i = 0; i < len; i++) {
     binary += String.fromCharCode(bytes[i])
