@@ -1,3 +1,4 @@
+import { setKysely } from "shared"
 import {
   createHandler,
   renderAsync,
@@ -5,5 +6,8 @@ import {
 } from "solid-start/entry-server"
 
 export default createHandler(
-  renderAsync((event) => <StartServer event={event} />)
+  renderAsync((event) => {
+    setKysely(event.env.planetscaleDbUrl)
+    return <StartServer event={event} />
+  })
 )

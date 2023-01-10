@@ -1,17 +1,13 @@
 import { Component, Show, Suspense } from "solid-js"
 import ErrorBoundary, { RouteDataArgs, useRouteData } from "solid-start"
 import { createServerData$ } from "solid-start/server"
-import { Base64Url, Kysely } from "shared"
+import { Base64Url, getPost } from "shared"
 
 export function routeData({ params }: RouteDataArgs) {
   return {
     threadId: (): string => params.threadId,
     thread: createServerData$(
-      async (threadId, { env }) => {
-        return await new Kysely(env.planetscaleDbUrl).getPost(
-          threadId as Base64Url
-        )
-      },
+      async (threadId) => await getPost(threadId as Base64Url),
       { key: () => params.threadId }
     ),
   }

@@ -1,6 +1,6 @@
 import { Show, JSX } from "solid-js"
 import { FormError, RouteDataArgs, useRouteData } from "solid-start"
-import { Kysely } from "shared"
+import { insertPost } from "shared"
 import { Ulid } from "id128"
 import { createServerAction$, redirect } from "solid-start/server"
 import { Hex } from "shared/src/brand"
@@ -33,7 +33,7 @@ export default function Submit(): JSX.Element {
   const { nook } = useRouteData<typeof routeData>()
 
   const [submitting, { Form }] = createServerAction$(
-    async (form: FormData, { env, request }) => {
+    async (form: FormData, { request }) => {
       const title = form.get("title")
       const text = form.get("text")
       const nook = form.get("nook")
@@ -56,7 +56,7 @@ export default function Submit(): JSX.Element {
       const user = await getUser(request)
       if (user == null) throw redirect("/login") as unknown
 
-      await new Kysely(env.planetscaleDbUrl).insertPost({
+      await insertPost({
         id: Ulid.generate().toRaw() as Hex,
         authorId: user.username,
         title,
