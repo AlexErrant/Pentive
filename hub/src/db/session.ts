@@ -1,6 +1,6 @@
 import { redirect } from "solid-start/server"
 import { createCookieSessionStorage } from "solid-start/session"
-import { Session } from "solid-start/session/sessions"
+import { Session, SessionStorage } from "solid-start/session/sessions"
 import { db } from "."
 interface LoginForm {
   username: string
@@ -28,21 +28,24 @@ export async function login({ username, password }: LoginForm): Promise<{
   return user
 }
 
-const sessionSecret = import.meta.env.SESSION_SECRET
+export function setSessionStorage(sessionSecret: string): void {
+  storage = createCookieSessionStorage({
+    cookie: {
+      name: "RJ_session",
+      // secure doesn't work on localhost for Safari
+      // https://web.dev/when-to-use-local-https/
+      secure: true,
+      secrets: [sessionSecret],
+      sameSite: "lax",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 30,
+      httpOnly: true,
+    },
+  })
+}
 
-const storage = createCookieSessionStorage({
-  cookie: {
-    name: "RJ_session",
-    // secure doesn't work on localhost for Safari
-    // https://web.dev/when-to-use-local-https/
-    secure: true,
-    secrets: ["hello"],
-    sameSite: "lax",
-    path: "/",
-    maxAge: 60 * 60 * 24 * 30,
-    httpOnly: true,
-  },
-})
+// @ts-expect-error session calls should throw null error if not setup
+let storage = null as SessionStorage
 
 export async function getUserSession(request: Request): Promise<Session> {
   return await storage.getSession(request.headers.get("Cookie"))
