@@ -16,6 +16,7 @@ iframes
 immer
 kysely
 lrpc
+miniflare
 mkcert
 msedge
 oneof

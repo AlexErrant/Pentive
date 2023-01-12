@@ -5,4 +5,5 @@ packages:
   - "lrpc/"
   - "shared/"
   - "mediaRouter/"
+  - "workers-test/"
   - "example-plugins/*"
