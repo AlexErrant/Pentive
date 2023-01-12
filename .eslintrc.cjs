@@ -12,7 +12,7 @@ module.exports = {
   ],
   overrides: [
     {
-      files: ["*.ts", "*.tsx"],
+      files: ["*.ts"],
       extends: [
         "standard-with-typescript",
         "plugin:@typescript-eslint/recommended",
@@ -22,7 +22,7 @@ module.exports = {
       plugins: ["@typescript-eslint"],
       parser: "@typescript-eslint/parser",
       parserOptions: {
-        project: "./tsconfig.json",
+        project: ["./tsconfig.json", "./test/tsconfig.json"],
       },
       rules: {
         "@typescript-eslint/no-misused-promises": [
