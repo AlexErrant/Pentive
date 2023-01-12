@@ -19,6 +19,9 @@
   "keywords": [],
   "author": "",
   "license": "MIT",
+  "dependencies": {
+    "shared": "workspace:*"
+  },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20221111.1",
     "@types/jest": "29.2.5",

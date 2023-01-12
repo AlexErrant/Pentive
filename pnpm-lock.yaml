@@ -417,9 +417,12 @@ importers:
       jest-environment-miniflare: 2.11.0
       miniflare: 2.11.0
       prettier: ^2.7.1
+      shared: workspace:*
       ts-jest: 29.0.4
       typescript: ^4.7.4
       wrangler: 2.6.2
+    dependencies:
+      shared: link:../shared
     devDependencies:
       '@cloudflare/workers-types': 4.20221111.1
       '@types/jest': 29.2.5
