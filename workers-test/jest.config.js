@@ -17,5 +17,5 @@ export default {
     // explicitly mark it as an ES module.
     scriptPath: "dist/index.mjs",
     modules: true,
-  }
-};
+  },
+}
