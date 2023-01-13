@@ -1,12 +1,22 @@
 import { Show, JSX } from "solid-js"
 import { FormError, RouteDataArgs, useRouteData } from "solid-start"
 import { insertPost, ulidAsHex } from "shared"
-import { createServerAction$, redirect } from "solid-start/server"
-import { getUser } from "~/db/session"
+import {
+  createServerAction$,
+  createServerData$,
+  redirect,
+} from "solid-start/server"
+import { getUser, requireSession } from "~/db/session"
 
 export function routeData({ params }: RouteDataArgs) {
   const nook = (): string => params.nook
-  return { nook }
+  return {
+    nook,
+    csrf: createServerData$(
+      async (_, { request }) => await requireSession(request, "csrf"),
+      { key: () => ["auth_user"] }
+    ),
+  }
 }
 
 function validateTitle(title: unknown): string | undefined {
@@ -28,7 +38,7 @@ function validateNook(nook: unknown): string | undefined {
 }
 
 export default function Submit(): JSX.Element {
-  const { nook } = useRouteData<typeof routeData>()
+  const { nook, csrf } = useRouteData<typeof routeData>()
 
   const [submitting, { Form }] = createServerAction$(
     async (form: FormData, { request }) => {
@@ -75,6 +85,7 @@ export default function Submit(): JSX.Element {
       <h1>Submit new Post</h1>
       <Form>
         <input type="hidden" name="nook" value={nook()} />
+        <input type="hidden" name="csrf" value={csrf()} />
         <div>
           <label for="title-input">Title</label>
           <input id="title-input" name="title" />

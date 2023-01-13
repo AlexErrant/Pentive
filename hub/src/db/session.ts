@@ -1,3 +1,4 @@
+import { base64url } from "shared"
 import { redirect } from "solid-start/server"
 import { createCookieSessionStorage } from "solid-start/session"
 import { Session, SessionStorage } from "solid-start/session/sessions"
@@ -8,7 +9,8 @@ interface LoginForm {
 }
 
 const sessionUserId = "userId"
-const sessionNames = [sessionUserId] as const
+const sessionCsrf = "csrf"
+const sessionNames = [sessionUserId, sessionCsrf] as const
 type SessionName = typeof sessionNames[number]
 export async function register({
   username,
@@ -109,6 +111,10 @@ export async function createUserSession(
 ): Promise<Response> {
   const session = await storage.getSession()
   session.set(sessionUserId, userId)
+  session.set(
+    sessionCsrf,
+    base64url.encode(crypto.getRandomValues(new Uint8Array(32)))
+  )
   return redirect(redirectTo, {
     headers: {
       // eslint-disable-next-line @typescript-eslint/naming-convention
