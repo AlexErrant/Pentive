@@ -6,7 +6,7 @@ import {
   createServerData$,
   redirect,
 } from "solid-start/server"
-import { getUser, requireSession } from "~/db/session"
+import { requireSession } from "~/db/session"
 
 export function routeData({ params }: RouteDataArgs) {
   const nook = (): string => params.nook
@@ -45,12 +45,14 @@ export default function Submit(): JSX.Element {
       const title = form.get("title")
       const text = form.get("text")
       const nook = form.get("nook")
+      const csrf = form.get("csrf")
       if (
         typeof title !== "string" ||
         typeof text !== "string" ||
-        typeof nook !== "string"
+        typeof nook !== "string" ||
+        typeof csrf !== "string"
       ) {
-        throw new FormError(`Title, text, and nook should be strings.`)
+        throw new FormError(`Title, text, nook, and csrf should be strings.`)
       }
       const fields = { title, text, nook }
       const fieldErrors = {
@@ -61,12 +63,17 @@ export default function Submit(): JSX.Element {
       if (Object.values(fieldErrors).some(Boolean)) {
         throw new FormError("Some fields are invalid", { fieldErrors, fields })
       }
-      const user = await getUser(request)
-      if (user == null) throw redirect("/login") as unknown
+      const session = await requireSession(request)
+      if (csrf !== session.csrf) {
+        const searchParams = new URLSearchParams([
+          ["redirectTo", new URL(request.url).pathname],
+        ])
+        throw redirect(`/login?${searchParams.toString()}`) as unknown
+      }
 
       await insertPost({
         id: ulidAsHex(),
-        authorId: user.username,
+        authorId: session.userId,
         title,
         text,
         nook,
