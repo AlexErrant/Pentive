@@ -7,6 +7,9 @@ interface LoginForm {
   password: string
 }
 
+const sessionUserId = "userId"
+const sessionNames = [sessionUserId] as const
+type SessionName = typeof sessionNames[number]
 export async function register({
   username,
   password,
@@ -53,14 +56,14 @@ export async function getUserSession(request: Request): Promise<Session> {
 
 export async function getUserId(request: Request): Promise<string | null> {
   const session = await getUserSession(request)
-  const userId = session.get("userId") as unknown
+  const userId = session.get(sessionUserId) as unknown
   if (typeof userId !== "string" || userId.length === 0) return null
   return userId
 }
 
 export async function requireSession(
   request: Request,
-  sessionName: "userId",
+  sessionName: SessionName,
   redirectTo: string = new URL(request.url).pathname
 ): Promise<string> {
   const session = await getUserSession(request)
@@ -105,7 +108,7 @@ export async function createUserSession(
   redirectTo: string
 ): Promise<Response> {
   const session = await storage.getSession()
-  session.set("userId", userId)
+  session.set(sessionUserId, userId)
   return redirect(redirectTo, {
     headers: {
       // eslint-disable-next-line @typescript-eslint/naming-convention
