@@ -58,17 +58,18 @@ export async function getUserId(request: Request): Promise<string | null> {
   return userId
 }
 
-export async function requireUserId(
+export async function requireSession(
   request: Request,
+  sessionName: "userId",
   redirectTo: string = new URL(request.url).pathname
 ): Promise<string> {
   const session = await getUserSession(request)
-  const userId = session.get("userId") as unknown
-  if (typeof userId !== "string" || userId.length === 0) {
+  const sessionValue = session.get(sessionName) as unknown
+  if (typeof sessionValue !== "string" || sessionValue.length === 0) {
     const searchParams = new URLSearchParams([["redirectTo", redirectTo]])
     throw redirect(`/login?${searchParams.toString()}`) as unknown
   }
-  return userId
+  return sessionValue
 }
 
 export async function getUser(
