@@ -12,8 +12,8 @@ export function routeData({ params }: RouteDataArgs) {
   const nook = (): string => params.nook
   return {
     nook,
-    csrf: createServerData$(
-      async (_, { request }) => await requireSession(request, "csrf"),
+    session: createServerData$(
+      async (_, { request }) => await requireSession(request),
       { key: () => ["auth_user"] }
     ),
   }
@@ -38,7 +38,7 @@ function validateNook(nook: unknown): string | undefined {
 }
 
 export default function Submit(): JSX.Element {
-  const { nook, csrf } = useRouteData<typeof routeData>()
+  const { nook, session } = useRouteData<typeof routeData>()
 
   const [submitting, { Form }] = createServerAction$(
     async (form: FormData, { request }) => {
@@ -85,7 +85,7 @@ export default function Submit(): JSX.Element {
       <h1>Submit new Post</h1>
       <Form>
         <input type="hidden" name="nook" value={nook()} />
-        <input type="hidden" name="csrf" value={csrf()} />
+        <input type="hidden" name="csrf" value={session()?.csrf} />
         <div>
           <label for="title-input">Title</label>
           <input id="title-input" name="title" />

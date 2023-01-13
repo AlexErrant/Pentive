@@ -12,6 +12,8 @@ const sessionUserId = "userId"
 const sessionCsrf = "csrf"
 const sessionNames = [sessionUserId, sessionCsrf] as const
 type SessionName = typeof sessionNames[number]
+export type UserSession = { [K in SessionName]: string }
+
 export async function register({
   username,
   password,
@@ -65,16 +67,20 @@ export async function getUserId(request: Request): Promise<string | null> {
 
 export async function requireSession(
   request: Request,
-  sessionName: SessionName,
   redirectTo: string = new URL(request.url).pathname
-): Promise<string> {
+): Promise<UserSession> {
   const session = await getUserSession(request)
-  const sessionValue = session.get(sessionName) as unknown
-  if (typeof sessionValue !== "string" || sessionValue.length === 0) {
-    const searchParams = new URLSearchParams([["redirectTo", redirectTo]])
-    throw redirect(`/login?${searchParams.toString()}`) as unknown
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+  const r = {} as UserSession
+  for (const sessionName of sessionNames) {
+    const sessionValue = session.get(sessionName) as unknown
+    if (typeof sessionValue !== "string" || sessionValue.length === 0) {
+      const searchParams = new URLSearchParams([["redirectTo", redirectTo]])
+      throw redirect(`/login?${searchParams.toString()}`) as unknown
+    }
+    r[sessionName] = sessionValue
   }
-  return sessionValue
+  return r
 }
 
 export async function getUser(
