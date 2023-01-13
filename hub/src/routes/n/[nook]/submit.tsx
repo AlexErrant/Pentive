@@ -1,9 +1,7 @@
 import { Show, JSX } from "solid-js"
 import { FormError, RouteDataArgs, useRouteData } from "solid-start"
-import { insertPost } from "shared"
-import { Ulid } from "id128"
+import { insertPost, ulidAsHex } from "shared"
 import { createServerAction$, redirect } from "solid-start/server"
-import { Hex } from "shared/src/brand"
 import { getUser } from "~/db/session"
 
 export function routeData({ params }: RouteDataArgs) {
@@ -57,7 +55,7 @@ export default function Submit(): JSX.Element {
       if (user == null) throw redirect("/login") as unknown
 
       await insertPost({
-        id: Ulid.generate().toRaw() as Hex,
+        id: ulidAsHex(),
         authorId: user.username,
         title,
         text,

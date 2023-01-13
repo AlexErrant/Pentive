@@ -4,6 +4,7 @@ authed
 ciphertext
 comlink
 concated
+crockford
 crsql
 crsqlite
 dexie
