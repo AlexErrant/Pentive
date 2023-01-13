@@ -29,6 +29,7 @@ precaching
 resizer
 rxdb
 sandboxed
+scure
 siteid
 stylelint
 superjson

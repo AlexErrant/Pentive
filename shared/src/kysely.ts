@@ -2,8 +2,9 @@ import { Kysely, sql, InsertResult, RawBuilder } from "kysely"
 import { PlanetScaleDialect } from "kysely-planetscale"
 import { DB } from "./database"
 import { Base64, Base64Url, DbId, Hex } from "./brand"
-import { binary16fromBase64URL, binary16toBase64URL } from "./convertBinary"
+import { binary16fromBase64URL } from "./convertBinary"
 import { undefinedMap } from "./utility"
+import { base64url } from "@scure/base"
 
 // @ts-expect-error db calls should throw null error if not setup
 let db: Kysely<DB> = null as Kysely<DB>
@@ -26,7 +27,7 @@ export async function getPosts({ nook }: { nook: string }): Promise<
 > {
   return await db
     .selectFrom("Post")
-    .select([selectId, "title", "text", "authorId"])
+    .select(["id", "title", "text", "authorId"])
     .where("nook", "=", nook)
     .execute()
     .then((ps) => ps.map(mapIdToBase64Url))
@@ -43,7 +44,7 @@ export async function getPost(id: Base64Url): Promise<
 > {
   return await db
     .selectFrom("Post")
-    .select([selectId, "title", "text", "authorId"])
+    .select(["id", "title", "text", "authorId"])
     .where("id", "=", fromBase64Url(id))
     .executeTakeFirst()
     .then((x) => undefinedMap(x, mapIdToBase64Url))
@@ -86,10 +87,12 @@ function fromBase64Url(id: Base64Url): RawBuilder<DbId> {
   return fromBase64(binary16fromBase64URL(id))
 }
 
-const selectId = sql<Base64>`TO_BASE64(id)`.as("id")
-
-function mapIdToBase64Url<T>(t: T & { id: Base64 }): T & {
+function mapIdToBase64Url<T>(t: T & { id: DbId }): T & {
   id: Base64Url
 } {
-  return { ...t, id: binary16toBase64URL(t.id) }
+  const array = Uint8Array.from(t.id.split("").map((b) => b.charCodeAt(0))) // https://github.com/planetscale/database-js/issues/78#issuecomment-1376435565
+  return {
+    ...t,
+    id: base64url.encode(array).substring(0, 22) as Base64Url,
+  }
 }
