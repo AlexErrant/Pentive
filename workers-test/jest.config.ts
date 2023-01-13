@@ -1,4 +1,7 @@
-export default {
+/* eslint-disable @typescript-eslint/naming-convention */
+import type { Config } from "jest"
+
+const config: Config = {
   preset: "ts-jest/presets/default-esm",
   globals: {
     "ts-jest": {
@@ -19,3 +22,5 @@ export default {
     modules: true,
   },
 }
+
+export default config

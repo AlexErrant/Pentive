@@ -2,16 +2,26 @@
   "compilerOptions": {
     "target": "esnext",
     "module": "esnext",
-    "lib": ["esnext"],
-    "types": ["@cloudflare/workers-types"],
+    "lib": [
+      "esnext"
+    ],
+    "types": [
+      "@cloudflare/workers-types"
+    ],
     "moduleResolution": "node",
     "strict": true,
     "noEmit": true,
     "esModuleInterop": true,
     "baseUrl": "./",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": [
+        "src/*"
+      ]
     }
   },
-  "include": ["src/**/*", "bindings.d.ts"]
+  "include": [
+    "src/**/*",
+    "bindings.d.ts",
+    "jest.config.ts"
+  ]
 }
