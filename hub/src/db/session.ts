@@ -38,15 +38,15 @@ export async function login({ username, password }: LoginForm): Promise<{
 export function setSessionStorage(sessionSecret: string): void {
   storage = createCookieSessionStorage({
     cookie: {
-      name: "RJ_session",
-      // secure doesn't work on localhost for Safari
-      // https://web.dev/when-to-use-local-https/
+      name: "__Host-session",
       secure: true,
       secrets: [sessionSecret],
       sameSite: "lax",
       path: "/",
-      maxAge: 60 * 60 * 24 * 30,
+      maxAge: 60 * 60 * 24 * 30, // 30 days
       httpOnly: true,
+      // domain: "", // intentionally missing https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html#cookie-with-__host-prefix
+      // expires: "", // intentionally missing because docs say it's calculated off `maxAge` when missing
     },
   })
 }
