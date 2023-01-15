@@ -84,8 +84,7 @@ export default function Submit(): JSX.Element {
   const error = (): FormError | undefined =>
     submitting.error as undefined | FormError
 
-  // highTODO add CSRF & idempotency token
-  // https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html#double-submit-cookie
+  // highTODO idempotency token
 
   return (
     <main>

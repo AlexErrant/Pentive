@@ -46,7 +46,7 @@ export function setSessionStorage(sessionSecret: string): void {
       maxAge: 60 * 60 * 24 * 30, // 30 days
       httpOnly: true,
       // domain: "", // intentionally missing https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html#cookie-with-__host-prefix
-      // expires: "", // intentionally missing because docs say it's calculated off `maxAge` when missing
+      // expires: "", // intentionally missing because docs say it's calculated off `maxAge` when missing https://github.com/solidjs/solid-start/blob/1b22cad87dd7bd74f73d807e1d60b886e753a6ee/packages/start/session/cookies.ts#L56-L57
     },
   })
 }
@@ -119,6 +119,9 @@ export async function createUserSession(
   session.set(sessionUserId, userId)
   session.set(
     sessionCsrf,
+    // https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html#double-submit-cookie
+    // If you ever separate csrf from the session cookie https://security.stackexchange.com/a/220810 https://security.stackexchange.com/a/248434
+    // REST endpoints may need csrf https://security.stackexchange.com/q/166724
     base64url.encode(crypto.getRandomValues(new Uint8Array(32)))
   )
   return redirect(redirectTo, {
