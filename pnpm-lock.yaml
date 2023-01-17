@@ -19,7 +19,7 @@ importers:
       '@types/uuid': ^9.0.0
       '@typescript-eslint/eslint-plugin': ^5.31.0
       '@typescript-eslint/parser': ^5.31.0
-      '@vlcn.io/wa-crsqlite': ^0.4.2
+      '@vlcn.io/wa-crsqlite': ^0.7.1
       '@zip.js/zip.js': ^2.6.41
       ag-grid-community: ^28.2.0
       ag-grid-solid: ^28.2.0
@@ -72,7 +72,7 @@ importers:
       '@tanstack/solid-table': 8.5.13_solid-js@1.5.4
       '@trpc/client': 10.2.0_@trpc+server@10.2.0
       '@trpc/server': 10.2.0
-      '@vlcn.io/wa-crsqlite': 0.4.2
+      '@vlcn.io/wa-crsqlite': 0.7.1
       '@zip.js/zip.js': 2.6.41
       ag-grid-community: 28.2.0
       ag-grid-solid: 28.2.0_r456abjkktdu6n3n64bymge7xa
@@ -287,7 +287,7 @@ importers:
       '@types/node': ^18.7.21
       '@types/node-fetch': ^2.6.2
       '@types/uuid': ^9.0.0
-      '@vlcn.io/crsqlite-allinone': ^0.3.3
+      '@vlcn.io/crsqlite-allinone': ^0.6.0
       aws-lambda: ^1.0.7
       dotenv: ^16.0.2
       html-to-text: ^8.2.1
@@ -310,7 +310,7 @@ importers:
       '@prisma/client': 4.6.1_prisma@4.6.1
       '@trpc/client': 10.2.0_@trpc+server@10.2.0
       '@trpc/server': 10.2.0
-      '@vlcn.io/crsqlite-allinone': 0.3.3
+      '@vlcn.io/crsqlite-allinone': 0.6.0
       aws-lambda: 1.0.7
       dotenv: 16.0.2
       html-to-text: 8.2.1
@@ -365,7 +365,7 @@ importers:
       '@types/uuid': ^9.0.0
       '@typescript-eslint/eslint-plugin': ^5.31.0
       '@typescript-eslint/parser': ^5.31.0
-      '@vlcn.io/xplat-api': ^0.3.1
+      '@vlcn.io/xplat-api': ^0.6.0
       eslint: ^8.20.0
       eslint-config-prettier: ^8.5.0
       eslint-config-standard-with-typescript: ^22.0.0
@@ -385,7 +385,7 @@ importers:
     dependencies:
       '@planetscale/database': 1.5.0
       '@scure/base': 1.1.1
-      '@vlcn.io/xplat-api': 0.3.1
+      '@vlcn.io/xplat-api': 0.6.0
       kysely: 0.23.3
       kysely-planetscale: 1.2.1_z7hkwvucbgukbaukm7lodlcsym
       ulid-workers: 2.1.0
@@ -4059,38 +4059,38 @@ packages:
       - rollup
       - supports-color
 
-  /@vlcn.io/crsqlite-allinone/0.3.3:
-    resolution: {integrity: sha512-PYzI7zgFAMuduYXadrrtLdbhA/CIuEtpT/cepd/jEiNDNUi9UnBhIkyc5w+xNI1dXvoPCIoy/JeMDz2cVp7p/Q==}
+  /@vlcn.io/crsqlite-allinone/0.6.0:
+    resolution: {integrity: sha512-76P4weHC7ZwB2RKKnE7UrzRystM9bp5/JRC7oeD5j5fcItu7/Eb8X24xEP1mO7BAUQ/y9ax2ml07R2rDk+6ZbA==}
     dependencies:
-      '@vlcn.io/crsqlite': 0.4.2
-      '@vlcn.io/xplat-api': 0.3.1
+      '@vlcn.io/crsqlite': 0.7.0
+      '@vlcn.io/xplat-api': 0.6.0
       better-sqlite3: 8.0.1
       import-meta-resolve: 2.2.0
       nanoid: 4.0.0
     dev: false
 
-  /@vlcn.io/crsqlite/0.4.2:
-    resolution: {integrity: sha512-swJP4Ufbr5nnEDk2zmi5JacYm6tZm2m86ZTaLivXZampgAjNnBXk1ctKdKoO3BsTjn4plio3E64y0h8SgemwEg==}
+  /@vlcn.io/crsqlite/0.7.0:
+    resolution: {integrity: sha512-38vFWAsKIqFxqKQHAsiHb8XTrEHTRd8a+EQGk2xg8CgmiDF3osZpL31Ft/5lX1P1VIvq5qB7r+MJBQx3dNUEKA==}
     requiresBuild: true
     dependencies:
       bindings: 1.5.0
       prebuild-install: 7.1.1
     dev: false
 
-  /@vlcn.io/wa-crsqlite/0.4.2:
-    resolution: {integrity: sha512-BTJ3W6CukaVmd3boQPS2hRF8R8YWhe+ka7MXosJAcJeXqKB4DqvimMX+rL7qvqT4CXskiMathEIdNnA5J7sJzw==}
+  /@vlcn.io/wa-crsqlite/0.7.1:
+    resolution: {integrity: sha512-6fZSeH9zRQOBE4Rw9QGeksNvOSkTwge8iD3bdoQuMxePzvWdzABntXfxwPePCPvDUwJR0tovdNtsk4JitUYR5Q==}
     dependencies:
-      '@vlcn.io/wa-sqlite': 0.11.2
-      '@vlcn.io/xplat-api': 0.3.1
+      '@vlcn.io/wa-sqlite': 0.14.0
+      '@vlcn.io/xplat-api': 0.6.0
       comlink: 4.3.1
     dev: false
 
-  /@vlcn.io/wa-sqlite/0.11.2:
-    resolution: {integrity: sha512-DxQ8UcjGG18lRHIXutWMjnI9U7nq8QIso83+ks+ddxg18OPvHL4bsugcJuZoV0WM7cnDBtpA5zF12f782aGF0A==}
+  /@vlcn.io/wa-sqlite/0.14.0:
+    resolution: {integrity: sha512-V8CC3vsXWikI3XRmaQTwnh01wIlEpsSB5fE0++w3HP7gOnyEmfXEfMkzQduPeYn3fD0+Y8wjm98+NBmMuoKQKg==}
     dev: false
 
-  /@vlcn.io/xplat-api/0.3.1:
-    resolution: {integrity: sha512-+M+kFGau6WJmQWVgH8r6HCuefGcTaVV/DknjjvkUYeaZ2yPCvfdcHor9avE9+29tXbKpiDe8MuvuqxUlnnHlbg==}
+  /@vlcn.io/xplat-api/0.6.0:
+    resolution: {integrity: sha512-p0BM4UYQzOHSo69lMjQ50BHWaRIOQ9HJqFoYuu4ZO5RXHRkgtizjlLCGo6BkT6h32cwd9cAFDYbwb9PjGMBPow==}
     dependencies:
       comlink: 4.3.1
     dev: false
@@ -10066,7 +10066,6 @@ packages:
 
   /minimist/1.2.7:
     resolution: {integrity: sha512-bzfL1YUZsP41gmu/qjrEk0Q6i2ix/cVeAhbCbqH9u3zYutS1cLg00qhrD0M2MVdCcx4Sc0UpP2eBWo9rotpq6g==}
-    dev: true
 
   /minipass/3.3.4:
     resolution: {integrity: sha512-I9WPbWHCGu8W+6k1ZiGpPu0GkoKBeorkfKNuAFBNS1HNFJvke82sxvI5bzcCNpWPorkOO5QQ+zomzzwRxejXiw==}
@@ -11114,7 +11113,7 @@ packages:
       detect-libc: 2.0.1
       expand-template: 2.0.3
       github-from-package: 0.0.0
-      minimist: 1.2.6
+      minimist: 1.2.7
       mkdirp-classic: 0.5.3
       napi-build-utils: 1.0.2
       node-abi: 3.30.0
@@ -11344,7 +11343,7 @@ packages:
     dependencies:
       deep-extend: 0.6.0
       ini: 1.3.8
-      minimist: 1.2.6
+      minimist: 1.2.7
       strip-json-comments: 2.0.1
     dev: false
 
