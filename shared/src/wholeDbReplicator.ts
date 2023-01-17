@@ -23,7 +23,8 @@ export type Changeset = [
   CID,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   any, // val,
-  Version,
+  Version, // col version
+  Version, // db version
   SiteIDWire // site_id
 ]
 
@@ -81,7 +82,7 @@ class WholeDbReplicator {
       let maxVersion = 0n
       log("inserting changesets in tx", changesets)
       const stmt = await this._db.prepare(
-        'INSERT INTO crsql_changes ("table", "pk", "cid", "val", "version", "site_id") VALUES (?, ?, ?, ?, ?, ?)'
+        'INSERT INTO crsql_changes ("table", "pk", "cid", "val", "col_version", "db_version", "site_id") VALUES (?, ?, ?, ?, ?, ?, ?)'
       )
       // TODO: may want to chunk
       try {
@@ -89,7 +90,7 @@ class WholeDbReplicator {
         // we have for this peer?
         // that'd preclude resetting tho.
         for (const cs of changesets) {
-          const v = BigInt(cs[4])
+          const v = BigInt(cs[5])
           maxVersion = v > maxVersion ? v : maxVersion
           // cannot use same statement in parallel
           await stmt.run(
@@ -97,9 +98,10 @@ class WholeDbReplicator {
             cs[1],
             cs[2],
             cs[3],
+            BigInt(cs[4]),
             v,
             // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
-            cs[5] ? uuidParse(cs[5]) : 0
+            cs[6] ? uuidParse(cs[6]) : 0
           )
         }
       } catch (e) {
@@ -123,13 +125,14 @@ class WholeDbReplicator {
     const fromAsBlob = uuidParse(from)
     // The casting is due to bigint support problems in various wasm builds of sqlite
     const changes: Changeset[] = await this._db.execA<Changeset>(
-      `SELECT "table", "pk", "cid", "val", "version", "site_id" FROM crsql_changes WHERE site_id != ? AND version > ?`,
+      `SELECT "table", "pk", "cid", "val", "col_version", "db_version", "site_id" FROM crsql_changes WHERE site_id != ? AND db_version > ?`,
       [fromAsBlob, since]
     )
 
     // TODO: temporary. better to `quote` out of db and `unquote` (to implement) into db
+    // TODO: further complicated by https://github.com/rhashimoto/wa-sqlite/issues/69
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-explicit-any
-    changes.forEach((c) => (c[5] = uuidStringify(c[5] as any)))
+    changes.forEach((c) => (c[6] = uuidStringify(c[6] as any)))
 
     log("pushing changesets across the network", changes)
     // console.log(changes);

@@ -18,7 +18,8 @@ const changeSet = z.tuple([
   quoteConcatedPKs,
   cid,
   val,
-  version,
+  version, // col version
+  version, // db version
   siteIdWire,
 ])
 
