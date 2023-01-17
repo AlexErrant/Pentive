@@ -12,8 +12,8 @@ export const initSql = [
     name TEXT,
     css TEXT,
     fields TEXT,
-    created, -- https://github.com/vlcn-io/cr-sqlite/issues/85
-    modified,
+    created INT,
+    modified INT,
     templateType TEXT
 );`,
   `CREATE TABLE IF NOT EXISTS note (
@@ -23,8 +23,8 @@ export const initSql = [
     pushTemplateId BLOB,
     push INT,
     ankiNoteId INT,
-    created, -- https://github.com/vlcn-io/cr-sqlite/issues/85
-    modified,
+    created INT,
+    modified INT,
     tags TEXT,
     fieldValues TEXT
 );`,
