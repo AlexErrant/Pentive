@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "strict": true,
-    "target": "ES2017",
+    "target": "ES2021",
     "module": "ESNext",
     "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,
@@ -12,7 +12,8 @@
     "jsxImportSource": "solid-js",
     "lib": [
       "WebWorker",
-      "DOM"
+      "DOM",
+      "ES2021.String"
     ],
     "types": [
       "vite/client"

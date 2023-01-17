@@ -6,7 +6,7 @@ import type {
   PostMessageTypes,
 } from "./register-service-worker"
 import type { ResourceId } from "app/src/domain/ids"
-import { throwExp } from "app/src/domain/utility"
+import { throwExp } from "shared"
 
 declare let self: ServiceWorkerGlobalScope
 
