@@ -15,7 +15,8 @@ export async function getDb(): Promise<sqliteWasm.DB> {
 async function createDb(): Promise<sqliteWasm.DB> {
   const sqlite = await sqliteWasm.default(
     (file) =>
-      // need to update this version number 👇👇 after every upgrade. lowTODO figure out something better. Grep for F00E815A-C0FD-4AEA-B83C-0BDB641D97CC
+      // You may need to `git clean -xdf` if you run into weird errors after an upgrade. I was getting "VFS '[object Object]' already registered", which means nothing to me. https://github.com/rhashimoto/wa-sqlite/pull/73
+      // Need to update this version number 👇👇 after every upgrade. lowTODO figure out something better. Grep for F00E815A-C0FD-4AEA-B83C-0BDB641D97CC
       "https://esm.sh/@vlcn.io/wa-crsqlite@0.7.1/dist/wa-sqlite-async.wasm"
   )
   const db = await sqlite.open("username.db")
