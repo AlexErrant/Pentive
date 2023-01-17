@@ -19,7 +19,7 @@ importers:
       '@types/uuid': ^9.0.0
       '@typescript-eslint/eslint-plugin': ^5.31.0
       '@typescript-eslint/parser': ^5.31.0
-      '@vlcn.io/wa-crsqlite': ^0.7.1
+      '@vlcn.io/wa-crsqlite': ^0.7.1 || grep for F00E815A-C0FD-4AEA-B83C-0BDB641D97CC
       '@zip.js/zip.js': ^2.6.41
       ag-grid-community: ^28.2.0
       ag-grid-solid: ^28.2.0
