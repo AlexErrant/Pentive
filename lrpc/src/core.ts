@@ -1,13 +1,13 @@
-import jwt from "jsonwebtoken"
+import { jwtVerify } from "jose"
+import { jwsPrivateKey } from "./config.js"
 
-export function getUser(auth: string | undefined): string | undefined {
+export async function getUser(
+  auth: string | undefined
+): Promise<string | undefined> {
   if (auth !== undefined) {
     const token = auth.split(" ")[1]
-    const jwtPayload = jwt.verify(
-      token,
-      "qwertyuiopasdfghjklzxcvbnm123456" // highTODO
-    ) as jwt.JwtPayload
-    return jwtPayload.sub
+    const jwt = await jwtVerify(token, jwsPrivateKey)
+    return jwt.payload.sub
   }
   return undefined
 }

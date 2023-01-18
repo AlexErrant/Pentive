@@ -9,13 +9,13 @@ import { Context } from "./trpc.js"
 
 // run with `npm run dev`
 
-function createContext(
+async function createContext(
   x: NodeHTTPCreateContextFnOptions<
     IncomingMessage,
     ServerResponse<IncomingMessage>
   >
-): Context {
-  const user = getUser(x.req.headers.authorization)
+): Promise<Context> {
+  const user = await getUser(x.req.headers.authorization)
   return { user }
 }
 
