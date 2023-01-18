@@ -11,8 +11,7 @@ set -euo pipefail # https://stackoverflow.com/a/2871034
 source ../PentiveSecrets/secrets.sh
 
 # Uncomment if you wanna
-# echo $jwsPublicKey     | wrangler secret put jwsPublicKey     --name mediarouter
-# echo $jwsPrivateKey    | wrangler secret put jwsPrivateKey    --name mediarouter
+# echo $jwsSecret        | wrangler secret put jwsSecret        --name mediarouter
 # echo $planetscaleDbUrl | wrangler secret put planetscaleDbUrl --name mediarouter
 # echo $appMediaIdSecret | wrangler secret put appMediaIdSecret --name mediarouter
 # echo $planetscaleDbUrl | wrangler secret put planetscaleDbUrl --name hub

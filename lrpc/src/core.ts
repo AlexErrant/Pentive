@@ -1,12 +1,12 @@
 import { jwtVerify } from "jose"
-import { jwsPrivateKey } from "./config.js"
+import { jwsSecret } from "./config.js"
 
 export async function getUser(
   auth: string | undefined
 ): Promise<string | undefined> {
   if (auth !== undefined) {
     const token = auth.split(" ")[1]
-    const jwt = await jwtVerify(token, jwsPrivateKey)
+    const jwt = await jwtVerify(token, jwsSecret)
     return jwt.payload.sub
   }
   return undefined

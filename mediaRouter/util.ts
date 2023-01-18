@@ -1,4 +1,4 @@
-import { base64ToArrayBuffer, Brand } from "shared"
+import { arrayBufferToBase64, base64ToArray, Brand } from "shared"
 
 export type UserId = Brand<string, "userId">
 export type AppMediaIdSecretBase64 = Brand<
@@ -79,7 +79,7 @@ export async function decryptDigest(
   userId: UserId
 ): Promise<Result<DigestBase64, string>> {
   const [iv, encryptedDigest] = splitIvDigest(
-    base64ToArrayBuffer(ivEncryptedDigest)
+    base64ToArray(ivEncryptedDigest).buffer
   )
   const key = await generateKey(appMediaIdSecret, "decrypt", userId)
   try {
@@ -110,7 +110,7 @@ async function generateKey(
     {
       name: "SHA-256",
     },
-    concat(userIdBytes, base64ToArrayBuffer(appMediaIdSecret))
+    concat(userIdBytes, base64ToArray(appMediaIdSecret))
   )
   return await crypto.subtle.importKey(
     "raw",

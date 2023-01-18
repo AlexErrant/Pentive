@@ -1,5 +1,6 @@
 import * as dotenv from "dotenv"
 import { importPKCS8 } from "jose"
+import { base64ToArray } from "shared"
 import { z } from "zod"
 
 // lowTODO figure out how to get/manage/merge ENV variables from serverless.yml
@@ -15,7 +16,7 @@ if (rawConfig.error !== undefined) {
 const envZ = z.object({
   /* eslint-disable @typescript-eslint/naming-convention */
   planetscaleDbUrl: z.string(),
-  jwsPrivateKey: z.string(),
+  jwsSecret: z.string(),
   IS_OFFLINE: z.literal("true").or(z.undefined()),
   /* eslint-enable @typescript-eslint/naming-convention */
 })
@@ -23,5 +24,4 @@ const envZ = z.object({
 const config = envZ.parse(rawConfig.parsed)
 export default config
 
-const alg = "EdDSA"
-export const jwsPrivateKey = await importPKCS8(config.jwsPrivateKey, alg)
+export const jwsSecret = base64ToArray(config.jwsSecret)

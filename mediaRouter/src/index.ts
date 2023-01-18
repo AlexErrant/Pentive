@@ -12,7 +12,6 @@ import { Context, Hono } from "hono"
 import {
   encryptDigest,
   decryptDigest,
-  arrayBufferToBase64,
   UserId,
   AppMediaIdSecretBase64,
   IvEncryptedDigestBase64,
@@ -23,15 +22,16 @@ import {
   toError,
 } from "../util"
 
-import { toBase64URL_0, fromBase64URL_0, Base64, Base64Url } from "shared"
-
 import {
-  importPKCS8,
-  importSPKI,
-  SignJWT,
-  jwtVerify,
-  JWTVerifyResult,
-} from "jose"
+  toBase64URL_0,
+  fromBase64URL_0,
+  Base64,
+  Base64Url,
+  base64ToArray,
+  arrayBufferToBase64,
+} from "shared"
+
+import { SignJWT, jwtVerify, JWTVerifyResult } from "jose"
 
 import { connect } from "@planetscale/database"
 
@@ -49,10 +49,9 @@ async function getUserId(
   if (jwt == null) {
     return toError(c.text("Missing `Authorization` header", 401))
   } else {
-    const publicKey = await importSPKI(c.env.jwsPublicKey, alg)
     let verifyResult: JWTVerifyResult
     try {
-      verifyResult = await jwtVerify(jwt, publicKey)
+      verifyResult = await jwtVerify(jwt, base64ToArray(c.env.jwsSecret))
     } catch {
       return toError(
         c.text("Failed to verify JWT in `Authorization` header.", 401)
@@ -75,20 +74,18 @@ export interface Env {
   //
   // Example binding to R2. Learn more at https://developers.cloudflare.com/workers/runtime-apis/r2/
   mediaBucket: R2Bucket
-  jwsPublicKey: string
-  jwsPrivateKey: string
+  jwsSecret: string
   appMediaIdSecret: AppMediaIdSecretBase64
   planetscaleDbUrl: string
 }
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const app = new Hono<{ Bindings: Env }>()
-const alg = "EdDSA"
+const alg = "HS256"
 
 app
   .get("/", (c) => c.text("Hono!!"))
   .get("/testJws", async (c) => {
-    const publicKey = await importSPKI(c.env.jwsPublicKey, alg)
-    const privateKey = await importPKCS8(c.env.jwsPrivateKey, alg)
+    const jwsSecretBytes = base64ToArray(c.env.jwsSecret)
     const jwt = await new SignJWT({})
       .setProtectedHeader({ alg })
       .setSubject("someUserName")
@@ -98,8 +95,8 @@ app
       // .setIssuer("urn:example:issuer")
       // .setAudience("urn:example:audience")
       // .setExpirationTime("2h")
-      .sign(privateKey)
-    const verifyResult = await jwtVerify(jwt, publicKey)
+      .sign(jwsSecretBytes)
+    const verifyResult = await jwtVerify(jwt, jwsSecretBytes)
     console.log(
       JSON.stringify(
         {
@@ -113,7 +110,6 @@ app
     return c.body(null, 200)
   })
   .get("/logJwt/:sub", async (c) => {
-    const privateKey = await importPKCS8(c.env.jwsPrivateKey, alg)
     const sub = c.req.param("sub")
     const jwt = await new SignJWT({})
       .setProtectedHeader({ alg })
@@ -124,7 +120,7 @@ app
       // .setIssuer("urn:example:issuer")
       // .setAudience("urn:example:audience")
       // .setExpirationTime("2h")
-      .sign(privateKey)
+      .sign(base64ToArray(c.env.jwsSecret))
     console.log("jwt:", jwt)
     return c.body(null)
   })
