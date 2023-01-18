@@ -233,6 +233,7 @@ importers:
       eslint-plugin-n: ^15.2.4
       eslint-plugin-prettier: ^4.2.1
       eslint-plugin-promise: ^6.0.0
+      jose: ^4.11.1
       prettier: ^2.7.1
       shared: workspace:*
       solid-js: ^1.6.2
@@ -251,6 +252,7 @@ importers:
       '@scure/base': 1.1.1
       '@solidjs/meta': 0.28.2_solid-js@1.6.6
       '@solidjs/router': 0.6.0_solid-js@1.6.6
+      jose: 4.11.1
       shared: link:../shared
       solid-js: 1.6.6
       solid-start: 0.2.8_7g4juq64zsg2futgalxovnqs54
@@ -6980,7 +6982,7 @@ packages:
       eslint-import-resolver-webpack:
         optional: true
     dependencies:
-      '@typescript-eslint/parser': 5.37.0_irgkl5vooow2ydyo6aokmferha
+      '@typescript-eslint/parser': 5.37.0_id2eilsndvzhjjktb64trvy3gu
       debug: 3.2.7
       eslint: 8.23.1
       eslint-import-resolver-node: 0.3.6
@@ -7009,7 +7011,7 @@ packages:
       '@typescript-eslint/parser':
         optional: true
     dependencies:
-      '@typescript-eslint/parser': 5.37.0_irgkl5vooow2ydyo6aokmferha
+      '@typescript-eslint/parser': 5.37.0_id2eilsndvzhjjktb64trvy3gu
       array-includes: 3.1.5
       array.prototype.flat: 1.3.0
       debug: 2.6.9
