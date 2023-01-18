@@ -1,4 +1,4 @@
-import { Base64, Base64Url, Hex } from "./brand"
+import { Base64, Base64Url, Hex } from "./brand.js"
 
 import { ulidFactory } from "ulid-workers"
 import { base16, base32crockford } from "@scure/base"

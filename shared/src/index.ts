@@ -33,6 +33,7 @@ export const initSql = [
 ]
 
 export * from "./wholeDbReplicator.js"
+export * from "./wholeDbReplicatorSync.js"
 export * from "./kysely.js"
 export * from "./convertBinary.js"
 export * from "./brand.js"

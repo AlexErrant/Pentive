@@ -1,10 +1,7 @@
 import { DB } from "@vlcn.io/xplat-api"
 import { parse as uuidParse, stringify as uuidStringify } from "uuid"
+import { Changeset } from "./wholeDbReplicator.js"
 type SiteIDWire = string
-type CID = string
-type QuoteConcatedPKs = string | number
-type TableName = string
-type Version = number | string
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
 const isDebug = (globalThis as any).__vlcn_whole_db_dbg
@@ -16,17 +13,6 @@ function log(...data: any[]): void {
     console.log("whole-db: ", ...data)
   }
 }
-
-export type Changeset = [
-  TableName,
-  QuoteConcatedPKs,
-  CID,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  any, // val,
-  Version, // col version
-  Version, // db version
-  SiteIDWire // site_id
-]
 
 // TODO: we need to handle initial sync.
 // Well, that should be easy. Just poke people on connect.

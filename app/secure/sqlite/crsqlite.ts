@@ -37,21 +37,14 @@ export async function sync(): Promise<void> {
     pokedBy: siteId,
     pokerVersion: BigInt(dbVersion),
   })
-  console.log("poke response:", poke)
   const wdb = await wholeDbReplicator(db)
   await wdb.onChangesReceived(poke.siteId, poke.changes)
   if (poke.version != null) {
     const changeSets = await wdb.onChangesRequested(poke.siteId, poke.version)
-    console.log("changeSets", changeSets)
     await lrpc.receiveChanges.mutate({
       changeSets,
       fromSiteId: siteId,
     })
-    console.log("Should be pushing changes, but is failing in 2 ways:")
-    console.log("1. 'SqliteError: Failed inserting changeset'")
-    console.log(
-      "2. The above error isn't being propagated, so tRPC is giving me a 200 OK."
-    )
   } else {
     console.log("No changes to push!")
   }

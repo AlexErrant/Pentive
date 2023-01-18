@@ -32,7 +32,7 @@ export type Changeset = [
 // Well, that should be easy. Just poke people on connect.
 
 class WholeDbReplicator {
-  constructor(private readonly _db: DB | DBAsync) {}
+  constructor(private readonly _db: DBAsync) {}
 
   async init(): Promise<void> {
     await this._createPeerTrackingTable()
@@ -141,7 +141,7 @@ class WholeDbReplicator {
 }
 
 export async function wholeDbReplicator(
-  db: DB | DBAsync
+  db: DBAsync
 ): Promise<WholeDbReplicator> {
   const wdb = new WholeDbReplicator(db)
   await wdb.init()

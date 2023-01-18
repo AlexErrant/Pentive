@@ -1,9 +1,9 @@
 import { Kysely, sql, InsertResult, RawBuilder } from "kysely"
 import { PlanetScaleDialect } from "kysely-planetscale"
-import { DB } from "./database"
-import { Base64, Base64Url, DbId, Hex } from "./brand"
-import { binary16fromBase64URL } from "./convertBinary"
-import { undefinedMap } from "./utility"
+import { DB } from "./database.js"
+import { Base64, Base64Url, DbId, Hex } from "./brand.js"
+import { binary16fromBase64URL } from "./convertBinary.js"
+import { undefinedMap } from "./utility.js"
 import { base64url } from "@scure/base"
 
 // @ts-expect-error db calls should throw null error if not setup

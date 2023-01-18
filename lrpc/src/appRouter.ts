@@ -3,7 +3,7 @@ import { noteRouter } from "./noteRouter.js"
 import { templateRouter } from "./templateRouter.js"
 import { authedProcedure, publicProcedure, router } from "./trpc.js"
 import aio from "@vlcn.io/crsqlite-allinone"
-import { initSql, wholeDbReplicator } from "shared"
+import { initSql, wholeDbReplicatorSync } from "shared"
 import { stringify as uuidStringify } from "uuid"
 
 const tableName = z.string()
@@ -34,16 +34,16 @@ export const appRouter = router({
         pokerVersion: z.bigint(),
       })
     )
-    .query(async ({ input, ctx }) => {
+    .query(({ input, ctx }) => {
       const db = aio.open(`${ctx.user}.db`)
       try {
         db.execMany(initSql)
         const siteId = uuidStringify(
           db.execA<[Uint8Array]>("SELECT crsql_siteid();")[0][0]
         )
-        const wdb = await wholeDbReplicator(db)
-        const version = await wdb.onPoked(input.pokedBy, input.pokerVersion)
-        const changes = await wdb.onChangesRequested(
+        const wdb = wholeDbReplicatorSync(db)
+        const version = wdb.onPoked(input.pokedBy, input.pokerVersion)
+        const changes = wdb.onChangesRequested(
           input.pokedBy,
           input.pokerVersion
         )
@@ -63,11 +63,11 @@ export const appRouter = router({
         fromSiteId: siteIdWire,
       })
     )
-    .mutation(async ({ input, ctx }) => {
+    .mutation(({ input, ctx }) => {
       const db = aio.open(`${ctx.user}.db`)
       try {
-        const wdb = await wholeDbReplicator(db)
-        await wdb.onChangesReceived(input.fromSiteId, input.changeSets)
+        const wdb = wholeDbReplicatorSync(db)
+        wdb.onChangesReceived(input.fromSiteId, input.changeSets)
       } finally {
         db.close()
       }
