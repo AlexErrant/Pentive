@@ -26,4 +26,6 @@ Thumbs.db
 # Other
 wrangler.toml
 .env
+.env.development
+.env.production
 .cert

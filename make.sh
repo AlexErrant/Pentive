@@ -24,5 +24,7 @@ source ../PentiveSecrets/secrets.sh
 envsubst < ./mediaRouter/.example.dev.vars     > ./mediaRouter/.dev.vars
 envsubst < ./mediaRouter/example.wrangler.toml > ./mediaRouter/wrangler.toml
 envsubst < ./hub/.example.env                  > ./hub/.env
+envsubst < ./hub/.example.env.development      > ./hub/.env.development
+envsubst < ./hub/.example.env.production       > ./hub/.env.production
 envsubst < ./hub/example.wrangler.toml         > ./hub/wrangler.toml
 envsubst < ./lrpc/.example.env                 > ./lrpc/.env
