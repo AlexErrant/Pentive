@@ -7,5 +7,6 @@ declare global {
   interface Env {
     planetscaleDbUrl: string
     hubSessionSecret: Base64
+    jwsSecret: Base64
   }
 }

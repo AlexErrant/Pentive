@@ -9,7 +9,10 @@ import { setSessionStorage } from "./db/session"
 export default createHandler(
   renderAsync((event) => {
     setKysely(event.env.planetscaleDbUrl)
-    setSessionStorage(event.env.hubSessionSecret)
+    setSessionStorage({
+      sessionSecret: event.env.hubSessionSecret,
+      jwsSecret: event.env.jwsSecret,
+    })
     return <StartServer event={event} />
   })
 )

@@ -1,6 +1,8 @@
-import { base64url } from "shared"
+import { SignJWT } from "jose"
+import { Base64, base64ToArray, base64url } from "shared"
 import { redirect } from "solid-start/server"
-import { createCookieSessionStorage } from "solid-start/session"
+import { createCookie, createCookieSessionStorage } from "solid-start/session"
+import { Cookie, CookieOptions } from "solid-start/session/cookies"
 import { Session, SessionStorage } from "solid-start/session/sessions"
 import { db } from "."
 interface LoginForm {
@@ -35,12 +37,15 @@ export async function login({ username, password }: LoginForm): Promise<{
   return user
 }
 
-export function setSessionStorage(sessionSecret: string): void {
+export function setSessionStorage(x: {
+  sessionSecret: Base64
+  jwsSecret: Base64
+}): void {
   storage = createCookieSessionStorage({
     cookie: {
       name: "__Host-session",
       secure: true,
-      secrets: [sessionSecret],
+      secrets: [x.sessionSecret],
       sameSite: "lax",
       path: "/",
       maxAge: 60 * 60 * 24 * 30, // 30 days
@@ -49,10 +54,34 @@ export function setSessionStorage(sessionSecret: string): void {
       // expires: "", // intentionally missing because docs say it's calculated off `maxAge` when missing https://github.com/solidjs/solid-start/blob/1b22cad87dd7bd74f73d807e1d60b886e753a6ee/packages/start/session/cookies.ts#L56-L57
     },
   })
+  jwsSecret = base64ToArray(x.jwsSecret)
+  const jwtCookieOpts: CookieOptions = {
+    secure: true,
+    secrets: [], // intentionally empty. This cookie should only store a signed JWT!
+    sameSite: "strict",
+    path: "/",
+    maxAge: 60 * 60 * 24 * 30, // 30 days
+    httpOnly: true,
+    domain: "local.pentive.com", // sadly, making cookies target specific subdomains from the main domain seems very hacky
+    // expires: "", // intentionally missing because docs say it's calculated off `maxAge` when missing https://github.com/solidjs/solid-start/blob/1b22cad87dd7bd74f73d807e1d60b886e753a6ee/packages/start/session/cookies.ts#L56-L57
+  }
+  const jwtCookieName = "__Secure-jwt"
+  jwtCookie = createCookie(jwtCookieName, jwtCookieOpts)
+  destroyJwtCookie = createCookie(jwtCookieName, {
+    ...jwtCookieOpts,
+    maxAge: undefined,
+    expires: new Date(0), // https://github.com/remix-run/remix/issues/5150 https://stackoverflow.com/q/5285940
+  })
 }
 
 // @ts-expect-error session calls should throw null error if not setup
 let storage = null as SessionStorage
+// @ts-expect-error calls should throw null error if not setup
+let jwtCookie = null as Cookie
+// @ts-expect-error calls should throw null error if not setup
+let destroyJwtCookie = null as Cookie
+// @ts-expect-error calls should throw null error if not setup
+let jwsSecret = null as Uint8Array
 
 export async function getUserSession(request: Request): Promise<Session> {
   return await storage.getSession(request.headers.get("Cookie"))
@@ -103,11 +132,11 @@ export async function getUser(
 
 export async function logout(request: Request): Promise<Response> {
   const session = await storage.getSession(request.headers.get("Cookie"))
+  const headers = new Headers()
+  headers.append("Set-Cookie", await storage.destroySession(session)) // lowTODO parallelize
+  headers.append("Set-Cookie", await destroyJwtCookie.serialize("")) // lowTODO parallelize
   return redirect("/login", {
-    headers: {
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      "Set-Cookie": await storage.destroySession(session),
-    },
+    headers,
   })
 }
 
@@ -124,10 +153,26 @@ export async function createUserSession(
     // REST endpoints may need csrf https://security.stackexchange.com/q/166724
     base64url.encode(crypto.getRandomValues(new Uint8Array(32)))
   )
+  const headers = new Headers()
+  headers.append("Set-Cookie", await storage.commitSession(session)) // lowTODO parallelize
+  const jwt = await generateJwt(userId)
+  headers.append("Set-Cookie", await jwtCookie.serialize(jwt)) // lowTODO parallelize
   return redirect(redirectTo, {
-    headers: {
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      "Set-Cookie": await storage.commitSession(session),
-    },
+    headers,
   })
 }
+
+async function generateJwt(userId: string): Promise<string> {
+  return await new SignJWT({})
+    .setProtectedHeader({ alg })
+    .setSubject(userId)
+    // .setJti() // highTODO
+    // .setNotBefore()
+    // .setIssuedAt()
+    // .setIssuer("urn:example:issuer")
+    // .setAudience("urn:example:audience")
+    // .setExpirationTime("2h")
+    .sign(jwsSecret)
+}
+
+const alg = "HS256"
