@@ -40,6 +40,8 @@
     "dev": "nodemon src/dev.ts",
     "//dev-comment": "maybe someday https://typestrong.org/ts-node/docs/swc/ https://github.com/privatenumber/ts-runtime-comparison abandoned ts-node-dev because of https://github.com/wclr/ts-node-dev/issues/265",
     "start-offline": "npx serverless offline start --httpPort 4050",
+    "//generate-cert": "requires installing https://github.com/FiloSottile/mkcert ",
+    "generate-cert": "mkdir .cert && mkcert -key-file ./.cert/key.pem -cert-file ./.cert/cert.pem lrpc.local.pentive.com",
     "rebuild-offline": "npm run build && npm run start-offline",
     "start-client": "yarn ts-node src/client.ts",
     "http-rest-client": "yarn ts-node src/payloadFormatVersionClient.ts",

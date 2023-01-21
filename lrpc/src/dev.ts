@@ -1,11 +1,13 @@
 // this exists because I couldn't figure out how to `watch` serverless/lambdaHandler.ts
 
 import { createHTTPHandler } from "@trpc/server/adapters/standalone"
-import http, { IncomingMessage, ServerResponse } from "http"
+import { IncomingMessage, ServerResponse } from "http"
 import { NodeHTTPCreateContextFnOptions } from "@trpc/server/adapters/node-http"
 import { appRouter } from "./appRouter.js"
 import { getUser } from "./core.js"
 import { Context } from "./trpc.js"
+import fs from "fs"
+import https from "https"
 
 // run with `npm run dev`
 
@@ -24,18 +26,24 @@ const handler = createHTTPHandler({
   createContext,
 })
 
-const server = http.createServer(async (req, res) => {
-  // Set CORS headers - https://github.com/trpc/trpc/discussions/655
-  res.setHeader("Access-Control-Allow-Origin", "*")
-  res.setHeader("Access-Control-Request-Method", "*")
-  res.setHeader("Access-Control-Allow-Methods", "OPTIONS, GET")
-  res.setHeader("Access-Control-Allow-Headers", "*")
-  if (req.method === "OPTIONS") {
-    res.writeHead(200)
-    res.end()
-    return
+const server = https.createServer(
+  {
+    key: fs.readFileSync("./.cert/key.pem"),
+    cert: fs.readFileSync("./.cert/cert.pem"),
+  },
+  async (req, res) => {
+    // Set CORS headers - https://github.com/trpc/trpc/discussions/655
+    res.setHeader("Access-Control-Allow-Origin", "*") // highTODO limit
+    res.setHeader("Access-Control-Request-Method", "*")
+    res.setHeader("Access-Control-Allow-Methods", "OPTIONS, GET")
+    res.setHeader("Access-Control-Allow-Headers", "*")
+    if (req.method === "OPTIONS") {
+      res.writeHead(200)
+      res.end()
+      return
+    }
+    await handler(req, res)
   }
-  await handler(req, res)
-})
+)
 
-server.listen(4050, () => console.log("listening to 4050"))
+server.listen(4050, "0.0.0.0", () => console.log("listening to 4050"))
