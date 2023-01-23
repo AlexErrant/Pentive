@@ -289,6 +289,7 @@ importers:
       '@trpc/client': ^10.2.0
       '@trpc/server': ^10.2.0
       '@types/aws-lambda': ^8.10.106
+      '@types/cookie': ^0.5.1
       '@types/html-to-text': ^8.1.1
       '@types/lodash': ^4.14.182
       '@types/node': ^18.7.21
@@ -296,6 +297,7 @@ importers:
       '@types/uuid': ^9.0.0
       '@vlcn.io/crsqlite-allinone': ^0.6.0
       aws-lambda: ^1.0.7
+      cookie: ^0.5.0
       dotenv: ^16.0.2
       html-to-text: ^8.2.1
       id128: ^1.6.6
@@ -319,6 +321,7 @@ importers:
       '@trpc/server': 10.2.0
       '@vlcn.io/crsqlite-allinone': 0.6.0
       aws-lambda: 1.0.7
+      cookie: 0.5.0
       dotenv: 16.0.2
       html-to-text: 8.2.1
       id128: 1.6.6
@@ -331,6 +334,7 @@ importers:
       zod: 3.19.1
     devDependencies:
       '@types/aws-lambda': 8.10.106
+      '@types/cookie': 0.5.1
       '@types/html-to-text': 8.1.1
       '@types/lodash': 4.14.185
       '@types/node': 18.7.21

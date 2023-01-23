@@ -1,15 +1,16 @@
 import { createTRPCProxyClient, httpBatchLink } from "@trpc/client"
 import { AppRouter } from "lrpc/src/appRouter"
-import { JWT_BEARER_TOKEN } from "shared"
 import superjson from "superjson"
 
 export const lrpc = createTRPCProxyClient<AppRouter>({
   links: [
     httpBatchLink({
-      url: "http://localhost:4050",
-      headers: {
-        // eslint-disable-next-line @typescript-eslint/naming-convention
-        Authorization: "Bearer " + JWT_BEARER_TOKEN,
+      url: "https://lrpc.local.pentive.com:4050",
+      async fetch(url, options) {
+        return await fetch(url, {
+          ...options,
+          credentials: "include",
+        })
       },
     }),
   ],

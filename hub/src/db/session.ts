@@ -1,9 +1,10 @@
 import { SignJWT } from "jose"
-import { Base64, base64ToArray, base64url } from "shared"
+import { Base64, base64ToArray, base64url, jwtCookieName } from "shared"
 import { redirect } from "solid-start/server"
-import { createCookie, createCookieSessionStorage } from "solid-start/session"
+import { createCookieSessionStorage } from "solid-start/session"
 import { Cookie, CookieOptions } from "solid-start/session/cookies"
 import { Session, SessionStorage } from "solid-start/session/sessions"
+import { createPlainCookie } from "~/createPlainCookie"
 import { db } from "."
 interface LoginForm {
   username: string
@@ -65,9 +66,8 @@ export function setSessionStorage(x: {
     domain: import.meta.env.VITE_DOMAIN, // sadly, making cookies target specific subdomains from the main domain seems very hacky
     // expires: "", // intentionally missing because docs say it's calculated off `maxAge` when missing https://github.com/solidjs/solid-start/blob/1b22cad87dd7bd74f73d807e1d60b886e753a6ee/packages/start/session/cookies.ts#L56-L57
   }
-  const jwtCookieName = "__Secure-jwt"
-  jwtCookie = createCookie(jwtCookieName, jwtCookieOpts)
-  destroyJwtCookie = createCookie(jwtCookieName, {
+  jwtCookie = createPlainCookie(jwtCookieName, jwtCookieOpts)
+  destroyJwtCookie = createPlainCookie(jwtCookieName, {
     ...jwtCookieOpts,
     maxAge: undefined,
     expires: new Date(0), // https://github.com/remix-run/remix/issues/5150 https://stackoverflow.com/q/5285940

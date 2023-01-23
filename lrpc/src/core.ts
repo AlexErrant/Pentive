@@ -1,13 +1,20 @@
 import { jwtVerify } from "jose"
 import { jwsSecret } from "./config.js"
+import { parse } from "cookie"
+import { jwtCookieName } from "shared"
 
 export async function getUser(
-  auth: string | undefined
+  rawCookie: string | undefined
 ): Promise<string | undefined> {
-  if (auth !== undefined) {
-    const token = auth.split(" ")[1]
-    const jwt = await jwtVerify(token, jwsSecret)
-    return jwt.payload.sub
+  if (rawCookie != null) {
+    const cookies = parse(rawCookie)
+    const jwtCookie = cookies[jwtCookieName]
+    if (jwtCookie != null) {
+      try {
+        const jwt = await jwtVerify(jwtCookie, jwsSecret)
+        return jwt.payload.sub
+      } catch {}
+    }
   }
   return undefined
 }

@@ -17,7 +17,7 @@ async function createContext(
     ServerResponse<IncomingMessage>
   >
 ): Promise<Context> {
-  const user = await getUser(x.req.headers.authorization)
+  const user = await getUser(x.req.headers.cookie)
   return { user }
 }
 
@@ -33,10 +33,14 @@ const server = https.createServer(
   },
   async (req, res) => {
     // Set CORS headers - https://github.com/trpc/trpc/discussions/655
-    res.setHeader("Access-Control-Allow-Origin", "*") // highTODO limit
+    res.setHeader(
+      "Access-Control-Allow-Origin",
+      "https://secure.local.pentive.com:3014"
+    )
+    res.setHeader("Access-Control-Allow-Credentials", "true")
     res.setHeader("Access-Control-Request-Method", "*")
     res.setHeader("Access-Control-Allow-Methods", "OPTIONS, GET")
-    res.setHeader("Access-Control-Allow-Headers", "*")
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type")
     if (req.method === "OPTIONS") {
       res.writeHead(200)
       res.end()

@@ -1,9 +1,3 @@
-// highTODO remove this
-export const JWT_PRIVATE_KEY = "qwertyuiopasdfghjklzxcvbnm123456" // H256
-export const JWT_BEARER_TOKEN =
-  "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJyeGRiIiwiaWF0IjoxNjA0MTg4Njk3LCJ" +
-  "leHAiOjIyNjY4NzY2OTcsImF1ZCI6InJ4ZGIuaW5mbyIsInN1YiI6InVzZXJAcnhkYi5pbmZvIn0.hNEC3V4LpkEvGnLeT8hNTXTCZRPpMVDwaltH-8zh4Iw"
-
 export const initSql = [
   `CREATE TABLE IF NOT EXISTS template (
     id BLOB PRIMARY KEY,
@@ -31,6 +25,8 @@ export const initSql = [
   `SELECT crsql_as_crr('template');`,
   `SELECT crsql_as_crr('note');`,
 ]
+
+export const jwtCookieName = "__Secure-jwt"
 
 export * from "./wholeDbReplicator.js"
 export * from "./wholeDbReplicatorSync.js"
