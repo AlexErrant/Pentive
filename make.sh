@@ -17,6 +17,7 @@ source ../PentiveSecrets/secrets.sh
 # echo $jwsSecret        | wrangler secret put jwsSecret        --name hub
 # echo $planetscaleDbUrl | wrangler secret put planetscaleDbUrl --name hub
 # echo $hubSessionSecret | wrangler secret put hubSessionSecret --name hub
+# echo $csrfSecret       | wrangler secret put csrfSecret       --name hub
 
 # https://developers.cloudflare.com/workers/wrangler/configuration/#environmental-variables
 # https://developers.cloudflare.com/workers/platform/environment-variables/#adding-secrets-via-wrangler

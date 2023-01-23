@@ -1,5 +1,11 @@
 import { SignJWT } from "jose"
-import { Base64, base64ToArray, base64url, jwtCookieName } from "shared"
+import {
+  Base64,
+  base64ToArray,
+  base64url,
+  hmacCsrfCookieName,
+  jwtCookieName,
+} from "shared"
 import { redirect } from "solid-start/server"
 import { createCookieSessionStorage } from "solid-start/session"
 import { Cookie, CookieOptions } from "solid-start/session/cookies"
@@ -41,6 +47,7 @@ export async function login({ username, password }: LoginForm): Promise<{
 export function setSessionStorage(x: {
   sessionSecret: Base64
   jwsSecret: Base64
+  csrfSecret: Base64
 }): void {
   storage = createCookieSessionStorage({
     cookie: {
@@ -56,6 +63,7 @@ export function setSessionStorage(x: {
     },
   })
   jwsSecret = base64ToArray(x.jwsSecret)
+  csrfSecret = x.csrfSecret
   const jwtCookieOpts: CookieOptions = {
     secure: true,
     secrets: [], // intentionally empty. This cookie should only store a signed JWT!
@@ -72,6 +80,23 @@ export function setSessionStorage(x: {
     maxAge: undefined,
     expires: new Date(0), // https://github.com/remix-run/remix/issues/5150 https://stackoverflow.com/q/5285940
   })
+  // lowTODO store this on the client in a cross-domain compatible way - it need not be a cookie
+  const hmacCsrfCookieOpts: CookieOptions = {
+    secure: true,
+    secrets: [], // intentionally empty. This cookie only stores an HMACed CSRF token.
+    sameSite: "strict",
+    path: "/",
+    maxAge: 60 * 60 * 24 * 30, // 30 days
+    httpOnly: false,
+    domain: import.meta.env.VITE_DOMAIN, // sadly, making cookies target specific subdomains from the main domain seems very hacky
+    // expires: "", // intentionally missing because docs say it's calculated off `maxAge` when missing https://github.com/solidjs/solid-start/blob/1b22cad87dd7bd74f73d807e1d60b886e753a6ee/packages/start/session/cookies.ts#L56-L57
+  }
+  hmacCsrfCookie = createPlainCookie(hmacCsrfCookieName, hmacCsrfCookieOpts)
+  destroyHmacCsrfCookie = createPlainCookie(hmacCsrfCookieName, {
+    ...hmacCsrfCookieOpts,
+    maxAge: undefined,
+    expires: new Date(0), // https://github.com/remix-run/remix/issues/5150 https://stackoverflow.com/q/5285940
+  })
 }
 
 // @ts-expect-error session calls should throw null error if not setup
@@ -81,7 +106,13 @@ let jwtCookie = null as Cookie
 // @ts-expect-error calls should throw null error if not setup
 let destroyJwtCookie = null as Cookie
 // @ts-expect-error calls should throw null error if not setup
+let hmacCsrfCookie = null as Cookie
+// @ts-expect-error calls should throw null error if not setup
+let destroyHmacCsrfCookie = null as Cookie
+// @ts-expect-error calls should throw null error if not setup
 let jwsSecret = null as Uint8Array
+// @ts-expect-error calls should throw null error if not setup
+let csrfSecret = null as string
 
 export async function getUserSession(request: Request): Promise<Session> {
   return await storage.getSession(request.headers.get("Cookie"))
@@ -135,6 +166,7 @@ export async function logout(request: Request): Promise<Response> {
   const headers = new Headers()
   headers.append("Set-Cookie", await storage.destroySession(session)) // lowTODO parallelize
   headers.append("Set-Cookie", await destroyJwtCookie.serialize("")) // lowTODO parallelize
+  headers.append("Set-Cookie", await destroyHmacCsrfCookie.serialize("")) // lowTODO parallelize
   return redirect("/login", {
     headers,
   })
@@ -146,33 +178,59 @@ export async function createUserSession(
 ): Promise<Response> {
   const session = await storage.getSession()
   session.set(sessionUserId, userId)
+  const [csrf, hmacCsrf] = await generateCsrf()
   session.set(
     sessionCsrf,
     // https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html#double-submit-cookie
     // If you ever separate csrf from the session cookie https://security.stackexchange.com/a/220810 https://security.stackexchange.com/a/248434
     // REST endpoints may need csrf https://security.stackexchange.com/q/166724
-    base64url.encode(crypto.getRandomValues(new Uint8Array(32)))
+    csrf
   )
   const headers = new Headers()
   headers.append("Set-Cookie", await storage.commitSession(session)) // lowTODO parallelize
-  const jwt = await generateJwt(userId)
+  const jwt = await generateJwt(userId, csrf)
   headers.append("Set-Cookie", await jwtCookie.serialize(jwt)) // lowTODO parallelize
+  headers.append("Set-Cookie", await hmacCsrfCookie.serialize(hmacCsrf)) // lowTODO parallelize
   return redirect(redirectTo, {
     headers,
   })
 }
 
-async function generateJwt(userId: string): Promise<string> {
+async function generateJwt(userId: string, csrf: string): Promise<string> {
   return await new SignJWT({})
     .setProtectedHeader({ alg })
     .setSubject(userId)
-    // .setJti() // highTODO
-    // .setNotBefore()
+    .setJti(csrf) // use 256-bit csrf as JTI https://www.rfc-editor.org/rfc/rfc7519#section-4.1.7 https://security.stackexchange.com/a/220810 https://security.stackexchange.com/a/248434
+    // .setNotBefore() // highTODO
     // .setIssuedAt()
     // .setIssuer("urn:example:issuer")
     // .setAudience("urn:example:audience")
     // .setExpirationTime("2h")
     .sign(jwsSecret)
+}
+
+let maybeCsrfKey: CryptoKey | null = null
+async function getCsrfKey(): Promise<CryptoKey> {
+  if (maybeCsrfKey == null) {
+    maybeCsrfKey = await crypto.subtle.importKey(
+      "raw",
+      base64ToArray(csrfSecret),
+      { name: "HMAC", hash: "SHA-256" },
+      false,
+      ["sign"]
+    )
+  }
+  return maybeCsrfKey
+}
+
+async function generateCsrf(): Promise<[string, string]> {
+  const csrfBytes = crypto.getRandomValues(new Uint8Array(32))
+  const csrfKey = await getCsrfKey()
+  const hmacCsrf = await crypto.subtle.sign("HMAC", csrfKey, csrfBytes)
+  return [
+    base64url.encode(csrfBytes).substring(0, 43),
+    base64url.encode(new Uint8Array(hmacCsrf)).substring(0, 43),
+  ]
 }
 
 const alg = "HS256"

@@ -8,5 +8,6 @@ declare global {
     planetscaleDbUrl: string
     hubSessionSecret: Base64
     jwsSecret: Base64
+    csrfSecret: Base64
   }
 }

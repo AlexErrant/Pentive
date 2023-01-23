@@ -12,6 +12,7 @@ export default createHandler(
     setSessionStorage({
       sessionSecret: event.env.hubSessionSecret,
       jwsSecret: event.env.jwsSecret,
+      csrfSecret: event.env.csrfSecret,
     })
     return <StartServer event={event} />
   })
