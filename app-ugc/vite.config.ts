@@ -22,43 +22,52 @@ const betterServiceWorkerDevExperience: BuildOptions = {
   },
 }
 
-export default defineConfig({
-  plugins: [
-    // if we ever move off this plugin https://github.com/vitejs/vite/issues/2248
-    VitePWA({
-      strategies: "injectManifest",
-      injectRegister: null,
-      srcDir: "src",
-      filename: "service-worker.ts",
-    }),
-    checker({
-      overlay: {
-        initialIsOpen: false,
+export default defineConfig(({ command }) => {
+  const baseBuild = {
+    target: "ES2022",
+  }
+  const build: BuildOptions =
+    command === "build" // is prod https://vitejs.dev/config/#conditional-config
+      ? baseBuild
+      : {
+          ...betterServiceWorkerDevExperience,
+          ...baseBuild,
+        }
+  return {
+    plugins: [
+      // if we ever move off this plugin https://github.com/vitejs/vite/issues/2248
+      VitePWA({
+        strategies: "injectManifest",
+        injectRegister: null,
+        srcDir: "src",
+        filename: "service-worker.ts",
+      }),
+      checker({
+        overlay: {
+          initialIsOpen: false,
+        },
+        typescript: true,
+        eslint: {
+          lintCommand: 'eslint "./src/**/*.ts"',
+        },
+      }),
+    ],
+    build,
+    server: {
+      port: 3015,
+      strictPort: true,
+      https: {
+        key: fs.readFileSync("./.cert/key.pem"),
+        cert: fs.readFileSync("./.cert/cert.pem"),
       },
-      typescript: true,
-      eslint: {
-        lintCommand: 'eslint "./src/**/*.ts"',
+    },
+    preview: {
+      port: 3015,
+      strictPort: true,
+      https: {
+        key: fs.readFileSync("./.cert/key.pem"),
+        cert: fs.readFileSync("./.cert/cert.pem"),
       },
-    }),
-  ],
-  build: {
-    ...betterServiceWorkerDevExperience,
-    target: "esnext",
-  },
-  server: {
-    port: 3015,
-    strictPort: true,
-    https: {
-      key: fs.readFileSync("./.cert/key.pem"),
-      cert: fs.readFileSync("./.cert/cert.pem"),
     },
-  },
-  preview: {
-    port: 3015,
-    strictPort: true,
-    https: {
-      key: fs.readFileSync("./.cert/key.pem"),
-      cert: fs.readFileSync("./.cert/cert.pem"),
-    },
-  },
+  }
 })
