@@ -6,15 +6,20 @@ import {
   createServerData$,
   redirect,
 } from "solid-start/server"
-import { requireSession } from "~/db/session"
+import {
+  requireHmacCsrf,
+  requireSession,
+  requireJwt,
+  isInvalidCsrf,
+} from "~/db/session"
 
 export function routeData({ params }: RouteDataArgs) {
   const nook = (): string => params.nook
   return {
     nook,
-    session: createServerData$(
-      async (_, { request }) => await requireSession(request),
-      { key: () => ["auth_user"] }
+    hmacCsrf: createServerData$(
+      async (_, { request }) => await requireHmacCsrf(request),
+      { key: () => ["hmacCsrf"] }
     ),
   }
 }
@@ -38,21 +43,23 @@ function validateNook(nook: unknown): string | undefined {
 }
 
 export default function Submit(): JSX.Element {
-  const { nook, session } = useRouteData<typeof routeData>()
+  const { nook, hmacCsrf } = useRouteData<typeof routeData>()
 
   const [submitting, { Form }] = createServerAction$(
     async (form: FormData, { request }) => {
       const title = form.get("title")
       const text = form.get("text")
       const nook = form.get("nook")
-      const csrf = form.get("csrf")
+      const hmacCsrf = form.get("hmacCsrf")
       if (
         typeof title !== "string" ||
         typeof text !== "string" ||
         typeof nook !== "string" ||
-        typeof csrf !== "string"
+        typeof hmacCsrf !== "string"
       ) {
-        throw new FormError(`Title, text, nook, and csrf should be strings.`)
+        throw new FormError(
+          `Title, text, nook, and hmacCsrf should be strings.`
+        )
       }
       const fields = { title, text, nook }
       const fieldErrors = {
@@ -64,7 +71,8 @@ export default function Submit(): JSX.Element {
         throw new FormError("Some fields are invalid", { fieldErrors, fields })
       }
       const session = await requireSession(request)
-      if (csrf !== session.csrf) {
+      const jwt = await requireJwt(request)
+      if (await isInvalidCsrf(hmacCsrf, jwt.jti)) {
         const searchParams = new URLSearchParams([
           ["redirectTo", new URL(request.url).pathname],
         ])
@@ -91,7 +99,7 @@ export default function Submit(): JSX.Element {
       <h1>Submit new Post</h1>
       <Form>
         <input type="hidden" name="nook" value={nook()} />
-        <input type="hidden" name="csrf" value={session()?.csrf} />
+        <input type="hidden" name="hmacCsrf" value={hmacCsrf() ?? ""} />
         <div>
           <label for="title-input">Title</label>
           <input id="title-input" name="title" />

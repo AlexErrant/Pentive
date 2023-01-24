@@ -1,10 +1,11 @@
-import { SignJWT } from "jose"
+import { jwtVerify, JWTVerifyResult, SignJWT } from "jose"
 import {
   Base64,
   base64ToArray,
   base64url,
   hmacCsrfCookieName,
   jwtCookieName,
+  throwExp,
 } from "shared"
 import { redirect } from "solid-start/server"
 import { createCookieSessionStorage } from "solid-start/session"
@@ -18,8 +19,7 @@ interface LoginForm {
 }
 
 const sessionUserId = "userId"
-const sessionCsrf = "csrf"
-const sessionNames = [sessionUserId, sessionCsrf] as const
+const sessionNames = [sessionUserId] as const
 type SessionName = typeof sessionNames[number]
 export type UserSession = { [K in SessionName]: string }
 
@@ -49,6 +49,7 @@ export function setSessionStorage(x: {
   jwsSecret: Base64
   csrfSecret: Base64
 }): void {
+  // highTODO consider removing this when adding Auth.js. We need cross-domain auth, and I'm not sure why this exists if we're using a JWT
   storage = createCookieSessionStorage({
     cookie: {
       name: "__Host-session",
@@ -118,6 +119,37 @@ export async function getUserSession(request: Request): Promise<Session> {
   return await storage.getSession(request.headers.get("Cookie"))
 }
 
+export async function getHmacCsrf(request: Request): Promise<string | null> {
+  const hmacCsrf = (await hmacCsrfCookie.parse(
+    request.headers.get("Cookie")
+  )) as unknown
+  if (typeof hmacCsrf !== "string" || hmacCsrf.length === 0) {
+    return null
+  }
+  return hmacCsrf
+}
+
+export interface Jwt {
+  sub: string
+  jti: string
+}
+
+export async function getJwt(request: Request): Promise<Jwt | null> {
+  const rawJwt = (await jwtCookie.parse(
+    request.headers.get("Cookie")
+  )) as string
+  let jwt: JWTVerifyResult | null = null
+  try {
+    jwt = await jwtVerify(rawJwt, jwsSecret)
+  } catch {}
+  return jwt == null
+    ? null
+    : {
+        sub: jwt.payload.sub ?? throwExp("`sub` is empty"),
+        jti: jwt.payload.jti ?? throwExp("`jti` is empty"),
+      }
+}
+
 export async function getUserId(request: Request): Promise<string | null> {
   const session = await getUserSession(request)
   const userId = session.get(sessionUserId) as unknown
@@ -141,6 +173,30 @@ export async function requireSession(
     r[sessionName] = sessionValue
   }
   return r
+}
+
+export async function requireHmacCsrf(
+  request: Request,
+  redirectTo: string = new URL(request.url).pathname
+): Promise<string> {
+  const hmacCsrf = await getHmacCsrf(request)
+  if (hmacCsrf == null) {
+    const searchParams = new URLSearchParams([["redirectTo", redirectTo]])
+    throw redirect(`/login?${searchParams.toString()}`) as unknown
+  }
+  return hmacCsrf
+}
+
+export async function requireJwt(
+  request: Request,
+  redirectTo: string = new URL(request.url).pathname
+): Promise<Jwt> {
+  const jwt = await getJwt(request)
+  if (jwt == null) {
+    const searchParams = new URLSearchParams([["redirectTo", redirectTo]])
+    throw redirect(`/login?${searchParams.toString()}`) as unknown
+  }
+  return jwt
 }
 
 export async function getUser(
@@ -179,17 +235,13 @@ export async function createUserSession(
   const session = await storage.getSession()
   session.set(sessionUserId, userId)
   const [csrf, hmacCsrf] = await generateCsrf()
-  session.set(
-    sessionCsrf,
-    // https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html#double-submit-cookie
-    // If you ever separate csrf from the session cookie https://security.stackexchange.com/a/220810 https://security.stackexchange.com/a/248434
-    // REST endpoints may need csrf https://security.stackexchange.com/q/166724
-    csrf
-  )
   const headers = new Headers()
   headers.append("Set-Cookie", await storage.commitSession(session)) // lowTODO parallelize
   const jwt = await generateJwt(userId, csrf)
   headers.append("Set-Cookie", await jwtCookie.serialize(jwt)) // lowTODO parallelize
+  // https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html#double-submit-cookie
+  // If you ever separate csrf from the session cookie https://security.stackexchange.com/a/220810 https://security.stackexchange.com/a/248434
+  // REST endpoints may need csrf https://security.stackexchange.com/q/166724
   headers.append("Set-Cookie", await hmacCsrfCookie.serialize(hmacCsrf)) // lowTODO parallelize
   return redirect(redirectTo, {
     headers,
@@ -217,7 +269,7 @@ async function getCsrfKey(): Promise<CryptoKey> {
       base64ToArray(csrfSecret),
       { name: "HMAC", hash: "SHA-256" },
       false,
-      ["sign"]
+      ["sign", "verify"]
     )
   }
   return maybeCsrfKey
@@ -231,6 +283,17 @@ async function generateCsrf(): Promise<[string, string]> {
     base64url.encode(csrfBytes).substring(0, 43),
     base64url.encode(new Uint8Array(hmacCsrf)).substring(0, 43),
   ]
+}
+
+export async function isInvalidCsrf(
+  hmacCsrf: string,
+  csrf: string
+): Promise<boolean> {
+  const csrfKey = await getCsrfKey()
+  const signature = base64url.decode(hmacCsrf + "=")
+  const data = base64url.decode(csrf + "=")
+  const isValid = await crypto.subtle.verify("HMAC", csrfKey, signature, data)
+  return !isValid
 }
 
 const alg = "HS256"
