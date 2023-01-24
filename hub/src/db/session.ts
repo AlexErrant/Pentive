@@ -3,7 +3,7 @@ import {
   Base64,
   base64ToArray,
   base64url,
-  hmacCsrfCookieName,
+  csrfSignatureCookieName,
   jwtCookieName,
   throwExp,
 } from "shared"
@@ -82,7 +82,7 @@ export function setSessionStorage(x: {
     expires: new Date(0), // https://github.com/remix-run/remix/issues/5150 https://stackoverflow.com/q/5285940
   })
   // lowTODO store this on the client in a cross-domain compatible way - it need not be a cookie
-  const hmacCsrfCookieOpts: CookieOptions = {
+  const csrfSignatureCookieOpts: CookieOptions = {
     secure: true,
     secrets: [], // intentionally empty. This cookie only stores an HMACed CSRF token.
     sameSite: "strict",
@@ -92,9 +92,12 @@ export function setSessionStorage(x: {
     domain: import.meta.env.VITE_DOMAIN, // sadly, making cookies target specific subdomains from the main domain seems very hacky
     // expires: "", // intentionally missing because docs say it's calculated off `maxAge` when missing https://github.com/solidjs/solid-start/blob/1b22cad87dd7bd74f73d807e1d60b886e753a6ee/packages/start/session/cookies.ts#L56-L57
   }
-  hmacCsrfCookie = createPlainCookie(hmacCsrfCookieName, hmacCsrfCookieOpts)
-  destroyHmacCsrfCookie = createPlainCookie(hmacCsrfCookieName, {
-    ...hmacCsrfCookieOpts,
+  csrfSignatureCookie = createPlainCookie(
+    csrfSignatureCookieName,
+    csrfSignatureCookieOpts
+  )
+  destroyCsrfSignatureCookie = createPlainCookie(csrfSignatureCookieName, {
+    ...csrfSignatureCookieOpts,
     maxAge: undefined,
     expires: new Date(0), // https://github.com/remix-run/remix/issues/5150 https://stackoverflow.com/q/5285940
   })
@@ -107,9 +110,9 @@ let jwtCookie = null as Cookie
 // @ts-expect-error calls should throw null error if not setup
 let destroyJwtCookie = null as Cookie
 // @ts-expect-error calls should throw null error if not setup
-let hmacCsrfCookie = null as Cookie
+let csrfSignatureCookie = null as Cookie
 // @ts-expect-error calls should throw null error if not setup
-let destroyHmacCsrfCookie = null as Cookie
+let destroyCsrfSignatureCookie = null as Cookie
 // @ts-expect-error calls should throw null error if not setup
 let jwsSecret = null as Uint8Array
 // @ts-expect-error calls should throw null error if not setup
@@ -119,14 +122,16 @@ export async function getUserSession(request: Request): Promise<Session> {
   return await storage.getSession(request.headers.get("Cookie"))
 }
 
-export async function getHmacCsrf(request: Request): Promise<string | null> {
-  const hmacCsrf = (await hmacCsrfCookie.parse(
+export async function getCsrfSignature(
+  request: Request
+): Promise<string | null> {
+  const csrfSignature = (await csrfSignatureCookie.parse(
     request.headers.get("Cookie")
   )) as unknown
-  if (typeof hmacCsrf !== "string" || hmacCsrf.length === 0) {
+  if (typeof csrfSignature !== "string" || csrfSignature.length === 0) {
     return null
   }
-  return hmacCsrf
+  return csrfSignature
 }
 
 export interface Jwt {
@@ -175,16 +180,16 @@ export async function requireSession(
   return r
 }
 
-export async function requireHmacCsrf(
+export async function requireCsrfSignature(
   request: Request,
   redirectTo: string = new URL(request.url).pathname
 ): Promise<string> {
-  const hmacCsrf = await getHmacCsrf(request)
-  if (hmacCsrf == null) {
+  const csrfSignature = await getCsrfSignature(request)
+  if (csrfSignature == null) {
     const searchParams = new URLSearchParams([["redirectTo", redirectTo]])
     throw redirect(`/login?${searchParams.toString()}`) as unknown
   }
-  return hmacCsrf
+  return csrfSignature
 }
 
 export async function requireJwt(
@@ -222,7 +227,7 @@ export async function logout(request: Request): Promise<Response> {
   const headers = new Headers()
   headers.append("Set-Cookie", await storage.destroySession(session)) // lowTODO parallelize
   headers.append("Set-Cookie", await destroyJwtCookie.serialize("")) // lowTODO parallelize
-  headers.append("Set-Cookie", await destroyHmacCsrfCookie.serialize("")) // lowTODO parallelize
+  headers.append("Set-Cookie", await destroyCsrfSignatureCookie.serialize("")) // lowTODO parallelize
   return redirect("/login", {
     headers,
   })
@@ -234,7 +239,7 @@ export async function createUserSession(
 ): Promise<Response> {
   const session = await storage.getSession()
   session.set(sessionUserId, userId)
-  const [csrf, hmacCsrf] = await generateCsrf()
+  const [csrf, csrfSignature] = await generateCsrf()
   const headers = new Headers()
   headers.append("Set-Cookie", await storage.commitSession(session)) // lowTODO parallelize
   const jwt = await generateJwt(userId, csrf)
@@ -242,7 +247,10 @@ export async function createUserSession(
   // https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html#double-submit-cookie
   // If you ever separate csrf from the session cookie https://security.stackexchange.com/a/220810 https://security.stackexchange.com/a/248434
   // REST endpoints may need csrf https://security.stackexchange.com/q/166724
-  headers.append("Set-Cookie", await hmacCsrfCookie.serialize(hmacCsrf)) // lowTODO parallelize
+  headers.append(
+    "Set-Cookie",
+    await csrfSignatureCookie.serialize(csrfSignature)
+  ) // lowTODO parallelize
   return redirect(redirectTo, {
     headers,
   })
@@ -278,19 +286,19 @@ async function getCsrfKey(): Promise<CryptoKey> {
 async function generateCsrf(): Promise<[string, string]> {
   const csrfBytes = crypto.getRandomValues(new Uint8Array(32))
   const csrfKey = await getCsrfKey()
-  const hmacCsrf = await crypto.subtle.sign("HMAC", csrfKey, csrfBytes)
+  const csrfSignature = await crypto.subtle.sign("HMAC", csrfKey, csrfBytes)
   return [
     base64url.encode(csrfBytes).substring(0, 43),
-    base64url.encode(new Uint8Array(hmacCsrf)).substring(0, 43),
+    base64url.encode(new Uint8Array(csrfSignature)).substring(0, 43),
   ]
 }
 
 export async function isInvalidCsrf(
-  hmacCsrf: string,
+  csrfSignature: string,
   csrf: string
 ): Promise<boolean> {
   const csrfKey = await getCsrfKey()
-  const signature = base64url.decode(hmacCsrf + "=")
+  const signature = base64url.decode(csrfSignature + "=")
   const data = base64url.decode(csrf + "=")
   const isValid = await crypto.subtle.verify("HMAC", csrfKey, signature, data)
   return !isValid

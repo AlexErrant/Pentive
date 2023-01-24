@@ -7,7 +7,7 @@ import {
   redirect,
 } from "solid-start/server"
 import {
-  requireHmacCsrf,
+  requireCsrfSignature,
   requireSession,
   requireJwt,
   isInvalidCsrf,
@@ -17,9 +17,9 @@ export function routeData({ params }: RouteDataArgs) {
   const nook = (): string => params.nook
   return {
     nook,
-    hmacCsrf: createServerData$(
-      async (_, { request }) => await requireHmacCsrf(request),
-      { key: () => ["hmacCsrf"] }
+    csrfSignature: createServerData$(
+      async (_, { request }) => await requireCsrfSignature(request),
+      { key: () => ["csrfSignature"] }
     ),
   }
 }
@@ -43,22 +43,22 @@ function validateNook(nook: unknown): string | undefined {
 }
 
 export default function Submit(): JSX.Element {
-  const { nook, hmacCsrf } = useRouteData<typeof routeData>()
+  const { nook, csrfSignature } = useRouteData<typeof routeData>()
 
   const [submitting, { Form }] = createServerAction$(
     async (form: FormData, { request }) => {
       const title = form.get("title")
       const text = form.get("text")
       const nook = form.get("nook")
-      const hmacCsrf = form.get("hmacCsrf")
+      const csrfSignature = form.get("csrfSignature")
       if (
         typeof title !== "string" ||
         typeof text !== "string" ||
         typeof nook !== "string" ||
-        typeof hmacCsrf !== "string"
+        typeof csrfSignature !== "string"
       ) {
         throw new FormError(
-          `Title, text, nook, and hmacCsrf should be strings.`
+          `Title, text, nook, and csrfSignature should be strings.`
         )
       }
       const fields = { title, text, nook }
@@ -72,7 +72,7 @@ export default function Submit(): JSX.Element {
       }
       const session = await requireSession(request)
       const jwt = await requireJwt(request)
-      if (await isInvalidCsrf(hmacCsrf, jwt.jti)) {
+      if (await isInvalidCsrf(csrfSignature, jwt.jti)) {
         const searchParams = new URLSearchParams([
           ["redirectTo", new URL(request.url).pathname],
         ])
@@ -99,7 +99,11 @@ export default function Submit(): JSX.Element {
       <h1>Submit new Post</h1>
       <Form>
         <input type="hidden" name="nook" value={nook()} />
-        <input type="hidden" name="hmacCsrf" value={hmacCsrf() ?? ""} />
+        <input
+          type="hidden"
+          name="csrfSignature"
+          value={csrfSignature() ?? ""}
+        />
         <div>
           <label for="title-input">Title</label>
           <input id="title-input" name="title" />

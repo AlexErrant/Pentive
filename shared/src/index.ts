@@ -27,7 +27,7 @@ export const initSql = [
 ]
 
 export const jwtCookieName = "__Secure-jwt"
-export const hmacCsrfCookieName = "__Secure-csrf"
+export const csrfSignatureCookieName = "__Secure-csrf"
 
 export * from "./wholeDbReplicator.js"
 export * from "./wholeDbReplicatorSync.js"
