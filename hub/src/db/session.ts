@@ -81,7 +81,7 @@ export function setSessionStorage(x: {
     maxAge: undefined,
     expires: new Date(0), // https://github.com/remix-run/remix/issues/5150 https://stackoverflow.com/q/5285940
   })
-  // lowTODO store this on the client in a cross-domain compatible way - it need not be a cookie
+  // lowTODO store this on the client in a cross-domain compatible way - it need not be a cookie https://stackoverflow.com/q/34790887
   const csrfSignatureCookieOpts: CookieOptions = {
     secure: true,
     secrets: [], // intentionally empty. This cookie only stores an HMACed CSRF token.

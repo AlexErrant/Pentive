@@ -1,5 +1,4 @@
 import { CreateRemoteTemplate } from "lrpc/src/schemas/template"
-import { KeyFunctionMap, RxCollection, RxDocument } from "rxdb"
 import { RemoteTemplateId, TemplateId } from "../../src/domain/ids"
 import { Field, Template, TemplateType } from "../../src/domain/template"
 import { assertNever, undefinedMap } from "shared"
@@ -41,17 +40,6 @@ function templateToDocType(template: Template): TemplateEntity {
     templateType: JSON.stringify(templateType),
   }
 }
-
-interface TemplateDocMethods extends KeyFunctionMap {}
-
-export type TemplateDocument = RxDocument<TemplateEntity, TemplateDocMethods>
-
-export type TemplateCollection = RxCollection<
-  TemplateEntity,
-  TemplateDocMethods
->
-
-export const templateDocMethods: TemplateDocMethods = {}
 
 function entityToDomain(template: TemplateEntity): Template {
   const r = {
