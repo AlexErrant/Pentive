@@ -16,7 +16,8 @@
       "ES2021.String"
     ],
     "types": [
-      "vite/client"
+      "vite/client",
+      "node"
     ]
   }
 }

@@ -133,6 +133,7 @@ importers:
   app-ugc:
     specifiers:
       '@types/iframe-resizer': ^3.5.9
+      '@types/node': ^18.7.21
       '@typescript-eslint/eslint-plugin': ^5.31.0
       '@typescript-eslint/parser': ^5.31.0
       app: workspace:*
@@ -163,6 +164,7 @@ importers:
       shared: link:../shared
     devDependencies:
       '@types/iframe-resizer': 3.5.9
+      '@types/node': 18.7.21
       '@typescript-eslint/eslint-plugin': 5.37.0_22c5fnooleyfkzrkkgdmel5kmi
       '@typescript-eslint/parser': 5.37.0_irgkl5vooow2ydyo6aokmferha
       eslint: 8.23.1
@@ -6995,7 +6997,7 @@ packages:
       eslint-import-resolver-webpack:
         optional: true
     dependencies:
-      '@typescript-eslint/parser': 5.37.0_id2eilsndvzhjjktb64trvy3gu
+      '@typescript-eslint/parser': 5.37.0_irgkl5vooow2ydyo6aokmferha
       debug: 3.2.7
       eslint: 8.23.1
       eslint-import-resolver-node: 0.3.6
@@ -7024,7 +7026,7 @@ packages:
       '@typescript-eslint/parser':
         optional: true
     dependencies:
-      '@typescript-eslint/parser': 5.37.0_id2eilsndvzhjjktb64trvy3gu
+      '@typescript-eslint/parser': 5.37.0_irgkl5vooow2ydyo6aokmferha
       array-includes: 3.1.5
       array.prototype.flat: 1.3.0
       debug: 2.6.9
