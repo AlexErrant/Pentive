@@ -34,6 +34,7 @@ const server = https.createServer(
   },
   async (req, res) => {
     // Set CORS headers - https://github.com/trpc/trpc/discussions/655
+    // medTODO add caching https://httptoolkit.com/blog/cache-your-cors/ https://techpearl.com/blog/avoid-options-call-to-improve-the-performance-of-your-web-apps/
     res.setHeader(
       "Access-Control-Allow-Origin",
       "https://secure.local.pentive.com:3014"
@@ -45,6 +46,7 @@ const server = https.createServer(
       "Access-Control-Allow-Headers",
       `${csrfHeaderName},content-type`
     )
+    res.setHeader("Access-Control-Max-Age", 86400) // 24hrs - browsers don't support longer https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Max-Age
     if (req.method === "OPTIONS") {
       res.writeHead(200)
       res.end()
