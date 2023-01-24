@@ -29,3 +29,4 @@ envsubst < ./hub/.example.env.development      > ./hub/.env.development
 envsubst < ./hub/.example.env.production       > ./hub/.env.production
 envsubst < ./hub/example.wrangler.toml         > ./hub/wrangler.toml
 envsubst < ./lrpc/.example.env                 > ./lrpc/.env
+envsubst < ./app-ugc/example.env.sh            > ./app-ugc/env.sh
