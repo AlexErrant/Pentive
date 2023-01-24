@@ -28,6 +28,7 @@ export const initSql = [
 
 export const jwtCookieName = "__Secure-jwt"
 export const csrfSignatureCookieName = "__Secure-csrf"
+export const csrfHeaderName = "x-csrf" // https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html#use-of-custom-request-headers
 
 export * from "./wholeDbReplicator.js"
 export * from "./wholeDbReplicatorSync.js"

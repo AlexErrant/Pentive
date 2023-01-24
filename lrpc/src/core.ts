@@ -1,15 +1,16 @@
 import { jwtVerify } from "jose"
 import { jwsSecret } from "./config.js"
 import { parse } from "cookie"
-import { jwtCookieName } from "shared"
+import { csrfHeaderName, jwtCookieName } from "shared"
+import { IncomingHttpHeaders } from "http"
 
 export async function getUser(
-  rawCookie: string | undefined
+  headers: IncomingHttpHeaders
 ): Promise<string | undefined> {
-  if (rawCookie != null) {
-    const cookies = parse(rawCookie)
+  if (headers.cookie != null) {
+    const cookies = parse(headers.cookie)
     const jwtCookie = cookies[jwtCookieName]
-    if (jwtCookie != null) {
+    if (jwtCookie != null && csrfHeaderName in headers) {
       try {
         const jwt = await jwtVerify(jwtCookie, jwsSecret)
         return jwt.payload.sub

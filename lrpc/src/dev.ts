@@ -8,6 +8,7 @@ import { getUser } from "./core.js"
 import { Context } from "./trpc.js"
 import fs from "fs"
 import https from "https"
+import { csrfHeaderName } from "shared"
 
 // run with `npm run dev`
 
@@ -17,7 +18,7 @@ async function createContext(
     ServerResponse<IncomingMessage>
   >
 ): Promise<Context> {
-  const user = await getUser(x.req.headers.cookie)
+  const user = await getUser(x.req.headers)
   return { user }
 }
 
@@ -40,7 +41,10 @@ const server = https.createServer(
     res.setHeader("Access-Control-Allow-Credentials", "true")
     res.setHeader("Access-Control-Request-Method", "*")
     res.setHeader("Access-Control-Allow-Methods", "OPTIONS, GET")
-    res.setHeader("Access-Control-Allow-Headers", "Content-Type")
+    res.setHeader(
+      "Access-Control-Allow-Headers",
+      `${csrfHeaderName},content-type`
+    )
     if (req.method === "OPTIONS") {
       res.writeHead(200)
       res.end()
