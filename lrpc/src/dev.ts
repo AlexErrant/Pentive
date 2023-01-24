@@ -8,7 +8,7 @@ import { getUser } from "./core.js"
 import { Context } from "./trpc.js"
 import fs from "fs"
 import https from "https"
-import { csrfHeaderName } from "shared"
+import { csrfHeaderName, hstsName, hstsValue } from "shared"
 
 // run with `npm run dev`
 
@@ -47,6 +47,10 @@ const server = https.createServer(
       `${csrfHeaderName},content-type`
     )
     res.setHeader("Access-Control-Max-Age", 86400) // 24hrs - browsers don't support longer https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Max-Age
+
+    // highTODO check with https://securityheaders.com/
+    res.setHeader(hstsName, hstsValue)
+
     if (req.method === "OPTIONS") {
       res.writeHead(200)
       res.end()

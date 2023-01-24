@@ -1,4 +1,4 @@
-import { setKysely } from "shared"
+import { setKysely, hstsName, hstsValue } from "shared"
 import {
   createHandler,
   renderAsync,
@@ -14,6 +14,7 @@ export default createHandler(
       jwsSecret: event.env.jwsSecret,
       csrfSecret: event.env.csrfSecret,
     })
+    event.responseHeaders.set(hstsName, hstsValue)
     return <StartServer event={event} />
   })
 )

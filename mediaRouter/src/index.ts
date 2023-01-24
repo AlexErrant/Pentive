@@ -29,6 +29,8 @@ import {
   Base64Url,
   base64ToArray,
   arrayBufferToBase64,
+  hstsName,
+  hstsValue,
 } from "shared"
 
 import { SignJWT, jwtVerify, JWTVerifyResult } from "jose"
@@ -83,6 +85,10 @@ const app = new Hono<{ Bindings: Env }>()
 const alg = "HS256"
 
 app
+  .use("*", async (c, next) => {
+    await next()
+    c.header(hstsName, hstsValue)
+  })
   .get("/", (c) => c.text("Hono!!"))
   .get("/testJws", async (c) => {
     const jwsSecretBytes = base64ToArray(c.env.jwsSecret)
