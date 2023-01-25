@@ -1,7 +1,7 @@
 import _ from "lodash"
 import { RxCollection, RxDocument, KeyFunctionMap } from "rxdb"
-import { Card } from "../../src/domain/card"
-import { CardId, NoteId } from "../../src/domain/ids"
+import { Card } from "../domain/card"
+import { CardId, NoteId } from "../domain/ids"
 import { CardDocType } from "./card.schema"
 import { getDb } from "./rxdb"
 

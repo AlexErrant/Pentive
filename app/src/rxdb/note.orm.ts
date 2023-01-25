@@ -1,6 +1,6 @@
 import { RxCollection, RxDocument, KeyFunctionMap } from "rxdb"
-import { Note } from "../../src/domain/note"
-import { NoteId } from "../../src/domain/ids"
+import { Note } from "../domain/note"
+import { NoteId } from "../domain/ids"
 import { NoteDocType } from "./note.schema"
 import { getDb } from "./rxdb"
 import _ from "lodash"

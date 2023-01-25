@@ -1,6 +1,6 @@
 import { CreateRemoteTemplate } from "lrpc/src/schemas/template"
-import { RemoteTemplateId, TemplateId } from "../../src/domain/ids"
-import { Field, Template, TemplateType } from "../../src/domain/template"
+import { RemoteTemplateId, TemplateId } from "../domain/ids"
+import { Field, Template, TemplateType } from "../domain/template"
 import { assertNever, undefinedMap } from "shared"
 import { getDb } from "./crsqlite"
 

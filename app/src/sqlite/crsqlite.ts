@@ -1,6 +1,6 @@
 import * as sqliteWasm from "@vlcn.io/wa-crsqlite"
 import { initSql, wholeDbReplicator } from "shared"
-import { lrpc } from "../../src/lrpcClient"
+import { lrpc } from "../lrpcClient"
 import { stringify as uuidStringify } from "uuid"
 
 let myDatabase: Promise<sqliteWasm.DB> | null = null

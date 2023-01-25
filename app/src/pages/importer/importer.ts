@@ -86,8 +86,6 @@ async function addMediaBatch(
   await db.bulkAddResources(resources)
 }
 
-// consider moving importer to secure, just to make it faster
-
 async function importAnkiDb(sqlite: Entry): Promise<void> {
   const ankiDb = await getAnkiDb(sqlite)
   const templatesDict: Record<TemplateId, Template> = {}
