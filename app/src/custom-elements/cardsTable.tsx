@@ -8,7 +8,7 @@ import "ag-grid-community/styles/ag-theme-alpine.css"
 import { ColDef, GetRowIdParams, RowNode } from "ag-grid-community"
 import { throwExp } from "shared"
 import { CardId, NoteId, TemplateId } from "../domain/ids"
-import { db } from "../messenger"
+import { db } from "../db"
 import { Note } from "../domain/note"
 import { Template } from "../domain/template"
 

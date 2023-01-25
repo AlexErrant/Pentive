@@ -19,7 +19,7 @@ import { Card as PCard } from "../../domain/card"
 import { Note as PNote } from "../../domain/note"
 import { Template } from "../../domain/template"
 import { ResourceId, TemplateId } from "../../domain/ids"
-import { db } from "../../messenger"
+import { db } from "./../../db"
 import _ from "lodash"
 import { Resource } from "../../domain/resource"
 

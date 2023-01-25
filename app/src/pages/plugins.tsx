@@ -1,6 +1,6 @@
 import { JSX } from "solid-js"
 import PluginTable from "../custom-elements/pluginsTable"
-import { db } from "../messenger"
+import { db } from "../db"
 import { Plugin } from "../../src/domain/plugin"
 
 export default function Plugins(): JSX.Element {

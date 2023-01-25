@@ -1,6 +1,6 @@
 import { JSX } from "solid-js/jsx-runtime"
 import _ from "lodash"
-import { db } from "./../messenger"
+import { db } from "./../db"
 
 import { createResource, Match, Switch } from "solid-js"
 import fc from "fast-check"

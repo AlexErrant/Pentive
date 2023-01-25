@@ -1,5 +1,5 @@
 import { createResource, Resource } from "solid-js"
-import { db } from "../messenger"
+import { db } from "../db"
 
 function HomeData(): Resource<number> {
   const [age] = createResource(async () => await db.getAge(), {
