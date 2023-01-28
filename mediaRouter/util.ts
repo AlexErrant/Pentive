@@ -1,17 +1,3 @@
-import { arrayBufferToBase64, base64ToArray, Brand } from "shared"
-
-export type UserId = Brand<string, "userId">
-export type AppMediaIdSecretBase64 = Brand<
-  string,
-  "appMediaIdSecretBase64" | "base64"
->
-export type IvEncryptedDigestBase64 = Brand<
-  string,
-  "ivEncryptedDigestBase64" | "base64"
->
-export type Digest = Brand<ArrayBuffer, "digest">
-export type DigestBase64 = Brand<string, "digestBase64" | "base64">
-
 export type Result<TOk, TError> =
   | {
       readonly tag: "Ok"
@@ -36,89 +22,10 @@ export function toError<T>(error: T): { tag: "Error"; error: T } {
   }
 }
 
-export const ivLength = 12 // https://crypto.stackexchange.com/q/41601
-
 // https://gist.github.com/72lions/4528834
-function concat(a1: Uint8Array, a2: ArrayBuffer): ArrayBuffer {
+export function concat(a1: Uint8Array, a2: ArrayBuffer): Uint8Array {
   const tmp = new Uint8Array(a1.byteLength + a2.byteLength)
   tmp.set(a1, 0)
   tmp.set(new Uint8Array(a2), a1.byteLength)
-  return tmp.buffer
-}
-
-function splitIvDigest(
-  ivEncryptedDigest: ArrayBuffer
-): [ArrayBuffer, ArrayBuffer] {
-  const iv = ivEncryptedDigest.slice(0, ivLength)
-  const encryptedDigest = ivEncryptedDigest.slice(ivLength)
-  return [iv, encryptedDigest]
-}
-
-export async function encryptDigest(
-  appMediaIdSecret: AppMediaIdSecretBase64,
-  digest: Digest,
-  userId: UserId
-): Promise<IvEncryptedDigestBase64> {
-  const iv = crypto.getRandomValues(new Uint8Array(ivLength))
-  const key = await generateKey(appMediaIdSecret, "encrypt", userId)
-  const encryptedDigest = await crypto.subtle.encrypt(
-    {
-      name: "AES-GCM",
-      iv,
-    },
-    key,
-    digest
-  )
-  const ivEncryptedDigest = concat(iv, encryptedDigest)
-  return arrayBufferToBase64(ivEncryptedDigest) as IvEncryptedDigestBase64
-}
-
-export async function decryptDigest(
-  ivEncryptedDigest: IvEncryptedDigestBase64,
-  appMediaIdSecret: AppMediaIdSecretBase64,
-  userId: UserId
-): Promise<Result<DigestBase64, string>> {
-  const [iv, encryptedDigest] = splitIvDigest(
-    base64ToArray(ivEncryptedDigest).buffer
-  )
-  const key = await generateKey(appMediaIdSecret, "decrypt", userId)
-  try {
-    const digest = (await crypto.subtle.decrypt(
-      {
-        name: "AES-GCM",
-        iv,
-      },
-      key,
-      encryptedDigest
-    )) as Digest
-    return toOk(arrayBufferToBase64(digest) as DigestBase64)
-  } catch (error) {
-    if (error instanceof DOMException) {
-      return toError(`Failed to decrypt input.`)
-    }
-    throw error
-  }
-}
-
-async function generateKey(
-  appMediaIdSecret: AppMediaIdSecretBase64,
-  keyUsage: "decrypt" | "encrypt",
-  userId: UserId
-): Promise<CryptoKey> {
-  const userIdBytes = new TextEncoder().encode(userId)
-  const aesKey = await crypto.subtle.digest(
-    {
-      name: "SHA-256",
-    },
-    concat(userIdBytes, base64ToArray(appMediaIdSecret))
-  )
-  return await crypto.subtle.importKey(
-    "raw",
-    aesKey,
-    {
-      name: "AES-GCM",
-    },
-    false,
-    [keyUsage]
-  )
+  return tmp
 }

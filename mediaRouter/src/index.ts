@@ -9,33 +9,20 @@
  */
 
 import { Context, Hono } from "hono"
-import {
-  encryptDigest,
-  decryptDigest,
-  UserId,
-  AppMediaIdSecretBase64,
-  IvEncryptedDigestBase64,
-  Digest,
-  DigestBase64,
-  Result,
-  toOk,
-  toError,
-} from "../util"
+import { Result, toOk, toError } from "../util"
 
-import {
-  toBase64URL_0,
-  fromBase64URL_0,
-  Base64,
-  Base64Url,
-  base64ToArray,
-  arrayBufferToBase64,
-  hstsName,
-  hstsValue,
-} from "shared"
+import { base64ToArray, hstsName, hstsValue, base64, base64url } from "shared"
 
 import { SignJWT, jwtVerify, JWTVerifyResult } from "jose"
 
 import { connect } from "@planetscale/database"
+import {
+  buildToken,
+  getMediaId,
+  MediaId,
+  TokenSecretBase64,
+  UserId,
+} from "../tokenCrypto"
 
 async function getUserId(
   c: Context<
@@ -77,7 +64,7 @@ export interface Env {
   // Example binding to R2. Learn more at https://developers.cloudflare.com/workers/runtime-apis/r2/
   mediaBucket: R2Bucket
   jwsSecret: string
-  appMediaIdSecret: AppMediaIdSecretBase64
+  tokenSecret: TokenSecretBase64
   planetscaleDbUrl: string
 }
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -170,14 +157,10 @@ app
 
     const digestStream = new crypto.DigestStream("SHA-256") // https://developers.cloudflare.com/workers/runtime-apis/web-crypto/#constructors
     void hashBody.pipeTo(digestStream)
-    const digest = (await digestStream.digest) as Digest
-    const digestBase64 = arrayBufferToBase64(digest) as DigestBase64
+    const mediaId = new Uint8Array(await digestStream.digest) as MediaId
+    const mediaIdBase64 = base64.encode(mediaId)
 
-    const ivEncryptedDigest = await encryptDigest(
-      c.env.appMediaIdSecret,
-      digest,
-      userId
-    )
+    const token = await buildToken(c.env.tokenSecret, mediaId, userId)
     const txResponse = await connect({
       url: c.env.planetscaleDbUrl,
     }).transaction(async (tx) => {
@@ -186,41 +169,39 @@ app
       // lowTODO brainstorm a better architecture
       const countResponse = await tx.execute(
         "SELECT count(*) from Media_User WHERE mediaId=FROM_BASE64(?) AND userId=?",
-        [digestBase64, userId],
+        [mediaIdBase64, userId],
         { as: "array" }
       )
       const count = (countResponse.rows[0] as string[])[0]
       if (count !== "0") {
         return c.text(
           "You've already uploaded this, or something exactly like it. See: " +
-            ivEncryptedDigest, // Users can only upload an object exactly once. Otherwise, we won't know when it's safe to delete that object from R2.
+            token, // Users can only upload an object exactly once. Otherwise, we won't know when it's safe to delete that object from R2.
           400
         )
       }
       await tx.execute(
         "INSERT INTO Media_User (mediaId, userId) VALUES (FROM_BASE64(?), ?)",
-        [digestBase64, userId]
+        [mediaIdBase64, userId]
       )
-      const object = await c.env.mediaBucket.put(digestBase64, readable, {
+      const object = await c.env.mediaBucket.put(mediaIdBase64, readable, {
         httpMetadata: headers,
       })
       c.header("ETag", object.httpEtag)
     })
-    return txResponse ?? c.text(toBase64URL_0(ivEncryptedDigest as Base64), 201)
+    return txResponse ?? c.text(token, 201)
   })
-  .get("/:ivEncryptedDigest", async (c) => {
+  .get("/:token", async (c) => {
     const authResult = await getUserId(c)
     if (authResult.tag === "Error") return authResult.error
     const userId = authResult.ok
-    const digest = await decryptDigest(
-      fromBase64URL_0(
-        c.req.param("ivEncryptedDigest") as Base64Url
-      ) as IvEncryptedDigestBase64,
-      c.env.appMediaIdSecret,
-      userId
+    const mediaId = await getMediaId(
+      c.env.tokenSecret,
+      userId,
+      base64url.decode(c.req.param("token"))
     )
-    if (digest.tag === "Error") return c.text(digest.error, 400)
-    const file = await c.env.mediaBucket.get(digest.ok)
+    if (mediaId == null) return c.text("Invalid token", 400)
+    const file = await c.env.mediaBucket.get(base64.encode(mediaId))
     if (file === null) {
       return await c.notFound()
     }
