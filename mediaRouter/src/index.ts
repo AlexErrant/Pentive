@@ -185,33 +185,28 @@ async function postMedia(c: MediaRouterContext): Promise<Response> {
   const mediaIdBase64 = base64.encode(mediaId)
 
   const token = await buildToken(c.env.tokenSecret, mediaId, userId)
-  const txResponse = await connect({
+  await connect({
     url: c.env.planetscaleDbUrl,
   }).transaction(async (tx) => {
     // Not a "real" transaction since the final `COMMIT` still needs to be sent as a fetch, but whatever.
     // Just means we could PUT something into the mediaBucket and have no record of it in PlanetScale. Not great, but _fine_.
     // lowTODO brainstorm a better architecture
     const countResponse = await tx.execute(
-      "SELECT count(*) from Media_User WHERE mediaId=FROM_BASE64(?) AND userId=?",
+      "SELECT COUNT(*) FROM Media_User WHERE mediaId=FROM_BASE64(?) AND userId=?",
       [mediaIdBase64, userId],
       { as: "array" }
     )
     const count = (countResponse.rows[0] as string[])[0]
-    if (count !== "0") {
-      return c.text(
-        "You've already uploaded this, or something exactly like it. See: " +
-          token, // Users can only upload an object exactly once. Otherwise, we won't know when it's safe to delete that object from R2.
-        400
+    if (count === "0") {
+      await tx.execute(
+        "INSERT INTO Media_User (mediaId, userId) VALUES (FROM_BASE64(?), ?)",
+        [mediaIdBase64, userId]
       )
+      const object = await c.env.mediaBucket.put(mediaIdBase64, readable, {
+        httpMetadata: headers,
+      })
+      c.header("ETag", object.httpEtag)
     }
-    await tx.execute(
-      "INSERT INTO Media_User (mediaId, userId) VALUES (FROM_BASE64(?), ?)",
-      [mediaIdBase64, userId]
-    )
-    const object = await c.env.mediaBucket.put(mediaIdBase64, readable, {
-      httpMetadata: headers,
-    })
-    c.header("ETag", object.httpEtag)
   })
-  return txResponse ?? c.text(token, 201)
+  return c.text(token, 201)
 }
