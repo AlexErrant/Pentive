@@ -1,3 +1,5 @@
+import { Brand } from "shared"
+
 export type Result<TOk, TError> =
   | {
       readonly tag: "Ok"
@@ -29,3 +31,6 @@ export function concat(a1: Uint8Array, a2: ArrayBuffer): Uint8Array {
   tmp.set(new Uint8Array(a2), a1.byteLength)
   return tmp
 }
+
+export type MediaId = Brand<Uint8Array, "mediaId">
+export type UserId = Brand<string, "userId">

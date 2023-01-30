@@ -9,20 +9,14 @@
  */
 
 import { Context, Hono } from "hono"
-import { Result, toOk, toError } from "../util"
+import { Result, toOk, toError, UserId, MediaId } from "../util"
 
 import { base64ToArray, hstsName, hstsValue, base64, base64url } from "shared"
 
 import { SignJWT, jwtVerify, JWTVerifyResult } from "jose"
 
 import { connect } from "@planetscale/database"
-import {
-  buildToken,
-  getMediaId,
-  MediaId,
-  TokenSecretBase64,
-  UserId,
-} from "../tokenCrypto"
+import { buildToken, getMediaId, TokenSecretBase64 } from "../tokenCrypto"
 
 async function getUserId(
   c: Context<
@@ -120,7 +114,7 @@ app
   // highTODO needs sanitization and stripping of Exif https://developers.cloudflare.com/workers/tutorials/generate-youtube-thumbnails-with-workers-and-images/ https://github.com/hMatoba/piexifjs https://github.com/hMatoba/exif-library
   // Someday B2? https://walshy.dev/blog/21_09_10-handling-file-uploads-with-cloudflare-workers https://news.ycombinator.com/item?id=28687181
   // Other alternatives https://bunny.net/ https://www.gumlet.com/ https://news.ycombinator.com/item?id=29474743
-  .post("/:filename", async (c) => {
+  .post("/private", async (c) => {
     if (c.req.body === null) {
       return c.text("Missing body", 400)
     }
@@ -153,7 +147,6 @@ app
     if (ct != null) headers.set("Content-Type", ct)
     const ce = c.req.headers.get("Content-Encoding")
     if (ce != null) headers.set("Content-Encoding", ce)
-    const filename = c.req.param("filename") // highTODO needs validation
 
     const digestStream = new crypto.DigestStream("SHA-256") // https://developers.cloudflare.com/workers/runtime-apis/web-crypto/#constructors
     void hashBody.pipeTo(digestStream)
@@ -191,7 +184,7 @@ app
     })
     return txResponse ?? c.text(token, 201)
   })
-  .get("/:token", async (c) => {
+  .get("/private/:token", async (c) => {
     const authResult = await getUserId(c)
     if (authResult.tag === "Error") return authResult.error
     const userId = authResult.ok
