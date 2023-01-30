@@ -192,20 +192,24 @@ async function postMedia(c: MediaRouterContext): Promise<Response> {
     // Just means we could PUT something into the mediaBucket and have no record of it in PlanetScale. Not great, but _fine_.
     // lowTODO brainstorm a better architecture
     const countResponse = await tx.execute(
-      "SELECT COUNT(*) FROM Media_User WHERE mediaId=FROM_BASE64(?) AND userId=?",
-      [mediaIdBase64, userId],
+      `SELECT (SELECT COUNT(*) FROM Media_User WHERE mediaId=FROM_BASE64(?) AND userId=?),
+              (SELECT COUNT(*) FROM Media_User WHERE mediaId=FROM_BASE64(?))`,
+      [mediaIdBase64, userId, mediaIdBase64],
       { as: "array" }
     )
-    const count = (countResponse.rows[0] as string[])[0]
-    if (count === "0") {
+    const userCount = (countResponse.rows[0] as string[])[0]
+    const mediaCount = (countResponse.rows[0] as string[])[1]
+    if (userCount === "0") {
       await tx.execute(
         "INSERT INTO Media_User (mediaId, userId) VALUES (FROM_BASE64(?), ?)",
         [mediaIdBase64, userId]
       )
-      const object = await c.env.mediaBucket.put(mediaIdBase64, readable, {
-        httpMetadata: headers,
-      })
-      c.header("ETag", object.httpEtag)
+      if (mediaCount === "0") {
+        const object = await c.env.mediaBucket.put(mediaIdBase64, readable, {
+          httpMetadata: headers,
+        })
+        c.header("ETag", object.httpEtag)
+      }
     }
   })
   return c.text(token, 201)
