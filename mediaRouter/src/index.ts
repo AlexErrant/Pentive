@@ -28,7 +28,7 @@ import {
   buildPrivateToken,
   getMediaId,
   TokenSecretBase64,
-} from "../tokenCrypto"
+} from "../privateToken"
 
 type MediaRouterContext = Context<
   never,
