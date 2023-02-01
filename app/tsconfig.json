@@ -12,7 +12,6 @@
     "jsxImportSource": "solid-js",
     "types": [
       "vite/client",
-      "node"
     ]
   }
 }

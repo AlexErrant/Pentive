@@ -17,7 +17,6 @@
     ],
     "types": [
       "vite/client",
-      "node"
     ]
   }
 }
