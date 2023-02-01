@@ -11,7 +11,8 @@
     "jsx": "preserve",
     "jsxImportSource": "solid-js",
     "types": [
-      "vite/client"
+      "vite/client",
+      "node"
     ]
   }
 }
