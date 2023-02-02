@@ -32,7 +32,7 @@ export type TokenSecretBase64 = Brand<string, "tokenSecretBase64" | "base64">
 
 */
 
-export async function buildToken(
+export async function buildPrivateToken(
   tokenSecret: TokenSecretBase64,
   mediaId: MediaId,
   userId: UserId
