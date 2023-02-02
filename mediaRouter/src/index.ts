@@ -18,15 +18,17 @@ import { SignJWT, jwtVerify, JWTVerifyResult } from "jose"
 import { connect } from "@planetscale/database"
 import { buildToken, getMediaId, TokenSecretBase64 } from "../tokenCrypto"
 
+type MediaRouterContext = Context<
+  never,
+  {
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    Bindings: Env
+  },
+  unknown
+>
+
 async function getUserId(
-  c: Context<
-    never,
-    {
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      Bindings: Env
-    },
-    unknown
-  >
+  c: MediaRouterContext
 ): Promise<Result<UserId, Response>> {
   const jwt = c.req.headers.get("Authorization")
   if (jwt == null) {
@@ -115,74 +117,7 @@ app
   // Someday B2? https://walshy.dev/blog/21_09_10-handling-file-uploads-with-cloudflare-workers https://news.ycombinator.com/item?id=28687181
   // Other alternatives https://bunny.net/ https://www.gumlet.com/ https://news.ycombinator.com/item?id=29474743
   .post("/private", async (c) => {
-    if (c.req.body === null) {
-      return c.text("Missing body", 400)
-    }
-    const contentLength = c.req.headers.get("content-length")
-    if (contentLength === null) {
-      return c.text("Missing `content-length` header", 400)
-    }
-    const contentLengthInt = parseInt(contentLength)
-    if (isNaN(contentLengthInt)) {
-      return c.text("`content-length` must be an int", 400)
-    } else if (contentLengthInt <= 0) {
-      return c.text("`content-length` must be larger than 0", 400)
-    } else if (contentLengthInt > 2097152) {
-      return c.text(
-        "`content-length` must be less than 2,097,152 bytes (2 MB).",
-        400
-      )
-    }
-    const authResult = await getUserId(c)
-    if (authResult.tag === "Error") return authResult.error
-    const userId = authResult.ok
-
-    const [responseBody, hashBody] = c.req.body.tee()
-    const { readable, writable } = new FixedLengthStream( // validates length
-      parseInt(contentLength)
-    )
-    void responseBody.pipeTo(writable) // https://developers.cloudflare.com/workers/learning/using-streams
-    const headers = new Headers()
-    const ct = c.req.headers.get("Content-Type")
-    if (ct != null) headers.set("Content-Type", ct)
-    const ce = c.req.headers.get("Content-Encoding")
-    if (ce != null) headers.set("Content-Encoding", ce)
-
-    const digestStream = new crypto.DigestStream("SHA-256") // https://developers.cloudflare.com/workers/runtime-apis/web-crypto/#constructors
-    void hashBody.pipeTo(digestStream)
-    const mediaId = new Uint8Array(await digestStream.digest) as MediaId
-    const mediaIdBase64 = base64.encode(mediaId)
-
-    const token = await buildToken(c.env.tokenSecret, mediaId, userId)
-    const txResponse = await connect({
-      url: c.env.planetscaleDbUrl,
-    }).transaction(async (tx) => {
-      // Not a "real" transaction since the final `COMMIT` still needs to be sent as a fetch, but whatever.
-      // Just means we could PUT something into the mediaBucket and have no record of it in PlanetScale. Not great, but _fine_.
-      // lowTODO brainstorm a better architecture
-      const countResponse = await tx.execute(
-        "SELECT count(*) from Media_User WHERE mediaId=FROM_BASE64(?) AND userId=?",
-        [mediaIdBase64, userId],
-        { as: "array" }
-      )
-      const count = (countResponse.rows[0] as string[])[0]
-      if (count !== "0") {
-        return c.text(
-          "You've already uploaded this, or something exactly like it. See: " +
-            token, // Users can only upload an object exactly once. Otherwise, we won't know when it's safe to delete that object from R2.
-          400
-        )
-      }
-      await tx.execute(
-        "INSERT INTO Media_User (mediaId, userId) VALUES (FROM_BASE64(?), ?)",
-        [mediaIdBase64, userId]
-      )
-      const object = await c.env.mediaBucket.put(mediaIdBase64, readable, {
-        httpMetadata: headers,
-      })
-      c.header("ETag", object.httpEtag)
-    })
-    return txResponse ?? c.text(token, 201)
+    return await postMedia(c)
   })
   .get("/private/:token", async (c) => {
     const authResult = await getUserId(c)
@@ -211,3 +146,72 @@ app
   })
 
 export default app
+
+async function postMedia(c: MediaRouterContext): Promise<Response> {
+  if (c.req.body === null) {
+    return c.text("Missing body", 400)
+  }
+  const contentLength = c.req.headers.get("content-length")
+  if (contentLength === null) {
+    return c.text("Missing `content-length` header", 400)
+  }
+  const contentLengthInt = parseInt(contentLength)
+  if (isNaN(contentLengthInt)) {
+    return c.text("`content-length` must be an int", 400)
+  } else if (contentLengthInt <= 0) {
+    return c.text("`content-length` must be larger than 0", 400)
+  } else if (contentLengthInt > 2097152) {
+    return c.text(
+      "`content-length` must be less than 2,097,152 bytes (2 MB).",
+      400
+    )
+  }
+  const authResult = await getUserId(c)
+  if (authResult.tag === "Error") return authResult.error
+  const userId = authResult.ok
+
+  const [responseBody, hashBody] = c.req.body.tee()
+  const { readable, writable } = new FixedLengthStream(parseInt(contentLength)) // validates length
+  void responseBody.pipeTo(writable) // https://developers.cloudflare.com/workers/learning/using-streams
+  const headers = new Headers()
+  const ct = c.req.headers.get("Content-Type")
+  if (ct != null) headers.set("Content-Type", ct)
+  const ce = c.req.headers.get("Content-Encoding")
+  if (ce != null) headers.set("Content-Encoding", ce)
+
+  const digestStream = new crypto.DigestStream("SHA-256") // https://developers.cloudflare.com/workers/runtime-apis/web-crypto/#constructors
+  void hashBody.pipeTo(digestStream)
+  const mediaId = new Uint8Array(await digestStream.digest) as MediaId
+  const mediaIdBase64 = base64.encode(mediaId)
+
+  const token = await buildToken(c.env.tokenSecret, mediaId, userId)
+  const txResponse = await connect({
+    url: c.env.planetscaleDbUrl,
+  }).transaction(async (tx) => {
+    // Not a "real" transaction since the final `COMMIT` still needs to be sent as a fetch, but whatever.
+    // Just means we could PUT something into the mediaBucket and have no record of it in PlanetScale. Not great, but _fine_.
+    // lowTODO brainstorm a better architecture
+    const countResponse = await tx.execute(
+      "SELECT count(*) from Media_User WHERE mediaId=FROM_BASE64(?) AND userId=?",
+      [mediaIdBase64, userId],
+      { as: "array" }
+    )
+    const count = (countResponse.rows[0] as string[])[0]
+    if (count !== "0") {
+      return c.text(
+        "You've already uploaded this, or something exactly like it. See: " +
+          token, // Users can only upload an object exactly once. Otherwise, we won't know when it's safe to delete that object from R2.
+        400
+      )
+    }
+    await tx.execute(
+      "INSERT INTO Media_User (mediaId, userId) VALUES (FROM_BASE64(?), ?)",
+      [mediaIdBase64, userId]
+    )
+    const object = await c.env.mediaBucket.put(mediaIdBase64, readable, {
+      httpMetadata: headers,
+    })
+    c.header("ETag", object.httpEtag)
+  })
+  return txResponse ?? c.text(token, 201)
+}
