@@ -6,7 +6,7 @@ export type RemoteTemplateId = Brand<string, "remoteTemplateId">
 export type RemoteCardId = Brand<string, "remoteCardId">
 export type RemoteResourceId = Brand<string, "remoteResourceId">
 
-export type TemplateId = Brand<string, "templateId">
+export { TemplateId } from "shared"
 export type ChildTemplateId = Brand<string, "childTemplateId">
 export type ClozeIndex = Brand<number, "clozeIndex">
 export type Pointer = ChildTemplateId | ClozeIndex

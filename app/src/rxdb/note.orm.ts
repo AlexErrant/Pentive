@@ -4,7 +4,7 @@ import { NoteId } from "../domain/ids"
 import { NoteDocType } from "./note.schema"
 import { getDb } from "./rxdb"
 import _ from "lodash"
-import { CreateRemoteNote } from "lrpc/src/schemas/note"
+import { CreateRemoteNote } from "shared"
 
 function noteToDocType(note: Note): NoteDocType {
   const { id, created, modified, push, pushId, pushTemplateId, ...shrunken } =
@@ -20,13 +20,15 @@ function noteToDocType(note: Note): NoteDocType {
   }
 }
 
-function domainToCreateRemote(
-  { id, templateId, tags, fields, values }: Note,
-  nook: string
-): CreateRemoteNote {
+function domainToCreateRemote({
+  id,
+  templateId,
+  tags,
+  fields,
+  values,
+}: Note): CreateRemoteNote {
   return {
-    id,
-    nook,
+    localId: id,
     templateId,
     fieldValues: _.fromPairs(_.zip(fields, values)),
     tags: Array.from(tags),
@@ -99,7 +101,7 @@ export const noteCollectionMethods = {
     const allNotes = await db.notes.find({ selector, limit }).exec()
     return allNotes.map(entityToDomain)
   },
-  getNewNotesToUpload: async function (nook: string) {
+  getNewNotesToUpload: async function () {
     const db = await getDb()
     const newNotes = await db.notes
       .find({
@@ -113,8 +115,6 @@ export const noteCollectionMethods = {
         },
       })
       .exec()
-    return newNotes
-      .map(entityToDomain)
-      .map((x) => domainToCreateRemote(x, nook))
+    return newNotes.map(entityToDomain).map(domainToCreateRemote)
   },
 }

@@ -7,7 +7,7 @@ import HomeData from "./home.data"
 import { db } from "../db"
 import { lrpc } from "../lrpcClient"
 import { importAnki } from "./importer/importer"
-import { throwExp } from "shared"
+import { createRemoteNotesJson, throwExp } from "shared"
 import { ResourceId } from "../domain/ids"
 
 async function uploadNewTemplates(): Promise<void> {
@@ -25,17 +25,16 @@ async function uploadNewTemplates(): Promise<void> {
 }
 
 async function uploadNewNotes(): Promise<void> {
-  const id = await lrpc.addNote.mutate({
-    nook: "aRandomNook",
+  const newNotes = await db.getNewNotesToUpload()
+  const formData = new FormData()
+  formData.append(createRemoteNotesJson, JSON.stringify(newNotes))
+  // nextTODO replace at build time vvv
+  const response = await fetch("https://api.local.pentive.com:8787/note", {
+    method: "POST",
+    body: formData,
+    credentials: "include",
   })
-  console.log("id is", id)
-  const r = await lrpc.getNote.query(id)
-  const newNotes = await db.getNewNotesToUpload("aRandomNook")
-  const remoteIdByLocal = await lrpc.addNotes.mutate(newNotes)
-  const remoteIds = Object.values(remoteIdByLocal)
-  const getBatch = await lrpc.getNotes.query(remoteIds)
-  console.log("getNotes", getBatch)
-  console.log(r)
+  console.log(response)
 }
 
 async function searchNotes(search: string): Promise<void> {

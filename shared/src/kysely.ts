@@ -1,10 +1,15 @@
-import { Kysely, sql, InsertResult, RawBuilder } from "kysely"
+import { Kysely, sql, InsertResult, RawBuilder, InsertObject } from "kysely"
 import { PlanetScaleDialect } from "kysely-planetscale"
 import { DB } from "./database.js"
-import { Base64, Base64Url, DbId, Hex } from "./brand.js"
-import { binary16fromBase64URL } from "./convertBinary.js"
+import { Base64, Base64Url, DbId, Hex, TemplateId } from "./brand.js"
+import { binary16fromBase64URL, ulidAsHex } from "./convertBinary.js"
 import { undefinedMap } from "./utility.js"
-import { base64url } from "@scure/base"
+import { base16, base64url } from "@scure/base"
+import { z } from "zod"
+import _ from "lodash"
+// import { compile } from "html-to-text"
+
+// const convert = compile({})
 
 // @ts-expect-error db calls should throw null error if not setup
 let db: Kysely<DB> = null as Kysely<DB>
@@ -73,6 +78,46 @@ export async function insertPost({
       title,
     })
     .execute()
+}
+
+export const createRemoteNote = z.object({
+  localId: z.string(),
+  templateId: z
+    .string()
+    .regex(/^[a-zA-Z0-9_-]{22}$/) as unknown as z.Schema<TemplateId>,
+  fieldValues: z.record(z.string()),
+  tags: z.array(z.string()),
+  ankiId: z.number().positive().optional(),
+})
+export type CreateRemoteNote = z.infer<typeof createRemoteNote>
+
+export async function insertNotes(
+  authorId: string,
+  notes: CreateRemoteNote[]
+): Promise<Record<string, string>> {
+  const noteCreatesAndIds = notes.map((n) => {
+    const remoteId = ulidAsHex()
+    const noteCreate: InsertObject<DB, "Note"> = {
+      id: unhex(remoteId),
+      templateId: fromBase64Url(n.templateId), // highTODO validate
+      authorId,
+      fieldValues: JSON.stringify(n.fieldValues),
+      fts: "", // Object.values(n.fieldValues).map(convert).concat(n.tags).join(" "), // nextTODO
+      tags: JSON.stringify(n.tags),
+      ankiId: n.ankiId,
+    }
+    return [
+      noteCreate,
+      [n.localId, base64url.encode(base16.decode(remoteId))] as [
+        string,
+        string
+      ],
+    ] as const
+  })
+  const noteCreates = noteCreatesAndIds.map((x) => x[0])
+  await db.insertInto("Note").values(noteCreates).execute()
+  const remoteIdByLocal = _.fromPairs(noteCreatesAndIds.map((x) => x[1]))
+  return remoteIdByLocal
 }
 
 function unhex(id: Hex): RawBuilder<DbId> {

@@ -4,3 +4,5 @@ export type Base64 = Brand<string, "base64">
 export type Base64Url = Brand<string, "base64url">
 export type Hex = Brand<string, "hex">
 export type DbId = Brand<string, "dbId">
+
+export type TemplateId = Brand<string, "templateId" & "base64url">

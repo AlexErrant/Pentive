@@ -9,6 +9,7 @@
  */
 
 import { Context, Hono } from "hono"
+import { cors } from "hono/cors"
 import { Result, toOk, toError, UserId, MediaId } from "../util"
 
 import {
@@ -19,8 +20,14 @@ import {
   base64url,
   Base64,
   Base64Url,
+  createRemoteNote,
+  insertNotes,
+  setKysely,
+  jwtCookieName,
+  createRemoteNotesJson,
 } from "shared"
 
+import z from "zod"
 import { SignJWT, jwtVerify, JWTVerifyResult } from "jose"
 
 import { connect, Transaction } from "@planetscale/database"
@@ -42,9 +49,9 @@ type MediaRouterContext = Context<
 async function getUserId(
   c: MediaRouterContext
 ): Promise<Result<UserId, Response>> {
-  const jwt = c.req.headers.get("Authorization")
+  const jwt = c.req.cookie(jwtCookieName)
   if (jwt == null) {
-    return toError(c.text("Missing `Authorization` header", 401))
+    return toError(c.text(`Missing '${jwtCookieName}' cookie`, 401))
   } else {
     let verifyResult: JWTVerifyResult
     try {
@@ -84,6 +91,17 @@ app
     await next()
     c.header(hstsName, hstsValue)
   })
+  .use(
+    "/*",
+    cors({
+      origin: "https://app.local.pentive.com:3014", // nextTODO replace at build time
+      allowMethods: ["POST", "GET", "OPTIONS"],
+      allowHeaders: [],
+      maxAge: 86400, // 24hrs - browsers don't support longer https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Max-Age
+      credentials: true,
+      exposeHeaders: [],
+    })
+  )
   .get("/", (c) => c.text("Hono!!"))
   .get("/testJws", async (c) => {
     const jwsSecretBytes = base64ToArray(c.env.jwsSecret)
@@ -187,6 +205,18 @@ app
     if (file.httpMetadata?.contentEncoding != null)
       c.header("Content-Encoding", file.httpMetadata.contentEncoding)
     return c.body(file.body)
+  })
+  .post("/note", async (c) => {
+    const authResult = await getUserId(c)
+    if (authResult.tag === "Error") return authResult.error
+    const userId = authResult.ok
+    setKysely(c.env.planetscaleDbUrl)
+    const body = await c.req.parseBody() // nextTODO handle images
+    const createRemoteNotes = z
+      .array(createRemoteNote)
+      .parse(JSON.parse(body[createRemoteNotesJson] as string))
+    const remoteIdByLocal = await insertNotes(userId, createRemoteNotes)
+    return c.json(remoteIdByLocal)
   })
 
 export default app
