@@ -28,8 +28,7 @@ async function uploadNewNotes(): Promise<void> {
   const newNotes = await db.getNewNotesToUpload()
   const formData = new FormData()
   formData.append(createRemoteNotesJson, JSON.stringify(newNotes))
-  // nextTODO replace at build time vvv
-  const response = await fetch("https://api.local.pentive.com:8787/note", {
+  const response = await fetch(import.meta.env.VITE_API_URL + "note", {
     method: "POST",
     body: formData,
     credentials: "include",

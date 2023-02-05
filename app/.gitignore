@@ -6,3 +6,5 @@ dist
 /playwright/.cache/
 .cert
 env.sh
+.env.development
+.env.production
