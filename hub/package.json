@@ -45,8 +45,9 @@
     "jose": "^4.11.1",
     "shared": "workspace:*",
     "solid-js": "^1.6.2",
+    "html-to-text": "^9.0.3 || Hub doesn't use this, but `shared` (actually `mediaRouter`) does. Not including this causes an ESModule error - I've no idea why.",
     "solid-start": "^0.2.0",
-    "ulid-workers": "^2.1.0",
+    "ulid-workers": "^2.1.0 || See comment on html-to-text",
     "undici": "^5.11.0"
   },
   "engines": {

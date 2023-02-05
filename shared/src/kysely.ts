@@ -7,9 +7,9 @@ import { undefinedMap } from "./utility.js"
 import { base16, base64url } from "@scure/base"
 import { z } from "zod"
 import _ from "lodash"
-// import { compile } from "html-to-text"
+import { compile } from "html-to-text"
 
-// const convert = compile({})
+const convert = compile({})
 
 // @ts-expect-error db calls should throw null error if not setup
 let db: Kysely<DB> = null as Kysely<DB>
@@ -102,7 +102,7 @@ export async function insertNotes(
       templateId: fromBase64Url(n.templateId), // highTODO validate
       authorId,
       fieldValues: JSON.stringify(n.fieldValues),
-      fts: "", // Object.values(n.fieldValues).map(convert).concat(n.tags).join(" "), // nextTODO
+      fts: Object.values(n.fieldValues).map(convert).concat(n.tags).join(" "),
       tags: JSON.stringify(n.tags),
       ankiId: n.ankiId,
     }
