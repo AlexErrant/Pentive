@@ -11,3 +11,4 @@ preview_bucket_name = 'media-dev'
 
 [dev]
 port = 8787
+local_protocol="https"

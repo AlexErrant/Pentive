@@ -10,7 +10,9 @@
   "scripts": {
     "start": "wrangler dev",
     "dev": "wrangler dev",
-    "deploy": "wrangler publish"
+    "deploy": "wrangler publish",
+    "//generate-cert": "requires installing https://github.com/FiloSottile/mkcert Move `key.pem` and `cert.pem` to `~\\.config\\.wrangler\\local-cert`. (Apologies for the \\ escaping.)",
+    "generate-cert": "mkcert -key-file key.pem -cert-file cert.pem api.local.pentive.com"
   },
   "dependencies": {
     "@planetscale/database": "^1.5.0",
