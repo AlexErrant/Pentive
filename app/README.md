@@ -12,3 +12,9 @@ Install [`pnpm`](https://pnpm.io/) then run:
 ```bash
 $ pnpm install && npm run dev
 ```
+
+## Generate types for sqlite
+
+```sh
+npx kysely-codegen --out-file './src/sqlite/database.ts' --url "./pentiveapp.sqlite"
+```
