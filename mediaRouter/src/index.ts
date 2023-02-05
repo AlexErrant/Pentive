@@ -81,6 +81,7 @@ export interface Env {
   jwsSecret: string
   tokenSecret: TokenSecretBase64
   planetscaleDbUrl: string
+  appOrigin: string
 }
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const app = new Hono<{ Bindings: Env }>()
@@ -91,17 +92,16 @@ app
     await next()
     c.header(hstsName, hstsValue)
   })
-  .use(
-    "/*",
-    cors({
-      origin: "https://app.local.pentive.com:3014", // nextTODO replace at build time
+  .use("/*", async (c, next) => {
+    return await cors({
+      origin: c.env.appOrigin, // lowTODO replace at build time (doesn't need to be a secret)
       allowMethods: ["POST", "GET", "OPTIONS"],
       allowHeaders: [],
       maxAge: 86400, // 24hrs - browsers don't support longer https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Max-Age
       credentials: true,
       exposeHeaders: [],
-    })
-  )
+    })(c, next)
+  })
   .get("/", (c) => c.text("Hono!!"))
   .get("/testJws", async (c) => {
     const jwsSecretBytes = base64ToArray(c.env.jwsSecret)
