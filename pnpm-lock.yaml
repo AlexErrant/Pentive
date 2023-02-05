@@ -361,11 +361,13 @@ importers:
       shared: workspace:*
       typescript: ^4.9.4
       wrangler: 2.6.2
+      zod: ^3.19.1
     dependencies:
       '@planetscale/database': 1.5.0
       hono: 2.6.2
       jose: 4.11.1
       shared: link:../shared
+      zod: 3.19.1
     devDependencies:
       '@cloudflare/workers-types': 4.20221111.1
       typescript: 4.9.4
@@ -376,6 +378,7 @@ importers:
       '@cloudflare/workers-types': ^4.20221111.1
       '@planetscale/database': ^1.5.0
       '@scure/base': ^1.1.1
+      '@types/lodash': 4.14.182
       '@types/uuid': ^9.0.0
       '@typescript-eslint/eslint-plugin': ^5.31.0
       '@typescript-eslint/parser': ^5.31.0
@@ -390,22 +393,27 @@ importers:
       kysely: ^0.23.3
       kysely-codegen: ^0.9.0
       kysely-planetscale: ^1.2.1
+      lodash: 4.17.21
       mysql2: ^2.3.3
       prettier: ^2.7.1
       standard: ^17.0.0
       typescript: ^4.7.4
       ulid-workers: ^2.1.0
       uuid: ^9.0.0
+      zod: ^3.19.1
     dependencies:
       '@planetscale/database': 1.5.0
       '@scure/base': 1.1.1
       '@vlcn.io/xplat-api': 0.6.0
       kysely: 0.23.3
       kysely-planetscale: 1.2.1_z7hkwvucbgukbaukm7lodlcsym
+      lodash: 4.17.21
       ulid-workers: 2.1.0
       uuid: 9.0.0
+      zod: 3.19.1
     devDependencies:
       '@cloudflare/workers-types': 4.20221111.1
+      '@types/lodash': 4.14.182
       '@types/uuid': 9.0.0
       '@typescript-eslint/eslint-plugin': 5.37.0_22c5fnooleyfkzrkkgdmel5kmi
       '@typescript-eslint/parser': 5.37.0_irgkl5vooow2ydyo6aokmferha
@@ -3656,6 +3664,10 @@ packages:
       '@types/node': 18.7.21
     dev: true
 
+  /@types/lodash/4.14.182:
+    resolution: {integrity: sha512-/THyiqyQAP9AfARo4pF+aCGcyiQ94tX/Is2I7HofNRqoYLgN1PBoOWu2/zTA5zMxzP5EFutMtWtGAFRKUe961Q==}
+    dev: true
+
   /@types/lodash/4.14.185:
     resolution: {integrity: sha512-evMDG1bC4rgQg4ku9tKpuMh5iBNEwNa3tf9zRHdP1qlv+1WUg44xat4IxCE14gIpZRGUUWAx2VhItCZc25NfMA==}
     dev: true
@@ -5727,7 +5739,7 @@ packages:
     dependencies:
       acorn-node: 1.8.2
       defined: 1.0.0
-      minimist: 1.2.6
+      minimist: 1.2.7
     dev: true
 
   /dexie/3.2.2:
@@ -8149,7 +8161,7 @@ packages:
       deepmerge: 4.2.2
       he: 1.2.0
       htmlparser2: 6.1.0
-      minimist: 1.2.6
+      minimist: 1.2.7
       selderee: 0.6.0
     dev: false
 
@@ -10001,9 +10013,6 @@ packages:
       kind-of: 6.0.3
     dev: true
 
-  /minimist/1.2.6:
-    resolution: {integrity: sha512-Jsjnk4bw3YJqYzbdyBiNsPWHPfO++UGG749Cxs6peCu5Xg4nrena6OVxOYxrQTqww0Jmwt+Ref8rggumkTLz9Q==}
-
   /minimist/1.2.7:
     resolution: {integrity: sha512-bzfL1YUZsP41gmu/qjrEk0Q6i2ix/cVeAhbCbqH9u3zYutS1cLg00qhrD0M2MVdCcx4Sc0UpP2eBWo9rotpq6g==}
 
@@ -10030,7 +10039,7 @@ packages:
     resolution: {integrity: sha512-FP+p8RB8OWpF3YZBCrP5gtADmtXApB5AMLn+vdyA+PyxCjrCs00mjyUozssO33cwDeT3wNGdLxJ5M//YqtHAJw==}
     hasBin: true
     dependencies:
-      minimist: 1.2.6
+      minimist: 1.2.7
 
   /mkdirp/1.0.4:
     resolution: {integrity: sha512-vVqVZQyf3WLx2Shd0qJ9xuvqgAyKPLAiqITEtqW0oIUjzo3PePDd6fW9iFz30ef7Ysp/oiWqbhszeGWW2T6Gzw==}
@@ -12184,7 +12193,7 @@ packages:
     hasBin: true
     dependencies:
       buffer-crc32: 0.2.13
-      minimist: 1.2.6
+      minimist: 1.2.7
       sander: 0.5.1
       sourcemap-codec: 1.4.8
     dev: true
@@ -13732,7 +13741,7 @@ packages:
       axios: 0.25.0_debug@4.3.4
       joi: 17.7.0
       lodash: 4.17.21
-      minimist: 1.2.6
+      minimist: 1.2.7
       rxjs: 7.5.6
     transitivePeerDependencies:
       - debug

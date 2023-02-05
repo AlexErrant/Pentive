@@ -15,6 +15,7 @@
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20221111.1",
+    "@types/lodash": "4.14.182",
     "@types/uuid": "^9.0.0",
     "@typescript-eslint/eslint-plugin": "^5.31.0",
     "@typescript-eslint/parser": "^5.31.0",
@@ -37,7 +38,9 @@
     "@vlcn.io/xplat-api": "^0.6.0",
     "kysely": "^0.23.3",
     "kysely-planetscale": "^1.2.1",
+    "lodash": "4.17.21",
     "ulid-workers": "^2.1.0",
-    "uuid": "^9.0.0"
+    "uuid": "^9.0.0",
+    "zod": "^3.19.1"
   }
 }
