@@ -22,7 +22,7 @@ export interface Note {
   id: DbId
   templateId: DbId
   createdAt: Generated<Date>
-  updatedAt: Date
+  updatedAt: Generated<Date>
   authorId: string
   fieldValues: string
   fts: string
@@ -81,7 +81,7 @@ export interface PostSubscriber {
 export interface Template {
   id: DbId
   createdAt: Generated<Date>
-  updatedAt: Date
+  updatedAt: Generated<Date>
   name: string
   nook: string
   type: string

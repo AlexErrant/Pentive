@@ -30,7 +30,7 @@ model User {
 model Template {
   id             Bytes                @id @db.Binary(16)
   createdAt      DateTime             @default(now())
-  updatedAt      DateTime             @updatedAt
+  updatedAt      DateTime             @default(now())
   name           String               @db.VarChar(255)
   nook           String               @db.VarChar(21)
   nookRef        Nook                 @relation(fields: [nook], references: [id])
@@ -98,7 +98,7 @@ model Note {
   templateId  Bytes    @db.Binary(16)
   template    Template @relation(fields: [templateId], references: [id])
   createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  updatedAt   DateTime @default(now())
   author      User     @relation(fields: [authorId], references: [id])
   authorId    String   @db.VarChar(21)
   fieldValues String   @db.Text
