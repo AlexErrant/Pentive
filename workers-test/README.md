@@ -1,3 +1,5 @@
+todo try Vitest https://blog.cloudflare.com/cloudflare-workers-templates/
+
 # Miniflare Example Project
 
 This is an example [Cloudflare Workers](https://workers.cloudflare.com/) project that uses [Miniflare](https://github.com/cloudflare/miniflare) for local development, [TypeScript](https://www.typescriptlang.org/), [esbuild](https://github.com/evanw/esbuild) for bundling, and [Jest](https://jestjs.io/) for testing, with [Miniflare's custom Jest environment](https://miniflare.dev/testing/jest).
