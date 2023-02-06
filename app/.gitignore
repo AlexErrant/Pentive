@@ -8,3 +8,4 @@ dist
 env.sh
 .env.development
 .env.production
+src/assets/sqlite.wasm

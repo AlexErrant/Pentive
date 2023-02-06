@@ -132,7 +132,7 @@ async function getAnkiDb(sqlite: Entry): Promise<Database> {
     initSqlJs({
       // Required to load the wasm binary asynchronously. Of course, you can host it wherever you want
       // Grep for F00E815A-C0FD-4AEA-B83C-0BDB641D97CC
-      // Service worker probably needs a reference.
+      // Service worker probably needs a reference. highTODO
       // https://stackoverflow.com/q/71571129 https://vitejs.dev/guide/features.html#webassembly https://github.com/vitejs/vite/issues/378 https://stackoverflow.com/q/69614671
       locateFile: (file) => `https://sql.js.org/dist/${file}`,
     }),
