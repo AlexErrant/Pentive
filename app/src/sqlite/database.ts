@@ -1,3 +1,5 @@
+// most of these columns are nullable in SQLite, but they're not nullable here for the sake of my sanity
+
 import { DbId } from "shared"
 
 export interface Note {
@@ -17,12 +19,12 @@ export interface Template {
   id: DbId
   pushId: DbId | null
   push: number | null
-  name: string | null
-  css: string | null
-  fields: string | null
-  created: number | null
-  modified: number | null
-  templateType: string | null
+  name: string
+  css: string
+  fields: string
+  created: number
+  modified: number
+  templateType: string
 }
 
 export interface DB {
