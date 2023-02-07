@@ -1,8 +1,8 @@
 import { CreateRemoteTemplate } from "lrpc/src/schemas/template"
 import { RemoteTemplateId, TemplateId } from "../domain/ids"
 import { Field, Template, TemplateType } from "../domain/template"
-import { assertNever, DbId, undefinedMap } from "shared"
-import { getDb, getKysely } from "./crsqlite"
+import { assertNever, undefinedMap } from "shared"
+import { getKysely } from "./crsqlite"
 import { DB, Template as TemplateEntity } from "./database"
 import { InsertObject } from "kysely"
 
@@ -91,33 +91,32 @@ export const templateCollectionMethods = {
     await db.insertInto("template").values(t).execute()
   },
   bulkUpsertTemplate: async function (templates: Template[]) {
-    for (const t of templates) {
-      await this.insertTemplate(t) // medTODO could probably make this better. Can't seem to find anything for parameterized bulk inserts.
-      // https://stackoverflow.com/q/1711631 https://stackoverflow.com/q/45562747 https://stackoverflow.com/q/3447842 https://stackoverflow.com/q/15858466 https://stackoverflow.com/q/1609637
-    }
+    const ts = templates.map(templateToDocType)
+    const db = await getKysely()
+    await db.insertInto("template").values(ts).execute()
   },
   getTemplate: async function (templateId: TemplateId) {
-    const db = await getDb()
-    const template = await db.execO<TemplateEntity>(
-      `SELECT * FROM template WHERE id = ?`,
-      [templateId]
-    )
-    return undefinedMap(template.at(0), entityToDomain) ?? null
+    const db = await getKysely()
+    const template = await db
+      .selectFrom("template")
+      .selectAll()
+      .where("id", "=", templateId)
+      .executeTakeFirst()
+    return undefinedMap(template, entityToDomain) ?? null
   },
   getTemplates: async function () {
-    const db = await getDb()
-    const allTemplates = await db.execO<TemplateEntity>(
-      `SELECT * FROM template`
-    )
+    const db = await getKysely()
+    const allTemplates = await db.selectFrom("template").selectAll().execute()
     return allTemplates.map(entityToDomain)
   },
   getNewTemplatesToUpload: async function (nook: string) {
-    const db = await getDb()
-    const newTemplates = await db.execO<TemplateEntity>(
-      `SELECT * FROM template
-       WHERE push = 1
-       AND pushId IS NULL;`
-    )
+    const db = await getKysely()
+    const newTemplates = await db
+      .selectFrom("template")
+      .selectAll()
+      .where("push", "=", 1)
+      .where("pushId", "is", null)
+      .execute()
     return newTemplates
       .map(entityToDomain)
       .map((x) => domainToCreateRemote(x, nook))
