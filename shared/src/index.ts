@@ -1,7 +1,7 @@
 export const initSql = [
   `CREATE TABLE IF NOT EXISTS template (
-    id BLOB PRIMARY KEY,
-    pushId BLOB,
+    id TEXT PRIMARY KEY, -- make BLOB upon SQLite v3.41 and the landing of UNHEX https://sqlite.org/forum/forumpost/30cca4e613d2fa2a
+    pushId TEXT, -- make BLOB upon SQLite v3.41 and the landing of UNHEX https://sqlite.org/forum/forumpost/30cca4e613d2fa2a
     push INTEGER,
     name TEXT,
     css TEXT,
@@ -11,10 +11,10 @@ export const initSql = [
     templateType TEXT
 ) STRICT;`,
   `CREATE TABLE IF NOT EXISTS note (
-    id BLOB PRIMARY KEY,
-    templateId BLOB,
-    pushId BLOB,
-    pushTemplateId BLOB,
+    id TEXT PRIMARY KEY, -- make BLOB upon SQLite v3.41 and the landing of UNHEX https://sqlite.org/forum/forumpost/30cca4e613d2fa2a
+    templateId TEXT, -- make BLOB upon SQLite v3.41 and the landing of UNHEX https://sqlite.org/forum/forumpost/30cca4e613d2fa2a
+    pushId TEXT, -- make BLOB upon SQLite v3.41 and the landing of UNHEX https://sqlite.org/forum/forumpost/30cca4e613d2fa2a
+    pushTemplateId TEXT, -- make BLOB upon SQLite v3.41 and the landing of UNHEX https://sqlite.org/forum/forumpost/30cca4e613d2fa2a
     push INTEGER,
     ankiNoteId INTEGER,
     created INTEGER,
