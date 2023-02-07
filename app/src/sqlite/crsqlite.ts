@@ -2,6 +2,9 @@ import * as sqliteWasm from "@vlcn.io/wa-crsqlite"
 import { initSql, wholeDbReplicator } from "shared"
 import { lrpc } from "../lrpcClient"
 import { stringify as uuidStringify } from "uuid"
+import { DB } from "./database"
+import { CRDatabase, CRDialect } from "./dialect"
+import { Kysely } from "kysely"
 
 let myDatabase: Promise<sqliteWasm.DB> | null = null
 
@@ -21,6 +24,22 @@ async function createDb(): Promise<sqliteWasm.DB> {
   const db = await sqlite.open("username.db")
   await db.execMany(initSql)
   return db
+}
+
+let myKysely: Promise<Kysely<DB>> | null = null
+
+export async function getKysely(): Promise<Kysely<DB>> {
+  if (myKysely == null) {
+    myKysely = createKysely()
+  }
+  return await myKysely
+}
+
+async function createKysely(): Promise<Kysely<DB>> {
+  const db = await createDb()
+  return new Kysely<DB>({
+    dialect: new CRDialect({ database: db as CRDatabase }),
+  })
 }
 
 export async function sync(): Promise<void> {

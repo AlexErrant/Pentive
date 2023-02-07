@@ -1,22 +1,12 @@
 import { CreateRemoteTemplate } from "lrpc/src/schemas/template"
 import { RemoteTemplateId, TemplateId } from "../domain/ids"
 import { Field, Template, TemplateType } from "../domain/template"
-import { assertNever, undefinedMap } from "shared"
-import { getDb } from "./crsqlite"
+import { assertNever, DbId, undefinedMap } from "shared"
+import { getDb, getKysely } from "./crsqlite"
+import { DB, Template as TemplateEntity } from "./database"
+import { InsertObject } from "kysely"
 
-interface TemplateEntity {
-  readonly id: string // nextTODO Buffer
-  readonly pushId: string | null
-  readonly push: number | null
-  readonly name: string
-  readonly css: string
-  readonly fields: string
-  readonly created: number
-  readonly modified: number
-  readonly templateType: string
-}
-
-function templateToDocType(template: Template): TemplateEntity {
+function templateToDocType(template: Template): InsertObject<DB, "template"> {
   const {
     id,
     name,
@@ -97,22 +87,8 @@ function domainToCreateRemote(
 export const templateCollectionMethods = {
   insertTemplate: async function (template: Template) {
     const t = templateToDocType(template)
-    const db = await getDb()
-    await db.exec(
-      `INSERT INTO template (id,pushId,push,name,css,fields,created,modified,templateType)
-                      VALUES (?,     ?,   ?,   ?,  ?,     ?,      ?,       ?,           ?)`,
-      [
-        t.id,
-        t.pushId,
-        t.push,
-        t.name,
-        t.css,
-        t.fields,
-        t.created,
-        t.modified,
-        t.templateType,
-      ]
-    )
+    const db = await getKysely()
+    await db.insertInto("template").values(t).execute()
   },
   bulkUpsertTemplate: async function (templates: Template[]) {
     for (const t of templates) {

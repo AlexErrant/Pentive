@@ -2,7 +2,7 @@ type Brand<T, B> = T & { readonly brand: B } // https://medium.com/@KevinBGreene
 
 export type UserId = Brand<string, "userId">
 
-export type RemoteTemplateId = Brand<string, "remoteTemplateId">
+export type RemoteTemplateId = Brand<string, "remoteTemplateId" & "base64url">
 export type RemoteCardId = Brand<string, "remoteCardId">
 export type RemoteResourceId = Brand<string, "remoteResourceId">
 
