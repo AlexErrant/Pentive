@@ -1,6 +1,5 @@
 import { addRxPlugin, createRxDatabase, RxDatabase } from "rxdb"
 import { HeroDocType, heroSchema } from "./hero.schema"
-import { templateSchema } from "./template.schema"
 import { cardSchema } from "./card.schema"
 import { noteSchema } from "./note.schema"
 import { RxDBLeaderElectionPlugin } from "rxdb/plugins/leader-election"
@@ -11,11 +10,6 @@ import {
   heroDocMethods,
   HeroDocument,
 } from "./hero.orm"
-import {
-  TemplateCollection,
-  templateCollectionMethods,
-  templateDocMethods,
-} from "./template.orm"
 import {
   CardCollection,
   cardCollectionMethods,
@@ -29,7 +23,6 @@ import {
 
 interface MyDatabaseCollections {
   readonly heroes: HeroCollection
-  readonly templates: TemplateCollection
   readonly cards: CardCollection
   readonly notes: NoteCollection
 }
@@ -66,11 +59,6 @@ export async function createDb(): Promise<MyDatabase> {
       schema: heroSchema,
       methods: heroDocMethods,
       statics: heroCollectionMethods,
-    },
-    templates: {
-      schema: templateSchema,
-      methods: templateDocMethods,
-      statics: templateCollectionMethods,
     },
     cards: {
       schema: cardSchema,
