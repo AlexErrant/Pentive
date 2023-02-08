@@ -4,15 +4,15 @@ import { DbId } from "shared"
 
 export interface Note {
   id: DbId
-  templateId: DbId | null
+  templateId: DbId
   pushId: DbId | null
   pushTemplateId: DbId | null
   push: number | null
   ankiNoteId: number | null
-  created: number | null
-  modified: number | null
-  tags: string | null
-  fieldValues: string | null
+  created: number
+  modified: number
+  tags: string
+  fieldValues: string
 }
 
 export interface Template {

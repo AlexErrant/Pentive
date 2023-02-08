@@ -37,8 +37,7 @@ function entityToDomain(template: TemplateEntity): Template {
     name: template.name,
     created: new Date(template.created),
     modified: new Date(template.modified),
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
-    push: (template.push === 1 ? true : undefined) as true | undefined,
+    push: template.push === 1 ? (true as const) : undefined,
     pushId: (template.pushId ?? undefined) as RemoteTemplateId | undefined,
     fields: JSON.parse(template.fields) as Field[],
     css: template.css,

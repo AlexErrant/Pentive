@@ -1,7 +1,6 @@
 import { addRxPlugin, createRxDatabase, RxDatabase } from "rxdb"
 import { HeroDocType, heroSchema } from "./hero.schema"
 import { cardSchema } from "./card.schema"
-import { noteSchema } from "./note.schema"
 import { RxDBLeaderElectionPlugin } from "rxdb/plugins/leader-election"
 import { getRxStorageDexie } from "rxdb/plugins/dexie"
 import {
@@ -15,16 +14,10 @@ import {
   cardCollectionMethods,
   cardDocMethods,
 } from "./card.orm"
-import {
-  NoteCollection,
-  noteCollectionMethods,
-  noteDocMethods,
-} from "./note.orm"
 
 interface MyDatabaseCollections {
   readonly heroes: HeroCollection
   readonly cards: CardCollection
-  readonly notes: NoteCollection
 }
 
 export type MyDatabase = RxDatabase<MyDatabaseCollections>
@@ -64,11 +57,6 @@ export async function createDb(): Promise<MyDatabase> {
       schema: cardSchema,
       methods: cardDocMethods,
       statics: cardCollectionMethods,
-    },
-    notes: {
-      schema: noteSchema,
-      methods: noteDocMethods,
-      statics: noteCollectionMethods,
     },
   })
 
