@@ -22,8 +22,20 @@ export const initSql = [
     tags TEXT,
     fieldValues TEXT
 ) STRICT;`,
+  `CREATE TABLE IF NOT EXISTS card (
+    id TEXT PRIMARY KEY, -- make BLOB upon SQLite v3.41 and the landing of UNHEX https://sqlite.org/forum/forumpost/30cca4e613d2fa2a grep F235B7FB-8CEA-4AE2-99CC-2790E607B1EB
+    pointer TEXT,
+    noteId TEXT, -- make BLOB upon SQLite v3.41 and the landing of UNHEX https://sqlite.org/forum/forumpost/30cca4e613d2fa2a grep F235B7FB-8CEA-4AE2-99CC-2790E607B1EB
+    deckIds TEXT,
+    created INTEGER,
+    modified INTEGER,
+    cardSettingId TEXT, -- make BLOB upon SQLite v3.41 and the landing of UNHEX https://sqlite.org/forum/forumpost/30cca4e613d2fa2a grep F235B7FB-8CEA-4AE2-99CC-2790E607B1EB
+    due INTEGER,
+    state INTEGER
+) STRICT;`,
   `SELECT crsql_as_crr('template');`,
   `SELECT crsql_as_crr('note');`,
+  `SELECT crsql_as_crr('card');`,
 ]
 
 export const jwtCookieName = "__Secure-jwt"
