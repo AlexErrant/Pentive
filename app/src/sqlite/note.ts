@@ -61,8 +61,6 @@ function entityToDomain(note: NoteEntity): Note {
     fieldValues,
     ankiNoteId: note.ankiNoteId ?? undefined,
   }
-  // @ts-expect-error Unsure why `type` is in `data` - it's not there when inserted. RxDB or PouchDB or something adds it. Removing to make roundtrip testing easier.
-  delete r.type
   if (r.push === undefined) {
     delete r.push
   }
@@ -76,9 +74,6 @@ function entityToDomain(note: NoteEntity): Note {
     delete r.ankiNoteId
   }
   return r
-  // Returning dates are *sometimes* strings.
-  // The first return after a page refresh is a string because IndexedDb can't handle Date and serializes it.
-  // After an upsert, the return is a Date Object because RxDB caches the upserted object... I think.
 }
 
 export const noteCollectionMethods = {

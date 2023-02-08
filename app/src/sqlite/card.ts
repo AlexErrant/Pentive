@@ -111,8 +111,6 @@ function entityToDomain(card: CardEntity): Card {
     state: deserializeState(card.state),
     cardSettingId: card.cardSettingId ?? undefined,
   }
-  // @ts-expect-error Unsure why `type` is in `data` - it's not there when inserted. RxDB or PouchDB or something adds it. Removing to make roundtrip testing easier.
-  delete r.type
   if (r.state === undefined) {
     delete r.state
   }
@@ -120,9 +118,6 @@ function entityToDomain(card: CardEntity): Card {
     delete r.cardSettingId
   }
   return r
-  // Returning dates are *sometimes* strings.
-  // The first return after a page refresh is a string because IndexedDb can't handle Date and serializes it.
-  // After an upsert, the return is a Date Object because RxDB caches the upserted object... I think.
 }
 
 export const cardCollectionMethods = {

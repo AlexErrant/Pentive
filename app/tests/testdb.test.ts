@@ -16,7 +16,7 @@ test.beforeEach(({ page }) => {
   })
 })
 
-test("all rxdb roundtrip tests in /testdb pass", async ({ page }) => {
+test("all sqlite roundtrip tests in /testdb pass", async ({ page }) => {
   await page.goto("/testdb")
   const testStatus = page.locator("#testStatus")
 
