@@ -14,8 +14,7 @@ function noteToDocType(note: Note): InsertObject<DB, "note"> {
     push,
     pushId,
     tags,
-    fields,
-    values,
+    fieldValues,
     templateId,
     ankiNoteId,
     pushTemplateId,
@@ -28,7 +27,7 @@ function noteToDocType(note: Note): InsertObject<DB, "note"> {
     push: push === true ? 1 : 0,
     pushId: pushId ?? null,
     tags: JSON.stringify([...tags]),
-    fieldValues: JSON.stringify(_.fromPairs(_.zip(fields, values))),
+    fieldValues: JSON.stringify(fieldValues),
     ankiNoteId,
     pushTemplateId,
   }
@@ -38,13 +37,12 @@ function domainToCreateRemote({
   id,
   templateId,
   tags,
-  fields,
-  values,
+  fieldValues,
 }: Note): CreateRemoteNote {
   return {
     localId: id,
     templateId,
-    fieldValues: _.fromPairs(_.zip(fields, values)),
+    fieldValues,
     tags: Array.from(tags),
   }
 }
@@ -60,8 +58,7 @@ function entityToDomain(note: NoteEntity): Note {
     pushTemplateId: note.pushTemplateId ?? undefined,
     templateId: note.templateId,
     tags: new Set(JSON.parse(note.tags) as string[]),
-    fields: Object.keys(fieldValues),
-    values: Object.values(fieldValues),
+    fieldValues,
     ankiNoteId: note.ankiNoteId ?? undefined,
   }
   // @ts-expect-error Unsure why `type` is in `data` - it's not there when inserted. RxDB or PouchDB or something adds it. Removing to make roundtrip testing easier.

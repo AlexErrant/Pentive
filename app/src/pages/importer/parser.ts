@@ -24,6 +24,7 @@ import {
   Note as ANote,
   Tmpl,
 } from "./typeChecker"
+import _ from "lodash"
 
 function parseField(fld: Fld): Field {
   return {
@@ -88,14 +89,15 @@ export function parseNote(
   templates: Record<TemplateId, Template>
 ): PNote {
   const templateId = note.mid.toString() as TemplateId // medTODO
+  const fields = templates[templateId].fields.map((f) => f.name)
+  const values = note.flds.split("\x1f")
   return {
     id: note.id.toString() as NoteId, // medTODO
     created: new Date(note.id),
     modified: new Date(note.mod),
     ankiNoteId: note.id,
     templateId,
-    fields: templates[templateId].fields.map((f) => f.name),
-    values: note.flds.split("\x1f"),
+    fieldValues: _.fromPairs(_.zip(fields, values)),
     tags: new Set(note.tags.split(" ")),
   }
 }

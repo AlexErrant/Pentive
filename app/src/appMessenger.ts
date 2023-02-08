@@ -55,10 +55,10 @@ async function renderBody(
       if (card == null) {
         return { body: `Card ${i.cardId} not found!` }
       }
-      const { fields, values } = note
-      const fv = _.zip(fields, values) as ReadonlyArray<
-        readonly [string, string]
-      >
+      const fv = _.zip(
+        Object.keys(note.fieldValues),
+        Object.values(note.fieldValues)
+      ) as ReadonlyArray<readonly [string, string]>
       const { front, back } =
         template.templateType.tag === "standard"
           ? template.templateType.templates.find(
