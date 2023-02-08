@@ -33,9 +33,16 @@ export const initSql = [
     due INTEGER,
     state INTEGER
 ) STRICT;`,
+  `CREATE TABLE IF NOT EXISTS resource (
+    id TEXT PRIMARY KEY, -- make BLOB upon SQLite v3.41 and the landing of UNHEX https://sqlite.org/forum/forumpost/30cca4e613d2fa2a grep F235B7FB-8CEA-4AE2-99CC-2790E607B1EB
+    remoteId TEXT, -- make BLOB upon SQLite v3.41 and the landing of UNHEX https://sqlite.org/forum/forumpost/30cca4e613d2fa2a grep F235B7FB-8CEA-4AE2-99CC-2790E607B1EB
+    created INTEGER,
+    data BLOB
+) STRICT;`,
   `SELECT crsql_as_crr('template');`,
   `SELECT crsql_as_crr('note');`,
   `SELECT crsql_as_crr('card');`,
+  `SELECT crsql_as_crr('resource');`,
 ]
 
 export const jwtCookieName = "__Secure-jwt"
