@@ -9,6 +9,12 @@ import {
 import { Note } from "./note"
 import { Template } from "./template"
 
+export const states = [
+  "normal",
+  "scheduler buried",
+  "user buried",
+  "suspended",
+] as const
 export type State = "normal" | "scheduler buried" | "user buried" | "suspended"
 export type Score = "again" | "hard" | "good" | "easy"
 

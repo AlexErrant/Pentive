@@ -1,10 +1,19 @@
 import { createResource, Resource } from "solid-js"
-import { db } from "../db"
+
+async function sleep(ms: number): Promise<unknown> {
+  return await new Promise((resolve) => setTimeout(resolve, ms))
+}
 
 function HomeData(): Resource<number> {
-  const [age] = createResource(async () => await db.getAge(), {
-    initialValue: 2,
-  })
+  const [age] = createResource(
+    async () => {
+      await sleep(500)
+      return 18
+    },
+    {
+      initialValue: 2,
+    }
+  )
   return age
 }
 

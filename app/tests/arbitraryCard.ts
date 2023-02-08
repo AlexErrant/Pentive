@@ -1,5 +1,5 @@
 import fc from "fast-check"
-import { Card, Review, Score, State } from "../src/domain/card"
+import { Card, Review, Score, states } from "../src/domain/card"
 
 import {
   CardId,
@@ -37,6 +37,6 @@ export const card = recordWithOptionalFields<Card>(
   },
   {
     cardSettingId: fc.uuidV(4).map((x) => x as CardSettingId),
-    state: fc.string().map((x) => x as State), // this will generate "invalid" States, but I intend on this being extensible via plugins anyway, so might as well test every string
+    state: fc.constantFrom(...states),
   }
 )

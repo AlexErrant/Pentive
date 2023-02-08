@@ -12,9 +12,9 @@ export type ClozeIndex = Brand<number, "clozeIndex">
 export type Pointer = ChildTemplateId | ClozeIndex
 export type Side = "front" | "back"
 
-export type CardId = Brand<string, "cardId">
+export type CardId = Brand<string, "cardId" & "base64url">
 export type NoteId = Brand<string, "noteId" & "base64url">
-export type CardSettingId = Brand<string, "cardSettingId">
+export type CardSettingId = Brand<string, "cardSettingId" & "base64url">
 
 export type DeckId = Brand<string, "deckId">
 
