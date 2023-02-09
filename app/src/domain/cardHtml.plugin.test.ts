@@ -1,6 +1,6 @@
 import "../services" // side effect to initialize C
 import { expect, test } from "vitest"
-import { ChildTemplateId } from "./ids"
+import { ChildTemplateId, PluginId } from "./ids"
 import { strip } from "./utility"
 import { Plugin } from "./plugin"
 import { registerPluginServices } from "../plugin-manager"
@@ -36,10 +36,10 @@ function buildPlugin(src: string): Plugin {
     script: new Blob([src], {
       type: "text/javascript",
     }),
-    id: "",
+    id: "16E54590-048C-437C-97A3-ED58F965EA43" as PluginId,
     name: "",
-    created: "",
-    modified: "",
+    created: new Date(),
+    modified: new Date(),
   }
 }
 

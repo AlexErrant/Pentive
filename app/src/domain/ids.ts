@@ -18,4 +18,5 @@ export type CardSettingId = Brand<string, "cardSettingId" & "base64url">
 
 export type DeckId = Brand<string, "deckId">
 
+export type PluginId = Brand<string, "pluginId" & "base64url">
 export type ResourceId = Brand<string, "resourceId">

@@ -36,10 +36,4 @@ export const dexieMethods = {
       return Comlink.transfer(resource, [data])
     }
   },
-  upsertPlugin: async function (plugin: Plugin) {
-    await ddb.plugins.put(plugin)
-  },
-  getPlugins: async function (): Promise<Plugin[]> {
-    return await ddb.plugins.toArray()
-  },
 }
