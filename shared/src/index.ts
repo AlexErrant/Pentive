@@ -39,10 +39,18 @@ export const initSql = [
     created INTEGER,
     data BLOB
 ) STRICT;`,
+  `CREATE TABLE IF NOT EXISTS plugin (
+    id TEXT PRIMARY KEY, -- make BLOB upon SQLite v3.41 and the landing of UNHEX https://sqlite.org/forum/forumpost/30cca4e613d2fa2a grep F235B7FB-8CEA-4AE2-99CC-2790E607B1EB
+    name TEXT,
+    created INTEGER,
+    modified INTEGER,
+    script BLOB
+) STRICT;`,
   `SELECT crsql_as_crr('template');`,
   `SELECT crsql_as_crr('note');`,
   `SELECT crsql_as_crr('card');`,
   `SELECT crsql_as_crr('resource');`,
+  `SELECT crsql_as_crr('plugin');`,
 ]
 
 export const jwtCookieName = "__Secure-jwt"
