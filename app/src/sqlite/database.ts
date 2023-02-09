@@ -2,6 +2,18 @@
 
 import { DbId } from "shared"
 
+export interface Card {
+  id: DbId
+  pointer: string
+  noteId: DbId
+  deckIds: string
+  created: number
+  modified: number
+  cardSettingId: DbId | null
+  due: number
+  state: number | null
+}
+
 export interface Note {
   id: DbId
   templateId: DbId
@@ -13,6 +25,21 @@ export interface Note {
   modified: number
   tags: string
   fieldValues: string
+}
+
+export interface Plugin {
+  id: DbId
+  name: string
+  created: number
+  modified: number
+  script: Uint8Array
+}
+
+export interface Resource {
+  id: DbId
+  remoteId: DbId | null
+  created: number
+  data: Uint8Array
 }
 
 export interface Template {
@@ -28,6 +55,9 @@ export interface Template {
 }
 
 export interface DB {
+  card: Card
   note: Note
+  plugin: Plugin
+  resource: Resource
   template: Template
 }
