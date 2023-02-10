@@ -25,9 +25,12 @@ async function uploadNewTemplates(): Promise<void> {
 }
 
 async function uploadNewNotes(): Promise<void> {
-  const newNotes = await db.getNewNotesToUpload()
+  const { notes, resources } = await db.getNewNotesToUpload()
   const formData = new FormData()
-  formData.append(createRemoteNotesJson, JSON.stringify(newNotes))
+  formData.append(createRemoteNotesJson, JSON.stringify(notes))
+  for (const { id, data } of resources) {
+    formData.append(id, new Blob([data]))
+  }
   const response = await fetch(import.meta.env.VITE_API_URL + "note", {
     method: "POST",
     body: formData,
@@ -180,7 +183,7 @@ export default function Home(): JSX.Element {
       <div class="mt-4">
         <label>
           Upload Resource
-          <input type="file" onchange={uploadResource} accept=".png"></input>
+          <input type="file" onchange={uploadResource} accept="image/*"></input>
         </label>
       </div>
       <div class="mt-4">

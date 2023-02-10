@@ -1,10 +1,11 @@
-import { CreateRemoteNote } from "shared"
-import { NoteId } from "../domain/ids"
+import { CreateRemoteNote, throwExp } from "shared"
+import { NoteId, ResourceId } from "../domain/ids"
 import { Note } from "../domain/note"
 import { getKysely } from "./crsqlite"
 import { DB, Note as NoteEntity } from "./database"
 import { InsertObject } from "kysely"
 import _ from "lodash"
+import { getImgSrcs } from "../domain/utility"
 
 function noteToDocType(note: Note): InsertObject<DB, "note"> {
   const {
@@ -35,13 +36,17 @@ function noteToDocType(note: Note): InsertObject<DB, "note"> {
 
 function domainToCreateRemote({
   id,
-  templateId,
+  pushTemplateId,
   tags,
   fieldValues,
 }: Note): CreateRemoteNote {
   return {
     localId: id,
-    templateId,
+    templateId:
+      pushTemplateId ??
+      throwExp(
+        `Note ${id} is missing a pushTemplateId... is something wrong with the SQL query?`
+      ),
     fieldValues,
     tags: Array.from(tags),
   }
@@ -123,12 +128,22 @@ export const noteCollectionMethods = {
   },
   getNewNotesToUpload: async function () {
     const db = await getKysely()
-    const newNotes = await db
+    const notes = await db
       .selectFrom("note")
       .selectAll()
       .where("push", "=", 1)
       .where("pushId", "is", null)
       .execute()
-    return newNotes.map(entityToDomain).map(domainToCreateRemote)
+      .then((n) => n.map(entityToDomain).map(domainToCreateRemote))
+    const srcs = notes.flatMap((n) =>
+      Object.values(n.fieldValues).flatMap(getImgSrcs)
+    )
+    const resources = await db
+      .selectFrom("resource")
+      .select(["id", "data"])
+      .where("id", "in", srcs)
+      .execute()
+    if (resources.length !== srcs.length) throwExp("You're missing a resource.") // medTODO better error message
+    return { notes, resources }
   },
 }

@@ -20,7 +20,9 @@ export const sampleNote: Note = {
   templateId: "EC2EFBBE-C944-478A-BFC4-023968B38A72" as TemplateId,
   tags: new Set<string>(),
   fieldValues: {
-    front: "foo",
-    back: "bar",
+    front: "Question",
+    back: `Answer <img src="tree.jpg" >`,
   },
+  push: true,
+  pushTemplateId: "9P1IlXnSRviXmwAA8kTMKw" as RemoteTemplateId,
 }
