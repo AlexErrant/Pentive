@@ -25,7 +25,7 @@ async function uploadNewTemplates(): Promise<void> {
 }
 
 async function uploadNewNotes(): Promise<void> {
-  const { notes, resources } = await db.getNewNotesToUpload()
+  const { notes, resources } = await db.prepareAndGetNewNotesToUpload()
   const formData = new FormData()
   formData.append(createRemoteNotesJson, JSON.stringify(notes))
   for (const { id, data } of resources) {

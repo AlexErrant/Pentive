@@ -125,7 +125,7 @@ export const noteCollectionMethods = {
       .execute()
     return allNotes.map(entityToDomain)
   },
-  getNewNotesToUpload: async function () {
+  prepareAndGetNewNotesToUpload: async function () {
     const db = await getKysely()
     const dp = new DOMParser()
     const notesAndStuff = await db
@@ -149,6 +149,17 @@ export const noteCollectionMethods = {
       .where("id", "in", srcs)
       .execute()
     if (resources.length !== srcs.length) throwExp("You're missing a resource.") // medTODO better error message
+    for (const { note, localMediaIdByRemoteMediaId } of notesAndStuff) {
+      await db // lowTODO optimize - use prepared statement?
+        .updateTable("note")
+        .set({
+          pushMedia: JSON.stringify(
+            Object.fromEntries(localMediaIdByRemoteMediaId)
+          ),
+        })
+        .where("id", "=", note.localId)
+        .execute()
+    }
     return { resources, notes: notesAndStuff.map((n) => n.note) }
   },
 }

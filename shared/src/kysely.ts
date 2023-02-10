@@ -1,7 +1,7 @@
 import { Kysely, sql, InsertResult, RawBuilder, InsertObject } from "kysely"
 import { PlanetScaleDialect } from "kysely-planetscale"
 import { DB } from "./database.js"
-import { Base64, Base64Url, DbId, Hex, TemplateId } from "./brand.js"
+import { Base64, Base64Url, DbId, Hex, NoteId, TemplateId } from "./brand.js"
 import { binary16fromBase64URL, ulidAsHex } from "./convertBinary.js"
 import { undefinedMap } from "./utility.js"
 import { base16, base64url } from "@scure/base"
@@ -81,7 +81,7 @@ export async function insertPost({
 }
 
 export const createRemoteNote = z.object({
-  localId: z.string(),
+  localId: z.string() as unknown as z.Schema<NoteId>,
   templateId: z
     .string()
     .regex(/^[a-zA-Z0-9_-]{22}$/) as unknown as z.Schema<TemplateId>,

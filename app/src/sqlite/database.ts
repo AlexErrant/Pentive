@@ -20,6 +20,7 @@ export interface Note {
   templateId: DbId
   pushId: DbId | null
   pushTemplateId: DbId | null
+  pushMedia: string | null
   push: number | null
   ankiNoteId: number | null
   created: number

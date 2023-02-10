@@ -6,14 +6,13 @@ export type RemoteTemplateId = Brand<string, "remoteTemplateId" & "base64url">
 export type RemoteCardId = Brand<string, "remoteCardId" & "base64url">
 export type RemoteResourceId = Brand<string, "remoteResourceId">
 
-export { TemplateId } from "shared"
+export { TemplateId, NoteId } from "shared"
 export type ChildTemplateId = Brand<string, "childTemplateId">
 export type ClozeIndex = Brand<number, "clozeIndex">
 export type Pointer = ChildTemplateId | ClozeIndex
 export type Side = "front" | "back"
 
 export type CardId = Brand<string, "cardId" & "base64url">
-export type NoteId = Brand<string, "noteId" & "base64url">
 export type CardSettingId = Brand<string, "cardSettingId" & "base64url">
 
 export type DeckId = Brand<string, "deckId">
