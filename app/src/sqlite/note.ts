@@ -1,4 +1,4 @@
-import { CreateRemoteNote, throwExp } from "shared"
+import { CreateRemoteNote, nullMap, throwExp } from "shared"
 import { NoteId, ResourceId } from "../domain/ids"
 import { Note } from "../domain/note"
 import { getKysely } from "./crsqlite"
@@ -64,6 +64,9 @@ function entityToDomain(note: NoteEntity): Note {
     tags: new Set(JSON.parse(note.tags) as string[]),
     fieldValues,
     ankiNoteId: note.ankiNoteId ?? undefined,
+    pushMedia:
+      nullMap(note.pushMedia, (x) => JSON.parse(x) as Record<string, string>) ??
+      undefined,
   }
   if (r.push === undefined) {
     delete r.push

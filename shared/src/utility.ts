@@ -13,6 +13,13 @@ export function undefinedMap<T, R>(
   return f(t)
 }
 
+export function nullMap<T, R>(t: T | null, f: (_: T) => R): R | null {
+  if (t === null) {
+    return t as null
+  }
+  return f(t)
+}
+
 // https://stackoverflow.com/a/65666402
 export function throwExp(errorMessage: string): never {
   throw new Error(errorMessage)
