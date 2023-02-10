@@ -5,7 +5,6 @@ import { getKysely } from "./crsqlite"
 import { DB, Note as NoteEntity } from "./database"
 import { InsertObject } from "kysely"
 import _ from "lodash"
-import { getImgSrcs } from "../domain/utility"
 
 function noteToDocType(note: Note): InsertObject<DB, "note"> {
   const {
@@ -128,15 +127,21 @@ export const noteCollectionMethods = {
   },
   getNewNotesToUpload: async function () {
     const db = await getKysely()
-    const notes = await db
+    const dp = new DOMParser()
+    const notesAndStuff = await db
       .selectFrom("note")
       .selectAll()
       .where("push", "=", 1)
       .where("pushId", "is", null)
       .execute()
-      .then((n) => n.map(entityToDomain).map(domainToCreateRemote))
-    const srcs = notes.flatMap((n) =>
-      Object.values(n.fieldValues).flatMap(getImgSrcs)
+      .then((n) =>
+        n
+          .map(entityToDomain)
+          .map(domainToCreateRemote)
+          .map((n) => withLocalMediaIdByRemoteMediaId(dp, n))
+      )
+    const srcs = notesAndStuff.flatMap((n) =>
+      Array.from(n.localMediaIdByRemoteMediaId.values())
     )
     const resources = await db
       .selectFrom("resource")
@@ -144,6 +149,37 @@ export const noteCollectionMethods = {
       .where("id", "in", srcs)
       .execute()
     if (resources.length !== srcs.length) throwExp("You're missing a resource.") // medTODO better error message
-    return { notes, resources }
+    return { resources, notes: notesAndStuff.map((n) => n.note) }
   },
+}
+
+function withLocalMediaIdByRemoteMediaId(
+  dp: DOMParser,
+  note: CreateRemoteNote
+): {
+  note: CreateRemoteNote
+  localMediaIdByRemoteMediaId: Map<number, ResourceId>
+} {
+  let i = 0
+  const localMediaIdByRemoteMediaId = new Map<number, ResourceId>()
+  const fieldValues = new Map<string, string>()
+  for (const field in note.fieldValues) {
+    const doc = dp.parseFromString(note.fieldValues[field], "text/html")
+    for (const image of doc.images) {
+      const src = image.getAttribute("src")
+      if (src != null) {
+        image.setAttribute("src", i.toString())
+        localMediaIdByRemoteMediaId.set(i, src as ResourceId)
+        i++
+      }
+    }
+    fieldValues.set(field, doc.body.innerHTML)
+  }
+  return {
+    note: {
+      ...note,
+      fieldValues: Object.fromEntries(fieldValues),
+    },
+    localMediaIdByRemoteMediaId,
+  }
 }
