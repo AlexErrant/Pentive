@@ -58,7 +58,7 @@ importers:
       stylelint: ^14.9.1
       stylelint-config-prettier: ^9.0.3
       stylelint-config-standard: ^26.0.0
-      superjson: ^1.10.1
+      superjson: ^1.12.2
       tailwindcss: ^3.1.6
       typescript: ^4.7.4
       uuid: ^9.0.0
@@ -93,7 +93,7 @@ importers:
       solid-element: 1.5.4_solid-js@1.5.4
       solid-js: 1.5.4
       sql.js: 1.8.0
-      superjson: 1.10.1
+      superjson: 1.12.2
       uuid: 9.0.0
       zod: 3.19.1
     devDependencies:
@@ -318,7 +318,7 @@ importers:
       serverless-offline: ^10.2.1
       serverless-plugin-typescript: ^2.1.2
       shared: workspace:*
-      superjson: ^1.10.1
+      superjson: ^1.12.2
       ts-node: ^10.9.1
       typescript: ^4.7.4
       uuid: ^9.0.0
@@ -337,7 +337,7 @@ importers:
       lodash: 4.17.21
       node-fetch: 2.6.7
       shared: link:../shared
-      superjson: 1.10.1
+      superjson: 1.12.2
       uuid: 9.0.0
       zod: 3.19.1
     devDependencies:
@@ -11799,8 +11799,8 @@ packages:
       - supports-color
     dev: true
 
-  /superjson/1.10.1:
-    resolution: {integrity: sha512-7fvPVDHmkTKg6641B9c6vr6Zz5CwPtF9j0XFExeLxJxrMaeLU2sqebY3/yrI3l0K5zJ+H9QA3H+lIYj5ooCOkg==}
+  /superjson/1.12.2:
+    resolution: {integrity: sha512-ugvUo9/WmvWOjstornQhsN/sR9mnGtWGYeTxFuqLb4AiT4QdUavjGFRALCPKWWnAiUJ4HTpytj5e0t5HoMRkXg==}
     engines: {node: '>=10'}
     dependencies:
       copy-anything: 3.0.2
