@@ -15,11 +15,13 @@ const convert = compile({})
 let db: Kysely<DB> = null as Kysely<DB>
 
 export function setKysely(url: string): void {
-  db = new Kysely<DB>({
-    dialect: new PlanetScaleDialect({
-      url,
-    }),
-  })
+  if (db == null) {
+    db = new Kysely<DB>({
+      dialect: new PlanetScaleDialect({
+        url,
+      }),
+    })
+  }
 }
 
 export async function getPosts({ nook }: { nook: string }): Promise<
