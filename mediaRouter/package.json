@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "@planetscale/database": "^1.5.0",
-    "hono": "^2.6.2",
+    "hono": "^2.7.7",
     "jose": "^4.11.1",
     "shared": "workspace:*",
     "zod": "^3.19.1"

@@ -360,7 +360,7 @@ importers:
     specifiers:
       '@cloudflare/workers-types': ^4.20221111.1
       '@planetscale/database': ^1.5.0
-      hono: ^2.6.2
+      hono: ^2.7.7
       jose: ^4.11.1
       shared: workspace:*
       typescript: ^4.9.4
@@ -368,7 +368,7 @@ importers:
       zod: ^3.19.1
     dependencies:
       '@planetscale/database': 1.5.0
-      hono: 2.6.2
+      hono: 2.7.7
       jose: 4.11.1
       shared: link:../shared
       zod: 3.19.1
@@ -7722,8 +7722,8 @@ packages:
     engines: {node: '>=8'}
     dev: true
 
-  /hono/2.6.2:
-    resolution: {integrity: sha512-Y4Uv6dPPx6u7TNoWN245tLw8jycBf97w0FJGJoEMdgdBqQEv1dqIvg5IfDhiYMkimSIt4SXxmMgiyPf2wzwFWQ==}
+  /hono/2.7.7:
+    resolution: {integrity: sha512-oPzXxqKlR6S7C2eErGa2EATglVUkcDuSlDVudafEjAik+ERYnLz1M9vkvgLjy3HISF1oXlA1ZFamzA99tkzJSg==}
     engines: {node: '>=16.0.0'}
     dev: false
 
