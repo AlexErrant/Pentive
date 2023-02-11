@@ -361,7 +361,6 @@ importers:
   mediaRouter:
     specifiers:
       '@cloudflare/workers-types': ^4.20221111.1
-      '@hono/trpc-server': ^0.0.1
       '@planetscale/database': ^1.5.0
       '@trpc/server': ^10.11.0
       hono: ^2.7.7
@@ -372,7 +371,6 @@ importers:
       wrangler: 2.6.2
       zod: ^3.19.1
     dependencies:
-      '@hono/trpc-server': 0.0.1_xtearurvg2iji7ydb6zu3rxzj4
       '@planetscale/database': 1.5.0
       '@trpc/server': 10.11.0
       hono: 2.7.7
@@ -2403,17 +2401,6 @@ packages:
       '@hapi/bourne': 2.1.0
       '@hapi/hoek': 9.3.0
     dev: true
-
-  /@hono/trpc-server/0.0.1_xtearurvg2iji7ydb6zu3rxzj4:
-    resolution: {integrity: sha512-CAnZe6cq69PUrHXr1OL2EHiybeHaV6l0zK6osxxbj+FeddoYpc/gmgqVwmr5T9HVncU3j941lKoPJnriNUO/Wg==}
-    engines: {node: '>=16.0.0'}
-    peerDependencies:
-      '@trpc/server': ^10.10.0
-      hono: ^2.7.5
-    dependencies:
-      '@trpc/server': 10.11.0
-      hono: 2.7.7
-    dev: false
 
   /@humanwhocodes/config-array/0.10.4:
     resolution: {integrity: sha512-mXAIHxZT3Vcpg83opl1wGlVZ9xydbfZO3r5YfRSH6Gpp2J/PfdBP0wbDa2sO6/qRbcalpoevVyW6A/fI6LfeMw==}

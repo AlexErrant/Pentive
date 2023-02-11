@@ -36,7 +36,6 @@ import {
   getMediaId,
   TokenSecretBase64,
 } from "../privateToken"
-import { trpcServer } from "@hono/trpc-server"
 import { appRouter } from "./router"
 import { fetchRequestHandler } from "@trpc/server/adapters/fetch"
 import { createContext } from "./trpc"
