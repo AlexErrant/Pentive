@@ -11,8 +11,8 @@ importers:
       '@github/time-elements': ^3.1.4
       '@playwright/test': ^1.25.0
       '@tanstack/solid-table': ^8.5.11
-      '@trpc/client': ^10.2.0
-      '@trpc/server': ^10.2.0
+      '@trpc/client': ^10.11.0
+      '@trpc/server': ^10.11.0
       '@types/iframe-resizer': ^3.5.9
       '@types/lodash': ^4.14.182
       '@types/node': ^18.7.21
@@ -72,8 +72,8 @@ importers:
     dependencies:
       '@github/time-elements': 3.1.4
       '@tanstack/solid-table': 8.5.13_solid-js@1.5.4
-      '@trpc/client': 10.2.0_@trpc+server@10.2.0
-      '@trpc/server': 10.2.0
+      '@trpc/client': 10.11.0_@trpc+server@10.11.0
+      '@trpc/server': 10.11.0
       '@vlcn.io/wa-crsqlite': 0.7.1
       '@zip.js/zip.js': 2.6.41
       ag-grid-community: 28.2.0
@@ -294,8 +294,8 @@ importers:
   lrpc:
     specifiers:
       '@prisma/client': ^4.6.1
-      '@trpc/client': ^10.2.0
-      '@trpc/server': ^10.2.0
+      '@trpc/client': ^10.11.0
+      '@trpc/server': ^10.11.0
       '@types/aws-lambda': ^8.10.106
       '@types/cookie': ^0.5.1
       '@types/html-to-text': ^8.1.1
@@ -325,8 +325,8 @@ importers:
       zod: ^3.19.1
     dependencies:
       '@prisma/client': 4.6.1_prisma@4.6.1
-      '@trpc/client': 10.2.0_@trpc+server@10.2.0
-      '@trpc/server': 10.2.0
+      '@trpc/client': 10.11.0_@trpc+server@10.11.0
+      '@trpc/server': 10.11.0
       '@vlcn.io/crsqlite-allinone': 0.6.0
       aws-lambda: 1.0.7
       cookie: 0.5.0
@@ -3463,16 +3463,16 @@ packages:
     engines: {node: '>= 10'}
     dev: true
 
-  /@trpc/client/10.2.0_@trpc+server@10.2.0:
-    resolution: {integrity: sha512-Mehf6euqMzAak+Umay1LKol9nC716yBjHNqrF6blWY/n2hwSICrLXQwveNaHK7qjKXJ86b4aDW39KR02WCQP4A==}
+  /@trpc/client/10.11.0_@trpc+server@10.11.0:
+    resolution: {integrity: sha512-GdSfyJxYI3Z9zyz2fEdJBGWLzqrpaonRtG1BtYLR5/63/eaW3/weA3JcEl2H3/CvqSNZfptNMZqLmaZyChTxdg==}
     peerDependencies:
-      '@trpc/server': 10.2.0
+      '@trpc/server': 10.11.0
     dependencies:
-      '@trpc/server': 10.2.0
+      '@trpc/server': 10.11.0
     dev: false
 
-  /@trpc/server/10.2.0:
-    resolution: {integrity: sha512-WGOA2bk6JOnOywUu1gkAgwqnxZ5g+vNkL9EpCGLgKYwwMcjAwgNRgYzLPsDsR1XL48wmdYOzfWzJ0G575+g/jA==}
+  /@trpc/server/10.11.0:
+    resolution: {integrity: sha512-alV96Bjpa3bPgF+LZkJeQtrUJP/BM5EVpsB8S755RA3xtbudMw/lvLJFep8L/xTRw1HFZ7r4uRD31dKLOrMpaA==}
     dev: false
 
   /@tsconfig/node10/1.0.9:
