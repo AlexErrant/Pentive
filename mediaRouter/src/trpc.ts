@@ -1,39 +1,14 @@
 import { initTRPC, TRPCError } from "@trpc/server"
-import { FetchCreateContextFnOptions } from "@trpc/server/adapters/fetch"
 import superjson from "superjson"
-import { parse } from "hono/utils/cookie"
-import { csrfHeaderName, jwtCookieName } from "shared"
-import { jwtVerify } from "jose"
-import { getJwsSecret } from "./env"
+import { Result, UserId } from "./util"
 
 interface Context {
-  user: string | undefined
+  user: UserId | undefined
 }
 
-export async function createContext(
-  jwsSecret: string,
-  x: FetchCreateContextFnOptions
-): Promise<Context> {
-  const user = await getUser(x.req.headers, jwsSecret)
+export function createContext(userId: Result<UserId, Response>): Context {
+  const user = userId.tag === "Ok" ? userId.ok : undefined
   return { user }
-}
-
-async function getUser(
-  headers: Headers,
-  jwsSecret: string
-): Promise<string | undefined> {
-  const rawCookie = headers.get("cookie")
-  if (rawCookie != null) {
-    const cookie = parse(rawCookie)
-    const jwtCookie = cookie[jwtCookieName]
-    if (headers.get(csrfHeaderName) != null) {
-      try {
-        const jwt = await jwtVerify(jwtCookie, getJwsSecret(jwsSecret))
-        return jwt.payload.sub
-      } catch {}
-    }
-  }
-  return undefined
 }
 
 // We export only the functionality that we use so we can enforce which base procedures should be used

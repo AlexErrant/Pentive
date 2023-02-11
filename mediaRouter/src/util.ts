@@ -1,6 +1,6 @@
 import { Context } from "hono"
 import { jwtVerify, JWTVerifyResult } from "jose"
-import { Brand, jwtCookieName } from "shared"
+import { Brand, csrfHeaderName, jwtCookieName } from "shared"
 import { getJwsSecret } from "./env"
 import { TokenSecretBase64 } from "./privateToken"
 
@@ -67,16 +67,20 @@ export interface Env {
 export async function getUserId(
   c: MediaRouterContext
 ): Promise<Result<UserId, Response>> {
+  // https://github.com/honojs/hono/pull/884
+  if (c.req.header(csrfHeaderName) == null) {
+    return toError(c.text(`Missing '${csrfHeaderName}' header`, 401))
+  }
   const jwt = c.req.cookie(jwtCookieName)
   if (jwt == null) {
-    return toError(c.text(`Missing '${jwtCookieName}' cookie`, 401))
+    return toError(c.text(`Missing '${jwtCookieName}' cookie.`, 401))
   } else {
     let verifyResult: JWTVerifyResult
     try {
       verifyResult = await jwtVerify(jwt, getJwsSecret(c.env.jwsSecret))
     } catch {
       return toError(
-        c.text("Failed to verify JWT in `Authorization` header.", 401)
+        c.text(`Failed to verify JWT in '${jwtCookieName}' cookie.`, 401)
       )
     }
     if (verifyResult.payload.sub == null) {

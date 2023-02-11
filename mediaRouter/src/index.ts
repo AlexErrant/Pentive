@@ -54,16 +54,15 @@ app
       exposeHeaders: [],
     })(c, next)
   })
-  .use(
-    "/trpc/*",
-    async (c) =>
-      await fetchRequestHandler({
-        endpoint: "/trpc",
-        req: c.req,
-        router: appRouter,
-        createContext: async (x) => await createContext(c.env.jwsSecret, x),
-      })
-  )
+  .use("/trpc/*", async (c) => {
+    const userId = await getUserId(c)
+    return await fetchRequestHandler({
+      endpoint: "/trpc",
+      req: c.req,
+      router: appRouter,
+      createContext: () => createContext(userId),
+    })
+  })
   .get("/", (c) => c.text("Hono!!"))
   .get("/testJws", async (c) => {
     const jwsSecretBytes = getJwsSecret(c.env.jwsSecret)
