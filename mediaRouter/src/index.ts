@@ -10,7 +10,7 @@
 
 import { Context, Hono } from "hono"
 import { cors } from "hono/cors"
-import { Result, toOk, toError, UserId, MediaId } from "../util"
+import { Result, toOk, toError, UserId, MediaId } from "./util"
 
 import {
   hstsName,
@@ -34,7 +34,7 @@ import {
   buildPrivateToken,
   getMediaId,
   TokenSecretBase64,
-} from "../privateToken"
+} from "./privateToken"
 import { appRouter } from "./router"
 import { fetchRequestHandler } from "@trpc/server/adapters/fetch"
 import { createContext } from "./trpc"
