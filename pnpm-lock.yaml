@@ -359,18 +359,24 @@ importers:
   mediaRouter:
     specifiers:
       '@cloudflare/workers-types': ^4.20221111.1
+      '@hono/trpc-server': ^0.0.1
       '@planetscale/database': ^1.5.0
+      '@trpc/server': ^10.11.0
       hono: ^2.7.7
       jose: ^4.11.1
       shared: workspace:*
+      superjson: ^1.12.2
       typescript: ^4.9.4
       wrangler: 2.6.2
       zod: ^3.19.1
     dependencies:
+      '@hono/trpc-server': 0.0.1_xtearurvg2iji7ydb6zu3rxzj4
       '@planetscale/database': 1.5.0
+      '@trpc/server': 10.11.0
       hono: 2.7.7
       jose: 4.11.1
       shared: link:../shared
+      superjson: 1.12.2
       zod: 3.19.1
     devDependencies:
       '@cloudflare/workers-types': 4.20221111.1
@@ -2395,6 +2401,17 @@ packages:
       '@hapi/bourne': 2.1.0
       '@hapi/hoek': 9.3.0
     dev: true
+
+  /@hono/trpc-server/0.0.1_xtearurvg2iji7ydb6zu3rxzj4:
+    resolution: {integrity: sha512-CAnZe6cq69PUrHXr1OL2EHiybeHaV6l0zK6osxxbj+FeddoYpc/gmgqVwmr5T9HVncU3j941lKoPJnriNUO/Wg==}
+    engines: {node: '>=16.0.0'}
+    peerDependencies:
+      '@trpc/server': ^10.10.0
+      hono: ^2.7.5
+    dependencies:
+      '@trpc/server': 10.11.0
+      hono: 2.7.7
+    dev: false
 
   /@humanwhocodes/config-array/0.10.4:
     resolution: {integrity: sha512-mXAIHxZT3Vcpg83opl1wGlVZ9xydbfZO3r5YfRSH6Gpp2J/PfdBP0wbDa2sO6/qRbcalpoevVyW6A/fI6LfeMw==}
@@ -5126,7 +5143,7 @@ packages:
     resolution: {integrity: sha512-CzATjGXzUQ0EvuvgOCI6A4BGOo2bcVx8B+eC2nF862iv9fopnPQwlrbACakNCHRIJbCSBj+J/9JeDf60k64MkA==}
     engines: {node: '>=12.13'}
     dependencies:
-      is-what: 4.1.7
+      is-what: 4.1.8
     dev: false
 
   /core-js-compat/3.25.5:
@@ -8201,6 +8218,7 @@ packages:
   /is-what/4.1.7:
     resolution: {integrity: sha512-DBVOQNiPKnGMxRMLIYSwERAS5MVY1B7xYiGnpgctsOFvVDz9f9PFXXxMcTOHuoqYp4NK9qFYQaIC1NRRxLMpBQ==}
     engines: {node: '>=12.13'}
+    dev: true
 
   /is-what/4.1.8:
     resolution: {integrity: sha512-yq8gMao5upkPoGEU9LsB2P+K3Kt8Q3fQFCGyNCWOAnJAMzEXVV9drYb0TXr42TTliLLhKIBvulgAXgtLLnwzGA==}
