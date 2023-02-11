@@ -12,9 +12,7 @@ export const lrpc = createTRPCProxyClient<AppRouter>({
       },
       async fetch(url, options) {
         return await fetch(url, {
-          body: options?.body, // nextTODO revert upon resolution of https://github.com/trpc/trpc/issues/3734
-          headers: options?.headers,
-          method: options?.method,
+          ...options,
           credentials: "include",
         })
       },
