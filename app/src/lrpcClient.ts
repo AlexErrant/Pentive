@@ -1,5 +1,6 @@
 import { createTRPCProxyClient, httpBatchLink } from "@trpc/client"
 import { AppRouter } from "lrpc/src/appRouter"
+import { csrfHeaderName } from "shared"
 import superjson from "superjson"
 
 export const lrpc = createTRPCProxyClient<AppRouter>({
@@ -7,7 +8,7 @@ export const lrpc = createTRPCProxyClient<AppRouter>({
     httpBatchLink({
       url: "https://lrpc.local.pentive.com:4050",
       headers: {
-        csrfHeaderName: "",
+        [csrfHeaderName]: "",
       },
       async fetch(url, options) {
         return await fetch(url, {
