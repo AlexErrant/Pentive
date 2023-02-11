@@ -18,6 +18,7 @@ iframes
 immer
 kysely
 lrpc
+mediarouter
 miniflare
 mkcert
 msedge

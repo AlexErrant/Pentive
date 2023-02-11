@@ -9,6 +9,7 @@ import { lrpc } from "../lrpcClient"
 import { importAnki } from "./importer/importer"
 import { createRemoteNotesJson, throwExp } from "shared"
 import { ResourceId } from "../domain/ids"
+import { apiClient } from "../apiClient"
 
 async function uploadNewTemplates(): Promise<void> {
   const id = await lrpc.addTemplate.mutate({
@@ -98,6 +99,14 @@ export default function Home(): JSX.Element {
           onClick={async () => await db.sync()}
         >
           sync
+        </button>
+        <button
+          class="border rounded-lg px-2 border-gray-900"
+          onClick={async () => {
+            console.log(await apiClient.hello.query("Harrowhark"))
+          }}
+        >
+          Hello tRPC
         </button>
       </div>
       <div class="mt-4">

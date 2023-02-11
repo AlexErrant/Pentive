@@ -36,6 +36,8 @@ import {
   getMediaId,
   TokenSecretBase64,
 } from "../privateToken"
+import { trpcServer } from "@hono/trpc-server"
+import { appRouter } from "./router"
 
 type MediaRouterContext = Context<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -103,6 +105,12 @@ app
       exposeHeaders: [],
     })(c, next)
   })
+  .use(
+    "/trpc/*",
+    trpcServer({
+      router: appRouter,
+    })
+  )
   .get("/", (c) => c.text("Hono!!"))
   .get("/testJws", async (c) => {
     const jwsSecretBytes = base64ToArray(c.env.jwsSecret)
