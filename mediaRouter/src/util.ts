@@ -1,4 +1,8 @@
-import { Brand } from "shared"
+import { Context } from "hono"
+import { jwtVerify, JWTVerifyResult } from "jose"
+import { Brand, jwtCookieName } from "shared"
+import { getJwsSecret } from "./env"
+import { TokenSecretBase64 } from "./privateToken"
 
 export type Result<TOk, TError> =
   | {
@@ -34,3 +38,51 @@ export function concat(a1: Uint8Array, a2: ArrayBuffer): Uint8Array {
 
 export type MediaId = Brand<Uint8Array, "mediaId">
 export type UserId = Brand<string, "userId">
+
+export type MediaRouterContext = Context<
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  any,
+  {
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    Bindings: Env
+  },
+  unknown
+>
+
+export interface Env {
+  // Example binding to KV. Learn more at https://developers.cloudflare.com/workers/runtime-apis/kv/
+  // MY_KV_NAMESPACE: KVNamespace;
+  //
+  // Example binding to Durable Object. Learn more at https://developers.cloudflare.com/workers/runtime-apis/durable-objects/
+  // MY_DURABLE_OBJECT: DurableObjectNamespace;
+  //
+  // Example binding to R2. Learn more at https://developers.cloudflare.com/workers/runtime-apis/r2/
+  mediaBucket: R2Bucket
+  jwsSecret: string
+  tokenSecret: TokenSecretBase64
+  planetscaleDbUrl: string
+  appOrigin: string
+}
+
+export async function getUserId(
+  c: MediaRouterContext
+): Promise<Result<UserId, Response>> {
+  const jwt = c.req.cookie(jwtCookieName)
+  if (jwt == null) {
+    return toError(c.text(`Missing '${jwtCookieName}' cookie`, 401))
+  } else {
+    let verifyResult: JWTVerifyResult
+    try {
+      verifyResult = await jwtVerify(jwt, getJwsSecret(c.env.jwsSecret))
+    } catch {
+      return toError(
+        c.text("Failed to verify JWT in `Authorization` header.", 401)
+      )
+    }
+    if (verifyResult.payload.sub == null) {
+      return toError(c.text("There's no sub claim, ya goof.", 401))
+    } else {
+      return toOk(verifyResult.payload.sub as UserId)
+    }
+  }
+}

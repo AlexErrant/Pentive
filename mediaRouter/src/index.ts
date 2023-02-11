@@ -8,9 +8,9 @@
  * Learn more at https://developers.cloudflare.com/workers/
  */
 
-import { Context, Hono } from "hono"
+import { Hono } from "hono"
 import { cors } from "hono/cors"
-import { Result, toOk, toError, UserId, MediaId } from "./util"
+import { Env, getUserId, MediaId, MediaRouterContext } from "./util"
 
 import {
   hstsName,
@@ -22,71 +22,19 @@ import {
   createRemoteNote,
   insertNotes,
   setKysely,
-  jwtCookieName,
   createRemoteNotesJson,
 } from "shared"
 
 import z from "zod"
-import { SignJWT, jwtVerify, JWTVerifyResult } from "jose"
+import { SignJWT, jwtVerify } from "jose"
 
 import { connect, Transaction } from "@planetscale/database"
-import {
-  buildPrivateToken,
-  getMediaId,
-  TokenSecretBase64,
-} from "./privateToken"
+import { buildPrivateToken, getMediaId } from "./privateToken"
 import { appRouter } from "./router"
 import { fetchRequestHandler } from "@trpc/server/adapters/fetch"
 import { createContext } from "./trpc"
 import { getJwsSecret } from "./env"
 
-type MediaRouterContext = Context<
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  any,
-  {
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    Bindings: Env
-  },
-  unknown
->
-
-async function getUserId(
-  c: MediaRouterContext
-): Promise<Result<UserId, Response>> {
-  const jwt = c.req.cookie(jwtCookieName)
-  if (jwt == null) {
-    return toError(c.text(`Missing '${jwtCookieName}' cookie`, 401))
-  } else {
-    let verifyResult: JWTVerifyResult
-    try {
-      verifyResult = await jwtVerify(jwt, getJwsSecret(c.env.jwsSecret))
-    } catch {
-      return toError(
-        c.text("Failed to verify JWT in `Authorization` header.", 401)
-      )
-    }
-    if (verifyResult.payload.sub == null) {
-      return toError(c.text("There's no sub claim, ya goof.", 401))
-    } else {
-      return toOk(verifyResult.payload.sub as UserId)
-    }
-  }
-}
-
-export interface Env {
-  // Example binding to KV. Learn more at https://developers.cloudflare.com/workers/runtime-apis/kv/
-  // MY_KV_NAMESPACE: KVNamespace;
-  //
-  // Example binding to Durable Object. Learn more at https://developers.cloudflare.com/workers/runtime-apis/durable-objects/
-  // MY_DURABLE_OBJECT: DurableObjectNamespace;
-  //
-  // Example binding to R2. Learn more at https://developers.cloudflare.com/workers/runtime-apis/r2/
-  mediaBucket: R2Bucket
-  jwsSecret: string
-  tokenSecret: TokenSecretBase64
-  planetscaleDbUrl: string
-  appOrigin: string
-}
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const app = new Hono<{ Bindings: Env }>()
 const alg = "HS256"
