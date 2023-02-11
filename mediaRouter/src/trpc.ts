@@ -2,8 +2,9 @@ import { initTRPC, TRPCError } from "@trpc/server"
 import { FetchCreateContextFnOptions } from "@trpc/server/adapters/fetch"
 import superjson from "superjson"
 import { parse } from "hono/utils/cookie"
-import { base64ToArray, csrfHeaderName, jwtCookieName } from "shared"
+import { csrfHeaderName, jwtCookieName } from "shared"
 import { jwtVerify } from "jose"
+import { getJwsSecret } from "./env"
 
 interface Context {
   user: string | undefined
@@ -27,7 +28,7 @@ async function getUser(
     const jwtCookie = cookie[jwtCookieName]
     if (headers.get(csrfHeaderName) != null) {
       try {
-        const jwt = await jwtVerify(jwtCookie, base64ToArray(jwsSecret))
+        const jwt = await jwtVerify(jwtCookie, getJwsSecret(jwsSecret))
         return jwt.payload.sub
       } catch {}
     }

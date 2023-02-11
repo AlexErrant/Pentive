@@ -13,7 +13,6 @@ import { cors } from "hono/cors"
 import { Result, toOk, toError, UserId, MediaId } from "../util"
 
 import {
-  base64ToArray,
   hstsName,
   hstsValue,
   base64,
@@ -39,6 +38,7 @@ import {
 import { appRouter } from "./router"
 import { fetchRequestHandler } from "@trpc/server/adapters/fetch"
 import { createContext } from "./trpc"
+import { getJwsSecret } from "./env"
 
 type MediaRouterContext = Context<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -59,7 +59,7 @@ async function getUserId(
   } else {
     let verifyResult: JWTVerifyResult
     try {
-      verifyResult = await jwtVerify(jwt, base64ToArray(c.env.jwsSecret))
+      verifyResult = await jwtVerify(jwt, getJwsSecret(c.env.jwsSecret))
     } catch {
       return toError(
         c.text("Failed to verify JWT in `Authorization` header.", 401)
@@ -118,7 +118,7 @@ app
   )
   .get("/", (c) => c.text("Hono!!"))
   .get("/testJws", async (c) => {
-    const jwsSecretBytes = base64ToArray(c.env.jwsSecret)
+    const jwsSecretBytes = getJwsSecret(c.env.jwsSecret)
     const jwt = await new SignJWT({})
       .setProtectedHeader({ alg })
       .setSubject("someUserName")
@@ -153,7 +153,7 @@ app
       // .setIssuer("urn:example:issuer")
       // .setAudience("urn:example:audience")
       // .setExpirationTime("2h")
-      .sign(base64ToArray(c.env.jwsSecret))
+      .sign(getJwsSecret(c.env.jwsSecret))
     console.log("jwt:", jwt)
     return c.body(null)
   })
