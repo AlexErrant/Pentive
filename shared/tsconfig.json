@@ -3,7 +3,7 @@
     "strict": true,
     "target": "ES2021",
     "module": "ESNext",
-    "moduleResolution": "node",
+    "moduleResolution": "node16",
     "types": [
       "@cloudflare/workers-types",
     ],
