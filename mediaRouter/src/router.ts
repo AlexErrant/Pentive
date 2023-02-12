@@ -1,6 +1,6 @@
 import { createRemoteNote, insertNotes } from "shared"
 import { z } from "zod"
-import { authedProcedure, publicProcedure, router } from "./trpc"
+import { authedProcedure, publicProcedure, router } from "./trpc.js"
 
 export const appRouter = router({
   hello: publicProcedure.input(z.string().nullish()).query(({ input }) => {

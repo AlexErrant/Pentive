@@ -1,8 +1,8 @@
 import { Context } from "hono"
 import { jwtVerify, JWTVerifyResult } from "jose"
 import { Brand, csrfHeaderName, jwtCookieName } from "shared"
-import { getJwsSecret } from "./env"
-import { TokenSecretBase64 } from "./privateToken"
+import { getJwsSecret } from "./env.js"
+import { TokenSecretBase64 } from "./privateToken.js"
 
 export type Result<TOk, TError> =
   | {

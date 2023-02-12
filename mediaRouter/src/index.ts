@@ -10,7 +10,7 @@
 
 import { Hono } from "hono"
 import { cors } from "hono/cors"
-import { Env, getUserId, MediaId, MediaRouterContext } from "./util"
+import { Env, getUserId, MediaId, MediaRouterContext } from "./util.js"
 import {
   hstsName,
   hstsValue,
@@ -22,11 +22,11 @@ import {
 } from "shared"
 import { SignJWT, jwtVerify } from "jose"
 import { connect, Transaction } from "@planetscale/database"
-import { buildPrivateToken, getMediaId } from "./privateToken"
-import { appRouter } from "./router"
+import { buildPrivateToken, getMediaId } from "./privateToken.js"
+import { appRouter } from "./router.js"
 import { fetchRequestHandler } from "@trpc/server/adapters/fetch"
-import { createContext } from "./trpc"
-import { getJwsSecret } from "./env"
+import { createContext } from "./trpc.js"
+import { getJwsSecret } from "./env.js"
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const app = new Hono<{ Bindings: Env }>()
