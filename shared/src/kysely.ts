@@ -2,7 +2,7 @@ import { Kysely, sql, InsertResult, RawBuilder, InsertObject } from "kysely"
 import { PlanetScaleDialect } from "kysely-planetscale"
 import { DB } from "./database.js"
 import { Base64, Base64Url, DbId, Hex, NoteId, TemplateId } from "./brand.js"
-import { binary16fromBase64URL, ulidAsHex } from "./convertBinary.js"
+import { binary16fromBase64URL, ulidAsRaw } from "./convertBinary.js"
 import { undefinedMap } from "./utility.js"
 import { base16, base64url } from "@scure/base"
 import { z } from "zod"
@@ -97,25 +97,43 @@ export async function insertNotes(
   authorId: string,
   notes: CreateRemoteNote[]
 ): Promise<Record<string, string>> {
-  const noteCreatesAndIds = notes.map((n) => {
-    const remoteId = ulidAsHex()
-    const noteCreate: InsertObject<DB, "Note"> = {
-      id: unhex(remoteId),
-      templateId: fromBase64Url(n.templateId), // highTODO validate
-      authorId,
-      fieldValues: JSON.stringify(n.fieldValues),
-      fts: Object.values(n.fieldValues).map(convert).concat(n.tags).join(" "),
-      tags: JSON.stringify(n.tags),
-      ankiId: n.ankiId,
-    }
-    return [
-      noteCreate,
-      [n.localId, base64url.encode(base16.decode(remoteId))] as [
-        string,
-        string
-      ],
-    ] as const
-  })
+  const noteCreatesAndIds = await Promise.all(
+    notes.map(async (n) => {
+      const remoteId = ulidAsRaw()
+      const remoteIdHex = base16.encode(remoteId) as Hex
+      const remoteIdBase64url = base64url.encode(remoteId)
+      for (const field in n.fieldValues) {
+        const oldResponse = new Response(n.fieldValues[field])
+        const newResponse = new HTMLRewriter()
+          .on("img", {
+            // highTODO filter images that shouldn't be replaced, e.g. ones with external URLs.
+            // Wait... uh... do we even want to support this? Breaks the point of offline-first...
+            element(element) {
+              const src = element.getAttribute("src")
+              if (src != null) {
+                // Filter no-src images - grep 330CE329-B962-4E68-90F3-F4F3700815DA
+                element.setAttribute("src", remoteIdBase64url + src)
+              }
+            },
+          })
+          .transform(oldResponse)
+        n.fieldValues[field] = await newResponse.text()
+      }
+      const noteCreate: InsertObject<DB, "Note"> = {
+        id: unhex(remoteIdHex),
+        templateId: fromBase64Url(n.templateId), // highTODO validate
+        authorId,
+        fieldValues: JSON.stringify(n.fieldValues),
+        fts: Object.values(n.fieldValues).map(convert).concat(n.tags).join(" "),
+        tags: JSON.stringify(n.tags),
+        ankiId: n.ankiId,
+      }
+      return [
+        noteCreate,
+        [n.localId, remoteIdBase64url] as [string, string],
+      ] as const
+    })
+  )
   const noteCreates = noteCreatesAndIds.map((x) => x[0])
   await db.insertInto("Note").values(noteCreates).execute()
   const remoteIdByLocal = _.fromPairs(noteCreatesAndIds.map((x) => x[1]))

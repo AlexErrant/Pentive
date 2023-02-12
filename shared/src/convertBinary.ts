@@ -27,7 +27,11 @@ export function binary16fromBase64URL(base64url: Base64Url): Base64 {
 }
 
 export function ulidAsHex(): Hex {
-  const ulid = ulidFactory()()
-  const raw = base32crockford.decode("000000" + ulid).slice(4) // https://github.com/ulid/spec/issues/73#issuecomment-1247320475
+  const raw = ulidAsRaw()
   return base16.encode(raw) as Hex
+}
+
+export function ulidAsRaw(): Uint8Array {
+  const ulid = ulidFactory()()
+  return base32crockford.decode("000000" + ulid).slice(4) // https://github.com/ulid/spec/issues/73#issuecomment-1247320475
 }
