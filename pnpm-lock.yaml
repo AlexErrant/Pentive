@@ -8,6 +8,7 @@ importers:
   app:
     specifiers:
       '@babel/core': ^7.18.10
+      '@cloudflare/workers-types': ^4.20221111.1
       '@github/time-elements': ^3.1.4
       '@playwright/test': ^1.25.0
       '@tanstack/solid-table': ^8.5.11
@@ -100,6 +101,7 @@ importers:
       zod: 3.19.1
     devDependencies:
       '@babel/core': 7.19.0
+      '@cloudflare/workers-types': 4.20221111.1
       '@playwright/test': 1.25.2
       '@types/iframe-resizer': 3.5.9
       '@types/lodash': 4.14.185
