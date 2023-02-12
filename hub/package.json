@@ -33,7 +33,7 @@
     "stylelint": "^14.9.1",
     "stylelint-config-prettier": "^9.0.3",
     "stylelint-config-standard": "^26.0.0",
-    "typescript": "^4.8.4",
+    "typescript": "^4.9.5",
     "vite": "^3.1.8",
     "wrangler": "^2.6.2"
   },
@@ -42,10 +42,10 @@
     "@solidjs/meta": "^0.28.0",
     "@solidjs/router": "^0.6.0",
     "cookie": "^0.5.0",
+    "html-to-text": "^9.0.3 || Hub doesn't use this, but `shared` (actually `mediaRouter`) does. Not including this causes an ESModule error - I've no idea why.",
     "jose": "^4.11.1",
     "shared": "workspace:*",
     "solid-js": "^1.6.2",
-    "html-to-text": "^9.0.3 || Hub doesn't use this, but `shared` (actually `mediaRouter`) does. Not including this causes an ESModule error - I've no idea why.",
     "solid-start": "^0.2.0",
     "ulid-workers": "^2.1.0 || See comment on html-to-text",
     "undici": "^5.11.0"
