@@ -1,4 +1,4 @@
-import { createRemoteNote, insertNotes } from "shared"
+import { createRemoteNote, insertNotes } from "shared/kysely"
 import { z } from "zod"
 import { authedProcedure, publicProcedure, router } from "./trpc.js"
 

@@ -1,6 +1,7 @@
 import { Context } from "hono"
 import { jwtVerify, JWTVerifyResult } from "jose"
-import { Brand, csrfHeaderName, jwtCookieName } from "shared"
+import { Brand } from "shared/brand"
+import { jwtCookieName, csrfHeaderName } from "shared/index"
 import { getJwsSecret } from "./env.js"
 import { TokenSecretBase64 } from "./privateToken.js"
 

@@ -5,8 +5,16 @@
   "//comment": "Making `shared` an esmodule is necessary for lrpc. We need  'main' because 'app' empirically fails without it. I have no idea if this is a good idea or not, but I'm out of give-a-damn juice.",
   "//comment2": "From https://nodejs.org/api/packages.html#main - 'When a package has an \"exports\" field, this will take precedence over the \"main\" field when importing the package by name.' ...raise eyebrows.",
   "type": "module",
-  "main": "src/index.ts",
-  "exports": "./src/index.ts",
+  "exports": {
+    "./index": "./src/index.ts",
+    "./wholeDbReplicator": "./src/wholeDbReplicator.ts",
+    "./wholeDbReplicatorSync": "./src/wholeDbReplicatorSync.ts",
+    "./kysely": "./src/kysely.ts",
+    "./convertBinary": "./src/convertBinary.ts",
+    "./brand": "./src/brand.ts",
+    "./utility": "./src/utility.ts",
+    "./headers": "./src/headers.ts"
+  },
   "scripts": {
     "eslint": "eslint .",
     "eslintw": "eslint . --fix",

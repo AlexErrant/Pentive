@@ -8,18 +8,12 @@
  * Learn more at https://developers.cloudflare.com/workers/
  */
 
+import { setKysely } from "shared/kysely"
+import { hstsName, hstsValue } from "shared/headers"
+import { Base64, Base64Url } from "shared/brand"
 import { Hono } from "hono"
 import { cors } from "hono/cors"
 import { Env, getUserId, MediaId, MediaRouterContext } from "./util.js"
-import {
-  hstsName,
-  hstsValue,
-  base64,
-  base64url,
-  Base64,
-  Base64Url,
-  setKysely,
-} from "shared"
 import { SignJWT, jwtVerify } from "jose"
 import { connect, Transaction } from "@planetscale/database"
 import { buildPrivateToken, getMediaId } from "./privateToken.js"
@@ -27,6 +21,7 @@ import { appRouter } from "./router.js"
 import { fetchRequestHandler } from "@trpc/server/adapters/fetch"
 import { createContext } from "./trpc.js"
 import { getJwsSecret } from "./env.js"
+import { base64, base64url } from "@scure/base"
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const app = new Hono<{ Bindings: Env }>()

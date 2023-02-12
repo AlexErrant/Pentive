@@ -1,4 +1,5 @@
-import { base64, Base64Url, base64url, Brand } from "shared"
+import { base64, base64url } from "@scure/base"
+import { Base64Url, Brand } from "shared/brand"
 import { concat } from "./util.js"
 
 export type MediaId = Brand<Uint8Array, "mediaId">
