@@ -364,6 +364,7 @@ importers:
     specifiers:
       '@cloudflare/workers-types': ^4.20221111.1
       '@planetscale/database': ^1.5.0
+      '@scure/base': ^1.1.1
       '@trpc/server': ^10.11.0
       hono: ^2.7.7
       jose: ^4.11.1
@@ -374,6 +375,7 @@ importers:
       zod: ^3.19.1
     dependencies:
       '@planetscale/database': 1.5.0
+      '@scure/base': 1.1.1
       '@trpc/server': 10.11.0
       hono: 2.7.7
       jose: 4.11.1
