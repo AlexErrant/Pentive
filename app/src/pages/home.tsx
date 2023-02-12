@@ -1,4 +1,4 @@
-import { useRouteData } from "solid-app-router"
+import { useRouteData } from "@solidjs/router"
 import { createEffect, createSignal, JSX } from "solid-js"
 import { sampleCard, Card } from "../domain/card.js"
 import { sampleNote, Note } from "../domain/note.js"

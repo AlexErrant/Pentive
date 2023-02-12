@@ -86,7 +86,7 @@
     "lrpc": "workspace:*",
     "mediarouter": "workspace:*",
     "shared": "workspace:*",
-    "solid-app-router": "^0.4.2",
+    "@solidjs/router": "^0.7.0",
     "solid-element": "^1.4.8",
     "solid-js": "^1.4.8",
     "sql.js": "^1.8.0",
