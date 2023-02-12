@@ -31,7 +31,7 @@
     "mysql2": "^2.3.3",
     "prettier": "^2.7.1",
     "standard": "^17.0.0",
-    "typescript": "^4.9.5"
+    "typescript": "5.0.0-beta"
   },
   "dependencies": {
     "@planetscale/database": "^1.5.0",
