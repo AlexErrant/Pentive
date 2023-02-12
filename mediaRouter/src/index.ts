@@ -11,7 +11,6 @@
 import { Hono } from "hono"
 import { cors } from "hono/cors"
 import { Env, getUserId, MediaId, MediaRouterContext } from "./util"
-
 import {
   hstsName,
   hstsValue,
@@ -19,15 +18,9 @@ import {
   base64url,
   Base64,
   Base64Url,
-  createRemoteNote,
-  insertNotes,
   setKysely,
-  createRemoteNotesJson,
 } from "shared"
-
-import z from "zod"
 import { SignJWT, jwtVerify } from "jose"
-
 import { connect, Transaction } from "@planetscale/database"
 import { buildPrivateToken, getMediaId } from "./privateToken"
 import { appRouter } from "./router"
@@ -56,6 +49,7 @@ app
   })
   .use("/trpc/*", async (c) => {
     const userId = await getUserId(c)
+    setKysely(c.env.planetscaleDbUrl)
     return await fetchRequestHandler({
       endpoint: "/trpc",
       req: c.req,
@@ -166,18 +160,6 @@ app
     if (file.httpMetadata?.contentEncoding != null)
       c.header("Content-Encoding", file.httpMetadata.contentEncoding)
     return c.body(file.body)
-  })
-  .post("/note", async (c) => {
-    const authResult = await getUserId(c)
-    if (authResult.tag === "Error") return authResult.error
-    const userId = authResult.ok
-    setKysely(c.env.planetscaleDbUrl)
-    const body = await c.req.parseBody() // nextTODO handle images
-    const createRemoteNotes = z
-      .array(createRemoteNote)
-      .parse(JSON.parse(body[createRemoteNotesJson] as string))
-    const remoteIdByLocal = await insertNotes(userId, createRemoteNotes)
-    return c.json(remoteIdByLocal)
   })
 
 export default app

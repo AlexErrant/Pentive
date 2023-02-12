@@ -7,7 +7,7 @@ import HomeData from "./home.data"
 import { db } from "../db"
 import { lrpc } from "../lrpcClient"
 import { importAnki } from "./importer/importer"
-import { createRemoteNotesJson, throwExp } from "shared"
+import { throwExp } from "shared"
 import { ResourceId } from "../domain/ids"
 import { apiClient } from "../apiClient"
 
@@ -27,17 +27,8 @@ async function uploadNewTemplates(): Promise<void> {
 
 async function uploadNewNotes(): Promise<void> {
   const { notes, resources } = await db.prepareAndGetNewNotesToUpload()
-  const formData = new FormData()
-  formData.append(createRemoteNotesJson, JSON.stringify(notes))
-  for (const { id, data } of resources) {
-    formData.append(id, new Blob([data]))
-  }
-  const response = await fetch(import.meta.env.VITE_API_URL + "note", {
-    method: "POST",
-    body: formData,
-    credentials: "include",
-  })
-  console.log(response)
+  const remoteIdByLocal = await apiClient.createNote.mutate(notes)
+  console.log(remoteIdByLocal)
 }
 
 async function searchNotes(search: string): Promise<void> {
