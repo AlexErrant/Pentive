@@ -1,5 +1,5 @@
 import fc from "fast-check"
-import { Card, Review, Score, states } from "../src/domain/card"
+import { Card, Review, Score, states } from "../src/domain/card.js"
 
 import {
   CardId,
@@ -7,9 +7,9 @@ import {
   ChildTemplateId,
   DeckId,
   NoteId,
-} from "../src/domain/ids"
+} from "../src/domain/ids.js"
 
-import { reasonableDates, recordWithOptionalFields } from "./arbitrary"
+import { reasonableDates, recordWithOptionalFields } from "./arbitrary.js"
 
 export const review = recordWithOptionalFields<Review>(
   {

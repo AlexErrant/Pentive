@@ -13,15 +13,15 @@ import {
 } from "@zip.js/zip.js"
 import { throwExp } from "shared"
 import initSqlJs, { Database } from "sql.js"
-import { checkCard, checkCol, checkMedia, checkNote } from "./typeChecker"
-import { parseNote, parseCard, parseTemplates } from "./parser"
-import { Card as PCard } from "../../domain/card"
-import { Note as PNote } from "../../domain/note"
-import { Template } from "../../domain/template"
-import { ResourceId, TemplateId } from "../../domain/ids"
-import { db } from "./../../db"
+import { checkCard, checkCol, checkMedia, checkNote } from "./typeChecker.js"
+import { parseNote, parseCard, parseTemplates } from "./parser.js"
+import { Card as PCard } from "../../domain/card.js"
+import { Note as PNote } from "../../domain/note.js"
+import { Template } from "../../domain/template.js"
+import { ResourceId, TemplateId } from "../../domain/ids.js"
+import { db } from "./../../db.js"
 import _ from "lodash"
-import { Resource } from "../../domain/resource"
+import { Resource } from "../../domain/resource.js"
 
 export async function importAnki(
   event: Event & {
