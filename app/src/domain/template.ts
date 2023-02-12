@@ -1,4 +1,4 @@
-import { ChildTemplateId, RemoteTemplateId, TemplateId } from "./ids"
+import { ChildTemplateId, RemoteTemplateId, TemplateId } from "./ids.js"
 
 export interface Field {
   readonly name: string

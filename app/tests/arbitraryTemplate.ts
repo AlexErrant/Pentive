@@ -4,14 +4,14 @@ import {
   ChildTemplateId,
   RemoteTemplateId,
   TemplateId,
-} from "../src/domain/ids"
+} from "../src/domain/ids.js"
 import {
   ChildTemplate,
   Field,
   Template,
   TemplateType,
-} from "../src/domain/template"
-import { reasonableDates, recordWithOptionalFields } from "./arbitrary"
+} from "../src/domain/template.js"
+import { reasonableDates, recordWithOptionalFields } from "./arbitrary.js"
 
 const field = recordWithOptionalFields<Field>(
   {

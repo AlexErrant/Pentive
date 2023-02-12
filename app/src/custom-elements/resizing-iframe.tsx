@@ -1,7 +1,7 @@
 import { iframeResizer, IFrameComponent } from "iframe-resizer"
 import { onCleanup, VoidComponent } from "solid-js"
 import * as Comlink from "comlink"
-import { appExpose, RenderBodyInput } from "../appMessenger"
+import { appExpose, RenderBodyInput } from "../appMessenger.js"
 
 const targetOrigin = "*" // highTODO make more limiting. Also implement https://stackoverflow.com/q/8169582
 

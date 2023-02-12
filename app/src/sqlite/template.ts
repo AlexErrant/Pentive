@@ -1,9 +1,9 @@
-import { CreateRemoteTemplate } from "lrpc/src/schemas/template"
-import { RemoteTemplateId, TemplateId } from "../domain/ids"
-import { Field, Template, TemplateType } from "../domain/template"
+import { CreateRemoteTemplate } from "lrpc/src/schemas/template.js"
+import { RemoteTemplateId, TemplateId } from "../domain/ids.js"
+import { Field, Template, TemplateType } from "../domain/template.js"
 import { assertNever, undefinedMap } from "shared"
-import { getKysely } from "./crsqlite"
-import { DB, Template as TemplateEntity } from "./database"
+import { getKysely } from "./crsqlite.js"
+import { DB, Template as TemplateEntity } from "./database.js"
 import { InsertObject } from "kysely"
 
 function templateToDocType(template: Template): InsertObject<DB, "template"> {

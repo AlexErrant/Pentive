@@ -5,7 +5,7 @@ import {
   flexRender,
   getCoreRowModel,
 } from "@tanstack/solid-table"
-import { Plugin } from "../domain/plugin"
+import { Plugin } from "../domain/plugin.js"
 import "@github/time-elements"
 
 function id(id: keyof Plugin): keyof Plugin {

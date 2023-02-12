@@ -5,10 +5,10 @@ import {
   DeckId,
   NoteId,
   Pointer,
-} from "../domain/ids"
-import { Card, State } from "../domain/card"
-import { getKysely } from "./crsqlite"
-import { DB, Card as CardEntity } from "./database"
+} from "../domain/ids.js"
+import { Card, State } from "../domain/card.js"
+import { getKysely } from "./crsqlite.js"
+import { DB, Card as CardEntity } from "./database.js"
 import { InsertObject } from "kysely"
 import _ from "lodash"
 import { assertNever, throwExp, undefinedMap } from "shared"

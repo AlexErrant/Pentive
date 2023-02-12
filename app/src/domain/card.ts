@@ -5,9 +5,9 @@ import {
   NoteId,
   ChildTemplateId,
   Pointer,
-} from "./ids"
-import { Note } from "./note"
-import { Template } from "./template"
+} from "./ids.js"
+import { Note } from "./note.js"
+import { Template } from "./template.js"
 
 export const states = [
   "normal",

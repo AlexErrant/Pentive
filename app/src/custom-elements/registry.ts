@@ -4,7 +4,7 @@
 // https://github.com/solidjs/solid/issues/616
 
 import { Component } from "solid-js"
-import Nav from "./nav"
+import Nav from "./nav.js"
 
 export interface HTMLElementTagNameMap {
   "pentive-nav": typeof Nav

@@ -6,16 +6,16 @@ import {
   NoteId,
   TemplateId,
   ClozeIndex,
-} from "../../domain/ids"
+} from "../../domain/ids.js"
 import {
   ChildTemplate,
   Field,
   Template,
   TemplateType,
-} from "../../domain/template"
+} from "../../domain/template.js"
 import { throwExp } from "shared"
-import { Card as PCard } from "../../domain/card"
-import { Note as PNote } from "../../domain/note"
+import { Card as PCard } from "../../domain/card.js"
+import { Note as PNote } from "../../domain/note.js"
 import {
   Card as ACard,
   Fld,
@@ -23,7 +23,7 @@ import {
   Models,
   Note as ANote,
   Tmpl,
-} from "./typeChecker"
+} from "./typeChecker.js"
 import _ from "lodash"
 
 function parseField(fld: Fld): Field {

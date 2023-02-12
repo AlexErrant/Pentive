@@ -1,7 +1,7 @@
 import { freeze } from "immer"
-import { PentiveElement } from "./custom-elements/registry"
-import { Plugin } from "./domain/plugin"
-import { Ci, Ct, PluginExports } from "./services"
+import { PentiveElement } from "./custom-elements/registry.js"
+import { Plugin } from "./domain/plugin.js"
+import { Ci, Ct, PluginExports } from "./services.js"
 
 // https://stackoverflow.com/a/18650249
 async function blobToBase64(blob: Blob): Promise<string> {

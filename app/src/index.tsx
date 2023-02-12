@@ -1,10 +1,10 @@
 import "./index.css"
 import { render } from "solid-js/web"
 import { Router } from "solid-app-router"
-import App from "./app"
-import { db } from "./db"
+import App from "./app.js"
+import { db } from "./db.js"
 
-import { registerPluginServices } from "./plugin-manager"
+import { registerPluginServices } from "./plugin-manager.js"
 
 const plugins = await db.getPlugins()
 

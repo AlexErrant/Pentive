@@ -1,5 +1,5 @@
 import { createTRPCProxyClient, httpBatchLink } from "@trpc/client"
-import { AppRouter } from "lrpc/src/appRouter"
+import { AppRouter } from "lrpc/src/appRouter.js"
 import { csrfHeaderName } from "shared"
 import superjson from "superjson"
 

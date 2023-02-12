@@ -1,7 +1,7 @@
 import { createSignal, JSX } from "solid-js"
-import CardsTable from "../custom-elements/cardsTable"
-import ResizingIframe from "../custom-elements/resizing-iframe"
-import { NoteCard } from "../domain/card"
+import CardsTable from "../custom-elements/cardsTable.js"
+import ResizingIframe from "../custom-elements/resizing-iframe.js"
+import { NoteCard } from "../domain/card.js"
 
 const [selected, setSelected] = createSignal<NoteCard>()
 

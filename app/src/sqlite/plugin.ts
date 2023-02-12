@@ -1,6 +1,6 @@
-import { Plugin } from "../domain/plugin"
-import { getDb, getKysely } from "./crsqlite"
-import { Plugin as PluginEntity } from "./database"
+import { Plugin } from "../domain/plugin.js"
+import { getDb, getKysely } from "./crsqlite.js"
+import { Plugin as PluginEntity } from "./database.js"
 
 function entityToDomain(entity: PluginEntity): Plugin {
   return {

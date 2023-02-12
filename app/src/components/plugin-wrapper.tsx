@@ -1,7 +1,7 @@
 import { ParentComponent, Show } from "solid-js"
 import { Dynamic } from "solid-js/web"
 import _ from "lodash"
-import { registeredElements } from ".."
+import { registeredElements } from "../index.jsx"
 
 // Due to
 //     "Props get assigned as element properties and hyphenated attributes."

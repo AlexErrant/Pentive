@@ -1,8 +1,8 @@
 import { CreateRemoteNote, nullMap, throwExp } from "shared"
-import { NoteId, ResourceId } from "../domain/ids"
-import { Note } from "../domain/note"
-import { getKysely } from "./crsqlite"
-import { DB, Note as NoteEntity } from "./database"
+import { NoteId, ResourceId } from "../domain/ids.js"
+import { Note } from "../domain/note.js"
+import { getKysely } from "./crsqlite.js"
+import { DB, Note as NoteEntity } from "./database.js"
 import { InsertObject } from "kysely"
 import _ from "lodash"
 

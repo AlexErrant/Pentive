@@ -1,4 +1,4 @@
-import { TemplateId, RemoteCardId, RemoteTemplateId, NoteId } from "./ids"
+import { TemplateId, RemoteCardId, RemoteTemplateId, NoteId } from "./ids.js"
 
 export interface Note {
   readonly id: NoteId

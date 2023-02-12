@@ -5,9 +5,9 @@ import {
   flexRender,
   getCoreRowModel,
 } from "@tanstack/solid-table"
-import { Template } from "../domain/template"
+import { Template } from "../domain/template.js"
 import _ from "lodash"
-import ResizingIframe from "./resizing-iframe"
+import ResizingIframe from "./resizing-iframe.js"
 import "@github/time-elements"
 
 function id(id: keyof Template): keyof Template {

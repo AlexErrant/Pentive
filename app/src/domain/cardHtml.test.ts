@@ -1,7 +1,7 @@
-import { Ci } from "../services"
+import { Ci } from "../services.js"
 import { expect, test } from "vitest"
-import { ChildTemplateId, ClozeIndex } from "./ids"
-import { strip } from "./utility"
+import { ChildTemplateId, ClozeIndex } from "./ids.js"
+import { strip } from "./utility.js"
 import { throwExp } from "shared"
 
 function testBody(

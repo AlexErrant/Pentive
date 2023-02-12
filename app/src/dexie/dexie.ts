@@ -1,7 +1,7 @@
 import { Dexie } from "dexie"
-import { ResourceId } from "../../src/domain/ids"
-import { Plugin } from "../../src/domain/plugin"
-import { Resource } from "../../src/domain/resource"
+import { ResourceId } from "../../src/domain/ids.js"
+import { Plugin } from "../../src/domain/plugin.js"
+import { Resource } from "../../src/domain/resource.js"
 import * as Comlink from "comlink"
 
 class DexieDb extends Dexie {

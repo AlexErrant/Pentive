@@ -1,8 +1,8 @@
 import { JSX } from "solid-js"
-import PluginTable from "../custom-elements/pluginsTable"
-import { db } from "../db"
-import { Plugin } from "../../src/domain/plugin"
-import { PluginId } from "../domain/ids"
+import PluginTable from "../custom-elements/pluginsTable.js"
+import { db } from "../db.js"
+import { Plugin } from "../../src/domain/plugin.js"
+import { PluginId } from "../domain/ids.js"
 
 export default function Plugins(): JSX.Element {
   return (

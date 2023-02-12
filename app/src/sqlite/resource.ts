@@ -1,9 +1,9 @@
 import { undefinedMap } from "shared"
-import { ResourceId } from "../domain/ids"
-import { Resource } from "../domain/resource"
+import { ResourceId } from "../domain/ids.js"
+import { Resource } from "../domain/resource.js"
 import * as Comlink from "comlink"
-import { getDb, getKysely } from "./crsqlite"
-import { Resource as ResourceEntity } from "./database"
+import { getDb, getKysely } from "./crsqlite.js"
+import { Resource as ResourceEntity } from "./database.js"
 
 function entityToDomain(entity: ResourceEntity): Resource {
   return {

@@ -1,6 +1,6 @@
 import { For, VoidComponent } from "solid-js"
 import { NavLink, useLocation } from "solid-app-router"
-import { NavLinkData } from "./contracts"
+import { NavLinkData } from "./contracts.js"
 
 const ends = new Set(["/"])
 

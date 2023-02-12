@@ -1,12 +1,12 @@
 import fc, { Arbitrary } from "fast-check"
-import { Note } from "../src/domain/note"
+import { Note } from "../src/domain/note.js"
 import {
   NoteId,
   RemoteCardId,
   RemoteTemplateId,
   TemplateId,
-} from "../src/domain/ids"
-import { reasonableDates, recordWithOptionalFields } from "./arbitrary"
+} from "../src/domain/ids.js"
+import { reasonableDates, recordWithOptionalFields } from "./arbitrary.js"
 import { Ulid } from "id128"
 import { base64url, hex } from "shared"
 

@@ -1,5 +1,5 @@
 import { VoidComponent, createResource } from "solid-js"
-import { Card, NoteCard } from "../domain/card"
+import { Card, NoteCard } from "../domain/card.js"
 import _ from "lodash"
 import "@github/time-elements"
 import AgGridSolid, { AgGridSolidRef } from "ag-grid-solid"
@@ -7,10 +7,10 @@ import "ag-grid-community/styles/ag-grid.css"
 import "ag-grid-community/styles/ag-theme-alpine.css"
 import { ColDef, GetRowIdParams, RowNode } from "ag-grid-community"
 import { throwExp } from "shared"
-import { CardId, NoteId, TemplateId } from "../domain/ids"
-import { db } from "../db"
-import { Note } from "../domain/note"
-import { Template } from "../domain/template"
+import { CardId, NoteId, TemplateId } from "../domain/ids.js"
+import { db } from "../db.js"
+import { Note } from "../domain/note.js"
+import { Template } from "../domain/template.js"
 
 let gridRef: AgGridSolidRef
 

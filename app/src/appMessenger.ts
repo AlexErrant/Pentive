@@ -1,8 +1,8 @@
 import _ from "lodash"
-import { C } from "."
-import { CardId, NoteId, ResourceId, Side, TemplateId } from "./domain/ids"
+import { C } from "./index.jsx"
+import { CardId, NoteId, ResourceId, Side, TemplateId } from "./domain/ids.js"
 import { assertNever, throwExp } from "shared"
-import { db } from "./db"
+import { db } from "./db.js"
 
 export type RenderBodyInput =
   | {

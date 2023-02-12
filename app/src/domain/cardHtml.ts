@@ -1,8 +1,8 @@
 import _ from "lodash"
-import { Ct } from "../services"
-import { ClozeIndex, Pointer } from "./ids"
-import { Field, Template } from "./template"
-import { strip } from "./utility"
+import { Ct } from "../services.js"
+import { ClozeIndex, Pointer } from "./ids.js"
+import { Field, Template } from "./template.js"
+import { strip } from "./utility.js"
 import { throwExp } from "shared"
 
 // These have hidden state - don't use `match` or `exec`!

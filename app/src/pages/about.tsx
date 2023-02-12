@@ -1,6 +1,6 @@
 import { JSX, createEffect, Suspense } from "solid-js"
 import { useRouteData } from "solid-app-router"
-import AboutData from "./about.data"
+import AboutData from "./about.data.js"
 
 export default function About(): JSX.Element {
   const name = useRouteData<typeof AboutData>()

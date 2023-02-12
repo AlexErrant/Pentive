@@ -4,8 +4,8 @@ import {
   clozeTemplateRegex,
   html,
   renderTemplate,
-} from "./domain/cardHtml"
-import { PentiveElement } from "./custom-elements/registry"
+} from "./domain/cardHtml.js"
+import { PentiveElement } from "./custom-elements/registry.js"
 
 // the DI container. Stands for "Container, initial".
 // eslint-disable-next-line @typescript-eslint/naming-convention

@@ -1,12 +1,12 @@
 import { JSX } from "solid-js/jsx-runtime"
 import _ from "lodash"
-import { db } from "./../db"
+import { db } from "./../db.js"
 
 import { createResource, Match, Switch } from "solid-js"
 import fc from "fast-check"
-import { template as arbitraryTemplate } from "../../tests/arbitraryTemplate"
-import { card as arbitraryCard } from "../../tests/arbitraryCard"
-import { note as arbitraryNote } from "../../tests/arbitraryNote"
+import { template as arbitraryTemplate } from "../../tests/arbitraryTemplate.js"
+import { card as arbitraryCard } from "../../tests/arbitraryCard.js"
+import { note as arbitraryNote } from "../../tests/arbitraryNote.js"
 
 async function testTemplate(): Promise<boolean> {
   await fc.assert(

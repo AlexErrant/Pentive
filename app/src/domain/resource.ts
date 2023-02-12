@@ -1,4 +1,4 @@
-import { RemoteResourceId, ResourceId } from "./ids"
+import { RemoteResourceId, ResourceId } from "./ids.js"
 
 export interface Resource {
   readonly id: ResourceId
