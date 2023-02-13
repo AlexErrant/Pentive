@@ -5,8 +5,8 @@
   "type": "module",
   "dependencies": {
     "@prisma/client": "^4.6.1",
-    "@trpc/client": "^10.11.0",
-    "@trpc/server": "^10.11.0",
+    "@trpc/client": "^10.11.1",
+    "@trpc/server": "^10.11.1",
     "@vlcn.io/crsqlite-allinone": "^0.6.0",
     "aws-lambda": "^1.0.7",
     "cookie": "^0.5.0",
