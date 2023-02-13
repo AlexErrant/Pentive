@@ -1,7 +1,15 @@
 import { Kysely, sql, InsertResult, RawBuilder, InsertObject } from "kysely"
 import { PlanetScaleDialect } from "kysely-planetscale"
 import { DB } from "./database.js"
-import { Base64, Base64Url, DbId, Hex, NoteId, TemplateId } from "./brand.js"
+import {
+  Base64,
+  Base64Url,
+  DbId,
+  Hex,
+  NoteId,
+  RemoteNoteId,
+  TemplateId,
+} from "./brand.js"
 import { binary16fromBase64URL, ulidAsRaw } from "./convertBinary.js"
 import { undefinedMap } from "./utility.js"
 import { base16, base64url } from "@scure/base"
@@ -96,7 +104,7 @@ export type CreateRemoteNote = z.infer<typeof createRemoteNote>
 export async function insertNotes(
   authorId: string,
   notes: CreateRemoteNote[]
-): Promise<Record<string, string>> {
+): Promise<Record<NoteId, RemoteNoteId>> {
   const noteCreatesAndIds = await Promise.all(
     notes.map(async (n) => {
       const remoteId = ulidAsRaw()
@@ -130,7 +138,7 @@ export async function insertNotes(
       }
       return [
         noteCreate,
-        [n.localId, remoteIdBase64url] as [string, string],
+        [n.localId, remoteIdBase64url] as [NoteId, RemoteNoteId],
       ] as const
     })
   )
