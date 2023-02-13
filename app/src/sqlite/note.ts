@@ -1,5 +1,5 @@
 import { CreateRemoteNote, nullMap, throwExp } from "shared"
-import { NoteId, ResourceId } from "../domain/ids"
+import { NoteId, RemoteMediaNum, ResourceId } from "../domain/ids"
 import { Note } from "../domain/note"
 import { getKysely } from "./crsqlite"
 import { DB, Note as NoteEntity } from "./database"
@@ -172,10 +172,10 @@ function withLocalMediaIdByRemoteMediaId(
   note: CreateRemoteNote
 ): {
   note: CreateRemoteNote
-  localMediaIdByRemoteMediaId: Map<number, ResourceId>
+  localMediaIdByRemoteMediaId: Map<RemoteMediaNum, ResourceId>
 } {
-  let i = 0
-  const localMediaIdByRemoteMediaId = new Map<number, ResourceId>()
+  let i = 0 as RemoteMediaNum
+  const localMediaIdByRemoteMediaId = new Map<RemoteMediaNum, ResourceId>()
   const fieldValues = new Map<string, string>()
   for (const field in note.fieldValues) {
     const doc = dp.parseFromString(note.fieldValues[field], "text/html")

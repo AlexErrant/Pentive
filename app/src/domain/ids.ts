@@ -19,3 +19,4 @@ export type DeckId = Brand<string, "deckId">
 
 export type PluginId = Brand<string, "pluginId" & "base64url">
 export type ResourceId = Brand<string, "resourceId">
+export type RemoteMediaNum = Brand<number, "remoteMediaNum">
