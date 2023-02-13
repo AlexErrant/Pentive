@@ -15,7 +15,7 @@ export default defineConfig({
         maximumFileSizeToCacheInBytes: 999999999999999,
       },
     }),
-    checker.default({
+    checker({
       overlay: {
         initialIsOpen: false,
       },
