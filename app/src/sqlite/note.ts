@@ -146,13 +146,27 @@ export const noteCollectionMethods = {
     const srcs = notesAndStuff.flatMap((n) =>
       Array.from(n.localMediaIdByRemoteMediaId.values())
     )
-    const resources = await db
+    const mediaBinaries = await db
       .selectFrom("resource")
       .select(["id", "data"])
       .where("id", "in", srcs)
       .execute()
-    if (resources.length !== srcs.length) throwExp("You're missing a resource.") // medTODO better error message
+    const resources = new Map<
+      ResourceId,
+      { data: ArrayBuffer; ids: Array<[NoteId, RemoteMediaNum]> }
+    >(mediaBinaries.map(({ id, data }) => [id, { data, ids: [] }]))
+    if (mediaBinaries.length !== srcs.length)
+      throwExp("You're missing a resource.") // medTODO better error message
     for (const { note, localMediaIdByRemoteMediaId } of notesAndStuff) {
+      for (const [
+        remoteMediaNum,
+        localMediaId,
+      ] of localMediaIdByRemoteMediaId) {
+        const value =
+          resources.get(localMediaId) ??
+          throwExp(`resourceMap is missing '${localMediaId}'... how?`)
+        value.ids.push([note.localId, remoteMediaNum])
+      }
       await db // lowTODO optimize - use prepared statement?
         .updateTable("note")
         .set({
