@@ -8,3 +8,5 @@ export type DbId = Brand<string, "dbId" & "base64url"> // nix `base64url` upon v
 export type TemplateId = Brand<string, "templateId" & "base64url">
 export type NoteId = Brand<string, "noteId" & "base64url">
 export type RemoteNoteId = Brand<string, "remoteNoteId" & "base64url">
+
+export type UserId = Brand<string, "userId">
