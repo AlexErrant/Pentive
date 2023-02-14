@@ -208,7 +208,7 @@ async function postMedia(
   }).transaction(async (tx) => {
     // Not a "real" transaction since the final `COMMIT` still needs to be sent as a fetch, but whatever.
     // Just means we could PUT something into the mediaBucket and have no record of it in PlanetScale. Not great, but _fine_.
-    // lowTODO brainstorm a better architecture
+    // Grep BC34B055-ECB7-496D-9E71-58EE899A11D1 for details.
     await persistDbAndBucket({ tx, mediaIdBase64, readable, headers })
   })
   return c.text(token, 201)
