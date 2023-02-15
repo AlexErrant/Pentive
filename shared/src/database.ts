@@ -11,6 +11,12 @@ export interface MediaUser {
   userId: string
 }
 
+export interface MediaEntity {
+  mediaId: DbId
+  i: number
+  entityId: DbId
+}
+
 export interface Nook {
   id: string
   displayName: string
@@ -126,6 +132,7 @@ export interface User {
 
 export interface DB {
   Media_User: MediaUser
+  Media_Entity: MediaEntity
   Nook: Nook
   Note: Note
   NoteComment: NoteComment
