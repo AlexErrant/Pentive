@@ -36,7 +36,7 @@ export function concat(a1: Uint8Array, a2: ArrayBuffer): Uint8Array {
   return tmp
 }
 
-export type MediaId = Brand<Uint8Array, "mediaId">
+export type MediaHash = Brand<Uint8Array, "mediaHash">
 export type UserId = Brand<string, "userId">
 
 export type MediaRouterContext = Context<

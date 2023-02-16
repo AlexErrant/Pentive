@@ -157,20 +157,20 @@ model NoteHistory {
 }
 
 model Media_User {
-  mediaId Bytes  @db.Binary(32)
-  userId  String @db.VarChar(21)
+  mediaHash Bytes  @db.Binary(32)
+  userId    String @db.VarChar(21)
 
-  @@id([mediaId, userId])
-  @@index([mediaId])
+  @@id([mediaHash, userId])
+  @@index([mediaHash])
 }
 
 model Media_Entity {
-  entityId Bytes @db.Binary(16)
-  i        Int   @db.UnsignedTinyInt
-  mediaId  Bytes @db.Binary(32)
+  entityId  Bytes @db.Binary(16)
+  i         Int   @db.UnsignedTinyInt
+  mediaHash Bytes @db.Binary(32)
 
   @@id([entityId, i])
-  @@index([mediaId])
+  @@index([mediaHash])
 }
 
 model Nook {

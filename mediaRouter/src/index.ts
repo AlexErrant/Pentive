@@ -10,7 +10,7 @@
 
 import { Hono } from "hono"
 import { cors } from "hono/cors"
-import { Env, getUserId, MediaId, MediaRouterContext } from "./util"
+import { Env, getUserId, MediaHash, MediaRouterContext } from "./util"
 import {
   hstsName,
   hstsValue,
@@ -29,7 +29,7 @@ import {
 } from "shared"
 import { SignJWT, jwtVerify } from "jose"
 import { connect } from "@planetscale/database"
-import { buildPrivateToken, getMediaId } from "./privateToken"
+import { buildPrivateToken, getMediaHash } from "./privateToken"
 import { appRouter } from "./router"
 import { fetchRequestHandler } from "@trpc/server/adapters/fetch"
 import { createContext } from "./trpc"
@@ -113,10 +113,10 @@ app
     const authResult = await getUserId(c)
     if (authResult.tag === "Error") return authResult.error
     const userId = authResult.ok
-    const buildToken = async (mediaId: MediaId): Promise<Base64Url> =>
-      await buildPrivateToken(c.env.tokenSecret, mediaId, userId)
+    const buildToken = async (mediaHash: MediaHash): Promise<Base64Url> =>
+      await buildPrivateToken(c.env.tokenSecret, mediaHash, userId)
     const persistDbAndBucket = async ({
-      mediaIdBase64,
+      mediaHashBase64,
       readable,
       headers,
     }: PersistParams): Promise<void> => {
@@ -127,21 +127,21 @@ app
         // Just means we could PUT something into the mediaBucket and have no record of it in PlanetScale. Not great, but _fine_.
         // Grep BC34B055-ECB7-496D-9E71-58EE899A11D1 for details.
         const countResponse = await tx.execute(
-          `SELECT (SELECT COUNT(*) FROM Media_User WHERE mediaId=FROM_BASE64(?) AND userId=?),
-                  (SELECT COUNT(*) FROM Media_User WHERE mediaId=FROM_BASE64(?))`,
-          [mediaIdBase64, userId, mediaIdBase64],
+          `SELECT (SELECT COUNT(*) FROM Media_User WHERE mediaHash=FROM_BASE64(?) AND userId=?),
+                  (SELECT COUNT(*) FROM Media_User WHERE mediaHash=FROM_BASE64(?))`,
+          [mediaHashBase64, userId, mediaHashBase64],
           { as: "array" }
         )
         const userCount = (countResponse.rows[0] as string[])[0]
         const mediaCount = (countResponse.rows[0] as string[])[1]
         if (userCount === "0") {
           await tx.execute(
-            "INSERT INTO Media_User (mediaId, userId) VALUES (FROM_BASE64(?), ?)",
-            [mediaIdBase64, userId]
+            "INSERT INTO Media_User (mediaHash, userId) VALUES (FROM_BASE64(?), ?)",
+            [mediaHashBase64, userId]
           )
           if (mediaCount === "0") {
             const object = await c.env.mediaBucket.put(
-              mediaIdBase64,
+              mediaHashBase64,
               readable,
               {
                 httpMetadata: headers,
@@ -166,17 +166,17 @@ app
       return c.text(`You don't own one (or more) of these notes.`, 401)
     }
     const persistDbAndBucket = async ({
-      mediaIdBase64,
+      mediaHashBase64,
       readable,
       headers,
     }: PersistParams): Promise<void> => {
-      const mediaId = fromBase64(mediaIdBase64)
+      const mediaHash = fromBase64(mediaHashBase64)
       const insertValues = Object.entries(iByNoteIds).map(([noteId, i]) => ({
-        mediaId,
+        mediaHash,
         i: i ?? throwExp("not sure why this can be undefined but whatever"),
         entityId: fromBase64Url(noteId as NoteId),
       }))
-      const has = await hasMedia(mediaIdBase64)
+      const has = await hasMedia(mediaHashBase64)
       await db
         .transaction()
         // Not a "real" transaction since the final `COMMIT` still needs to be sent as a fetch, but whatever.
@@ -186,11 +186,11 @@ app
           await trx
             .insertInto("Media_Entity")
             .values(insertValues)
-            .onDuplicateKeyUpdate({ mediaId })
+            .onDuplicateKeyUpdate({ mediaHash })
             .execute()
           if (!has) {
             const object = await c.env.mediaBucket.put(
-              mediaIdBase64,
+              mediaHashBase64,
               readable,
               {
                 httpMetadata: headers,
@@ -206,13 +206,13 @@ app
     const authResult = await getUserId(c)
     if (authResult.tag === "Error") return authResult.error
     const userId = authResult.ok
-    const mediaId = await getMediaId(
+    const mediaHash = await getMediaHash(
       c.env.tokenSecret,
       userId,
       base64url.decode(c.req.param("token"))
     )
-    if (mediaId == null) return c.text("Invalid token", 400)
-    const file = await c.env.mediaBucket.get(base64.encode(mediaId))
+    if (mediaHash == null) return c.text("Invalid token", 400)
+    const file = await c.env.mediaBucket.get(base64.encode(mediaHash))
     if (file === null) {
       return await c.notFound()
     }
@@ -233,7 +233,7 @@ export default app
 async function postMedia(
   c: MediaRouterContext,
   persistDbAndBucket: (_: PersistParams) => Promise<void>,
-  buildResponse: (mediaId: MediaId) => string | Promise<string>
+  buildResponse: (mediaHash: MediaHash) => string | Promise<string>
 ): Promise<Response> {
   if (c.req.body === null) {
     return c.text("Missing body", 400)
@@ -265,16 +265,20 @@ async function postMedia(
 
   const digestStream = new crypto.DigestStream("SHA-256") // https://developers.cloudflare.com/workers/runtime-apis/web-crypto/#constructors
   void hashBody.pipeTo(digestStream)
-  const mediaId = new Uint8Array(await digestStream.digest) as MediaId
-  const mediaIdBase64 = base64.encode(mediaId) as Base64
+  const mediaHash = new Uint8Array(await digestStream.digest) as MediaHash
+  const mediaHashBase64 = base64.encode(mediaHash) as Base64
 
-  const response = await buildResponse(mediaId)
-  await persistDbAndBucket({ mediaIdBase64, readable, headers })
+  const response = await buildResponse(mediaHash)
+  await persistDbAndBucket({
+    mediaHashBase64,
+    readable,
+    headers,
+  })
   return c.text(response, 201)
 }
 
 interface PersistParams {
-  mediaIdBase64: Base64
+  mediaHashBase64: Base64
   readable: ReadableStream<Uint8Array>
   headers: Headers
 }

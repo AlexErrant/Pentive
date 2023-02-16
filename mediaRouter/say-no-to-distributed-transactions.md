@@ -1,6 +1,6 @@
 # Problem Statement
 
-PlanetScale (PS) and R2's mediaBucket may get out of sync. PS needs to store mediaIds for easy lookups, while R2 is object storage. We can either first write to PS then R2, or vice versa. Let's not do distributed transactions.
+PlanetScale (PS) and R2's mediaBucket may get out of sync. PS needs to store `mediaHash` for easy lookups, while R2 is object storage. We can either first write to PS then R2, or vice versa. Let's not do distributed transactions.
 
 Grep BC34B055-ECB7-496D-9E71-58EE899A11D1
 

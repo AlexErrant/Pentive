@@ -107,8 +107,8 @@ export async function userOwns(
 export async function hasMedia(id: Base64): Promise<boolean> {
   const r = await db
     .selectFrom("Media_Entity")
-    .select(db.fn.count<number>("mediaId").as("x"))
-    .where("mediaId", "=", fromBase64(id))
+    .select(db.fn.count<number>("mediaHash").as("x"))
+    .where("mediaHash", "=", fromBase64(id))
     .executeTakeFirstOrThrow()
   return r.x !== 0
 }
