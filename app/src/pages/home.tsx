@@ -7,7 +7,7 @@ import HomeData from "./home.data"
 import { db } from "../db"
 import { lrpc } from "../lrpcClient"
 import { importAnki } from "./importer/importer"
-import { RemoteNoteId, throwExp } from "shared"
+import { csrfHeaderName, RemoteNoteId, throwExp } from "shared"
 import { RemoteMediaNum, ResourceId } from "../domain/ids"
 import { apiClient } from "../apiClient"
 
@@ -46,6 +46,9 @@ async function uploadNewNotes(): Promise<void> {
         method: "POST",
         body: data,
         credentials: "include",
+        headers: new Headers({
+          [csrfHeaderName]: "",
+        }),
       }
     )
     console.log(response)
