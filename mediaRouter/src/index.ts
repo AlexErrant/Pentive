@@ -19,6 +19,13 @@ import {
   Base64,
   Base64Url,
   setKysely,
+  userOwns,
+  hasMedia,
+  db,
+  fromBase64Url,
+  fromBase64,
+  NoteId,
+  throwExp,
 } from "shared"
 import { SignJWT, jwtVerify } from "jose"
 import { connect } from "@planetscale/database"
@@ -27,6 +34,7 @@ import { appRouter } from "./router"
 import { fetchRequestHandler } from "@trpc/server/adapters/fetch"
 import { createContext } from "./trpc"
 import { getJwsSecret } from "./env"
+import { iByNoteIdsValidator } from "./publicToken"
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const app = new Hono<{ Bindings: Env }>()
@@ -145,6 +153,54 @@ app
       })
     }
     return await postMedia(c, persistDbAndBucket, buildToken)
+  })
+  .post("/media/note", async (c) => {
+    const authResult = await getUserId(c)
+    if (authResult.tag === "Error") return authResult.error
+    const userId = authResult.ok
+    setKysely(c.env.planetscaleDbUrl)
+    const iByNoteIds = iByNoteIdsValidator.parse(c.req.query())
+    const noteIds = Object.keys(iByNoteIds) as NoteId[]
+    const owns = await userOwns(noteIds, userId)
+    if (!owns) {
+      return c.text(`You don't own one (or more) of these notes.`, 401)
+    }
+    const persistDbAndBucket = async ({
+      mediaIdBase64,
+      readable,
+      headers,
+    }: PersistParams): Promise<void> => {
+      const mediaId = fromBase64(mediaIdBase64)
+      const insertValues = Object.entries(iByNoteIds).map(([noteId, i]) => ({
+        mediaId,
+        i: i ?? throwExp("not sure why this can be undefined but whatever"),
+        entityId: fromBase64Url(noteId as NoteId),
+      }))
+      const has = await hasMedia(mediaIdBase64)
+      await db
+        .transaction()
+        // Not a "real" transaction since the final `COMMIT` still needs to be sent as a fetch, but whatever.
+        // Just means we could PUT something into the mediaBucket and have no record of it in PlanetScale. Not great, but _fine_.
+        // Grep BC34B055-ECB7-496D-9E71-58EE899A11D1 for details.
+        .execute(async (trx) => {
+          await trx
+            .insertInto("Media_Entity")
+            .values(insertValues)
+            .onDuplicateKeyUpdate({ mediaId })
+            .execute()
+          if (!has) {
+            const object = await c.env.mediaBucket.put(
+              mediaIdBase64,
+              readable,
+              {
+                httpMetadata: headers,
+              }
+            )
+            c.header("ETag", object.httpEtag)
+          }
+        })
+    }
+    return await postMedia(c, persistDbAndBucket, () => "")
   })
   .get("/private/:token", async (c) => {
     const authResult = await getUserId(c)

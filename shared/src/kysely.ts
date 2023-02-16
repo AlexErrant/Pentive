@@ -9,6 +9,7 @@ import {
   NoteId,
   RemoteNoteId,
   TemplateId,
+  UserId,
 } from "./brand.js"
 import { binary16fromBase64URL, ulidAsRaw } from "./convertBinary.js"
 import { undefinedMap } from "./utility.js"
@@ -20,7 +21,7 @@ import { compile } from "html-to-text"
 const convert = compile({})
 
 // @ts-expect-error db calls should throw null error if not setup
-let db: Kysely<DB> = null as Kysely<DB>
+export let db: Kysely<DB> = null as Kysely<DB>
 
 export function setKysely(url: string): void {
   if (db == null) {
@@ -90,6 +91,28 @@ export async function insertPost({
     .execute()
 }
 
+export async function userOwns(
+  ids: NoteId[],
+  authorId: UserId
+): Promise<boolean> {
+  const r = await db
+    .selectFrom("Note")
+    .select(db.fn.count<string>("id").as("x"))
+    .where("id", "in", ids.map(fromBase64Url))
+    .where("authorId", "=", authorId)
+    .executeTakeFirstOrThrow()
+  return parseInt(r.x) === ids.length
+}
+
+export async function hasMedia(id: Base64): Promise<boolean> {
+  const r = await db
+    .selectFrom("Media_Entity")
+    .select(db.fn.count<number>("mediaId").as("x"))
+    .where("mediaId", "=", fromBase64(id))
+    .executeTakeFirstOrThrow()
+  return r.x !== 0
+}
+
 export const createRemoteNote = z.object({
   localId: z.string() as unknown as z.Schema<NoteId>,
   templateId: z
@@ -109,7 +132,7 @@ export async function insertNotes(
     notes.map(async (n) => {
       const remoteId = ulidAsRaw()
       const remoteIdHex = base16.encode(remoteId) as Hex
-      const remoteIdBase64url = base64url.encode(remoteId)
+      const remoteIdBase64url = base64url.encode(remoteId).substring(0, 22)
       for (const field in n.fieldValues) {
         const oldResponse = new Response(n.fieldValues[field])
         const newResponse = new HTMLRewriter()
@@ -152,11 +175,11 @@ function unhex(id: Hex): RawBuilder<DbId> {
   return sql<DbId>`UNHEX(${id})`
 }
 
-function fromBase64(id: Base64): RawBuilder<DbId> {
+export function fromBase64(id: Base64): RawBuilder<DbId> {
   return sql<DbId>`FROM_BASE64(${id})`
 }
 
-function fromBase64Url(id: Base64Url): RawBuilder<DbId> {
+export function fromBase64Url(id: Base64Url): RawBuilder<DbId> {
   return fromBase64(binary16fromBase64URL(id))
 }
 
