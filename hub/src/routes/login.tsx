@@ -65,7 +65,7 @@ export default function Login(): JSX.Element {
             fields,
           })
         }
-        return await createUserSession(`${user.id}`, redirectTo)
+        return await createUserSession(`${user.username}`, redirectTo)
       }
       case "register": {
         const userExists = await db.user.findUnique({ where: { username } })
@@ -75,7 +75,7 @@ export default function Login(): JSX.Element {
           })
         }
         const user = await register({ username, password })
-        return await createUserSession(`${user.id}`, redirectTo)
+        return await createUserSession(`${user.username}`, redirectTo)
       }
       default: {
         throw new FormError(`Login type invalid`, { fields })

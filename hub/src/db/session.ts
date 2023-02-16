@@ -26,14 +26,13 @@ export type UserSession = { [K in SessionName]: string }
 export async function register({
   username,
   password,
-}: LoginForm): Promise<{ id: number; username: string; password: string }> {
+}: LoginForm): Promise<{ username: string; password: string }> {
   return await db.user.create({
     data: { username, password },
   })
 }
 
 export async function login({ username, password }: LoginForm): Promise<{
-  id: number
   username: string
   password: string
 } | null> {
@@ -206,16 +205,14 @@ export async function requireJwt(
 
 export async function getUser(
   request: Request
-): Promise<
-  { id: number; username: string; password: string } | null | undefined
-> {
+): Promise<{ username: string; password: string } | null | undefined> {
   const userId = await getUserId(request)
   if (typeof userId !== "string") {
     return null
   }
 
   try {
-    const user = await db.user.findUnique({ where: { id: Number(userId) } })
+    const user = await db.user.findUnique({ where: { username: userId } })
     return user
   } catch {
     throw await logout(request)
