@@ -21,7 +21,7 @@ import {
   setKysely,
 } from "shared"
 import { SignJWT, jwtVerify } from "jose"
-import { connect, Transaction } from "@planetscale/database"
+import { connect } from "@planetscale/database"
 import { buildPrivateToken, getMediaId } from "./privateToken"
 import { appRouter } from "./router"
 import { fetchRequestHandler } from "@trpc/server/adapters/fetch"
@@ -108,31 +108,41 @@ app
     const buildToken = async (mediaId: MediaId): Promise<Base64Url> =>
       await buildPrivateToken(c.env.tokenSecret, mediaId, userId)
     const persistDbAndBucket = async ({
-      tx,
       mediaIdBase64,
       readable,
       headers,
     }: PersistParams): Promise<void> => {
-      const countResponse = await tx.execute(
-        `SELECT (SELECT COUNT(*) FROM Media_User WHERE mediaId=FROM_BASE64(?) AND userId=?),
-                (SELECT COUNT(*) FROM Media_User WHERE mediaId=FROM_BASE64(?))`,
-        [mediaIdBase64, userId, mediaIdBase64],
-        { as: "array" }
-      )
-      const userCount = (countResponse.rows[0] as string[])[0]
-      const mediaCount = (countResponse.rows[0] as string[])[1]
-      if (userCount === "0") {
-        await tx.execute(
-          "INSERT INTO Media_User (mediaId, userId) VALUES (FROM_BASE64(?), ?)",
-          [mediaIdBase64, userId]
+      await connect({
+        url: c.env.planetscaleDbUrl,
+      }).transaction(async (tx) => {
+        // Not a "real" transaction since the final `COMMIT` still needs to be sent as a fetch, but whatever.
+        // Just means we could PUT something into the mediaBucket and have no record of it in PlanetScale. Not great, but _fine_.
+        // Grep BC34B055-ECB7-496D-9E71-58EE899A11D1 for details.
+        const countResponse = await tx.execute(
+          `SELECT (SELECT COUNT(*) FROM Media_User WHERE mediaId=FROM_BASE64(?) AND userId=?),
+                  (SELECT COUNT(*) FROM Media_User WHERE mediaId=FROM_BASE64(?))`,
+          [mediaIdBase64, userId, mediaIdBase64],
+          { as: "array" }
         )
-        if (mediaCount === "0") {
-          const object = await c.env.mediaBucket.put(mediaIdBase64, readable, {
-            httpMetadata: headers,
-          })
-          c.header("ETag", object.httpEtag)
+        const userCount = (countResponse.rows[0] as string[])[0]
+        const mediaCount = (countResponse.rows[0] as string[])[1]
+        if (userCount === "0") {
+          await tx.execute(
+            "INSERT INTO Media_User (mediaId, userId) VALUES (FROM_BASE64(?), ?)",
+            [mediaIdBase64, userId]
+          )
+          if (mediaCount === "0") {
+            const object = await c.env.mediaBucket.put(
+              mediaIdBase64,
+              readable,
+              {
+                httpMetadata: headers,
+              }
+            )
+            c.header("ETag", object.httpEtag)
+          }
         }
-      }
+      })
     }
     return await postMedia(c, persistDbAndBucket, buildToken)
   })
@@ -203,19 +213,11 @@ async function postMedia(
   const mediaIdBase64 = base64.encode(mediaId) as Base64
 
   const response = await buildResponse(mediaId)
-  await connect({
-    url: c.env.planetscaleDbUrl,
-  }).transaction(async (tx) => {
-    // Not a "real" transaction since the final `COMMIT` still needs to be sent as a fetch, but whatever.
-    // Just means we could PUT something into the mediaBucket and have no record of it in PlanetScale. Not great, but _fine_.
-    // Grep BC34B055-ECB7-496D-9E71-58EE899A11D1 for details.
-    await persistDbAndBucket({ tx, mediaIdBase64, readable, headers })
-  })
+  await persistDbAndBucket({ mediaIdBase64, readable, headers })
   return c.text(response, 201)
 }
 
 interface PersistParams {
-  tx: Transaction
   mediaIdBase64: Base64
   readable: ReadableStream<Uint8Array>
   headers: Headers
