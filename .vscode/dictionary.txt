@@ -39,7 +39,9 @@ superjson
 sveltejs
 tailwindcss
 Tauri
+tinyint
 trpc
+ulids
 unhex
 upserted
 viewports

@@ -165,7 +165,7 @@ model Media_User {
 }
 
 model Media_Entity {
-  entityId  Bytes @db.Binary(16)
+  entityId  Bytes @db.Binary(16) // e.g. template, note, or comment that refers to said media
   i         Int   @db.UnsignedTinyInt
   mediaHash Bytes @db.Binary(32)
 
