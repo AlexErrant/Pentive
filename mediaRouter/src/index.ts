@@ -167,7 +167,7 @@ export default app
 async function postMedia(
   c: MediaRouterContext,
   persistDbAndBucket: (_: PersistParams) => Promise<void>,
-  buildToken: (mediaId: MediaId) => Promise<Base64Url>
+  buildResponse: (mediaId: MediaId) => string | Promise<string>
 ): Promise<Response> {
   if (c.req.body === null) {
     return c.text("Missing body", 400)
@@ -202,7 +202,7 @@ async function postMedia(
   const mediaId = new Uint8Array(await digestStream.digest) as MediaId
   const mediaIdBase64 = base64.encode(mediaId) as Base64
 
-  const token = await buildToken(mediaId)
+  const response = await buildResponse(mediaId)
   await connect({
     url: c.env.planetscaleDbUrl,
   }).transaction(async (tx) => {
@@ -211,7 +211,7 @@ async function postMedia(
     // Grep BC34B055-ECB7-496D-9E71-58EE899A11D1 for details.
     await persistDbAndBucket({ tx, mediaIdBase64, readable, headers })
   })
-  return c.text(token, 201)
+  return c.text(response, 201)
 }
 
 interface PersistParams {
