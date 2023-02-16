@@ -70,7 +70,7 @@ importers:
       vite-plugin-solid: ^2.3.0
       vitest: ^0.20.3
       workbox-precaching: ^6.5.4
-      zod: ^3.19.1
+      zod: ^3.20.6
     dependencies:
       '@github/time-elements': 3.1.4
       '@tanstack/solid-table': 8.5.13_solid-js@1.5.4
@@ -98,7 +98,7 @@ importers:
       sql.js: 1.8.0
       superjson: 1.12.2
       uuid: 9.0.0
-      zod: 3.19.1
+      zod: 3.20.6
     devDependencies:
       '@babel/core': 7.19.0
       '@cloudflare/workers-types': 4.20221111.1
@@ -326,7 +326,7 @@ importers:
       ts-node: ^10.9.1
       typescript: ^4.7.4
       uuid: ^9.0.0
-      zod: ^3.19.1
+      zod: ^3.20.6
     dependencies:
       '@prisma/client': 4.6.1_prisma@4.6.1
       '@trpc/client': 10.11.1_@trpc+server@10.11.1
@@ -343,7 +343,7 @@ importers:
       shared: link:../shared
       superjson: 1.12.2
       uuid: 9.0.0
-      zod: 3.19.1
+      zod: 3.20.6
     devDependencies:
       '@types/aws-lambda': 8.10.106
       '@types/cookie': 0.5.1
@@ -371,7 +371,7 @@ importers:
       superjson: ^1.12.2
       typescript: ^4.9.4
       wrangler: 2.6.2
-      zod: ^3.19.1
+      zod: ^3.20.6
     dependencies:
       '@planetscale/database': 1.5.0
       '@trpc/server': 10.11.1
@@ -379,7 +379,7 @@ importers:
       jose: 4.11.1
       shared: link:../shared
       superjson: 1.12.2
-      zod: 3.19.1
+      zod: 3.20.6
     devDependencies:
       '@cloudflare/workers-types': 4.20221111.1
       typescript: 4.9.4
@@ -414,7 +414,7 @@ importers:
       typescript: ^4.7.4
       ulid-workers: ^2.1.0
       uuid: ^9.0.0
-      zod: ^3.19.1
+      zod: ^3.20.6
     dependencies:
       '@planetscale/database': 1.5.0
       '@scure/base': 1.1.1
@@ -425,7 +425,7 @@ importers:
       lodash: 4.17.21
       ulid-workers: 2.1.0
       uuid: 9.0.0
-      zod: 3.19.1
+      zod: 3.20.6
     devDependencies:
       '@cloudflare/workers-types': 4.20221111.1
       '@types/html-to-text': 9.0.0
@@ -13363,6 +13363,6 @@ packages:
       readable-stream: 3.6.0
     dev: true
 
-  /zod/3.19.1:
-    resolution: {integrity: sha512-LYjZsEDhCdYET9ikFu6dVPGp2YH9DegXjdJToSzD9rO6fy4qiRYFoyEYwps88OseJlPyl2NOe2iJuhEhL7IpEA==}
+  /zod/3.20.6:
+    resolution: {integrity: sha512-oyu0m54SGCtzh6EClBVqDDlAYRz4jrVtKwQ7ZnsEmMI9HnzuZFj8QFwAY1M5uniIYACdGvv0PBWPF2kO0aNofA==}
     dev: false
