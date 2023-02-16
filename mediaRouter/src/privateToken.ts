@@ -1,7 +1,6 @@
 import { base64, Base64Url, base64url, Brand } from "shared"
-import { concat } from "./util"
+import { concat, MediaId } from "./util"
 
-export type MediaId = Brand<Uint8Array, "mediaId">
 export type UserId = Brand<string, "userId">
 export type TokenSecretBase64 = Brand<string, "tokenSecretBase64" | "base64">
 
