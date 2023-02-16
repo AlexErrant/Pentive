@@ -113,6 +113,19 @@ export async function hasMedia(id: Base64): Promise<boolean> {
   return r.x !== 0
 }
 
+export async function lookupMediaHash(
+  entityId: Base64,
+  i: number
+): Promise<Base64 | undefined> {
+  const mediaHash = await db
+    .selectFrom("Media_Entity")
+    .select(sql<Base64>`TO_BASE64(mediaHash)`.as("mediaHash"))
+    .where("entityId", "=", fromBase64(entityId))
+    .where("i", "=", i)
+    .executeTakeFirst()
+  return mediaHash?.mediaHash
+}
+
 export const createRemoteNote = z.object({
   localId: z.string() as unknown as z.Schema<NoteId>,
   templateId: z

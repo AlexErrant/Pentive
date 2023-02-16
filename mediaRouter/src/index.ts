@@ -26,6 +26,8 @@ import {
   fromBase64,
   NoteId,
   throwExp,
+  lookupMediaHash,
+  binary16fromBase64URL,
 } from "shared"
 import { SignJWT, jwtVerify } from "jose"
 import { connect } from "@planetscale/database"
@@ -34,7 +36,7 @@ import { appRouter } from "./router"
 import { fetchRequestHandler } from "@trpc/server/adapters/fetch"
 import { createContext } from "./trpc"
 import { getJwsSecret } from "./env"
-import { iByNoteIdsValidator } from "./publicToken"
+import { iByNoteIdsValidator, parsePublicToken } from "./publicToken"
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const app = new Hono<{ Bindings: Env }>()
@@ -212,20 +214,15 @@ app
       base64url.decode(c.req.param("token"))
     )
     if (mediaHash == null) return c.text("Invalid token", 400)
-    const file = await c.env.mediaBucket.get(base64.encode(mediaHash))
-    if (file === null) {
-      return await c.notFound()
-    }
-    c.header("ETag", file.httpEtag)
-    c.header("Expires", new Date(31536000 * 1000 + Date.now()).toUTCString())
-    // eslint-disable-next-line no-constant-condition
-    const p = true ? "public" : "private" // nextTODO fix
-    c.header("Cache-Control", `${p}, max-age=31536000, immutable`)
-    if (file.httpMetadata?.contentType != null)
-      c.header("Content-Type", file.httpMetadata.contentType)
-    if (file.httpMetadata?.contentEncoding != null)
-      c.header("Content-Encoding", file.httpMetadata.contentEncoding)
-    return c.body(file.body)
+    const mediaHashBase64 = base64.encode(mediaHash) as Base64
+    return await getMedia(c, mediaHashBase64, "private")
+  })
+  .get("/i/:token", async (c) => {
+    const [entityId, i] = parsePublicToken(c.req.param("token"))
+    const entityIdBase64 = binary16fromBase64URL(entityId)
+    const mediaHash = await lookupMediaHash(entityIdBase64, i)
+    if (mediaHash == null) return await c.notFound()
+    return await getMedia(c, mediaHash, "public")
   })
 
 export default app
@@ -281,4 +278,27 @@ interface PersistParams {
   mediaHashBase64: Base64
   readable: ReadableStream<Uint8Array>
   headers: Headers
+}
+
+async function getMedia(
+  c: MediaRouterContext,
+  mediaIdBase64: Base64,
+  cacheControl: "public" | "private"
+): Promise<Response> {
+  const file = await c.env.mediaBucket.get(mediaIdBase64)
+  if (file === null) {
+    return await c.notFound()
+  }
+  c.header("ETag", file.httpEtag)
+  const maxAge =
+    cacheControl === "public"
+      ? 1814400 // 21 days
+      : 31536000 // 1 year
+  c.header("Expires", new Date(maxAge * 1000 + Date.now()).toUTCString())
+  c.header("Cache-Control", `${cacheControl}, max-age=${maxAge}, immutable`)
+  if (file.httpMetadata?.contentType != null)
+    c.header("Content-Type", file.httpMetadata.contentType)
+  if (file.httpMetadata?.contentEncoding != null)
+    c.header("Content-Encoding", file.httpMetadata.contentEncoding)
+  return c.body(file.body)
 }
