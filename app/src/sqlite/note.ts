@@ -1,5 +1,5 @@
 import { CreateRemoteNote, RemoteNoteId, nullMap, throwExp } from "shared"
-import { NoteId, RemoteMediaNum, ResourceId } from "../domain/ids"
+import { NoteId, RemoteMediaNum, MediaId } from "../domain/ids"
 import { Note } from "../domain/note"
 import { getKysely } from "./crsqlite"
 import { DB, Note as NoteEntity } from "./database"
@@ -152,7 +152,7 @@ export const noteCollectionMethods = {
       .where("id", "in", srcs)
       .execute()
     const resources = new Map<
-      ResourceId,
+      MediaId,
       { data: ArrayBuffer; ids: Array<[NoteId, RemoteMediaNum]> }
     >(mediaBinaries.map(({ id, data }) => [id, { data, ids: [] }]))
     if (mediaBinaries.length !== srcs.length)
@@ -204,10 +204,10 @@ function withLocalMediaIdByRemoteMediaId(
   note: CreateRemoteNote
 ): {
   note: CreateRemoteNote
-  localMediaIdByRemoteMediaId: Map<RemoteMediaNum, ResourceId>
+  localMediaIdByRemoteMediaId: Map<RemoteMediaNum, MediaId>
 } {
   let i = 0 as RemoteMediaNum
-  const localMediaIdByRemoteMediaId = new Map<RemoteMediaNum, ResourceId>()
+  const localMediaIdByRemoteMediaId = new Map<RemoteMediaNum, MediaId>()
   const fieldValues = new Map<string, string>()
   for (const field in note.fieldValues) {
     const doc = dp.parseFromString(note.fieldValues[field], "text/html")
@@ -216,7 +216,7 @@ function withLocalMediaIdByRemoteMediaId(
       if (src != null) {
         // Filter no-src images - grep 330CE329-B962-4E68-90F3-F4F3700815DA
         image.setAttribute("src", i.toString())
-        localMediaIdByRemoteMediaId.set(i, src as ResourceId)
+        localMediaIdByRemoteMediaId.set(i, src as MediaId)
         i++
       }
     }

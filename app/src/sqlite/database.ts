@@ -1,7 +1,7 @@
 // most of these columns are nullable in SQLite, but they're not nullable here for the sake of my sanity
 
 import { DbId } from "shared"
-import { ResourceId } from "../domain/ids"
+import { MediaId } from "../domain/ids"
 
 export interface Card {
   id: DbId
@@ -38,7 +38,7 @@ export interface Plugin {
 }
 
 export interface Resource {
-  id: ResourceId
+  id: MediaId
   created: number
   data: Uint8Array
 }

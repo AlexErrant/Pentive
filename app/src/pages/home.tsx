@@ -8,7 +8,7 @@ import { db } from "../db"
 import { lrpc } from "../lrpcClient"
 import { importAnki } from "./importer/importer"
 import { csrfHeaderName, throwExp } from "shared"
-import { ResourceId } from "../domain/ids"
+import { MediaId } from "../domain/ids"
 import { apiClient } from "../apiClient"
 
 async function uploadNewTemplates(): Promise<void> {
@@ -266,7 +266,7 @@ async function uploadResource(
     throwExp("Impossible - there should be a file selected")
   await db.bulkAddResources([
     {
-      id: file.name as ResourceId,
+      id: file.name as MediaId,
       created: new Date(),
       data: await file.arrayBuffer(),
     },

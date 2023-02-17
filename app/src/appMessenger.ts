@@ -1,6 +1,6 @@
 import _ from "lodash"
 import { C } from "."
-import { CardId, NoteId, ResourceId, Side, TemplateId } from "./domain/ids"
+import { CardId, NoteId, MediaId, Side, TemplateId } from "./domain/ids"
 import { assertNever, throwExp } from "shared"
 import { db } from "./db"
 
@@ -80,7 +80,7 @@ async function renderBody(
   }
 }
 
-async function getLocalResource(id: ResourceId): Promise<ArrayBuffer | null> {
+async function getLocalResource(id: MediaId): Promise<ArrayBuffer | null> {
   const resource = await db.getResource(id)
   return resource?.data ?? null
 }

@@ -1,7 +1,7 @@
-import { ResourceId } from "./ids"
+import { MediaId } from "./ids"
 
 export interface Resource {
-  readonly id: ResourceId
+  readonly id: MediaId
   readonly created: Date
   readonly data: ArrayBuffer
 }

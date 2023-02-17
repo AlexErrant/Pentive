@@ -1,5 +1,5 @@
 import { Dexie } from "dexie"
-import { ResourceId } from "../../src/domain/ids"
+import { MediaId } from "../../src/domain/ids"
 import { Plugin } from "../../src/domain/plugin"
 import { Resource } from "../../src/domain/resource"
 import * as Comlink from "comlink"
@@ -23,7 +23,7 @@ export const dexieMethods = {
   async bulkAddResources(resources: Resource[]) {
     await ddb.resources.bulkAdd(resources)
   },
-  async getResource(id: ResourceId) {
+  async getResource(id: MediaId) {
     // This helps detect memory leaks - if you see this log 100x, something's very wrong.
     console.debug("getResource for " + id)
     // highTODO perf is abysmal https://stackoverflow.com/q/20809832

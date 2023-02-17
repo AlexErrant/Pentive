@@ -18,7 +18,7 @@ import { parseNote, parseCard, parseTemplates } from "./parser"
 import { Card as PCard } from "../../domain/card"
 import { Note as PNote } from "../../domain/note"
 import { Template } from "../../domain/template"
-import { ResourceId, TemplateId } from "../../domain/ids"
+import { MediaId, TemplateId } from "../../domain/ids"
 import { db } from "./../../db"
 import _ from "lodash"
 import { Resource } from "../../domain/resource"
@@ -76,7 +76,7 @@ async function addMediaBatch(
       return name == null // occurs for entries that aren't media, e.g. collection.anki2
         ? null
         : {
-            id: name as ResourceId,
+            id: name as MediaId,
             created: new Date(),
             data: array.buffer,
           }

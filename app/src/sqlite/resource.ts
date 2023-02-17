@@ -1,5 +1,5 @@
 import { undefinedMap } from "shared"
-import { ResourceId } from "../domain/ids"
+import { MediaId } from "../domain/ids"
 import { Resource } from "../domain/resource"
 import * as Comlink from "comlink"
 import { getDb, getKysely } from "./crsqlite"
@@ -44,7 +44,7 @@ export const resourceCollectionMethods = {
     }
     insert.finalize()
   },
-  async getResource(id: ResourceId) {
+  async getResource(id: MediaId) {
     // This helps detect memory leaks - if you see this log 100x, something's very wrong.
     console.debug("getResource for " + id)
     const db = await getKysely()
