@@ -8,7 +8,6 @@ import { Resource as ResourceEntity } from "./database"
 function entityToDomain(entity: ResourceEntity): Resource {
   return {
     id: entity.id,
-    remoteId: entity.remoteId ?? undefined,
     created: new Date(entity.created),
     data: entity.data.buffer,
   }
@@ -18,12 +17,11 @@ export const resourceCollectionMethods = {
   upsertResource: async function (resource: Resource) {
     const db = await getDb()
     const insert = await db.prepare(
-      `INSERT INTO resource (id,remoteId,created,data)
-                     VALUES ( ?,       ?,      ?,   ?)`
+      `INSERT INTO resource (id,created,data)
+                     VALUES ( ?,      ?,   ?)`
     )
     await insert.run(
       resource.id,
-      resource.remoteId ?? null,
       resource.created.getTime(),
       new Uint8Array(resource.data)
     )
@@ -34,13 +32,12 @@ export const resourceCollectionMethods = {
     // If moving to SQLite official doesn't improve perf, consider using Origin Private File System
     const db = await getDb()
     const insert = await db.prepare(
-      `INSERT INTO resource (id,remoteId,created,data)
-                     VALUES ( ?,       ?,      ?,   ?)`
+      `INSERT INTO resource (id,created,data)
+                     VALUES ( ?,      ?,   ?)`
     )
     for (const resource of resources) {
       await insert.run(
         resource.id,
-        resource.remoteId ?? null,
         resource.created.getTime(),
         new Uint8Array(resource.data)
       )

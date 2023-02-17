@@ -2,7 +2,6 @@ type Brand<T, B> = T & { readonly brand: B } // https://medium.com/@KevinBGreene
 
 export type RemoteTemplateId = Brand<string, "remoteTemplateId" & "base64url">
 export type RemoteCardId = Brand<string, "remoteCardId" & "base64url">
-export type RemoteResourceId = Brand<string, "remoteResourceId">
 
 export { TemplateId, NoteId, UserId } from "shared"
 export type ChildTemplateId = Brand<string, "childTemplateId">

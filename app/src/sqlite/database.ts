@@ -39,7 +39,6 @@ export interface Plugin {
 
 export interface Resource {
   id: ResourceId
-  remoteId: DbId | null
   created: number
   data: Uint8Array
 }
