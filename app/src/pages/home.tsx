@@ -26,12 +26,12 @@ async function uploadNewTemplates(): Promise<void> {
 }
 
 async function uploadNewNotes(): Promise<void> {
-  const { notes, resources } = await db.prepareAndGetNewNotesToUpload()
+  const { notes, media } = await db.prepareAndGetNewNotesToUpload()
   if (notes.length > 0) {
     const remoteIdByLocal = await apiClient.createNote.mutate(notes)
     await db.updateRemoteIds(remoteIdByLocal)
     console.log(remoteIdByLocal)
-    for (const [, { data, ids }] of resources) {
+    for (const [, { data, ids }] of media) {
       const remoteNoteIdAndRemoteMediaNum = ids.map(
         ([noteId, remoteMediaNum]) => {
           const remoteNoteId =
@@ -238,8 +238,8 @@ export default function Home(): JSX.Element {
       </div>
       <div class="mt-4">
         <label>
-          Upload Resource
-          <input type="file" onchange={uploadResource} accept="image/*"></input>
+          Upload Media
+          <input type="file" onchange={uploadMedia} accept="image/*"></input>
         </label>
       </div>
       <div class="mt-4">
@@ -254,7 +254,7 @@ export default function Home(): JSX.Element {
   )
 }
 
-async function uploadResource(
+async function uploadMedia(
   event: Event & {
     currentTarget: HTMLInputElement
     target: Element
@@ -264,7 +264,7 @@ async function uploadResource(
     // My mental static analysis says to use `currentTarget`, but it seems to randomly be null, hence `target`. I'm confused but whatever.
     (event.target as HTMLInputElement).files?.item(0) ??
     throwExp("Impossible - there should be a file selected")
-  await db.bulkAddResources([
+  await db.bulkAddMedia([
     {
       id: file.name as MediaId,
       created: new Date(),

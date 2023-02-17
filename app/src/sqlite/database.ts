@@ -37,7 +37,7 @@ export interface Plugin {
   script: Uint8Array
 }
 
-export interface Resource {
+export interface Media {
   id: MediaId
   created: number
   data: Uint8Array
@@ -59,6 +59,6 @@ export interface DB {
   card: Card
   note: Note
   plugin: Plugin
-  resource: Resource
+  media: Media
   template: Template
 }

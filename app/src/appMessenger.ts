@@ -80,12 +80,12 @@ async function renderBody(
   }
 }
 
-async function getLocalResource(id: MediaId): Promise<ArrayBuffer | null> {
-  const resource = await db.getResource(id)
-  return resource?.data ?? null
+async function getLocalMedia(id: MediaId): Promise<ArrayBuffer | null> {
+  const media = await db.getMedia(id)
+  return media?.data ?? null
 }
 
 export const appExpose = {
-  getLocalResource,
+  getLocalMedia,
   renderBody,
 }

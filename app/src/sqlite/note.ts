@@ -147,24 +147,24 @@ export const noteCollectionMethods = {
       Array.from(n.localMediaIdByRemoteMediaId.values())
     )
     const mediaBinaries = await db
-      .selectFrom("resource")
+      .selectFrom("media")
       .select(["id", "data"])
       .where("id", "in", srcs)
       .execute()
-    const resources = new Map<
+    const media = new Map<
       MediaId,
       { data: ArrayBuffer; ids: Array<[NoteId, RemoteMediaNum]> }
     >(mediaBinaries.map(({ id, data }) => [id, { data, ids: [] }]))
     if (mediaBinaries.length !== srcs.length)
-      throwExp("You're missing a resource.") // medTODO better error message
+      throwExp("You're missing a media.") // medTODO better error message
     for (const { note, localMediaIdByRemoteMediaId } of notesAndStuff) {
       for (const [
         remoteMediaNum,
         localMediaId,
       ] of localMediaIdByRemoteMediaId) {
         const value =
-          resources.get(localMediaId) ??
-          throwExp(`resourceMap is missing '${localMediaId}'... how?`)
+          media.get(localMediaId) ??
+          throwExp(`mediaMap is missing '${localMediaId}'... how?`)
         value.ids.push([note.localId, remoteMediaNum])
       }
       await db // lowTODO optimize - use prepared statement?
@@ -177,7 +177,7 @@ export const noteCollectionMethods = {
         .where("id", "=", note.localId)
         .execute()
     }
-    return { resources, notes: notesAndStuff.map((n) => n.note) }
+    return { media, notes: notesAndStuff.map((n) => n.note) }
   },
   updateRemoteIds: async function (
     remoteIdByLocal: Record<NoteId, RemoteNoteId>

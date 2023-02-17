@@ -21,7 +21,7 @@ import { Template } from "../../domain/template"
 import { MediaId, TemplateId } from "../../domain/ids"
 import { db } from "./../../db"
 import _ from "lodash"
-import { Resource } from "../../domain/resource"
+import { Media } from "../../domain/media"
 
 export async function importAnki(
   event: Event & {
@@ -65,7 +65,7 @@ async function addMediaBatch(
   entries: Entry[],
   nameByI: Record<string, string>
 ): Promise<void> {
-  const resourcesAndNulls = await Promise.all(
+  const mediaAndNulls = await Promise.all(
     entries.map(async (entry) => {
       const array =
         (await entry.getData?.(new Uint8ArrayWriter())) ??
@@ -82,8 +82,8 @@ async function addMediaBatch(
           }
     })
   )
-  const resources = resourcesAndNulls.filter((r) => r != null) as Resource[]
-  await db.bulkAddResources(resources)
+  const media = mediaAndNulls.filter((r) => r != null) as Media[]
+  await db.bulkAddMedia(media)
 }
 
 async function importAnkiDb(sqlite: Entry): Promise<void> {

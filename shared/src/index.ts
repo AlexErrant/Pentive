@@ -34,7 +34,7 @@ export const initSql = [
     due INTEGER,
     state INTEGER
 ) STRICT;`,
-  `CREATE TABLE IF NOT EXISTS resource (
+  `CREATE TABLE IF NOT EXISTS media (
     id TEXT PRIMARY KEY, -- should stay TEXT!
     created INTEGER,
     data BLOB
@@ -49,7 +49,7 @@ export const initSql = [
   `SELECT crsql_as_crr('template');`,
   `SELECT crsql_as_crr('note');`,
   `SELECT crsql_as_crr('card');`,
-  `SELECT crsql_as_crr('resource');`,
+  `SELECT crsql_as_crr('media');`,
   `SELECT crsql_as_crr('plugin');`,
 ]
 
