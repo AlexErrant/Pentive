@@ -7,8 +7,8 @@ import HomeData from "./home.data"
 import { db } from "../db"
 import { lrpc } from "../lrpcClient"
 import { importAnki } from "./importer/importer"
-import { csrfHeaderName, RemoteNoteId, throwExp } from "shared"
-import { RemoteMediaNum, ResourceId } from "../domain/ids"
+import { csrfHeaderName, throwExp } from "shared"
+import { ResourceId } from "../domain/ids"
 import { apiClient } from "../apiClient"
 
 async function uploadNewTemplates(): Promise<void> {
@@ -27,31 +27,36 @@ async function uploadNewTemplates(): Promise<void> {
 
 async function uploadNewNotes(): Promise<void> {
   const { notes, resources } = await db.prepareAndGetNewNotesToUpload()
-  const remoteIdByLocal = await apiClient.createNote.mutate(notes)
-  console.log(remoteIdByLocal)
-  for (const [, { data, ids }] of resources) {
-    const remoteNoteIdAndRemoteMediaNum = ids.map(
-      ([noteId, remoteMediaNum]) => {
-        const remoteNoteId =
-          remoteIdByLocal[noteId] ??
-          throwExp(`remoteIdByLocal is missing ${noteId} - how?`)
-        return [remoteNoteId, remoteMediaNum.toString()]
-      }
-    )
-    const response = await fetch(
-      import.meta.env.VITE_API_URL +
-        "media/note?" +
-        new URLSearchParams(remoteNoteIdAndRemoteMediaNum).toString(),
-      {
-        method: "POST",
-        body: data,
-        credentials: "include",
-        headers: new Headers({
-          [csrfHeaderName]: "",
-        }),
-      }
-    )
-    console.log(response)
+  if (notes.length > 0) {
+    const remoteIdByLocal = await apiClient.createNote.mutate(notes)
+    await db.updateRemoteIds(remoteIdByLocal)
+    console.log(remoteIdByLocal)
+    for (const [, { data, ids }] of resources) {
+      const remoteNoteIdAndRemoteMediaNum = ids.map(
+        ([noteId, remoteMediaNum]) => {
+          const remoteNoteId =
+            remoteIdByLocal[noteId] ??
+            throwExp(`remoteIdByLocal is missing ${noteId} - how?`)
+          return [remoteNoteId, remoteMediaNum.toString()]
+        }
+      )
+      const response = await fetch(
+        import.meta.env.VITE_API_URL +
+          "media/note?" +
+          new URLSearchParams(remoteNoteIdAndRemoteMediaNum).toString(),
+        {
+          method: "POST",
+          body: data,
+          credentials: "include",
+          headers: new Headers({
+            [csrfHeaderName]: "",
+          }),
+        }
+      )
+      console.log(response)
+    }
+  } else {
+    console.log("Nothing to upload!")
   }
 }
 

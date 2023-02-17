@@ -1,4 +1,4 @@
-import { CreateRemoteNote, nullMap, throwExp } from "shared"
+import { CreateRemoteNote, RemoteNoteId, nullMap, throwExp } from "shared"
 import { NoteId, RemoteMediaNum, ResourceId } from "../domain/ids"
 import { Note } from "../domain/note"
 import { getKysely } from "./crsqlite"
@@ -178,6 +178,19 @@ export const noteCollectionMethods = {
         .execute()
     }
     return { resources, notes: notesAndStuff.map((n) => n.note) }
+  },
+  updateRemoteIds: async function (
+    remoteIdByLocal: Record<NoteId, RemoteNoteId>
+  ) {
+    const db = await getKysely()
+    for (const noteId in remoteIdByLocal) {
+      const remoteId = remoteIdByLocal[noteId as NoteId]
+      await db
+        .updateTable("note")
+        .set({ pushId: remoteId, push: null })
+        .where("id", "=", noteId as NoteId)
+        .execute()
+    }
   },
 }
 

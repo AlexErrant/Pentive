@@ -10,7 +10,7 @@ export const appRouter = router({
     return `Authed Hello ${ctx.user}!`
   }),
   createNote: authedProcedure
-    .input(z.array(createRemoteNote))
+    .input(z.array(createRemoteNote).min(1))
     .mutation(async ({ input, ctx }) => {
       const remoteIdByLocal = await insertNotes(ctx.user, input)
       return remoteIdByLocal
