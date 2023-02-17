@@ -60,6 +60,19 @@ async function uploadNewNotes(): Promise<void> {
   }
 }
 
+async function updateNotes(): Promise<void> {
+  const note = await db.getNote(sampleNote.id)
+  if (note == null) throwExp("No note!")
+  await db.updateNote({
+    ...note,
+    fieldValues: {
+      front: note.fieldValues.front + "!",
+      back: note.fieldValues.back + "!",
+    },
+    push: true,
+  })
+}
+
 async function searchNotes(search: string): Promise<void> {
   const searchBatch = await lrpc.searchNotes.query(search)
   console.log(searchBatch)
@@ -183,6 +196,12 @@ export default function Home(): JSX.Element {
           onClick={async () => await searchNotes(search())}
         >
           searchNotes
+        </button>
+        <button
+          class="border rounded-lg px-2 border-gray-900"
+          onClick={async () => await updateNotes()}
+        >
+          updateNotes
         </button>
         <form
           onSubmit={async (e) => {

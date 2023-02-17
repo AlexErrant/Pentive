@@ -192,6 +192,11 @@ export const noteCollectionMethods = {
         .execute()
     }
   },
+  updateNote: async function (note: Note) {
+    const db = await getKysely()
+    const { id, ...rest } = noteToDocType(note)
+    await db.updateTable("note").set(rest).where("id", "=", id).execute()
+  },
 }
 
 function withLocalMediaIdByRemoteMediaId(
