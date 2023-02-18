@@ -190,6 +190,17 @@ export const noteCollectionMethods = {
         .execute()
     }
   },
+  updateUploadDate: async function (ids: Array<[NoteId, RemoteMediaNum]>) {
+    const db = await getKysely()
+    for (const [localEntityId, i] of ids) {
+      await db
+        .updateTable("remoteMedia")
+        .set({ uploadDate: new Date().getTime() })
+        .where("localEntityId", "=", localEntityId)
+        .where("i", "=", i)
+        .execute()
+    }
+  },
   updateNote: async function (note: Note) {
     const db = await getKysely()
     const { id, ...rest } = noteToDocType(note)

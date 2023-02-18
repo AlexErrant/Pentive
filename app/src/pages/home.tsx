@@ -7,8 +7,8 @@ import HomeData from "./home.data"
 import { db } from "../db"
 import { lrpc } from "../lrpcClient"
 import { importAnki } from "./importer/importer"
-import { csrfHeaderName, throwExp } from "shared"
-import { MediaId } from "../domain/ids"
+import { csrfHeaderName, NoteId, RemoteNoteId, throwExp } from "shared"
+import { MediaId, RemoteMediaNum } from "../domain/ids"
 import { apiClient } from "../apiClient"
 
 async function uploadNewTemplates(): Promise<void> {
@@ -31,33 +31,48 @@ async function uploadNewNotes(): Promise<void> {
     const remoteIdByLocal = await apiClient.createNote.mutate(notes)
     await db.updateRemoteIds(remoteIdByLocal)
     console.log(remoteIdByLocal)
-    for (const [, { data, ids }] of media) {
-      const remoteNoteIdAndRemoteMediaNum = ids.map(
-        ([noteId, remoteMediaNum]) => {
-          const remoteNoteId =
-            remoteIdByLocal[noteId] ??
-            throwExp(`remoteIdByLocal is missing ${noteId} - how?`)
-          return [remoteNoteId, remoteMediaNum.toString()]
-        }
-      )
-      const response = await fetch(
-        import.meta.env.VITE_API_URL +
-          "media/note?" +
-          new URLSearchParams(remoteNoteIdAndRemoteMediaNum).toString(),
-        {
-          method: "POST",
-          body: data,
-          credentials: "include",
-          headers: new Headers({
-            [csrfHeaderName]: "",
-          }),
-        }
-      )
-      console.log(response)
+    for (const [mediaId, { data, ids }] of media) {
+      await postMedia(mediaId, ids, remoteIdByLocal, data)
     }
   } else {
     console.log("Nothing to upload!")
   }
+}
+
+async function postMedia(
+  mediaId: MediaId,
+  ids: Array<[NoteId, RemoteMediaNum]>,
+  remoteIdByLocal: Record<NoteId, RemoteNoteId>,
+  data: ArrayBuffer
+): Promise<void> {
+  const remoteNoteIdAndRemoteMediaNum = ids.map(([noteId, remoteMediaNum]) => {
+    const remoteNoteId =
+      remoteIdByLocal[noteId] ??
+      throwExp(`remoteIdByLocal is missing ${noteId} - how?`)
+    return [remoteNoteId, remoteMediaNum.toString()]
+  })
+  const response = await fetch(
+    import.meta.env.VITE_API_URL +
+      "media/note?" +
+      new URLSearchParams(remoteNoteIdAndRemoteMediaNum).toString(),
+    {
+      method: "POST",
+      body: data,
+      credentials: "include",
+      headers: new Headers({
+        [csrfHeaderName]: "",
+      }),
+    }
+  )
+  // eslint-disable-next-line yoda
+  if (200 <= response.status && response.status <= 299) {
+    await db.updateUploadDate(ids)
+  } else {
+    console.error(
+      `'${response.status}' HTTP status while uploading ${mediaId}.`
+    )
+  }
+  console.log(response)
 }
 
 async function updateNotes(): Promise<void> {
