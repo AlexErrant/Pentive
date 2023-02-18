@@ -28,6 +28,7 @@ import {
   throwExp,
   lookupMediaHash,
   binary16fromBase64URL,
+  userOwnsAndHasMedia,
 } from "shared"
 import { SignJWT, jwtVerify } from "jose"
 import { connect } from "@planetscale/database"
@@ -121,7 +122,7 @@ app
       mediaHashBase64,
       readable,
       headers,
-    }: PersistParams): Promise<void> => {
+    }: PersistParams): Promise<undefined> => {
       await connect({
         url: c.env.planetscaleDbUrl,
       }).transaction(async (tx) => {
@@ -153,6 +154,7 @@ app
           }
         }
       })
+      return undefined
     }
     return await postMedia(c, persistDbAndBucket, buildToken)
   })
@@ -163,22 +165,24 @@ app
     setKysely(c.env.planetscaleDbUrl)
     const iByNoteIds = iByNoteIdsValidator.parse(c.req.query())
     const noteIds = Object.keys(iByNoteIds) as NoteId[]
-    const owns = await userOwns(noteIds, userId)
-    if (!owns) {
-      return c.text(`You don't own one (or more) of these notes.`, 401)
-    }
     const persistDbAndBucket = async ({
       mediaHashBase64,
       readable,
       headers,
-    }: PersistParams): Promise<void> => {
+    }: PersistParams): Promise<undefined | Response> => {
       const mediaHash = fromBase64(mediaHashBase64)
       const insertValues = Object.entries(iByNoteIds).map(([noteId, i]) => ({
         mediaHash,
         i: i ?? throwExp("not sure why this can be undefined but whatever"),
         entityId: fromBase64Url(noteId as NoteId),
       }))
-      const has = await hasMedia(mediaHashBase64)
+      const { userOwns, hasMedia } = await userOwnsAndHasMedia(
+        noteIds,
+        userId,
+        mediaHashBase64
+      )
+      if (!userOwns)
+        return c.text(`You don't own one (or more) of these notes.`, 401)
       await db
         .transaction()
         // Not a "real" transaction since the final `COMMIT` still needs to be sent as a fetch, but whatever.
@@ -190,7 +194,7 @@ app
             .values(insertValues)
             .onDuplicateKeyUpdate({ mediaHash })
             .execute()
-          if (!has) {
+          if (!hasMedia) {
             const object = await c.env.mediaBucket.put(
               mediaHashBase64,
               readable,
@@ -229,7 +233,7 @@ export default app
 
 async function postMedia(
   c: MediaRouterContext,
-  persistDbAndBucket: (_: PersistParams) => Promise<void>,
+  persistDbAndBucket: (_: PersistParams) => Promise<undefined | Response>,
   buildResponse: (mediaHash: MediaHash) => string | Promise<string>
 ): Promise<Response> {
   if (c.req.body === null) {
@@ -266,11 +270,12 @@ async function postMedia(
   const mediaHashBase64 = base64.encode(mediaHash) as Base64
 
   const response = await buildResponse(mediaHash)
-  await persistDbAndBucket({
+  const r = await persistDbAndBucket({
     mediaHashBase64,
     readable,
     headers,
   })
+  if (r != null) return r
   return c.text(response, 201)
 }
 

@@ -91,26 +91,34 @@ export async function insertPost({
     .execute()
 }
 
-export async function userOwns(
+export async function userOwnsAndHasMedia(
   ids: NoteId[],
-  authorId: UserId
-): Promise<boolean> {
-  const r = await db
-    .selectFrom("Note")
-    .select(db.fn.count<string>("id").as("x"))
-    .where("id", "in", ids.map(fromBase64Url))
-    .where("authorId", "=", authorId)
+  authorId: UserId,
+  id: Base64
+): Promise<{
+  userOwns: boolean
+  hasMedia: boolean
+}> {
+  const { hasMedia, userOwns } = await db
+    .selectFrom([
+      db
+        .selectFrom("Note")
+        .select(db.fn.count("id").as("userOwns"))
+        .where("id", "in", ids.map(fromBase64Url))
+        .where("authorId", "=", authorId)
+        .as("userOwns"),
+      db
+        .selectFrom("Media_Entity")
+        .select(db.fn.count("mediaHash").as("hasMedia"))
+        .where("mediaHash", "=", fromBase64(id))
+        .as("hasMedia"),
+    ])
+    .selectAll()
     .executeTakeFirstOrThrow()
-  return parseInt(r.x) === ids.length
-}
-
-export async function hasMedia(id: Base64): Promise<boolean> {
-  const r = await db
-    .selectFrom("Media_Entity")
-    .select(db.fn.count<number>("mediaHash").as("x"))
-    .where("mediaHash", "=", fromBase64(id))
-    .executeTakeFirstOrThrow()
-  return r.x !== 0
+  return {
+    userOwns: userOwns === ids.length.toString(),
+    hasMedia: hasMedia !== "0",
+  }
 }
 
 export async function lookupMediaHash(
