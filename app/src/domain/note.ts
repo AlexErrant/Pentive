@@ -5,7 +5,6 @@ export interface Note {
   readonly templateId: TemplateId
   readonly pushId?: RemoteCardId
   readonly pushTemplateId?: RemoteTemplateId
-  readonly pushMedia?: Record<string, string>
   readonly push?: true
   readonly ankiNoteId?: number
   readonly created: Date

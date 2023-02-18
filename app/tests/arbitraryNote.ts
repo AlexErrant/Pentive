@@ -34,9 +34,5 @@ export const note = recordWithOptionalFields<Note>(
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
     push: fc.constant(true) as Arbitrary<true>,
     ankiNoteId: fc.integer(),
-    pushMedia: fc.dictionary(
-      fc.nat({ max: 128 }).map((x) => x.toString()),
-      fc.string()
-    ),
   }
 )

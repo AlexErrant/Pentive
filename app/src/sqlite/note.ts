@@ -1,4 +1,4 @@
-import { CreateRemoteNote, RemoteNoteId, nullMap, throwExp } from "shared"
+import { CreateRemoteNote, RemoteNoteId, throwExp } from "shared"
 import { NoteId, RemoteMediaNum, MediaId } from "../domain/ids"
 import { Note } from "../domain/note"
 import { getKysely } from "./crsqlite"
@@ -64,9 +64,6 @@ function entityToDomain(note: NoteEntity): Note {
     tags: new Set(JSON.parse(note.tags) as string[]),
     fieldValues,
     ankiNoteId: note.ankiNoteId ?? undefined,
-    pushMedia:
-      nullMap(note.pushMedia, (x) => JSON.parse(x) as Record<string, string>) ??
-      undefined,
   }
   if (r.push === undefined) {
     delete r.push
@@ -167,14 +164,15 @@ export const noteCollectionMethods = {
           throwExp(`mediaMap is missing '${localMediaId}'... how?`)
         value.ids.push([note.localId, remoteMediaNum])
       }
-      await db // lowTODO optimize - use prepared statement?
-        .updateTable("note")
-        .set({
-          pushMedia: JSON.stringify(
-            Object.fromEntries(localMediaIdByRemoteMediaId)
-          ),
-        })
-        .where("id", "=", note.localId)
+      await db
+        .insertInto("remoteMedia")
+        .values(
+          Array.from(localMediaIdByRemoteMediaId).map(([i, localMediaId]) => ({
+            localEntityId: note.localId,
+            i,
+            localMediaId,
+          }))
+        )
         .execute()
     }
     return { media, notes: notesAndStuff.map((n) => n.note) }
