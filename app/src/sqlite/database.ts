@@ -24,7 +24,7 @@ export interface Media {
 export interface Note {
   id: DbId
   templateId: DbId
-  pushId: DbId | null
+  remoteId: DbId | null
   pushTemplateId: DbId | null
   push: number | null
   ankiNoteId: number | null
@@ -51,7 +51,7 @@ export interface RemoteMedia {
 
 export interface Template {
   id: DbId
-  pushId: DbId | null
+  remoteId: DbId | null
   push: number | null
   name: string
   css: string

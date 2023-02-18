@@ -28,7 +28,7 @@ export type TemplateType =
 
 export interface Template {
   readonly id: TemplateId
-  readonly pushId?: RemoteTemplateId
+  readonly remoteId?: RemoteTemplateId
   readonly push?: true
   readonly name: string // todo limit to 100
   readonly css: string

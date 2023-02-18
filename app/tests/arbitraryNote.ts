@@ -29,7 +29,7 @@ export const note = recordWithOptionalFields<Note>(
     modified: reasonableDates,
   },
   {
-    pushId: fc.uuidV(4).map((x) => x as RemoteCardId),
+    remoteId: fc.uuidV(4).map((x) => x as RemoteCardId),
     pushTemplateId: fc.uuidV(4).map((x) => x as RemoteTemplateId),
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
     push: fc.constant(true) as Arbitrary<true>,

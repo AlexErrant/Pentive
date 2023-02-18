@@ -3,7 +3,7 @@ import { TemplateId, RemoteCardId, RemoteTemplateId, NoteId } from "./ids"
 export interface Note {
   readonly id: NoteId
   readonly templateId: TemplateId
-  readonly pushId?: RemoteCardId
+  readonly remoteId?: RemoteCardId
   readonly pushTemplateId?: RemoteTemplateId
   readonly push?: true
   readonly ankiNoteId?: number

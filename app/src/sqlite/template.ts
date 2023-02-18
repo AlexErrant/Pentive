@@ -13,7 +13,7 @@ function templateToDocType(template: Template): InsertObject<DB, "template"> {
     created,
     modified,
     push,
-    pushId,
+    remoteId,
     css,
     fields,
     templateType,
@@ -24,7 +24,7 @@ function templateToDocType(template: Template): InsertObject<DB, "template"> {
     created: created.getTime(),
     modified: modified.getTime(),
     push: push === true ? 1 : 0,
-    pushId: pushId ?? null,
+    remoteId: remoteId ?? null,
     css,
     fields: JSON.stringify(fields),
     templateType: JSON.stringify(templateType),
@@ -38,7 +38,7 @@ function entityToDomain(template: TemplateEntity): Template {
     created: new Date(template.created),
     modified: new Date(template.modified),
     push: template.push === 1 ? (true as const) : undefined,
-    pushId: (template.pushId ?? undefined) as RemoteTemplateId | undefined,
+    remoteId: (template.remoteId ?? undefined) as RemoteTemplateId | undefined,
     fields: JSON.parse(template.fields) as Field[],
     css: template.css,
     templateType: JSON.parse(template.templateType) as TemplateType,
@@ -46,8 +46,8 @@ function entityToDomain(template: TemplateEntity): Template {
   if (r.push === undefined) {
     delete r.push
   }
-  if (r.pushId === undefined) {
-    delete r.pushId
+  if (r.remoteId === undefined) {
+    delete r.remoteId
   }
   return r
 }
@@ -109,7 +109,7 @@ export const templateCollectionMethods = {
       .selectFrom("template")
       .selectAll()
       .where("push", "=", 1)
-      .where("pushId", "is", null)
+      .where("remoteId", "is", null)
       .execute()
     return newTemplates
       .map(entityToDomain)

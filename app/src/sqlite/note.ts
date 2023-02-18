@@ -12,7 +12,7 @@ function noteToDocType(note: Note): InsertObject<DB, "note"> {
     created,
     modified,
     push,
-    pushId,
+    remoteId,
     tags,
     fieldValues,
     templateId,
@@ -25,7 +25,7 @@ function noteToDocType(note: Note): InsertObject<DB, "note"> {
     created: created.getTime(),
     modified: modified.getTime(),
     push: push === true ? 1 : 0,
-    pushId: pushId ?? null,
+    remoteId: remoteId ?? null,
     tags: JSON.stringify([...tags]),
     fieldValues: JSON.stringify(fieldValues),
     ankiNoteId,
@@ -58,7 +58,7 @@ function entityToDomain(note: NoteEntity): Note {
     created: new Date(note.created),
     modified: new Date(note.modified),
     push: note.push === 1 ? (true as const) : undefined,
-    pushId: note.pushId ?? undefined,
+    remoteId: note.remoteId ?? undefined,
     pushTemplateId: note.pushTemplateId ?? undefined,
     templateId: note.templateId,
     tags: new Set(JSON.parse(note.tags) as string[]),
@@ -68,8 +68,8 @@ function entityToDomain(note: NoteEntity): Note {
   if (r.push === undefined) {
     delete r.push
   }
-  if (r.pushId === undefined) {
-    delete r.pushId
+  if (r.remoteId === undefined) {
+    delete r.remoteId
   }
   if (r.pushTemplateId === undefined) {
     delete r.pushTemplateId
@@ -132,7 +132,7 @@ export const noteCollectionMethods = {
       .selectFrom("note")
       .selectAll()
       .where("push", "=", 1)
-      .where("pushId", "is", null)
+      .where("remoteId", "is", null)
       .execute()
       .then((n) =>
         n
@@ -185,7 +185,7 @@ export const noteCollectionMethods = {
       const remoteId = remoteIdByLocal[noteId as NoteId]
       await db
         .updateTable("note")
-        .set({ pushId: remoteId, push: null })
+        .set({ remoteId, push: null })
         .where("id", "=", noteId as NoteId)
         .execute()
     }

@@ -15,7 +15,7 @@ function id(id: keyof Template): keyof Template {
 }
 
 function remoteCell(template: Template): JSX.Element {
-  const url = `https://pentive.com/t/${template.pushId as string}`
+  const url = `https://pentive.com/t/${template.remoteId as string}`
   const content = template.push === true ? "☁" : "🔗"
   return <a href={url}>{content}</a>
 }
