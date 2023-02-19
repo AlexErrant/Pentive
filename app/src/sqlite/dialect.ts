@@ -3,7 +3,6 @@
 /* eslint-disable no-unmodified-loop-condition */
 /* eslint-disable require-yield */
 /* eslint-disable promise/param-names */
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
 /* eslint-disable @typescript-eslint/require-await */
 import {
   SqliteDialect,

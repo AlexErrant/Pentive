@@ -25,6 +25,7 @@ module.exports = {
         project: ["./tsconfig.json", "./test/tsconfig.json"],
       },
       rules: {
+        "@typescript-eslint/explicit-function-return-type": "off",
         "@typescript-eslint/no-misused-promises": [
           "error",
           {
@@ -91,13 +92,7 @@ module.exports = {
             allowThrowingUnknown: true,
           },
         ],
-        "@typescript-eslint/explicit-function-return-type": [
-          "error",
-          {
-            allowedNames: ["routeData"],
-            allowExpressions: true,
-          },
-        ],
+        "@typescript-eslint/explicit-function-return-type": "off",
         "@typescript-eslint/no-misused-promises": [
           "error",
           {
