@@ -36,6 +36,7 @@ export const initSql = [
   `CREATE TABLE IF NOT EXISTS media (
     id TEXT PRIMARY KEY, -- should stay TEXT!
     created INTEGER,
+    modified INTEGER,
     data BLOB
 ) STRICT;`,
   `CREATE TABLE IF NOT EXISTS remoteMedia (

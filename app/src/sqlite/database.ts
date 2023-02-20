@@ -18,6 +18,7 @@ export interface Card {
 export interface Media {
   id: MediaId
   created: number
+  modified: number
   data: Uint8Array
 }
 
