@@ -164,18 +164,51 @@ export const noteCollectionMethods = {
           throwExp(`mediaMap is missing '${localMediaId}'... how?`)
         value.ids.push([note.localId, remoteMediaNum])
       }
-      await db
-        .insertInto("remoteMedia")
-        .values(
-          Array.from(localMediaIdByRemoteMediaId).map(([i, localMediaId]) => ({
-            localEntityId: note.localId,
-            i,
-            localMediaId,
-          }))
-        )
-        .execute()
     }
     return { media, notes: notesAndStuff.map((n) => n.note) }
+  },
+  makeNoteUploadable: async function (noteId: NoteId) {
+    const db = await getKysely()
+    const dp = new DOMParser()
+    const { localMediaIdByRemoteMediaId } = await db
+      .selectFrom("note")
+      .selectAll()
+      .where("id", "=", noteId)
+      .executeTakeFirstOrThrow()
+      .then((n) =>
+        withLocalMediaIdByRemoteMediaId(
+          dp,
+          domainToCreateRemote(entityToDomain(n))
+        )
+      )
+    const srcs = Array.from(localMediaIdByRemoteMediaId.values())
+    const mediaBinaries = await db
+      .selectFrom("media")
+      .select(["id", "data"])
+      .where("id", "in", srcs)
+      .execute()
+    const media = new Map<
+      MediaId,
+      { data: ArrayBuffer; ids: Array<[NoteId, RemoteMediaNum]> }
+    >(mediaBinaries.map(({ id, data }) => [id, { data, ids: [] }]))
+    if (mediaBinaries.length !== srcs.length)
+      throwExp("You're missing a media.") // medTODO better error message
+    for (const [remoteMediaNum, localMediaId] of localMediaIdByRemoteMediaId) {
+      const value =
+        media.get(localMediaId) ??
+        throwExp(`mediaMap is missing '${localMediaId}'... how?`)
+      value.ids.push([noteId, remoteMediaNum])
+    }
+    await db
+      .insertInto("remoteMedia")
+      .values(
+        Array.from(localMediaIdByRemoteMediaId).map(([i, localMediaId]) => ({
+          localEntityId: noteId,
+          i,
+          localMediaId,
+        }))
+      )
+      .execute()
   },
   updateRemoteIds: async function (
     remoteIdByLocal: Record<NoteId, RemoteNoteId>
