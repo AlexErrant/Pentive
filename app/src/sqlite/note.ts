@@ -140,32 +140,38 @@ export const noteCollectionMethods = {
           .map(domainToCreateRemote)
           .map((n) => withLocalMediaIdByRemoteMediaId(dp, n))
       )
-    const srcs = notesAndStuff.flatMap((n) =>
-      Array.from(n.localMediaIdByRemoteMediaId.values())
-    )
+    return notesAndStuff.map((n) => n.note)
+  },
+  getMediaToUpload: async function () {
+    const db = await getKysely()
     const mediaBinaries = await db
-      .selectFrom("media")
-      .select(["id", "data"])
-      .where("id", "in", srcs)
+      .selectFrom("remoteMedia")
+      .innerJoin("media", "remoteMedia.localMediaId", "media.id")
+      .select([
+        "remoteMedia.localMediaId",
+        "media.data",
+        "remoteMedia.localEntityId",
+        "remoteMedia.i",
+      ])
+      .where("remoteMedia.uploadDate", "is", null)
+      .orWhereRef("media.modified", ">", "remoteMedia.uploadDate")
       .execute()
     const media = new Map<
       MediaId,
       { data: ArrayBuffer; ids: Array<[NoteId, RemoteMediaNum]> }
-    >(mediaBinaries.map(({ id, data }) => [id, { data, ids: [] }]))
-    if (mediaBinaries.length !== srcs.length)
-      throwExp("You're missing a media.") // medTODO better error message
-    for (const { note, localMediaIdByRemoteMediaId } of notesAndStuff) {
-      for (const [
-        remoteMediaNum,
+    >(
+      mediaBinaries.map(({ localMediaId, data }) => [
         localMediaId,
-      ] of localMediaIdByRemoteMediaId) {
-        const value =
-          media.get(localMediaId) ??
-          throwExp(`mediaMap is missing '${localMediaId}'... how?`)
-        value.ids.push([note.localId, remoteMediaNum])
-      }
+        { data, ids: [] },
+      ])
+    )
+    for (const m of mediaBinaries) {
+      const value =
+        media.get(m.localMediaId) ??
+        throwExp(`mediaBinaries is missing '${m.localMediaId}'... how?`)
+      value.ids.push([m.localEntityId, m.i])
     }
-    return { media, notes: notesAndStuff.map((n) => n.note) }
+    return media
   },
   makeNoteUploadable: async function (noteId: NoteId) {
     const db = await getKysely()
@@ -187,18 +193,8 @@ export const noteCollectionMethods = {
       .select(["id", "data"])
       .where("id", "in", srcs)
       .execute()
-    const media = new Map<
-      MediaId,
-      { data: ArrayBuffer; ids: Array<[NoteId, RemoteMediaNum]> }
-    >(mediaBinaries.map(({ id, data }) => [id, { data, ids: [] }]))
     if (mediaBinaries.length !== srcs.length)
       throwExp("You're missing a media.") // medTODO better error message
-    for (const [remoteMediaNum, localMediaId] of localMediaIdByRemoteMediaId) {
-      const value =
-        media.get(localMediaId) ??
-        throwExp(`mediaMap is missing '${localMediaId}'... how?`)
-      value.ids.push([noteId, remoteMediaNum])
-    }
     await db
       .insertInto("remoteMedia")
       .values(

@@ -26,7 +26,8 @@ async function uploadNewTemplates(): Promise<void> {
 }
 
 async function uploadNewNotes(): Promise<void> {
-  const { notes, media } = await db.prepareAndGetNewNotesToUpload()
+  const notes = await db.prepareAndGetNewNotesToUpload()
+  const media = await db.getMediaToUpload()
   if (notes.length > 0) {
     const remoteIdByLocal = await apiClient.createNote.mutate(notes)
     await db.updateRemoteIds(remoteIdByLocal)
