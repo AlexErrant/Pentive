@@ -1,5 +1,10 @@
 import { CreateRemoteNote, RemoteNoteId, throwExp } from "shared"
-import { NoteId, RemoteMediaNum, MediaId } from "../domain/ids"
+import {
+  NoteId,
+  RemoteMediaNum,
+  MediaId,
+  RemoteTemplateId,
+} from "../domain/ids"
 import { Note } from "../domain/note"
 import { getKysely } from "./crsqlite"
 import { DB, Note as NoteEntity } from "./database"
@@ -173,20 +178,25 @@ export const noteCollectionMethods = {
     }
     return media
   },
-  makeNoteUploadable: async function (noteId: NoteId) {
+  makeNoteUploadable: async function (
+    noteId: NoteId,
+    pushTemplateId?: RemoteTemplateId
+  ) {
     const db = await getKysely()
-    const dp = new DOMParser()
-    const { localMediaIdByRemoteMediaId } = await db
+    await db
+      .updateTable("note")
+      .set({ push: 1, pushTemplateId })
+      .where("id", "=", noteId)
+      .execute()
+    const note = await db
       .selectFrom("note")
       .selectAll()
       .where("id", "=", noteId)
       .executeTakeFirstOrThrow()
-      .then((n) =>
-        withLocalMediaIdByRemoteMediaId(
-          dp,
-          domainToCreateRemote(entityToDomain(n))
-        )
-      )
+    const { localMediaIdByRemoteMediaId } = withLocalMediaIdByRemoteMediaId(
+      new DOMParser(),
+      domainToCreateRemote(entityToDomain(note))
+    )
     const srcs = Array.from(localMediaIdByRemoteMediaId.values())
     const mediaBinaries = await db
       .selectFrom("media")

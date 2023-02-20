@@ -8,7 +8,7 @@ import { db } from "../db"
 import { lrpc } from "../lrpcClient"
 import { importAnki } from "./importer/importer"
 import { csrfHeaderName, NoteId, RemoteNoteId, throwExp } from "shared"
-import { MediaId, RemoteMediaNum } from "../domain/ids"
+import { MediaId, RemoteMediaNum, RemoteTemplateId } from "../domain/ids"
 import { apiClient } from "../apiClient"
 
 async function uploadNewTemplates(): Promise<void> {
@@ -23,6 +23,13 @@ async function uploadNewTemplates(): Promise<void> {
   const getBatch = await lrpc.getTemplates.query(remoteIds)
   console.log("getTemplates", getBatch)
   console.log(r)
+}
+
+async function makeNoteUploadable() {
+  await db.makeNoteUploadable(
+    sampleNote.id,
+    "9P1IlXnSRviXmwAA8kTMKw" as RemoteTemplateId
+  )
 }
 
 async function uploadNewNotes(): Promise<void> {
@@ -200,6 +207,12 @@ export default function Home(): JSX.Element {
           onClick={async () => setNote(await db.getNote(sampleNote.id))}
         >
           getNote
+        </button>
+        <button
+          class="border rounded-lg px-2 border-gray-900"
+          onClick={makeNoteUploadable}
+        >
+          makeNoteUploadable
         </button>
         <button
           class="border rounded-lg px-2 border-gray-900"

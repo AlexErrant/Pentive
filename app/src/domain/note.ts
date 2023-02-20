@@ -23,6 +23,4 @@ export const sampleNote: Note = {
     front: "Question",
     back: `Answer <img src="tree.jpg" >`,
   },
-  push: true,
-  pushTemplateId: "9P1IlXnSRviXmwAA8kTMKw" as RemoteTemplateId,
 }
