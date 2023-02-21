@@ -43,13 +43,13 @@ export interface Card {
 }
 
 export const sampleCard: Card = {
-  id: "B598A95F-2372-45DE-B7A6-29CA67A10D8E" as CardId,
-  noteId: "305B7B2E-8591-4B4C-8775-3038E0AA34A4" as NoteId,
+  id: "tZipXyNyRd63pgAAKcpnoQ" as CardId,
+  noteId: "dZA8bN6wQMCfjwAAxwL72w" as NoteId,
   deckIds: new Set(),
   created: new Date(),
   modified: new Date(),
   due: new Date(),
-  pointer: "ED061BC3-B183-4C55-BE0D-0A820F491CE1" as ChildTemplateId,
+  pointer: "lt31LyaTR3qBMQAAsZdhdg" as ChildTemplateId,
 }
 
 export interface NoteCard {

@@ -39,7 +39,7 @@ export interface Template {
 }
 
 export const defaultTemplate: Template = {
-  id: "EC2EFBBE-C944-478A-BFC4-023968B38A72" as TemplateId,
+  id: "fanOeCfrTeGKVgAAek3FQg" as TemplateId,
   name: "New Template",
   css: "",
   fields: [
@@ -56,7 +56,7 @@ export const defaultTemplate: Template = {
     tag: "standard",
     templates: [
       {
-        id: "ED061BC3-B183-4C55-BE0D-0A820F491CE1" as ChildTemplateId,
+        id: "lt31LyaTR3qBMQAAsZdhdg" as ChildTemplateId,
         name: "My Template",
         front: "{{Front}}",
         back: "{{FrontSide}}<hr id=answer>{{Back}}",

@@ -14,10 +14,10 @@ export interface Note {
 }
 
 export const sampleNote: Note = {
-  id: "305B7B2E-8591-4B4C-8775-3038E0AA34A4" as NoteId,
+  id: "dZA8bN6wQMCfjwAAxwL72w" as NoteId,
   created: new Date(),
   modified: new Date(),
-  templateId: "EC2EFBBE-C944-478A-BFC4-023968B38A72" as TemplateId,
+  templateId: "fanOeCfrTeGKVgAAek3FQg" as TemplateId,
   tags: new Set<string>(),
   fieldValues: {
     front: "Question",
