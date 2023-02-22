@@ -145,41 +145,26 @@ export const createRemoteNote = z.object({
 })
 export type CreateRemoteNote = z.infer<typeof createRemoteNote>
 
+export const editRemoteNote = z.object({
+  remoteId: z
+    .string()
+    .regex(/^[a-zA-Z0-9_-]{22}$/) as unknown as z.Schema<RemoteNoteId>,
+  templateId: z
+    .string()
+    .regex(/^[a-zA-Z0-9_-]{22}$/) as unknown as z.Schema<TemplateId>,
+  fieldValues: z.record(z.string()),
+  tags: z.array(z.string()),
+  ankiId: z.number().positive().optional(),
+})
+export type EditRemoteNote = z.infer<typeof editRemoteNote>
+
 export async function insertNotes(
-  authorId: string,
+  authorId: UserId,
   notes: CreateRemoteNote[]
 ): Promise<Record<NoteId, RemoteNoteId>> {
   const noteCreatesAndIds = await Promise.all(
     notes.map(async (n) => {
-      const remoteId = ulidAsRaw()
-      const remoteIdHex = base16.encode(remoteId) as Hex
-      const remoteIdBase64url = base64url.encode(remoteId).substring(0, 22)
-      for (const field in n.fieldValues) {
-        const oldResponse = new Response(n.fieldValues[field])
-        const newResponse = new HTMLRewriter()
-          .on("img", {
-            // highTODO filter images that shouldn't be replaced, e.g. ones with external URLs.
-            // Wait... uh... do we even want to support this? Breaks the point of offline-first...
-            element(element) {
-              const src = element.getAttribute("src")
-              if (src != null) {
-                // Filter no-src images - grep 330CE329-B962-4E68-90F3-F4F3700815DA
-                element.setAttribute("src", remoteIdBase64url + src)
-              }
-            },
-          })
-          .transform(oldResponse)
-        n.fieldValues[field] = await newResponse.text()
-      }
-      const noteCreate: InsertObject<DB, "Note"> = {
-        id: unhex(remoteIdHex),
-        templateId: fromBase64Url(n.templateId), // highTODO validate
-        authorId,
-        fieldValues: JSON.stringify(n.fieldValues),
-        fts: Object.values(n.fieldValues).map(convert).concat(n.tags).join(" "),
-        tags: JSON.stringify(n.tags),
-        ankiId: n.ankiId,
-      }
+      const { noteCreate, remoteIdBase64url } = await toNoteCreate(n, authorId)
       return [
         noteCreate,
         [n.localId, remoteIdBase64url] as [NoteId, RemoteNoteId],
@@ -190,6 +175,74 @@ export async function insertNotes(
   await db.insertInto("Note").values(noteCreates).execute()
   const remoteIdByLocal = _.fromPairs(noteCreatesAndIds.map((x) => x[1]))
   return remoteIdByLocal
+}
+
+async function toNoteCreate(
+  n: EditRemoteNote | CreateRemoteNote,
+  authorId: UserId
+) {
+  const remoteId =
+    "remoteId" in n ? base64url.decode(n.remoteId + "==") : ulidAsRaw()
+  const remoteIdHex = base16.encode(remoteId) as Hex
+  const remoteIdBase64url = base64url.encode(remoteId).substring(0, 22)
+  for (const field in n.fieldValues) {
+    const oldResponse = new Response(n.fieldValues[field])
+    const newResponse = new HTMLRewriter()
+      .on("img", {
+        // highTODO filter images that shouldn't be replaced, e.g. ones with external URLs.
+        // Wait... uh... do we even want to support this? Breaks the point of offline-first...
+        element(element) {
+          const src = element.getAttribute("src")
+          if (src != null) {
+            // Filter no-src images - grep 330CE329-B962-4E68-90F3-F4F3700815DA
+            element.setAttribute("src", remoteIdBase64url + src)
+          }
+        },
+      })
+      .transform(oldResponse)
+    n.fieldValues[field] = await newResponse.text()
+  }
+  const noteCreate: InsertObject<DB, "Note"> = {
+    id: unhex(remoteIdHex),
+    templateId: fromBase64Url(n.templateId), // highTODO validate
+    authorId,
+    fieldValues: JSON.stringify(n.fieldValues),
+    fts: Object.values(n.fieldValues).map(convert).concat(n.tags).join(" "),
+    tags: JSON.stringify(n.tags),
+    ankiId: n.ankiId,
+  }
+  return { noteCreate, remoteIdBase64url }
+}
+
+export async function editNotes(authorId: UserId, notes: EditRemoteNote[]) {
+  const noteCreates = await Promise.all(
+    notes.map(async (n) => {
+      const { noteCreate } = await toNoteCreate(n, authorId)
+      return noteCreate
+    })
+  )
+  // insert into `Note` (`id`, `templateId`, `authorId`, `fieldValues`, `fts`, `tags`)
+  // values (UNHEX(?), FROM_BASE64(?), ?, ?, ?, ?)
+  // on duplicate key update `templateId` = values(`templateId`), `updatedAt` = values(`updatedAt`), `authorId` = values(`authorId`), `fieldValues` = values(`fieldValues`), `fts` = values(`fts`), `tags` = values(`tags`), `ankiId` = values(`ankiId`)
+  await db
+    .insertInto("Note")
+    .values(noteCreates)
+    // https://stackoverflow.com/a/34866431
+    .onDuplicateKeyUpdate({
+      templateId: (x) => values(x.ref("templateId")),
+      // createdAt: (x) => values(x.ref("createdAt")),
+      updatedAt: (x) => values(x.ref("updatedAt")),
+      authorId: (x) => values(x.ref("authorId")),
+      fieldValues: (x) => values(x.ref("fieldValues")),
+      fts: (x) => values(x.ref("fts")),
+      tags: (x) => values(x.ref("tags")),
+      ankiId: (x) => values(x.ref("ankiId")),
+    })
+    .execute()
+}
+
+function values<T>(x: RawBuilder<T>) {
+  return sql<T>`values(${x})`
 }
 
 function unhex(id: Hex): RawBuilder<DbId> {

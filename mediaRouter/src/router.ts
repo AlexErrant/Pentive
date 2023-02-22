@@ -1,4 +1,9 @@
-import { createRemoteNote, insertNotes } from "shared"
+import {
+  createRemoteNote,
+  editNotes,
+  editRemoteNote,
+  insertNotes,
+} from "shared"
 import { z } from "zod"
 import { authedProcedure, publicProcedure, router } from "./trpc"
 
@@ -15,6 +20,9 @@ export const appRouter = router({
       const remoteIdByLocal = await insertNotes(ctx.user, input)
       return remoteIdByLocal
     }),
+  editNote: authedProcedure
+    .input(z.array(editRemoteNote).min(1))
+    .mutation(async ({ input, ctx }) => await editNotes(ctx.user, input)),
 })
 
 export type AppRouter = typeof appRouter

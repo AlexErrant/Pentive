@@ -1,4 +1,9 @@
-import { CreateRemoteNote, RemoteNoteId, throwExp } from "shared"
+import {
+  CreateRemoteNote,
+  EditRemoteNote,
+  RemoteNoteId,
+  throwExp,
+} from "shared"
 import {
   NoteId,
   RemoteMediaNum,
@@ -46,6 +51,29 @@ function domainToCreateRemote({
 }: Note): CreateRemoteNote {
   return {
     localId: id,
+    templateId:
+      pushTemplateId ??
+      throwExp(
+        `Note ${id} is missing a pushTemplateId... is something wrong with the SQL query?`
+      ),
+    fieldValues,
+    tags: Array.from(tags),
+  }
+}
+
+function domainToEditRemote({
+  id,
+  remoteId,
+  pushTemplateId,
+  tags,
+  fieldValues,
+}: Note): EditRemoteNote {
+  return {
+    remoteId:
+      remoteId ??
+      throwExp(
+        `Note ${id} is missing a remoteId... is something wrong with the SQL query?`
+      ),
     templateId:
       pushTemplateId ??
       throwExp(
@@ -147,6 +175,23 @@ export const noteCollectionMethods = {
       )
     return notesAndStuff.map((n) => n.note)
   },
+  prepareAndGetOldNotesToUpload: async function () {
+    const db = await getKysely()
+    const dp = new DOMParser()
+    const notesAndStuff = await db
+      .selectFrom("note")
+      .selectAll()
+      .where("push", "=", 1)
+      .where("remoteId", "is not", null)
+      .execute()
+      .then((n) =>
+        n
+          .map(entityToDomain)
+          .map(domainToEditRemote)
+          .map((n) => withLocalMediaIdByRemoteMediaId(dp, n))
+      )
+    return notesAndStuff.map((n) => n.note)
+  },
   getMediaToUpload: async function () {
     const db = await getKysely()
     const mediaBinaries = await db
@@ -205,16 +250,30 @@ export const noteCollectionMethods = {
       .execute()
     if (mediaBinaries.length !== srcs.length)
       throwExp("You're missing a media.") // medTODO better error message
-    await db
-      .insertInto("remoteMedia")
-      .values(
-        Array.from(localMediaIdByRemoteMediaId).map(([i, localMediaId]) => ({
-          localEntityId: noteId,
-          i,
-          localMediaId,
-        }))
-      )
-      .execute()
+    await db.transaction().execute(async (db) => {
+      await db
+        .deleteFrom("remoteMedia")
+        .where("localEntityId", "=", noteId)
+        .where("i", ">", srcs.length as RemoteMediaNum)
+        .execute()
+      await db
+        .insertInto("remoteMedia")
+        .values(
+          Array.from(localMediaIdByRemoteMediaId).map(([i, localMediaId]) => ({
+            localEntityId: noteId,
+            i,
+            localMediaId,
+          }))
+        )
+        // insert into "remoteMedia" ("localEntityId", "i", "localMediaId") values (?, ?, ?)
+        // on conflict do update set "localMediaId" = "excluded"."localMediaId"
+        .onConflict((db) =>
+          db.doUpdateSet({
+            localMediaId: (x) => x.ref("excluded.localMediaId"),
+          })
+        )
+        .execute()
+    })
   },
   updateRemoteIds: async function (
     remoteIdByLocal: Record<NoteId, RemoteNoteId>
@@ -228,6 +287,14 @@ export const noteCollectionMethods = {
         .where("id", "=", noteId as NoteId)
         .execute()
     }
+  },
+  markAsPushed: async function (remoteNoteIds: RemoteNoteId[]) {
+    const db = await getKysely()
+    await db
+      .updateTable("note")
+      .set({ push: null })
+      .where("remoteId", "in", remoteNoteIds)
+      .execute()
   },
   updateUploadDate: async function (ids: Array<[NoteId, RemoteMediaNum]>) {
     const db = await getKysely()
@@ -247,13 +314,9 @@ export const noteCollectionMethods = {
   },
 }
 
-function withLocalMediaIdByRemoteMediaId(
-  dp: DOMParser,
-  note: CreateRemoteNote
-): {
-  note: CreateRemoteNote
-  localMediaIdByRemoteMediaId: Map<RemoteMediaNum, MediaId>
-} {
+function withLocalMediaIdByRemoteMediaId<
+  T extends CreateRemoteNote | EditRemoteNote
+>(dp: DOMParser, note: T) {
   let i = 0 as RemoteMediaNum
   const localMediaIdByRemoteMediaId = new Map<RemoteMediaNum, MediaId>()
   const fieldValues = new Map<string, string>()
