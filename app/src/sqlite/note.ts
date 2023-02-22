@@ -158,7 +158,7 @@ export const noteCollectionMethods = {
       .execute()
     return allNotes.map(entityToDomain)
   },
-  prepareAndGetNewNotesToUpload: async function () {
+  getNewNotesToUpload: async function () {
     const db = await getKysely()
     const dp = new DOMParser()
     const notesAndStuff = await db
@@ -175,7 +175,7 @@ export const noteCollectionMethods = {
       )
     return notesAndStuff.map((n) => n.note)
   },
-  prepareAndGetOldNotesToUpload: async function () {
+  getEditedNotesToUpload: async function () {
     const db = await getKysely()
     const dp = new DOMParser()
     const notesAndStuff = await db

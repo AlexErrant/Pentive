@@ -33,22 +33,21 @@ async function makeNoteUploadable() {
 }
 
 async function uploadNewNotes(): Promise<void> {
-  const newNotes = await db.prepareAndGetNewNotesToUpload()
+  const newNotes = await db.getNewNotesToUpload()
   const media = await db.getMediaToUpload()
   if (newNotes.length > 0) {
     const remoteIdByLocal = await apiClient.createNote.mutate(newNotes)
     await db.updateRemoteIds(remoteIdByLocal)
-    console.log(remoteIdByLocal)
     for (const [mediaId, { data, ids }] of media) {
       await postMedia(mediaId, ids, remoteIdByLocal, data)
     }
   }
-  const oldNotes = await db.prepareAndGetOldNotesToUpload()
-  if (oldNotes.length > 0) {
-    await apiClient.editNote.mutate(oldNotes)
-    await db.markAsPushed(oldNotes.map((n) => n.remoteId))
+  const editedNotes = await db.getEditedNotesToUpload()
+  if (editedNotes.length > 0) {
+    await apiClient.editNote.mutate(editedNotes)
+    await db.markAsPushed(editedNotes.map((n) => n.remoteId))
   }
-  if (oldNotes.length === 0 && newNotes.length === 0) {
+  if (editedNotes.length === 0 && newNotes.length === 0) {
     console.log("Nothing to upload!")
   }
 }
