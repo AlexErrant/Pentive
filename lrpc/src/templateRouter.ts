@@ -1,5 +1,4 @@
-import { createRemoteTemplate, remoteTemplate } from "./schemas/template.js"
-import { id } from "./schemas/core.js"
+import { createRemoteTemplate, id } from "shared"
 import { z } from "zod"
 import _ from "lodash"
 import id128 from "id128"

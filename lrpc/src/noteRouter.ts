@@ -1,4 +1,4 @@
-import { id } from "./schemas/core.js"
+import { id } from "shared"
 import { z } from "zod"
 import id128 from "id128"
 import { Note } from "@prisma/client"

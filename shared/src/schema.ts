@@ -24,3 +24,28 @@ export const editRemoteNote = z.object({
   ankiId: z.number().positive().optional(),
 })
 export type EditRemoteNote = z.infer<typeof editRemoteNote>
+
+export const id = z.string() // highTODO are we doing ULIDs, KSUID, or neither?
+
+export const dateSchema = z.preprocess((arg) => {
+  if (typeof arg === "string" || arg instanceof Date) return new Date(arg)
+}, z.date())
+
+export const createRemoteTemplate = z.object({
+  id,
+  name: z.string(),
+  nook: z.string(),
+  templateType: z.literal("standard").or(z.literal("cloze")),
+  fields: z.array(z.string()),
+  css: z.string(),
+  childTemplates: z.string(),
+  ankiId: z.number().positive().optional(),
+})
+
+export type CreateRemoteTemplate = z.infer<typeof createRemoteTemplate>
+
+export const remoteTemplate = createRemoteTemplate.extend({
+  author: z.string(),
+  created: dateSchema,
+  modified: dateSchema,
+})
