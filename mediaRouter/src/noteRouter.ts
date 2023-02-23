@@ -1,23 +1,26 @@
 import {
   Base64Url,
   createRemoteNote,
+  db,
+  dbIdToBase64Url,
   editNotes,
   editRemoteNote,
-  id,
+  fromBase64Url,
   insertNotes,
-  mapDbIdsToBase64Url,
+  remoteNoteId,
 } from "shared"
 import { z } from "zod"
 import { authedProcedure, publicProcedure } from "./trpc"
 import { Note } from "shared/src/database"
 
-type ClientNote = Omit<Note, "id" | "templateId" | "fts"> & {
+type ClientNote = Omit<
+  Note,
+  "id" | "templateId" | "fts" | "createdAt" | "updatedAt"
+> & {
   id: Base64Url
   templateId: Base64Url
-}
-
-export function mapNote({ fts, ...t }: Note): ClientNote {
-  return mapDbIdsToBase64Url(t, ["id", "templateId"])
+  createdAt: Date
+  updatedAt: Date
 }
 
 export const noteRouter = {
@@ -30,10 +33,31 @@ export const noteRouter = {
   editNote: authedProcedure
     .input(z.array(editRemoteNote).min(1))
     .mutation(async ({ input, ctx }) => await editNotes(ctx.user, input)),
-  getNote: publicProcedure.input(id).query(async (req) => {
-    const id = ulidStringToBuffer(req.input)
-    const note = await prisma.note.findUnique({ where: { id } })
-    return optionMap(note, mapNote)
+  getNote: publicProcedure.input(remoteNoteId).query(async ({ input }) => {
+    const note = await db
+      .selectFrom("Note")
+      .select([
+        "id",
+        "templateId",
+        "createdAt",
+        "updatedAt",
+        "authorId",
+        "fieldValues",
+        // "fts",
+        "tags",
+        "ankiId",
+      ])
+      .where("id", "=", fromBase64Url(input))
+      .executeTakeFirst()
+    if (note == null) {
+      return undefined
+    }
+    const r: ClientNote = {
+      ...note,
+      id: dbIdToBase64Url(note.id),
+      templateId: dbIdToBase64Url(note.templateId),
+    }
+    return r
   }),
   getNotes: publicProcedure.input(z.array(id)).query(async (req) => {
     const r = await prisma.note.findMany({

@@ -27,6 +27,10 @@ export type EditRemoteNote = z.infer<typeof editRemoteNote>
 
 export const id = z.string() // highTODO are we doing ULIDs, KSUID, or neither?
 
+export const remoteNoteId = z
+  .string()
+  .regex(/^[a-zA-Z0-9_-]{22}$/) as unknown as z.Schema<RemoteNoteId>
+
 export const dateSchema = z.preprocess((arg) => {
   if (typeof arg === "string" || arg instanceof Date) return new Date(arg)
 }, z.date())
