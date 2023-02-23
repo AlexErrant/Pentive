@@ -1,6 +1,6 @@
 import { Kysely, sql, InsertResult, RawBuilder, InsertObject } from "kysely"
 import { PlanetScaleDialect } from "kysely-planetscale"
-import { DB } from "./database.js"
+import { DB, Note } from "./database.js"
 import {
   Base64,
   Base64Url,
@@ -240,5 +240,27 @@ function mapIdToBase64Url<T>(t: T & { id: DbId }): T & {
   return {
     ...t,
     id: base64url.encode(array).substring(0, 22) as Base64Url,
+  }
+}
+
+// I have absolutely no idea what I'm doing, but it works... with an `as DbId` cast https://stackoverflow.com/a/62411318
+type KeyValueIsDbId<T> = {
+  [K in keyof T]: T[K] extends DbId ? K : never
+}[keyof T]
+
+// I regret everything please save me from myself
+export function mapDbIdsToBase64Url<T, K extends KeyValueIsDbId<T>>(
+  entity: T,
+  keys: K[]
+) {
+  const mappedDbIds = keys.map((key) => {
+    const dbId = entity[key] as DbId
+    const array = Uint8Array.from(dbId.split("").map((b) => b.charCodeAt(0))) // https://github.com/planetscale/database-js/issues/78#issuecomment-1376435565
+    const newId = base64url.encode(array).substring(0, 22) as Base64Url
+    return [key, newId] as const
+  })
+  return {
+    ...entity,
+    ...mappedDbIds,
   }
 }

@@ -1,5 +1,4 @@
 import { z } from "zod"
-import { noteRouter } from "./noteRouter.js"
 import { templateRouter } from "./templateRouter.js"
 import { authedProcedure, publicProcedure, router } from "./trpc.js"
 import aio from "@vlcn.io/crsqlite-allinone"
@@ -73,7 +72,6 @@ export const appRouter = router({
       }
     }),
   ...templateRouter,
-  ...noteRouter,
 })
 
 export type AppRouter = typeof appRouter
