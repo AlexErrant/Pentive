@@ -1,16 +1,16 @@
 // most of these columns are nullable in SQLite, but they're not nullable here for the sake of my sanity
 
-import { DbId } from "shared"
+import { LDbId } from "shared"
 import { MediaId, RemoteMediaNum } from "../domain/ids"
 
 export interface Card {
-  id: DbId
+  id: LDbId
   pointer: string
-  noteId: DbId
+  noteId: LDbId
   deckIds: string
   created: number
   modified: number
-  cardSettingId: DbId | null
+  cardSettingId: LDbId | null
   due: number
   state: number | null
 }
@@ -23,10 +23,10 @@ export interface Media {
 }
 
 export interface Note {
-  id: DbId
-  templateId: DbId
-  remoteId: DbId | null
-  pushTemplateId: DbId | null
+  id: LDbId
+  templateId: LDbId
+  remoteId: LDbId | null
+  pushTemplateId: LDbId | null
   push: number | null
   ankiNoteId: number | null
   created: number
@@ -36,7 +36,7 @@ export interface Note {
 }
 
 export interface Plugin {
-  id: DbId
+  id: LDbId
   name: string
   created: number
   modified: number
@@ -44,15 +44,15 @@ export interface Plugin {
 }
 
 export interface RemoteMedia {
-  localEntityId: DbId
+  localEntityId: LDbId
   i: RemoteMediaNum
   localMediaId: MediaId
   uploadDate: number | null
 }
 
 export interface Template {
-  id: DbId
-  remoteId: DbId | null
+  id: LDbId
+  remoteId: LDbId | null
   push: number | null
   name: string
   css: string
