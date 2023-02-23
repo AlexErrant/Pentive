@@ -9,6 +9,7 @@ function entityToDomain(entity: MediaEntity): Media {
   return {
     id: entity.id,
     created: new Date(entity.created),
+    modified: new Date(entity.modified),
     data: entity.data.buffer,
   }
 }
@@ -17,14 +18,11 @@ export const mediaCollectionMethods = {
   upsertMedia: async function (media: Media) {
     const db = await getDb()
     const insert = await db.prepare(
-      `INSERT INTO media (id,created,data)
-                  VALUES ( ?,      ?,   ?)`
+      `INSERT INTO media (id,created,modified,data)
+                  VALUES ( ?,      ?,       ?,   ?)`
     )
-    await insert.run(
-      media.id,
-      media.created.getTime(),
-      new Uint8Array(media.data)
-    )
+    const created = media.created.getTime()
+    await insert.run(media.id, created, created, new Uint8Array(media.data))
     insert.finalize()
   },
   async bulkAddMedia(media: Media[]) {
@@ -32,11 +30,12 @@ export const mediaCollectionMethods = {
     // If moving to SQLite official doesn't improve perf, consider using Origin Private File System
     const db = await getDb()
     const insert = await db.prepare(
-      `INSERT INTO media (id,created,data)
-                  VALUES ( ?,      ?,   ?)`
+      `INSERT INTO media (id,created,modified,data)
+                  VALUES ( ?,      ?,       ?,   ?)`
     )
     for (const m of media) {
-      await insert.run(m.id, m.created.getTime(), new Uint8Array(m.data))
+      const created = m.created.getTime()
+      await insert.run(m.id, created, created, new Uint8Array(m.data))
     }
     insert.finalize()
   },

@@ -197,18 +197,20 @@ export const noteCollectionMethods = {
     const mediaBinaries = await db
       .selectFrom("remoteMedia")
       .innerJoin("media", "remoteMedia.localMediaId", "media.id")
+      .leftJoin("note", "remoteMedia.localEntityId", "note.id")
       .select([
         "remoteMedia.localMediaId",
         "media.data",
         "remoteMedia.localEntityId",
         "remoteMedia.i",
+        "note.remoteId as noteRemoteId",
       ])
       .where("remoteMedia.uploadDate", "is", null)
       .orWhereRef("media.modified", ">", "remoteMedia.uploadDate")
       .execute()
     const media = new Map<
       MediaId,
-      { data: ArrayBuffer; ids: Array<[NoteId, RemoteMediaNum]> }
+      { data: ArrayBuffer; ids: Array<[NoteId, RemoteNoteId, RemoteMediaNum]> }
     >(
       mediaBinaries.map(({ localMediaId, data }) => [
         localMediaId,
@@ -216,10 +218,13 @@ export const noteCollectionMethods = {
       ])
     )
     for (const m of mediaBinaries) {
+      const remoteId =
+        (m.noteRemoteId as RemoteNoteId) ??
+        `Note ${m.localMediaId} is missing a noteRemoteId... is something wrong with the SQL query?`
       const value =
         media.get(m.localMediaId) ??
         throwExp(`mediaBinaries is missing '${m.localMediaId}'... how?`)
-      value.ids.push([m.localEntityId, m.i])
+      value.ids.push([m.localEntityId, remoteId, m.i])
     }
     return media
   },
@@ -296,9 +301,11 @@ export const noteCollectionMethods = {
       .where("remoteId", "in", remoteNoteIds)
       .execute()
   },
-  updateUploadDate: async function (ids: Array<[NoteId, RemoteMediaNum]>) {
+  updateUploadDate: async function (
+    ids: Array<[NoteId, RemoteNoteId, RemoteMediaNum]>
+  ) {
     const db = await getKysely()
-    for (const [localEntityId, i] of ids) {
+    for (const [localEntityId, , i] of ids) {
       await db
         .updateTable("remoteMedia")
         .set({ uploadDate: new Date().getTime() })

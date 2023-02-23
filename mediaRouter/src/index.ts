@@ -19,8 +19,6 @@ import {
   Base64,
   Base64Url,
   setKysely,
-  userOwns,
-  hasMedia,
   db,
   fromBase64Url,
   fromBase64,
@@ -165,6 +163,7 @@ app
     setKysely(c.env.planetscaleDbUrl)
     const iByNoteIds = iByNoteIdsValidator.parse(c.req.query())
     const noteIds = Object.keys(iByNoteIds) as NoteId[]
+    if (noteIds.length === 0) return c.text("Need at least one note.", 400)
     const persistDbAndBucket = async ({
       mediaHashBase64,
       readable,

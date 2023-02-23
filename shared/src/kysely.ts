@@ -241,6 +241,7 @@ export async function editNotes(authorId: UserId, notes: EditRemoteNote[]) {
     .execute()
 }
 
+// nix upon resolution of https://github.com/koskimas/kysely/issues/251
 function values<T>(x: RawBuilder<T>) {
   return sql<T>`values(${x})`
 }

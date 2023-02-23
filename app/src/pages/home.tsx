@@ -34,36 +34,35 @@ async function makeNoteUploadable() {
 
 async function uploadNewNotes(): Promise<void> {
   const newNotes = await db.getNewNotesToUpload()
-  const media = await db.getMediaToUpload()
   if (newNotes.length > 0) {
     const remoteIdByLocal = await apiClient.createNote.mutate(newNotes)
     await db.updateRemoteIds(remoteIdByLocal)
-    for (const [mediaId, { data, ids }] of media) {
-      await postMedia(mediaId, ids, remoteIdByLocal, data)
-    }
   }
   const editedNotes = await db.getEditedNotesToUpload()
   if (editedNotes.length > 0) {
     await apiClient.editNote.mutate(editedNotes)
     await db.markAsPushed(editedNotes.map((n) => n.remoteId))
   }
-  if (editedNotes.length === 0 && newNotes.length === 0) {
+  const media = await db.getMediaToUpload()
+  for (const [mediaId, { data, ids }] of media) {
+    await postMedia(mediaId, ids, data)
+  }
+  if (editedNotes.length === 0 && newNotes.length === 0 && media.size === 0) {
     console.log("Nothing to upload!")
   }
 }
 
 async function postMedia(
   mediaId: MediaId,
-  ids: Array<[NoteId, RemoteMediaNum]>,
-  remoteIdByLocal: Record<NoteId, RemoteNoteId>,
+  ids: Array<[NoteId, RemoteNoteId, RemoteMediaNum]>,
   data: ArrayBuffer
 ): Promise<void> {
-  const remoteNoteIdAndRemoteMediaNum = ids.map(([noteId, remoteMediaNum]) => {
-    const remoteNoteId =
-      remoteIdByLocal[noteId] ??
-      throwExp(`remoteIdByLocal is missing ${noteId} - how?`)
-    return [remoteNoteId, remoteMediaNum.toString()]
-  })
+  const remoteNoteIdAndRemoteMediaNum = ids.map(
+    ([, remoteNoteId, remoteMediaNum]) => [
+      remoteNoteId,
+      remoteMediaNum.toString(),
+    ]
+  )
   const response = await fetch(
     import.meta.env.VITE_API_URL +
       "media/note?" +
@@ -302,6 +301,7 @@ async function uploadMedia(
     {
       id: file.name as MediaId,
       created: new Date(),
+      modified: new Date(),
       data: await file.arrayBuffer(),
     },
   ])
