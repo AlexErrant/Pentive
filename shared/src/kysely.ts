@@ -8,15 +8,14 @@ import {
   Hex,
   NoteId,
   RemoteNoteId,
-  TemplateId,
   UserId,
 } from "./brand.js"
 import { binary16fromBase64URL, ulidAsRaw } from "./convertBinary.js"
 import { undefinedMap } from "./utility.js"
 import { base16, base64url } from "@scure/base"
-import { z } from "zod"
 import _ from "lodash"
 import { compile } from "html-to-text"
+import { CreateRemoteNote, EditRemoteNote } from "./schema.js"
 
 const convert = compile({})
 
@@ -133,30 +132,6 @@ export async function lookupMediaHash(
     .executeTakeFirst()
   return mediaHash?.mediaHash
 }
-
-export const createRemoteNote = z.object({
-  localId: z.string() as unknown as z.Schema<NoteId>,
-  templateId: z
-    .string()
-    .regex(/^[a-zA-Z0-9_-]{22}$/) as unknown as z.Schema<TemplateId>,
-  fieldValues: z.record(z.string()),
-  tags: z.array(z.string()),
-  ankiId: z.number().positive().optional(),
-})
-export type CreateRemoteNote = z.infer<typeof createRemoteNote>
-
-export const editRemoteNote = z.object({
-  remoteId: z
-    .string()
-    .regex(/^[a-zA-Z0-9_-]{22}$/) as unknown as z.Schema<RemoteNoteId>,
-  templateId: z
-    .string()
-    .regex(/^[a-zA-Z0-9_-]{22}$/) as unknown as z.Schema<TemplateId>,
-  fieldValues: z.record(z.string()),
-  tags: z.array(z.string()),
-  ankiId: z.number().positive().optional(),
-})
-export type EditRemoteNote = z.infer<typeof editRemoteNote>
 
 export async function insertNotes(
   authorId: UserId,
