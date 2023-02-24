@@ -161,21 +161,10 @@ async function toNoteCreate(
   const remoteIdHex = base16.encode(remoteId) as Hex
   const remoteIdBase64url = base64url.encode(remoteId).substring(0, 22)
   for (const field in n.fieldValues) {
-    const oldResponse = new Response(n.fieldValues[field])
-    const newResponse = new HTMLRewriter()
-      .on("img", {
-        // highTODO filter images that shouldn't be replaced, e.g. ones with external URLs.
-        // Wait... uh... do we even want to support this? Breaks the point of offline-first...
-        element(element) {
-          const src = element.getAttribute("src")
-          if (src != null) {
-            // Filter no-src images - grep 330CE329-B962-4E68-90F3-F4F3700815DA
-            element.setAttribute("src", remoteIdBase64url + src)
-          }
-        },
-      })
-      .transform(oldResponse)
-    n.fieldValues[field] = await newResponse.text()
+    n.fieldValues[field] = await replaceImgSrcs(
+      n.fieldValues[field],
+      remoteIdBase64url
+    )
   }
   const noteCreate: InsertObject<DB, "Note"> = {
     id: unhex(remoteIdHex),
@@ -187,6 +176,25 @@ async function toNoteCreate(
     ankiId: n.ankiId,
   }
   return { noteCreate, remoteIdBase64url }
+}
+
+async function replaceImgSrcs(value: string, remoteIdBase64url: string) {
+  const oldResponse = new Response(value)
+  const newResponse = new HTMLRewriter()
+    .on("img", {
+      // highTODO filter images that shouldn't be replaced, e.g. ones with external URLs.
+      // Wait... uh... do we even want to support this? Breaks the point of offline-first...
+      element(element) {
+        const src = element.getAttribute("src")
+        if (src != null) {
+          // Filter no-src images - grep 330CE329-B962-4E68-90F3-F4F3700815DA
+          element.setAttribute("src", remoteIdBase64url + src)
+        }
+      },
+    })
+    .transform(oldResponse)
+  const r = await newResponse.text()
+  return r
 }
 
 export async function editNotes(authorId: UserId, notes: EditRemoteNote[]) {
