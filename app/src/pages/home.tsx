@@ -101,7 +101,7 @@ async function updateNotes(): Promise<void> {
 }
 
 async function searchNotes(search: string): Promise<void> {
-  const searchBatch = await lrpc.searchNotes.query(search)
+  const searchBatch = await apiClient.searchNotes.query(search)
   console.log(searchBatch)
 }
 

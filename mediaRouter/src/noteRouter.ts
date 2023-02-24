@@ -11,7 +11,9 @@ import {
 } from "shared"
 import { z } from "zod"
 import { authedProcedure, publicProcedure } from "./trpc"
-import { Note } from "shared/src/database"
+import { DB, Note } from "shared/src/database"
+import { Selection, sql } from "kysely"
+import { From } from "kysely/dist/cjs/parser/table-parser"
 
 type ClientNote = Omit<
   Note,
@@ -52,23 +54,46 @@ export const noteRouter = {
     if (note == null) {
       return undefined
     }
-    const r: ClientNote = {
-      ...note,
-      id: dbIdToBase64Url(note.id),
-      templateId: dbIdToBase64Url(note.templateId),
-    }
-    return r
+    return mapNote(note)
   }),
-  getNotes: publicProcedure.input(z.array(id)).query(async (req) => {
-    const r = await prisma.note.findMany({
-      where: { id: { in: req.input.map(ulidStringToBuffer) } },
-    })
-    return r.map(mapNote)
+  searchNotes: publicProcedure.input(z.string()).query(async ({ input }) => {
+    const notes = await db
+      .selectFrom("Note")
+      .select([
+        "id",
+        "templateId",
+        "createdAt",
+        "updatedAt",
+        "authorId",
+        "fieldValues",
+        // "fts",
+        "tags",
+        "ankiId",
+      ])
+      .where(sql`MATCH(fts) AGAINST (${input} IN NATURAL LANGUAGE MODE)`)
+      .execute()
+    return notes.map(mapNote)
   }),
-  searchNotes: publicProcedure.input(z.string()).query(async (req) => {
-    const r = await prisma.note.findMany({
-      where: { fts: { search: req.input } },
-    })
-    return r.map(mapNote)
-  }),
+}
+
+function mapNote(
+  note: Selection<
+    From<DB, "Note">,
+    "Note",
+    | "templateId"
+    | "fieldValues"
+    | "tags"
+    | "ankiId"
+    | "id"
+    | "createdAt"
+    | "updatedAt"
+    | "authorId"
+  >
+) {
+  const r: ClientNote = {
+    ...note,
+    id: dbIdToBase64Url(note.id),
+    templateId: dbIdToBase64Url(note.templateId),
+  }
+  return r
 }
