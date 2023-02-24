@@ -1,5 +1,4 @@
 import { z } from "zod"
-import { templateRouter } from "./templateRouter.js"
 import { authedProcedure, publicProcedure, router } from "./trpc.js"
 import aio from "@vlcn.io/crsqlite-allinone"
 import { initSql, wholeDbReplicatorSync } from "shared"
@@ -71,7 +70,6 @@ export const appRouter = router({
         db.close()
       }
     }),
-  ...templateRouter,
 })
 
 export type AppRouter = typeof appRouter

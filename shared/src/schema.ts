@@ -1,5 +1,11 @@
 import { z } from "zod"
-import { NoteId, TemplateId, RemoteNoteId, ChildTemplateId } from "./brand"
+import {
+  NoteId,
+  TemplateId,
+  RemoteNoteId,
+  ChildTemplateId,
+  RemoteTemplateId,
+} from "./brand"
 
 export const createRemoteNote = z.object({
   localId: z.string() as unknown as z.Schema<NoteId>,
@@ -25,11 +31,15 @@ export const editRemoteNote = z.object({
 })
 export type EditRemoteNote = z.infer<typeof editRemoteNote>
 
-export const id = z.string() // highTODO are we doing ULIDs, KSUID, or neither?
+// highTODO are we doing ULIDs, KSUID, or neither?
 
 export const remoteNoteId = z
   .string()
   .regex(/^[a-zA-Z0-9_-]{22}$/) as unknown as z.Schema<RemoteNoteId>
+
+export const remoteTemplateId = z
+  .string()
+  .regex(/^[a-zA-Z0-9_-]{22}$/) as unknown as z.Schema<RemoteTemplateId>
 
 export const dateSchema = z.preprocess((arg) => {
   if (typeof arg === "string" || arg instanceof Date) return new Date(arg)

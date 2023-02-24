@@ -5,7 +5,6 @@ import { sampleNote, Note } from "../domain/note"
 import { defaultTemplate, Template } from "../domain/template"
 import HomeData from "./home.data"
 import { db } from "../db"
-import { lrpc } from "../lrpcClient"
 import { importAnki } from "./importer/importer"
 import { csrfHeaderName, NoteId, RemoteNoteId, throwExp } from "shared"
 import { MediaId, RemoteMediaNum, RemoteTemplateId } from "../domain/ids"
@@ -15,7 +14,7 @@ async function uploadNewTemplates(): Promise<void> {
   const newTemplates = await db.getNewTemplatesToUpload("aRandomNook")
   const remoteIdByLocal = await apiClient.createTemplates.mutate(newTemplates)
   const remoteIds = Object.values(remoteIdByLocal)
-  const getBatch = await lrpc.getTemplates.query(remoteIds)
+  const getBatch = await apiClient.getTemplates.query(remoteIds)
   console.log("getTemplates", getBatch)
 }
 
