@@ -33,7 +33,6 @@ export const templateRouter = {
           type: "type",
           fields: "fields",
           css: "css",
-          childTemplates: "childTemplates",
           ankiId: 0,
         },
       })

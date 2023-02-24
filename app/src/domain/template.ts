@@ -1,3 +1,4 @@
+import { z } from "zod"
 import { ChildTemplateId, RemoteTemplateId, TemplateId } from "./ids"
 
 export interface Field {
@@ -7,24 +8,29 @@ export interface Field {
   readonly private?: boolean
 }
 
-export interface ChildTemplate {
-  readonly id: ChildTemplateId
-  readonly name: string
-  readonly front: string
-  readonly back: string
-  readonly shortFront?: string
-  readonly shortBack?: string
-}
+export const childTemplate = z.object({
+  id: z.string() as unknown as z.Schema<ChildTemplateId>,
+  name: z.string(),
+  front: z.string(),
+  back: z.string(),
+  shortFront: z.string().optional(),
+  shortBack: z.string().optional(),
+})
 
-export type TemplateType =
-  | {
-      readonly tag: "standard"
-      readonly templates: readonly ChildTemplate[]
-    }
-  | {
-      readonly tag: "cloze"
-      readonly template: ChildTemplate
-    }
+export type ChildTemplate = z.infer<typeof childTemplate>
+
+export const templateType = z.discriminatedUnion("tag", [
+  z.object({
+    tag: z.literal("standard"),
+    templates: z.array(childTemplate).min(1),
+  }),
+  z.object({
+    tag: z.literal("cloze"),
+    template: childTemplate,
+  }),
+])
+
+export type TemplateType = z.infer<typeof templateType>
 
 export interface Template {
   readonly id: TemplateId

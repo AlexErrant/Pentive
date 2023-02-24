@@ -93,7 +93,6 @@ export interface Template {
   type: string
   fields: string
   css: string
-  childTemplates: string
   ankiId: number | null
 }
 
@@ -115,7 +114,6 @@ export interface TemplateHistory {
   type: string | null
   fields: string | null
   css: string | null
-  childTemplates: string | null
 }
 
 export interface TemplateSubscriber {

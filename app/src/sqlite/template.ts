@@ -71,9 +71,8 @@ function domainToCreateRemote(
     name,
     css,
     nook,
-    templateType: templateType.tag,
+    templateType: stringifyTemplates(templateType),
     fields: fields.map((x) => x.name),
-    childTemplates: stringifyTemplates(templateType),
   }
 }
 

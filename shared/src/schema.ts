@@ -42,7 +42,6 @@ export const createRemoteTemplate = z.object({
   templateType: z.literal("standard").or(z.literal("cloze")),
   fields: z.array(z.string()),
   css: z.string(),
-  childTemplates: z.string(),
   ankiId: z.number().positive().optional(),
 })
 

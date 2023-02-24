@@ -28,21 +28,20 @@ model User {
 }
 
 model Template {
-  id             Bytes                @id @db.Binary(16)
-  createdAt      DateTime             @default(now())
-  updatedAt      DateTime             @default(now())
-  name           String               @db.VarChar(255)
-  nook           String               @db.VarChar(21)
-  nookRef        Nook                 @relation(fields: [nook], references: [id])
-  type           String               @db.VarChar(21)
-  fields         String               @db.Text
-  css            String               @db.Text
-  childTemplates String               @db.Text
-  history        TemplateHistory[]
-  comments       TemplateComment[]
-  ankiId         BigInt?              @db.UnsignedBigInt // should be its own table
-  subscribers    TemplateSubscriber[]
-  notes          Note[]
+  id          Bytes                @id @db.Binary(16)
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @default(now())
+  name        String               @db.VarChar(255)
+  nook        String               @db.VarChar(21)
+  nookRef     Nook                 @relation(fields: [nook], references: [id])
+  type        String               @db.Text // medTODO compress
+  fields      String               @db.Text // medTODO compress
+  css         String               @db.Text // medTODO compress
+  history     TemplateHistory[]
+  comments    TemplateComment[]
+  ankiId      BigInt?              @db.UnsignedBigInt // should be its own table
+  subscribers TemplateSubscriber[]
+  notes       Note[]
 
   @@index([ankiId])
   @@index([nook])
@@ -80,13 +79,12 @@ model TemplateHistory {
   template   Template @relation(fields: [templateId], references: [id])
   createdAt  DateTime @default(now())
 
-  name           String? @db.VarChar(255)
-  author         User?   @relation(fields: [authorId], references: [id])
-  authorId       String? @db.VarChar(21)
-  type           String? @db.VarChar(21)
-  fields         String? @db.Text
-  css            String? @db.Text
-  childTemplates String? @db.Text
+  name     String? @db.VarChar(255)
+  author   User?   @relation(fields: [authorId], references: [id])
+  authorId String? @db.VarChar(21)
+  type     String? @db.VarChar(21)
+  fields   String? @db.Text
+  css      String? @db.Text
 
   @@id([templateId, createdAt])
   @@index([templateId])
@@ -101,7 +99,7 @@ model Note {
   updatedAt   DateTime @default(now())
   author      User     @relation(fields: [authorId], references: [id])
   authorId    String   @db.VarChar(21)
-  fieldValues String   @db.Text
+  fieldValues String   @db.Text // medTODO compress
   fts         String   @db.Text
   tags        String   @db.Text
 
