@@ -17,49 +17,6 @@ function mapTemplate(t: Template): ClientTemplate {
 }
 
 export const templateRouter = {
-  addTemplate: authedProcedure
-    .input(
-      z.object({
-        name: z.string(),
-      })
-    )
-    .mutation(async (req) => {
-      const id = ulid.generate()
-      await prisma.template.create({
-        data: {
-          ...req.input,
-          id: ulidToBuffer(id),
-          nook: "nook",
-          type: "type",
-          fields: "fields",
-          css: "css",
-          ankiId: 0,
-        },
-      })
-      return id.toCanonical()
-    }),
-  addTemplates: authedProcedure
-    .input(z.array(createRemoteTemplate))
-    .mutation(async (req) => {
-      const templateCreatesAndIds = req.input.map(({ templateType, ...t }) => {
-        const remoteId = ulid.generate()
-        const t2: Prisma.TemplateCreateManyInput = {
-          ...t,
-          type: "templateType",
-          fields: JSON.stringify(t.fields),
-          id: ulidToBuffer(remoteId),
-        }
-        return [t2, [t.id, remoteId.toCanonical()] as [string, string]] as const
-      })
-      const templateCreates = templateCreatesAndIds.map((x) => x[0])
-      const remoteIdByLocal = _.fromPairs(
-        templateCreatesAndIds.map((x) => x[1])
-      )
-      await prisma.template.createMany({
-        data: templateCreates,
-      })
-      return remoteIdByLocal
-    }),
   getTemplate: publicProcedure.input(id).query(async (req) => {
     const id = ulidStringToBuffer(req.input)
     const template = await prisma.template.findUnique({ where: { id } })

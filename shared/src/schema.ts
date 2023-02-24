@@ -60,7 +60,7 @@ export const templateType = z.discriminatedUnion("tag", [
 export type TemplateType = z.infer<typeof templateType>
 
 export const createRemoteTemplate = z.object({
-  id,
+  localId: z.string() as unknown as z.Schema<TemplateId>,
   name: z.string(),
   nook: z.string(),
   templateType,
@@ -70,6 +70,18 @@ export const createRemoteTemplate = z.object({
 })
 
 export type CreateRemoteTemplate = z.infer<typeof createRemoteTemplate>
+
+export const editRemoteTemplate = z.object({
+  remoteId: z.string() as unknown as z.Schema<TemplateId>,
+  name: z.string(),
+  // nook: z.string(), intentionally omitted
+  templateType,
+  fields: z.array(z.string()),
+  css: z.string(),
+  ankiId: z.number().positive().optional(),
+})
+
+export type EditRemoteTemplate = z.infer<typeof editRemoteTemplate>
 
 export const remoteTemplate = createRemoteTemplate.extend({
   author: z.string(),

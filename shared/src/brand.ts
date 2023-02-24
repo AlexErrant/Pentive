@@ -7,6 +7,7 @@ export type DbId = Brand<string, "dbId">
 export type LDbId = Brand<string, "dbId" & "base64url"> // L means local/Lite. nix `base64url` upon v3.41 - grep F235B7FB-8CEA-4AE2-99CC-2790E607B1EB
 
 export type TemplateId = Brand<string, "templateId" & "base64url">
+export type RemoteTemplateId = Brand<string, "remoteTemplateId" & "base64url">
 export type ChildTemplateId = Brand<string, "childTemplateId">
 
 export type NoteId = Brand<string, "noteId" & "base64url">

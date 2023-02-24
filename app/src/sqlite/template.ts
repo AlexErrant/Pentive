@@ -56,7 +56,7 @@ function domainToCreateRemote(
   nook: string
 ): CreateRemoteTemplate {
   return {
-    id,
+    localId: id,
     name,
     css,
     nook,

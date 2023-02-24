@@ -8,6 +8,8 @@ import {
   Hex,
   NoteId,
   RemoteNoteId,
+  RemoteTemplateId,
+  TemplateId,
   UserId,
 } from "./brand.js"
 import { binary16fromBase64URL, ulidAsRaw } from "./convertBinary.js"
@@ -15,7 +17,12 @@ import { undefinedMap } from "./utility.js"
 import { base16, base64url } from "@scure/base"
 import _ from "lodash"
 import { compile } from "html-to-text"
-import { CreateRemoteNote, EditRemoteNote } from "./schema.js"
+import {
+  CreateRemoteNote,
+  CreateRemoteTemplate,
+  EditRemoteNote,
+  EditRemoteTemplate,
+} from "./schema.js"
 
 const convert = compile({})
 
@@ -152,12 +159,35 @@ export async function insertNotes(
   return remoteIdByLocal
 }
 
+export async function insertTemplates(
+  authorId: UserId,
+  templates: CreateRemoteTemplate[]
+): Promise<Record<TemplateId, RemoteTemplateId>> {
+  const templateCreatesAndIds = await Promise.all(
+    templates.map(async (n) => {
+      const { templateCreate, remoteIdBase64url } = await toTemplateCreate(
+        n,
+        authorId
+      )
+      return [
+        templateCreate,
+        [n.localId, remoteIdBase64url] as [TemplateId, RemoteTemplateId],
+      ] as const
+    })
+  )
+  const templateCreates = templateCreatesAndIds.map((x) => x[0])
+  await db.insertInto("Template").values(templateCreates).execute()
+  const remoteIdByLocal = _.fromPairs(templateCreatesAndIds.map((x) => x[1]))
+  return remoteIdByLocal
+}
+
 async function toNoteCreate(
   n: EditRemoteNote | CreateRemoteNote,
   authorId: UserId
 ) {
   const remoteId =
     "remoteId" in n ? base64url.decode(n.remoteId + "==") : ulidAsRaw()
+  const updatedAt = "remoteId" in n ? new Date() : undefined
   const remoteIdHex = base16.encode(remoteId) as Hex
   const remoteIdBase64url = base64url.encode(remoteId).substring(0, 22)
   for (const field in n.fieldValues) {
@@ -170,6 +200,7 @@ async function toNoteCreate(
     id: unhex(remoteIdHex),
     templateId: fromBase64Url(n.templateId), // highTODO validate
     authorId,
+    updatedAt,
     fieldValues: JSON.stringify(n.fieldValues),
     fts: Object.values(n.fieldValues).map(convert).concat(n.tags).join(" "),
     tags: JSON.stringify(n.tags),
@@ -197,7 +228,46 @@ async function replaceImgSrcs(value: string, remoteIdBase64url: string) {
   return r
 }
 
+async function toTemplateCreate(
+  n: EditRemoteTemplate | CreateRemoteTemplate,
+  authorId: UserId // highTODO update History. Could History be a compressed column instead of its own table?
+) {
+  const remoteId =
+    "remoteId" in n ? base64url.decode(n.remoteId + "==") : ulidAsRaw()
+  const updatedAt = "remoteId" in n ? new Date() : undefined
+  const nook = "remoteId" in n ? "undefined" : n.nook
+  const remoteIdHex = base16.encode(remoteId) as Hex
+  const remoteIdBase64url = base64url.encode(remoteId).substring(0, 22)
+  if (n.templateType.tag === "standard") {
+    for (const t of n.templateType.templates) {
+      t.front = await replaceImgSrcs(t.front, remoteIdBase64url)
+      t.back = await replaceImgSrcs(t.back, remoteIdBase64url)
+    }
+  } else {
+    n.templateType.template.front = await replaceImgSrcs(
+      n.templateType.template.front,
+      remoteIdBase64url
+    )
+    n.templateType.template.back = await replaceImgSrcs(
+      n.templateType.template.back,
+      remoteIdBase64url
+    )
+  }
+  const templateCreate: InsertObject<DB, "Template"> = {
+    id: unhex(remoteIdHex),
+    ankiId: n.ankiId,
+    updatedAt,
+    name: n.name,
+    nook,
+    type: JSON.stringify(n.templateType),
+    fields: JSON.stringify(n.fields),
+    css: n.css,
+  }
+  return { templateCreate, remoteIdBase64url }
+}
+
 export async function editNotes(authorId: UserId, notes: EditRemoteNote[]) {
+  // nextTODO validate pk doesn't exist
   const noteCreates = await Promise.all(
     notes.map(async (n) => {
       const { noteCreate } = await toNoteCreate(n, authorId)
@@ -220,6 +290,34 @@ export async function editNotes(authorId: UserId, notes: EditRemoteNote[]) {
       fts: (x) => values(x.ref("fts")),
       tags: (x) => values(x.ref("tags")),
       ankiId: (x) => values(x.ref("ankiId")),
+    })
+    .execute()
+}
+
+export async function editTemplates(
+  authorId: UserId,
+  templates: EditRemoteTemplate[]
+) {
+  // nextTODO validate pk doesn't exist
+  const templateCreates = await Promise.all(
+    templates.map(async (n) => {
+      const { templateCreate } = await toTemplateCreate(n, authorId)
+      return templateCreate
+    })
+  )
+  await db
+    .insertInto("Template")
+    .values(templateCreates)
+    // https://stackoverflow.com/a/34866431
+    .onDuplicateKeyUpdate({
+      ankiId: (x) => values(x.ref("ankiId")),
+      // createdAt: (x) => values(x.ref("createdAt")),
+      updatedAt: (x) => values(x.ref("updatedAt")),
+      name: (x) => values(x.ref("name")),
+      // nook: (x) => values(x.ref("nook")), do not update Nook!
+      type: (x) => values(x.ref("type")),
+      fields: (x) => values(x.ref("fields")),
+      css: (x) => values(x.ref("css")),
     })
     .execute()
 }

@@ -12,17 +12,11 @@ import { MediaId, RemoteMediaNum, RemoteTemplateId } from "../domain/ids"
 import { apiClient } from "../apiClient"
 
 async function uploadNewTemplates(): Promise<void> {
-  const id = await lrpc.addTemplate.mutate({
-    name: "a template name",
-  })
-  console.log("id is", id)
-  const r = await lrpc.getTemplate.query(id)
   const newTemplates = await db.getNewTemplatesToUpload("aRandomNook")
-  const remoteIdByLocal = await lrpc.addTemplates.mutate(newTemplates)
+  const remoteIdByLocal = await apiClient.createTemplates.mutate(newTemplates)
   const remoteIds = Object.values(remoteIdByLocal)
   const getBatch = await lrpc.getTemplates.query(remoteIds)
   console.log("getTemplates", getBatch)
-  console.log(r)
 }
 
 async function makeNoteUploadable() {
