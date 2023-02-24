@@ -45,7 +45,7 @@ export const templateRouter = {
         const remoteId = ulid.generate()
         const t2: Prisma.TemplateCreateManyInput = {
           ...t,
-          type: templateType,
+          type: "templateType",
           fields: JSON.stringify(t.fields),
           id: ulidToBuffer(remoteId),
         }

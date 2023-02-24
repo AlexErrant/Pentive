@@ -1,10 +1,11 @@
+import { ChildTemplateId } from "shared"
+
 type Brand<T, B> = T & { readonly brand: B } // https://medium.com/@KevinBGreene/surviving-the-typescript-ecosystem-branding-and-type-tagging-6cf6e516523d
 
 export type RemoteTemplateId = Brand<string, "remoteTemplateId" & "base64url">
 export type RemoteCardId = Brand<string, "remoteCardId" & "base64url">
 
-export { TemplateId, NoteId, UserId } from "shared"
-export type ChildTemplateId = Brand<string, "childTemplateId">
+export { TemplateId, NoteId, UserId, ChildTemplateId } from "shared"
 export type ClozeIndex = Brand<number, "clozeIndex">
 export type Pointer = ChildTemplateId | ClozeIndex
 export type Side = "front" | "back"

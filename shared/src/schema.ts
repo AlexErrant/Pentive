@@ -1,5 +1,5 @@
 import { z } from "zod"
-import { NoteId, TemplateId, RemoteNoteId } from "./brand"
+import { NoteId, TemplateId, RemoteNoteId, ChildTemplateId } from "./brand"
 
 export const createRemoteNote = z.object({
   localId: z.string() as unknown as z.Schema<NoteId>,
@@ -35,11 +35,35 @@ export const dateSchema = z.preprocess((arg) => {
   if (typeof arg === "string" || arg instanceof Date) return new Date(arg)
 }, z.date())
 
+export const childTemplate = z.object({
+  id: z.string() as unknown as z.Schema<ChildTemplateId>,
+  name: z.string(),
+  front: z.string(),
+  back: z.string(),
+  shortFront: z.string().optional(),
+  shortBack: z.string().optional(),
+})
+
+export type ChildTemplate = z.infer<typeof childTemplate>
+
+export const templateType = z.discriminatedUnion("tag", [
+  z.object({
+    tag: z.literal("standard"),
+    templates: z.array(childTemplate).min(1),
+  }),
+  z.object({
+    tag: z.literal("cloze"),
+    template: childTemplate,
+  }),
+])
+
+export type TemplateType = z.infer<typeof templateType>
+
 export const createRemoteTemplate = z.object({
   id,
   name: z.string(),
   nook: z.string(),
-  templateType: z.literal("standard").or(z.literal("cloze")),
+  templateType,
   fields: z.array(z.string()),
   css: z.string(),
   ankiId: z.number().positive().optional(),

@@ -7,13 +7,8 @@ import {
   TemplateId,
   ClozeIndex,
 } from "../../domain/ids"
-import {
-  ChildTemplate,
-  Field,
-  Template,
-  TemplateType,
-} from "../../domain/template"
-import { throwExp } from "shared"
+import { Field, Template } from "../../domain/template"
+import { ChildTemplate, TemplateType, throwExp } from "shared"
 import { Card as PCard } from "../../domain/card"
 import { Note as PNote } from "../../domain/note"
 import {

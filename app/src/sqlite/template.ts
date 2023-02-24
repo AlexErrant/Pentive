@@ -1,6 +1,6 @@
 import { RemoteTemplateId, TemplateId } from "../domain/ids"
-import { Field, Template, TemplateType } from "../domain/template"
-import { CreateRemoteTemplate, assertNever, undefinedMap } from "shared"
+import { Field, Template } from "../domain/template"
+import { CreateRemoteTemplate, TemplateType, undefinedMap } from "shared"
 import { getKysely } from "./crsqlite"
 import { DB, Template as TemplateEntity } from "./database"
 import { InsertObject } from "kysely"
@@ -51,17 +51,6 @@ function entityToDomain(template: TemplateEntity): Template {
   return r
 }
 
-function stringifyTemplates(t: TemplateType): string {
-  switch (t.tag) {
-    case "standard":
-      return JSON.stringify(t.templates)
-    case "cloze":
-      return JSON.stringify(t.template)
-    default:
-      return assertNever(t)
-  }
-}
-
 function domainToCreateRemote(
   { id, name, css, templateType, fields }: Template,
   nook: string
@@ -71,7 +60,7 @@ function domainToCreateRemote(
     name,
     css,
     nook,
-    templateType: stringifyTemplates(templateType),
+    templateType,
     fields: fields.map((x) => x.name),
   }
 }

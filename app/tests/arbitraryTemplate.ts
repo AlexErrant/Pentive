@@ -5,13 +5,9 @@ import {
   RemoteTemplateId,
   TemplateId,
 } from "../src/domain/ids"
-import {
-  ChildTemplate,
-  Field,
-  Template,
-  TemplateType,
-} from "../src/domain/template"
+import { Field, Template } from "../src/domain/template"
 import { reasonableDates, recordWithOptionalFields } from "./arbitrary"
+import { ChildTemplate, TemplateType } from "shared"
 
 const field = recordWithOptionalFields<Field>(
   {
