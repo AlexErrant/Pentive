@@ -19,6 +19,7 @@
     "@trpc/server": "^10.11.1",
     "hono": "^2.7.7",
     "jose": "^4.11.1",
+    "kysely": "^0.23.3",
     "shared": "workspace:*",
     "superjson": "^1.12.2",
     "zod": "^3.20.6"
