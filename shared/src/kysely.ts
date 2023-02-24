@@ -13,7 +13,7 @@ import {
   UserId,
 } from "./brand.js"
 import { binary16fromBase64URL, ulidAsRaw } from "./convertBinary.js"
-import { undefinedMap } from "./utility.js"
+import { throwExp, undefinedMap } from "./utility.js"
 import { base16, base64url } from "@scure/base"
 import _ from "lodash"
 import { compile } from "html-to-text"
@@ -267,7 +267,17 @@ async function toTemplateCreate(
 }
 
 export async function editNotes(authorId: UserId, notes: EditRemoteNote[]) {
-  // nextTODO validate pk doesn't exist
+  const count = await db
+    .selectFrom("Note")
+    .select(db.fn.count("id").as("c"))
+    .where(
+      "id",
+      "in",
+      notes.map((n) => fromBase64Url(n.remoteId))
+    )
+    .executeTakeFirstOrThrow()
+  if (count.c !== notes.length.toString())
+    throwExp("At least one of these notes doesn't exist.")
   const noteCreates = await Promise.all(
     notes.map(async (n) => {
       const { noteCreate } = await toNoteCreate(n, authorId)
@@ -298,7 +308,17 @@ export async function editTemplates(
   authorId: UserId,
   templates: EditRemoteTemplate[]
 ) {
-  // nextTODO validate pk doesn't exist
+  const count = await db
+    .selectFrom("Template")
+    .select(db.fn.count("id").as("c"))
+    .where(
+      "id",
+      "in",
+      templates.map((t) => fromBase64Url(t.remoteId))
+    )
+    .executeTakeFirstOrThrow()
+  if (count.c !== templates.length.toString())
+    throwExp("At least one of these templates doesn't exist.")
   const templateCreates = await Promise.all(
     templates.map(async (n) => {
       const { templateCreate } = await toTemplateCreate(n, authorId)
