@@ -60,6 +60,7 @@ export interface Template {
   created: number
   modified: number
   templateType: string
+  ankiId: number | null
 }
 
 export interface DB {
