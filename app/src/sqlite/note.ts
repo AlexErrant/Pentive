@@ -324,20 +324,15 @@ export const noteCollectionMethods = {
 function withLocalMediaIdByRemoteMediaId<
   T extends CreateRemoteNote | EditRemoteNote
 >(dp: DOMParser, note: T) {
-  let i = 0 as RemoteMediaNum
   const localMediaIdByRemoteMediaId = new Map<RemoteMediaNum, MediaId>()
   const fieldValues = new Map<string, string>()
-  for (const field in note.fieldValues) {
-    const doc = dp.parseFromString(note.fieldValues[field], "text/html")
-    for (const image of doc.images) {
-      const src = image.getAttribute("src")
-      if (src != null) {
-        // Filter no-src images - grep 330CE329-B962-4E68-90F3-F4F3700815DA
-        image.setAttribute("src", i.toString())
-        localMediaIdByRemoteMediaId.set(i, src as MediaId)
-        i++
-      }
-    }
+  for (const field of Object.keys(note.fieldValues).sort()) {
+    const value = note.fieldValues[field]
+    const doc = updateLocalMediaIdByRemoteMediaIdAndGetNewDoc(
+      dp,
+      value,
+      localMediaIdByRemoteMediaId
+    )
     fieldValues.set(field, doc.body.innerHTML)
   }
   return {
@@ -347,4 +342,22 @@ function withLocalMediaIdByRemoteMediaId<
     },
     localMediaIdByRemoteMediaId,
   }
+}
+
+function updateLocalMediaIdByRemoteMediaIdAndGetNewDoc(
+  dp: DOMParser,
+  rawDom: string,
+  localMediaIdByRemoteMediaId: Map<RemoteMediaNum, MediaId>
+) {
+  const doc = dp.parseFromString(rawDom, "text/html")
+  for (const image of doc.images) {
+    const src = image.getAttribute("src")
+    if (src != null) {
+      // Filter no-src images - grep 330CE329-B962-4E68-90F3-F4F3700815DA
+      const i = localMediaIdByRemoteMediaId.size as RemoteMediaNum
+      image.setAttribute("src", i.toString())
+      localMediaIdByRemoteMediaId.set(i, src as MediaId)
+    }
+  }
+  return doc
 }
