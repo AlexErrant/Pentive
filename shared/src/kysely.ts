@@ -97,7 +97,7 @@ export async function insertPost({
     .execute()
 }
 
-export async function userOwnsAndHasMedia(
+export async function userOwnsNoteAndHasMedia(
   ids: NoteId[],
   authorId: UserId,
   id: Base64

@@ -23,10 +23,10 @@ import {
   fromBase64Url,
   fromBase64,
   NoteId,
-  throwExp,
   lookupMediaHash,
   binary16fromBase64URL,
-  userOwnsAndHasMedia,
+  userOwnsNoteAndHasMedia,
+  UserId,
 } from "shared"
 import { SignJWT, jwtVerify } from "jose"
 import { connect } from "@planetscale/database"
@@ -156,7 +156,21 @@ app
     }
     return await postMedia(c, persistDbAndBucket, buildToken)
   })
-  .post("/media/note", async (c) => await postPublicMedia(c, "note"))
+  .post("/media/note", async (c) => {
+    const iByEntityIds = iByEntityIdsValidator.parse(c.req.query()) as Record<
+      NoteId,
+      number
+    > // nix upon resolution of https://github.com/colinhacks/zod/pull/2097
+    const noteIds = Object.keys(iByEntityIds) as NoteId[]
+    if (noteIds.length === 0) return c.text(`Need at least one note.`, 400)
+    return await postPublicMedia(
+      c,
+      "note",
+      async (authorId: UserId, mediaHash: Base64) =>
+        await userOwnsNoteAndHasMedia(noteIds, authorId, mediaHash),
+      iByEntityIds
+    )
+  })
   .get("/private/:token", async (c) => {
     const authResult = await getUserId(c)
     if (authResult.tag === "Error") return authResult.error
@@ -180,27 +194,34 @@ app
 
 export default app
 
-async function postPublicMedia(c: MediaRouterContext, type: "note") {
+async function postPublicMedia(
+  c: MediaRouterContext,
+  type: "note",
+  userOwnsAndHasMedia: (
+    authorId: UserId,
+    id: Base64
+  ) => Promise<{
+    userOwns: boolean
+    hasMedia: boolean
+  }>,
+  iByEntityIds: Record<Base64Url, number>
+) {
   const authResult = await getUserId(c)
   if (authResult.tag === "Error") return authResult.error
   const userId = authResult.ok
   setKysely(c.env.planetscaleDbUrl)
-  const iByEntityIds = iByEntityIdsValidator.parse(c.req.query())
-  const noteIds = Object.keys(iByEntityIds) as NoteId[]
-  if (noteIds.length === 0) return c.text(`Need at least one ${type}.`, 400)
   const persistDbAndBucket = async ({
     mediaHashBase64,
     readable,
     headers,
   }: PersistParams): Promise<undefined | Response> => {
     const mediaHash = fromBase64(mediaHashBase64)
-    const insertValues = Object.entries(iByEntityIds).map(([noteId, i]) => ({
+    const insertValues = Object.entries(iByEntityIds).map(([entityId, i]) => ({
       mediaHash,
-      i: i ?? throwExp("not sure why this can be undefined but whatever"),
-      entityId: fromBase64Url(noteId as NoteId),
+      i,
+      entityId: fromBase64Url(entityId as Base64Url),
     }))
     const { userOwns, hasMedia } = await userOwnsAndHasMedia(
-      noteIds,
       userId,
       mediaHashBase64
     )
