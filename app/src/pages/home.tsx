@@ -10,12 +10,28 @@ import { Base64Url, csrfHeaderName, throwExp } from "shared"
 import { MediaId, RemoteMediaNum, RemoteTemplateId } from "../domain/ids"
 import { apiClient } from "../apiClient"
 
-async function uploadNewTemplates(): Promise<void> {
+async function uploadTemplates(): Promise<void> {
   const newTemplates = await db.getNewTemplatesToUpload()
-  const remoteIdByLocal = await apiClient.createTemplates.mutate(newTemplates)
-  const remoteIds = Object.values(remoteIdByLocal)
-  const getBatch = await apiClient.getTemplates.query(remoteIds)
-  console.log("getTemplates", getBatch)
+  if (newTemplates.length > 0) {
+    const remoteIdByLocal = await apiClient.createTemplates.mutate(newTemplates)
+    await db.updateTemplateRemoteIds(remoteIdByLocal)
+  }
+  const editedTemplates = await db.getEditedTemplatesToUpload()
+  if (editedTemplates.length > 0) {
+    await apiClient.editTemplates.mutate(editedTemplates)
+    await db.markTemplateAsPushed(editedTemplates.map((n) => n.remoteId))
+  }
+  const media = await db.getTemplateMediaToUpload()
+  for (const [mediaId, { data, ids }] of media) {
+    await postMedia("template", mediaId, ids, data)
+  }
+  if (
+    editedTemplates.length === 0 &&
+    newTemplates.length === 0 &&
+    media.size === 0
+  ) {
+    console.log("Nothing to upload!")
+  }
 }
 
 async function makeNoteUploadable() {
@@ -29,7 +45,7 @@ async function makeTemplateUploadable() {
   await db.makeTemplateUploadable(defaultTemplate.id)
 }
 
-async function uploadNewNotes(): Promise<void> {
+async function uploadNotes(): Promise<void> {
   const newNotes = await db.getNewNotesToUpload()
   if (newNotes.length > 0) {
     const remoteIdByLocal = await apiClient.createNote.mutate(newNotes)
@@ -50,7 +66,7 @@ async function uploadNewNotes(): Promise<void> {
 }
 
 async function postMedia(
-  type: "note",
+  type: "note" | "template",
   mediaId: MediaId,
   ids: Array<[Base64Url, Base64Url, RemoteMediaNum]>, // localId, remoteId, i
   data: ArrayBuffer
@@ -198,9 +214,9 @@ export default function Home(): JSX.Element {
         </button>
         <button
           class="border rounded-lg px-2 border-gray-900"
-          onClick={uploadNewTemplates}
+          onClick={uploadTemplates}
         >
-          uploadNewTemplates
+          uploadTemplates
         </button>
       </div>
       <div class="mt-4">
@@ -224,9 +240,9 @@ export default function Home(): JSX.Element {
         </button>
         <button
           class="border rounded-lg px-2 border-gray-900"
-          onClick={uploadNewNotes}
+          onClick={uploadNotes}
         >
-          uploadNewNotes
+          uploadNotes
         </button>
         <button
           class="border rounded-lg px-2 border-gray-900"
