@@ -190,7 +190,9 @@ export const templateCollectionMethods = {
     for (const m of mediaBinaries) {
       const remoteId =
         (m.templateRemoteId as RemoteTemplateId) ??
-        `Template ${m.localMediaId} is missing a templateRemoteId... is something wrong with the SQL query?`
+        throwExp(
+          `Template ${m.localMediaId} is missing a templateRemoteId, is something wrong with the SQL query?`
+        )
       const value =
         media.get(m.localMediaId) ??
         throwExp(`mediaBinaries is missing '${m.localMediaId}'... how?`)

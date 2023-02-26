@@ -222,7 +222,9 @@ export const noteCollectionMethods = {
     for (const m of mediaBinaries) {
       const remoteId =
         (m.noteRemoteId as RemoteNoteId) ??
-        `Note ${m.localMediaId} is missing a noteRemoteId... is something wrong with the SQL query?`
+        throwExp(
+          `Note ${m.localMediaId} is missing a noteRemoteId, is something wrong with the SQL query?`
+        )
       const value =
         media.get(m.localMediaId) ??
         throwExp(`mediaBinaries is missing '${m.localMediaId}'... how?`)
