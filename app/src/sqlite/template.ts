@@ -270,19 +270,6 @@ export const templateCollectionMethods = {
       .where("remoteId", "in", remoteTemplateIds)
       .execute()
   },
-  updateUploadDate: async function (
-    ids: Array<[TemplateId, RemoteTemplateId, RemoteMediaNum]>
-  ) {
-    const db = await getKysely()
-    for (const [localEntityId, , i] of ids) {
-      await db
-        .updateTable("remoteMedia")
-        .set({ uploadDate: new Date().getTime() })
-        .where("localEntityId", "=", localEntityId)
-        .where("i", "=", i)
-        .execute()
-    }
-  },
   updateTemplate: async function (template: Template) {
     const db = await getKysely()
     const { id, ...rest } = templateToDocType(template)

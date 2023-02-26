@@ -1,8 +1,6 @@
 import {
-  Base64Url,
   CreateRemoteNote,
   EditRemoteNote,
-  LDbId,
   RemoteNoteId,
   throwExp,
 } from "shared"
@@ -304,19 +302,6 @@ export const noteCollectionMethods = {
       .set({ push: null })
       .where("remoteId", "in", remoteNoteIds)
       .execute()
-  },
-  updateUploadDate: async function (
-    ids: Array<[Base64Url, unknown, RemoteMediaNum]>
-  ) {
-    const db = await getKysely()
-    for (const [localEntityId, , i] of ids) {
-      await db
-        .updateTable("remoteMedia")
-        .set({ uploadDate: new Date().getTime() })
-        .where("localEntityId", "=", localEntityId as LDbId)
-        .where("i", "=", i)
-        .execute()
-    }
   },
   updateNote: async function (note: Note) {
     const db = await getKysely()
