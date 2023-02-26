@@ -35,7 +35,7 @@ import { appRouter } from "./router"
 import { fetchRequestHandler } from "@trpc/server/adapters/fetch"
 import { createContext } from "./trpc"
 import { getJwsSecret } from "./env"
-import { iByNoteIdsValidator, parsePublicToken } from "./publicToken"
+import { iByEntityIdsValidator, parsePublicToken } from "./publicToken"
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const app = new Hono<{ Bindings: Env }>()
@@ -185,8 +185,8 @@ async function postPublicMedia(c: MediaRouterContext) {
   if (authResult.tag === "Error") return authResult.error
   const userId = authResult.ok
   setKysely(c.env.planetscaleDbUrl)
-  const iByNoteIds = iByNoteIdsValidator.parse(c.req.query())
-  const noteIds = Object.keys(iByNoteIds) as NoteId[]
+  const iByEntityIds = iByEntityIdsValidator.parse(c.req.query())
+  const noteIds = Object.keys(iByEntityIds) as NoteId[]
   if (noteIds.length === 0) return c.text("Need at least one note.", 400)
   const persistDbAndBucket = async ({
     mediaHashBase64,
@@ -194,7 +194,7 @@ async function postPublicMedia(c: MediaRouterContext) {
     headers,
   }: PersistParams): Promise<undefined | Response> => {
     const mediaHash = fromBase64(mediaHashBase64)
-    const insertValues = Object.entries(iByNoteIds).map(([noteId, i]) => ({
+    const insertValues = Object.entries(iByEntityIds).map(([noteId, i]) => ({
       mediaHash,
       i: i ?? throwExp("not sure why this can be undefined but whatever"),
       entityId: fromBase64Url(noteId as NoteId),

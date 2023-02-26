@@ -1,12 +1,12 @@
 import { Base64Url, NoteId, throwExp } from "shared"
 import z from "zod"
 
-const noteId = z
+const entityId = z
   .string()
   .regex(/^[a-zA-Z0-9_-]{22}$/) as unknown as z.Schema<NoteId>
 
-export const iByNoteIdsValidator = z.record(
-  noteId,
+export const iByEntityIdsValidator = z.record(
+  entityId,
   z.coerce.number().int().min(0).max(255)
 )
 
