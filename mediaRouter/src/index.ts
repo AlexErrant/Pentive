@@ -27,6 +27,8 @@ import {
   binary16fromBase64URL,
   userOwnsNoteAndHasMedia,
   UserId,
+  TemplateId,
+  userOwnsTemplateAndHasMedia,
 } from "shared"
 import { SignJWT, jwtVerify } from "jose"
 import { connect } from "@planetscale/database"
@@ -171,6 +173,22 @@ app
       iByEntityIds
     )
   })
+  .post("/media/template", async (c) => {
+    const iByEntityIds = iByEntityIdsValidator.parse(c.req.query()) as Record<
+      TemplateId,
+      number
+    > // nix upon resolution of https://github.com/colinhacks/zod/pull/2097
+    const templateIds = Object.keys(iByEntityIds) as TemplateId[]
+    if (templateIds.length === 0)
+      return c.text(`Need at least one template.`, 400)
+    return await postPublicMedia(
+      c,
+      "template",
+      async (authorId: UserId, mediaHash: Base64) =>
+        await userOwnsTemplateAndHasMedia(templateIds, authorId, mediaHash),
+      iByEntityIds
+    )
+  })
   .get("/private/:token", async (c) => {
     const authResult = await getUserId(c)
     if (authResult.tag === "Error") return authResult.error
@@ -196,7 +214,7 @@ export default app
 
 async function postPublicMedia(
   c: MediaRouterContext,
-  type: "note",
+  type: "note" | "template",
   userOwnsAndHasMedia: (
     authorId: UserId,
     id: Base64

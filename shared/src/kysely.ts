@@ -127,6 +127,36 @@ export async function userOwnsNoteAndHasMedia(
   }
 }
 
+export async function userOwnsTemplateAndHasMedia(
+  ids: TemplateId[],
+  authorId: UserId,
+  id: Base64
+): Promise<{
+  userOwns: boolean
+  hasMedia: boolean
+}> {
+  const { hasMedia, userOwns } = await db
+    .selectFrom([
+      db
+        .selectFrom("Template")
+        .select(db.fn.count("id").as("userOwns"))
+        .where("id", "in", ids.map(fromBase64Url))
+        // .where("authorId", "=", authorId) // nextTODO
+        .as("userOwns"),
+      db
+        .selectFrom("Media_Entity")
+        .select(db.fn.count("mediaHash").as("hasMedia"))
+        .where("mediaHash", "=", fromBase64(id))
+        .as("hasMedia"),
+    ])
+    .selectAll()
+    .executeTakeFirstOrThrow()
+  return {
+    userOwns: userOwns === ids.length.toString(),
+    hasMedia: hasMedia !== "0",
+  }
+}
+
 export async function lookupMediaHash(
   entityId: Base64,
   i: number
