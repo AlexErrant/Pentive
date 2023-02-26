@@ -194,7 +194,7 @@ export const noteCollectionMethods = {
       )
     return notesAndStuff.map((n) => n.note)
   },
-  getMediaToUpload: async function () {
+  getNoteMediaToUpload: async function () {
     const db = await getKysely()
     const mediaBinaries = await db
       .selectFrom("remoteMedia")

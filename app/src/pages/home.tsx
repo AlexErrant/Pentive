@@ -40,7 +40,7 @@ async function uploadNewNotes(): Promise<void> {
     await apiClient.editNote.mutate(editedNotes)
     await db.markAsPushed(editedNotes.map((n) => n.remoteId))
   }
-  const media = await db.getMediaToUpload()
+  const media = await db.getNoteMediaToUpload()
   for (const [mediaId, { data, ids }] of media) {
     await postMedia("note", mediaId, ids, data)
   }

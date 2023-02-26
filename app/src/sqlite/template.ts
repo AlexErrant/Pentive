@@ -159,7 +159,7 @@ export const templateCollectionMethods = {
       )
     return templatesAndStuff.map((n) => n.template)
   },
-  getMediaToUpload: async function () {
+  getTemplateMediaToUpload: async function () {
     const db = await getKysely()
     const mediaBinaries = await db
       .selectFrom("remoteMedia")
