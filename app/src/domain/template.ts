@@ -41,7 +41,7 @@ export const defaultTemplate: Template = {
         id: "lt31LyaTR3qBMQAAsZdhdg" as ChildTemplateId,
         name: "My Template",
         front: "{{Front}}",
-        back: "{{FrontSide}}<hr id=answer>{{Back}}",
+        back: `{{FrontSide}}<hr id=answer>{{Back}}<img src="book.jpg" >`, // highTODO nix book.jpg
         shortFront: "{{Front}}",
         shortBack: "{{Back}}",
       },

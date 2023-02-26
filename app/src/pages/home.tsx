@@ -11,7 +11,7 @@ import { MediaId, RemoteMediaNum, RemoteTemplateId } from "../domain/ids"
 import { apiClient } from "../apiClient"
 
 async function uploadNewTemplates(): Promise<void> {
-  const newTemplates = await db.getNewTemplatesToUpload("aRandomNook")
+  const newTemplates = await db.getNewTemplatesToUpload()
   const remoteIdByLocal = await apiClient.createTemplates.mutate(newTemplates)
   const remoteIds = Object.values(remoteIdByLocal)
   const getBatch = await apiClient.getTemplates.query(remoteIds)
@@ -23,6 +23,10 @@ async function makeNoteUploadable() {
     sampleNote.id,
     "9P1IlXnSRviXmwAA8kTMKw" as RemoteTemplateId
   )
+}
+
+async function makeTemplateUploadable() {
+  await db.makeTemplateUploadable(defaultTemplate.id)
 }
 
 async function uploadNewNotes(): Promise<void> {
@@ -184,6 +188,12 @@ export default function Home(): JSX.Element {
           }
         >
           getTemplate
+        </button>
+        <button
+          class="border rounded-lg px-2 border-gray-900"
+          onClick={makeTemplateUploadable}
+        >
+          makeTemplateUploadable
         </button>
         <button
           class="border rounded-lg px-2 border-gray-900"

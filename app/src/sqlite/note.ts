@@ -344,7 +344,7 @@ function withLocalMediaIdByRemoteMediaId<
   }
 }
 
-function updateLocalMediaIdByRemoteMediaIdAndGetNewDoc(
+export function updateLocalMediaIdByRemoteMediaIdAndGetNewDoc(
   dp: DOMParser,
   rawDom: string,
   localMediaIdByRemoteMediaId: Map<RemoteMediaNum, MediaId>
