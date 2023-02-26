@@ -249,7 +249,7 @@ export const templateCollectionMethods = {
         .execute()
     })
   },
-  updateRemoteIds: async function (
+  updateTemplateRemoteIds: async function (
     remoteIdByLocal: Record<TemplateId, RemoteTemplateId>
   ) {
     const db = await getKysely()
@@ -262,7 +262,7 @@ export const templateCollectionMethods = {
         .execute()
     }
   },
-  markAsPushed: async function (remoteTemplateIds: RemoteTemplateId[]) {
+  markTemplateAsPushed: async function (remoteTemplateIds: RemoteTemplateId[]) {
     const db = await getKysely()
     await db
       .updateTable("template")

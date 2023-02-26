@@ -33,12 +33,12 @@ async function uploadNewNotes(): Promise<void> {
   const newNotes = await db.getNewNotesToUpload()
   if (newNotes.length > 0) {
     const remoteIdByLocal = await apiClient.createNote.mutate(newNotes)
-    await db.updateRemoteIds(remoteIdByLocal)
+    await db.updateNoteRemoteIds(remoteIdByLocal)
   }
   const editedNotes = await db.getEditedNotesToUpload()
   if (editedNotes.length > 0) {
     await apiClient.editNote.mutate(editedNotes)
-    await db.markAsPushed(editedNotes.map((n) => n.remoteId))
+    await db.markNoteAsPushed(editedNotes.map((n) => n.remoteId))
   }
   const media = await db.getNoteMediaToUpload()
   for (const [mediaId, { data, ids }] of media) {

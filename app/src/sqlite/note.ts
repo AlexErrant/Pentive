@@ -284,7 +284,7 @@ export const noteCollectionMethods = {
         .execute()
     })
   },
-  updateRemoteIds: async function (
+  updateNoteRemoteIds: async function (
     remoteIdByLocal: Record<NoteId, RemoteNoteId>
   ) {
     const db = await getKysely()
@@ -297,7 +297,7 @@ export const noteCollectionMethods = {
         .execute()
     }
   },
-  markAsPushed: async function (remoteNoteIds: RemoteNoteId[]) {
+  markNoteAsPushed: async function (remoteNoteIds: RemoteNoteId[]) {
     const db = await getKysely()
     await db
       .updateTable("note")
