@@ -156,7 +156,7 @@ app
     }
     return await postMedia(c, persistDbAndBucket, buildToken)
   })
-  .post("/media/note", postPublicMedia)
+  .post("/media/note", async (c) => await postPublicMedia(c, "note"))
   .get("/private/:token", async (c) => {
     const authResult = await getUserId(c)
     if (authResult.tag === "Error") return authResult.error
@@ -180,14 +180,14 @@ app
 
 export default app
 
-async function postPublicMedia(c: MediaRouterContext) {
+async function postPublicMedia(c: MediaRouterContext, type: "note") {
   const authResult = await getUserId(c)
   if (authResult.tag === "Error") return authResult.error
   const userId = authResult.ok
   setKysely(c.env.planetscaleDbUrl)
   const iByEntityIds = iByEntityIdsValidator.parse(c.req.query())
   const noteIds = Object.keys(iByEntityIds) as NoteId[]
-  if (noteIds.length === 0) return c.text("Need at least one note.", 400)
+  if (noteIds.length === 0) return c.text(`Need at least one ${type}.`, 400)
   const persistDbAndBucket = async ({
     mediaHashBase64,
     readable,
@@ -205,7 +205,7 @@ async function postPublicMedia(c: MediaRouterContext) {
       mediaHashBase64
     )
     if (!userOwns)
-      return c.text(`You don't own one (or more) of these notes.`, 401)
+      return c.text(`You don't own one (or more) of these ${type}s.`, 401)
     await db
       .transaction()
       // Not a "real" transaction since the final `COMMIT` still needs to be sent as a fetch, but whatever.
