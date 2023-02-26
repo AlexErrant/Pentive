@@ -6,7 +6,7 @@ import { defaultTemplate, Template } from "../domain/template"
 import HomeData from "./home.data"
 import { db } from "../db"
 import { importAnki } from "./importer/importer"
-import { csrfHeaderName, NoteId, RemoteNoteId, throwExp } from "shared"
+import { Base64Url, csrfHeaderName, throwExp } from "shared"
 import { MediaId, RemoteMediaNum, RemoteTemplateId } from "../domain/ids"
 import { apiClient } from "../apiClient"
 
@@ -42,7 +42,7 @@ async function uploadNewNotes(): Promise<void> {
   }
   const media = await db.getMediaToUpload()
   for (const [mediaId, { data, ids }] of media) {
-    await postMedia(mediaId, ids, data)
+    await postMedia("note", mediaId, ids, data)
   }
   if (editedNotes.length === 0 && newNotes.length === 0 && media.size === 0) {
     console.log("Nothing to upload!")
@@ -50,20 +50,21 @@ async function uploadNewNotes(): Promise<void> {
 }
 
 async function postMedia(
+  type: "note",
   mediaId: MediaId,
-  ids: Array<[NoteId, RemoteNoteId, RemoteMediaNum]>,
+  ids: Array<[Base64Url, Base64Url, RemoteMediaNum]>, // localId, remoteId, i
   data: ArrayBuffer
 ): Promise<void> {
-  const remoteNoteIdAndRemoteMediaNum = ids.map(
-    ([, remoteNoteId, remoteMediaNum]) => [
-      remoteNoteId,
+  const remoteEntityIdAndRemoteMediaNum = ids.map(
+    ([, remoteEntityId, remoteMediaNum]) => [
+      remoteEntityId,
       remoteMediaNum.toString(),
     ]
   )
   const response = await fetch(
     import.meta.env.VITE_API_URL +
-      "media/note?" +
-      new URLSearchParams(remoteNoteIdAndRemoteMediaNum).toString(),
+      `media/${type}?` +
+      new URLSearchParams(remoteEntityIdAndRemoteMediaNum).toString(),
     {
       method: "POST",
       body: data,
