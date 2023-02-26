@@ -156,57 +156,7 @@ app
     }
     return await postMedia(c, persistDbAndBucket, buildToken)
   })
-  .post("/media/note", async (c) => {
-    const authResult = await getUserId(c)
-    if (authResult.tag === "Error") return authResult.error
-    const userId = authResult.ok
-    setKysely(c.env.planetscaleDbUrl)
-    const iByNoteIds = iByNoteIdsValidator.parse(c.req.query())
-    const noteIds = Object.keys(iByNoteIds) as NoteId[]
-    if (noteIds.length === 0) return c.text("Need at least one note.", 400)
-    const persistDbAndBucket = async ({
-      mediaHashBase64,
-      readable,
-      headers,
-    }: PersistParams): Promise<undefined | Response> => {
-      const mediaHash = fromBase64(mediaHashBase64)
-      const insertValues = Object.entries(iByNoteIds).map(([noteId, i]) => ({
-        mediaHash,
-        i: i ?? throwExp("not sure why this can be undefined but whatever"),
-        entityId: fromBase64Url(noteId as NoteId),
-      }))
-      const { userOwns, hasMedia } = await userOwnsAndHasMedia(
-        noteIds,
-        userId,
-        mediaHashBase64
-      )
-      if (!userOwns)
-        return c.text(`You don't own one (or more) of these notes.`, 401)
-      await db
-        .transaction()
-        // Not a "real" transaction since the final `COMMIT` still needs to be sent as a fetch, but whatever.
-        // Just means we could PUT something into the mediaBucket and have no record of it in PlanetScale. Not great, but _fine_.
-        // Grep BC34B055-ECB7-496D-9E71-58EE899A11D1 for details.
-        .execute(async (trx) => {
-          await trx
-            .insertInto("Media_Entity")
-            .values(insertValues)
-            .onDuplicateKeyUpdate({ mediaHash })
-            .execute()
-          if (!hasMedia) {
-            const object = await c.env.mediaBucket.put(
-              mediaHashBase64,
-              readable,
-              {
-                httpMetadata: headers,
-              }
-            )
-            c.header("ETag", object.httpEtag)
-          }
-        })
-    }
-    return await postMedia(c, persistDbAndBucket, () => "")
-  })
+  .post("/media/note", postPublicMedia)
   .get("/private/:token", async (c) => {
     const authResult = await getUserId(c)
     if (authResult.tag === "Error") return authResult.error
@@ -229,6 +179,58 @@ app
   })
 
 export default app
+
+async function postPublicMedia(c: MediaRouterContext) {
+  const authResult = await getUserId(c)
+  if (authResult.tag === "Error") return authResult.error
+  const userId = authResult.ok
+  setKysely(c.env.planetscaleDbUrl)
+  const iByNoteIds = iByNoteIdsValidator.parse(c.req.query())
+  const noteIds = Object.keys(iByNoteIds) as NoteId[]
+  if (noteIds.length === 0) return c.text("Need at least one note.", 400)
+  const persistDbAndBucket = async ({
+    mediaHashBase64,
+    readable,
+    headers,
+  }: PersistParams): Promise<undefined | Response> => {
+    const mediaHash = fromBase64(mediaHashBase64)
+    const insertValues = Object.entries(iByNoteIds).map(([noteId, i]) => ({
+      mediaHash,
+      i: i ?? throwExp("not sure why this can be undefined but whatever"),
+      entityId: fromBase64Url(noteId as NoteId),
+    }))
+    const { userOwns, hasMedia } = await userOwnsAndHasMedia(
+      noteIds,
+      userId,
+      mediaHashBase64
+    )
+    if (!userOwns)
+      return c.text(`You don't own one (or more) of these notes.`, 401)
+    await db
+      .transaction()
+      // Not a "real" transaction since the final `COMMIT` still needs to be sent as a fetch, but whatever.
+      // Just means we could PUT something into the mediaBucket and have no record of it in PlanetScale. Not great, but _fine_.
+      // Grep BC34B055-ECB7-496D-9E71-58EE899A11D1 for details.
+      .execute(async (trx) => {
+        await trx
+          .insertInto("Media_Entity")
+          .values(insertValues)
+          .onDuplicateKeyUpdate({ mediaHash })
+          .execute()
+        if (!hasMedia) {
+          const object = await c.env.mediaBucket.put(
+            mediaHashBase64,
+            readable,
+            {
+              httpMetadata: headers,
+            }
+          )
+          c.header("ETag", object.httpEtag)
+        }
+      })
+  }
+  return await postMedia(c, persistDbAndBucket, () => "")
+}
 
 async function postMedia(
   c: MediaRouterContext,
