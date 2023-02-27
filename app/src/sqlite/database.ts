@@ -25,14 +25,18 @@ export interface Media {
 export interface Note {
   id: LDbId
   templateId: LDbId
-  remoteId: LDbId | null
-  pushTemplateId: LDbId | null
-  push: number | null
   ankiNoteId: number | null
   created: number
   modified: number
   tags: string
   fieldValues: string
+}
+
+export interface RemoteNote {
+  localId: LDbId
+  nook: string
+  remoteId: LDbId | null
+  uploadDate: number | null
 }
 
 export interface Plugin {
@@ -72,6 +76,7 @@ export interface DB {
   card: Card
   media: Media
   note: Note
+  remoteNote: RemoteNote
   plugin: Plugin
   remoteMedia: RemoteMedia
   template: Template

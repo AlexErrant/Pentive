@@ -19,14 +19,18 @@ export const initSql = [
   `CREATE TABLE IF NOT EXISTS note (
     id TEXT PRIMARY KEY, -- make BLOB upon SQLite v3.41 and the landing of UNHEX https://sqlite.org/forum/forumpost/30cca4e613d2fa2a grep F235B7FB-8CEA-4AE2-99CC-2790E607B1EB
     templateId TEXT, -- make BLOB upon SQLite v3.41 and the landing of UNHEX https://sqlite.org/forum/forumpost/30cca4e613d2fa2a grep F235B7FB-8CEA-4AE2-99CC-2790E607B1EB
-    remoteId TEXT, -- make BLOB upon SQLite v3.41 and the landing of UNHEX https://sqlite.org/forum/forumpost/30cca4e613d2fa2a grep F235B7FB-8CEA-4AE2-99CC-2790E607B1EB
-    pushTemplateId TEXT, -- make BLOB upon SQLite v3.41 and the landing of UNHEX https://sqlite.org/forum/forumpost/30cca4e613d2fa2a grep F235B7FB-8CEA-4AE2-99CC-2790E607B1EB
-    push INTEGER,
     ankiNoteId INTEGER,
     created INTEGER,
     modified INTEGER,
     tags TEXT,
     fieldValues TEXT
+) STRICT;`,
+  `CREATE TABLE IF NOT EXISTS remoteNote (
+    localId TEXT, -- make BLOB upon SQLite v3.41 and the landing of UNHEX https://sqlite.org/forum/forumpost/30cca4e613d2fa2a grep F235B7FB-8CEA-4AE2-99CC-2790E607B1EB
+    nook TEXT,
+    remoteId TEXT, -- make BLOB upon SQLite v3.41 and the landing of UNHEX https://sqlite.org/forum/forumpost/30cca4e613d2fa2a grep F235B7FB-8CEA-4AE2-99CC-2790E607B1EB
+    uploadDate INTEGER,
+    PRIMARY KEY (localId, nook)
 ) STRICT;`,
   `CREATE TABLE IF NOT EXISTS card (
     id TEXT PRIMARY KEY, -- make BLOB upon SQLite v3.41 and the landing of UNHEX https://sqlite.org/forum/forumpost/30cca4e613d2fa2a grep F235B7FB-8CEA-4AE2-99CC-2790E607B1EB
@@ -62,6 +66,7 @@ export const initSql = [
   `SELECT crsql_as_crr('template');`,
   `SELECT crsql_as_crr('remoteTemplate');`,
   `SELECT crsql_as_crr('note');`,
+  `SELECT crsql_as_crr('remoteNote');`,
   `SELECT crsql_as_crr('card');`,
   `SELECT crsql_as_crr('media');`,
   `SELECT crsql_as_crr('remoteMedia');`,
