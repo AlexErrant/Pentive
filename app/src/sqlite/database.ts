@@ -52,8 +52,6 @@ export interface RemoteMedia {
 
 export interface Template {
   id: LDbId
-  remoteId: LDbId | null
-  push: number | null
   name: string
   css: string
   fields: string
@@ -63,6 +61,13 @@ export interface Template {
   ankiId: number | null
 }
 
+export interface RemoteTemplate {
+  localId: LDbId
+  nook: string
+  remoteId: LDbId | null
+  uploadDate: number | null
+}
+
 export interface DB {
   card: Card
   media: Media
@@ -70,4 +75,5 @@ export interface DB {
   plugin: Plugin
   remoteMedia: RemoteMedia
   template: Template
+  remoteTemplate: RemoteTemplate
 }
