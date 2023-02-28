@@ -15,9 +15,14 @@ function id(id: keyof Template): keyof Template {
 }
 
 function remoteCell(template: Template): JSX.Element {
-  const url = `https://pentive.com/t/${template.remoteId as string}`
-  const content = template.push === true ? "☁" : "🔗"
-  return <a href={url}>{content}</a>
+  return Object.entries(template.remotes).map(([nook, remoteId]) => {
+    if (remoteId == null) {
+      return nook
+    }
+    const url = `https://pentive.com/t/${remoteId}`
+    // const content = template.push === true ? "☁" : "🔗" // nextTODO
+    return <a href={url}>{nook}</a>
+  })
 }
 
 const columns: Array<ColumnDef<Template>> = [

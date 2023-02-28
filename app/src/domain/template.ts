@@ -1,5 +1,5 @@
 import { ChildTemplateId, RemoteTemplateId, TemplateId } from "./ids"
-import { TemplateType } from "shared"
+import { NookId, TemplateType } from "shared"
 
 export interface Field {
   readonly name: string
@@ -10,14 +10,13 @@ export interface Field {
 
 export interface Template {
   readonly id: TemplateId
-  readonly remoteId?: RemoteTemplateId
-  readonly push?: true
   readonly name: string // todo limit to 100
   readonly css: string
   readonly fields: readonly Field[]
   readonly created: Date
   readonly modified: Date
   readonly templateType: TemplateType
+  readonly remotes: Record<NookId, RemoteTemplateId | null>
 }
 
 export const defaultTemplate: Template = {
@@ -47,4 +46,5 @@ export const defaultTemplate: Template = {
       },
     ],
   },
+  remotes: {},
 }

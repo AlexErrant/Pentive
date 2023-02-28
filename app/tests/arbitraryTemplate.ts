@@ -6,7 +6,11 @@ import {
   TemplateId,
 } from "../src/domain/ids"
 import { Field, Template } from "../src/domain/template"
-import { reasonableDates, recordWithOptionalFields } from "./arbitrary"
+import {
+  arbitraryUlid,
+  reasonableDates,
+  recordWithOptionalFields,
+} from "./arbitrary"
 import { ChildTemplate, TemplateType } from "shared"
 
 const field = recordWithOptionalFields<Field>(
@@ -54,9 +58,7 @@ export const template = recordWithOptionalFields<Template>(
     created: reasonableDates,
     modified: reasonableDates,
     templateType,
+    remotes: fc.dictionary(fc.string(), arbitraryUlid<RemoteTemplateId>()),
   },
-  {
-    remoteId: fc.uuidV(4).map((x) => x as RemoteTemplateId),
-    push: fc.constant(true),
-  }
+  {}
 )

@@ -8,57 +8,41 @@ import { Field, Template } from "../domain/template"
 import {
   CreateRemoteTemplate,
   EditRemoteTemplate,
+  NookId,
+  TemplateIdSpaceNookId,
   TemplateType,
+  notEmpty,
   throwExp,
   undefinedMap,
 } from "shared"
 import { getKysely } from "./crsqlite"
-import { DB, Template as TemplateEntity } from "./database"
+import { DB, RemoteTemplate, Template as TemplateEntity } from "./database"
 import { InsertObject } from "kysely"
 import { updateLocalMediaIdByRemoteMediaIdAndGetNewDoc } from "./note"
 
-function templateToDocType(template: Template): InsertObject<DB, "template"> {
-  const {
-    id,
-    name,
-    created,
-    modified,
-    push,
-    remoteId,
-    css,
-    fields,
-    templateType,
-  } = template
-  return {
-    id,
-    name,
-    created: created.getTime(),
-    modified: modified.getTime(),
-    push: push === true ? 1 : 0,
-    remoteId: remoteId ?? null,
-    css,
-    fields: JSON.stringify(fields),
-    templateType: JSON.stringify(templateType),
+function templateToDocType(template: Template) {
+  const r: InsertObject<DB, "template"> = {
+    id: template.id,
+    name: template.name,
+    css: template.css,
+    created: template.created.getTime(),
+    modified: template.modified.getTime(),
+    fields: JSON.stringify(template.fields),
+    templateType: JSON.stringify(template.templateType),
   }
+  return r
 }
 
-function entityToDomain(template: TemplateEntity): Template {
-  const r = {
+function entityToDomain(template: TemplateEntity, remotes: RemoteTemplate[]) {
+  const r: Template = {
     id: template.id as TemplateId,
     name: template.name,
     created: new Date(template.created),
     modified: new Date(template.modified),
-    push: template.push === 1 ? (true as const) : undefined,
-    remoteId: (template.remoteId ?? undefined) as RemoteTemplateId | undefined,
     fields: JSON.parse(template.fields) as Field[],
     css: template.css,
     templateType: JSON.parse(template.templateType) as TemplateType,
-  }
-  if (r.push === undefined) {
-    delete r.push
-  }
-  if (r.remoteId === undefined) {
-    delete r.remoteId
+    remotes: Object.fromEntries(remotes.map((r) => [r.nook, r.remoteId])),
   }
   return r
 }
@@ -78,24 +62,16 @@ function domainToCreateRemote(
   return r
 }
 
-function domainToEditRemote({
-  id,
-  remoteId,
-  name,
-  css,
-  templateType,
-  fields,
-}: Template) {
+function domainToEditRemote(template: Template) {
+  const remoteIds = Object.values(template.remotes).filter(notEmpty)
+  if (remoteIds.length === 0)
+    throwExp(`Zero remoteIds - is something wrong with the SQL query?`)
   const r: EditRemoteTemplate = {
-    remoteId:
-      remoteId ??
-      throwExp(
-        `Template ${id} is missing a remoteId... is something wrong with the SQL query?`
-      ),
-    name,
-    css,
-    templateType,
-    fields: fields.map((x) => x.name),
+    name: template.name,
+    css: template.css,
+    templateType: template.templateType,
+    remoteIds,
+    fields: template.fields.map((x) => x.name),
   }
   return r
 }
@@ -118,25 +94,51 @@ export const templateCollectionMethods = {
       .selectAll()
       .where("id", "=", templateId)
       .executeTakeFirst()
-    return undefinedMap(template, entityToDomain) ?? null
+    const remoteTemplates = await db
+      .selectFrom("remoteTemplate")
+      .selectAll()
+      .where("localId", "=", templateId)
+      .execute()
+    return (
+      undefinedMap(template, (x) => entityToDomain(x, remoteTemplates)) ?? null
+    )
   },
   getTemplates: async function () {
     const db = await getKysely()
     const allTemplates = await db.selectFrom("template").selectAll().execute()
-    return allTemplates.map(entityToDomain)
+    const remoteTemplates = await db
+      .selectFrom("remoteTemplate")
+      .selectAll()
+      .execute()
+    return allTemplates.map((alt) =>
+      entityToDomain(
+        alt,
+        remoteTemplates.filter((rt) => rt.localId === alt.id)
+      )
+    )
   },
   getNewTemplatesToUpload: async function () {
     const db = await getKysely()
     const dp = new DOMParser()
+    const remoteTemplates = await db
+      .selectFrom("remoteTemplate")
+      .selectAll()
+      .where("remoteId", "is", null)
+      .execute()
+    const localIds = [...new Set(remoteTemplates.map((t) => t.localId))]
     const templatesAndStuff = await db
       .selectFrom("template")
       .selectAll()
-      .where("push", "=", 1)
-      .where("remoteId", "is", null)
+      .where("id", "in", localIds)
       .execute()
       .then((n) =>
         n
-          .map(entityToDomain)
+          .map((lt) =>
+            entityToDomain(
+              lt,
+              remoteTemplates.filter((rt) => rt.localId === lt.id)
+            )
+          )
           .map((x) => domainToCreateRemote(x, "aRandomNook")) // nextTODO fix
           .map((n) => withLocalMediaIdByRemoteMediaId(dp, n))
       )
@@ -145,15 +147,27 @@ export const templateCollectionMethods = {
   getEditedTemplatesToUpload: async function () {
     const db = await getKysely()
     const dp = new DOMParser()
+    const remoteTemplates = await db
+      .selectFrom("remoteTemplate")
+      .leftJoin("template", "remoteTemplate.localId", "template.id")
+      .selectAll("remoteTemplate")
+      .where("remoteId", "is not", null)
+      .whereRef("remoteTemplate.uploadDate", "<", "template.modified")
+      .execute()
+    const localIds = [...new Set(remoteTemplates.map((t) => t.localId))]
     const templatesAndStuff = await db
       .selectFrom("template")
       .selectAll()
-      .where("push", "=", 1)
-      .where("remoteId", "is not", null)
+      .where("id", "in", localIds)
       .execute()
       .then((n) =>
         n
-          .map(entityToDomain)
+          .map((lt) =>
+            entityToDomain(
+              lt,
+              remoteTemplates.filter((rt) => rt.localId === lt.id)
+            )
+          )
           .map(domainToEditRemote)
           .map((n) => withLocalMediaIdByRemoteMediaId(dp, n))
       )
@@ -165,12 +179,13 @@ export const templateCollectionMethods = {
       .selectFrom("remoteMedia")
       .innerJoin("media", "remoteMedia.localMediaId", "media.id")
       .leftJoin("template", "remoteMedia.localEntityId", "template.id")
+      .leftJoin("remoteTemplate", "remoteTemplate.localId", "template.id")
       .select([
         "remoteMedia.localMediaId",
         "media.data",
         "remoteMedia.localEntityId",
         "remoteMedia.i",
-        "template.remoteId as templateRemoteId",
+        "remoteTemplate.remoteId",
       ])
       .where("remoteMedia.uploadDate", "is", null)
       .orWhereRef("media.modified", ">", "remoteMedia.uploadDate")
@@ -189,7 +204,7 @@ export const templateCollectionMethods = {
     )
     for (const m of mediaBinaries) {
       const remoteId =
-        (m.templateRemoteId as RemoteTemplateId) ??
+        m.remoteId ??
         throwExp(
           `Template ${m.localMediaId} is missing a templateRemoteId, is something wrong with the SQL query?`
         )
@@ -200,31 +215,40 @@ export const templateCollectionMethods = {
     }
     return media
   },
-  makeTemplateUploadable: async function (templateId: TemplateId) {
+  makeTemplateUploadable: async function (
+    templateId: TemplateId,
+    nook: NookId
+  ) {
     const db = await getKysely()
-    await db
-      .updateTable("template")
-      .set({ push: 1 })
-      .where("id", "=", templateId)
-      .execute()
-    const template = await db
-      .selectFrom("template")
-      .selectAll()
-      .where("id", "=", templateId)
-      .executeTakeFirstOrThrow()
-    const { localMediaIdByRemoteMediaId } = withLocalMediaIdByRemoteMediaId(
-      new DOMParser(),
-      domainToCreateRemote(entityToDomain(template), "aRandomNook") // nextTODO fix
-    )
-    const srcs = Array.from(localMediaIdByRemoteMediaId.values())
-    const mediaBinaries = await db
-      .selectFrom("media")
-      .select(["id", "data"])
-      .where("id", "in", srcs)
-      .execute()
-    if (mediaBinaries.length !== srcs.length)
-      throwExp("You're missing a media.") // medTODO better error message
+    const remoteTemplate = {
+      localId: templateId,
+      nook,
+      remoteId: null,
+      uploadDate: null,
+    }
     await db.transaction().execute(async (db) => {
+      await db
+        .insertInto("remoteTemplate")
+        .values(remoteTemplate)
+        .onConflict((db) => db.doNothing())
+        .execute()
+      const template = await db
+        .selectFrom("template")
+        .selectAll()
+        .where("id", "=", templateId)
+        .executeTakeFirstOrThrow()
+      const { localMediaIdByRemoteMediaId } = withLocalMediaIdByRemoteMediaId(
+        new DOMParser(),
+        domainToCreateRemote(entityToDomain(template, [remoteTemplate]), nook)
+      )
+      const srcs = Array.from(localMediaIdByRemoteMediaId.values())
+      const mediaBinaries = await db
+        .selectFrom("media")
+        .select(["id", "data"])
+        .where("id", "in", srcs)
+        .execute()
+      if (mediaBinaries.length !== srcs.length)
+        throwExp("You're missing a media.") // medTODO better error message
       await db
         .deleteFrom("remoteMedia")
         .where("localEntityId", "=", templateId)
@@ -250,23 +274,29 @@ export const templateCollectionMethods = {
     })
   },
   updateTemplateRemoteIds: async function (
-    remoteIdByLocal: Record<TemplateId, RemoteTemplateId>
+    remoteIdByLocal: Record<TemplateIdSpaceNookId, RemoteTemplateId>
   ) {
     const db = await getKysely()
-    for (const templateId in remoteIdByLocal) {
-      const remoteId = remoteIdByLocal[templateId as TemplateId]
+    for (const templateIdSpaceNookId in remoteIdByLocal) {
+      const [templateId, nook] = templateIdSpaceNookId.split(" ") as [
+        TemplateId,
+        NookId
+      ]
+      const remoteId =
+        remoteIdByLocal[templateIdSpaceNookId as TemplateIdSpaceNookId]
       await db
-        .updateTable("template")
-        .set({ remoteId, push: null })
-        .where("id", "=", templateId as TemplateId)
+        .updateTable("remoteTemplate")
+        .set({ remoteId, uploadDate: new Date().getTime() })
+        .where("nook", "=", nook)
+        .where("localId", "=", templateId)
         .execute()
     }
   },
   markTemplateAsPushed: async function (remoteTemplateIds: RemoteTemplateId[]) {
     const db = await getKysely()
     await db
-      .updateTable("template")
-      .set({ push: null })
+      .updateTable("remoteTemplate")
+      .set({ uploadDate: new Date().getTime() })
       .where("remoteId", "in", remoteTemplateIds)
       .execute()
   },

@@ -82,7 +82,7 @@ export const createRemoteTemplate = z.object({
 export type CreateRemoteTemplate = z.infer<typeof createRemoteTemplate>
 
 export const editRemoteTemplate = z.object({
-  remoteId: z.string() as unknown as z.Schema<TemplateId>,
+  remoteIds: z.array(remoteTemplateId).min(1),
   name: z.string(),
   // nook: z.string(), intentionally omitted
   templateType,

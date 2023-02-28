@@ -235,29 +235,29 @@ export const noteCollectionMethods = {
     pushTemplateId?: RemoteTemplateId
   ) {
     const db = await getKysely()
-    await db
-      .updateTable("note")
-      .set({ push: 1, pushTemplateId })
-      .where("id", "=", noteId)
-      .execute()
-    const note = await db
-      .selectFrom("note")
-      .selectAll()
-      .where("id", "=", noteId)
-      .executeTakeFirstOrThrow()
-    const { localMediaIdByRemoteMediaId } = withLocalMediaIdByRemoteMediaId(
-      new DOMParser(),
-      domainToCreateRemote(entityToDomain(note))
-    )
-    const srcs = Array.from(localMediaIdByRemoteMediaId.values())
-    const mediaBinaries = await db
-      .selectFrom("media")
-      .select(["id", "data"])
-      .where("id", "in", srcs)
-      .execute()
-    if (mediaBinaries.length !== srcs.length)
-      throwExp("You're missing a media.") // medTODO better error message
     await db.transaction().execute(async (db) => {
+      await db
+        .updateTable("note")
+        .set({ push: 1, pushTemplateId })
+        .where("id", "=", noteId)
+        .execute()
+      const note = await db
+        .selectFrom("note")
+        .selectAll()
+        .where("id", "=", noteId)
+        .executeTakeFirstOrThrow()
+      const { localMediaIdByRemoteMediaId } = withLocalMediaIdByRemoteMediaId(
+        new DOMParser(),
+        domainToCreateRemote(entityToDomain(note))
+      )
+      const srcs = Array.from(localMediaIdByRemoteMediaId.values())
+      const mediaBinaries = await db
+        .selectFrom("media")
+        .select(["id", "data"])
+        .where("id", "in", srcs)
+        .execute()
+      if (mediaBinaries.length !== srcs.length)
+        throwExp("You're missing a media.") // medTODO better error message
       await db
         .deleteFrom("remoteMedia")
         .where("localEntityId", "=", noteId)

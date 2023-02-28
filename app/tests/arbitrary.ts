@@ -1,6 +1,8 @@
 // https://github.com/dubzzz/fast-check/issues/490#issuecomment-1215040121
 
 import fc, { Arbitrary, RecordConstraints } from "fast-check"
+import { Ulid } from "id128"
+import { Brand, base64url, hex } from "shared"
 
 // https://stackoverflow.com/a/72760489
 type OptionalKeys<T> = Required<{
@@ -37,3 +39,18 @@ export const reasonableDates = fc.date({
   min: new Date("0000-01-01T00:00:00.000Z"),
   max: new Date("9999-12-31T23:59:59.999Z"),
 })
+
+export function arbitraryUlid<
+  T extends Brand<string, "base64url">
+>(): fc.Arbitrary<T> {
+  return fc
+    .date({
+      min: new Date(1970, 0, 1),
+      max: new Date(10889, 7, 2),
+    })
+    .map((time) => {
+      const hexUlid = Ulid.generate({ time }).toRaw()
+      const x = base64url.encode(hex.decode(hexUlid)).slice(0, 22)
+      return x as T
+    })
+}

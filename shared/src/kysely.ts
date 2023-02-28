@@ -10,6 +10,7 @@ import {
   RemoteNoteId,
   RemoteTemplateId,
   TemplateId,
+  TemplateIdSpaceNookId,
   UserId,
 } from "./brand.js"
 import { binary16fromBase64URL, ulidAsRaw } from "./convertBinary.js"
@@ -192,22 +193,27 @@ export async function insertNotes(
 export async function insertTemplates(
   authorId: UserId,
   templates: CreateRemoteTemplate[]
-): Promise<Record<TemplateId, RemoteTemplateId>> {
-  const templateCreatesAndIds = await Promise.all(
-    templates.map(async (n) => {
-      const { templateCreate, remoteIdBase64url } = await toTemplateCreate(
-        n,
-        authorId
-      )
-      return [
-        templateCreate,
-        [n.localId, remoteIdBase64url] as [TemplateId, RemoteTemplateId],
-      ] as const
-    })
-  )
+) {
+  const templateCreatesAndIds = (
+    await Promise.all(
+      templates.map(async (n) => {
+        const tcs = await toTemplateCreates(n, authorId)
+        return tcs.map(({ templateCreate, remoteIdBase64url }) => {
+          return [
+            templateCreate,
+            [`${n.localId} ${n.nook}`, remoteIdBase64url] as [
+              TemplateIdSpaceNookId,
+              RemoteTemplateId
+            ],
+          ] as const
+        })
+      })
+    )
+  ).flatMap((x) => x)
   const templateCreates = templateCreatesAndIds.map((x) => x[0])
   await db.insertInto("Template").values(templateCreates).execute()
-  const remoteIdByLocal = _.fromPairs(templateCreatesAndIds.map((x) => x[1]))
+  const remoteIdByLocal: Record<TemplateIdSpaceNookId, RemoteTemplateId> =
+    _.fromPairs(templateCreatesAndIds.map((x) => x[1]))
   return remoteIdByLocal
 }
 
@@ -258,14 +264,25 @@ async function replaceImgSrcs(value: string, remoteIdBase64url: string) {
   return r
 }
 
-async function toTemplateCreate(
+async function toTemplateCreates(
   n: EditRemoteTemplate | CreateRemoteTemplate,
   authorId: UserId // highTODO update History. Could History be a compressed column instead of its own table?
 ) {
-  const remoteId =
-    "remoteId" in n ? base64url.decode(n.remoteId + "==") : ulidAsRaw()
+  const remoteIds =
+    "remoteIds" in n
+      ? n.remoteIds.map((id) => base64url.decode(id + "=="))
+      : [ulidAsRaw()]
+  return await Promise.all(
+    remoteIds.map(async (id) => await toTemplateCreate(n, id))
+  )
+}
+
+async function toTemplateCreate(
+  n: EditRemoteTemplate | CreateRemoteTemplate,
+  remoteId: Uint8Array
+) {
   const updatedAt = "remoteId" in n ? new Date() : undefined
-  const nook = "remoteId" in n ? "undefined" : n.nook
+  const nook = "remoteIds" in n ? "undefined" : n.nook
   const remoteIdHex = base16.encode(remoteId) as Hex
   const remoteIdBase64url = base64url.encode(remoteId).substring(0, 22)
   if (n.templateType.tag === "standard") {
@@ -338,26 +355,25 @@ export async function editTemplates(
   authorId: UserId,
   templates: EditRemoteTemplate[]
 ) {
+  const editTemplateIds = templates
+    .flatMap((t) => t.remoteIds)
+    .map(fromBase64Url)
   const count = await db
     .selectFrom("Template")
     .select(db.fn.count("id").as("c"))
-    .where(
-      "id",
-      "in",
-      templates.map((t) => fromBase64Url(t.remoteId))
-    )
+    .where("id", "in", editTemplateIds)
     .executeTakeFirstOrThrow()
-  if (count.c !== templates.length.toString())
+  if (count.c !== editTemplateIds.length.toString())
     throwExp("At least one of these templates doesn't exist.")
   const templateCreates = await Promise.all(
     templates.map(async (n) => {
-      const { templateCreate } = await toTemplateCreate(n, authorId)
-      return templateCreate
+      const tcs = await toTemplateCreates(n, authorId)
+      return tcs.map((tc) => tc.templateCreate)
     })
   )
   await db
     .insertInto("Template")
-    .values(templateCreates)
+    .values(templateCreates.flatMap((x) => x))
     // https://stackoverflow.com/a/34866431
     .onDuplicateKeyUpdate({
       ankiId: (x) => values(x.ref("ankiId")),

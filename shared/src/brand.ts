@@ -14,3 +14,7 @@ export type NoteId = Brand<string, "noteId" & "base64url">
 export type RemoteNoteId = Brand<string, "remoteNoteId" & "base64url">
 
 export type UserId = Brand<string, "userId">
+
+export type NookId = Brand<string, "nookId">
+
+export type TemplateIdSpaceNookId = Brand<string, "templateIdSpaceNookId">

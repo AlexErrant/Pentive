@@ -6,7 +6,7 @@ import { defaultTemplate, Template } from "../domain/template"
 import HomeData from "./home.data"
 import { db } from "../db"
 import { importAnki } from "./importer/importer"
-import { Base64Url, csrfHeaderName, throwExp } from "shared"
+import { Base64Url, csrfHeaderName, NookId, throwExp } from "shared"
 import { MediaId, RemoteMediaNum, RemoteTemplateId } from "../domain/ids"
 import { apiClient } from "../apiClient"
 
@@ -19,7 +19,7 @@ async function uploadTemplates(): Promise<void> {
   const editedTemplates = await db.getEditedTemplatesToUpload()
   if (editedTemplates.length > 0) {
     await apiClient.editTemplates.mutate(editedTemplates)
-    await db.markTemplateAsPushed(editedTemplates.map((n) => n.remoteId))
+    await db.markTemplateAsPushed(editedTemplates.flatMap((n) => n.remoteIds))
   }
   const media = await db.getTemplateMediaToUpload()
   for (const [mediaId, { data, ids }] of media) {
@@ -42,7 +42,7 @@ async function makeNoteUploadable() {
 }
 
 async function makeTemplateUploadable() {
-  await db.makeTemplateUploadable(defaultTemplate.id)
+  await db.makeTemplateUploadable(defaultTemplate.id, "aRandomNook" as NookId)
 }
 
 async function uploadNotes(): Promise<void> {
