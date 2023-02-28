@@ -1,6 +1,8 @@
 import {
   CreateRemoteNote,
   EditRemoteNote,
+  NookId,
+  NoteIdSpaceNookId,
   RemoteNoteId,
   throwExp,
 } from "shared"
@@ -12,100 +14,58 @@ import {
 } from "../domain/ids"
 import { Note } from "../domain/note"
 import { getKysely } from "./crsqlite"
-import { DB, Note as NoteEntity } from "./database"
+import { DB, Note as NoteEntity, RemoteNote } from "./database"
 import { InsertObject } from "kysely"
 import _ from "lodash"
 
 function noteToDocType(note: Note): InsertObject<DB, "note"> {
-  const {
-    id,
-    created,
-    modified,
-    push,
-    remoteId,
-    tags,
-    fieldValues,
-    templateId,
-    ankiNoteId,
-    pushTemplateId,
-  } = note
-  return {
-    id,
-    templateId,
-    created: created.getTime(),
-    modified: modified.getTime(),
-    push: push === true ? 1 : 0,
-    remoteId: remoteId ?? null,
-    tags: JSON.stringify([...tags]),
-    fieldValues: JSON.stringify(fieldValues),
-    ankiNoteId,
-    pushTemplateId,
+  const r: InsertObject<DB, "note"> = {
+    id: note.id,
+    templateId: note.templateId,
+    created: note.created.getTime(),
+    modified: note.modified.getTime(),
+    tags: JSON.stringify([...note.tags]),
+    fieldValues: JSON.stringify(note.fieldValues),
+    ankiNoteId: note.ankiNoteId,
   }
+  return r
 }
 
-function domainToCreateRemote({
-  id,
-  pushTemplateId,
-  tags,
-  fieldValues,
-}: Note): CreateRemoteNote {
+function domainToCreateRemote(
+  { id, tags, fieldValues }: Note,
+  remoteTemplateIds: RemoteTemplateId[]
+): CreateRemoteNote {
   return {
     localId: id,
-    templateId:
-      pushTemplateId ??
-      throwExp(
-        `Note ${id} is missing a pushTemplateId... is something wrong with the SQL query?`
-      ),
+    remoteTemplateIds,
     fieldValues,
     tags: Array.from(tags),
   }
 }
 
-function domainToEditRemote({
-  id,
-  remoteId,
-  pushTemplateId,
-  tags,
-  fieldValues,
-}: Note): EditRemoteNote {
-  return {
-    remoteId:
-      remoteId ??
-      throwExp(
-        `Note ${id} is missing a remoteId... is something wrong with the SQL query?`
-      ),
-    templateId:
-      pushTemplateId ??
-      throwExp(
-        `Note ${id} is missing a pushTemplateId... is something wrong with the SQL query?`
-      ),
-    fieldValues,
-    tags: Array.from(tags),
+function domainToEditRemote(
+  note: Note,
+  remoteIds: Record<RemoteNoteId, RemoteTemplateId>
+) {
+  const r: EditRemoteNote = {
+    remoteIds,
+    fieldValues: note.fieldValues,
+    tags: Array.from(note.tags),
   }
+  return r
 }
 
-function entityToDomain(note: NoteEntity): Note {
+function entityToDomain(note: NoteEntity, remotes: RemoteNote[]): Note {
   const fieldValues = JSON.parse(note.fieldValues) as Record<string, string>
-  const r = {
+  const r: Note = {
     id: note.id as NoteId,
     created: new Date(note.created),
     modified: new Date(note.modified),
-    push: note.push === 1 ? (true as const) : undefined,
-    remoteId: note.remoteId ?? undefined,
-    pushTemplateId: note.pushTemplateId ?? undefined,
     templateId: note.templateId,
     tags: new Set(JSON.parse(note.tags) as string[]),
     fieldValues,
     ankiNoteId: note.ankiNoteId ?? undefined,
-  }
-  if (r.push === undefined) {
-    delete r.push
-  }
-  if (r.remoteId === undefined) {
-    delete r.remoteId
-  }
-  if (r.pushTemplateId === undefined) {
-    delete r.pushTemplateId
+    remotes: Object.fromEntries(remotes.map((r) => [r.nook, r.remoteId])),
   }
   if (r.ankiNoteId === undefined) {
     delete r.ankiNoteId
@@ -128,49 +88,80 @@ export const noteCollectionMethods = {
   },
   getNote: async function (noteId: NoteId) {
     const db = await getKysely()
+    const remoteNotes = await db
+      .selectFrom("remoteNote")
+      .selectAll()
+      .where("localId", "=", noteId)
+      .execute()
     const note = await db
       .selectFrom("note")
       .selectAll()
       .where("id", "=", noteId)
       .executeTakeFirst()
-    return note == null ? null : entityToDomain(note)
+    return note == null ? null : entityToDomain(note, remoteNotes)
   },
   getNotesByIds: async function (noteIds: NoteId[]) {
     const db = await getKysely()
+    const remoteNotes = await db
+      .selectFrom("remoteNote")
+      .selectAll()
+      .where("localId", "in", noteIds)
+      .execute()
     const notes = await db
       .selectFrom("note")
       .selectAll()
       .where("id", "in", noteIds)
       .execute()
-    return notes.map(entityToDomain)
-  },
-  getNotes: async function (exclusiveStartId?: NoteId, limit?: number) {
-    const db = await getKysely()
-    const allNotes = await db
-      .selectFrom("note")
-      .selectAll()
-      .if(exclusiveStartId != null, (x) =>
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        x.where("id", ">", exclusiveStartId!)
+    return notes.map((ln) =>
+      entityToDomain(
+        ln,
+        remoteNotes.filter((rn) => rn.localId === ln.id)
       )
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      .if(limit != null, (x) => x.limit(limit!))
-      .execute()
-    return allNotes.map(entityToDomain)
+    )
   },
   getNewNotesToUpload: async function () {
     const db = await getKysely()
     const dp = new DOMParser()
+    const remoteNotes = await db
+      .selectFrom("remoteNote")
+      .selectAll()
+      .where("remoteId", "is", null)
+      .execute()
+    const localIds = [...new Set(remoteNotes.map((t) => t.localId))]
+    const remoteTemplates = await db
+      .selectFrom("remoteTemplate")
+      .selectAll()
+      .execute()
     const notesAndStuff = await db
       .selectFrom("note")
       .selectAll()
-      .where("push", "=", 1)
-      .where("remoteId", "is", null)
+      .where("id", "in", localIds)
       .execute()
       .then((n) =>
         n
-          .map(entityToDomain)
-          .map(domainToCreateRemote)
+          .map((noteEntity) => {
+            const note = entityToDomain(
+              noteEntity,
+              remoteNotes.filter((rn) => rn.localId === noteEntity.id)
+            )
+            const entries = Object.entries(note.remotes)
+            if (entries.length === 0)
+              throwExp("Zero remotes - is something wrong with the SQL query?")
+            const remoteIds = entries.map(([nook]) => {
+              const rt =
+                remoteTemplates.find(
+                  (rt) => rt.localId === note.templateId && nook === rt.nook
+                ) ??
+                throwExp(
+                  `No template found for id '${note.templateId}' with nook '${nook}'.`
+                )
+              return (
+                (rt.remoteId as RemoteTemplateId) ??
+                throwExp(`Template ${rt.localId} has no remoteId.`)
+              )
+            })
+            return domainToCreateRemote(note, remoteIds)
+          })
           .map((n) => withLocalMediaIdByRemoteMediaId(dp, n))
       )
     return notesAndStuff.map((n) => n.note)
@@ -178,16 +169,47 @@ export const noteCollectionMethods = {
   getEditedNotesToUpload: async function () {
     const db = await getKysely()
     const dp = new DOMParser()
+    const remoteNotes = await db
+      .selectFrom("remoteNote")
+      .leftJoin("note", "remoteNote.localId", "note.id")
+      .selectAll("remoteNote")
+      .where("remoteId", "is not", null)
+      .whereRef("remoteNote.uploadDate", "<", "note.modified")
+      .execute()
+    const localIds = [...new Set(remoteNotes.map((t) => t.localId))]
+    const remoteTemplates = await db
+      .selectFrom("remoteTemplate")
+      .selectAll()
+      .execute()
     const notesAndStuff = await db
       .selectFrom("note")
       .selectAll()
-      .where("push", "=", 1)
-      .where("remoteId", "is not", null)
+      .where("id", "in", localIds)
       .execute()
       .then((n) =>
         n
-          .map(entityToDomain)
-          .map(domainToEditRemote)
+          .map((noteEntity) => {
+            const note = entityToDomain(
+              noteEntity,
+              remoteNotes.filter((rn) => rn.localId === noteEntity.id)
+            )
+            const entries = Object.entries(note.remotes)
+            if (entries.length === 0)
+              throwExp("Zero remotes - is something wrong with the SQL query?")
+            const remotes = Object.fromEntries(
+              entries.map(([nook, remoteNoteId]) => {
+                const rt =
+                  remoteTemplates.find(
+                    (rt) => rt.localId === note.templateId && nook === rt.nook
+                  ) ??
+                  throwExp(
+                    `No template found for id '${note.templateId}' with nook '${nook}'.`
+                  )
+                return [remoteNoteId, rt.remoteId]
+              })
+            ) as Record<RemoteNoteId, RemoteTemplateId>
+            return domainToEditRemote(note, remotes)
+          })
           .map((n) => withLocalMediaIdByRemoteMediaId(dp, n))
       )
     return notesAndStuff.map((n) => n.note)
@@ -198,12 +220,13 @@ export const noteCollectionMethods = {
       .selectFrom("remoteMedia")
       .innerJoin("media", "remoteMedia.localMediaId", "media.id")
       .leftJoin("note", "remoteMedia.localEntityId", "note.id")
+      .leftJoin("remoteNote", "remoteNote.localId", "note.id")
       .select([
         "remoteMedia.localMediaId",
         "media.data",
         "remoteMedia.localEntityId",
         "remoteMedia.i",
-        "note.remoteId as noteRemoteId",
+        "remoteNote.remoteId",
       ])
       .where("remoteMedia.uploadDate", "is", null)
       .orWhereRef("media.modified", ">", "remoteMedia.uploadDate")
@@ -219,9 +242,9 @@ export const noteCollectionMethods = {
     )
     for (const m of mediaBinaries) {
       const remoteId =
-        (m.noteRemoteId as RemoteNoteId) ??
+        m.remoteId ??
         throwExp(
-          `Note ${m.localMediaId} is missing a noteRemoteId, is something wrong with the SQL query?`
+          `Note media ${m.localMediaId} is missing a remoteId, is something wrong with the SQL query?`
         )
       const value =
         media.get(m.localMediaId) ??
@@ -230,16 +253,19 @@ export const noteCollectionMethods = {
     }
     return media
   },
-  makeNoteUploadable: async function (
-    noteId: NoteId,
-    pushTemplateId?: RemoteTemplateId
-  ) {
+  makeNoteUploadable: async function (noteId: NoteId, nook: NookId) {
+    const remoteNote = {
+      localId: noteId,
+      nook,
+      remoteId: null,
+      uploadDate: null,
+    }
     const db = await getKysely()
     await db.transaction().execute(async (db) => {
       await db
-        .updateTable("note")
-        .set({ push: 1, pushTemplateId })
-        .where("id", "=", noteId)
+        .insertInto("remoteNote")
+        .values(remoteNote)
+        .onConflict((db) => db.doNothing())
         .execute()
       const note = await db
         .selectFrom("note")
@@ -248,7 +274,9 @@ export const noteCollectionMethods = {
         .executeTakeFirstOrThrow()
       const { localMediaIdByRemoteMediaId } = withLocalMediaIdByRemoteMediaId(
         new DOMParser(),
-        domainToCreateRemote(entityToDomain(note))
+        domainToCreateRemote(entityToDomain(note, [remoteNote]), [
+          /* this doesn't need any real values... I think */
+        ])
       )
       const srcs = Array.from(localMediaIdByRemoteMediaId.values())
       const mediaBinaries = await db
@@ -283,29 +311,34 @@ export const noteCollectionMethods = {
     })
   },
   updateNoteRemoteIds: async function (
-    remoteIdByLocal: Record<NoteId, RemoteNoteId>
+    remoteIdByLocal: Record<NoteIdSpaceNookId, RemoteNoteId>
   ) {
     const db = await getKysely()
-    for (const noteId in remoteIdByLocal) {
-      const remoteId = remoteIdByLocal[noteId as NoteId]
+    for (const noteIdSpaceNookId in remoteIdByLocal) {
+      const [noteId, nook] = noteIdSpaceNookId.split(" ") as [NoteId, NookId]
+      const remoteId = remoteIdByLocal[noteIdSpaceNookId as NoteIdSpaceNookId]
       await db
-        .updateTable("note")
-        .set({ remoteId, push: null })
-        .where("id", "=", noteId as NoteId)
+        .updateTable("remoteNote")
+        .set({ remoteId, uploadDate: new Date().getTime() })
+        .where("nook", "=", nook)
+        .where("localId", "=", noteId)
         .execute()
     }
   },
   markNoteAsPushed: async function (remoteNoteIds: RemoteNoteId[]) {
     const db = await getKysely()
     await db
-      .updateTable("note")
-      .set({ push: null })
+      .updateTable("remoteNote")
+      .set({ uploadDate: new Date().getTime() })
       .where("remoteId", "in", remoteNoteIds)
       .execute()
   },
   updateNote: async function (note: Note) {
     const db = await getKysely()
-    const { id, ...rest } = noteToDocType(note)
+    const { id, ...rest } = noteToDocType({
+      ...note,
+      modified: new Date(),
+    })
     await db.updateTable("note").set(rest).where("id", "=", id).execute()
   },
 }

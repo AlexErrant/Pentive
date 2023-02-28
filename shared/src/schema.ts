@@ -7,32 +7,6 @@ import {
   RemoteTemplateId,
 } from "./brand"
 
-export const createRemoteNote = z.object({
-  localId: z.string() as unknown as z.Schema<NoteId>,
-  templateId: z
-    .string()
-    .regex(/^[a-zA-Z0-9_-]{22}$/) as unknown as z.Schema<TemplateId>,
-  fieldValues: z.record(z.string()),
-  tags: z.array(z.string()),
-  ankiId: z.number().positive().optional(),
-})
-export type CreateRemoteNote = z.infer<typeof createRemoteNote>
-
-export const editRemoteNote = z.object({
-  remoteId: z
-    .string()
-    .regex(/^[a-zA-Z0-9_-]{22}$/) as unknown as z.Schema<RemoteNoteId>,
-  templateId: z
-    .string()
-    .regex(/^[a-zA-Z0-9_-]{22}$/) as unknown as z.Schema<TemplateId>,
-  fieldValues: z.record(z.string()),
-  tags: z.array(z.string()),
-  ankiId: z.number().positive().optional(),
-})
-export type EditRemoteNote = z.infer<typeof editRemoteNote>
-
-// highTODO are we doing ULIDs, KSUID, or neither?
-
 export const remoteNoteId = z
   .string()
   .regex(/^[a-zA-Z0-9_-]{22}$/) as unknown as z.Schema<RemoteNoteId>
@@ -40,6 +14,25 @@ export const remoteNoteId = z
 export const remoteTemplateId = z
   .string()
   .regex(/^[a-zA-Z0-9_-]{22}$/) as unknown as z.Schema<RemoteTemplateId>
+
+export const createRemoteNote = z.object({
+  localId: z.string() as unknown as z.Schema<NoteId>,
+  remoteTemplateIds: z.array(remoteTemplateId).min(1),
+  fieldValues: z.record(z.string()),
+  tags: z.array(z.string()),
+  ankiId: z.number().positive().optional(),
+})
+export type CreateRemoteNote = z.infer<typeof createRemoteNote>
+
+export const editRemoteNote = z.object({
+  remoteIds: z.record(remoteNoteId, remoteTemplateId),
+  fieldValues: z.record(z.string()),
+  tags: z.array(z.string()),
+  ankiId: z.number().positive().optional(),
+})
+export type EditRemoteNote = z.infer<typeof editRemoteNote>
+
+// highTODO are we doing ULIDs, KSUID, or neither?
 
 export const dateSchema = z.preprocess((arg) => {
   if (typeof arg === "string" || arg instanceof Date) return new Date(arg)

@@ -96,6 +96,7 @@ export function parseNote(
     templateId,
     fieldValues: _.fromPairs(_.zip(fields, values)),
     tags: new Set(note.tags.split(" ")),
+    remotes: {},
   }
 }
 

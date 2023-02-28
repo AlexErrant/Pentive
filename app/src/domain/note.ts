@@ -1,16 +1,15 @@
-import { TemplateId, RemoteCardId, RemoteTemplateId, NoteId } from "./ids"
+import { NookId, RemoteNoteId } from "shared"
+import { TemplateId, NoteId } from "./ids"
 
 export interface Note {
   readonly id: NoteId
   readonly templateId: TemplateId
-  readonly remoteId?: RemoteCardId
-  readonly pushTemplateId?: RemoteTemplateId
-  readonly push?: true
-  readonly ankiNoteId?: number
+  ankiNoteId?: number
   readonly created: Date
   readonly modified: Date
   readonly tags: ReadonlySet<string>
   readonly fieldValues: Record<string, string>
+  readonly remotes: Record<NookId, RemoteNoteId | null>
 }
 
 export const sampleNote: Note = {
@@ -23,4 +22,5 @@ export const sampleNote: Note = {
     front: "Question",
     back: `Answer <img src="tree.jpg" >`,
   },
+  remotes: {},
 }

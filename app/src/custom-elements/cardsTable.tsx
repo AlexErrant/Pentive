@@ -45,12 +45,13 @@ async function fillGrid(): Promise<void> {
         : (cardsByNoteId[c.noteId] = [c])
     }
   } while (cards.length !== 0)
-  let notes: Note[] = []
-  do {
-    notes = await db.getNotes(_.last(notes)?.id, 1000)
-    const noteCards = getUpdatedNoteCards(notes, cardsByNoteId, templateDict)
-    gridRef.api.applyTransaction({ update: noteCards })
-  } while (notes.length !== 0)
+  // nextTODO
+  // let notes: Note[] = []
+  // do {
+  //   notes = await db.getNotes(_.last(notes)?.id, 1000)
+  //   const noteCards = getUpdatedNoteCards(notes, cardsByNoteId, templateDict)
+  //   gridRef.api.applyTransaction({ update: noteCards })
+  // } while (notes.length !== 0)
   cache = null
 }
 

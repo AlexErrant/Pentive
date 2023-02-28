@@ -1,12 +1,13 @@
 import { Kysely, sql, InsertResult, RawBuilder, InsertObject } from "kysely"
 import { PlanetScaleDialect } from "kysely-planetscale"
-import { DB, Note } from "./database.js"
+import { DB } from "./database.js"
 import {
   Base64,
   Base64Url,
   DbId,
   Hex,
   NoteId,
+  NoteIdSpaceNookId,
   RemoteNoteId,
   RemoteTemplateId,
   TemplateId,
@@ -175,15 +176,23 @@ export async function insertNotes(
   authorId: UserId,
   notes: CreateRemoteNote[]
 ): Promise<Record<NoteId, RemoteNoteId>> {
-  const noteCreatesAndIds = await Promise.all(
-    notes.map(async (n) => {
-      const { noteCreate, remoteIdBase64url } = await toNoteCreate(n, authorId)
-      return [
-        noteCreate,
-        [n.localId, remoteIdBase64url] as [NoteId, RemoteNoteId],
-      ] as const
-    })
-  )
+  const noteCreatesAndIds = (
+    await Promise.all(
+      notes.map(async (n) => {
+        const ncs = await toNoteCreates(n, authorId)
+        return ncs.map(({ noteCreate, remoteIdBase64url }) => {
+          return [
+            noteCreate,
+            // nextTODO Validate Nook
+            [`${n.localId} ${"aRandomNook"}`, remoteIdBase64url] as [
+              NoteIdSpaceNookId,
+              RemoteNoteId
+            ],
+          ] as const
+        })
+      })
+    )
+  ).flatMap((x) => x)
   const noteCreates = noteCreatesAndIds.map((x) => x[0])
   await db.insertInto("Note").values(noteCreates).execute()
   const remoteIdByLocal = _.fromPairs(noteCreatesAndIds.map((x) => x[1]))
@@ -217,15 +226,37 @@ export async function insertTemplates(
   return remoteIdByLocal
 }
 
-async function toNoteCreate(
+async function toNoteCreates(
   n: EditRemoteNote | CreateRemoteNote,
   authorId: UserId
 ) {
-  const remoteId =
-    "remoteId" in n ? base64url.decode(n.remoteId + "==") : ulidAsRaw()
+  const remoteIds =
+    "remoteIds" in n
+      ? new Map(
+          Object.entries(n.remoteIds).map(
+            ([remoteNoteId, remoteTemplateId]) => [
+              base64url.decode(remoteNoteId + "=="),
+              remoteTemplateId ??
+                throwExp(
+                  "remove upon resolution of https://github.com/colinhacks/zod/pull/2097"
+                ),
+            ]
+          )
+        )
+      : new Map(n.remoteTemplateIds.map((rt) => [ulidAsRaw(), rt]))
+  return await Promise.all(
+    Array.from(remoteIds).map(async (x) => await toNoteCreate(x, n, authorId))
+  )
+}
+
+async function toNoteCreate(
+  [remoteNoteId, remoteTemplateId]: [Uint8Array, RemoteTemplateId],
+  n: EditRemoteNote | CreateRemoteNote,
+  authorId: UserId
+) {
   const updatedAt = "remoteId" in n ? new Date() : undefined
-  const remoteIdHex = base16.encode(remoteId) as Hex
-  const remoteIdBase64url = base64url.encode(remoteId).substring(0, 22)
+  const remoteIdHex = base16.encode(remoteNoteId) as Hex
+  const remoteIdBase64url = base64url.encode(remoteNoteId).substring(0, 22)
   for (const field in n.fieldValues) {
     n.fieldValues[field] = await replaceImgSrcs(
       n.fieldValues[field],
@@ -234,7 +265,7 @@ async function toNoteCreate(
   }
   const noteCreate: InsertObject<DB, "Note"> = {
     id: unhex(remoteIdHex),
-    templateId: fromBase64Url(n.templateId), // highTODO validate
+    templateId: fromBase64Url(remoteTemplateId), // highTODO validate
     authorId,
     updatedAt,
     fieldValues: JSON.stringify(n.fieldValues),
@@ -314,21 +345,20 @@ async function toTemplateCreate(
 }
 
 export async function editNotes(authorId: UserId, notes: EditRemoteNote[]) {
+  const editNoteIds = notes
+    .flatMap((t) => Object.keys(t.remoteIds) as RemoteNoteId[])
+    .map(fromBase64Url)
   const count = await db
     .selectFrom("Note")
     .select(db.fn.count("id").as("c"))
-    .where(
-      "id",
-      "in",
-      notes.map((n) => fromBase64Url(n.remoteId))
-    )
+    .where("id", "in", editNoteIds)
     .executeTakeFirstOrThrow()
   if (count.c !== notes.length.toString())
     throwExp("At least one of these notes doesn't exist.")
   const noteCreates = await Promise.all(
     notes.map(async (n) => {
-      const { noteCreate } = await toNoteCreate(n, authorId)
-      return noteCreate
+      const tcs = await toNoteCreates(n, authorId)
+      return tcs.map((tc) => tc.noteCreate)
     })
   )
   // insert into `Note` (`id`, `templateId`, `authorId`, `fieldValues`, `fts`, `tags`)
@@ -336,7 +366,7 @@ export async function editNotes(authorId: UserId, notes: EditRemoteNote[]) {
   // on duplicate key update `templateId` = values(`templateId`), `updatedAt` = values(`updatedAt`), `authorId` = values(`authorId`), `fieldValues` = values(`fieldValues`), `fts` = values(`fts`), `tags` = values(`tags`), `ankiId` = values(`ankiId`)
   await db
     .insertInto("Note")
-    .values(noteCreates)
+    .values(noteCreates.flat())
     // https://stackoverflow.com/a/34866431
     .onDuplicateKeyUpdate({
       templateId: (x) => values(x.ref("templateId")),
@@ -373,7 +403,7 @@ export async function editTemplates(
   )
   await db
     .insertInto("Template")
-    .values(templateCreates.flatMap((x) => x))
+    .values(templateCreates.flat())
     // https://stackoverflow.com/a/34866431
     .onDuplicateKeyUpdate({
       ankiId: (x) => values(x.ref("ankiId")),

@@ -6,8 +6,14 @@ import { defaultTemplate, Template } from "../domain/template"
 import HomeData from "./home.data"
 import { db } from "../db"
 import { importAnki } from "./importer/importer"
-import { Base64Url, csrfHeaderName, NookId, throwExp } from "shared"
-import { MediaId, RemoteMediaNum, RemoteTemplateId } from "../domain/ids"
+import {
+  Base64Url,
+  csrfHeaderName,
+  NookId,
+  RemoteNoteId,
+  throwExp,
+} from "shared"
+import { MediaId, RemoteMediaNum } from "../domain/ids"
 import { apiClient } from "../apiClient"
 
 async function uploadTemplates(): Promise<void> {
@@ -35,10 +41,7 @@ async function uploadTemplates(): Promise<void> {
 }
 
 async function makeNoteUploadable() {
-  await db.makeNoteUploadable(
-    sampleNote.id,
-    "9P1IlXnSRviXmwAA8kTMKw" as RemoteTemplateId
-  )
+  await db.makeNoteUploadable(sampleNote.id, "aRandomNook" as NookId)
 }
 
 async function makeTemplateUploadable() {
@@ -54,7 +57,9 @@ async function uploadNotes(): Promise<void> {
   const editedNotes = await db.getEditedNotesToUpload()
   if (editedNotes.length > 0) {
     await apiClient.editNote.mutate(editedNotes)
-    await db.markNoteAsPushed(editedNotes.map((n) => n.remoteId))
+    await db.markNoteAsPushed(
+      editedNotes.flatMap((n) => Object.keys(n.remoteIds) as RemoteNoteId[])
+    )
   }
   const media = await db.getNoteMediaToUpload()
   for (const [mediaId, { data, ids }] of media) {
@@ -110,7 +115,6 @@ async function updateNotes(): Promise<void> {
       front: note.fieldValues.front + "!",
       back: note.fieldValues.back + "!",
     },
-    push: true,
   })
 }
 

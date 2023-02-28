@@ -18,3 +18,4 @@ export type UserId = Brand<string, "userId">
 export type NookId = Brand<string, "nookId">
 
 export type TemplateIdSpaceNookId = Brand<string, "templateIdSpaceNookId">
+export type NoteIdSpaceNookId = Brand<string, "noteIdSpaceNookId">
