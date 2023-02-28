@@ -317,21 +317,33 @@ export const noteCollectionMethods = {
     for (const noteIdSpaceNookId in remoteIdByLocal) {
       const [noteId, nook] = noteIdSpaceNookId.split(" ") as [NoteId, NookId]
       const remoteId = remoteIdByLocal[noteIdSpaceNookId as NoteIdSpaceNookId]
-      await db
+      const r = await db
         .updateTable("remoteNote")
         .set({ remoteId, uploadDate: new Date().getTime() })
         .where("nook", "=", nook)
         .where("localId", "=", noteId)
+        .returningAll()
         .execute()
+      if (r.length !== 1)
+        throwExp(
+          `No remoteNote found for nook '${nook}' and noteId '${noteId}'`
+        )
     }
   },
   markNoteAsPushed: async function (remoteNoteIds: RemoteNoteId[]) {
     const db = await getKysely()
-    await db
+    const r = await db
       .updateTable("remoteNote")
       .set({ uploadDate: new Date().getTime() })
       .where("remoteId", "in", remoteNoteIds)
+      .returningAll()
       .execute()
+    if (r.length !== remoteNoteIds.length)
+      throwExp(
+        `Some remoteNotes in ${JSON.stringify(
+          remoteNoteIds
+        )} not found. (This is the worst error message ever - medTODO.)`
+      )
   },
   updateNote: async function (note: Note) {
     const db = await getKysely()
@@ -339,7 +351,13 @@ export const noteCollectionMethods = {
       ...note,
       modified: new Date(),
     })
-    await db.updateTable("note").set(rest).where("id", "=", id).execute()
+    const r = await db
+      .updateTable("note")
+      .set(rest)
+      .where("id", "=", id)
+      .returningAll()
+      .execute()
+    if (r.length !== 1) throwExp(`No note found for id '${note.id}'.`)
   },
 }
 

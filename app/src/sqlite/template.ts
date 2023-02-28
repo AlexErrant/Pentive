@@ -206,7 +206,7 @@ export const templateCollectionMethods = {
       const remoteId =
         m.remoteId ??
         throwExp(
-          `Template ${m.localMediaId} is missing a templateRemoteId, is something wrong with the SQL query?`
+          `Template media ${m.localMediaId} is missing a remoteId, is something wrong with the SQL query?`
         )
       const value =
         media.get(m.localMediaId) ??
@@ -284,26 +284,44 @@ export const templateCollectionMethods = {
       ]
       const remoteId =
         remoteIdByLocal[templateIdSpaceNookId as TemplateIdSpaceNookId]
-      await db
+      const r = await db
         .updateTable("remoteTemplate")
         .set({ remoteId, uploadDate: new Date().getTime() })
         .where("nook", "=", nook)
         .where("localId", "=", templateId)
+        .returningAll()
         .execute()
+      if (r.length !== 1)
+        throwExp(
+          `No remoteTemplate found for nook '${nook}' and templateId '${templateId}'`
+        )
     }
   },
   markTemplateAsPushed: async function (remoteTemplateIds: RemoteTemplateId[]) {
     const db = await getKysely()
-    await db
+    const r = await db
       .updateTable("remoteTemplate")
       .set({ uploadDate: new Date().getTime() })
       .where("remoteId", "in", remoteTemplateIds)
+      .returningAll()
       .execute()
+    if (r.length !== remoteTemplateIds.length)
+      throwExp(
+        `Some remoteTemplates in ${JSON.stringify(
+          remoteTemplateIds
+        )} not found. (This is the worst error message ever - medTODO.)`
+      )
   },
   updateTemplate: async function (template: Template) {
     const db = await getKysely()
     const { id, ...rest } = templateToDocType(template)
-    await db.updateTable("template").set(rest).where("id", "=", id).execute()
+    const r = await db
+      .updateTable("template")
+      .set(rest)
+      .where("id", "=", id)
+      .returningAll()
+      .execute()
+    if (r.length !== 1) throwExp(`No template found for id '${template.id}'.`)
   },
 }
 
