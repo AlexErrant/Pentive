@@ -5,6 +5,7 @@ import {
   RemoteNoteId,
   ChildTemplateId,
   RemoteTemplateId,
+  NookId,
 } from "./brand"
 
 export const remoteNoteId = z
@@ -66,10 +67,14 @@ export const templateType = z.discriminatedUnion("tag", [
 
 export type TemplateType = z.infer<typeof templateType>
 
+const nookId = z
+  .string()
+  .regex(/^[a-z0-9_]{1,22}$/) as unknown as z.Schema<NookId>
+
 export const createRemoteTemplate = z.object({
   localId: z.string() as unknown as z.Schema<TemplateId>,
   name: z.string(),
-  nook: z.string(),
+  nooks: z.array(nookId),
   templateType,
   fields: z.array(z.string()),
   css: z.string(),

@@ -35,11 +35,11 @@ async function uploadTemplates(): Promise<void> {
 }
 
 async function makeNoteUploadable() {
-  await db.makeNoteUploadable(sampleNote.id, "aRandomNook" as NookId)
+  await db.makeNoteUploadable(sampleNote.id, "a_random_nook" as NookId)
 }
 
 async function makeTemplateUploadable() {
-  await db.makeTemplateUploadable(defaultTemplate.id, "aRandomNook" as NookId)
+  await db.makeTemplateUploadable(defaultTemplate.id, "a_random_nook" as NookId)
 }
 
 async function uploadNotes(): Promise<void> {

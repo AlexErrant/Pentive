@@ -48,17 +48,14 @@ function entityToDomain(template: TemplateEntity, remotes: RemoteTemplate[]) {
   return r
 }
 
-function domainToCreateRemote(
-  { id, name, css, templateType, fields }: Template,
-  nook: string
-) {
+function domainToCreateRemote(t: Template) {
   const r: CreateRemoteTemplate = {
-    localId: id,
-    name,
-    css,
-    nook,
-    templateType,
-    fields: fields.map((x) => x.name),
+    localId: t.id,
+    name: t.name,
+    css: t.css,
+    nooks: Array.from(t.remotes.keys()),
+    templateType: t.templateType,
+    fields: t.fields.map((x) => x.name),
   }
   return r
 }
@@ -140,7 +137,7 @@ export const templateCollectionMethods = {
               remoteTemplates.filter((rt) => rt.localId === lt.id)
             )
           )
-          .map((x) => domainToCreateRemote(x, "aRandomNook")) // nextTODO fix
+          .map(domainToCreateRemote)
           .map((n) => withLocalMediaIdByRemoteMediaId(dp, n))
       )
     return templatesAndStuff.map((n) => n.template)
@@ -240,7 +237,7 @@ export const templateCollectionMethods = {
         .executeTakeFirstOrThrow()
       const { localMediaIdByRemoteMediaId } = withLocalMediaIdByRemoteMediaId(
         new DOMParser(),
-        domainToCreateRemote(entityToDomain(template, [remoteTemplate]), nook)
+        domainToCreateRemote(entityToDomain(template, [remoteTemplate]))
       )
       const srcs = Array.from(localMediaIdByRemoteMediaId.values())
       const mediaBinaries = await db

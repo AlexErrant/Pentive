@@ -16,7 +16,6 @@ import {
 import { binary16fromBase64URL, ulidAsRaw } from "./convertBinary.js"
 import { stringifyMap, throwExp, undefinedMap } from "./utility.js"
 import { base16, base64url } from "@scure/base"
-import _ from "lodash"
 import { compile } from "html-to-text"
 import {
   CreateRemoteNote,
@@ -142,7 +141,7 @@ export async function userOwnsTemplateAndHasMedia(
         .selectFrom("Template")
         .select(db.fn.count("id").as("userOwns"))
         .where("id", "in", ids.map(fromBase64Url))
-        // .where("authorId", "=", authorId) // nextTODO
+        // .where("authorId", "=", authorId) // highTODO
         .as("userOwns"),
       db
         .selectFrom("Media_Entity")
@@ -217,7 +216,7 @@ export async function insertTemplates(
         return tcs.map(({ templateCreate, remoteIdBase64url }) => {
           return [
             templateCreate,
-            [[n.localId, n.nook as NookId], remoteIdBase64url],
+            [[n.localId, templateCreate.nook], remoteIdBase64url],
           ] as const
         })
       })
@@ -304,19 +303,22 @@ async function toTemplateCreates(
 ) {
   const remoteIds =
     "remoteIds" in n
-      ? n.remoteIds.map((id) => base64url.decode(id + "=="))
-      : [ulidAsRaw()]
+      ? n.remoteIds.map(
+          (id) =>
+            [base64url.decode(id + "=="), "undefined_nook" as NookId] as const
+        )
+      : n.nooks.map((nook) => [ulidAsRaw(), nook] as const)
   return await Promise.all(
-    remoteIds.map(async (id) => await toTemplateCreate(n, id))
+    remoteIds.map(async ([id, nook]) => await toTemplateCreate(n, id, nook))
   )
 }
 
 async function toTemplateCreate(
   n: EditRemoteTemplate | CreateRemoteTemplate,
-  remoteId: Uint8Array
+  remoteId: Uint8Array,
+  nook: NookId
 ) {
   const updatedAt = "remoteId" in n ? new Date() : undefined
-  const nook = ("remoteIds" in n ? "undefined" : n.nook) as NookId
   const remoteIdHex = base16.encode(remoteId) as Hex
   const remoteIdBase64url = base64url
     .encode(remoteId)
@@ -336,7 +338,7 @@ async function toTemplateCreate(
       remoteIdBase64url
     )
   }
-  const templateCreate: InsertObject<DB, "Template"> = {
+  const templateCreate: InsertObject<DB, "Template"> & { nook: NookId } = {
     id: unhex(remoteIdHex),
     ankiId: n.ankiId,
     updatedAt,
