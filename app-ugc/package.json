@@ -20,6 +20,7 @@
     "stylelintw": "stylelint **/*.css --fix"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "^4.20221111.1",
     "@types/iframe-resizer": "^3.5.9",
     "@types/node": "^18.7.21",
     "@typescript-eslint/eslint-plugin": "^5.31.0",
