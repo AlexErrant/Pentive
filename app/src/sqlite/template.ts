@@ -9,7 +9,6 @@ import {
   CreateRemoteTemplate,
   EditRemoteTemplate,
   NookId,
-  TemplateIdSpaceNookId,
   TemplateType,
   notEmpty,
   throwExp,
@@ -276,14 +275,10 @@ export const templateCollectionMethods = {
     })
   },
   updateTemplateRemoteIds: async function (
-    remoteIdByLocal: Map<TemplateIdSpaceNookId, RemoteTemplateId>
+    remoteIdByLocal: Map<readonly [TemplateId, NookId], RemoteTemplateId>
   ) {
     const db = await getKysely()
-    for (const [templateIdSpaceNookId, remoteId] of remoteIdByLocal) {
-      const [templateId, nook] = templateIdSpaceNookId.split(" ") as [
-        TemplateId,
-        NookId
-      ]
+    for (const [[templateId, nook], remoteId] of remoteIdByLocal) {
       const r = await db
         .updateTable("remoteTemplate")
         .set({ remoteId, uploadDate: new Date().getTime() })

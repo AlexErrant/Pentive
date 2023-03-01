@@ -2,7 +2,6 @@ import {
   CreateRemoteNote,
   EditRemoteNote,
   NookId,
-  NoteIdSpaceNookId,
   RemoteNoteId,
   parseMap,
   parseSet,
@@ -327,11 +326,10 @@ export const noteCollectionMethods = {
     })
   },
   updateNoteRemoteIds: async function (
-    remoteIdByLocal: Map<NoteIdSpaceNookId, RemoteNoteId>
+    remoteIdByLocal: Map<readonly [NoteId, NookId], RemoteNoteId>
   ) {
     const db = await getKysely()
-    for (const [noteIdSpaceNookId, remoteId] of remoteIdByLocal) {
-      const [noteId, nook] = noteIdSpaceNookId.split(" ") as [NoteId, NookId]
+    for (const [[noteId, nook], remoteId] of remoteIdByLocal) {
       const r = await db
         .updateTable("remoteNote")
         .set({ remoteId, uploadDate: new Date().getTime() })

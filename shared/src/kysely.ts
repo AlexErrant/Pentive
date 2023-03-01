@@ -6,12 +6,11 @@ import {
   Base64Url,
   DbId,
   Hex,
+  NookId,
   NoteId,
-  NoteIdSpaceNookId,
   RemoteNoteId,
   RemoteTemplateId,
   TemplateId,
-  TemplateIdSpaceNookId,
   UserId,
 } from "./brand.js"
 import { binary16fromBase64URL, ulidAsRaw } from "./convertBinary.js"
@@ -178,14 +177,8 @@ export async function insertNotes(authorId: UserId, notes: CreateRemoteNote[]) {
       notes.map(async (n) => {
         const ncs = await toNoteCreates(n, authorId)
         return ncs.map(({ noteCreate, remoteIdBase64url }) => {
-          return [
-            noteCreate,
-            // nextTODO Validate Nook
-            [`${n.localId} ${"aRandomNook"}`, remoteIdBase64url] as [
-              NoteIdSpaceNookId,
-              RemoteNoteId
-            ],
-          ] as const
+          const nook = "aRandomNook" as NookId // nextTODO
+          return [noteCreate, [[n.localId, nook], remoteIdBase64url]] as const
         })
       })
     )
@@ -207,10 +200,7 @@ export async function insertTemplates(
         return tcs.map(({ templateCreate, remoteIdBase64url }) => {
           return [
             templateCreate,
-            [`${n.localId} ${n.nook}`, remoteIdBase64url] as [
-              TemplateIdSpaceNookId,
-              RemoteTemplateId
-            ],
+            [[n.localId, n.nook as NookId], remoteIdBase64url],
           ] as const
         })
       })
@@ -250,7 +240,9 @@ async function toNoteCreate(
 ) {
   const updatedAt = "remoteId" in n ? new Date() : undefined
   const remoteIdHex = base16.encode(remoteNoteId) as Hex
-  const remoteIdBase64url = base64url.encode(remoteNoteId).substring(0, 22)
+  const remoteIdBase64url = base64url
+    .encode(remoteNoteId)
+    .substring(0, 22) as RemoteNoteId
   for (const [field, value] of n.fieldValues) {
     n.fieldValues.set(field, await replaceImgSrcs(value, remoteIdBase64url))
   }
@@ -309,7 +301,9 @@ async function toTemplateCreate(
   const updatedAt = "remoteId" in n ? new Date() : undefined
   const nook = "remoteIds" in n ? "undefined" : n.nook
   const remoteIdHex = base16.encode(remoteId) as Hex
-  const remoteIdBase64url = base64url.encode(remoteId).substring(0, 22)
+  const remoteIdBase64url = base64url
+    .encode(remoteId)
+    .substring(0, 22) as RemoteTemplateId
   if (n.templateType.tag === "standard") {
     for (const t of n.templateType.templates) {
       t.front = await replaceImgSrcs(t.front, remoteIdBase64url)
