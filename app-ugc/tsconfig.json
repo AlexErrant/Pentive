@@ -13,6 +13,7 @@
     "lib": [
       "WebWorker",
       "DOM",
+      "DOM.Iterable",
       "ES2021.String"
     ],
     "types": [
