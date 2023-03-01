@@ -23,8 +23,8 @@ importers:
       '@typescript-eslint/parser': ^5.31.0
       '@vlcn.io/wa-crsqlite': ^0.7.1 || upon update, run `npm run postinstall`
       '@zip.js/zip.js': ^2.6.41
-      ag-grid-community: ^28.2.0
-      ag-grid-solid: ^28.2.0
+      ag-grid-community: ^29.1.0
+      ag-grid-solid: ^29.1.0
       autoprefixer: ^10.4.7
       babel-preset-solid: ^1.4.8
       better-sqlite3: ^8.0.1
@@ -78,8 +78,8 @@ importers:
       '@trpc/server': 10.11.1
       '@vlcn.io/wa-crsqlite': 0.7.1
       '@zip.js/zip.js': 2.6.41
-      ag-grid-community: 28.2.0
-      ag-grid-solid: 28.2.0_r456abjkktdu6n3n64bymge7xa
+      ag-grid-community: 29.1.0
+      ag-grid-solid: 29.1.0_uhloq4sdzo5xzb4gjtzt45vqv4
       babel-preset-solid: 1.5.4_@babel+core@7.19.0
       buffer: 6.0.3
       comlink: 4.3.1
@@ -4115,17 +4115,17 @@ packages:
     engines: {node: '>=6.0'}
     dev: true
 
-  /ag-grid-community/28.2.0:
-    resolution: {integrity: sha512-mL55V1H7c8zMWv3aumARCoU6ilDzN5lB69bFY9lhC2mzbvL/DyNWpX1v417IRidt2bHsVfQewPs6DOMkav7fqg==}
+  /ag-grid-community/29.1.0:
+    resolution: {integrity: sha512-QJZi1qP7fpK/sxXbEFZWR3/Jf3HVRK0Xm3Tw55tn0ehNdkuSxRBOmOvjE3lPWqgRlT2rcL1xmjdqM4mpB1fobQ==}
     dev: false
 
-  /ag-grid-solid/28.2.0_r456abjkktdu6n3n64bymge7xa:
-    resolution: {integrity: sha512-ZBWejepcAc/pBCQjr6SIL01t3pDmsK1e2G97rJda/PTpZMNdIGWrc+h/MrXcTmjobE/b2P9RJ+d+pcXa+z4TXw==}
+  /ag-grid-solid/29.1.0_uhloq4sdzo5xzb4gjtzt45vqv4:
+    resolution: {integrity: sha512-rF3qsgok9YtJm/ZpgD0gYRv5uyREWML5m7noRzOvkurFWlaKQa7cwGXmAzPxtHqzmZO76PyxNzLxMNVTR4ZRlQ==}
     peerDependencies:
-      ag-grid-community: ~28.2.0
+      ag-grid-community: ~29.1.0
       solid-js: '>=1.0.0'
     dependencies:
-      ag-grid-community: 28.2.0
+      ag-grid-community: 29.1.0
       solid-js: 1.5.4
     dev: false
 
