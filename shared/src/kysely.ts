@@ -172,14 +172,31 @@ export async function lookupMediaHash(
 }
 
 export async function insertNotes(authorId: UserId, notes: CreateRemoteNote[]) {
+  const rtIds = notes.flatMap((n) => n.remoteTemplateIds).map(fromBase64Url)
+  // highTODO validate author
+  const templates = await db
+    .selectFrom("Template")
+    .select(["nook", "id"])
+    .where("id", "in", rtIds)
+    .execute()
+  if (templates.length !== rtIds.length)
+    throwExp("You have an invalid RemoteTemplateId.")
   const noteCreatesAndIds = (
     await Promise.all(
       notes.map(async (n) => {
         const ncs = await toNoteCreates(n, authorId)
-        return ncs.map(({ noteCreate, remoteIdBase64url }) => {
-          const nook = "aRandomNook" as NookId // nextTODO
-          return [noteCreate, [[n.localId, nook], remoteIdBase64url]] as const
-        })
+        return ncs.map(
+          ({ noteCreate, remoteIdBase64url, remoteTemplateId }) => {
+            const t =
+              templates.find(
+                (t) => dbIdToBase64Url(t.id) === remoteTemplateId
+              ) ?? throwExp(`Template not found - should be impossible.`)
+            return [
+              noteCreate,
+              [[n.localId, t.nook], remoteIdBase64url],
+            ] as const
+          }
+        )
       })
     )
   ).flatMap((x) => x)
@@ -259,7 +276,7 @@ async function toNoteCreate(
     tags: JSON.stringify(n.tags),
     ankiId: n.ankiId,
   }
-  return { noteCreate, remoteIdBase64url }
+  return { noteCreate, remoteIdBase64url, remoteTemplateId }
 }
 
 async function replaceImgSrcs(value: string, remoteIdBase64url: string) {
@@ -299,7 +316,7 @@ async function toTemplateCreate(
   remoteId: Uint8Array
 ) {
   const updatedAt = "remoteId" in n ? new Date() : undefined
-  const nook = "remoteIds" in n ? "undefined" : n.nook
+  const nook = ("remoteIds" in n ? "undefined" : n.nook) as NookId
   const remoteIdHex = base16.encode(remoteId) as Hex
   const remoteIdBase64url = base64url
     .encode(remoteId)

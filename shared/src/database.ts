@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import type { ColumnType } from "kysely"
-import type { DbId } from "./brand"
+import type { DbId, NookId } from "./brand"
 
 export type Generated<T> = T extends ColumnType<infer S, infer I, infer U>
   ? ColumnType<S, I | undefined, U>
@@ -89,7 +89,7 @@ export interface Template {
   createdAt: Generated<Date>
   updatedAt: Generated<Date>
   name: string
-  nook: string
+  nook: NookId
   type: string
   fields: string
   css: string
