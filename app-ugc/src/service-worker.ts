@@ -5,7 +5,7 @@ import type {
   Exposed,
   PostMessageTypes,
 } from "./register-service-worker"
-import type { ResourceId } from "app/src/domain/ids"
+import { MediaId } from "app/src/domain/ids"
 import { throwExp } from "shared"
 
 declare let self: ServiceWorkerGlobalScope
@@ -69,21 +69,21 @@ self.addEventListener("message", (event) => {
   }
 })
 
-const localResourcePrefix = self.registration.scope + "localResource/"
+const localMediaPrefix = self.registration.scope + "localMedia/"
 
 async function sleep(ms: number): Promise<void> {
   return await new Promise((resolve) => setTimeout(resolve, ms))
 }
 
-async function getLocalResource(
-  resourceId: ResourceId,
+async function getLocalMedia(
+  mediaId: MediaId,
   clientId: string
 ): Promise<Response> {
   const messenger = await getMessenger(clientId)
-  const resource = await messenger.getLocalResource(resourceId)
-  return resource == null
-    ? new Response(resource, { status: 404 })
-    : new Response(resource)
+  const media = await messenger.getLocalMedia(mediaId)
+  return media == null
+    ? new Response(media, { status: 404 })
+    : new Response(media)
 }
 
 async function getMessenger(
@@ -119,10 +119,10 @@ async function getMessenger(
 }
 
 self.addEventListener("fetch", (fetch) => {
-  if (fetch.request.url.startsWith(localResourcePrefix)) {
-    const resourceId = decodeURI(
-      fetch.request.url.substring(localResourcePrefix.length)
-    ) as ResourceId
-    fetch.respondWith(getLocalResource(resourceId, fetch.clientId))
+  if (fetch.request.url.startsWith(localMediaPrefix)) {
+    const mediaId = decodeURI(
+      fetch.request.url.substring(localMediaPrefix.length)
+    ) as MediaId
+    fetch.respondWith(getLocalMedia(mediaId, fetch.clientId))
   }
 })

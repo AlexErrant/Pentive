@@ -1,4 +1,4 @@
-import { ResourceId } from "app/src/domain/ids"
+import { MediaId } from "app/src/domain/ids"
 import * as Comlink from "comlink" // https://github.com/GoogleChromeLabs/comlink/tree/main/docs/examples/05-serviceworker-example
 import { appMessenger } from "../appMessenger"
 import { setBody } from "./setBody"
@@ -19,8 +19,8 @@ export interface ComlinkClose {
 export type PostMessageTypes = ComlinkInit | ComlinkClose
 
 // explicit because Comlink can't clone functions
-async function getLocalResource(id: ResourceId): Promise<ArrayBuffer | null> {
-  const data = await appMessenger.getLocalResource(id)
+async function getLocalMedia(id: MediaId): Promise<ArrayBuffer | null> {
+  const data = await appMessenger.getLocalMedia(id)
   if (data == null) {
     return data
   } else {
@@ -29,7 +29,7 @@ async function getLocalResource(id: ResourceId): Promise<ArrayBuffer | null> {
 }
 
 const exposed = {
-  getLocalResource,
+  getLocalMedia,
 }
 
 export type Exposed = typeof exposed
