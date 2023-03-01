@@ -16,7 +16,7 @@ export interface Template {
   readonly created: Date
   readonly modified: Date
   readonly templateType: TemplateType
-  readonly remotes: Record<NookId, RemoteTemplateId | null>
+  readonly remotes: Map<NookId, RemoteTemplateId | null>
 }
 
 export const defaultTemplate: Template = {
@@ -46,5 +46,5 @@ export const defaultTemplate: Template = {
       },
     ],
   },
-  remotes: {},
+  remotes: new Map(),
 }

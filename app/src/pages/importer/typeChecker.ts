@@ -109,7 +109,7 @@ const dconfSingle = z.object({
   dyn: z.boolean(),
 })
 
-const dconf = z.record(z.string(), dconfSingle)
+const dconf = z.map(z.string(), dconfSingle)
 
 const col = z.object({
   id: z.number(),
@@ -127,8 +127,8 @@ const col = z.object({
   tags: z.string(),
 })
 
-const models = z.record(z.string(), model)
-const decks = z.record(z.string(), deck)
+const models = z.map(z.string(), model)
+const decks = z.map(z.string(), deck)
 
 type Col = z.infer<typeof col>
 type Conf = z.infer<typeof conf>
@@ -146,7 +146,7 @@ type MergedCol = Omit<Col, "conf" | "decks" | "models" | "dconf"> & {
   dconf: Dconf
 }
 
-export function checkCol(raw: Record<string, unknown>): MergedCol {
+export function checkCol(raw: initSqlJs.ParamsObject): MergedCol {
   const parsedCol = col.parse(raw)
   const parsedConf = conf.parse(JSON.parse(parsedCol.conf))
   const parsedModels = models.parse(JSON.parse(parsedCol.models))
@@ -199,14 +199,14 @@ const card = z.object({
 export type Note = z.infer<typeof note>
 export type Card = z.infer<typeof card>
 
-export function checkNote(raw: Record<string, unknown>): Note {
+export function checkNote(raw: initSqlJs.ParamsObject): Note {
   return note.parse(raw)
 }
 
-export function checkCard(raw: Record<string, unknown>): Card {
+export function checkCard(raw: initSqlJs.ParamsObject): Card {
   return card.parse(raw)
 }
 
-export function checkMedia(raw: unknown): Record<string, string> {
-  return z.record(z.string()).parse(raw)
+export function checkMedia(raw: unknown): Map<string, string> {
+  return z.map(z.string(), z.string()).parse(raw)
 }

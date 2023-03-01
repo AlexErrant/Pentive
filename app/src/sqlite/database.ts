@@ -1,6 +1,6 @@
 // most of these columns are nullable in SQLite, but they're not nullable here for the sake of my sanity
 
-import { LDbId } from "shared"
+import { LDbId, NookId } from "shared"
 import { MediaId, RemoteMediaNum } from "../domain/ids"
 
 export interface Card {
@@ -34,7 +34,7 @@ export interface Note {
 
 export interface RemoteNote {
   localId: LDbId
-  nook: string
+  nook: NookId
   remoteId: LDbId | null
   uploadDate: number | null
 }

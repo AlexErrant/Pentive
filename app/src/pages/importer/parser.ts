@@ -66,7 +66,7 @@ function parseTemplateType(model: Model): TemplateType {
 }
 
 export function parseTemplates(models: Models): Template[] {
-  return Object.values(models).map((m) => {
+  return Array.from(models).map(([, m]) => {
     return {
       id: m.id.toString() as TemplateId, // medTODO
       name: m.name,
@@ -76,37 +76,45 @@ export function parseTemplates(models: Models): Template[] {
       modified: new Date(m.mod * 1000),
       templateType: parseTemplateType(m),
       ankiId: m.id,
-      remotes: {},
+      remotes: new Map(),
     }
   })
 }
 
 export function parseNote(
   note: ANote,
-  templates: Record<TemplateId, Template>
+  templates: Map<TemplateId, Template>
 ): PNote {
   const templateId = note.mid.toString() as TemplateId // medTODO
-  const fields = templates[templateId].fields.map((f) => f.name)
+  const template = templates.get(templateId)
+  if (template == null) throwExp(`Template ${templateId} not found`)
+  const fields = template.fields.map((f) => f.name)
   const values = note.flds.split("\x1f")
+  if (fields.length !== values.length)
+    throwExp(
+      `The length of fields (${fields.length}) and values (${values.length}) for noteId=${note.id} don't match.`
+    )
   return {
     id: note.id.toString() as NoteId, // medTODO
     created: new Date(note.id),
     modified: new Date(note.mod),
     ankiNoteId: note.id,
     templateId,
-    fieldValues: _.fromPairs(_.zip(fields, values)),
+    fieldValues: new Map(_.zip(fields, values) as Array<[string, string]>),
     tags: new Set(note.tags.split(" ")),
-    remotes: {},
+    remotes: new Map(),
   }
 }
 
 export function parseCard(
   card: ACard,
-  notes: Record<number, PNote>,
-  templates: Record<TemplateId, Template>
+  notes: Map<number, PNote>,
+  templates: Map<TemplateId, Template>
 ): PCard {
-  const note = notes[card.nid]
-  const template = templates[note.templateId]
+  const note = notes.get(card.nid)
+  if (note == null) throwExp(`Note ${card.nid} not found`)
+  const template = templates.get(note.templateId)
+  if (template == null) throwExp(`Template ${note.templateId} not found`)
   const pointer =
     template.templateType.tag === "standard"
       ? (card.ord.toString() as ChildTemplateId)

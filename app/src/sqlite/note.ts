@@ -4,6 +4,10 @@ import {
   NookId,
   NoteIdSpaceNookId,
   RemoteNoteId,
+  parseMap,
+  parseSet,
+  stringifyMap,
+  stringifySet,
   throwExp,
 } from "shared"
 import {
@@ -24,8 +28,8 @@ function noteToDocType(note: Note): InsertObject<DB, "note"> {
     templateId: note.templateId,
     created: note.created.getTime(),
     modified: note.modified.getTime(),
-    tags: JSON.stringify([...note.tags]),
-    fieldValues: JSON.stringify(note.fieldValues),
+    tags: stringifySet(note.tags),
+    fieldValues: stringifyMap(note.fieldValues),
     ankiNoteId: note.ankiNoteId,
   }
   return r
@@ -45,7 +49,7 @@ function domainToCreateRemote(
 
 function domainToEditRemote(
   note: Note,
-  remoteIds: Record<RemoteNoteId, RemoteTemplateId>
+  remoteIds: Map<RemoteNoteId, RemoteTemplateId>
 ) {
   const r: EditRemoteNote = {
     remoteIds,
@@ -56,16 +60,15 @@ function domainToEditRemote(
 }
 
 function entityToDomain(note: NoteEntity, remotes: RemoteNote[]): Note {
-  const fieldValues = JSON.parse(note.fieldValues) as Record<string, string>
   const r: Note = {
     id: note.id as NoteId,
     created: new Date(note.created),
     modified: new Date(note.modified),
     templateId: note.templateId,
-    tags: new Set(JSON.parse(note.tags) as string[]),
-    fieldValues,
+    tags: parseSet(note.tags),
+    fieldValues: parseMap(note.fieldValues),
     ankiNoteId: note.ankiNoteId ?? undefined,
-    remotes: Object.fromEntries(remotes.map((r) => [r.nook, r.remoteId])),
+    remotes: new Map(remotes.map((r) => [r.nook, r.remoteId])),
   }
   if (r.ankiNoteId === undefined) {
     delete r.ankiNoteId
@@ -144,10 +147,9 @@ export const noteCollectionMethods = {
               noteEntity,
               remoteNotes.filter((rn) => rn.localId === noteEntity.id)
             )
-            const entries = Object.entries(note.remotes)
-            if (entries.length === 0)
+            if (note.remotes.size === 0)
               throwExp("Zero remotes - is something wrong with the SQL query?")
-            const remoteIds = entries.map(([nook]) => {
+            const remoteIds = Array.from(note.remotes).map(([nook]) => {
               const rt =
                 remoteTemplates.find(
                   (rt) => rt.localId === note.templateId && nook === rt.nook
@@ -193,11 +195,10 @@ export const noteCollectionMethods = {
               noteEntity,
               remoteNotes.filter((rn) => rn.localId === noteEntity.id)
             )
-            const entries = Object.entries(note.remotes)
-            if (entries.length === 0)
+            if (note.remotes.size === 0)
               throwExp("Zero remotes - is something wrong with the SQL query?")
-            const remotes = Object.fromEntries(
-              entries.map(([nook, remoteNoteId]) => {
+            const remotes = new Map(
+              Array.from(note.remotes).map(([nook, remoteNoteId]) => {
                 const rt =
                   remoteTemplates.find(
                     (rt) => rt.localId === note.templateId && nook === rt.nook
@@ -205,9 +206,24 @@ export const noteCollectionMethods = {
                   throwExp(
                     `No template found for id '${note.templateId}' with nook '${nook}'.`
                   )
-                return [remoteNoteId, rt.remoteId]
+                return [
+                  remoteNoteId ??
+                    throwExp(
+                      `remoteNoteId for ${JSON.stringify({
+                        nook,
+                        noteEntityId: noteEntity.id,
+                      })} is null.`
+                    ),
+                  rt.remoteId ??
+                    throwExp(
+                      `remoteId for ${JSON.stringify({
+                        nook,
+                        noteEntityId: noteEntity.id,
+                      })} is null.`
+                    ),
+                ]
               })
-            ) as Record<RemoteNoteId, RemoteTemplateId>
+            )
             return domainToEditRemote(note, remotes)
           })
           .map((n) => withLocalMediaIdByRemoteMediaId(dp, n))
@@ -311,12 +327,11 @@ export const noteCollectionMethods = {
     })
   },
   updateNoteRemoteIds: async function (
-    remoteIdByLocal: Record<NoteIdSpaceNookId, RemoteNoteId>
+    remoteIdByLocal: Map<NoteIdSpaceNookId, RemoteNoteId>
   ) {
     const db = await getKysely()
-    for (const noteIdSpaceNookId in remoteIdByLocal) {
+    for (const [noteIdSpaceNookId, remoteId] of remoteIdByLocal) {
       const [noteId, nook] = noteIdSpaceNookId.split(" ") as [NoteId, NookId]
-      const remoteId = remoteIdByLocal[noteIdSpaceNookId as NoteIdSpaceNookId]
       const r = await db
         .updateTable("remoteNote")
         .set({ remoteId, uploadDate: new Date().getTime() })
@@ -366,8 +381,7 @@ function withLocalMediaIdByRemoteMediaId<
 >(dp: DOMParser, note: T) {
   const localMediaIdByRemoteMediaId = new Map<RemoteMediaNum, MediaId>()
   const fieldValues = new Map<string, string>()
-  for (const field of Object.keys(note.fieldValues).sort()) {
-    const value = note.fieldValues[field]
+  for (const [field, value] of note.fieldValues) {
     const doc = updateLocalMediaIdByRemoteMediaIdAndGetNewDoc(
       dp,
       value,
@@ -378,7 +392,7 @@ function withLocalMediaIdByRemoteMediaId<
   return {
     note: {
       ...note,
-      fieldValues: Object.fromEntries(fieldValues),
+      fieldValues,
     },
     localMediaIdByRemoteMediaId,
   }

@@ -63,7 +63,7 @@ async function importAnkiMedia(ankiEntries: Entry[]): Promise<void> {
 
 async function addMediaBatch(
   entries: Entry[],
-  nameByI: Record<string, string>
+  nameByI: Map<string, string>
 ): Promise<void> {
   const mediaAndNulls = await Promise.all(
     entries.map(async (entry) => {
@@ -72,7 +72,7 @@ async function addMediaBatch(
         throwExp(
           "Impossible since we're using `getEntries` https://github.com/gildas-lormeau/zip.js/issues/371"
         )
-      const name = nameByI[entry.filename]
+      const name = nameByI.get(entry.filename)
       return name == null // occurs for entries that aren't media, e.g. collection.anki2
         ? null
         : {
@@ -88,8 +88,8 @@ async function addMediaBatch(
 
 async function importAnkiDb(sqlite: Entry): Promise<void> {
   const ankiDb = await getAnkiDb(sqlite)
-  const templatesDict: Record<TemplateId, Template> = {}
-  const notesDict: Record<number, PNote> = {}
+  const templatesMap = new Map<TemplateId, Template>()
+  const notesMap = new Map<number, PNote>()
   const cardsList: PCard[] = []
   try {
     // highTODO wrap in a transaction
@@ -99,7 +99,7 @@ async function importAnkiDb(sqlite: Entry): Promise<void> {
       const col = checkCol(row)
       const templates = parseTemplates(col.models)
       await db.bulkUpsertTemplate(templates)
-      templates.forEach((t) => (templatesDict[t.id] = t))
+      templates.forEach((t) => templatesMap.set(t.id, t))
       console.log(templates)
     }
     cols.free()
@@ -107,15 +107,15 @@ async function importAnkiDb(sqlite: Entry): Promise<void> {
     while (notes.step()) {
       const row = notes.getAsObject()
       const note = checkNote(row)
-      notesDict[note.id] = parseNote(note, templatesDict)
+      notesMap.set(note.id, parseNote(note, templatesMap))
     }
     notes.free()
-    await db.bulkUpsertNotes(Object.values(notesDict))
+    await db.bulkUpsertNotes(Array.from(notesMap.values()))
     const cards = ankiDb.prepare("select * from cards") // lowTODO select exact columns
     while (cards.step()) {
       const row = cards.getAsObject()
       const card = checkCard(row)
-      cardsList.push(parseCard(card, notesDict, templatesDict))
+      cardsList.push(parseCard(card, notesMap, templatesMap))
     }
     cards.free()
     await db.bulkUpsertCards(cardsList)

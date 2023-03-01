@@ -42,7 +42,9 @@ function entityToDomain(template: TemplateEntity, remotes: RemoteTemplate[]) {
     fields: JSON.parse(template.fields) as Field[],
     css: template.css,
     templateType: JSON.parse(template.templateType) as TemplateType,
-    remotes: Object.fromEntries(remotes.map((r) => [r.nook, r.remoteId])),
+    remotes: new Map(
+      remotes.map((r) => [r.nook as NookId, r.remoteId as RemoteTemplateId])
+    ),
   }
   return r
 }
@@ -63,7 +65,7 @@ function domainToCreateRemote(
 }
 
 function domainToEditRemote(template: Template) {
-  const remoteIds = Object.values(template.remotes).filter(notEmpty)
+  const remoteIds = Array.from(template.remotes.values()).filter(notEmpty)
   if (remoteIds.length === 0)
     throwExp(`Zero remoteIds - is something wrong with the SQL query?`)
   const r: EditRemoteTemplate = {
@@ -274,16 +276,14 @@ export const templateCollectionMethods = {
     })
   },
   updateTemplateRemoteIds: async function (
-    remoteIdByLocal: Record<TemplateIdSpaceNookId, RemoteTemplateId>
+    remoteIdByLocal: Map<TemplateIdSpaceNookId, RemoteTemplateId>
   ) {
     const db = await getKysely()
-    for (const templateIdSpaceNookId in remoteIdByLocal) {
+    for (const [templateIdSpaceNookId, remoteId] of remoteIdByLocal) {
       const [templateId, nook] = templateIdSpaceNookId.split(" ") as [
         TemplateId,
         NookId
       ]
-      const remoteId =
-        remoteIdByLocal[templateIdSpaceNookId as TemplateIdSpaceNookId]
       const r = await db
         .updateTable("remoteTemplate")
         .set({ remoteId, uploadDate: new Date().getTime() })

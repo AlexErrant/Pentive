@@ -6,13 +6,7 @@ import { defaultTemplate, Template } from "../domain/template"
 import HomeData from "./home.data"
 import { db } from "../db"
 import { importAnki } from "./importer/importer"
-import {
-  Base64Url,
-  csrfHeaderName,
-  NookId,
-  RemoteNoteId,
-  throwExp,
-} from "shared"
+import { Base64Url, csrfHeaderName, NookId, throwExp } from "shared"
 import { MediaId, RemoteMediaNum } from "../domain/ids"
 import { apiClient } from "../apiClient"
 
@@ -58,7 +52,7 @@ async function uploadNotes(): Promise<void> {
   if (editedNotes.length > 0) {
     await apiClient.editNote.mutate(editedNotes)
     await db.markNoteAsPushed(
-      editedNotes.flatMap((n) => Object.keys(n.remoteIds) as RemoteNoteId[])
+      editedNotes.flatMap((n) => Array.from(n.remoteIds.keys()))
     )
   }
   const media = await db.getNoteMediaToUpload()
@@ -109,13 +103,9 @@ async function postMedia(
 async function updateNotes(): Promise<void> {
   const note = await db.getNote(sampleNote.id)
   if (note == null) throwExp("No note!")
-  await db.updateNote({
-    ...note,
-    fieldValues: {
-      front: note.fieldValues.front + "!",
-      back: note.fieldValues.back + "!",
-    },
-  })
+  note.fieldValues.set("front", note.fieldValues.get("front")! + "!")
+  note.fieldValues.set("back", note.fieldValues.get("back")! + "!")
+  await db.updateNote(note)
 }
 
 async function searchNotes(search: string): Promise<void> {

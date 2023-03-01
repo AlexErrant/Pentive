@@ -11,7 +11,7 @@ import { getKysely } from "./crsqlite"
 import { DB, Card as CardEntity } from "./database"
 import { InsertObject } from "kysely"
 import _ from "lodash"
-import { assertNever, throwExp, undefinedMap } from "shared"
+import { assertNever, stringifySet, throwExp, undefinedMap } from "shared"
 
 type SerializedPointer = { t: string } | { c: number }
 
@@ -93,7 +93,7 @@ function cardToDocType(card: Card): InsertObject<DB, "card"> {
     modified: modified.getTime(),
     due: due.getTime(),
     pointer: serializePointer(pointer),
-    deckIds: JSON.stringify([...deckIds]),
+    deckIds: stringifySet(deckIds),
     cardSettingId: cardSettingId ?? null,
     state: undefinedMap(state, serializeState) ?? null,
   }

@@ -1,4 +1,3 @@
-import _ from "lodash"
 import { C } from "."
 import { CardId, NoteId, MediaId, Side, TemplateId } from "./domain/ids"
 import { assertNever, throwExp } from "shared"
@@ -55,10 +54,7 @@ async function renderBody(
       if (card == null) {
         return { body: `Card ${i.cardId} not found!` }
       }
-      const fv = _.zip(
-        Object.keys(note.fieldValues),
-        Object.values(note.fieldValues)
-      ) as ReadonlyArray<readonly [string, string]>
+      const fv = Array.from(note.fieldValues)
       const { front, back } =
         template.templateType.tag === "standard"
           ? template.templateType.templates.find(

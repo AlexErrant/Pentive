@@ -8,8 +8,8 @@ export interface Note {
   readonly created: Date
   readonly modified: Date
   readonly tags: ReadonlySet<string>
-  readonly fieldValues: Record<string, string>
-  readonly remotes: Record<NookId, RemoteNoteId | null>
+  readonly fieldValues: Map<string, string>
+  readonly remotes: Map<NookId, RemoteNoteId | null>
 }
 
 export const sampleNote: Note = {
@@ -18,9 +18,9 @@ export const sampleNote: Note = {
   modified: new Date(),
   templateId: "fanOeCfrTeGKVgAAek3FQg" as TemplateId,
   tags: new Set<string>(),
-  fieldValues: {
-    front: "Question",
-    back: `Answer <img src="tree.jpg" >`,
-  },
-  remotes: {},
+  fieldValues: new Map([
+    ["front", "Question"],
+    ["back", `Answer <img src="tree.jpg" >`],
+  ]),
+  remotes: new Map(),
 }

@@ -56,3 +56,22 @@ export function notEmpty<TValue>(
 ): value is TValue {
   return value !== null && value !== undefined
 }
+
+export function stringifyMap(map: Map<unknown, unknown>) {
+  return JSON.stringify(Object.fromEntries(map))
+}
+
+export function parseMap<T extends string, U>(rawMap: string) {
+  const parsed = JSON.parse(rawMap) as Record<T, U>
+  const entries = Object.entries(parsed) as Array<[T, U]>
+  return new Map(entries)
+}
+
+export function stringifySet(set: Set<unknown> | ReadonlySet<unknown>) {
+  return JSON.stringify([...set])
+}
+
+export function parseSet<T>(rawSet: string) {
+  const parsed = JSON.parse(rawSet) as T[]
+  return new Set(parsed)
+}

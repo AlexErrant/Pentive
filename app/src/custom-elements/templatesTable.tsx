@@ -15,7 +15,7 @@ function id(id: keyof Template): keyof Template {
 }
 
 function remoteCell(template: Template): JSX.Element {
-  return Object.entries(template.remotes).map(([nook, remoteId]) => {
+  return Array.from(template.remotes).map(([nook, remoteId]) => {
     if (remoteId == null) {
       return nook
     }

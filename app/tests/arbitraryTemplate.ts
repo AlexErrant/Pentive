@@ -11,7 +11,7 @@ import {
   reasonableDates,
   recordWithOptionalFields,
 } from "./arbitrary"
-import { ChildTemplate, TemplateType } from "shared"
+import { ChildTemplate, NookId, TemplateType } from "shared"
 
 const field = recordWithOptionalFields<Field>(
   {
@@ -58,7 +58,11 @@ export const template = recordWithOptionalFields<Template>(
     created: reasonableDates,
     modified: reasonableDates,
     templateType,
-    remotes: fc.dictionary(fc.string(), arbitraryUlid<RemoteTemplateId>()),
+    remotes: fc
+      .dictionary(fc.string(), arbitraryUlid<RemoteTemplateId>())
+      .map(
+        (x) => new Map(Object.entries(x) as Array<[NookId, RemoteTemplateId]>)
+      ),
   },
   {}
 )

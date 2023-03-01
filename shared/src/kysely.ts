@@ -15,7 +15,7 @@ import {
   UserId,
 } from "./brand.js"
 import { binary16fromBase64URL, ulidAsRaw } from "./convertBinary.js"
-import { throwExp, undefinedMap } from "./utility.js"
+import { stringifyMap, throwExp, undefinedMap } from "./utility.js"
 import { base16, base64url } from "@scure/base"
 import _ from "lodash"
 import { compile } from "html-to-text"
@@ -172,10 +172,7 @@ export async function lookupMediaHash(
   return mediaHash?.mediaHash
 }
 
-export async function insertNotes(
-  authorId: UserId,
-  notes: CreateRemoteNote[]
-): Promise<Record<NoteId, RemoteNoteId>> {
+export async function insertNotes(authorId: UserId, notes: CreateRemoteNote[]) {
   const noteCreatesAndIds = (
     await Promise.all(
       notes.map(async (n) => {
@@ -195,7 +192,7 @@ export async function insertNotes(
   ).flatMap((x) => x)
   const noteCreates = noteCreatesAndIds.map((x) => x[0])
   await db.insertInto("Note").values(noteCreates).execute()
-  const remoteIdByLocal = _.fromPairs(noteCreatesAndIds.map((x) => x[1]))
+  const remoteIdByLocal = new Map(noteCreatesAndIds.map((x) => x[1]))
   return remoteIdByLocal
 }
 
@@ -221,8 +218,7 @@ export async function insertTemplates(
   ).flatMap((x) => x)
   const templateCreates = templateCreatesAndIds.map((x) => x[0])
   await db.insertInto("Template").values(templateCreates).execute()
-  const remoteIdByLocal: Record<TemplateIdSpaceNookId, RemoteTemplateId> =
-    _.fromPairs(templateCreatesAndIds.map((x) => x[1]))
+  const remoteIdByLocal = new Map(templateCreatesAndIds.map((x) => x[1]))
   return remoteIdByLocal
 }
 
@@ -233,15 +229,13 @@ async function toNoteCreates(
   const remoteIds =
     "remoteIds" in n
       ? new Map(
-          Object.entries(n.remoteIds).map(
-            ([remoteNoteId, remoteTemplateId]) => [
-              base64url.decode(remoteNoteId + "=="),
-              remoteTemplateId ??
-                throwExp(
-                  "remove upon resolution of https://github.com/colinhacks/zod/pull/2097"
-                ),
-            ]
-          )
+          Array.from(n.remoteIds).map(([remoteNoteId, remoteTemplateId]) => [
+            base64url.decode(remoteNoteId + "=="),
+            remoteTemplateId ??
+              throwExp(
+                "remove upon resolution of https://github.com/colinhacks/zod/pull/2097"
+              ),
+          ])
         )
       : new Map(n.remoteTemplateIds.map((rt) => [ulidAsRaw(), rt]))
   return await Promise.all(
@@ -257,19 +251,19 @@ async function toNoteCreate(
   const updatedAt = "remoteId" in n ? new Date() : undefined
   const remoteIdHex = base16.encode(remoteNoteId) as Hex
   const remoteIdBase64url = base64url.encode(remoteNoteId).substring(0, 22)
-  for (const field in n.fieldValues) {
-    n.fieldValues[field] = await replaceImgSrcs(
-      n.fieldValues[field],
-      remoteIdBase64url
-    )
+  for (const [field, value] of n.fieldValues) {
+    n.fieldValues.set(field, await replaceImgSrcs(value, remoteIdBase64url))
   }
   const noteCreate: InsertObject<DB, "Note"> = {
     id: unhex(remoteIdHex),
     templateId: fromBase64Url(remoteTemplateId), // highTODO validate
     authorId,
     updatedAt,
-    fieldValues: JSON.stringify(n.fieldValues),
-    fts: Object.values(n.fieldValues).map(convert).concat(n.tags).join(" "),
+    fieldValues: stringifyMap(n.fieldValues),
+    fts: Array.from(n.fieldValues)
+      .map(([, v]) => convert(v))
+      .concat(n.tags)
+      .join(" "),
     tags: JSON.stringify(n.tags),
     ankiId: n.ankiId,
   }
@@ -346,7 +340,7 @@ async function toTemplateCreate(
 
 export async function editNotes(authorId: UserId, notes: EditRemoteNote[]) {
   const editNoteIds = notes
-    .flatMap((t) => Object.keys(t.remoteIds) as RemoteNoteId[])
+    .flatMap((t) => Array.from(t.remoteIds.keys()))
     .map(fromBase64Url)
   const count = await db
     .selectFrom("Note")

@@ -15,18 +15,22 @@ export const remoteTemplateId = z
   .string()
   .regex(/^[a-zA-Z0-9_-]{22}$/) as unknown as z.Schema<RemoteTemplateId>
 
+const fieldValues = z
+  .map(z.string().min(1), z.string())
+  .refine((x) => x.size > 0)
+
 export const createRemoteNote = z.object({
   localId: z.string() as unknown as z.Schema<NoteId>,
   remoteTemplateIds: z.array(remoteTemplateId).min(1),
-  fieldValues: z.record(z.string()),
+  fieldValues,
   tags: z.array(z.string()),
   ankiId: z.number().positive().optional(),
 })
 export type CreateRemoteNote = z.infer<typeof createRemoteNote>
 
 export const editRemoteNote = z.object({
-  remoteIds: z.record(remoteNoteId, remoteTemplateId),
-  fieldValues: z.record(z.string()),
+  remoteIds: z.map(remoteNoteId, remoteTemplateId).refine((x) => x.size > 0),
+  fieldValues,
   tags: z.array(z.string()),
   ankiId: z.number().positive().optional(),
 })
