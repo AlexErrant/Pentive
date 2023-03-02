@@ -63,7 +63,7 @@ async function importAnkiMedia(ankiEntries: Entry[]): Promise<void> {
 
 async function addMediaBatch(
   entries: Entry[],
-  nameByI: Map<string, string>
+  nameByI: Record<string, string>
 ): Promise<void> {
   const mediaAndNulls = await Promise.all(
     entries.map(async (entry) => {
@@ -72,7 +72,7 @@ async function addMediaBatch(
         throwExp(
           "Impossible since we're using `getEntries` https://github.com/gildas-lormeau/zip.js/issues/371"
         )
-      const name = nameByI.get(entry.filename)
+      const name = nameByI[entry.filename]
       return name == null // occurs for entries that aren't media, e.g. collection.anki2
         ? null
         : {

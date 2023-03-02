@@ -66,7 +66,7 @@ function parseTemplateType(model: Model): TemplateType {
 }
 
 export function parseTemplates(models: Models): Template[] {
-  return Array.from(models).map(([, m]) => {
+  return Object.entries(models).map(([, m]) => {
     return {
       id: m.id.toString() as TemplateId, // medTODO
       name: m.name,

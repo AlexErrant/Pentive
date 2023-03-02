@@ -109,7 +109,7 @@ const dconfSingle = z.object({
   dyn: z.boolean(),
 })
 
-const dconf = z.map(z.string(), dconfSingle)
+const dconf = z.record(z.string(), dconfSingle)
 
 const col = z.object({
   id: z.number(),
@@ -127,8 +127,8 @@ const col = z.object({
   tags: z.string(),
 })
 
-const models = z.map(z.string(), model)
-const decks = z.map(z.string(), deck)
+const models = z.record(z.string(), model)
+const decks = z.record(z.string(), deck)
 
 type Col = z.infer<typeof col>
 type Conf = z.infer<typeof conf>
@@ -207,6 +207,6 @@ export function checkCard(raw: initSqlJs.ParamsObject): Card {
   return card.parse(raw)
 }
 
-export function checkMedia(raw: unknown): Map<string, string> {
-  return z.map(z.string(), z.string()).parse(raw)
+export function checkMedia(raw: unknown): Record<string, string> {
+  return z.record(z.string(), z.string()).parse(raw)
 }
