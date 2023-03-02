@@ -99,7 +99,7 @@ function cardToDocType(card: Card): InsertObject<DB, "card"> {
   }
 }
 
-function entityToDomain(card: CardEntity): Card {
+export function entityToDomain(card: CardEntity): Card {
   const r = {
     id: card.id as CardId,
     noteId: card.noteId as NoteId,

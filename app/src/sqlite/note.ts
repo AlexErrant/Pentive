@@ -20,6 +20,9 @@ import { getKysely } from "./crsqlite"
 import { DB, Note as NoteEntity, RemoteNote } from "./database"
 import { InsertObject } from "kysely"
 import _ from "lodash"
+import { entityToDomain as templateEntityToDomain } from "./template"
+import { entityToDomain as cardEntityToDomain } from "./card"
+import { NoteCard } from "../domain/card"
 
 function noteToDocType(note: Note): InsertObject<DB, "note"> {
   const r: InsertObject<DB, "note"> = {
@@ -120,6 +123,91 @@ export const noteCollectionMethods = {
         remoteNotes.filter((rn) => rn.localId === ln.id)
       )
     )
+  },
+  getNotes: async function (offset: number, limit: number) {
+    const db = await getKysely()
+    const entities = await db
+      .selectFrom("note")
+      .innerJoin("template", "template.id", "note.templateId")
+      .innerJoin("card", "card.noteId", "note.id")
+      .select([
+        "card.cardSettingId as card_cardSettingId",
+        "card.created as card_created",
+        "card.deckIds as card_deckIds",
+        "card.due as card_due",
+        "card.id as card_id",
+        "card.modified as card_modified",
+        "card.noteId as card_noteId",
+        "card.pointer as card_pointer",
+        "card.state as card_state",
+
+        "note.ankiNoteId as note_ankiNoteId",
+        "note.created as note_created",
+        "note.fieldValues as note_fieldValues",
+        "note.id as note_id",
+        "note.modified as note_modified",
+        "note.tags as note_tags",
+        "note.templateId as note_templateId",
+
+        "template.ankiId as template_ankiId",
+        "template.created as template_created",
+        "template.css as template_css",
+        "template.fields as template_fields",
+        "template.id as template_id",
+        "template.modified as template_modified",
+        "template.name as template_name",
+        "template.templateType as template_templateType",
+      ])
+      .offset(offset)
+      .limit(limit)
+      .execute()
+    const count = await db
+      .selectFrom("note")
+      .select(db.fn.count<number>("id").as("c"))
+      .executeTakeFirstOrThrow()
+    return {
+      count: count.c,
+      noteCards: entities.map((tnc) => {
+        const note = entityToDomain(
+          {
+            ankiNoteId: tnc.note_ankiNoteId,
+            created: tnc.note_created,
+            fieldValues: tnc.note_fieldValues,
+            id: tnc.note_id,
+            modified: tnc.note_modified,
+            tags: tnc.note_tags,
+            templateId: tnc.note_templateId,
+          },
+          []
+        )
+        const template = templateEntityToDomain(
+          {
+            ankiId: tnc.template_ankiId,
+            created: tnc.template_created,
+            css: tnc.template_css,
+            fields: tnc.template_fields,
+            id: tnc.template_id,
+            modified: tnc.template_modified,
+            name: tnc.template_name,
+            templateType: tnc.template_templateType,
+          },
+          []
+        )
+        const card = cardEntityToDomain({
+          cardSettingId: tnc.card_cardSettingId,
+          created: tnc.card_created,
+          deckIds: tnc.card_deckIds,
+          due: tnc.card_due,
+          id: tnc.card_id,
+          modified: tnc.card_modified,
+          noteId: tnc.card_noteId,
+          pointer: tnc.card_pointer,
+          state: tnc.card_state,
+        })
+        const r: NoteCard = { note, template, card }
+        return r
+      }),
+    }
   },
   getNewNotesToUpload: async function () {
     const db = await getKysely()

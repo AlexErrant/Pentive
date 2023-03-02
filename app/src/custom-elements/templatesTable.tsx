@@ -20,7 +20,6 @@ function remoteCell(template: Template): JSX.Element {
       return nook
     }
     const url = `https://pentive.com/t/${remoteId}`
-    // const content = template.push === true ? "☁" : "🔗" // nextTODO
     return <a href={url}>{nook}</a>
   })
 }

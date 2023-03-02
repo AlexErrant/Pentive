@@ -53,7 +53,7 @@ export const sampleCard: Card = {
 }
 
 export interface NoteCard {
-  template?: Template
-  note?: Note
+  template: Template
+  note: Note
   card: Card
 }

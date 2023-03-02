@@ -32,7 +32,10 @@ function templateToDocType(template: Template) {
   return r
 }
 
-function entityToDomain(template: TemplateEntity, remotes: RemoteTemplate[]) {
+export function entityToDomain(
+  template: TemplateEntity,
+  remotes: RemoteTemplate[]
+) {
   const r: Template = {
     id: template.id as TemplateId,
     name: template.name,
