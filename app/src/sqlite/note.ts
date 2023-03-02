@@ -381,36 +381,40 @@ export const noteCollectionMethods = {
           /* this doesn't need any real values... I think */
         ])
       )
-      const srcs = Array.from(localMediaIdByRemoteMediaId.values())
+      const srcs = new Set(localMediaIdByRemoteMediaId.values())
       const mediaBinaries = await db
         .selectFrom("media")
         .select(["id", "data"])
-        .where("id", "in", srcs)
+        .where("id", "in", Array.from(srcs))
         .execute()
-      if (mediaBinaries.length !== srcs.length)
+      if (mediaBinaries.length !== srcs.size)
         throwExp("You're missing a media.") // medTODO better error message
       await db
         .deleteFrom("remoteMedia")
         .where("localEntityId", "=", noteId)
-        .where("i", ">", srcs.length as RemoteMediaNum)
+        .where("i", ">", srcs.size as RemoteMediaNum)
         .execute()
-      await db
-        .insertInto("remoteMedia")
-        .values(
-          Array.from(localMediaIdByRemoteMediaId).map(([i, localMediaId]) => ({
-            localEntityId: noteId,
-            i,
-            localMediaId,
-          }))
-        )
-        // insert into "remoteMedia" ("localEntityId", "i", "localMediaId") values (?, ?, ?)
-        // on conflict do update set "localMediaId" = "excluded"."localMediaId"
-        .onConflict((db) =>
-          db.doUpdateSet({
-            localMediaId: (x) => x.ref("excluded.localMediaId"),
-          })
-        )
-        .execute()
+      if (localMediaIdByRemoteMediaId.size !== 0) {
+        await db
+          .insertInto("remoteMedia")
+          .values(
+            Array.from(localMediaIdByRemoteMediaId).map(
+              ([i, localMediaId]) => ({
+                localEntityId: noteId,
+                i,
+                localMediaId,
+              })
+            )
+          )
+          // insert into "remoteMedia" ("localEntityId", "i", "localMediaId") values (?, ?, ?)
+          // on conflict do update set "localMediaId" = "excluded"."localMediaId"
+          .onConflict((db) =>
+            db.doUpdateSet({
+              localMediaId: (x) => x.ref("excluded.localMediaId"),
+            })
+          )
+          .execute()
+      }
     })
   },
   updateNoteRemoteIds: async function (

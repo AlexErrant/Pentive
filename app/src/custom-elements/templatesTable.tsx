@@ -18,6 +18,7 @@ import _ from "lodash"
 import ResizingIframe from "./resizing-iframe"
 import "@github/time-elements"
 import { NookId } from "shared"
+import { db } from "../db"
 
 function id(id: keyof Template): keyof Template {
   return id
@@ -41,11 +42,12 @@ function remoteCell(template: Template): JSX.Element {
         </For>
       </ul>
       <form
-        onSubmit={(e) => {
+        onSubmit={async (e) => {
           e.preventDefault()
           const formData = new FormData(e.target as HTMLFormElement)
           const newNookId = formData.get("newNookId") as NookId
           setRemotes((x) => [...x, [newNookId, null]])
+          await db.makeTemplateUploadable(template.id, newNookId)
         }}
       >
         <input
