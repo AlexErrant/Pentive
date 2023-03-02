@@ -1,4 +1,4 @@
-import { createSignal, JSX } from "solid-js"
+import { createSignal, JSX, Show } from "solid-js"
 import CardsTable from "../custom-elements/cardsTable"
 import ResizingIframe from "../custom-elements/resizing-iframe"
 import { NoteCard } from "../domain/card"
@@ -26,33 +26,26 @@ export default function Cards(): JSX.Element {
 }
 
 const cardPreview = (): JSX.Element => {
-  if (selected() == null) {
-    return <></>
-  }
-  const { note, card, template } = selected() as NoteCard
-  if (note == null || template == null) {
-    return <span>Loading...</span>
-  }
   return (
-    <>
+    <Show when={selected() != null}>
       <ResizingIframe
         i={{
           tag: "card",
           side: "front",
-          templateId: template.id,
-          noteId: note.id,
-          cardId: card.id,
+          templateId: selected()!.template.id,
+          noteId: selected()!.note.id,
+          cardId: selected()!.card.id,
         }}
       ></ResizingIframe>
       <ResizingIframe
         i={{
           tag: "card",
           side: "back",
-          templateId: template.id,
-          noteId: note.id,
-          cardId: card.id,
+          templateId: selected()!.template.id,
+          noteId: selected()!.note.id,
+          cardId: selected()!.card.id,
         }}
       ></ResizingIframe>
-    </>
+    </Show>
   )
 }

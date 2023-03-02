@@ -10,7 +10,6 @@ const ResizingIframe: VoidComponent<{
   readonly i: RenderBodyInput
 }> = (props) => {
   let iframeReference: HTMLIFrameElement
-  const usp = new URLSearchParams(props.i)
   onCleanup(() => {
     ;(iframeReference as IFrameComponent).iFrameResizer.close()
   })
@@ -45,7 +44,9 @@ const ResizingIframe: VoidComponent<{
       sandbox="allow-scripts allow-same-origin" // Changing this has security ramifications! https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe#attr-sandbox
       // "When the embedded document has the same origin as the embedding page, it is strongly discouraged to use both allow-scripts and allow-same-origin"
       // Since this iframe is hosted on `user-generated-content` and this component is hosted on `app`, resulting in different origins, we should be safe. https://web.dev/sandboxed-iframes/ https://stackoverflow.com/q/35208161
-      src={`https://user-generated-content.local.pentive.com:3015?${usp.toString()}`}
+      src={`https://user-generated-content.local.pentive.com:3015?${new URLSearchParams(
+        props.i
+      ).toString()}`}
     />
   )
 }
