@@ -1,4 +1,12 @@
-import { For, JSX, VoidComponent, Suspense, createResource } from "solid-js"
+import {
+  For,
+  JSX,
+  VoidComponent,
+  Suspense,
+  createResource,
+  createSignal,
+  Show,
+} from "solid-js"
 import {
   ColumnDef,
   createSolidTable,
@@ -9,19 +17,45 @@ import { Template } from "../domain/template"
 import _ from "lodash"
 import ResizingIframe from "./resizing-iframe"
 import "@github/time-elements"
+import { NookId } from "shared"
 
 function id(id: keyof Template): keyof Template {
   return id
 }
 
 function remoteCell(template: Template): JSX.Element {
-  return Array.from(template.remotes).map(([nook, remoteId]) => {
-    if (remoteId == null) {
-      return nook
-    }
-    const url = `https://pentive.com/t/${remoteId}`
-    return <a href={url}>{nook}</a>
-  })
+  const [getRemotes, setRemotes] = createSignal(Array.from(template.remotes))
+  return (
+    <>
+      <ul>
+        <For each={getRemotes()}>
+          {([nookId, remoteTemplateId]) => (
+            <li class="py-2 px-4">
+              <Show when={remoteTemplateId != null} fallback={nookId}>
+                <a href={`https://pentive.com/t/${remoteTemplateId!}`}>
+                  {nookId}
+                </a>
+              </Show>
+            </li>
+          )}
+        </For>
+      </ul>
+      <form
+        onSubmit={(e) => {
+          e.preventDefault()
+          const formData = new FormData(e.target as HTMLFormElement)
+          const newNookId = formData.get("newNookId") as NookId
+          setRemotes((x) => [...x, [newNookId, null]])
+        }}
+      >
+        <input
+          name="newNookId"
+          class="w-75px p-1 bg-white text-sm rounded-lg border"
+          type="text"
+        />
+      </form>
+    </>
+  )
 }
 
 const columns: Array<ColumnDef<Template>> = [
