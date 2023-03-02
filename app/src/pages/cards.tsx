@@ -1,7 +1,8 @@
-import { createSignal, JSX, Show } from "solid-js"
+import { createResource, createSignal, For, JSX, Show } from "solid-js"
 import CardsTable from "../custom-elements/cardsTable"
 import ResizingIframe from "../custom-elements/resizing-iframe"
 import { NoteCard } from "../domain/card"
+import { db } from "../db"
 
 const [selected, setSelected] = createSignal<NoteCard>()
 
@@ -26,8 +27,38 @@ export default function Cards(): JSX.Element {
 }
 
 const cardPreview = (): JSX.Element => {
+  const [getRemotes] = createResource(
+    selected(),
+    async (selected) => {
+      const template = await db.getTemplate(selected.template.id)
+      const note = await db.getNote(selected.note.id)
+      return Array.from(template!.remotes).map(([nookId, remoteTemplateId]) => {
+        const remoteNoteId = note!.remotes.get(nookId) ?? null
+        const uploadable = note!.remotes.has(nookId)
+        return {
+          nookId,
+          remoteTemplateId,
+          remoteNoteId,
+          uploadable,
+        } as const
+      })
+    },
+    { initialValue: [] }
+  )
   return (
     <Show when={selected() != null}>
+      <For each={getRemotes()}>
+        {(x) => (
+          <li class="py-2 px-4">
+            {x.uploadable ? "✔" : ""}
+            <Show when={x.remoteNoteId != null} fallback={x.nookId}>
+              <a href={`https://pentive.com/n/${x.remoteNoteId!}`}>
+                {x.nookId}
+              </a>
+            </Show>
+          </li>
+        )}
+      </For>
       <ResizingIframe
         i={{
           tag: "card",
