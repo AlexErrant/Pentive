@@ -278,6 +278,28 @@ export const templateCollectionMethods = {
       }
     })
   },
+  makeTemplateNotUploadable: async function (
+    templateId: TemplateId,
+    nook: NookId
+  ) {
+    const db = await getKysely()
+    await db.transaction().execute(async (db) => {
+      const r1 = await db
+        .deleteFrom("remoteTemplate")
+        .where("localId", "=", templateId)
+        .where("nook", "=", nook)
+        .returningAll()
+        .execute()
+      if (r1.length !== 1)
+        console.warn(
+          `No remoteTemplate found for nook '${nook}' and templateId '${templateId}'`
+        )
+      await db
+        .deleteFrom("remoteMedia")
+        .where("localEntityId", "=", templateId)
+        .execute()
+    })
+  },
   updateTemplateRemoteIds: async function (
     remoteIdByLocal: Map<readonly [TemplateId, NookId], RemoteTemplateId>
   ) {

@@ -67,7 +67,7 @@ export const templateType = z.discriminatedUnion("tag", [
 
 export type TemplateType = z.infer<typeof templateType>
 
-const nookId = z
+export const nookId = z
   .string()
   .regex(/^[a-z0-9_]{1,22}$/) as unknown as z.Schema<NookId>
 
