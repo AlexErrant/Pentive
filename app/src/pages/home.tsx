@@ -9,6 +9,7 @@ import { importAnki } from "./importer/importer"
 import { Base64Url, csrfHeaderName, NookId, throwExp } from "shared"
 import { MediaId, RemoteMediaNum } from "../domain/ids"
 import { apiClient } from "../apiClient"
+import { getDb } from "../sqlite/crsqlite"
 
 async function uploadTemplates(): Promise<void> {
   const newTemplates = await db.getNewTemplatesToUpload()
@@ -297,8 +298,44 @@ export default function Home(): JSX.Element {
           sync
         </button>
       </div>
+      <div class="mt-4">
+        <form
+          onSubmit={async (e) => {
+            e.preventDefault()
+            const formData = new FormData(e.target as HTMLFormElement)
+            const rawSql = formData.get("rawSql") as string
+            await q(rawSql)()
+          }}
+        >
+          <label for="rawSql">SQL</label>
+          <input
+            name="rawSql"
+            class="w-75px p-1 bg-white text-sm rounded-lg border"
+            type="text"
+          />
+        </form>
+        <button class="px-2" onclick={q("select * from template")}>
+          template
+        </button>
+        <button class="px-2" onclick={q("select * from remoteTemplate")}>
+          remoteTemplate
+        </button>
+        <button class="px-2" onclick={q("select * from remoteNote")}>
+          remoteNote
+        </button>
+        <button class="px-2" onclick={q("select * from remoteMedia")}>
+          remoteMedia
+        </button>
+      </div>
     </section>
   )
+}
+
+function q(rawSql: string) {
+  return async () => {
+    console.log(rawSql)
+    return console.table(await (await getDb()).execO(rawSql))
+  }
 }
 
 async function uploadMedia(
