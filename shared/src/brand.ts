@@ -9,6 +9,8 @@ export type LDbId = Brand<string, "dbId" & "base64url"> // L means local/Lite. n
 export type TemplateId = Brand<string, "templateId" & "base64url">
 export type RemoteTemplateId = Brand<string, "remoteTemplateId" & "base64url">
 export type ChildTemplateId = Brand<string, "childTemplateId">
+export type ClozeIndex = Brand<number, "clozeIndex">
+export type Pointer = ChildTemplateId | ClozeIndex
 
 export type NoteId = Brand<string, "noteId" & "base64url">
 export type RemoteNoteId = Brand<string, "remoteNoteId" & "base64url">
@@ -16,3 +18,5 @@ export type RemoteNoteId = Brand<string, "remoteNoteId" & "base64url">
 export type UserId = Brand<string, "userId">
 
 export type NookId = Brand<string, "nookId">
+
+export type PluginId = Brand<string, "pluginId" & "base64url">

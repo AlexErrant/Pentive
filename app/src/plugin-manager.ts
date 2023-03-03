@@ -1,6 +1,6 @@
 import { freeze } from "immer"
 import { PentiveElement } from "./custom-elements/registry"
-import { Plugin } from "./domain/plugin"
+import { Plugin } from "shared"
 import { Ci, Ct, PluginExports } from "./services"
 
 // https://stackoverflow.com/a/18650249

@@ -1,6 +1,6 @@
 import { Dexie } from "dexie"
 import { MediaId } from "../../src/domain/ids"
-import { Plugin } from "../../src/domain/plugin"
+import { Plugin } from "shared"
 import { Media } from "../domain/media"
 import * as Comlink from "comlink"
 

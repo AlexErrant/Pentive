@@ -1,9 +1,9 @@
 import "../services" // side effect to initialize C
 import { expect, test } from "vitest"
-import { ChildTemplateId, PluginId } from "./ids"
-import { strip, ulidAsBase64Url } from "./utility"
+import { ChildTemplateId, PluginId } from "./brand"
 import { Plugin } from "./plugin"
 import { registerPluginServices } from "../plugin-manager"
+import { strip } from "./cardHtml"
 
 function expectStrippedToBe(html: string, expected: string): void {
   const newline = /[\r\n]/g

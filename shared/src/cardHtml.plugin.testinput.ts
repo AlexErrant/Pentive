@@ -1,5 +1,5 @@
 // npx tsc .\cardHtml.plugin.testinput.ts
-import { Ci, Ct, PluginExports } from "../services"
+import { Ci, Ct, PluginExports } from "./renderContainer"
 
 function clozeTemplateRegex(c: Ct): RegExp {
   return new RegExp(

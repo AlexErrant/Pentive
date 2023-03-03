@@ -1,4 +1,4 @@
-import { PluginId } from "./ids"
+import { PluginId } from "./brand"
 
 export interface Plugin {
   readonly name: string

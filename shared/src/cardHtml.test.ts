@@ -1,8 +1,8 @@
-import { Ci } from "../services"
+import { Ci } from "./renderContainer"
 import { expect, test } from "vitest"
-import { ChildTemplateId, ClozeIndex } from "./ids"
-import { strip } from "./utility"
-import { throwExp } from "shared"
+import { ChildTemplateId, ClozeIndex } from "./brand"
+import { throwExp } from "./utility"
+import { strip } from "./cardHtml"
 
 function testBody(
   fieldValues: Array<readonly [string, string]>,

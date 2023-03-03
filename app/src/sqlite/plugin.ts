@@ -1,4 +1,4 @@
-import { Plugin } from "../domain/plugin"
+import { Plugin } from "shared"
 import { getDb, getKysely } from "./crsqlite"
 import { Plugin as PluginEntity } from "./database"
 

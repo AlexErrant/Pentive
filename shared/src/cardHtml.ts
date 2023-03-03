@@ -1,9 +1,24 @@
 import _ from "lodash"
-import { Ct } from "../services"
-import { ClozeIndex, Pointer } from "./ids"
-import { Field, Template } from "./template"
-import { strip } from "./utility"
-import { throwExp } from "shared"
+import { Ct } from "./renderContainer"
+import { ClozeIndex, Pointer } from "./brand"
+import { throwExp } from "./utility"
+import { TemplateType } from "./schema"
+
+interface Field {
+  readonly name: string
+}
+
+interface Template {
+  readonly css: string
+  readonly fields: readonly Field[]
+  readonly templateType: TemplateType
+}
+
+// https://stackoverflow.com/a/47140708
+export function strip(html: string): string {
+  const doc = new DOMParser().parseFromString(html, "text/html")
+  return doc.body.textContent ?? ""
+}
 
 // These have hidden state - don't use `match` or `exec`!
 // https://www.tsmean.com/articles/regex/javascript-regex-match-vs-exec-vs-matchall/

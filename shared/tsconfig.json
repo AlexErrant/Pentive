@@ -12,7 +12,8 @@
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
     "lib": [
-      "ES2022"
+      "ES2022",
+      "DOM"
     ]
   }
 }

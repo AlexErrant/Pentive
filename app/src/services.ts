@@ -4,7 +4,7 @@ import {
   clozeTemplateRegex,
   html,
   renderTemplate,
-} from "./domain/cardHtml"
+} from "shared"
 import { PentiveElement } from "./custom-elements/registry"
 
 // the DI container. Stands for "Container, initial".
