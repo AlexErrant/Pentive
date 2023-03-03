@@ -2,7 +2,7 @@
 import {
   defaultRenderContainer,
   RenderContainer,
-  PluginExports,
+  RenderPluginExports,
 } from "./renderContainer"
 
 function clozeTemplateRegex(c: RenderContainer): RegExp {
@@ -30,7 +30,7 @@ const services = (c: RenderContainer): Partial<RenderContainer> => {
   }
 }
 
-const exports: PluginExports = {
+const exports: RenderPluginExports = {
   services,
 }
 

@@ -15,3 +15,7 @@ export const defaultRenderContainer = {
 }
 
 export type RenderContainer = typeof defaultRenderContainer
+
+export interface RenderPluginExports {
+  services?: (c: RenderContainer) => Partial<RenderContainer>
+}

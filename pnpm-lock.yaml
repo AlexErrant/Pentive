@@ -408,6 +408,7 @@ importers:
       eslint-plugin-prettier: ^4.2.1
       eslint-plugin-promise: ^6.0.0
       html-to-text: ^9.0.3
+      immer: ^9.0.15
       kysely: ^0.23.3
       kysely-codegen: ^0.9.0
       kysely-planetscale: ^1.2.1
@@ -425,6 +426,7 @@ importers:
       '@scure/base': 1.1.1
       '@vlcn.io/xplat-api': 0.6.0
       html-to-text: 9.0.3
+      immer: 9.0.15
       kysely: 0.23.3
       kysely-planetscale: 1.2.1_z7hkwvucbgukbaukm7lodlcsym
       lodash: 4.17.21

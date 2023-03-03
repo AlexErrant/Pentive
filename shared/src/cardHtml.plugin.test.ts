@@ -2,8 +2,9 @@ import "../services" // side effect to initialize C
 import { expect, test } from "vitest"
 import { ChildTemplateId, PluginId } from "./brand"
 import { Plugin } from "./plugin"
-import { registerPluginServices } from "../plugin-manager"
+import { registerPluginServices } from "./pluginManager"
 import { strip } from "./cardHtml"
+import { ulidAsBase64Url } from "./convertBinary"
 
 function expectStrippedToBe(html: string, expected: string): void {
   const newline = /[\r\n]/g
@@ -69,7 +70,7 @@ var exports = {
     }
 };
 export default exports;`)
-  const [c] = await registerPluginServices([plugin])
+  const c = await registerPluginServices([plugin])
   const templates = c.renderTemplate(clozeWithRequiredEdit)
   expect(templates.length).toBe(1)
   const [template] = templates
@@ -104,7 +105,7 @@ var exports = {
   services: services
 };
 export default exports;`)
-  const [c] = await registerPluginServices([plugin])
+  const c = await registerPluginServices([plugin])
   const templates = c.renderTemplate(clozeWithRequiredEdit)
   expect(templates.length).toBe(1)
   const [template] = templates
@@ -139,7 +140,7 @@ var exports = {
   services: services
 };
 export default exports;`)
-  const [c] = await registerPluginServices([plugin])
+  const c = await registerPluginServices([plugin])
   const templates = c.renderTemplate(clozeWithRequiredEdit)
   expect(templates.length).toBe(0)
 })
