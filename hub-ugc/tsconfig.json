@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "target": "ES2021",
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "jsx": "preserve",
+    "jsxImportSource": "solid-js",
+    "lib": [
+      "WebWorker",
+      "DOM",
+      "DOM.Iterable",
+      "ES2021.String"
+    ],
+    "types": [
+      "@cloudflare/workers-types",
+      "vite/client",
+    ]
+  }
+}

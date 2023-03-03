@@ -1,0 +1,1 @@
+export CLOUDFLARE_ACCOUNT_ID=$cloudflareAccountId
