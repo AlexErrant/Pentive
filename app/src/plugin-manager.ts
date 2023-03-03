@@ -1,7 +1,7 @@
 import { freeze } from "immer"
 import { PentiveElement } from "./custom-elements/registry"
 import { Plugin } from "shared"
-import { Ci, Ct, PluginExports } from "./services"
+import { defaultContainer, Container, PluginExports } from "./services"
 
 // https://stackoverflow.com/a/18650249
 async function blobToBase64(blob: Blob): Promise<string> {
@@ -47,9 +47,9 @@ function resolveRegistrations(er: ElementRegistry): Set<string> {
 }
 
 async function registerPluginService(
-  [c, er]: [Ct, ElementRegistry],
+  [c, er]: [Container, ElementRegistry],
   plugin: Plugin
-): Promise<[Ct, ElementRegistry]> {
+): Promise<[Container, ElementRegistry]> {
   const script = await blobToBase64(plugin.script)
   const exports = (await import(/* @vite-ignore */ script)) as {
     default: PluginExports
@@ -60,7 +60,7 @@ async function registerPluginService(
   ]
 }
 
-function getC(c: Ct, exports: PluginExports): Ct {
+function getC(c: Container, exports: PluginExports): Container {
   if (exports.services === undefined) return c
   const rExports = exports.services(freeze(c, true))
   return {
@@ -91,8 +91,8 @@ function getElementRegistry(
 
 export async function registerPluginServices(
   plugins: Plugin[]
-): Promise<[Ct, Set<string>]> {
-  const seed: [Ct, ElementRegistry] = [Ci, {}]
+): Promise<[Container, Set<string>]> {
+  const seed: [Container, ElementRegistry] = [defaultContainer, {}]
   const [c, er] = await plugins.reduce(async (prior, plugin) => {
     return await registerPluginService(await prior, plugin)
   }, Promise.resolve(seed))

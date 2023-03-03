@@ -1,5 +1,5 @@
 import _ from "lodash"
-import { Ct } from "./renderContainer"
+import { RenderContainer } from "./renderContainer"
 import { ClozeIndex, Pointer } from "./brand"
 import { throwExp } from "./utility"
 import { TemplateType } from "./schema"
@@ -25,7 +25,7 @@ export function strip(html: string): string {
 export const clozeRegex =
   /{{c(?<clozeIndex>\d+)::(?<answer>.*?)(?:::(?<hint>.*?))?}}/gi
 export const clozeTemplateRegex = /{{cloze:(?<fieldName>.+?)}}/gi
-function clozeTemplateFor(this: Ct, fieldName: string): RegExp {
+function clozeTemplateFor(this: RenderContainer, fieldName: string): RegExp {
   const escapedFieldName = escapeRegExp(fieldName)
   const r = this.clozeTemplateRegex.source.replace(
     "(?<fieldName>.+?)",
@@ -46,7 +46,7 @@ function isNullOrWhitespace(input: string | undefined): boolean {
 }
 
 export function body(
-  this: Ct,
+  this: RenderContainer,
   fieldsAndValues: ReadonlyArray<readonly [string, string]>,
   frontTemplate: string,
   backTemplate: string,
@@ -79,7 +79,10 @@ export function body(
   }
 }
 
-function getClozeFields(this: Ct, frontTemplate: string): string[] {
+function getClozeFields(
+  this: RenderContainer,
+  frontTemplate: string
+): string[] {
   return Array.from(
     frontTemplate.matchAll(this.clozeTemplateRegex),
     (x) =>
@@ -91,7 +94,7 @@ function getClozeFields(this: Ct, frontTemplate: string): string[] {
 }
 
 function getFieldsValuesFrontTemplateBackTemplate(
-  this: Ct,
+  this: RenderContainer,
   fieldsAndValues: ReadonlyArray<readonly [string, string]>,
   frontTemplate: string,
   backTemplate: string,
@@ -153,7 +156,7 @@ function getFieldsValuesFrontTemplateBackTemplate(
 }
 
 function replaceFields(
-  this: Ct,
+  this: RenderContainer,
   fieldsAndValues: ReadonlyArray<readonly [string, string]>,
   isFront: boolean,
   template: string
@@ -251,7 +254,7 @@ function buildHtml(body: string, css: string): string {
 }
 
 export function html(
-  this: Ct,
+  this: RenderContainer,
   fieldsAndValues: ReadonlyArray<readonly [string, string]>,
   frontTemplate: string,
   backTemplate: string,
@@ -267,7 +270,7 @@ export function html(
 }
 
 export function renderTemplate(
-  this: Ct,
+  this: RenderContainer,
   template: Pick<Template, "fields" | "templateType" | "css">
 ): ReadonlyArray<readonly [string, string] | null> {
   const getStandardFieldAndValue = (

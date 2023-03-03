@@ -1,25 +1,15 @@
-import {
-  body,
-  clozeRegex,
-  clozeTemplateRegex,
-  html,
-  renderTemplate,
-} from "shared"
+import { defaultRenderContainer } from "shared"
 import { PentiveElement } from "./custom-elements/registry"
 
-// the DI container. Stands for "Container, initial".
-// eslint-disable-next-line @typescript-eslint/naming-convention
-export const Ci = {
-  clozeRegex,
-  clozeTemplateRegex,
-  body,
-  renderTemplate,
-  html,
+// the dependency injection container
+export const defaultContainer = {
+  ...defaultRenderContainer,
+  // todo - add other (non-render) services
 }
 
-export type Ct = typeof Ci
+export type Container = typeof defaultContainer
 
 export interface PluginExports {
-  services?: (c: Ct) => Partial<Ct>
+  services?: (c: Container) => Partial<Container>
   customElements?: Record<PentiveElement, () => void> // highTODO is this really the best name you can come up with
 }

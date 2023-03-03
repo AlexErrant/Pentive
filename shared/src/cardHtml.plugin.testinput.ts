@@ -1,14 +1,20 @@
 // npx tsc .\cardHtml.plugin.testinput.ts
-import { Ci, Ct, PluginExports } from "./renderContainer"
+import {
+  defaultRenderContainer,
+  RenderContainer,
+  PluginExports,
+} from "./renderContainer"
 
-function clozeTemplateRegex(c: Ct): RegExp {
+function clozeTemplateRegex(c: RenderContainer): RegExp {
   return new RegExp(
     c.clozeTemplateRegex.source.replace("cloze:", "edit:cloze:"),
     c.clozeTemplateRegex.flags
   )
 }
 
-function renderTemplate(c: Ct): typeof Ci.renderTemplate {
+function renderTemplate(
+  c: RenderContainer
+): typeof defaultRenderContainer.renderTemplate {
   return function (template) {
     const original = c.renderTemplate.bind(this)(template)
     return original.map((x) =>
@@ -17,7 +23,7 @@ function renderTemplate(c: Ct): typeof Ci.renderTemplate {
   }
 }
 
-const services = (c: Ct): Partial<Ct> => {
+const services = (c: RenderContainer): Partial<RenderContainer> => {
   return {
     clozeTemplateRegex: clozeTemplateRegex(c),
     renderTemplate: renderTemplate(c),
