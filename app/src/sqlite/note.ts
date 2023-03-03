@@ -322,7 +322,7 @@ export const noteCollectionMethods = {
     const mediaBinaries = await db
       .selectFrom("remoteMedia")
       .innerJoin("media", "remoteMedia.localMediaId", "media.id")
-      .leftJoin("note", "remoteMedia.localEntityId", "note.id")
+      .innerJoin("note", "remoteMedia.localEntityId", "note.id")
       .leftJoin("remoteNote", "remoteNote.localId", "note.id")
       .select([
         "remoteMedia.localMediaId",
@@ -347,7 +347,7 @@ export const noteCollectionMethods = {
       const remoteId =
         m.remoteId ??
         throwExp(
-          `Note media ${m.localMediaId} is missing a remoteId, is something wrong with the SQL query?`
+          `Note media '${m.localMediaId}' is missing a remoteId, is something wrong with the SQL query?`
         )
       const value =
         media.get(m.localMediaId) ??

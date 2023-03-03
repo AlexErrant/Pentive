@@ -171,7 +171,9 @@ export async function lookupMediaHash(
 }
 
 export async function insertNotes(authorId: UserId, notes: CreateRemoteNote[]) {
-  const rtIds = notes.flatMap((n) => n.remoteTemplateIds).map(fromBase64Url)
+  const rtIds = Array.from(
+    new Set(notes.flatMap((n) => n.remoteTemplateIds))
+  ).map(fromBase64Url)
   // highTODO validate author
   const templates = await db
     .selectFrom("Template")
@@ -279,6 +281,7 @@ async function toNoteCreate(
 }
 
 async function replaceImgSrcs(value: string, remoteIdBase64url: string) {
+  if (value === "") return "" // nextTODO
   const oldResponse = new Response(value)
   const newResponse = new HTMLRewriter()
     .on("img", {

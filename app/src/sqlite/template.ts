@@ -179,7 +179,7 @@ export const templateCollectionMethods = {
     const mediaBinaries = await db
       .selectFrom("remoteMedia")
       .innerJoin("media", "remoteMedia.localMediaId", "media.id")
-      .leftJoin("template", "remoteMedia.localEntityId", "template.id")
+      .innerJoin("template", "remoteMedia.localEntityId", "template.id")
       .leftJoin("remoteTemplate", "remoteTemplate.localId", "template.id")
       .select([
         "remoteMedia.localMediaId",
@@ -207,7 +207,7 @@ export const templateCollectionMethods = {
       const remoteId =
         m.remoteId ??
         throwExp(
-          `Template media ${m.localMediaId} is missing a remoteId, is something wrong with the SQL query?`
+          `Template media '${m.localMediaId}' is missing a remoteId, is something wrong with the SQL query?`
         )
       const value =
         media.get(m.localMediaId) ??

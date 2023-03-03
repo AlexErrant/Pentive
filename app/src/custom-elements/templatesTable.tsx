@@ -72,8 +72,8 @@ function remoteCell(template: Template): JSX.Element {
               .includes(newNookId)
           )
             throwExp("No dupes")
-          setRemotes((x) => [...x, [newNookId, null]])
           await db.makeTemplateUploadable(template.id, newNookId)
+          setRemotes((x) => [...x, [newNookId, null]])
         }}
       >
         <input
