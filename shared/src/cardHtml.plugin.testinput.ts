@@ -1,3 +1,5 @@
+// This file generates the test plugin code in `cardHtml.plugin.test.ts`
+// You can re-generate via
 // npx tsc .\cardHtml.plugin.testinput.ts
 import {
   defaultRenderContainer,

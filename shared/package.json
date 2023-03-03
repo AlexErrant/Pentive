@@ -11,7 +11,8 @@
     "eslint": "eslint .",
     "eslintw": "eslint . --fix",
     "prettier": "prettier --check .",
-    "prettierw": "prettier --write ."
+    "prettierw": "prettier --write .",
+    "test": "vitest"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20221111.1",
@@ -27,6 +28,7 @@
     "eslint-plugin-n": "^15.2.4",
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-promise": "^6.0.0",
+    "jsdom": "^20.0.0",
     "kysely-codegen": "^0.9.0",
     "mysql2": "^2.3.3",
     "prettier": "^2.7.1",

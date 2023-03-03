@@ -1,4 +1,3 @@
-import "../services" // side effect to initialize C
 import { expect, test } from "vitest"
 import { ChildTemplateId, PluginId } from "./brand"
 import { Plugin } from "./plugin"
