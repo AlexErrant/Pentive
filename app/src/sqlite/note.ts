@@ -417,6 +417,25 @@ export const noteCollectionMethods = {
       }
     })
   },
+  makeNoteNotUploadable: async function (noteId: NoteId, nook: NookId) {
+    const db = await getKysely()
+    await db.transaction().execute(async (db) => {
+      const r1 = await db
+        .deleteFrom("remoteNote")
+        .where("localId", "=", noteId)
+        .where("nook", "=", nook)
+        .returningAll()
+        .execute()
+      if (r1.length !== 1)
+        console.warn(
+          `No remoteNote found for nook '${nook}' and noteId '${noteId}'`
+        )
+      await db
+        .deleteFrom("remoteMedia")
+        .where("localEntityId", "=", noteId)
+        .execute()
+    })
+  },
   updateNoteRemoteIds: async function (
     remoteIdByLocal: Map<readonly [NoteId, NookId], RemoteNoteId>
   ) {

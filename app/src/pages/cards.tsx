@@ -1,8 +1,9 @@
-import { createResource, createSignal, For, JSX, Show } from "solid-js"
+import { createResource, createSignal, For, JSX, Setter, Show } from "solid-js"
 import CardsTable from "../custom-elements/cardsTable"
 import ResizingIframe from "../custom-elements/resizing-iframe"
 import { NoteCard } from "../domain/card"
 import { db } from "../db"
+import { NookId, NoteId, RemoteNoteId, RemoteTemplateId } from "shared"
 
 const [selected, setSelected] = createSignal<NoteCard>()
 
@@ -26,8 +27,38 @@ export default function Cards(): JSX.Element {
   )
 }
 
+function toggleNook(
+  uploadable: boolean,
+  noteId: NoteId,
+  nook: NookId,
+  setRemotes: Setter<
+    Array<{
+      readonly nookId: NookId
+      readonly remoteTemplateId: RemoteTemplateId | null
+      readonly remoteNoteId: RemoteNoteId | null
+      readonly uploadable: boolean
+    }>
+  >
+) {
+  return (
+    <input
+      type="checkbox"
+      checked={uploadable}
+      onChange={async () => {
+        uploadable = !uploadable
+        setRemotes((rs) =>
+          rs.map((r) => (r.nookId === nook ? { ...r, uploadable } : r))
+        )
+        uploadable
+          ? await db.makeNoteUploadable(noteId, nook)
+          : await db.makeNoteNotUploadable(noteId, nook)
+      }}
+    />
+  )
+}
+
 const cardPreview = (): JSX.Element => {
-  const [getRemotes] = createResource(
+  const [getRemotes, { mutate: setRemotes }] = createResource(
     selected(),
     async (selected) => {
       const template = await db.getTemplate(selected.template.id)
@@ -56,6 +87,12 @@ const cardPreview = (): JSX.Element => {
                 {x.nookId}
               </a>
             </Show>
+            {toggleNook(
+              x.uploadable,
+              selected()!.note.id,
+              x.nookId,
+              setRemotes
+            )}
           </li>
         )}
       </For>
