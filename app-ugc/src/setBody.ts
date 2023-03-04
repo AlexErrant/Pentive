@@ -1,6 +1,6 @@
 import contentWindowJs from "iframe-resizer/js/iframeResizer.contentWindow.js?raw" // https://vitejs.dev/guide/assets.html#importing-asset-as-string https://github.com/davidjbradshaw/iframe-resizer/issues/513
 import { appMessenger } from "../appMessenger"
-import { RenderBodyInput } from "app/src/appMessenger"
+import { RenderBodyInput } from "app/src/customElements/resizingIframe"
 
 export async function setBody(): Promise<void> {
   // https://stackoverflow.com/a/901144

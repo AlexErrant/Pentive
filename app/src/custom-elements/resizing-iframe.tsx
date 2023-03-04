@@ -1,9 +1,95 @@
 import { iframeResizer, IFrameComponent } from "iframe-resizer"
 import { onCleanup, VoidComponent } from "solid-js"
 import * as Comlink from "comlink"
-import { appExpose, RenderBodyInput } from "../appMessenger"
+import { NoteId, TemplateId, assertNever, throwExp } from "shared"
+import { C } from ".."
+import { Side, CardId, MediaId } from "../domain/ids"
+import { db } from "../db"
 
 const targetOrigin = "*" // highTODO make more limiting. Also implement https://stackoverflow.com/q/8169582
+
+export type RenderBodyInput =
+  | {
+      readonly tag: "template"
+      readonly side: Side
+      readonly templateId: TemplateId
+      readonly index: string // string due to `new URLSearchParams()`, which expects everything to be a string.
+    }
+  | {
+      readonly tag: "card"
+      readonly side: Side
+      readonly templateId: TemplateId
+      readonly noteId: NoteId
+      readonly cardId: CardId
+    }
+
+async function renderBody(
+  i: RenderBodyInput
+): Promise<{ body: string; css?: string }> {
+  switch (i.tag) {
+    case "template": {
+      const template = await db.getTemplate(i.templateId)
+      if (template == null)
+        return {
+          body: `Template ${i.templateId} not found.`,
+        }
+      const result = C.renderTemplate(template)[parseInt(i.index)]
+      if (result == null) {
+        return {
+          body: `Error rendering Template ${i.templateId}: "${template.name}".`,
+          css: template.css,
+        }
+      } else {
+        return {
+          body: i.side === "front" ? result[0] : result[1],
+          css: template.css,
+        }
+      }
+    }
+    case "card": {
+      const template = await db.getTemplate(i.templateId)
+      const note = await db.getNote(i.noteId)
+      const card = await db.getCard(i.cardId)
+      if (template == null) {
+        return { body: `Template ${i.templateId} not found!` }
+      }
+      if (note == null) {
+        return { body: `Note ${i.noteId} not found!` }
+      }
+      if (card == null) {
+        return { body: `Card ${i.cardId} not found!` }
+      }
+      const fv = Array.from(note.fieldValues)
+      const { front, back } =
+        template.templateType.tag === "standard"
+          ? template.templateType.templates.find(
+              (t) => t.id === card.pointer
+            ) ??
+            throwExp(
+              `Invalid pointer ${card.pointer} for template ${template.id}`
+            )
+          : template.templateType.template
+      const frontBack = C.html(fv, front, back, card.pointer, template.css)
+      if (frontBack == null) {
+        return { body: "Card is invalid!" }
+      }
+      const body = i.side === "front" ? frontBack[0] : frontBack[1]
+      return { body }
+    }
+    default:
+      return assertNever(i)
+  }
+}
+
+async function getLocalMedia(id: MediaId): Promise<ArrayBuffer | null> {
+  const media = await db.getMedia(id)
+  return media?.data ?? null
+}
+
+export const appExpose = {
+  getLocalMedia,
+  renderBody,
+}
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const ResizingIframe: VoidComponent<{
