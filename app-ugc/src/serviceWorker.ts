@@ -4,7 +4,7 @@ import type {
   ComlinkReady,
   Exposed,
   PostMessageTypes,
-} from "./register-service-worker"
+} from "./registerServiceWorker"
 import { MediaId } from "app/src/domain/ids"
 import { throwExp } from "shared"
 

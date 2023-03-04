@@ -1,4 +1,4 @@
 import { setBody } from "./setBody"
-import "./register-service-worker"
+import "./registerServiceWorker"
 
 await setBody()

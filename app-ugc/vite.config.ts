@@ -15,7 +15,7 @@ const betterServiceWorkerDevExperience: BuildOptions = {
       {
         name: "watch-external", // https://stackoverflow.com/a/63548394 force `npm run build-watch` to watch `sw.ts`, which isn't watched by default because it lives outside the module graph
         buildStart() {
-          this.addWatchFile("src/service-worker.ts")
+          this.addWatchFile("src/serviceWorker.ts")
         },
       },
     ],
@@ -40,7 +40,7 @@ export default defineConfig(({ command }) => {
         strategies: "injectManifest",
         injectRegister: null,
         srcDir: "src",
-        filename: "service-worker.ts",
+        filename: "serviceWorker.ts",
       }),
       checker({
         overlay: {

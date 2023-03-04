@@ -1,1 +1,1 @@
-import "./register-service-worker"
+import "./registerServiceWorker"

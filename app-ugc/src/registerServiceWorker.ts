@@ -37,7 +37,7 @@ export type Exposed = typeof exposed
 if ("serviceWorker" in navigator) {
   window.addEventListener("DOMContentLoaded", async () => {
     const registration = await navigator.serviceWorker.register(
-      "/service-worker.js"
+      "/serviceWorker.js"
     )
     if (registration.installing != null) {
       firstServiceWorkerInstall(registration.installing)
