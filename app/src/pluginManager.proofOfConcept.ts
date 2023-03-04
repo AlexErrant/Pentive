@@ -26,7 +26,7 @@ const plugin = (c: Container): Partial<Container> => {
       // This is not desirable! The plugin defines its own `regex` (L19). The plugin author wants the original container
       // to call the plugin's implementation of `regex` (which may or may not call the container's `regex`).
       // `bind(this)` accomplishes this goal.
-      // See `src\plugin-manager.excalidraw.svg` for a diagram with dependency arrows.
+      // See `src\pluginManager.excalidraw.svg` for a diagram with dependency arrows.
     },
   }
 }

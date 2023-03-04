@@ -4,7 +4,7 @@ import { Router } from "solid-app-router"
 import App from "./app"
 import { db } from "./db"
 
-import { registerPluginServices } from "./plugin-manager"
+import { registerPluginServices } from "./pluginManager"
 
 const plugins = await db.getPlugins()
 
