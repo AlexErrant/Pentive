@@ -1,5 +1,5 @@
 import { JSX } from "solid-js"
-import TemplatesTable from "../custom-elements/templatesTable"
+import TemplatesTable from "../customElements/templatesTable"
 import { db } from "../db"
 
 export default function Templates(): JSX.Element {

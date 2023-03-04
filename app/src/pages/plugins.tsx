@@ -1,5 +1,5 @@
 import { JSX } from "solid-js"
-import PluginTable from "../custom-elements/pluginsTable"
+import PluginTable from "../customElements/pluginsTable"
 import { db } from "../db"
 import { Plugin } from "shared"
 import { PluginId } from "../domain/ids"

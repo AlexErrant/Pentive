@@ -4,7 +4,7 @@ import type { RouteDefinition } from "solid-app-router"
 import Home from "./pages/home"
 import HomeData from "./pages/home.data"
 import AboutData from "./pages/about.data"
-import { NavLinkData } from "./custom-elements/contracts"
+import { NavLinkData } from "./customElements/contracts"
 
 export const navLinks: readonly NavLinkData[] = [
   {

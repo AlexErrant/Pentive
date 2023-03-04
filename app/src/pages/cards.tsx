@@ -1,6 +1,6 @@
 import { createResource, createSignal, For, JSX, Setter, Show } from "solid-js"
-import CardsTable from "../custom-elements/cardsTable"
-import ResizingIframe from "../custom-elements/resizingIframe"
+import CardsTable from "../customElements/cardsTable"
+import ResizingIframe from "../customElements/resizingIframe"
 import { NoteCard } from "../domain/card"
 import { db } from "../db"
 import { NookId, NoteId, RemoteNoteId, RemoteTemplateId } from "shared"
