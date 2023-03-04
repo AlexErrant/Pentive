@@ -16,7 +16,7 @@ import {
 } from "@tanstack/solid-table"
 import { Template } from "../domain/template"
 import _ from "lodash"
-import ResizingIframe from "./resizing-iframe"
+import ResizingIframe from "./resizingIframe"
 import "@github/time-elements"
 import { NookId, RemoteTemplateId, TemplateId, nookId, throwExp } from "shared"
 import { db } from "../db"
