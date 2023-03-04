@@ -10,7 +10,7 @@ export default defineConfig({
     VitePWA({
       strategies: "injectManifest",
       srcDir: "src",
-      filename: "service-worker.ts",
+      filename: "serviceWorker.ts",
       injectManifest: {
         maximumFileSizeToCacheInBytes: 999999999999999,
       },
