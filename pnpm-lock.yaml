@@ -237,8 +237,10 @@ importers:
       '@solidjs/meta': ^0.28.0
       '@solidjs/router': ^0.6.0
       '@types/cookie': ^0.5.1
+      '@types/iframe-resizer': ^3.5.9
       '@typescript-eslint/eslint-plugin': ^5.31.0
       '@typescript-eslint/parser': ^5.31.0
+      comlink: ^4.3.1
       cookie: ^0.5.0
       eslint: ^8.20.0
       eslint-config-prettier: ^8.5.0
@@ -248,6 +250,7 @@ importers:
       eslint-plugin-prettier: ^4.2.1
       eslint-plugin-promise: ^6.0.0
       html-to-text: ^9.0.3 || Hub doesn't use this, but `shared` (actually `mediaRouter`) does. Not including this causes an ESModule error - I've no idea why.
+      iframe-resizer: ^4.3.2
       jose: ^4.11.1
       prettier: ^2.7.1
       shared: workspace:*
@@ -267,8 +270,10 @@ importers:
       '@scure/base': 1.1.1
       '@solidjs/meta': 0.28.2_solid-js@1.6.6
       '@solidjs/router': 0.6.0_solid-js@1.6.6
+      comlink: 4.3.1
       cookie: 0.5.0
       html-to-text: 9.0.3
+      iframe-resizer: 4.3.2
       jose: 4.11.1
       shared: link:../shared
       solid-js: 1.6.6
@@ -278,6 +283,7 @@ importers:
     devDependencies:
       '@cloudflare/workers-types': 4.20221111.1
       '@types/cookie': 0.5.1
+      '@types/iframe-resizer': 3.5.9
       '@typescript-eslint/eslint-plugin': 5.37.0_prfgnnd24ifn4qs3ksmejx4hbe
       '@typescript-eslint/parser': 5.37.0_id2eilsndvzhjjktb64trvy3gu
       eslint: 8.23.1
@@ -304,7 +310,6 @@ importers:
       '@types/node': ^18.7.21
       '@typescript-eslint/eslint-plugin': ^5.31.0
       '@typescript-eslint/parser': ^5.31.0
-      app: workspace:*
       comlink: ^4.3.1
       eslint: ^8.20.0
       eslint-config-prettier: ^8.5.0
@@ -313,6 +318,7 @@ importers:
       eslint-plugin-n: ^15.2.4
       eslint-plugin-prettier: ^4.2.1
       eslint-plugin-promise: ^6.0.0
+      hub: workspace:*
       iframe-resizer: ^4.3.2
       prettier: ^2.7.1
       shared: workspace:*
@@ -326,8 +332,8 @@ importers:
       vite-plugin-pwa: ^0.13.1
       workbox-precaching: ^6.5.4
     dependencies:
-      app: link:../app
       comlink: 4.3.1
+      hub: link:../hub
       iframe-resizer: 4.3.2
       shared: link:../shared
     devDependencies:

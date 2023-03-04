@@ -44,7 +44,7 @@
     "workbox-precaching": "^6.5.4"
   },
   "dependencies": {
-    "app": "workspace:*",
+    "hub": "workspace:*",
     "comlink": "^4.3.1",
     "iframe-resizer": "^4.3.2",
     "shared": "workspace:*"

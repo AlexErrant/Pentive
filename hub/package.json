@@ -18,6 +18,7 @@
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20221111.1",
     "@types/cookie": "^0.5.1",
+    "@types/iframe-resizer": "^3.5.9",
     "@typescript-eslint/eslint-plugin": "^5.31.0",
     "@typescript-eslint/parser": "^5.31.0",
     "eslint": "^8.20.0",
@@ -41,11 +42,13 @@
     "@scure/base": "^1.1.1",
     "@solidjs/meta": "^0.28.0",
     "@solidjs/router": "^0.6.0",
+    "comlink": "^4.3.1",
     "cookie": "^0.5.0",
+    "html-to-text": "^9.0.3 || Hub doesn't use this, but `shared` (actually `mediaRouter`) does. Not including this causes an ESModule error - I've no idea why.",
+    "iframe-resizer": "^4.3.2",
     "jose": "^4.11.1",
     "shared": "workspace:*",
     "solid-js": "^1.6.2",
-    "html-to-text": "^9.0.3 || Hub doesn't use this, but `shared` (actually `mediaRouter`) does. Not including this causes an ESModule error - I've no idea why.",
     "solid-start": "^0.2.0",
     "ulid-workers": "^2.1.0 || See comment on html-to-text",
     "undici": "^5.11.0"

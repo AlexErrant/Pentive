@@ -11,10 +11,10 @@ export {
   ClozeIndex,
   Pointer,
   PluginId,
+  Side,
+  CardId,
 } from "shared"
-export type Side = "front" | "back"
 
-export type CardId = Brand<string, "cardId" & "base64url">
 export type CardSettingId = Brand<string, "cardSettingId" & "base64url">
 
 export type DeckId = Brand<string, "deckId">
