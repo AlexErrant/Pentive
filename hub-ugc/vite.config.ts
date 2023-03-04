@@ -54,7 +54,7 @@ export default defineConfig(({ command }) => {
     ],
     build,
     server: {
-      port: 3015,
+      port: 3016,
       strictPort: true,
       https: {
         key: fs.readFileSync("./.cert/key.pem"),
@@ -62,7 +62,7 @@ export default defineConfig(({ command }) => {
       },
     },
     preview: {
-      port: 3015,
+      port: 3016,
       strictPort: true,
       https: {
         key: fs.readFileSync("./.cert/key.pem"),
