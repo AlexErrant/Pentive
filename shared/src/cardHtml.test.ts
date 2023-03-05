@@ -1,6 +1,6 @@
 import { defaultRenderContainer } from "./renderContainer"
 import { expect, test } from "vitest"
-import { ChildTemplateId, ClozeIndex } from "./brand"
+import { Ord } from "./brand"
 import { throwExp } from "./utility"
 import { strip } from "./cardHtml"
 
@@ -8,20 +8,16 @@ function testBody(
   fieldValues: Array<readonly [string, string]>,
   frontTemplate: string,
   backTemplate: string,
-  pointer: string | number,
+  ord: Ord,
   expectedFront: string,
   expectedBack: string
 ): void {
-  const typedPointer =
-    typeof pointer === "string"
-      ? (pointer as ChildTemplateId)
-      : (pointer as ClozeIndex)
   const [front, back] =
     defaultRenderContainer.body(
       fieldValues,
       frontTemplate,
       backTemplate,
-      typedPointer
+      ord
     ) ?? throwExp("should never happen")
   expect(front).toBe(expectedFront)
   expect(back).toBe(expectedBack)
@@ -31,20 +27,16 @@ function testStrippedBody(
   fieldValues: Array<readonly [string, string]>,
   frontTemplate: string,
   backTemplate: string,
-  pointer: string | number,
+  ord: Ord,
   expectedFront: string,
   expectedBack: string
 ): void {
-  const pointer2 =
-    typeof pointer === "string"
-      ? (pointer as ChildTemplateId)
-      : (pointer as ClozeIndex)
   const [front, back] =
     defaultRenderContainer.body(
       fieldValues,
       frontTemplate,
       backTemplate,
-      pointer2
+      ord
     ) ?? throwExp("should never happen")
   expectStrippedToBe(front, expectedFront)
   expectStrippedToBe(back, expectedBack)
@@ -59,15 +51,13 @@ function testBodyIsNull(
   fieldValues: Array<readonly [string, string]>,
   frontTemplate: string,
   backTemplate: string,
-  pointer: string | ClozeIndex
+  ord: Ord
 ): void {
-  const pointer2 =
-    typeof pointer === "string" ? (pointer as ChildTemplateId) : pointer
   const result = defaultRenderContainer.body(
     fieldValues,
     frontTemplate,
     backTemplate,
-    pointer2
+    ord
   )
   expect(result).toBeNull()
 }

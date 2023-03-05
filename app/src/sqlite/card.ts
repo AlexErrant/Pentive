@@ -1,46 +1,10 @@
-import {
-  CardId,
-  ChildTemplateId,
-  ClozeIndex,
-  DeckId,
-  NoteId,
-  Pointer,
-} from "../domain/ids"
+import { CardId, DeckId, NoteId } from "../domain/ids"
 import { Card, State } from "../domain/card"
 import { getKysely } from "./crsqlite"
 import { DB, Card as CardEntity } from "./database"
 import { InsertObject } from "kysely"
 import _ from "lodash"
 import { assertNever, stringifySet, throwExp, undefinedMap } from "shared"
-
-type SerializedPointer = { t: string } | { c: number }
-
-// nextTODO reconsider
-function serializePointer(p: Pointer): string {
-  switch (typeof p) {
-    case "string": {
-      const x: SerializedPointer = { t: p }
-      return JSON.stringify(x)
-    }
-    case "number": {
-      const x: SerializedPointer = { c: p }
-      return JSON.stringify(x)
-    }
-    default:
-      return throwExp("pointers can only be strings or numbers")
-  }
-}
-
-function deserializePointer(p: string): Pointer {
-  const serializedPointer = JSON.parse(p) as SerializedPointer
-  if ("t" in serializedPointer) {
-    return serializedPointer.t as ChildTemplateId
-  }
-  if ("c" in serializedPointer) {
-    return serializedPointer.c as ClozeIndex
-  }
-  return throwExp("Expected `t` or `c` to be in the pointer, but got" + p)
-}
 
 function serializeState(s: State): number {
   switch (s) {
@@ -81,7 +45,7 @@ function cardToDocType(card: Card): InsertObject<DB, "card"> {
     created,
     modified,
     due,
-    pointer,
+    ord,
     deckIds,
     cardSettingId,
     state,
@@ -92,7 +56,7 @@ function cardToDocType(card: Card): InsertObject<DB, "card"> {
     created: created.getTime(),
     modified: modified.getTime(),
     due: due.getTime(),
-    pointer: serializePointer(pointer),
+    ord,
     deckIds: stringifySet(deckIds),
     cardSettingId: cardSettingId ?? null,
     state: undefinedMap(state, serializeState) ?? null,
@@ -106,7 +70,7 @@ export function entityToDomain(card: CardEntity): Card {
     created: new Date(card.created),
     modified: new Date(card.modified),
     due: new Date(card.due),
-    pointer: deserializePointer(card.pointer),
+    ord: card.ord,
     deckIds: new Set(JSON.parse(card.deckIds) as DeckId[]),
     state: deserializeState(card.state),
     cardSettingId: card.cardSettingId ?? undefined,

@@ -43,10 +43,10 @@ function renderBody(i: RenderBodyInput): { body: string; css?: string } {
       const fv = i.fieldsAndValues
       const { front, back } =
         template.templateType.tag === "standard"
-          ? template.templateType.templates.find((t) => t.id === i.pointer) ??
-            throwExp(`Invalid pointer ${i.pointer}`)
+          ? template.templateType.templates.find((t) => t.id === i.ord) ??
+            throwExp(`Invalid ord ${i.ord}`)
           : template.templateType.template
-      const frontBack = C.html(fv, front, back, i.pointer, i.template.css)
+      const frontBack = C.html(fv, front, back, i.ord, i.template.css)
       if (frontBack == null) {
         return { body: "Card is invalid!" }
       }

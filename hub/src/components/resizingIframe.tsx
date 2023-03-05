@@ -1,7 +1,7 @@
 import { iframeResizer, IFrameComponent } from "iframe-resizer"
 import { onCleanup, VoidComponent } from "solid-js"
 import * as Comlink from "comlink"
-import { Pointer, Side } from "shared"
+import { Ord, Side } from "shared"
 import { Template } from "shared/src/cardHtml"
 
 const targetOrigin = "*" // highTODO make more limiting. Also implement https://stackoverflow.com/q/8169582
@@ -17,7 +17,7 @@ export type RenderBodyInput =
       readonly tag: "card"
       readonly side: Side
       readonly fieldsAndValues: ReadonlyArray<readonly [string, string]>
-      readonly pointer: Pointer
+      readonly ord: Ord
       readonly template: Template
     }
 

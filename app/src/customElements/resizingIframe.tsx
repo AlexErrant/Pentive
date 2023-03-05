@@ -62,14 +62,10 @@ async function renderBody(
       const fv = Array.from(note.fieldValues)
       const { front, back } =
         template.templateType.tag === "standard"
-          ? template.templateType.templates.find(
-              (t) => t.id === card.pointer
-            ) ??
-            throwExp(
-              `Invalid pointer ${card.pointer} for template ${template.id}`
-            )
+          ? template.templateType.templates.find((t) => t.id === card.ord) ??
+            throwExp(`Invalid ord ${card.ord} for template ${template.id}`)
           : template.templateType.template
-      const frontBack = C.html(fv, front, back, card.pointer, template.css)
+      const frontBack = C.html(fv, front, back, card.ord, template.css)
       if (frontBack == null) {
         return { body: "Card is invalid!" }
       }

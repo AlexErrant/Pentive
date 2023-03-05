@@ -138,7 +138,7 @@ export const noteCollectionMethods = {
         "card.id as card_id",
         "card.modified as card_modified",
         "card.noteId as card_noteId",
-        "card.pointer as card_pointer",
+        "card.ord as card_ord",
         "card.state as card_state",
 
         "note.ankiNoteId as note_ankiNoteId",
@@ -201,7 +201,7 @@ export const noteCollectionMethods = {
           id: tnc.card_id,
           modified: tnc.card_modified,
           noteId: tnc.card_noteId,
-          pointer: tnc.card_pointer,
+          ord: tnc.card_ord,
           state: tnc.card_state,
         })
         const r: NoteCard = { note, template, card }

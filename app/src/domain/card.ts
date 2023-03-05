@@ -1,11 +1,4 @@
-import {
-  CardSettingId,
-  DeckId,
-  CardId,
-  NoteId,
-  ChildTemplateId,
-  Pointer,
-} from "./ids"
+import { CardSettingId, DeckId, CardId, NoteId, Ord } from "./ids"
 import { Note } from "./note"
 import { Template } from "./template"
 
@@ -32,7 +25,7 @@ export interface Review {
 
 export interface Card {
   readonly id: CardId
-  readonly pointer: Pointer
+  readonly ord: Ord
   readonly noteId: NoteId
   readonly deckIds: ReadonlySet<DeckId>
   readonly created: Date
@@ -49,7 +42,7 @@ export const sampleCard: Card = {
   created: new Date(),
   modified: new Date(),
   due: new Date(),
-  pointer: "lt31LyaTR3qBMQAAsZdhdg" as ChildTemplateId,
+  ord: 0 as Ord,
 }
 
 export interface NoteCard {

@@ -2,10 +2,9 @@ import {
   CardId,
   CardSettingId,
   DeckId,
-  ChildTemplateId,
+  Ord,
   NoteId,
   TemplateId,
-  ClozeIndex,
 } from "../../domain/ids"
 import { Field, Template } from "../../domain/template"
 import { ChildTemplate, TemplateType, throwExp } from "shared"
@@ -31,7 +30,7 @@ function parseField(fld: Fld): Field {
 
 function parseChildTemplate(tmpl: Tmpl): ChildTemplate {
   return {
-    id: tmpl.ord.toString() as ChildTemplateId, // medTODO
+    id: tmpl.ord as Ord,
     name: tmpl.name,
     front: tmpl.qfmt,
     back: tmpl.afmt,
@@ -115,10 +114,6 @@ export function parseCard(
   if (note == null) throwExp(`Note ${card.nid} not found`)
   const template = templates.get(note.templateId)
   if (template == null) throwExp(`Template ${note.templateId} not found`)
-  const pointer =
-    template.templateType.tag === "standard"
-      ? (card.ord.toString() as ChildTemplateId)
-      : (card.ord as ClozeIndex)
   return {
     id: card.id.toString() as CardId, // medTODO
     noteId: card.nid.toString() as NoteId, // medTODO
@@ -127,6 +122,6 @@ export function parseCard(
     modified: new Date(card.mod),
     due: new Date(card.due), // highTODO
     cardSettingId: card.did.toString() as CardSettingId, // medTODO
-    pointer,
+    ord: card.ord,
   }
 }

@@ -3,7 +3,7 @@ import {
   NoteId,
   TemplateId,
   RemoteNoteId,
-  ChildTemplateId,
+  Ord,
   RemoteTemplateId,
   NookId,
 } from "./brand"
@@ -44,7 +44,7 @@ export const dateSchema = z.preprocess((arg) => {
 }, z.date())
 
 export const childTemplate = z.object({
-  id: z.string() as unknown as z.Schema<ChildTemplateId>,
+  id: z.number().int() as unknown as z.Schema<Ord>,
   name: z.string(),
   front: z.string(),
   back: z.string(),

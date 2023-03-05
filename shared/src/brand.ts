@@ -8,9 +8,7 @@ export type LDbId = Brand<string, "dbId" & "base64url"> // L means local/Lite. n
 
 export type TemplateId = Brand<string, "templateId" & "base64url">
 export type RemoteTemplateId = Brand<string, "remoteTemplateId" & "base64url">
-export type ChildTemplateId = Brand<string, "childTemplateId">
-export type ClozeIndex = Brand<number, "clozeIndex">
-export type Pointer = ChildTemplateId | ClozeIndex
+export type Ord = Brand<number, "ord">
 
 export type CardId = Brand<string, "cardId" & "base64url">
 export type Side = "front" | "back"

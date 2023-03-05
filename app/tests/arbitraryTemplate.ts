@@ -1,10 +1,6 @@
 import fc from "fast-check"
 
-import {
-  ChildTemplateId,
-  RemoteTemplateId,
-  TemplateId,
-} from "../src/domain/ids"
+import { Ord, RemoteTemplateId, TemplateId } from "../src/domain/ids"
 import { Field, Template } from "../src/domain/template"
 import {
   arbitraryUlid,
@@ -26,7 +22,7 @@ const field = recordWithOptionalFields<Field>(
 
 const childTemplate = recordWithOptionalFields<ChildTemplate>(
   {
-    id: fc.uuidV(4).map((x) => x as ChildTemplateId),
+    id: fc.integer().map((x) => x as Ord),
     name: fc.string(),
     front: fc.string(),
     back: fc.string(),

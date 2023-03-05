@@ -1,4 +1,4 @@
-import { ChildTemplateId, RemoteTemplateId, TemplateId } from "./ids"
+import { Ord, RemoteTemplateId, TemplateId } from "./ids"
 import { NookId, TemplateType } from "shared"
 
 export interface Field {
@@ -37,7 +37,7 @@ export const defaultTemplate: Template = {
     tag: "standard",
     templates: [
       {
-        id: "lt31LyaTR3qBMQAAsZdhdg" as ChildTemplateId,
+        id: 0 as Ord,
         name: "My Template",
         front: "{{Front}}",
         back: `{{FrontSide}}<hr id=answer>{{Back}}<img src="book.jpg" >`, // highTODO nix book.jpg

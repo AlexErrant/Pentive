@@ -1,6 +1,6 @@
 import _ from "lodash"
 import { RenderContainer } from "./renderContainer"
-import { ClozeIndex, Pointer } from "./brand"
+import { Ord } from "./brand"
 import { throwExp } from "./utility"
 import { TemplateType } from "./schema"
 
@@ -50,7 +50,7 @@ export function body(
   fieldsAndValues: ReadonlyArray<readonly [string, string]>,
   frontTemplate: string,
   backTemplate: string,
-  pointer: Pointer
+  ord: Ord
 ): readonly [string, string] | null {
   const [fieldsAndValues2, frontTemplate2, backTemplate2] =
     getFieldsValuesFrontTemplateBackTemplate.call(
@@ -58,7 +58,7 @@ export function body(
       fieldsAndValues,
       frontTemplate,
       backTemplate,
-      pointer
+      ord
     )
   const frontSide = replaceFields.call(
     this,
@@ -98,12 +98,12 @@ function getFieldsValuesFrontTemplateBackTemplate(
   fieldsAndValues: ReadonlyArray<readonly [string, string]>,
   frontTemplate: string,
   backTemplate: string,
-  pointer: Pointer
+  ord: Ord
 ): readonly [ReadonlyArray<readonly [string, string]>, string, string] {
-  if (pointer.brand === "childTemplateId") {
+  if (ord.brand === "childTemplateId") {
     return [fieldsAndValues, frontTemplate, backTemplate]
   } else {
-    const i = (pointer.valueOf() + 1).toString()
+    const i = (ord.valueOf() + 1).toString()
     const clozeFields = getClozeFields.call(this, frontTemplate)
     const [fieldsAndValues2, unusedFields] = _.partition(
       fieldsAndValues,
@@ -258,10 +258,10 @@ export function html(
   fieldsAndValues: ReadonlyArray<readonly [string, string]>,
   frontTemplate: string,
   backTemplate: string,
-  pointer: Pointer,
+  ord: Ord,
   css: string
 ): readonly [string, string] | null {
-  const body2 = this.body(fieldsAndValues, frontTemplate, backTemplate, pointer)
+  const body2 = this.body(fieldsAndValues, frontTemplate, backTemplate, ord)
   if (body2 === null) {
     return null
   } else {
@@ -300,12 +300,7 @@ export function renderTemplate(
     return getClozeFields
       .call(this, front)
       .map((clozeField, i) =>
-        this.body(
-          getFieldsAndValues(clozeField, i),
-          front,
-          back,
-          i as ClozeIndex
-        )
+        this.body(getFieldsAndValues(clozeField, i), front, back, i as Ord)
       )
   }
   throw new Error(

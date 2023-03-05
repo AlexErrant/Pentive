@@ -1,3 +1,4 @@
+import { Ord } from "shared"
 import { z } from "zod"
 
 const tmpl = z.object({
@@ -179,7 +180,7 @@ const card = z.object({
   id: z.number(),
   nid: z.number(),
   did: z.number(),
-  ord: z.number(),
+  ord: z.number() as unknown as z.Schema<Ord>,
   mod: z.number(),
   // usn: z.number(),
   type: z.number(),

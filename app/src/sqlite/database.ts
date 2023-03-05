@@ -1,11 +1,11 @@
 // most of these columns are nullable in SQLite, but they're not nullable here for the sake of my sanity
 
-import { LDbId, NookId } from "shared"
+import { LDbId, NookId, Ord } from "shared"
 import { MediaId, RemoteMediaNum } from "../domain/ids"
 
 export interface Card {
   id: LDbId
-  pointer: string
+  ord: Ord
   noteId: LDbId
   deckIds: string
   created: number
