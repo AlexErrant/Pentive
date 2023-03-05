@@ -8,7 +8,8 @@ function testBody(
   fieldValues: Array<readonly [string, string]>,
   frontTemplate: string,
   backTemplate: string,
-  ord: Ord,
+  ord: number,
+  type: "standard" | "cloze",
   expectedFront: string,
   expectedBack: string
 ): void {
@@ -17,7 +18,8 @@ function testBody(
       fieldValues,
       frontTemplate,
       backTemplate,
-      ord
+      ord as Ord,
+      type
     ) ?? throwExp("should never happen")
   expect(front).toBe(expectedFront)
   expect(back).toBe(expectedBack)
@@ -27,7 +29,8 @@ function testStrippedBody(
   fieldValues: Array<readonly [string, string]>,
   frontTemplate: string,
   backTemplate: string,
-  ord: Ord,
+  ord: number,
+  type: "standard" | "cloze",
   expectedFront: string,
   expectedBack: string
 ): void {
@@ -36,7 +39,8 @@ function testStrippedBody(
       fieldValues,
       frontTemplate,
       backTemplate,
-      ord
+      ord as Ord,
+      type
     ) ?? throwExp("should never happen")
   expectStrippedToBe(front, expectedFront)
   expectStrippedToBe(back, expectedBack)
@@ -51,13 +55,15 @@ function testBodyIsNull(
   fieldValues: Array<readonly [string, string]>,
   frontTemplate: string,
   backTemplate: string,
-  ord: Ord
+  ord: number,
+  type: "standard" | "cloze"
 ): void {
   const result = defaultRenderContainer.body(
     fieldValues,
     frontTemplate,
     backTemplate,
-    ord
+    ord as Ord,
+    type
   )
   expect(result).toBeNull()
 }
@@ -72,7 +78,8 @@ test("CardHtml generates proper basic card template", () => {
     `{{FrontSide}}
   <hr id=answer>
   {{Back}}`,
-    "",
+    0,
+    "standard",
     "What is the capital of Canada?",
     `What is the capital of Canada?
   <hr id=answer>
@@ -90,7 +97,8 @@ test("CardHtml generates empty string when Front field is missing", () => {
     `{{FrontSide}}
     <hr id=answer>
     {{Back}}`,
-    ""
+    0,
+    "standard"
   )
 })
 
@@ -106,7 +114,8 @@ test("CardHtml generates proper basic with optional reversed custom card templat
     `{{FrontSide}}
     <hr id=answer>
     {{Back2}}`,
-    "",
+    0,
+    "standard",
     "What is Ottawa the capital of?",
     `What is Ottawa the capital of?
     <hr id=answer>
@@ -126,7 +135,8 @@ test("CardHtml generates proper basic with optional reversed custom card templat
     `{{FrontSide}}
     <hr id=answer>
     {{Back}}`,
-    "",
+    0,
+    "standard",
     "What is the capital of Canada?",
     `What is the capital of Canada?
     <hr id=answer>
@@ -145,7 +155,8 @@ test("CardHtml generates proper basic card template, but with (empty) conditiona
     `{{FrontSide}}
     <hr id=answer>
     {{Back}}`,
-    "",
+    0,
+    "standard",
     "What is the capital of Canada?",
     `What is the capital of Canada?
     <hr id=answer>
@@ -164,7 +175,8 @@ test("CardHtml generates proper basic card template, but with conditional Catego
     `{{FrontSide}}
     <hr id=answer>
     {{Back}}`,
-    "",
+    0,
+    "standard",
     "Category: Nations and Capitals<br/>What is the capital of Canada?",
     `Category: Nations and Capitals<br/>What is the capital of Canada?
     <hr id=answer>
@@ -183,7 +195,8 @@ test("CardHtml generates proper basic card template, with conditional Category (
     `{{FrontSide}}
     <hr id=answer>
     {{Back}}`,
-    "",
+    0,
+    "standard",
     "Category: No category was given<br/>What is the capital of Canada?",
     `Category: No category was given<br/>What is the capital of Canada?
     <hr id=answer>
@@ -202,7 +215,8 @@ test("CardHtml generates proper basic card template, with conditional Category (
     `{{FrontSide}}
     <hr id=answer>
     {{Back}}`,
-    "",
+    0,
+    "standard",
     "What is the capital of Canada?",
     `What is the capital of Canada?
     <hr id=answer>
@@ -220,7 +234,8 @@ test("CardHtml renders {{text:FieldName}} properly", () => {
     `{{FrontSide}}
     <hr id=answer>
     {{Back}}<br/><a href="http://example.com/search?q={{text:Back}}">check in dictionary</a>`,
-    "",
+    0,
+    "standard",
     "What is the capital of Canada?",
     `What is the capital of Canada?
     <hr id=answer>
@@ -237,6 +252,7 @@ test("CardHtml renders {{cloze:FieldName}} properly", () => {
     "{{cloze:Text}}",
     `{{cloze:Text}}<br>{{Extra}}`,
     0,
+    "cloze",
     `Canberra was founded in 
 <span class="cloze-brackets-front">[</span>
 <span class="cloze-filler-front">...</span>
@@ -260,6 +276,7 @@ test("CardHtml renders multiple cloze templates properly 1", () => {
     "{{cloze:Field1}}{{cloze:Field2}}",
     `{{cloze:Field1}}{{cloze:Field2}}<br>{{Extra}}`,
     0,
+    "cloze",
     "Columbus first crossed the Atlantic in [...]",
     `Columbus first crossed the Atlantic in [1492]Some extra info`
   )
@@ -275,6 +292,7 @@ test("CardHtml renders multiple cloze templates properly 2", () => {
     "{{cloze:Field1}}{{cloze:Field2}}",
     `{{cloze:Field1}}{{cloze:Field2}}<br>{{Extra}}`,
     1,
+    "cloze",
     "In [...], Columbus sailed the ocean blue.",
     "In [1492], Columbus sailed the ocean blue.Some extra info"
   )
@@ -290,6 +308,7 @@ test("CardHtml renders multiple cloze templates properly 3", () => {
     "{{cloze:Field1}}{{cloze:Field2}}",
     "{{cloze:Field1}}{{cloze:Field2}}<br>{{Extra}}",
     2,
+    "cloze",
     "In 1492, Columbus sailed the ocean [...].",
     "In 1492, Columbus sailed the ocean [blue].Some extra info"
   )
@@ -305,6 +324,7 @@ test("CardHtml renders multiple cloze templates properly 4", () => {
     "{{cloze:Field1}}{{cloze:Field2}}",
     "{{cloze:Field1}}{{cloze:Field2}}<br>{{Extra}}",
     0,
+    "cloze",
     "[...] first crossed the Atlantic in [...]",
     "[Columbus] first crossed the Atlantic in [1492]Some extra info"
   )
@@ -319,6 +339,7 @@ test("CardHtml renders {{cloze:FieldName}} properly with hint", () => {
     "{{cloze:Text}}",
     "{{cloze:Text}}<br>{{Extra}}",
     0,
+    "cloze",
     "Canberra was founded in [year].",
     "Canberra was founded in [1913].Some extra stuff."
   )
@@ -337,6 +358,7 @@ test("CardHtml renders multiple cloze templates properly 1 with hint", () => {
     "{{cloze:Field1}}{{cloze:Field2}}",
     "{{cloze:Field1}}{{cloze:Field2}}<br>{{Extra}}",
     0,
+    "cloze",
     "Columbus first crossed the Atlantic in [year]",
     "Columbus first crossed the Atlantic in [1492]Some extra info"
   )
@@ -355,6 +377,7 @@ test("CardHtml renders multiple cloze templates properly 2 with hint", () => {
     "{{cloze:Field1}}{{cloze:Field2}}",
     "{{cloze:Field1}}{{cloze:Field2}}<br>{{Extra}}",
     1,
+    "cloze",
     "In [year], Columbus sailed the ocean blue.",
     "In [1492], Columbus sailed the ocean blue.Some extra info"
   )
@@ -373,6 +396,7 @@ test("CardHtml renders multiple cloze templates properly 3 with hint", () => {
     "{{cloze:Field1}}{{cloze:Field2}}",
     "{{cloze:Field1}}{{cloze:Field2}}<br>{{Extra}}",
     2,
+    "cloze",
     "In 1492, Columbus sailed the ocean [color].",
     "In 1492, Columbus sailed the ocean [blue].Some extra info"
   )
@@ -391,6 +415,7 @@ test("CardHtml renders multiple cloze templates properly 4 with hint", () => {
     "{{cloze:Field1}}{{cloze:Field2}}",
     "{{cloze:Field1}}{{cloze:Field2}}<br>{{Extra}}",
     0,
+    "cloze",
     "[person] first crossed the Atlantic in [year]",
     "[Columbus] first crossed the Atlantic in [1492]Some extra info"
   )
@@ -422,7 +447,7 @@ test("renderTemplate works for 1 cloze", () => {
     templateType: {
       tag: "cloze" as const,
       template: {
-        id: "0" as ChildTemplateId,
+        id: 0 as Ord,
         name: "Cloze",
         front: "{{cloze:Text}}",
         back: "{{cloze:Text}}{{Extra}}",
@@ -456,7 +481,7 @@ test("renderTemplate works for 2 cloze deletions", () => {
     templateType: {
       tag: "cloze" as const,
       template: {
-        id: "0" as ChildTemplateId,
+        id: 0 as Ord,
         name: "Cloze",
         front: "{{cloze:Text1}}{{cloze:Text2}}",
         back: "{{cloze:Text1}}{{cloze:Text2}}{{Extra}}",
@@ -493,7 +518,7 @@ test("renderTemplate works for standard with 1 child template", () => {
       tag: "standard" as const,
       templates: [
         {
-          id: "0" as ChildTemplateId,
+          id: 0 as Ord,
           name: "e2s",
           front: "{{English}}",
           back: "{{English}}-{{Spanish}}",
@@ -522,13 +547,13 @@ test("renderTemplate works for standard with 2 child templates", () => {
       tag: "standard" as const,
       templates: [
         {
-          id: "0" as ChildTemplateId,
+          id: 0 as Ord,
           name: "e2s",
           front: "{{English}}",
           back: "{{English}}-{{Spanish}}",
         },
         {
-          id: "1" as ChildTemplateId,
+          id: 1 as Ord,
           name: "s2e",
           front: "{{Spanish}}",
           back: "{{Spanish}}-{{English}}",

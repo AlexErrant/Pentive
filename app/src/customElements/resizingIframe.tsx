@@ -65,7 +65,14 @@ async function renderBody(
           ? template.templateType.templates.find((t) => t.id === card.ord) ??
             throwExp(`Invalid ord ${card.ord} for template ${template.id}`)
           : template.templateType.template
-      const frontBack = C.html(fv, front, back, card.ord, template.css)
+      const frontBack = C.html(
+        fv,
+        front,
+        back,
+        card.ord,
+        template.css,
+        template.templateType.tag
+      )
       if (frontBack == null) {
         return { body: "Card is invalid!" }
       }

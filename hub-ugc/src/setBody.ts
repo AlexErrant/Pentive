@@ -46,7 +46,14 @@ function renderBody(i: RenderBodyInput): { body: string; css?: string } {
           ? template.templateType.templates.find((t) => t.id === i.ord) ??
             throwExp(`Invalid ord ${i.ord}`)
           : template.templateType.template
-      const frontBack = C.html(fv, front, back, i.ord, i.template.css)
+      const frontBack = C.html(
+        fv,
+        front,
+        back,
+        i.ord,
+        i.template.css,
+        i.template.templateType.tag
+      )
       if (frontBack == null) {
         return { body: "Card is invalid!" }
       }

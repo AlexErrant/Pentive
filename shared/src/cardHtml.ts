@@ -50,7 +50,8 @@ export function body(
   fieldsAndValues: ReadonlyArray<readonly [string, string]>,
   frontTemplate: string,
   backTemplate: string,
-  ord: Ord
+  ord: Ord,
+  type: "standard" | "cloze"
 ): readonly [string, string] | null {
   const [fieldsAndValues2, frontTemplate2, backTemplate2] =
     getFieldsValuesFrontTemplateBackTemplate.call(
@@ -58,7 +59,8 @@ export function body(
       fieldsAndValues,
       frontTemplate,
       backTemplate,
-      ord
+      ord,
+      type
     )
   const frontSide = replaceFields.call(
     this,
@@ -98,9 +100,10 @@ function getFieldsValuesFrontTemplateBackTemplate(
   fieldsAndValues: ReadonlyArray<readonly [string, string]>,
   frontTemplate: string,
   backTemplate: string,
-  ord: Ord
+  ord: Ord,
+  type: "standard" | "cloze"
 ): readonly [ReadonlyArray<readonly [string, string]>, string, string] {
-  if (ord.brand === "childTemplateId") {
+  if (type === "standard") {
     return [fieldsAndValues, frontTemplate, backTemplate]
   } else {
     const i = (ord.valueOf() + 1).toString()
@@ -259,9 +262,16 @@ export function html(
   frontTemplate: string,
   backTemplate: string,
   ord: Ord,
-  css: string
+  css: string,
+  type: "standard" | "cloze"
 ): readonly [string, string] | null {
-  const body2 = this.body(fieldsAndValues, frontTemplate, backTemplate, ord)
+  const body2 = this.body(
+    fieldsAndValues,
+    frontTemplate,
+    backTemplate,
+    ord,
+    type
+  )
   if (body2 === null) {
     return null
   } else {
@@ -281,7 +291,7 @@ export function renderTemplate(
   const fieldsAndValues = template.fields.map(getStandardFieldAndValue) // medTODO consider adding escape characters so you can do e.g. {{Front}}. Apparently Anki doesn't have escape characters - now would be a good time to introduce this feature.
   if (template.templateType.tag === "standard") {
     return template.templateType.templates.map(({ front, back, id }) =>
-      this.body(fieldsAndValues, front, back, id)
+      this.body(fieldsAndValues, front, back, id, template.templateType.tag)
     )
   } else if (template.templateType.tag === "cloze") {
     const getFieldsAndValues = (
@@ -300,7 +310,13 @@ export function renderTemplate(
     return getClozeFields
       .call(this, front)
       .map((clozeField, i) =>
-        this.body(getFieldsAndValues(clozeField, i), front, back, i as Ord)
+        this.body(
+          getFieldsAndValues(clozeField, i),
+          front,
+          back,
+          i as Ord,
+          template.templateType.tag
+        )
       )
   }
   throw new Error(

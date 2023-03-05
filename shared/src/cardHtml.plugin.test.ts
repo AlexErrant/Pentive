@@ -1,5 +1,5 @@
 import { expect, test } from "vitest"
-import { ChildTemplateId, PluginId } from "./brand"
+import { Ord, PluginId } from "./brand"
 import { Plugin } from "./plugin"
 import { registerPluginServices } from "./pluginManager"
 import { strip } from "./cardHtml"
@@ -23,7 +23,7 @@ const clozeWithRequiredEdit = {
   templateType: {
     tag: "cloze" as const,
     template: {
-      id: "0" as ChildTemplateId,
+      id: 0 as Ord,
       name: "Cloze",
       front: "{{edit:cloze:Text}}",
       back: "{{edit:cloze:Text}}{{Extra}}",
