@@ -8,7 +8,7 @@ interface Field {
   readonly name: string
 }
 
-interface Template {
+export interface Template {
   readonly css: string
   readonly fields: readonly Field[]
   readonly templateType: TemplateType
@@ -271,7 +271,7 @@ export function html(
 
 export function renderTemplate(
   this: RenderContainer,
-  template: Pick<Template, "fields" | "templateType" | "css">
+  template: Template
 ): ReadonlyArray<readonly [string, string] | null> {
   const getStandardFieldAndValue = (
     field: Field

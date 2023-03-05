@@ -13,11 +13,11 @@ export {
   PluginId,
   Side,
   CardId,
+  MediaId,
 } from "shared"
 
 export type CardSettingId = Brand<string, "cardSettingId" & "base64url">
 
 export type DeckId = Brand<string, "deckId">
 
-export type MediaId = Brand<string, "mediaId">
 export type RemoteMediaNum = Brand<number, "remoteMediaNum">
