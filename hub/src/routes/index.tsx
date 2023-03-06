@@ -63,6 +63,18 @@ export default function Home(): JSX.Element {
           index: 0,
         }}
       />
+      <ResizingIframe
+        i={{
+          tag: "card",
+          side: "back",
+          template: template(),
+          ord: 0 as Ord,
+          fieldsAndValues: [
+            ["Front", "q"],
+            ["Back", "a"],
+          ],
+        }}
+      />
       <button
         onclick={() => {
           setTemplate((t) => {

@@ -14,7 +14,7 @@ import {
   UserId,
 } from "./brand.js"
 import { binary16fromBase64URL, ulidAsRaw } from "./convertBinary.js"
-import { stringifyMap, throwExp, undefinedMap } from "./utility.js"
+import { parseMap, stringifyMap, throwExp, undefinedMap } from "./utility.js"
 import { base16, base64url } from "@scure/base"
 import { compile } from "html-to-text"
 import {
@@ -55,6 +55,37 @@ export async function getPosts({ nook }: { nook: string }): Promise<
     .where("nook", "=", nook)
     .execute()
     .then((ps) => ps.map(mapIdToBase64Url))
+}
+
+function noteToNookView(x: {
+  fieldValues: string
+  css: string
+  type: string
+  fields: string
+}) {
+  return {
+    fieldValues: deserializeFieldValues(x.fieldValues),
+    template: {
+      css: x.css,
+      fields: deserializeFields(x.fields),
+      templateType: deserializeTemplateType(x.type),
+    },
+  }
+}
+
+export async function getNotes(nook: NookId) {
+  const r = await db
+    .selectFrom("Note")
+    .innerJoin("Template", "Template.id", "Note.templateId")
+    .select([
+      "Note.fieldValues",
+      "Template.css",
+      "Template.fields",
+      "Template.type",
+    ])
+    .where("Template.nook", "=", nook)
+    .execute()
+  return r.map(noteToNookView)
 }
 
 export async function getPost(id: Base64Url): Promise<
@@ -292,7 +323,7 @@ async function toNoteCreate(
     templateId: fromBase64Url(remoteTemplateId), // highTODO validate
     authorId,
     updatedAt,
-    fieldValues: stringifyMap(n.fieldValues),
+    fieldValues: serializeFieldValues(n.fieldValues),
     fts: Array.from(n.fieldValues)
       .map(([, v]) => convert(v))
       .concat(n.tags)
@@ -386,12 +417,20 @@ function serializeFields(tt: string[]) {
   return JSON.stringify(tt)
 }
 
+function serializeFieldValues(fvs: Map<string, string>) {
+  return stringifyMap(fvs)
+}
+
 function deserializeTemplateType(tt: string) {
   return JSON.parse(tt) as TemplateType
 }
 
 function deserializeFields(tt: string) {
   return JSON.parse(tt) as string[]
+}
+
+function deserializeFieldValues(fvs: string) {
+  return parseMap<string, string>(fvs)
 }
 
 export async function editNotes(authorId: UserId, notes: EditRemoteNote[]) {

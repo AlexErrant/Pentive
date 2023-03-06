@@ -57,6 +57,7 @@ export function notEmpty<TValue>(
   return value !== null && value !== undefined
 }
 
+// highTODO property test
 export function stringifyMap(map: Map<unknown, unknown>) {
   return JSON.stringify(Object.fromEntries(map))
 }
@@ -67,6 +68,7 @@ export function parseMap<T extends string, U>(rawMap: string) {
   return new Map(entries)
 }
 
+// highTODO property test
 export function stringifySet(set: Set<unknown> | ReadonlySet<unknown>) {
   return JSON.stringify([...set])
 }
