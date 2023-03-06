@@ -1,15 +1,15 @@
 import { customElement } from "solid-element"
-import type { Ct, PluginExports } from "../../../app/src/services"
+import type { Container, PluginExports } from "../../../app/src/services"
 import { Nav } from "./nav"
 
-function clozeTemplateRegex(c: Ct): RegExp {
+function clozeTemplateRegex(c: Container): RegExp {
   return new RegExp(
     c.clozeTemplateRegex.source.replace("cloze:", "(?:edit:)?cloze:"),
     c.clozeTemplateRegex.flags
   )
 }
 
-const services = (c: Ct): Partial<Ct> => {
+const services = (c: Container): Partial<Container> => {
   return {
     clozeTemplateRegex: clozeTemplateRegex(c),
   }
