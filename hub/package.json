@@ -39,6 +39,8 @@
     "wrangler": "^2.6.2"
   },
   "dependencies": {
+    "@codemirror/state": "^6.2.0",
+    "@codemirror/view": "^6.9.1",
     "@scure/base": "^1.1.1",
     "@solidjs/meta": "^0.28.2",
     "@solidjs/router": "^0.7.0",
