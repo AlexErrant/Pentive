@@ -1,12 +1,11 @@
 import contentWindowJs from "iframe-resizer/js/iframeResizer.contentWindow.js?raw" // https://vitejs.dev/guide/assets.html#importing-asset-as-string https://github.com/davidjbradshaw/iframe-resizer/issues/513
-import { hubMessenger } from "../hubMessenger"
 import { RenderBodyInput } from "hub/src/components/resizingIframe"
 import { assertNever, throwExp, registerPluginServices } from "shared"
 
 const C = await registerPluginServices([])
 
-export async function setBody(): Promise<void> {
-  const { body, css } = renderBody(await hubMessenger.renderBodyInput)
+export function setBody(i: RenderBodyInput) {
+  const { body, css } = buildHtml(i)
 
   document.getElementsByTagName("body")[0].innerHTML = body
   const resizeScript = document.createElement("script")
@@ -20,7 +19,7 @@ export async function setBody(): Promise<void> {
   }
 }
 
-function renderBody(i: RenderBodyInput): { body: string; css?: string } {
+function buildHtml(i: RenderBodyInput): { body: string; css?: string } {
   switch (i.tag) {
     case "template": {
       const template = i.template

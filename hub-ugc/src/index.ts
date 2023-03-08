@@ -1,4 +1,6 @@
 import { setBody } from "./setBody"
 import "./registerServiceWorker"
+import { hubMessenger } from "../hubMessenger"
 
-await setBody()
+const i = await hubMessenger.renderBodyInput
+setBody(i)
