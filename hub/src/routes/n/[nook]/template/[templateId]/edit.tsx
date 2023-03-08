@@ -1,5 +1,33 @@
 import { EditorState } from "@codemirror/state"
-import { EditorView } from "@codemirror/view"
+import {
+  EditorView,
+  keymap,
+  highlightSpecialChars,
+  drawSelection,
+  highlightActiveLine,
+  dropCursor,
+  rectangularSelection,
+  crosshairCursor,
+  lineNumbers,
+  highlightActiveLineGutter,
+} from "@codemirror/view"
+import {
+  defaultHighlightStyle,
+  syntaxHighlighting,
+  indentOnInput,
+  bracketMatching,
+  foldGutter,
+  foldKeymap,
+} from "@codemirror/language"
+import { defaultKeymap, history, historyKeymap } from "@codemirror/commands"
+import { searchKeymap, highlightSelectionMatches } from "@codemirror/search"
+import {
+  autocompletion,
+  completionKeymap,
+  closeBrackets,
+  closeBracketsKeymap,
+} from "@codemirror/autocomplete"
+import { lintKeymap } from "@codemirror/lint"
 import { Cloze, NookId, RemoteTemplateId, Standard, getTemplate } from "shared"
 import { JSX, onMount, Show, createSignal } from "solid-js"
 import { RouteDataArgs, useRouteData } from "solid-start"
@@ -60,7 +88,34 @@ export default function Submit(): JSX.Element {
 function createEditorState(doc: string) {
   return EditorState.create({
     doc,
-    extensions: [],
+    extensions: [
+      lineNumbers(),
+      highlightActiveLineGutter(),
+      highlightSpecialChars(),
+      history(),
+      foldGutter(),
+      drawSelection(),
+      dropCursor(),
+      EditorState.allowMultipleSelections.of(true),
+      indentOnInput(),
+      syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
+      bracketMatching(),
+      closeBrackets(),
+      autocompletion(),
+      rectangularSelection(),
+      crosshairCursor(),
+      highlightActiveLine(),
+      highlightSelectionMatches(),
+      keymap.of([
+        ...closeBracketsKeymap,
+        ...defaultKeymap,
+        ...searchKeymap,
+        ...historyKeymap,
+        ...foldKeymap,
+        ...completionKeymap,
+        ...lintKeymap,
+      ]),
+    ],
   })
 }
 

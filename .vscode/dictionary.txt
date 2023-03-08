@@ -18,6 +18,7 @@ idempotency
 iframe
 iframes
 immer
+keymap
 kysely
 lrpc
 mediarouter
