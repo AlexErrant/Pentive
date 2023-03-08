@@ -1,5 +1,5 @@
 import { iframeResizer, IFrameComponent } from "iframe-resizer"
-import { onCleanup, VoidComponent } from "solid-js"
+import { createEffect, onCleanup, VoidComponent } from "solid-js"
 import * as Comlink from "comlink"
 import { Ord, Side } from "shared"
 import { Template } from "shared/src/cardHtml"
@@ -32,6 +32,12 @@ const ResizingIframe: VoidComponent<{
   const hubExpose: HubExpose = {
     renderBodyInput: props.i,
   }
+  createEffect(() => {
+    iframeReference.contentWindow!.postMessage(
+      { type: "pleaseRerender", i: props.i },
+      targetOrigin
+    )
+  })
   let iframeReference: HTMLIFrameElement
   onCleanup(() => {
     ;(iframeReference as IFrameComponent)?.iFrameResizer?.close()

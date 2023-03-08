@@ -4,6 +4,20 @@ import { assertNever, throwExp, registerPluginServices } from "shared"
 
 const C = await registerPluginServices([])
 
+self.addEventListener("message", (event) => {
+  const data = event.data as unknown
+  if (
+    typeof data === "object" &&
+    data != null &&
+    "type" in data &&
+    data.type === "pleaseRerender"
+  ) {
+    // @ts-expect-error i exists; grep pleaseRerender
+    const i = data.i as RenderBodyInput
+    setBody(i)
+  }
+})
+
 export function setBody(i: RenderBodyInput) {
   const { body, css } = buildHtml(i)
 
