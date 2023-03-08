@@ -39,6 +39,11 @@
     "wrangler": "^2.6.2"
   },
   "dependencies": {
+    "@codemirror/autocomplete": "^6.4.2",
+    "@codemirror/commands": "^6.2.1",
+    "@codemirror/language": "^6.6.0",
+    "@codemirror/lint": "^6.2.0",
+    "@codemirror/search": "^6.2.3",
     "@codemirror/state": "^6.2.0",
     "@codemirror/view": "^6.9.1",
     "@scure/base": "^1.1.1",
