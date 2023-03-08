@@ -12,14 +12,7 @@ function expectStrippedToBe(html: string, expected: string): void {
 
 const clozeWithRequiredEdit = {
   css: "",
-  fields: [
-    {
-      name: "Text",
-    },
-    {
-      name: "Extra",
-    },
-  ],
+  fields: ["Text", "Extra"],
   templateType: {
     tag: "cloze" as const,
     template: {

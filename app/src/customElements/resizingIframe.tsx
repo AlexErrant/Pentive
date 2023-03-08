@@ -33,7 +33,10 @@ async function renderBody(
         return {
           body: `Template ${i.templateId} not found.`,
         }
-      const result = C.renderTemplate(template)[parseInt(i.index)]
+      const result = C.renderTemplate({
+        ...template,
+        fields: template.fields.map((f) => f.name),
+      })[parseInt(i.index)]
       if (result == null) {
         return {
           body: `Error rendering Template ${i.templateId}: "${template.name}".`,

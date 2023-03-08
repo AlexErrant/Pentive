@@ -4,13 +4,9 @@ import { Ord } from "./brand"
 import { throwExp } from "./utility"
 import { TemplateType } from "./schema"
 
-interface Field {
-  readonly name: string
-}
-
 export interface Template {
   readonly css: string
-  readonly fields: readonly Field[]
+  readonly fields: readonly string[]
   readonly templateType: TemplateType
 }
 
@@ -284,9 +280,9 @@ export function renderTemplate(
   template: Template
 ): ReadonlyArray<readonly [string, string] | null> {
   const getStandardFieldAndValue = (
-    field: Field
+    field: string
   ): readonly [string, string] => {
-    return [field.name, `(${field.name})`] as const
+    return [field, `(${field})`] as const
   }
   const fieldsAndValues = template.fields.map(getStandardFieldAndValue) // medTODO consider adding escape characters so you can do e.g. {{Front}}. Apparently Anki doesn't have escape characters - now would be a good time to introduce this feature.
   if (template.templateType.tag === "standard") {
@@ -299,11 +295,8 @@ export function renderTemplate(
       i: number
     ): Array<readonly [string, string]> =>
       template.fields.map((f) => {
-        return f.name === clozeField
-          ? ([
-              f.name,
-              `This is a cloze deletion for {{c${i + 1}::${f.name}}}.`,
-            ] as const)
+        return f === clozeField
+          ? ([f, `This is a cloze deletion for {{c${i + 1}::${f}}}.`] as const)
           : getStandardFieldAndValue(f)
       })
     const { front, back } = template.templateType.template

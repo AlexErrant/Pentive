@@ -42,14 +42,7 @@ export default function Home(): JSX.Element {
           side: "back",
           template: {
             css: "",
-            fields: [
-              {
-                name: "Front",
-              },
-              {
-                name: "Back",
-              },
-            ],
+            fields: ["Front", "Back"],
             templateType: {
               tag: "standard",
               templates: [

@@ -436,14 +436,7 @@ function expectTemplate(
 test("renderTemplate works for 1 cloze", () => {
   const cloze = {
     css: "",
-    fields: [
-      {
-        name: "Text",
-      },
-      {
-        name: "Extra",
-      },
-    ],
+    fields: ["Text", "Extra"],
     templateType: {
       tag: "cloze" as const,
       template: {
@@ -467,17 +460,7 @@ test("renderTemplate works for 1 cloze", () => {
 test("renderTemplate works for 2 cloze deletions", () => {
   const cloze = {
     css: "",
-    fields: [
-      {
-        name: "Text1",
-      },
-      {
-        name: "Text2",
-      },
-      {
-        name: "Extra",
-      },
-    ],
+    fields: ["Text1", "Text2", "Extra"],
     templateType: {
       tag: "cloze" as const,
       template: {
@@ -506,14 +489,7 @@ test("renderTemplate works for 2 cloze deletions", () => {
 test("renderTemplate works for standard with 1 child template", () => {
   const standard = {
     css: "",
-    fields: [
-      {
-        name: "English",
-      },
-      {
-        name: "Spanish",
-      },
-    ],
+    fields: ["English", "Spanish"],
     templateType: {
       tag: "standard" as const,
       templates: [
@@ -535,14 +511,7 @@ test("renderTemplate works for standard with 1 child template", () => {
 test("renderTemplate works for standard with 2 child templates", () => {
   const standard = {
     css: "",
-    fields: [
-      {
-        name: "English",
-      },
-      {
-        name: "Spanish",
-      },
-    ],
+    fields: ["English", "Spanish"],
     templateType: {
       tag: "standard" as const,
       templates: [
