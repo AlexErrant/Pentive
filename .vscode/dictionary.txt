@@ -2,6 +2,7 @@ allinone
 apkg
 authed
 ciphertext
+codemirror
 comlink
 concated
 crockford

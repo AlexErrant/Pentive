@@ -22,6 +22,7 @@ import {
   CreateRemoteTemplate,
   EditRemoteNote,
   EditRemoteTemplate,
+  TemplateType,
 } from "./schema.js"
 
 const convert = compile({})
@@ -70,6 +71,36 @@ export async function getPost(id: Base64Url): Promise<
     .where("id", "=", fromBase64Url(id))
     .executeTakeFirst()
     .then((x) => undefinedMap(x, mapIdToBase64Url))
+}
+
+export interface Template {
+  readonly id: RemoteTemplateId
+  readonly name: string
+  readonly css: string
+  readonly fields: string[]
+  readonly created: Date
+  readonly modified: Date
+  readonly templateType: TemplateType
+}
+
+export async function getTemplate(id: RemoteTemplateId, nook: NookId) {
+  const t = await db
+    .selectFrom("Template")
+    .selectAll()
+    .where("id", "=", fromBase64Url(id))
+    .where("nook", "=", nook)
+    .executeTakeFirst()
+  if (t == null) return t
+  const r: Template = {
+    id,
+    name: t.name,
+    css: t.css,
+    fields: JSON.parse(t.fields) as string[],
+    created: t.createdAt,
+    modified: t.updatedAt,
+    templateType: JSON.parse(t.type) as TemplateType,
+  }
+  return r
 }
 
 export async function insertPost({

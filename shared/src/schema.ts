@@ -54,18 +54,21 @@ export const childTemplate = z.object({
 
 export type ChildTemplate = z.infer<typeof childTemplate>
 
-export const templateType = z.discriminatedUnion("tag", [
-  z.object({
-    tag: z.literal("standard"),
-    templates: z.array(childTemplate).min(1),
-  }),
-  z.object({
-    tag: z.literal("cloze"),
-    template: childTemplate,
-  }),
-])
+const standard = z.object({
+  tag: z.literal("standard"),
+  templates: z.array(childTemplate).min(1),
+})
+
+const cloze = z.object({
+  tag: z.literal("cloze"),
+  template: childTemplate,
+})
+
+export const templateType = z.discriminatedUnion("tag", [standard, cloze])
 
 export type TemplateType = z.infer<typeof templateType>
+export type Standard = z.infer<typeof standard>
+export type Cloze = z.infer<typeof cloze>
 
 export const nookId = z
   .string()
