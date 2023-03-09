@@ -29,7 +29,15 @@ import {
 } from "@codemirror/autocomplete"
 import { lintKeymap } from "@codemirror/lint"
 import { NookId, RemoteTemplateId, RemoteTemplate, getTemplate } from "shared"
-import { JSX, onMount, Show, createSignal, createEffect, on } from "solid-js"
+import {
+  JSX,
+  onMount,
+  Show,
+  createSignal,
+  createEffect,
+  on,
+  onCleanup,
+} from "solid-js"
 import { RouteDataArgs, useRouteData } from "solid-start"
 import { createServerData$ } from "solid-start/server"
 import { html } from "@codemirror/lang-html"
@@ -100,6 +108,14 @@ export default function Submit(): JSX.Element {
           dispatch(tr, backView()!, template, setTemplate, i()!),
       })
     )
+  })
+  onCleanup(() => {
+    if (frontView() != null) {
+      frontView()!.destroy()
+    }
+    if (backView() != null) {
+      backView()!.destroy()
+    }
   })
 
   return (
