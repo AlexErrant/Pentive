@@ -262,6 +262,7 @@ importers:
       html-to-text: ^9.0.3 || Hub doesn't use this, but `shared` (actually `mediaRouter`) does. Not including this causes an ESModule error - I've no idea why.
       iframe-resizer: ^4.3.2
       jose: ^4.11.1
+      mediarouter: workspace:*
       prettier: ^2.7.1
       shared: workspace:*
       solid-js: ^1.6.12
@@ -296,6 +297,7 @@ importers:
       html-to-text: 9.0.3
       iframe-resizer: 4.3.2
       jose: 4.11.1
+      mediarouter: link:../mediaRouter
       shared: link:../shared
       solid-js: 1.6.12
       solid-start: 0.2.23_gdo2uyue4rxjya3vvgcm5nbzom
@@ -4204,7 +4206,6 @@ packages:
 
   /@types/node/18.7.21:
     resolution: {integrity: sha512-rLFzK5bhM0YPyCoTC8bolBjMk7bwnZ8qeZUBslBfjZQou2ssJdWslx9CZ8DGM+Dx7QXQiiTVZ/6QO6kwtHkZCA==}
-    dev: true
 
   /@types/normalize-package-data/2.4.1:
     resolution: {integrity: sha512-Gj7cI7z+98M282Tqmp2K5EIsoouUEzbBJhQQzDE3jSIRk6r9gsz0oUokqIUR4u1R3dMHo0pDHM7sNOHyhulypw==}
@@ -6958,7 +6959,7 @@ packages:
       eslint-import-resolver-webpack:
         optional: true
     dependencies:
-      '@typescript-eslint/parser': 5.37.0_id2eilsndvzhjjktb64trvy3gu
+      '@typescript-eslint/parser': 5.37.0_irgkl5vooow2ydyo6aokmferha
       debug: 3.2.7
       eslint: 8.23.1
       eslint-import-resolver-node: 0.3.6
@@ -6987,7 +6988,7 @@ packages:
       '@typescript-eslint/parser':
         optional: true
     dependencies:
-      '@typescript-eslint/parser': 5.37.0_id2eilsndvzhjjktb64trvy3gu
+      '@typescript-eslint/parser': 5.37.0_irgkl5vooow2ydyo6aokmferha
       array-includes: 3.1.5
       array.prototype.flat: 1.3.0
       debug: 2.6.9
@@ -13209,7 +13210,7 @@ packages:
       merge-anything: 5.1.4
       solid-js: 1.6.12
       solid-refresh: 0.5.1_solid-js@1.6.12
-      vite: 4.1.4
+      vite: 4.1.4_@types+node@18.7.21
       vitefu: 0.2.4_vite@4.1.4
     transitivePeerDependencies:
       - supports-color
@@ -13311,7 +13312,6 @@ packages:
       rollup: 3.18.0
     optionalDependencies:
       fsevents: 2.3.2
-    dev: true
 
   /vitefu/0.2.4_vite@4.1.4:
     resolution: {integrity: sha512-fanAXjSaf9xXtOOeno8wZXIhgia+CZury481LsDaV++lSvcU2R9Ch2bPh3PYFyoHW+w9LqAeYRISVQjUIew14g==}
@@ -13321,7 +13321,7 @@ packages:
       vite:
         optional: true
     dependencies:
-      vite: 4.1.4
+      vite: 4.1.4_@types+node@18.7.21
 
   /vitest/0.29.2_jsdom@20.0.0:
     resolution: {integrity: sha512-ydK9IGbAvoY8wkg29DQ4ivcVviCaUi3ivuPKfZEVddMTenFHUfB8EEDXQV8+RasEk1ACFLgMUqAaDuQ/Nk+mQA==}
