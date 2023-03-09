@@ -95,10 +95,10 @@ export async function getTemplate(id: RemoteTemplateId, nook: NookId) {
     id,
     name: t.name,
     css: t.css,
-    fields: JSON.parse(t.fields) as string[],
+    fields: deserializeFields(t.fields),
     created: t.createdAt,
     modified: t.updatedAt,
-    templateType: JSON.parse(t.type) as TemplateType,
+    templateType: deserializeTemplateType(t.type),
   }
   return r
 }
@@ -378,11 +378,28 @@ async function toTemplateCreate(
     updatedAt,
     name: n.name,
     nook,
-    type: JSON.stringify(n.templateType),
-    fields: JSON.stringify(n.fields),
+    type: serializeTemplateType(n.templateType),
+    fields: serializeFields(n.fields),
     css: n.css,
   }
   return { templateCreate, remoteIdBase64url }
+}
+
+// highTODO property test
+function serializeTemplateType(tt: TemplateType) {
+  return JSON.stringify(tt)
+}
+
+function serializeFields(tt: string[]) {
+  return JSON.stringify(tt)
+}
+
+function deserializeTemplateType(tt: string) {
+  return JSON.parse(tt) as TemplateType
+}
+
+function deserializeFields(tt: string) {
+  return JSON.parse(tt) as string[]
 }
 
 export async function editNotes(authorId: UserId, notes: EditRemoteNote[]) {
