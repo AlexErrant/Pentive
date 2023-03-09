@@ -28,13 +28,7 @@ import {
   closeBracketsKeymap,
 } from "@codemirror/autocomplete"
 import { lintKeymap } from "@codemirror/lint"
-import {
-  NookId,
-  RemoteTemplateId,
-  RemoteTemplate,
-  getTemplate,
-  EditRemoteTemplate,
-} from "shared"
+import { NookId, RemoteTemplateId, RemoteTemplate, getTemplate } from "shared"
 import { JSX, onMount, Show, createSignal, createEffect, on } from "solid-js"
 import { RouteDataArgs, useRouteData } from "solid-start"
 import { createServerData$ } from "solid-start/server"
@@ -91,7 +85,7 @@ export default function Submit(): JSX.Element {
     )
   )
   onMount(() => {
-    setI(0) // highTODO add <select> or tabs or something
+    if (template.t != null) setI(0) // highTODO add <select> or tabs or something
     setFrontView(
       new EditorView({
         parent: frontRef,
@@ -113,6 +107,7 @@ export default function Submit(): JSX.Element {
       <h1>Edit Template</h1>
       <Show
         when={template.t != null && frontView() != null && backView() !== null}
+        fallback={"404 - Template not found"}
       >
         <ResizingIframe
           i={{
