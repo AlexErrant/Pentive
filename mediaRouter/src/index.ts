@@ -50,7 +50,8 @@ app
   })
   .use("/*", async (c, next) => {
     return await cors({
-      origin: c.env.appOrigin, // lowTODO replace at build time (doesn't need to be a secret)
+      origin: (x) =>
+        c.env.hubOrigin === x || c.env.appOrigin === x ? x : null, // lowTODO replace at build time (doesn't need to be a secret)
       allowMethods: ["POST", "GET", "OPTIONS"],
       allowHeaders: [],
       maxAge: 86400, // 24hrs - browsers don't support longer https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Max-Age

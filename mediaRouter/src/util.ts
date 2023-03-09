@@ -62,6 +62,7 @@ export interface Env {
   tokenSecret: TokenSecretBase64
   planetscaleDbUrl: string
   appOrigin: string
+  hubOrigin: string
 }
 
 export async function getUserId(
