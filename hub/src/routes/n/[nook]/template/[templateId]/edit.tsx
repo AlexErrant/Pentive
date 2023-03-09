@@ -28,7 +28,13 @@ import {
   closeBracketsKeymap,
 } from "@codemirror/autocomplete"
 import { lintKeymap } from "@codemirror/lint"
-import { NookId, RemoteTemplateId, RemoteTemplate, getTemplate } from "shared"
+import {
+  NookId,
+  RemoteTemplateId,
+  RemoteTemplate,
+  getTemplate,
+  EditRemoteTemplate,
+} from "shared"
 import { JSX, onMount, Show, createSignal, createEffect, on } from "solid-js"
 import { RouteDataArgs, useRouteData } from "solid-start"
 import { createServerData$ } from "solid-start/server"
@@ -36,6 +42,7 @@ import { html } from "@codemirror/lang-html"
 import ResizingIframe from "~/components/resizingIframe"
 import { ClozeTemplate, StandardTemplate } from "shared/src/cardHtml"
 import { SetStoreFunction, createStore } from "solid-js/store"
+import { apiClient } from "~/routes/apiClient"
 
 interface TemplateStore {
   t: RemoteTemplate | undefined
@@ -126,6 +133,20 @@ export default function Submit(): JSX.Element {
       </Show>
       <div ref={frontRef} />
       <div ref={backRef} />
+      <button
+        type="button"
+        onclick={async () => {
+          const t = template.t!
+          await apiClient.editTemplates.mutate([
+            {
+              ...t,
+              remoteIds: [t.id],
+            },
+          ])
+        }}
+      >
+        Save
+      </button>
     </main>
   )
 }
