@@ -75,3 +75,16 @@ export function parseSet<T>(rawSet: string) {
   const parsed = JSON.parse(rawSet) as T[]
   return new Set(parsed)
 }
+
+// https://stackoverflow.com/a/69827802
+export function unproxify<T>(val: T): T {
+  // @ts-expect-error unavoidable any
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+  if (val instanceof Array) return val.map(unproxify)
+  if (val instanceof Object)
+    // @ts-expect-error whatever
+    return Object.fromEntries(
+      Object.entries(Object.assign({}, val)).map(([k, v]) => [k, unproxify(v)])
+    )
+  return val
+}

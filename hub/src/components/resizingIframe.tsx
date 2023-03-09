@@ -1,7 +1,7 @@
 import { iframeResizer, IFrameComponent } from "iframe-resizer"
 import { createEffect, onCleanup, VoidComponent } from "solid-js"
 import * as Comlink from "comlink"
-import { Ord, Side } from "shared"
+import { Ord, Side, unproxify } from "shared"
 import { Template } from "shared/src/cardHtml"
 
 const targetOrigin = "*" // highTODO make more limiting. Also implement https://stackoverflow.com/q/8169582
@@ -23,19 +23,6 @@ export type RenderBodyInput =
 
 export interface HubExpose {
   renderBodyInput: RenderBodyInput
-}
-
-// https://stackoverflow.com/a/69827802
-function unproxify<T>(val: T): T {
-  // @ts-expect-error unavoidable any
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-  if (val instanceof Array) return val.map(unproxify)
-  if (val instanceof Object)
-    // @ts-expect-error whatever
-    return Object.fromEntries(
-      Object.entries(Object.assign({}, val)).map(([k, v]) => [k, unproxify(v)])
-    )
-  return val
 }
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
