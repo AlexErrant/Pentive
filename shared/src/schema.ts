@@ -74,37 +74,36 @@ export const nookId = z
   .string()
   .regex(/^[a-z0-9_]{1,22}$/) as unknown as z.Schema<NookId>
 
-export const createRemoteTemplate = z.object({
-  localId: z.string() as unknown as z.Schema<TemplateId>,
+export const remoteTemplate = z.object({
+  id: remoteTemplateId,
+  nook: nookId,
+  created: dateSchema,
+  modified: dateSchema,
   name: z.string(),
-  nooks: z.array(nookId),
   templateType,
   fields: z.array(z.string()),
   css: z.string(),
   ankiId: z.number().positive().optional(),
+})
+
+export type RemoteTemplate = z.infer<typeof remoteTemplate>
+
+const uneditable = {
+  id: true,
+  nook: true,
+  created: true,
+  modified: true,
+} as const
+
+export const createRemoteTemplate = remoteTemplate.omit(uneditable).extend({
+  localId: z.string() as unknown as z.Schema<TemplateId>,
+  nooks: z.array(nookId),
 })
 
 export type CreateRemoteTemplate = z.infer<typeof createRemoteTemplate>
 
-export const editRemoteTemplate = z.object({
+export const editRemoteTemplate = remoteTemplate.omit(uneditable).extend({
   remoteIds: z.array(remoteTemplateId).min(1),
-  name: z.string(),
-  // nook: z.string(), intentionally omitted
-  templateType,
-  fields: z.array(z.string()),
-  css: z.string(),
-  ankiId: z.number().positive().optional(),
 })
 
 export type EditRemoteTemplate = z.infer<typeof editRemoteTemplate>
-
-export const remoteTemplate = createRemoteTemplate
-  .omit({ nooks: true, localId: true })
-  .extend({
-    id: remoteTemplateId,
-    nook: nookId,
-    created: dateSchema,
-    modified: dateSchema,
-  })
-
-export type RemoteTemplate = z.infer<typeof remoteTemplate>
