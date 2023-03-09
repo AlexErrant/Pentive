@@ -28,7 +28,7 @@ import {
   closeBracketsKeymap,
 } from "@codemirror/autocomplete"
 import { lintKeymap } from "@codemirror/lint"
-import { NookId, RemoteTemplateId, Template, getTemplate } from "shared"
+import { NookId, RemoteTemplateId, RemoteTemplate, getTemplate } from "shared"
 import { JSX, onMount, Show, createSignal, createEffect, on } from "solid-js"
 import { RouteDataArgs, useRouteData } from "solid-start"
 import { createServerData$ } from "solid-start/server"
@@ -38,7 +38,7 @@ import { ClozeTemplate, StandardTemplate } from "shared/src/cardHtml"
 import { SetStoreFunction, createStore } from "solid-js/store"
 
 interface TemplateStore {
-  t: Template | undefined
+  t: RemoteTemplate | undefined
 }
 interface ClozeTemplateStore {
   t: ClozeTemplate

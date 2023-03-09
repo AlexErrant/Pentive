@@ -98,8 +98,13 @@ export const editRemoteTemplate = z.object({
 
 export type EditRemoteTemplate = z.infer<typeof editRemoteTemplate>
 
-export const remoteTemplate = createRemoteTemplate.extend({
-  author: z.string(),
-  created: dateSchema,
-  modified: dateSchema,
-})
+export const remoteTemplate = createRemoteTemplate
+  .omit({ nooks: true, localId: true })
+  .extend({
+    id: remoteTemplateId,
+    nook: nookId,
+    created: dateSchema,
+    modified: dateSchema,
+  })
+
+export type RemoteTemplate = z.infer<typeof remoteTemplate>
