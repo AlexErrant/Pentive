@@ -2,12 +2,20 @@ import _ from "lodash"
 import { RenderContainer } from "./renderContainer"
 import { Ord } from "./brand"
 import { throwExp } from "./utility"
-import { TemplateType } from "./schema"
+import { Cloze, Standard, TemplateType } from "./schema"
 
 export interface Template {
   readonly css: string
   readonly fields: readonly string[]
   readonly templateType: TemplateType
+}
+
+export type StandardTemplate = Omit<Template, "templateType"> & {
+  templateType: Standard
+}
+
+export type ClozeTemplate = Omit<Template, "templateType"> & {
+  templateType: Cloze
 }
 
 // https://stackoverflow.com/a/47140708

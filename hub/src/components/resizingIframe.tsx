@@ -25,18 +25,35 @@ export interface HubExpose {
   renderBodyInput: RenderBodyInput
 }
 
+// https://stackoverflow.com/a/69827802
+function unproxify<T>(val: T): T {
+  // @ts-expect-error unavoidable any
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+  if (val instanceof Array) return val.map(unproxify)
+  if (val instanceof Object)
+    // @ts-expect-error whatever
+    return Object.fromEntries(
+      Object.entries(Object.assign({}, val)).map(([k, v]) => [k, unproxify(v)])
+    )
+  return val
+}
+
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const ResizingIframe: VoidComponent<{
   readonly i: RenderBodyInput
 }> = (props) => {
   const hubExpose: HubExpose = {
-    renderBodyInput: props.i,
+    renderBodyInput: unproxify(props.i),
   }
   createEffect(() => {
-    iframeReference.contentWindow!.postMessage(
-      { type: "pleaseRerender", i: props.i },
-      targetOrigin
-    )
+    try {
+      iframeReference.contentWindow!.postMessage(
+        { type: "pleaseRerender", i: unproxify(props.i) },
+        targetOrigin
+      )
+    } catch (error) {
+      console.error(error)
+    }
   })
   let iframeReference: HTMLIFrameElement
   onCleanup(() => {

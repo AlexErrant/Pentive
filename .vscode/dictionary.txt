@@ -46,6 +46,7 @@ tinyint
 trpc
 ulids
 unhex
+unproxify
 upserted
 viewports
 vite
