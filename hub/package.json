@@ -50,6 +50,8 @@
     "@scure/base": "^1.1.1",
     "@solidjs/meta": "^0.28.2",
     "@solidjs/router": "^0.7.0",
+    "@trpc/client": "^10.11.1",
+    "@trpc/server": "^10.11.1",
     "comlink": "^4.3.1",
     "cookie": "^0.5.0",
     "html-to-text": "^9.0.3 || Hub doesn't use this, but `shared` (actually `mediaRouter`) does. Not including this causes an ESModule error - I've no idea why.",
@@ -58,6 +60,7 @@
     "shared": "workspace:*",
     "solid-js": "^1.6.12",
     "solid-start": "^0.2.23",
+    "superjson": "^1.12.2",
     "ulid-workers": "^2.1.0 || See comment on html-to-text",
     "undici": "^5.11.0"
   },
