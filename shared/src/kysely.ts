@@ -112,11 +112,33 @@ export async function getTemplate(id: RemoteTemplateId, nook: NookId) {
     .where("id", "=", fromBase64Url(id))
     .where("nook", "=", nook)
     .executeTakeFirst()
-  if (t == null) return t
+  return undefinedMap(t, templateEntityToDomain)
+}
+
+export async function getTemplates(nook: NookId) {
+  const ts = await db
+    .selectFrom("Template")
+    .selectAll()
+    .where("nook", "=", nook)
+    .execute()
+  return ts.map(templateEntityToDomain)
+}
+
+function templateEntityToDomain(t: {
+  id: DbId
+  createdAt: Date
+  updatedAt: Date
+  name: string
+  nook: NookId
+  type: string
+  fields: string
+  css: string
+  ankiId: number | null
+}) {
   const r: RemoteTemplate = {
-    id,
+    id: dbIdToBase64Url(t.id) as RemoteTemplateId,
     name: t.name,
-    nook,
+    nook: t.nook,
     css: t.css,
     fields: deserializeFields(t.fields),
     created: t.createdAt,

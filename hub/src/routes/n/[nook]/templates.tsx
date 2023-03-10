@@ -1,7 +1,7 @@
-import { Component, For, Show, JSX } from "solid-js"
-import { A, RouteDataArgs, useRouteData } from "solid-start"
+import { Component, For, Show } from "solid-js"
+import { RouteDataArgs, useRouteData } from "solid-start"
 import { createServerData$ } from "solid-start/server"
-import { getPosts, getNotes, NookId, Ord } from "shared"
+import { NookId, getTemplates } from "shared"
 import ResizingIframe from "~/components/resizingIframe"
 
 export function routeData({ params }: RouteDataArgs) {
@@ -10,8 +10,7 @@ export function routeData({ params }: RouteDataArgs) {
     data: createServerData$(
       async (nook) => {
         return {
-          posts: await getPosts({ nook }),
-          notes: await getNotes(nook as NookId),
+          templates: await getTemplates(nook as NookId),
         }
       },
       { key: () => params.nook }
@@ -23,28 +22,21 @@ const Threads: Component = () => {
   const { data } = useRouteData<typeof routeData>()
   return (
     <>
-      <a href="templates">Templates</a>
       <Show when={data()}>
         <ul>
-          <For each={data()!.posts}>
-            {(post) => (
+          <For each={data()!.templates}>
+            {(template) => (
               <li>
-                <A href={`thread/${post.id}`}>{post.title}</A>
-              </li>
-            )}
-          </For>
-          <For each={data()!.notes}>
-            {(note) => (
-              <li>
+                <h1>{template.name}</h1>
                 <ResizingIframe
                   i={{
-                    tag: "card",
+                    tag: "template",
                     side: "front",
-                    template: note.template,
-                    ord: 0 as Ord,
-                    fieldsAndValues: Array.from(note.fieldValues.entries()),
+                    template,
+                    index: 0,
                   }}
                 />
+                <a href={`./template/${template.id}/edit`}>Edit</a>
               </li>
             )}
           </For>
