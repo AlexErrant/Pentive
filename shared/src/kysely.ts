@@ -14,7 +14,13 @@ import {
   UserId,
 } from "./brand.js"
 import { binary16fromBase64URL, ulidAsRaw } from "./convertBinary.js"
-import { parseMap, stringifyMap, throwExp, undefinedMap } from "./utility.js"
+import {
+  nullMap,
+  parseMap,
+  stringifyMap,
+  throwExp,
+  undefinedMap,
+} from "./utility.js"
 import { base16, base64url } from "@scure/base"
 import { compile } from "html-to-text"
 import {
@@ -125,6 +131,75 @@ export async function getNote(noteId: RemoteNoteId) {
       templateType: deserializeTemplateType(r.type),
     },
   }
+}
+
+// https://stackoverflow.com/a/18018037
+function listToTree(list: NoteComment[]) {
+  const map = new Map<Base64Url, number>()
+  let node
+  const roots = []
+  let i
+  for (i = 0; i < list.length; i += 1) {
+    map.set(list[i].id, i)
+  }
+  for (i = 0; i < list.length; i += 1) {
+    node = list[i]
+    if (node.parentId !== null) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      list[map.get(node.parentId)!].comments.push(node)
+    } else {
+      roots.push(node)
+    }
+  }
+  return roots
+}
+
+export interface NoteComment {
+  id: Base64Url
+  parentId: Base64Url | null
+  noteId: DbId
+  createdAt: Date
+  updatedAt: Date
+  text: string
+  authorId: string
+  votes: string
+  level: number
+  comments: NoteComment[]
+}
+
+export async function getNoteComments(noteId: RemoteNoteId) {
+  const cs = await db
+    .selectFrom("NoteComment")
+    .select([
+      "id",
+      "parentId",
+      "createdAt",
+      "updatedAt",
+      "text",
+      "authorId",
+      "votes",
+      "level",
+    ])
+    .where("NoteComment.noteId", "=", fromBase64Url(noteId))
+    .orderBy("level", "asc")
+    .orderBy("votes", "desc")
+    .execute()
+  const commentsList = cs.map((c) => {
+    const r: NoteComment = {
+      id: dbIdToBase64Url(c.id),
+      parentId: nullMap(c.parentId, dbIdToBase64Url),
+      noteId,
+      createdAt: c.createdAt,
+      updatedAt: c.updatedAt,
+      text: c.text,
+      authorId: c.authorId as UserId,
+      votes: c.votes,
+      level: c.level,
+      comments: [],
+    }
+    return r
+  })
+  return listToTree(commentsList)
 }
 
 export async function getPost(id: Base64Url): Promise<

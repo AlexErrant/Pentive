@@ -1,34 +1,45 @@
-import { Component, Show, Suspense } from "solid-js"
+import { Component, For, Show, Suspense } from "solid-js"
 import ErrorBoundary, { RouteDataArgs, useRouteData } from "solid-start"
 import { createServerData$ } from "solid-start/server"
-import { Ord, RemoteNoteId, getNote } from "shared"
+import { Ord, RemoteNoteId, getNote, getNoteComments } from "shared"
 import ResizingIframe from "~/components/resizingIframe"
+import NoteComment from "~/components/noteComment"
 
 export function routeData({ params }: RouteDataArgs) {
   return {
     noteId: (): string => params.noteId,
-    note: createServerData$(
-      async (noteId) => await getNote(noteId as RemoteNoteId),
+    data: createServerData$(
+      async (noteId) => {
+        return {
+          note: await getNote(noteId as RemoteNoteId),
+          comments: await getNoteComments(noteId as RemoteNoteId),
+        }
+      },
       { key: () => params.noteId }
     ),
   }
 }
 
 const Thread: Component = () => {
-  const { note } = useRouteData<typeof routeData>()
+  const { data } = useRouteData<typeof routeData>()
   return (
     <ErrorBoundary fallback={() => <p>Error loading note.</p>}>
       <Suspense fallback={<p>Loading note...</p>}>
-        <Show when={note()} fallback={<p>"404 Not Found"</p>}>
+        <Show when={data()?.note} fallback={<p>"404 Not Found"</p>}>
           <ResizingIframe
             i={{
               tag: "card",
               side: "front",
-              template: note()!.template,
+              template: data()!.note!.template,
               ord: 0 as Ord,
-              fieldsAndValues: Array.from(note()!.fieldValues.entries()),
+              fieldsAndValues: Array.from(data()!.note!.fieldValues.entries()),
             }}
           />
+        </Show>
+        <Show when={data()}>
+          <For each={data()!.comments}>
+            {(comment) => <NoteComment comment={comment} />}
+          </For>
         </Show>
       </Suspense>
     </ErrorBoundary>
