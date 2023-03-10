@@ -57,6 +57,7 @@ model TemplateComment {
   authorId   String   @db.VarChar(21)
   history    String?  @db.Text
   votes      String   @db.Text
+  level      Int      @db.UnsignedTinyInt
 
   @@index([authorId])
   @@index([templateId])
@@ -124,6 +125,7 @@ model NoteComment {
   authorId String  @db.VarChar(21)
   history  String? @db.Text
   votes    String  @db.Text
+  level    Int     @db.UnsignedTinyInt
 
   @@index([authorId])
   @@index([noteId])
@@ -205,6 +207,7 @@ model PostComment {
   authorId String  @db.VarChar(21)
   history  String? @db.Text
   votes    String  @db.Text
+  level    Int     @db.UnsignedTinyInt
 
   @@index([authorId])
   @@index([postId])

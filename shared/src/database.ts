@@ -44,6 +44,7 @@ export interface NoteComment {
   authorId: string
   history: string | null
   votes: string
+  level: number
 }
 
 export interface NoteHistory {
@@ -76,6 +77,7 @@ export interface PostComment {
   authorId: string
   history: string | null
   votes: string
+  level: number
 }
 
 export interface PostSubscriber {
@@ -104,6 +106,7 @@ export interface TemplateComment {
   authorId: string
   history: string | null
   votes: string
+  level: number
 }
 
 export interface TemplateHistory {
