@@ -40,6 +40,8 @@ export interface NoteComment {
   id: DbId
   parentId: DbId | null
   noteId: DbId
+  createdAt: Generated<Date>
+  updatedAt: Generated<Date>
   text: string
   authorId: string
   history: string | null
@@ -73,6 +75,8 @@ export interface PostComment {
   id: DbId
   parentId: DbId | null
   postId: DbId
+  createdAt: Generated<Date>
+  updatedAt: Generated<Date>
   text: string
   authorId: string
   history: string | null
@@ -102,6 +106,8 @@ export interface TemplateComment {
   id: DbId
   parentId: DbId | null
   templateId: DbId
+  createdAt: Generated<Date>
+  updatedAt: Generated<Date>
   text: string
   authorId: string
   history: string | null
