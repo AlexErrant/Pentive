@@ -58,12 +58,14 @@ export async function getPosts({ nook }: { nook: string }): Promise<
 }
 
 function noteToNookView(x: {
+  id: DbId
   fieldValues: string
   css: string
   type: string
   fields: string
 }) {
   return {
+    id: dbIdToBase64Url(x.id) as RemoteNoteId,
     fieldValues: deserializeFieldValues(x.fieldValues),
     template: {
       css: x.css,
@@ -78,6 +80,7 @@ export async function getNotes(nook: NookId) {
     .selectFrom("Note")
     .innerJoin("Template", "Template.id", "Note.templateId")
     .select([
+      "Note.id",
       "Note.fieldValues",
       "Template.css",
       "Template.fields",
@@ -86,6 +89,42 @@ export async function getNotes(nook: NookId) {
     .where("Template.nook", "=", nook)
     .execute()
   return r.map(noteToNookView)
+}
+
+export async function getNote(noteId: RemoteNoteId) {
+  const r = await db
+    .selectFrom("Note")
+    .innerJoin("Template", "Template.id", "Note.templateId")
+    .select([
+      "Note.templateId",
+      "Note.createdAt",
+      "Note.updatedAt",
+      "Note.authorId",
+      "Note.fieldValues",
+      "Note.tags",
+      "Note.ankiId",
+      "Template.css",
+      "Template.fields",
+      "Template.type",
+    ])
+    .where("Note.id", "=", fromBase64Url(noteId))
+    .executeTakeFirst()
+  if (r == null) return null
+  return {
+    id: noteId,
+    templateId: dbIdToBase64Url(r.templateId) as RemoteTemplateId,
+    createdAt: r.createdAt,
+    updatedAt: r.updatedAt,
+    authorId: r.authorId as UserId,
+    fieldValues: deserializeFieldValues(r.fieldValues),
+    tags: deserializeTags(r.tags),
+    ankiId: r.ankiId,
+    template: {
+      css: r.css,
+      fields: deserializeFields(r.fields),
+      templateType: deserializeTemplateType(r.type),
+    },
+  }
 }
 
 export async function getPost(id: Base64Url): Promise<
@@ -331,7 +370,7 @@ function toNoteCreate(
       .map(([, v]) => convert(v))
       .concat(n.tags)
       .join(" "),
-    tags: JSON.stringify(n.tags),
+    tags: serializeTags(n.tags),
     ankiId: n.ankiId,
   }
   return { noteCreate, remoteIdBase64url, remoteTemplateId }
@@ -412,6 +451,10 @@ function serializeFieldValues(fvs: Map<string, string>) {
   return stringifyMap(fvs)
 }
 
+function serializeTags(tags: string[]) {
+  return JSON.stringify(tags)
+}
+
 function deserializeTemplateType(tt: string) {
   return JSON.parse(tt) as TemplateType
 }
@@ -422,6 +465,10 @@ function deserializeFields(tt: string) {
 
 function deserializeFieldValues(fvs: string) {
   return parseMap<string, string>(fvs)
+}
+
+function deserializeTags(tags: string) {
+  return JSON.parse(tags) as string[]
 }
 
 export async function editNotes(authorId: UserId, notes: EditRemoteNote[]) {

@@ -1,4 +1,4 @@
-import { Component, For, Show, JSX } from "solid-js"
+import { Component, For, Show } from "solid-js"
 import { A, RouteDataArgs, useRouteData } from "solid-start"
 import { createServerData$ } from "solid-start/server"
 import { getPosts, getNotes, NookId, Ord } from "shared"
@@ -20,7 +20,7 @@ export function routeData({ params }: RouteDataArgs) {
 }
 
 const Threads: Component = () => {
-  const { data } = useRouteData<typeof routeData>()
+  const { data, nook } = useRouteData<typeof routeData>()
   return (
     <>
       <a href="templates">Templates</a>
@@ -36,6 +36,7 @@ const Threads: Component = () => {
           <For each={data()!.notes}>
             {(note) => (
               <li>
+                <a href={`/n/${nook()}/note/${note.id}`}>Go</a>
                 <ResizingIframe
                   i={{
                     tag: "card",
