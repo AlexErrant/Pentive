@@ -3,6 +3,7 @@ import {
   EditRemoteNote,
   NookId,
   RemoteNoteId,
+  imgPlaceholder,
   parseMap,
   parseSet,
   stringifyMap,
@@ -516,9 +517,8 @@ export function updateLocalMediaIdByRemoteMediaIdAndGetNewDoc(
   for (const image of doc.images) {
     const src = image.getAttribute("src")
     if (src != null) {
-      // Filter no-src images - grep 330CE329-B962-4E68-90F3-F4F3700815DA
       const i = localMediaIdByRemoteMediaId.size as RemoteMediaNum
-      image.setAttribute("src", i.toString())
+      image.setAttribute("src", imgPlaceholder + i.toString())
       localMediaIdByRemoteMediaId.set(i, src as MediaId)
     }
   }

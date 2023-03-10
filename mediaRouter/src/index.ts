@@ -204,6 +204,7 @@ app
     return await getMedia(c, mediaHashBase64, "private")
   })
   .get("/i/:token", async (c) => {
+    setKysely(c.env.planetscaleDbUrl)
     const [entityId, i] = parsePublicToken(c.req.param("token"))
     const entityIdBase64 = binary16fromBase64URL(entityId)
     const mediaHash = await lookupMediaHash(entityIdBase64, i)

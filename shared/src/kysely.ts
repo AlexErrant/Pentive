@@ -236,25 +236,15 @@ export async function insertNotes(authorId: UserId, notes: CreateRemoteNote[]) {
     .execute()
   if (templates.length !== rtIds.length)
     throwExp("You have an invalid RemoteTemplateId.")
-  const noteCreatesAndIds = (
-    await Promise.all(
-      notes.map(async (n) => {
-        const ncs = await toNoteCreates(n, authorId)
-        return ncs.map(
-          ({ noteCreate, remoteIdBase64url, remoteTemplateId }) => {
-            const t =
-              templates.find(
-                (t) => dbIdToBase64Url(t.id) === remoteTemplateId
-              ) ?? throwExp(`Template not found - should be impossible.`)
-            return [
-              noteCreate,
-              [[n.localId, t.nook], remoteIdBase64url],
-            ] as const
-          }
-        )
-      })
-    )
-  ).flatMap((x) => x)
+  const noteCreatesAndIds = notes.flatMap((n) => {
+    const ncs = toNoteCreates(n, authorId)
+    return ncs.map(({ noteCreate, remoteIdBase64url, remoteTemplateId }) => {
+      const t =
+        templates.find((t) => dbIdToBase64Url(t.id) === remoteTemplateId) ??
+        throwExp(`Template not found - should be impossible.`)
+      return [noteCreate, [[n.localId, t.nook], remoteIdBase64url]] as const
+    })
+  })
   const noteCreates = noteCreatesAndIds.map((x) => x[0])
   await db.insertInto("Note").values(noteCreates).execute()
   const remoteIdByLocal = new Map(noteCreatesAndIds.map((x) => x[1]))
@@ -265,29 +255,22 @@ export async function insertTemplates(
   authorId: UserId,
   templates: CreateRemoteTemplate[]
 ) {
-  const templateCreatesAndIds = (
-    await Promise.all(
-      templates.map(async (n) => {
-        const tcs = await toTemplateCreates(n, authorId)
-        return tcs.map(({ templateCreate, remoteIdBase64url }) => {
-          return [
-            templateCreate,
-            [[n.localId, templateCreate.nook], remoteIdBase64url],
-          ] as const
-        })
-      })
-    )
-  ).flatMap((x) => x)
+  const templateCreatesAndIds = templates.flatMap((n) => {
+    const tcs = toTemplateCreates(n, authorId)
+    return tcs.map(({ templateCreate, remoteIdBase64url }) => {
+      return [
+        templateCreate,
+        [[n.localId, templateCreate.nook], remoteIdBase64url],
+      ] as const
+    })
+  })
   const templateCreates = templateCreatesAndIds.map((x) => x[0])
   await db.insertInto("Template").values(templateCreates).execute()
   const remoteIdByLocal = new Map(templateCreatesAndIds.map((x) => x[1]))
   return remoteIdByLocal
 }
 
-async function toNoteCreates(
-  n: EditRemoteNote | CreateRemoteNote,
-  authorId: UserId
-) {
+function toNoteCreates(n: EditRemoteNote | CreateRemoteNote, authorId: UserId) {
   const remoteIds =
     "remoteIds" in n
       ? new Map(
@@ -300,12 +283,10 @@ async function toNoteCreates(
           ])
         )
       : new Map(n.remoteTemplateIds.map((rt) => [ulidAsRaw(), rt]))
-  return await Promise.all(
-    Array.from(remoteIds).map(async (x) => await toNoteCreate(x, n, authorId))
-  )
+  return Array.from(remoteIds).map((x) => toNoteCreate(x, n, authorId))
 }
 
-async function toNoteCreate(
+function toNoteCreate(
   [remoteNoteId, remoteTemplateId]: [Uint8Array, RemoteTemplateId],
   n: EditRemoteNote | CreateRemoteNote,
   authorId: UserId
@@ -316,7 +297,7 @@ async function toNoteCreate(
     .encode(remoteNoteId)
     .substring(0, 22) as RemoteNoteId
   for (const [field, value] of n.fieldValues) {
-    n.fieldValues.set(field, await replaceImgSrcs(value, remoteIdBase64url))
+    n.fieldValues.set(field, replaceImgSrcs(value, remoteIdBase64url))
   }
   const noteCreate: InsertObject<DB, "Note"> = {
     id: unhex(remoteIdHex),
@@ -334,27 +315,17 @@ async function toNoteCreate(
   return { noteCreate, remoteIdBase64url, remoteTemplateId }
 }
 
-async function replaceImgSrcs(value: string, remoteIdBase64url: string) {
-  if (value === "") return "" // nextTODO
-  const oldResponse = new Response(value)
-  const newResponse = new HTMLRewriter()
-    .on("img", {
-      // highTODO filter images that shouldn't be replaced, e.g. ones with external URLs.
-      // Wait... uh... do we even want to support this? Breaks the point of offline-first...
-      element(element) {
-        const src = element.getAttribute("src")
-        if (src != null) {
-          // Filter no-src images - grep 330CE329-B962-4E68-90F3-F4F3700815DA
-          element.setAttribute("src", remoteIdBase64url + src)
-        }
-      },
-    })
-    .transform(oldResponse)
-  const r = await newResponse.text()
-  return r
+// hacky, but better than my previous solution, which was to parse the value, which was slow(er) and fragile.
+export const imgPlaceholder = "3Iptw8cmfkd/KLrTw+9swHnzxxVhtDCraYLejUh3"
+
+function replaceImgSrcs(value: string, remoteIdBase64url: string) {
+  return value.replaceAll(
+    imgPlaceholder,
+    "https://api.local.pentive.com:8787/i/" + remoteIdBase64url
+  )
 }
 
-async function toTemplateCreates(
+function toTemplateCreates(
   n: EditRemoteTemplate | CreateRemoteTemplate,
   authorId: UserId // highTODO update History. Could History be a compressed column instead of its own table?
 ) {
@@ -365,12 +336,10 @@ async function toTemplateCreates(
             [base64url.decode(id + "=="), "undefined_nook" as NookId] as const
         )
       : n.nooks.map((nook) => [ulidAsRaw(), nook] as const)
-  return await Promise.all(
-    remoteIds.map(async ([id, nook]) => await toTemplateCreate(n, id, nook))
-  )
+  return remoteIds.map(([id, nook]) => toTemplateCreate(n, id, nook))
 }
 
-async function toTemplateCreate(
+function toTemplateCreate(
   n: EditRemoteTemplate | CreateRemoteTemplate,
   remoteId: Uint8Array,
   nook: NookId
@@ -382,15 +351,15 @@ async function toTemplateCreate(
     .substring(0, 22) as RemoteTemplateId
   if (n.templateType.tag === "standard") {
     for (const t of n.templateType.templates) {
-      t.front = await replaceImgSrcs(t.front, remoteIdBase64url)
-      t.back = await replaceImgSrcs(t.back, remoteIdBase64url)
+      t.front = replaceImgSrcs(t.front, remoteIdBase64url)
+      t.back = replaceImgSrcs(t.back, remoteIdBase64url)
     }
   } else {
-    n.templateType.template.front = await replaceImgSrcs(
+    n.templateType.template.front = replaceImgSrcs(
       n.templateType.template.front,
       remoteIdBase64url
     )
-    n.templateType.template.back = await replaceImgSrcs(
+    n.templateType.template.back = replaceImgSrcs(
       n.templateType.template.back,
       remoteIdBase64url
     )
@@ -444,12 +413,10 @@ export async function editNotes(authorId: UserId, notes: EditRemoteNote[]) {
     .executeTakeFirstOrThrow()
   if (count.c !== notes.length.toString())
     throwExp("At least one of these notes doesn't exist.")
-  const noteCreates = await Promise.all(
-    notes.map(async (n) => {
-      const tcs = await toNoteCreates(n, authorId)
-      return tcs.map((tc) => tc.noteCreate)
-    })
-  )
+  const noteCreates = notes.map((n) => {
+    const tcs = toNoteCreates(n, authorId)
+    return tcs.map((tc) => tc.noteCreate)
+  })
   // insert into `Note` (`id`, `templateId`, `authorId`, `fieldValues`, `fts`, `tags`)
   // values (UNHEX(?), FROM_BASE64(?), ?, ?, ?, ?)
   // on duplicate key update `templateId` = values(`templateId`), `updatedAt` = values(`updatedAt`), `authorId` = values(`authorId`), `fieldValues` = values(`fieldValues`), `fts` = values(`fts`), `tags` = values(`tags`), `ankiId` = values(`ankiId`)
@@ -484,12 +451,10 @@ export async function editTemplates(
     .executeTakeFirstOrThrow()
   if (count.c !== editTemplateIds.length.toString())
     throwExp("At least one of these templates doesn't exist.")
-  const templateCreates = await Promise.all(
-    templates.map(async (n) => {
-      const tcs = await toTemplateCreates(n, authorId)
-      return tcs.map((tc) => tc.templateCreate)
-    })
-  )
+  const templateCreates = templates.map((n) => {
+    const tcs = toTemplateCreates(n, authorId)
+    return tcs.map((tc) => tc.templateCreate)
+  })
   await db
     .insertInto("Template")
     .values(templateCreates.flat())
