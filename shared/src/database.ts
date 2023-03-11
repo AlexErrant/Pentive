@@ -60,7 +60,7 @@ export interface NoteHistory {
 export interface NoteSubscriber {
   noteId: DbId
   userId: string
-  til: Date
+  til: Generated<Date>
 }
 
 export interface Post {
@@ -87,7 +87,7 @@ export interface PostComment {
 export interface PostSubscriber {
   postId: DbId
   userId: string
-  til: Date
+  til: Generated<Date>
 }
 
 export interface Template {
@@ -128,7 +128,7 @@ export interface TemplateHistory {
 export interface TemplateSubscriber {
   templateId: DbId
   userId: string
-  til: Date
+  til: Generated<Date>
 }
 
 export interface User {

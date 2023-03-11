@@ -70,7 +70,7 @@ model TemplateSubscriber {
   template   Template @relation(fields: [templateId], references: [id])
   userId     String   @db.VarChar(21)
   user       User     @relation(fields: [userId], references: [id])
-  til        DateTime
+  til        DateTime @default(now())
 
   @@id([templateId, userId])
   @@index([templateId])
@@ -140,7 +140,7 @@ model NoteSubscriber {
   note   Note     @relation(fields: [noteId], references: [id])
   userId String   @db.VarChar(21)
   user   User     @relation(fields: [userId], references: [id])
-  til    DateTime
+  til    DateTime @default(now())
 
   @@id([noteId, userId])
   @@index([noteId])
@@ -224,7 +224,7 @@ model PostSubscriber {
   post   Post     @relation(fields: [postId], references: [id])
   userId String   @db.VarChar(21)
   user   User     @relation(fields: [userId], references: [id])
-  til    DateTime
+  til    DateTime @default(now())
 
   @@id([postId, userId])
   @@index([postId])
