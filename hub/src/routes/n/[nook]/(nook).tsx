@@ -23,7 +23,7 @@ const Threads: Component = () => {
   const { data, nook } = useRouteData<typeof routeData>()
   return (
     <>
-      <a href="templates">Templates</a>
+      <a href={`/n/${nook()}/templates`}>Templates</a>
       <Show when={data()}>
         <ul>
           <For each={data()!.posts}>
