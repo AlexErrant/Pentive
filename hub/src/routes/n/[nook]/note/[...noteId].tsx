@@ -4,6 +4,7 @@ import { createServerData$ } from "solid-start/server"
 import { Ord, RemoteNoteId, getNote, getNoteComments } from "shared"
 import ResizingIframe from "~/components/resizingIframe"
 import NoteComment from "~/components/noteComment"
+import SubmitComment from "~/components/submitComment"
 
 export function routeData({ params }: RouteDataArgs) {
   return {
@@ -35,8 +36,7 @@ const Thread: Component = () => {
               fieldsAndValues: Array.from(data()!.note!.fieldValues.entries()),
             }}
           />
-        </Show>
-        <Show when={data()}>
+          <SubmitComment noteId={data()!.note!.id} />
           <For each={data()!.comments}>
             {(comment) => <NoteComment comment={comment} />}
           </For>

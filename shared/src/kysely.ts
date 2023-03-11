@@ -13,7 +13,7 @@ import {
   TemplateId,
   UserId,
 } from "./brand.js"
-import { binary16fromBase64URL, ulidAsRaw } from "./convertBinary.js"
+import { binary16fromBase64URL, ulidAsHex, ulidAsRaw } from "./convertBinary.js"
 import {
   nullMap,
   parseMap,
@@ -287,6 +287,32 @@ export async function insertPost({
     .execute()
 }
 
+export async function insertNoteComment(
+  noteId: RemoteNoteId,
+  text: string,
+  authorId: UserId
+) {
+  const noteDbId = fromBase64Url(noteId)
+  const r = await db
+    .selectFrom("Note")
+    .select(["id"])
+    .where("Note.id", "=", noteDbId)
+    .executeTakeFirst()
+  if (r == null) throwExp(`Note ${noteId} not found.`)
+  await db
+    .insertInto("NoteComment")
+    .values([
+      {
+        id: unhex(ulidAsHex()),
+        authorId,
+        level: 0,
+        noteId: noteDbId,
+        votes: "",
+        text,
+      },
+    ])
+    .execute()
+}
 export async function userOwnsNoteAndHasMedia(
   ids: NoteId[],
   authorId: UserId,

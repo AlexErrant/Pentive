@@ -1,11 +1,13 @@
 import {
   Base64Url,
+  commentText,
   createRemoteNote,
   db,
   dbIdToBase64Url,
   editNotes,
   editRemoteNote,
   fromBase64Url,
+  insertNoteComment,
   insertNotes,
   remoteNoteId,
 } from "shared"
@@ -31,6 +33,11 @@ export const noteRouter = {
     .mutation(async ({ input, ctx }) => {
       const remoteIdByLocal = await insertNotes(ctx.user, input)
       return remoteIdByLocal
+    }),
+  insertNoteComment: authedProcedure
+    .input(z.object({ noteId: remoteNoteId, text: commentText }))
+    .mutation(async ({ input, ctx }) => {
+      await insertNoteComment(input.noteId, input.text, ctx.user)
     }),
   editNote: authedProcedure
     .input(z.array(editRemoteNote).min(1))

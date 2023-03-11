@@ -1,0 +1,27 @@
+import { RemoteNoteId } from "shared"
+import { commentText } from "shared"
+import { apiClient } from "~/routes/apiClient"
+
+export default function SubmitComment(props: { noteId: RemoteNoteId }) {
+  return (
+    <main>
+      <form
+        onSubmit={async (e) => {
+          e.preventDefault()
+          const formData = new FormData(e.target as HTMLFormElement)
+          const text = commentText.parse(formData.get("comment"))
+          // highTODO idempotency token
+          apiClient.insertNoteComment.mutate({ noteId: props.noteId, text })
+        }}
+      >
+        <textarea
+          name="comment"
+          autocomplete="off"
+          rows="4"
+          cols="50"
+        ></textarea>
+        <button type="submit">Submit</button>
+      </form>
+    </main>
+  )
+}

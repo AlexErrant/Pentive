@@ -107,3 +107,5 @@ export const editRemoteTemplate = remoteTemplate.omit(uneditable).extend({
 })
 
 export type EditRemoteTemplate = z.infer<typeof editRemoteTemplate>
+
+export const commentText = z.string().min(1).max(1000)
