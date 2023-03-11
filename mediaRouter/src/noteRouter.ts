@@ -7,8 +7,10 @@ import {
   editNotes,
   editRemoteNote,
   fromBase64Url,
+  insertNoteChildComment,
   insertNoteComment,
   insertNotes,
+  noteCommentId,
   remoteNoteId,
 } from "shared"
 import { z } from "zod"
@@ -38,6 +40,11 @@ export const noteRouter = {
     .input(z.object({ noteId: remoteNoteId, text: commentText }))
     .mutation(async ({ input, ctx }) => {
       await insertNoteComment(input.noteId, input.text, ctx.user)
+    }),
+  insertNoteChildComment: authedProcedure
+    .input(z.object({ parentCommentId: noteCommentId, text: commentText }))
+    .mutation(async ({ input, ctx }) => {
+      await insertNoteChildComment(input.parentCommentId, input.text, ctx.user)
     }),
   editNote: authedProcedure
     .input(z.array(editRemoteNote).min(1))

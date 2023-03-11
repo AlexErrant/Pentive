@@ -302,18 +302,43 @@ export async function insertNoteComment(
   if (r == null) throwExp(`Note ${noteId} not found.`)
   await db
     .insertInto("NoteComment")
-    .values([
-      {
-        id: unhex(ulidAsHex()),
-        authorId,
-        level: 0,
-        noteId: noteDbId,
-        votes: "",
-        text,
-      },
-    ])
+    .values({
+      id: unhex(ulidAsHex()),
+      authorId,
+      level: 0,
+      noteId: noteDbId,
+      votes: "",
+      text,
+    })
     .execute()
 }
+
+export async function insertNoteChildComment(
+  parentCommentId: NoteCommentId,
+  text: string,
+  authorId: UserId
+) {
+  const parentCommentDbId = fromBase64Url(parentCommentId)
+  const parent = await db
+    .selectFrom("NoteComment")
+    .select(["level", sql<Base64>`TO_BASE64(noteId)`.as("noteId")])
+    .where("id", "=", parentCommentDbId)
+    .executeTakeFirst()
+  if (parent == null) throwExp(`Comment ${parentCommentId} not found.`)
+  await db
+    .insertInto("NoteComment")
+    .values({
+      id: unhex(ulidAsHex()),
+      authorId,
+      level: parent.level + 1,
+      noteId: fromBase64(parent.noteId),
+      votes: "",
+      text,
+      parentId: parentCommentDbId,
+    })
+    .execute()
+}
+
 export async function userOwnsNoteAndHasMedia(
   ids: NoteId[],
   authorId: UserId,

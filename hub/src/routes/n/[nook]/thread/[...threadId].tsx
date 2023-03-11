@@ -16,14 +16,12 @@ export function routeData({ params }: RouteDataArgs) {
 const Thread: Component = () => {
   const { thread } = useRouteData<typeof routeData>()
   return (
-    <ErrorBoundary fallback={() => <p>Error loading thread.</p>}>
-      <Suspense fallback={<p>Loading thread...</p>}>
-        <Show when={thread()} fallback={<p>"404 Not Found"</p>}>
-          <h1>{thread()!.title}</h1>
-          <p>{thread()!.text}</p>
-        </Show>
-      </Suspense>
-    </ErrorBoundary>
+    <Suspense fallback={<p>Loading thread...</p>}>
+      <Show when={thread()} fallback={<p>"404 Not Found"</p>}>
+        <h1>{thread()!.title}</h1>
+        <p>{thread()!.text}</p>
+      </Show>
+    </Suspense>
   )
 }
 
