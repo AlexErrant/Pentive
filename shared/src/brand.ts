@@ -1,3 +1,9 @@
+// We do some questionable shit with Brands, e.g. `"templateId" & "base64url"`.
+// This allows us to pass Ids into functions that expect a generic base64url.
+// However, this means we don't use Zod brands,`which leads to issues like
+// grep E7F24704-8D0B-460A-BF2C-A97344C535E0
+// In particular, the fix https://github.com/colinhacks/zod/pull/2097" doesn't work for us
+
 export type Brand<T, B> = T & { readonly brand: B } // https://medium.com/@KevinBGreene/surviving-the-typescript-ecosystem-branding-and-type-tagging-6cf6e516523d
 
 export type Base64 = Brand<string, "base64">

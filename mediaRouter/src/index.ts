@@ -163,7 +163,7 @@ app
     const iByEntityIds = iByEntityIdsValidator.parse(c.req.query()) as Record<
       NoteId,
       number
-    > // nix upon resolution of https://github.com/colinhacks/zod/pull/2097
+    > // grep E7F24704-8D0B-460A-BF2C-A97344C535E0
     const noteIds = Object.keys(iByEntityIds) as NoteId[]
     if (noteIds.length === 0) return c.text(`Need at least one note.`, 400)
     return await postPublicMedia(
@@ -178,7 +178,7 @@ app
     const iByEntityIds = iByEntityIdsValidator.parse(c.req.query()) as Record<
       TemplateId,
       number
-    > // nix upon resolution of https://github.com/colinhacks/zod/pull/2097
+    > // grep E7F24704-8D0B-460A-BF2C-A97344C535E0
     const templateIds = Object.keys(iByEntityIds) as TemplateId[]
     if (templateIds.length === 0)
       return c.text(`Need at least one template.`, 400)

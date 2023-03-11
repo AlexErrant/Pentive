@@ -1,4 +1,4 @@
-type Brand<T, B> = T & { readonly brand: B } // https://medium.com/@KevinBGreene/surviving-the-typescript-ecosystem-branding-and-type-tagging-6cf6e516523d
+import { Brand } from "shared"
 
 export type RemoteTemplateId = Brand<string, "remoteTemplateId" & "base64url">
 export type RemoteCardId = Brand<string, "remoteCardId" & "base64url">

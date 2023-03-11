@@ -465,9 +465,7 @@ function toNoteCreates(n: EditRemoteNote | CreateRemoteNote, authorId: UserId) {
           Array.from(n.remoteIds).map(([remoteNoteId, remoteTemplateId]) => [
             base64url.decode(remoteNoteId + "=="),
             remoteTemplateId ??
-              throwExp(
-                "remove upon resolution of https://github.com/colinhacks/zod/pull/2097"
-              ),
+              throwExp("grep E7F24704-8D0B-460A-BF2C-A97344C535E0"),
           ])
         )
       : new Map(n.remoteTemplateIds.map((rt) => [ulidAsRaw(), rt]))
