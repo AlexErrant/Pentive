@@ -23,3 +23,5 @@ export type NookId = Brand<string, "nookId">
 export type PluginId = Brand<string, "pluginId" & "base64url">
 
 export type MediaId = Brand<string, "mediaId">
+
+export type NoteCommentId = Brand<string, "noteCommentId" & "base64url">

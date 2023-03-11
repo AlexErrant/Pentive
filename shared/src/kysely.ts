@@ -7,6 +7,7 @@ import {
   DbId,
   Hex,
   NookId,
+  NoteCommentId,
   NoteId,
   RemoteNoteId,
   RemoteTemplateId,
@@ -155,8 +156,8 @@ function listToTree(list: NoteComment[]) {
 }
 
 export interface NoteComment {
-  id: Base64Url
-  parentId: Base64Url | null
+  id: NoteCommentId
+  parentId: NoteCommentId | null
   noteId: DbId
   createdAt: Date
   updatedAt: Date
@@ -186,8 +187,8 @@ export async function getNoteComments(noteId: RemoteNoteId) {
     .execute()
   const commentsList = cs.map((c) => {
     const r: NoteComment = {
-      id: dbIdToBase64Url(c.id),
-      parentId: nullMap(c.parentId, dbIdToBase64Url),
+      id: dbIdToBase64Url(c.id) as NoteCommentId,
+      parentId: nullMap(c.parentId, dbIdToBase64Url) as NoteCommentId | null,
       noteId,
       createdAt: c.createdAt,
       updatedAt: c.updatedAt,

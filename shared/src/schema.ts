@@ -6,6 +6,7 @@ import {
   Ord,
   RemoteTemplateId,
   NookId,
+  NoteCommentId,
 } from "./brand"
 
 export const remoteNoteId = z
@@ -15,6 +16,10 @@ export const remoteNoteId = z
 export const remoteTemplateId = z
   .string()
   .regex(/^[a-zA-Z0-9_-]{22}$/) as unknown as z.Schema<RemoteTemplateId>
+
+export const noteCommentId = z
+  .string()
+  .regex(/^[a-zA-Z0-9_-]{22}$/) as unknown as z.Schema<NoteCommentId>
 
 const fieldValues = z
   .map(z.string().min(1), z.string())
