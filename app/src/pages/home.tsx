@@ -169,22 +169,6 @@ export default function Home(): JSX.Element {
         >
           sync
         </button>
-        <button
-          class="border rounded-lg px-2 border-gray-900"
-          onClick={async () => {
-            console.log(await apiClient.hello.query("Harrowhark"))
-          }}
-        >
-          Hello tRPC
-        </button>
-        <button
-          class="border rounded-lg px-2 border-gray-900"
-          onClick={async () => {
-            console.log(await apiClient.authedHello.query())
-          }}
-        >
-          Hello Auth
-        </button>
       </div>
       <div class="mt-4">
         <button

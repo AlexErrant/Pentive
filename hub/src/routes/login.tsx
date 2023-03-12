@@ -16,8 +16,8 @@ function validateUsername(username: unknown): string | undefined {
 }
 
 function validatePassword(password: unknown): string | undefined {
-  if (typeof password !== "string" || password.length < 6) {
-    return `Passwords must be at least 6 characters long`
+  if (typeof password !== "string" || password.length < 2) {
+    return `Passwords must be at least 2 characters long`
   }
 }
 

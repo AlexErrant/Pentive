@@ -1,4 +1,9 @@
-const users = [{ username: "kody", password: "twixrox" }]
+const users = [
+  { username: "kody", password: "twixrox" },
+  { username: "gid", password: "hark" },
+  { username: "har", password: "eon" },
+  { username: "cam", password: "des" },
+]
 export const db = {
   user: {
     // eslint-disable-next-line @typescript-eslint/require-await
