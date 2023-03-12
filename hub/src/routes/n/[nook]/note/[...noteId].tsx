@@ -7,6 +7,7 @@ import NoteComment from "~/components/noteComment"
 import SubmitComment from "~/components/submitComment"
 import { apiClient } from "~/routes/apiClient"
 import { getUserId } from "~/db/session"
+import { getAppMessenger } from "~/root"
 
 export function routeData({ params }: RouteDataArgs) {
   return {
@@ -46,6 +47,7 @@ const Thread: Component = () => {
           </p>
           <button
             onclick={async () => {
+              await getAppMessenger().hiFromApp("Lo!")
               await apiClient.subscribeToNote.mutate(data()!.note!.id)
             }}
             disabled={data()?.note?.til != null}

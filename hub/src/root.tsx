@@ -15,6 +15,25 @@ import {
 } from "solid-start"
 import Nav from "./components/nav"
 import "./root.css"
+import type { appExpose } from "app/src/index"
+import * as Comlink from "comlink"
+import { throwExp } from "shared"
+
+let appMessenger: Comlink.Remote<typeof appExpose> | null
+
+export function getAppMessenger() {
+  if (appMessenger == null) {
+    const pai = document.getElementById(
+      "pentive-app-iframe"
+    ) as HTMLIFrameElement
+    if (pai.contentWindow == null)
+      throwExp("Unable to find the pentive app iframe.")
+    appMessenger = Comlink.wrap<typeof appExpose>(
+      Comlink.windowEndpoint(pai.contentWindow)
+    )
+  }
+  return appMessenger
+}
 
 export default function Root(): JSX.Element {
   return (
@@ -27,6 +46,13 @@ export default function Root(): JSX.Element {
         <Link rel="manifest" href="/manifest.webmanifest" />
       </Head>
       <Body>
+        <iframe
+          id="pentive-app-iframe"
+          sandbox="allow-scripts allow-same-origin" // Changing this has security ramifications! https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe#attr-sandbox
+          // "When the embedded document has the same origin as the embedding page, it is strongly discouraged to use both allow-scripts and allow-same-origin"
+          // Since this iframe hosts `app.pentive.com` and this page is hosted on `pentive.com`, resulting in different origins, we should be safe. https://web.dev/sandboxed-iframes/ https://stackoverflow.com/q/35208161
+          src={`https://app.local.pentive.com:3014/`}
+        />
         <Nav />
         <ErrorBoundary>
           <Suspense fallback={<div class="news-list-nav">Loading...</div>}>
