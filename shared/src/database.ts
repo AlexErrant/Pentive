@@ -34,6 +34,8 @@ export interface Note {
   fts: string
   tags: string
   ankiId: number | null
+  subscribersCount: Generated<number>
+  commentsCount: Generated<number>
 }
 
 export interface NoteComment {
