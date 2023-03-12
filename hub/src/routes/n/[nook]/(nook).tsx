@@ -3,15 +3,18 @@ import { A, RouteDataArgs, useRouteData } from "solid-start"
 import { createServerData$ } from "solid-start/server"
 import { getPosts, getNotes, NookId, Ord } from "shared"
 import ResizingIframe from "~/components/resizingIframe"
+import { getUserId } from "~/db/session"
 
 export function routeData({ params }: RouteDataArgs) {
   return {
     nook: () => params.nook,
     data: createServerData$(
-      async (nook) => {
+      async (nook, { request }) => {
         return {
           posts: await getPosts({ nook }),
-          notes: await getNotes(nook as NookId),
+          notes: await getUserId(request).then(
+            async (userId) => await getNotes(nook as NookId, userId)
+          ),
         }
       },
       { key: () => params.nook }
@@ -36,6 +39,9 @@ const Threads: Component = () => {
           <For each={data()!.notes}>
             {(note) => (
               <li>
+                <div>
+                  Til {note.til == null ? "X" : note.til.toLocaleTimeString()}
+                </div>
                 <div>{note.subscribers} subscribers</div>
                 <div>
                   <a href={`/n/${nook()}/note/${note.id}`}>

@@ -72,12 +72,14 @@ function noteToNookView(x: {
   fields: string
   subscribers: number
   comments: number
+  til?: Date
 }) {
   return {
     id: dbIdToBase64Url(x.id) as RemoteNoteId,
     fieldValues: deserializeFieldValues(x.fieldValues),
     subscribers: x.subscribers,
     comments: x.comments,
+    til: x.til,
     template: {
       css: x.css,
       fields: deserializeFields(x.fields),
@@ -86,7 +88,7 @@ function noteToNookView(x: {
   }
 }
 
-export async function getNotes(nook: NookId) {
+export async function getNotes(nook: NookId, userId: UserId | null) {
   const r = await db
     .selectFrom("Note")
     .innerJoin("Template", "Template.id", "Note.templateId")
@@ -99,12 +101,22 @@ export async function getNotes(nook: NookId) {
       "Template.fields",
       "Template.type",
     ])
+    .if(userId != null, (a) =>
+      a.select((b) =>
+        b
+          .selectFrom("NoteSubscriber")
+          .select(["til"])
+          .where("userId", "=", userId)
+          .whereRef("NoteSubscriber.noteId", "=", "Note.id")
+          .as("til")
+      )
+    )
     .where("Template.nook", "=", nook)
     .execute()
   return r.map(noteToNookView)
 }
 
-export async function getNote(noteId: RemoteNoteId) {
+export async function getNote(noteId: RemoteNoteId, userId: UserId | null) {
   const r = await db
     .selectFrom("Note")
     .innerJoin("Template", "Template.id", "Note.templateId")
@@ -120,6 +132,16 @@ export async function getNote(noteId: RemoteNoteId) {
       "Template.fields",
       "Template.type",
     ])
+    .if(userId != null, (a) =>
+      a.select((b) =>
+        b
+          .selectFrom("NoteSubscriber")
+          .select(["til"])
+          .where("userId", "=", userId)
+          .whereRef("NoteSubscriber.noteId", "=", "Note.id")
+          .as("til")
+      )
+    )
     .where("Note.id", "=", fromBase64Url(noteId))
     .executeTakeFirst()
   if (r == null) return null
@@ -132,6 +154,7 @@ export async function getNote(noteId: RemoteNoteId) {
     fieldValues: deserializeFieldValues(r.fieldValues),
     tags: deserializeTags(r.tags),
     ankiId: r.ankiId,
+    til: r.til,
     template: {
       css: r.css,
       fields: deserializeFields(r.fields),

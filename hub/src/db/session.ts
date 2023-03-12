@@ -6,6 +6,7 @@ import {
   csrfSignatureCookieName,
   jwtCookieName,
   throwExp,
+  UserId,
 } from "shared"
 import { redirect } from "solid-start/server"
 import { createCookieSessionStorage } from "solid-start/session"
@@ -154,11 +155,11 @@ export async function getJwt(request: Request): Promise<Jwt | null> {
       }
 }
 
-export async function getUserId(request: Request): Promise<string | null> {
+export async function getUserId(request: Request) {
   const session = await getUserSession(request)
   const userId = session.get(sessionUserId) as unknown
   if (typeof userId !== "string" || userId.length === 0) return null
-  return userId
+  return userId as UserId
 }
 
 export async function requireSession(

@@ -1,19 +1,22 @@
 import { Component, For, Show, Suspense } from "solid-js"
-import ErrorBoundary, { RouteDataArgs, useRouteData } from "solid-start"
+import { RouteDataArgs, useRouteData } from "solid-start"
 import { createServerData$ } from "solid-start/server"
 import { Ord, RemoteNoteId, getNote, getNoteComments } from "shared"
 import ResizingIframe from "~/components/resizingIframe"
 import NoteComment from "~/components/noteComment"
 import SubmitComment from "~/components/submitComment"
 import { apiClient } from "~/routes/apiClient"
+import { getUserId } from "~/db/session"
 
 export function routeData({ params }: RouteDataArgs) {
   return {
     noteId: (): string => params.noteId,
     data: createServerData$(
-      async (noteId) => {
+      async (noteId, { request }) => {
         return {
-          note: await getNote(noteId as RemoteNoteId),
+          note: await getUserId(request).then(
+            async (userId) => await getNote(noteId as RemoteNoteId, userId)
+          ),
           comments: await getNoteComments(noteId as RemoteNoteId),
         }
       },
@@ -45,6 +48,7 @@ const Thread: Component = () => {
             onclick={async () => {
               await apiClient.subscribeToNote.mutate(data()!.note!.id)
             }}
+            disabled={data()?.note?.til != null}
           >
             Download
           </button>
