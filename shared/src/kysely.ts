@@ -491,6 +491,37 @@ export async function insertTemplates(
   return remoteIdByLocal
 }
 
+export async function subscribeToNote(userId: UserId, noteId: RemoteNoteId) {
+  const noteDbId = fromBase64Url(noteId)
+  await db.transaction().execute(
+    async (tx) =>
+      await Promise.all([
+        tx
+          .selectFrom("Note")
+          .select(["id"])
+          .where("id", "=", noteDbId)
+          .executeTakeFirst()
+          .then((n) => {
+            if (n == null) throwExp(`Note ${noteId} not found.`)
+          }),
+        tx
+          .updateTable("Note")
+          .set({
+            subscribersCount: (x) => sql`${x.ref("subscribersCount")} + 1`,
+          })
+          .where("Note.id", "=", noteDbId)
+          .execute(),
+        tx
+          .insertInto("NoteSubscriber")
+          .values({
+            userId,
+            noteId: noteDbId,
+          })
+          .execute(),
+      ])
+  )
+}
+
 function toNoteCreates(n: EditRemoteNote | CreateRemoteNote, authorId: UserId) {
   const remoteIds =
     "remoteIds" in n

@@ -41,6 +41,13 @@ const Thread: Component = () => {
               }}
             />
           </p>
+          <button
+            onclick={async () => {
+              await apiClient.subscribeToNote.mutate(data()!.note!.id)
+            }}
+          >
+            Download
+          </button>
           <ul class="comment-children">
             <SubmitComment
               onSubmit={async (text) =>

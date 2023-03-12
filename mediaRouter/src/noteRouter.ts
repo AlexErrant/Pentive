@@ -12,6 +12,7 @@ import {
   insertNotes,
   noteCommentId,
   remoteNoteId,
+  subscribeToNote,
 } from "shared"
 import { z } from "zod"
 import { authedProcedure, publicProcedure } from "./trpc"
@@ -53,6 +54,11 @@ export const noteRouter = {
     .input(z.object({ parentCommentId: noteCommentId, text: commentText }))
     .mutation(async ({ input, ctx }) => {
       await insertNoteChildComment(input.parentCommentId, input.text, ctx.user)
+    }),
+  subscribeToNote: authedProcedure
+    .input(remoteNoteId)
+    .mutation(async ({ input, ctx }) => {
+      await subscribeToNote(ctx.user, input)
     }),
   editNote: authedProcedure
     .input(z.array(editRemoteNote).min(1))
