@@ -70,10 +70,14 @@ function noteToNookView(x: {
   css: string
   type: string
   fields: string
+  subscribers: number
+  comments: number
 }) {
   return {
     id: dbIdToBase64Url(x.id) as RemoteNoteId,
     fieldValues: deserializeFieldValues(x.fieldValues),
+    subscribers: x.subscribers,
+    comments: x.comments,
     template: {
       css: x.css,
       fields: deserializeFields(x.fields),
@@ -89,6 +93,8 @@ export async function getNotes(nook: NookId) {
     .select([
       "Note.id",
       "Note.fieldValues",
+      "Note.subscribersCount as subscribers",
+      "Note.commentsCount as comments",
       "Template.css",
       "Template.fields",
       "Template.type",
@@ -294,23 +300,37 @@ export async function insertNoteComment(
   authorId: UserId
 ) {
   const noteDbId = fromBase64Url(noteId)
-  const r = await db
-    .selectFrom("Note")
-    .select(["id"])
-    .where("Note.id", "=", noteDbId)
-    .executeTakeFirst()
-  if (r == null) throwExp(`Note ${noteId} not found.`)
-  await db
-    .insertInto("NoteComment")
-    .values({
-      id: unhex(ulidAsHex()),
-      authorId,
-      level: 0,
-      noteId: noteDbId,
-      votes: "",
-      text,
-    })
-    .execute()
+  await db.transaction().execute(
+    async (tx) =>
+      await Promise.all([
+        await db
+          .selectFrom("Note")
+          .select(["id"])
+          .where("Note.id", "=", noteDbId)
+          .executeTakeFirst()
+          .then((r) => {
+            if (r == null) throwExp(`Note ${noteId} not found.`)
+          }),
+        tx
+          .updateTable("Note")
+          .set({
+            commentsCount: (x) => sql`${x.ref("commentsCount")} + 1`,
+          })
+          .where("Note.id", "=", noteDbId)
+          .execute(),
+        tx
+          .insertInto("NoteComment")
+          .values({
+            id: unhex(ulidAsHex()),
+            authorId,
+            level: 0,
+            noteId: noteDbId,
+            votes: "",
+            text,
+          })
+          .execute(),
+      ])
+  )
 }
 
 export async function insertNoteChildComment(
@@ -325,18 +345,31 @@ export async function insertNoteChildComment(
     .where("id", "=", parentCommentDbId)
     .executeTakeFirst()
   if (parent == null) throwExp(`Comment ${parentCommentId} not found.`)
-  await db
-    .insertInto("NoteComment")
-    .values({
-      id: unhex(ulidAsHex()),
-      authorId,
-      level: parent.level + 1,
-      noteId: fromBase64(parent.noteId),
-      votes: "",
-      text,
-      parentId: parentCommentDbId,
-    })
-    .execute()
+  const noteId = fromBase64(parent.noteId)
+  await db.transaction().execute(
+    async (tx) =>
+      await Promise.all([
+        tx
+          .updateTable("Note")
+          .set({
+            commentsCount: (x) => sql`${x.ref("commentsCount")} + 1`,
+          })
+          .where("Note.id", "=", noteId)
+          .execute(),
+        await tx
+          .insertInto("NoteComment")
+          .values({
+            id: unhex(ulidAsHex()),
+            authorId,
+            level: parent.level + 1,
+            noteId,
+            votes: "",
+            text,
+            parentId: parentCommentDbId,
+          })
+          .execute(),
+      ])
+  )
 }
 
 export async function userOwnsNoteAndHasMedia(

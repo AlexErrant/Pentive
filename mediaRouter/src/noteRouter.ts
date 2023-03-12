@@ -21,12 +21,20 @@ import { From } from "kysely/dist/cjs/parser/table-parser"
 
 type ClientNote = Omit<
   Note,
-  "id" | "templateId" | "fts" | "createdAt" | "updatedAt"
+  | "id"
+  | "templateId"
+  | "fts"
+  | "createdAt"
+  | "updatedAt"
+  | "subscribersCount"
+  | "commentsCount"
 > & {
   id: Base64Url
   templateId: Base64Url
   createdAt: Date
   updatedAt: Date
+  subscribersCount: number
+  commentsCount: number
 }
 
 export const noteRouter = {
@@ -62,6 +70,8 @@ export const noteRouter = {
         // "fts",
         "tags",
         "ankiId",
+        "commentsCount",
+        "subscribersCount",
       ])
       .where("id", "=", fromBase64Url(input))
       .executeTakeFirst()
@@ -83,6 +93,8 @@ export const noteRouter = {
         // "fts",
         "tags",
         "ankiId",
+        "commentsCount",
+        "subscribersCount",
       ])
       .where(sql`MATCH(fts) AGAINST (${input} IN NATURAL LANGUAGE MODE)`)
       .execute()
@@ -102,6 +114,8 @@ function mapNote(
     | "createdAt"
     | "updatedAt"
     | "authorId"
+    | "commentsCount"
+    | "subscribersCount"
   >
 ) {
   const r: ClientNote = {

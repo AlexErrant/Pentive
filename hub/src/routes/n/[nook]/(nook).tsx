@@ -36,7 +36,12 @@ const Threads: Component = () => {
           <For each={data()!.notes}>
             {(note) => (
               <li>
-                <a href={`/n/${nook()}/note/${note.id}`}>Go</a>
+                <div>{note.subscribers} subscribers</div>
+                <div>
+                  <a href={`/n/${nook()}/note/${note.id}`}>
+                    {note.comments} comments
+                  </a>
+                </div>
                 <ResizingIframe
                   i={{
                     tag: "card",
