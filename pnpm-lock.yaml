@@ -250,6 +250,7 @@ importers:
       '@types/iframe-resizer': ^3.5.9
       '@typescript-eslint/eslint-plugin': ^5.31.0
       '@typescript-eslint/parser': ^5.31.0
+      app: workspace:*
       comlink: ^4.3.1
       cookie: ^0.5.0
       eslint: ^8.20.0
@@ -292,6 +293,7 @@ importers:
       '@solidjs/router': 0.7.0_solid-js@1.6.12
       '@trpc/client': 10.11.1_@trpc+server@10.11.1
       '@trpc/server': 10.11.1
+      app: link:../app
       comlink: 4.3.1
       cookie: 0.5.0
       html-to-text: 9.0.3

@@ -52,6 +52,7 @@
     "@solidjs/router": "^0.7.0",
     "@trpc/client": "^10.11.1",
     "@trpc/server": "^10.11.1",
+    "app": "workspace:*",
     "comlink": "^4.3.1",
     "cookie": "^0.5.0",
     "html-to-text": "^9.0.3 || Hub doesn't use this, but `shared` (actually `mediaRouter`) does. Not including this causes an ESModule error - I've no idea why.",
