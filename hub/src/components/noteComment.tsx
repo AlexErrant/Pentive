@@ -13,7 +13,7 @@ const NoteComment: Component<{ comment: NoteCommentType }> = (props) => {
         <A href={`/users/${props.comment.authorId}`}>
           {props.comment.authorId}
         </A>{" "}
-        {props.comment.updatedAt.toLocaleString()}
+        {props.comment.updated.toLocaleString()}
       </div>
       <div class="text" innerHTML={props.comment.text} />
       <button

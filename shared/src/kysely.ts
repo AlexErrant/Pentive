@@ -122,8 +122,8 @@ export async function getNote(noteId: RemoteNoteId, userId: UserId | null) {
     .innerJoin("Template", "Template.id", "Note.templateId")
     .select([
       "Note.templateId",
-      "Note.createdAt",
-      "Note.updatedAt",
+      "Note.created",
+      "Note.updated",
       "Note.authorId",
       "Note.fieldValues",
       "Note.tags",
@@ -148,8 +148,8 @@ export async function getNote(noteId: RemoteNoteId, userId: UserId | null) {
   return {
     id: noteId,
     templateId: dbIdToBase64Url(r.templateId) as RemoteTemplateId,
-    createdAt: r.createdAt,
-    updatedAt: r.updatedAt,
+    created: r.created,
+    updated: r.updated,
     authorId: r.authorId as UserId,
     fieldValues: deserializeFieldValues(r.fieldValues),
     tags: deserializeTags(r.tags),
@@ -188,8 +188,8 @@ export interface NoteComment {
   id: NoteCommentId
   parentId: NoteCommentId | null
   noteId: DbId
-  createdAt: Date
-  updatedAt: Date
+  created: Date
+  updated: Date
   text: string
   authorId: string
   votes: string
@@ -203,8 +203,8 @@ export async function getNoteComments(noteId: RemoteNoteId) {
     .select([
       "id",
       "parentId",
-      "createdAt",
-      "updatedAt",
+      "created",
+      "updated",
       "text",
       "authorId",
       "votes",
@@ -219,8 +219,8 @@ export async function getNoteComments(noteId: RemoteNoteId) {
       id: dbIdToBase64Url(c.id) as NoteCommentId,
       parentId: nullMap(c.parentId, dbIdToBase64Url) as NoteCommentId | null,
       noteId,
-      createdAt: c.createdAt,
-      updatedAt: c.updatedAt,
+      created: c.created,
+      updated: c.updated,
       text: c.text,
       authorId: c.authorId as UserId,
       votes: c.votes,
@@ -271,8 +271,8 @@ export async function getTemplates(nook: NookId) {
 
 function templateEntityToDomain(t: {
   id: DbId
-  createdAt: Date
-  updatedAt: Date
+  created: Date
+  updated: Date
   name: string
   nook: NookId
   type: string
@@ -286,8 +286,8 @@ function templateEntityToDomain(t: {
     nook: t.nook,
     css: t.css,
     fields: deserializeFields(t.fields),
-    created: t.createdAt,
-    modified: t.updatedAt,
+    created: t.created,
+    modified: t.updated,
     templateType: deserializeTemplateType(t.type),
   }
   return r
@@ -565,7 +565,7 @@ function toNoteCreate(
   n: EditRemoteNote | CreateRemoteNote,
   authorId: UserId
 ) {
-  const updatedAt = "remoteId" in n ? new Date() : undefined
+  const updated = "remoteId" in n ? new Date() : undefined
   const remoteIdHex = base16.encode(remoteNoteId) as Hex
   const remoteIdBase64url = base64url
     .encode(remoteNoteId)
@@ -577,7 +577,7 @@ function toNoteCreate(
     id: unhex(remoteIdHex),
     templateId: fromBase64Url(remoteTemplateId), // highTODO validate
     authorId,
-    updatedAt,
+    updated,
     fieldValues: serializeFieldValues(n.fieldValues),
     fts: Array.from(n.fieldValues)
       .map(([, v]) => convert(v))
@@ -618,7 +618,7 @@ function toTemplateCreate(
   remoteId: Uint8Array,
   nook: NookId
 ) {
-  const updatedAt = "remoteId" in n ? new Date() : undefined
+  const updated = "remoteId" in n ? new Date() : undefined
   const remoteIdHex = base16.encode(remoteId) as Hex
   const remoteIdBase64url = base64url
     .encode(remoteId)
@@ -641,7 +641,7 @@ function toTemplateCreate(
   const templateCreate: InsertObject<DB, "Template"> & { nook: NookId } = {
     id: unhex(remoteIdHex),
     ankiId: n.ankiId,
-    updatedAt,
+    updated,
     name: n.name,
     nook,
     type: serializeTemplateType(n.templateType),
@@ -701,15 +701,15 @@ export async function editNotes(authorId: UserId, notes: EditRemoteNote[]) {
   })
   // insert into `Note` (`id`, `templateId`, `authorId`, `fieldValues`, `fts`, `tags`)
   // values (UNHEX(?), FROM_BASE64(?), ?, ?, ?, ?)
-  // on duplicate key update `templateId` = values(`templateId`), `updatedAt` = values(`updatedAt`), `authorId` = values(`authorId`), `fieldValues` = values(`fieldValues`), `fts` = values(`fts`), `tags` = values(`tags`), `ankiId` = values(`ankiId`)
+  // on duplicate key update `templateId` = values(`templateId`), `updated` = values(`updated`), `authorId` = values(`authorId`), `fieldValues` = values(`fieldValues`), `fts` = values(`fts`), `tags` = values(`tags`), `ankiId` = values(`ankiId`)
   await db
     .insertInto("Note")
     .values(noteCreates.flat())
     // https://stackoverflow.com/a/34866431
     .onDuplicateKeyUpdate({
       templateId: (x) => values(x.ref("templateId")),
-      // createdAt: (x) => values(x.ref("createdAt")),
-      updatedAt: (x) => values(x.ref("updatedAt")),
+      // created: (x) => values(x.ref("created")),
+      updated: (x) => values(x.ref("updated")),
       authorId: (x) => values(x.ref("authorId")),
       fieldValues: (x) => values(x.ref("fieldValues")),
       fts: (x) => values(x.ref("fts")),
@@ -743,8 +743,8 @@ export async function editTemplates(
     // https://stackoverflow.com/a/34866431
     .onDuplicateKeyUpdate({
       ankiId: (x) => values(x.ref("ankiId")),
-      // createdAt: (x) => values(x.ref("createdAt")),
-      updatedAt: (x) => values(x.ref("updatedAt")),
+      // created: (x) => values(x.ref("created")),
+      updated: (x) => values(x.ref("updated")),
       name: (x) => values(x.ref("name")),
       // nook: (x) => values(x.ref("nook")), do not update Nook!
       type: (x) => values(x.ref("type")),

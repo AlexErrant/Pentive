@@ -20,15 +20,15 @@ export interface MediaEntity {
 export interface Nook {
   id: string
   displayName: string
-  createdAt: Generated<Date>
+  created: Generated<Date>
   moderators: string
 }
 
 export interface Note {
   id: DbId
   templateId: DbId
-  createdAt: Generated<Date>
-  updatedAt: Generated<Date>
+  created: Generated<Date>
+  updated: Generated<Date>
   authorId: string
   fieldValues: string
   fts: string
@@ -42,8 +42,8 @@ export interface NoteComment {
   id: DbId
   parentId: DbId | null
   noteId: DbId
-  createdAt: Generated<Date>
-  updatedAt: Generated<Date>
+  created: Generated<Date>
+  updated: Generated<Date>
   text: string
   authorId: string
   history: string | null
@@ -53,7 +53,7 @@ export interface NoteComment {
 
 export interface NoteHistory {
   noteId: DbId
-  createdAt: Generated<Date>
+  created: Generated<Date>
   templateId: DbId | null
   fieldValues: string
   tags: string
@@ -77,8 +77,8 @@ export interface PostComment {
   id: DbId
   parentId: DbId | null
   postId: DbId
-  createdAt: Generated<Date>
-  updatedAt: Generated<Date>
+  created: Generated<Date>
+  updated: Generated<Date>
   text: string
   authorId: string
   history: string | null
@@ -94,8 +94,8 @@ export interface PostSubscriber {
 
 export interface Template {
   id: DbId
-  createdAt: Generated<Date>
-  updatedAt: Generated<Date>
+  created: Generated<Date>
+  updated: Generated<Date>
   name: string
   nook: NookId
   type: string
@@ -108,8 +108,8 @@ export interface TemplateComment {
   id: DbId
   parentId: DbId | null
   templateId: DbId
-  createdAt: Generated<Date>
-  updatedAt: Generated<Date>
+  created: Generated<Date>
+  updated: Generated<Date>
   text: string
   authorId: string
   history: string | null
@@ -119,7 +119,7 @@ export interface TemplateComment {
 
 export interface TemplateHistory {
   templateId: DbId
-  createdAt: Generated<Date>
+  created: Generated<Date>
   name: string | null
   authorId: string | null
   type: string | null
@@ -136,7 +136,7 @@ export interface TemplateSubscriber {
 export interface User {
   id: string
   displayName: string
-  createdAt: Generated<Date>
+  created: Generated<Date>
 }
 
 export interface DB {

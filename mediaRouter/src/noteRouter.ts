@@ -25,15 +25,15 @@ type ClientNote = Omit<
   | "id"
   | "templateId"
   | "fts"
-  | "createdAt"
-  | "updatedAt"
+  | "created"
+  | "updated"
   | "subscribersCount"
   | "commentsCount"
 > & {
   id: Base64Url
   templateId: Base64Url
-  createdAt: Date
-  updatedAt: Date
+  created: Date
+  updated: Date
   subscribersCount: number
   commentsCount: number
 }
@@ -69,8 +69,8 @@ export const noteRouter = {
       .select([
         "id",
         "templateId",
-        "createdAt",
-        "updatedAt",
+        "created",
+        "updated",
         "authorId",
         "fieldValues",
         // "fts",
@@ -92,8 +92,8 @@ export const noteRouter = {
       .select([
         "id",
         "templateId",
-        "createdAt",
-        "updatedAt",
+        "created",
+        "updated",
         "authorId",
         "fieldValues",
         // "fts",
@@ -117,8 +117,8 @@ function mapNote(
     | "tags"
     | "ankiId"
     | "id"
-    | "createdAt"
-    | "updatedAt"
+    | "created"
+    | "updated"
     | "authorId"
     | "commentsCount"
     | "subscribersCount"
