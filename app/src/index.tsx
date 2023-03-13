@@ -33,7 +33,7 @@ export const appExpose = {
       name: rt.name,
       css: rt.css,
       created: new Date(),
-      modified: new Date(),
+      updated: new Date(),
       templateType: rt.templateType,
       fields: rt.fields.map((name) => ({ name })),
       remotes: new Map([[rt.nook, rt.id]]),
@@ -73,7 +73,7 @@ async function downloadImages(ct: ChildTemplate, dp: DOMParser) {
       const media: Media = {
         id: getId(imgSrc),
         created: now,
-        modified: now,
+        updated: now,
         data: await response.arrayBuffer(),
       }
       return await db.upsertMedia(media)

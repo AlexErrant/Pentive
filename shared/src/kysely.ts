@@ -287,7 +287,7 @@ function templateEntityToDomain(t: {
     css: t.css,
     fields: deserializeFields(t.fields),
     created: t.created,
-    modified: t.updated,
+    updated: t.updated,
     templateType: deserializeTemplateType(t.type),
   }
   return r

@@ -5,7 +5,7 @@ export const initSql = [
     css TEXT,
     fields TEXT,
     created INTEGER,
-    modified INTEGER,
+    updated INTEGER,
     templateType TEXT,
     ankiId INTEGER
 ) STRICT;`,
@@ -21,7 +21,7 @@ export const initSql = [
     templateId TEXT, -- make BLOB upon SQLite v3.41 and the landing of UNHEX https://sqlite.org/forum/forumpost/30cca4e613d2fa2a grep F235B7FB-8CEA-4AE2-99CC-2790E607B1EB
     ankiNoteId INTEGER,
     created INTEGER,
-    modified INTEGER,
+    updated INTEGER,
     tags TEXT,
     fieldValues TEXT
 ) STRICT;`,
@@ -38,7 +38,7 @@ export const initSql = [
     noteId TEXT, -- make BLOB upon SQLite v3.41 and the landing of UNHEX https://sqlite.org/forum/forumpost/30cca4e613d2fa2a grep F235B7FB-8CEA-4AE2-99CC-2790E607B1EB
     deckIds TEXT,
     created INTEGER,
-    modified INTEGER,
+    updated INTEGER,
     cardSettingId TEXT, -- make BLOB upon SQLite v3.41 and the landing of UNHEX https://sqlite.org/forum/forumpost/30cca4e613d2fa2a grep F235B7FB-8CEA-4AE2-99CC-2790E607B1EB
     due INTEGER,
     state INTEGER
@@ -46,7 +46,7 @@ export const initSql = [
   `CREATE TABLE IF NOT EXISTS media (
     id TEXT PRIMARY KEY, -- should stay TEXT!
     created INTEGER,
-    modified INTEGER,
+    updated INTEGER,
     data BLOB
 ) STRICT;`,
   `CREATE TABLE IF NOT EXISTS remoteMedia (
@@ -60,7 +60,7 @@ export const initSql = [
     id TEXT PRIMARY KEY, -- make BLOB upon SQLite v3.41 and the landing of UNHEX https://sqlite.org/forum/forumpost/30cca4e613d2fa2a grep F235B7FB-8CEA-4AE2-99CC-2790E607B1EB
     name TEXT,
     created INTEGER,
-    modified INTEGER,
+    updated INTEGER,
     script BLOB
 ) STRICT;`,
   `SELECT crsql_as_crr('template');`,

@@ -25,7 +25,7 @@ export const card = recordWithOptionalFields<Card>(
     noteId: fc.uuidV(4).map((x) => x as NoteId),
     deckIds: fc.array(fc.uuidV(4)).map((x) => new Set(x) as Set<DeckId>),
     created: reasonableDates,
-    modified: reasonableDates,
+    updated: reasonableDates,
     due: reasonableDates,
     ord: fc.integer().map((x) => x as Ord),
   },

@@ -14,7 +14,7 @@ export interface Template {
   readonly css: string
   readonly fields: readonly Field[]
   readonly created: Date
-  readonly modified: Date
+  readonly updated: Date
   readonly templateType: TemplateType
   readonly remotes: Map<NookId, RemoteTemplateId | null>
 }
@@ -32,7 +32,7 @@ export const defaultTemplate: Template = {
     },
   ],
   created: new Date(),
-  modified: new Date(),
+  updated: new Date(),
   templateType: {
     tag: "standard",
     templates: [

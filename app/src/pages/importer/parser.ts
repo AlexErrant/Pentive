@@ -72,7 +72,7 @@ export function parseTemplates(models: Models): Template[] {
       css: m.css,
       fields: m.flds.map(parseField),
       created: new Date(m.id),
-      modified: new Date(m.mod * 1000),
+      updated: new Date(m.mod * 1000),
       templateType: parseTemplateType(m),
       ankiId: m.id,
       remotes: new Map(),
@@ -96,7 +96,7 @@ export function parseNote(
   return {
     id: note.id.toString() as NoteId, // medTODO
     created: new Date(note.id),
-    modified: new Date(note.mod),
+    updated: new Date(note.mod),
     ankiNoteId: note.id,
     templateId,
     fieldValues: new Map(_.zip(fields, values) as Array<[string, string]>),
@@ -119,7 +119,7 @@ export function parseCard(
     noteId: card.nid.toString() as NoteId, // medTODO
     deckIds: new Set([card.did.toString() as DeckId]), // medTODO
     created: new Date(card.id),
-    modified: new Date(card.mod),
+    updated: new Date(card.mod),
     due: new Date(card.due), // highTODO
     cardSettingId: card.did.toString() as CardSettingId, // medTODO
     ord: card.ord,

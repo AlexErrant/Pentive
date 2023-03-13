@@ -25,8 +25,8 @@ const columns: Array<ColumnDef<Plugin>> = [
     },
   },
   {
-    header: "Modified",
-    accessorKey: id("modified"),
+    header: "Updated",
+    accessorKey: id("updated"),
     cell: (info) => {
       return <time-ago attr:datetime={info.getValue<Date>()}></time-ago>
     },

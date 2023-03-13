@@ -19,7 +19,7 @@ export default function Plugins(): JSX.Element {
           const plugin: Plugin = {
             id: ulidAsBase64Url() as PluginId,
             created: new Date(),
-            modified: new Date(),
+            updated: new Date(),
             name: "plain pentive nav",
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             script: target.files![0],

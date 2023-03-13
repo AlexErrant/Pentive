@@ -336,7 +336,7 @@ async function uploadMedia(
     {
       id: file.name as MediaId,
       created: new Date(),
-      modified: new Date(),
+      updated: new Date(),
       data: await file.arrayBuffer(),
     },
   ])

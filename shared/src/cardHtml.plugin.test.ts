@@ -32,7 +32,7 @@ function buildPlugin(src: string): Plugin {
     id: ulidAsBase64Url() as PluginId,
     name: "",
     created: new Date(),
-    modified: new Date(),
+    updated: new Date(),
   }
 }
 

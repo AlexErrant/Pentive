@@ -9,7 +9,7 @@ export interface Card {
   noteId: LDbId
   deckIds: string
   created: number
-  modified: number
+  updated: number
   cardSettingId: LDbId | null
   due: number
   state: number | null
@@ -18,7 +18,7 @@ export interface Card {
 export interface Media {
   id: MediaId
   created: number
-  modified: number
+  updated: number
   data: Uint8Array
 }
 
@@ -27,7 +27,7 @@ export interface Note {
   templateId: LDbId
   ankiNoteId: number | null
   created: number
-  modified: number
+  updated: number
   tags: string
   fieldValues: string
 }
@@ -43,7 +43,7 @@ export interface Plugin {
   id: LDbId
   name: string
   created: number
-  modified: number
+  updated: number
   script: Uint8Array
 }
 
@@ -60,7 +60,7 @@ export interface Template {
   css: string
   fields: string
   created: number
-  modified: number
+  updated: number
   templateType: string
   ankiId: number | null
 }

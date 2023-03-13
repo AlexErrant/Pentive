@@ -17,7 +17,7 @@ export const note = recordWithOptionalFields<Note>(
       .map((x) => new Map(Object.entries(x))),
     tags: fc.array(fc.string()).map((x) => new Set(x)),
     created: reasonableDates,
-    modified: reasonableDates,
+    updated: reasonableDates,
     remotes: fc
       .dictionary(fc.string(), arbitraryUlid<RemoteNoteId>())
       .map((x) => new Map(Object.entries(x) as Array<[NookId, RemoteNoteId]>)),

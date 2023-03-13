@@ -30,7 +30,7 @@ function noteToDocType(note: Note): InsertObject<DB, "note"> {
     id: note.id,
     templateId: note.templateId,
     created: note.created.getTime(),
-    modified: note.modified.getTime(),
+    updated: note.updated.getTime(),
     tags: stringifySet(note.tags),
     fieldValues: stringifyMap(note.fieldValues),
     ankiNoteId: note.ankiNoteId,
@@ -66,7 +66,7 @@ function entityToDomain(note: NoteEntity, remotes: RemoteNote[]): Note {
   const r: Note = {
     id: note.id as NoteId,
     created: new Date(note.created),
-    modified: new Date(note.modified),
+    updated: new Date(note.updated),
     templateId: note.templateId,
     tags: parseSet(note.tags),
     fieldValues: parseMap(note.fieldValues),
@@ -137,7 +137,7 @@ export const noteCollectionMethods = {
         "card.deckIds as card_deckIds",
         "card.due as card_due",
         "card.id as card_id",
-        "card.modified as card_modified",
+        "card.updated as card_updated",
         "card.noteId as card_noteId",
         "card.ord as card_ord",
         "card.state as card_state",
@@ -146,7 +146,7 @@ export const noteCollectionMethods = {
         "note.created as note_created",
         "note.fieldValues as note_fieldValues",
         "note.id as note_id",
-        "note.modified as note_modified",
+        "note.updated as note_updated",
         "note.tags as note_tags",
         "note.templateId as note_templateId",
 
@@ -155,7 +155,7 @@ export const noteCollectionMethods = {
         "template.css as template_css",
         "template.fields as template_fields",
         "template.id as template_id",
-        "template.modified as template_modified",
+        "template.updated as template_updated",
         "template.name as template_name",
         "template.templateType as template_templateType",
       ])
@@ -175,7 +175,7 @@ export const noteCollectionMethods = {
             created: tnc.note_created,
             fieldValues: tnc.note_fieldValues,
             id: tnc.note_id,
-            modified: tnc.note_modified,
+            updated: tnc.note_updated,
             tags: tnc.note_tags,
             templateId: tnc.note_templateId,
           },
@@ -188,7 +188,7 @@ export const noteCollectionMethods = {
             css: tnc.template_css,
             fields: tnc.template_fields,
             id: tnc.template_id,
-            modified: tnc.template_modified,
+            updated: tnc.template_updated,
             name: tnc.template_name,
             templateType: tnc.template_templateType,
           },
@@ -200,7 +200,7 @@ export const noteCollectionMethods = {
           deckIds: tnc.card_deckIds,
           due: tnc.card_due,
           id: tnc.card_id,
-          modified: tnc.card_modified,
+          updated: tnc.card_updated,
           noteId: tnc.card_noteId,
           ord: tnc.card_ord,
           state: tnc.card_state,
@@ -264,7 +264,7 @@ export const noteCollectionMethods = {
       .leftJoin("note", "remoteNote.localId", "note.id")
       .selectAll("remoteNote")
       .where("remoteId", "is not", null)
-      .whereRef("remoteNote.uploadDate", "<", "note.modified")
+      .whereRef("remoteNote.uploadDate", "<", "note.updated")
       .execute()
     const localIds = [...new Set(remoteNotes.map((t) => t.localId))]
     const remoteTemplates = await db
@@ -333,7 +333,7 @@ export const noteCollectionMethods = {
         "remoteNote.remoteId",
       ])
       .where("remoteMedia.uploadDate", "is", null)
-      .orWhereRef("media.modified", ">", "remoteMedia.uploadDate")
+      .orWhereRef("media.updated", ">", "remoteMedia.uploadDate")
       .execute()
     const media = new Map<
       MediaId,
@@ -472,7 +472,7 @@ export const noteCollectionMethods = {
     const db = await getKysely()
     const { id, ...rest } = noteToDocType({
       ...note,
-      modified: new Date(),
+      updated: new Date(),
     })
     const r = await db
       .updateTable("note")

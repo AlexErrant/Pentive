@@ -9,7 +9,7 @@ function entityToDomain(entity: MediaEntity): Media {
   return {
     id: entity.id,
     created: new Date(entity.created),
-    modified: new Date(entity.modified),
+    updated: new Date(entity.updated),
     data: entity.data.buffer,
   }
 }
@@ -18,12 +18,12 @@ export const mediaCollectionMethods = {
   upsertMedia: async function (media: Media) {
     const db = await getDb()
     const insert = await db.prepare(
-      `INSERT INTO media (id,created,modified,data)
-                  VALUES ( ?,      ?,       ?,   ?)`
+      `INSERT INTO media (id,created,updated,data)
+                  VALUES ( ?,      ?,      ?,   ?)`
     )
     const created = media.created.getTime()
-    const modified = media.modified.getTime()
-    await insert.run(media.id, created, modified, new Uint8Array(media.data))
+    const updated = media.updated.getTime()
+    await insert.run(media.id, created, updated, new Uint8Array(media.data))
     insert.finalize()
   },
   async bulkAddMedia(media: Media[]) {
@@ -31,13 +31,13 @@ export const mediaCollectionMethods = {
     // If moving to SQLite official doesn't improve perf, consider using Origin Private File System
     const db = await getDb()
     const insert = await db.prepare(
-      `INSERT INTO media (id,created,modified,data)
-                  VALUES ( ?,      ?,       ?,   ?)`
+      `INSERT INTO media (id,created,updated,data)
+                  VALUES ( ?,      ?,      ?,   ?)`
     )
     for (const m of media) {
       const created = m.created.getTime()
-      const modified = m.modified.getTime()
-      await insert.run(m.id, created, modified, new Uint8Array(m.data))
+      const updated = m.updated.getTime()
+      await insert.run(m.id, created, updated, new Uint8Array(m.data))
     }
     insert.finalize()
   },

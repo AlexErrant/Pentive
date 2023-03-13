@@ -29,7 +29,7 @@ export interface Card {
   readonly noteId: NoteId
   readonly deckIds: ReadonlySet<DeckId>
   readonly created: Date
-  readonly modified: Date
+  readonly updated: Date
   readonly cardSettingId?: CardSettingId
   readonly due: Date
   readonly state?: State
@@ -40,7 +40,7 @@ export const sampleCard: Card = {
   noteId: "dZA8bN6wQMCfjwAAxwL72w" as NoteId,
   deckIds: new Set(),
   created: new Date(),
-  modified: new Date(),
+  updated: new Date(),
   due: new Date(),
   ord: 0 as Ord,
 }

@@ -25,7 +25,7 @@ function templateToDocType(template: Template) {
     name: template.name,
     css: template.css,
     created: template.created.getTime(),
-    modified: template.modified.getTime(),
+    updated: template.updated.getTime(),
     fields: JSON.stringify(template.fields),
     templateType: JSON.stringify(template.templateType),
   }
@@ -48,7 +48,7 @@ export function entityToDomain(
     id: template.id as TemplateId,
     name: template.name,
     created: new Date(template.created),
-    modified: new Date(template.modified),
+    updated: new Date(template.updated),
     fields: JSON.parse(template.fields) as Field[],
     css: template.css,
     templateType: JSON.parse(template.templateType) as TemplateType,
@@ -169,7 +169,7 @@ export const templateCollectionMethods = {
       .leftJoin("template", "remoteTemplate.localId", "template.id")
       .selectAll("remoteTemplate")
       .where("remoteId", "is not", null)
-      .whereRef("remoteTemplate.uploadDate", "<", "template.modified")
+      .whereRef("remoteTemplate.uploadDate", "<", "template.updated")
       .execute()
     const localIds = [...new Set(remoteTemplates.map((t) => t.localId))]
     const templatesAndStuff = await db
@@ -205,7 +205,7 @@ export const templateCollectionMethods = {
         "remoteTemplate.remoteId",
       ])
       .where("remoteMedia.uploadDate", "is", null)
-      .orWhereRef("media.modified", ">", "remoteMedia.uploadDate")
+      .orWhereRef("media.updated", ">", "remoteMedia.uploadDate")
       .execute()
     const media = new Map<
       MediaId,

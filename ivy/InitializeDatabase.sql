@@ -27,7 +27,7 @@ create table posts
     author    text                     not null
         references padawan,
     created   timestamp with time zone not null,
-    modified  timestamp with time zone not null,
+    updated   timestamp with time zone not null,
     tags      json                     not null,
     comments  json                     not null,
     followers integer                  not null
@@ -47,7 +47,7 @@ create table template
     author          text                     not null
         references padawan,
     created         timestamp with time zone not null,
-    modified        timestamp with time zone not null,
+    updated         timestamp with time zone not null,
     type            text                     not null,
     fields          json                     not null,
     css             text                     not null,
@@ -61,7 +61,7 @@ create table template
 create index on template (nook);
 create index on template (author);
 create index on template (created);
-create index on template (modified);
+create index on template (updated);
 create index on template (type);
 create index on template (followers);
 create index on template (anki_id);
@@ -74,7 +74,7 @@ create table card
     nook         text                     not null
         references nook,
     created      timestamp with time zone not null,
-    modified     timestamp with time zone not null,
+    updated      timestamp with time zone not null,
     author       text                     not null
         references padawan,
     type         text                     not null,
@@ -92,7 +92,7 @@ create table card
 );
 create index on card (nook);
 create index on card (created);
-create index on card (modified);
+create index on card (updated);
 create index on card (author);
 create index on card (type);
 create index on card (template_id);
