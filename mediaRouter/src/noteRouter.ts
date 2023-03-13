@@ -65,7 +65,7 @@ export const noteRouter = {
     .mutation(async ({ input, ctx }) => await editNotes(ctx.user, input)),
   getNote: publicProcedure.input(remoteNoteId).query(async ({ input }) => {
     const note = await db
-      .selectFrom("Note")
+      .selectFrom("note")
       .select([
         "id",
         "templateId",
@@ -88,7 +88,7 @@ export const noteRouter = {
   }),
   searchNotes: publicProcedure.input(z.string()).query(async ({ input }) => {
     const notes = await db
-      .selectFrom("Note")
+      .selectFrom("note")
       .select([
         "id",
         "templateId",
@@ -110,8 +110,8 @@ export const noteRouter = {
 
 function mapNote(
   note: Selection<
-    From<DB, "Note">,
-    "Note",
+    From<DB, "note">,
+    "note",
     | "templateId"
     | "fieldValues"
     | "tags"

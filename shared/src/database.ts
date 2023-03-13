@@ -140,19 +140,19 @@ export interface User {
 }
 
 export interface DB {
-  Media_User: MediaUser
-  Media_Entity: MediaEntity
-  Nook: Nook
-  Note: Note
-  NoteComment: NoteComment
-  NoteHistory: NoteHistory
-  NoteSubscriber: NoteSubscriber
-  Post: Post
-  PostComment: PostComment
-  PostSubscriber: PostSubscriber
-  Template: Template
-  TemplateComment: TemplateComment
-  TemplateHistory: TemplateHistory
-  TemplateSubscriber: TemplateSubscriber
-  User: User
+  media_User: MediaUser
+  media_Entity: MediaEntity
+  nook: Nook
+  note: Note
+  noteComment: NoteComment
+  noteHistory: NoteHistory
+  noteSubscriber: NoteSubscriber
+  post: Post
+  postComment: PostComment
+  postSubscriber: PostSubscriber
+  template: Template
+  templateComment: TemplateComment
+  templateHistory: TemplateHistory
+  templateSubscriber: TemplateSubscriber
+  user: User
 }

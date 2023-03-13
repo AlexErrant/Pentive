@@ -12,50 +12,50 @@ generator js {
   previewFeatures = ["referentialIntegrity", "fullTextSearch", "fullTextIndex"]
 }
 
-model User {
+model user {
   id                    String               @id @db.VarChar(21) // lowercase
   displayName           String               @db.VarChar(21) // cased as user input
   created               DateTime             @default(now())
-  templateHistory       TemplateHistory[]
-  templateComments      TemplateComment[]
-  templateSubscriptions TemplateSubscriber[]
-  notes                 Note[]
-  noteComments          NoteComment[]
-  noteSubscriptions     NoteSubscriber[]
-  posts                 Post[]
-  postComments          PostComment[]
-  postSubscriptions     PostSubscriber[]
+  templateHistory       templateHistory[]
+  templateComments      templateComment[]
+  templateSubscriptions templateSubscriber[]
+  notes                 note[]
+  noteComments          noteComment[]
+  noteSubscriptions     noteSubscriber[]
+  posts                 post[]
+  postComments          postComment[]
+  postSubscriptions     postSubscriber[]
 }
 
-model Template {
+model template {
   id          Bytes                @id @db.Binary(16)
   created     DateTime             @default(now())
   updated     DateTime             @default(now())
   name        String               @db.VarChar(255)
   nook        String               @db.VarChar(21)
-  nookRef     Nook                 @relation(fields: [nook], references: [id])
+  nookRef     nook                 @relation(fields: [nook], references: [id])
   type        String               @db.Text // medTODO compress
   fields      String               @db.Text // medTODO compress
   css         String               @db.Text // medTODO compress
-  history     TemplateHistory[]
-  comments    TemplateComment[]
+  history     templateHistory[]
+  comments    templateComment[]
   ankiId      BigInt?              @db.UnsignedBigInt // should be its own table
-  subscribers TemplateSubscriber[]
-  notes       Note[]
+  subscribers templateSubscriber[]
+  notes       note[]
 
   @@index([ankiId])
   @@index([nook])
 }
 
-model TemplateComment {
+model templateComment {
   id         Bytes    @id @db.Binary(16)
   parentId   Bytes?   @db.Binary(16)
   templateId Bytes    @db.Binary(16)
-  template   Template @relation(fields: [templateId], references: [id])
+  template   template @relation(fields: [templateId], references: [id])
   created    DateTime @default(now())
   updated    DateTime @default(now())
   text       String   @db.Text
-  author     User     @relation(fields: [authorId], references: [id])
+  author     user     @relation(fields: [authorId], references: [id])
   authorId   String   @db.VarChar(21)
   history    String?  @db.Text
   votes      String   @db.Text
@@ -65,11 +65,11 @@ model TemplateComment {
   @@index([templateId])
 }
 
-model TemplateSubscriber {
+model templateSubscriber {
   templateId Bytes    @db.Binary(16)
-  template   Template @relation(fields: [templateId], references: [id])
+  template   template @relation(fields: [templateId], references: [id])
   userId     String   @db.VarChar(21)
-  user       User     @relation(fields: [userId], references: [id])
+  user       user     @relation(fields: [userId], references: [id])
   til        DateTime @default(now())
 
   @@id([templateId, userId])
@@ -77,13 +77,13 @@ model TemplateSubscriber {
   @@index([userId])
 }
 
-model TemplateHistory {
+model templateHistory {
   templateId Bytes    @db.Binary(16)
-  template   Template @relation(fields: [templateId], references: [id])
+  template   template @relation(fields: [templateId], references: [id])
   created    DateTime @default(now())
 
   name     String? @db.VarChar(255)
-  author   User?   @relation(fields: [authorId], references: [id])
+  author   user?   @relation(fields: [authorId], references: [id])
   authorId String? @db.VarChar(21)
   type     String? @db.VarChar(21)
   fields   String? @db.Text
@@ -94,13 +94,13 @@ model TemplateHistory {
   @@index([authorId])
 }
 
-model Note {
+model note {
   id               Bytes    @id @db.Binary(16)
   templateId       Bytes    @db.Binary(16)
-  template         Template @relation(fields: [templateId], references: [id])
+  template         template @relation(fields: [templateId], references: [id])
   created          DateTime @default(now())
   updated          DateTime @default(now())
-  author           User     @relation(fields: [authorId], references: [id])
+  author           user     @relation(fields: [authorId], references: [id])
   authorId         String   @db.VarChar(21)
   fieldValues      String   @db.Text // medTODO compress
   fts              String   @db.Text
@@ -108,10 +108,10 @@ model Note {
   subscribersCount Int      @default(0) @db.UnsignedSmallInt
   commentsCount    Int      @default(0) @db.UnsignedMediumInt
 
-  history     NoteHistory[]
-  comments    NoteComment[]
+  history     noteHistory[]
+  comments    noteComment[]
   ankiId      BigInt?          @db.UnsignedBigInt // should be its own table
-  subscribers NoteSubscriber[]
+  subscribers noteSubscriber[]
 
   @@index([authorId])
   @@index([ankiId])
@@ -119,15 +119,15 @@ model Note {
   @@fulltext([fts])
 }
 
-model NoteComment {
+model noteComment {
   id       Bytes    @id @db.Binary(16)
   parentId Bytes?   @db.Binary(16)
   noteId   Bytes    @db.Binary(16)
-  note     Note     @relation(fields: [noteId], references: [id])
+  note     note     @relation(fields: [noteId], references: [id])
   created  DateTime @default(now())
   updated  DateTime @default(now())
   text     String   @db.Text
-  author   User     @relation(fields: [authorId], references: [id])
+  author   user     @relation(fields: [authorId], references: [id])
   authorId String   @db.VarChar(21)
   history  String?  @db.Text
   votes    String   @db.Text
@@ -137,11 +137,11 @@ model NoteComment {
   @@index([noteId])
 }
 
-model NoteSubscriber {
+model noteSubscriber {
   noteId Bytes    @db.Binary(16)
-  note   Note     @relation(fields: [noteId], references: [id])
+  note   note     @relation(fields: [noteId], references: [id])
   userId String   @db.VarChar(21)
-  user   User     @relation(fields: [userId], references: [id])
+  user   user     @relation(fields: [userId], references: [id])
   til    DateTime @default(now())
 
   @@id([noteId, userId])
@@ -149,9 +149,9 @@ model NoteSubscriber {
   @@index([userId])
 }
 
-model NoteHistory {
+model noteHistory {
   noteId  Bytes    @db.Binary(16)
-  note    Note     @relation(fields: [noteId], references: [id])
+  note    note     @relation(fields: [noteId], references: [id])
   created DateTime @default(now())
 
   templateId  Bytes? @db.Binary(16)
@@ -162,7 +162,7 @@ model NoteHistory {
   @@index([noteId])
 }
 
-model Media_User {
+model media_User {
   mediaHash Bytes  @db.Binary(32)
   userId    String @db.VarChar(21)
 
@@ -170,7 +170,7 @@ model Media_User {
   @@index([mediaHash])
 }
 
-model Media_Entity {
+model media_Entity {
   entityId  Bytes @db.Binary(16) // e.g. template, note, or comment that refers to said media
   i         Int   @db.UnsignedTinyInt
   mediaHash Bytes @db.Binary(32)
@@ -179,39 +179,39 @@ model Media_Entity {
   @@index([mediaHash])
 }
 
-model Nook {
+model nook {
   id          String     @id @db.VarChar(21) // lowercase
   displayName String     @db.VarChar(21) // cased as user input
   created     DateTime   @default(now())
-  templates   Template[]
-  posts       Post[]
+  templates   template[]
+  posts       post[]
   moderators  String     @db.Text
 }
 
-model Post {
+model post {
   id          Bytes            @id @db.Binary(16)
   title       String           @db.VarChar(255)
   text        String           @db.Text
   nook        String           @db.VarChar(21)
-  nookRef     Nook             @relation(fields: [nook], references: [id])
-  author      User             @relation(fields: [authorId], references: [id])
+  nookRef     nook             @relation(fields: [nook], references: [id])
+  author      user             @relation(fields: [authorId], references: [id])
   authorId    String           @db.VarChar(21)
-  comments    PostComment[]
-  subscribers PostSubscriber[]
+  comments    postComment[]
+  subscribers postSubscriber[]
 
   @@index([authorId])
   @@index([nook])
 }
 
-model PostComment {
+model postComment {
   id       Bytes    @id @db.Binary(16)
   parentId Bytes?   @db.Binary(16)
   postId   Bytes    @db.Binary(16)
-  post     Post     @relation(fields: [postId], references: [id])
+  post     post     @relation(fields: [postId], references: [id])
   created  DateTime @default(now())
   updated  DateTime @default(now())
   text     String   @db.Text
-  author   User     @relation(fields: [authorId], references: [id])
+  author   user     @relation(fields: [authorId], references: [id])
   authorId String   @db.VarChar(21)
   history  String?  @db.Text
   votes    String   @db.Text
@@ -221,11 +221,11 @@ model PostComment {
   @@index([postId])
 }
 
-model PostSubscriber {
+model postSubscriber {
   postId Bytes    @db.Binary(16)
-  post   Post     @relation(fields: [postId], references: [id])
+  post   post     @relation(fields: [postId], references: [id])
   userId String   @db.VarChar(21)
-  user   User     @relation(fields: [userId], references: [id])
+  user   user     @relation(fields: [userId], references: [id])
   til    DateTime @default(now())
 
   @@id([postId, userId])

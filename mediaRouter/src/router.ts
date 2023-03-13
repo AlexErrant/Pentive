@@ -1,5 +1,4 @@
-import { z } from "zod"
-import { authedProcedure, publicProcedure, router } from "./trpc"
+import { router } from "./trpc"
 import { noteRouter } from "./noteRouter"
 import { templateRouter } from "./templateRouter"
 

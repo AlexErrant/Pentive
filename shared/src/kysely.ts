@@ -57,7 +57,7 @@ export async function getPosts({ nook }: { nook: string }): Promise<
   }>
 > {
   return await db
-    .selectFrom("Post")
+    .selectFrom("post")
     .select(["id", "title", "text", "authorId"])
     .where("nook", "=", nook)
     .execute()
@@ -90,59 +90,59 @@ function noteToNookView(x: {
 
 export async function getNotes(nook: NookId, userId: UserId | null) {
   const r = await db
-    .selectFrom("Note")
-    .innerJoin("Template", "Template.id", "Note.templateId")
+    .selectFrom("note")
+    .innerJoin("template", "template.id", "note.templateId")
     .select([
-      "Note.id",
-      "Note.fieldValues",
-      "Note.subscribersCount as subscribers",
-      "Note.commentsCount as comments",
-      "Template.css",
-      "Template.fields",
-      "Template.type",
+      "note.id",
+      "note.fieldValues",
+      "note.subscribersCount as subscribers",
+      "note.commentsCount as comments",
+      "template.css",
+      "template.fields",
+      "template.type",
     ])
     .if(userId != null, (a) =>
       a.select((b) =>
         b
-          .selectFrom("NoteSubscriber")
+          .selectFrom("noteSubscriber")
           .select(["til"])
           .where("userId", "=", userId)
-          .whereRef("NoteSubscriber.noteId", "=", "Note.id")
+          .whereRef("noteSubscriber.noteId", "=", "note.id")
           .as("til")
       )
     )
-    .where("Template.nook", "=", nook)
+    .where("template.nook", "=", nook)
     .execute()
   return r.map(noteToNookView)
 }
 
 export async function getNote(noteId: RemoteNoteId, userId: UserId | null) {
   const r = await db
-    .selectFrom("Note")
-    .innerJoin("Template", "Template.id", "Note.templateId")
+    .selectFrom("note")
+    .innerJoin("template", "template.id", "note.templateId")
     .select([
-      "Note.templateId",
-      "Note.created",
-      "Note.updated",
-      "Note.authorId",
-      "Note.fieldValues",
-      "Note.tags",
-      "Note.ankiId",
-      "Template.css",
-      "Template.fields",
-      "Template.type",
+      "note.templateId",
+      "note.created",
+      "note.updated",
+      "note.authorId",
+      "note.fieldValues",
+      "note.tags",
+      "note.ankiId",
+      "template.css",
+      "template.fields",
+      "template.type",
     ])
     .if(userId != null, (a) =>
       a.select((b) =>
         b
-          .selectFrom("NoteSubscriber")
+          .selectFrom("noteSubscriber")
           .select(["til"])
           .where("userId", "=", userId)
-          .whereRef("NoteSubscriber.noteId", "=", "Note.id")
+          .whereRef("noteSubscriber.noteId", "=", "note.id")
           .as("til")
       )
     )
-    .where("Note.id", "=", fromBase64Url(noteId))
+    .where("note.id", "=", fromBase64Url(noteId))
     .executeTakeFirst()
   if (r == null) return null
   return {
@@ -199,7 +199,7 @@ export interface NoteComment {
 
 export async function getNoteComments(noteId: RemoteNoteId) {
   const cs = await db
-    .selectFrom("NoteComment")
+    .selectFrom("noteComment")
     .select([
       "id",
       "parentId",
@@ -210,7 +210,7 @@ export async function getNoteComments(noteId: RemoteNoteId) {
       "votes",
       "level",
     ])
-    .where("NoteComment.noteId", "=", fromBase64Url(noteId))
+    .where("noteComment.noteId", "=", fromBase64Url(noteId))
     .orderBy("level", "asc")
     .orderBy("votes", "desc")
     .execute()
@@ -242,7 +242,7 @@ export async function getPost(id: Base64Url): Promise<
   | undefined
 > {
   return await db
-    .selectFrom("Post")
+    .selectFrom("post")
     .select(["id", "title", "text", "authorId"])
     .where("id", "=", fromBase64Url(id))
     .executeTakeFirst()
@@ -251,7 +251,7 @@ export async function getPost(id: Base64Url): Promise<
 
 export async function getTemplate(id: RemoteTemplateId, nook?: NookId) {
   const t = await db
-    .selectFrom("Template")
+    .selectFrom("template")
     .selectAll()
     .where("id", "=", fromBase64Url(id))
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -262,7 +262,7 @@ export async function getTemplate(id: RemoteTemplateId, nook?: NookId) {
 
 export async function getTemplates(nook: NookId) {
   const ts = await db
-    .selectFrom("Template")
+    .selectFrom("template")
     .selectAll()
     .where("nook", "=", nook)
     .execute()
@@ -307,7 +307,7 @@ export async function insertPost({
   id: Hex
 }): Promise<InsertResult[]> {
   return await db
-    .insertInto("Post")
+    .insertInto("post")
     .values({
       id: unhex(id),
       authorId,
@@ -328,22 +328,22 @@ export async function insertNoteComment(
     async (tx) =>
       await Promise.all([
         await db
-          .selectFrom("Note")
+          .selectFrom("note")
           .select(["id"])
-          .where("Note.id", "=", noteDbId)
+          .where("note.id", "=", noteDbId)
           .executeTakeFirst()
           .then((r) => {
             if (r == null) throwExp(`Note ${noteId} not found.`)
           }),
         tx
-          .updateTable("Note")
+          .updateTable("note")
           .set({
             commentsCount: (x) => sql`${x.ref("commentsCount")} + 1`,
           })
-          .where("Note.id", "=", noteDbId)
+          .where("note.id", "=", noteDbId)
           .execute(),
         tx
-          .insertInto("NoteComment")
+          .insertInto("noteComment")
           .values({
             id: unhex(ulidAsHex()),
             authorId,
@@ -364,7 +364,7 @@ export async function insertNoteChildComment(
 ) {
   const parentCommentDbId = fromBase64Url(parentCommentId)
   const parent = await db
-    .selectFrom("NoteComment")
+    .selectFrom("noteComment")
     .select(["level", sql<Base64>`TO_BASE64(noteId)`.as("noteId")])
     .where("id", "=", parentCommentDbId)
     .executeTakeFirst()
@@ -374,14 +374,14 @@ export async function insertNoteChildComment(
     async (tx) =>
       await Promise.all([
         tx
-          .updateTable("Note")
+          .updateTable("note")
           .set({
             commentsCount: (x) => sql`${x.ref("commentsCount")} + 1`,
           })
-          .where("Note.id", "=", noteId)
+          .where("note.id", "=", noteId)
           .execute(),
         await tx
-          .insertInto("NoteComment")
+          .insertInto("noteComment")
           .values({
             id: unhex(ulidAsHex()),
             authorId,
@@ -407,13 +407,13 @@ export async function userOwnsNoteAndHasMedia(
   const { hasMedia, userOwns } = await db
     .selectFrom([
       db
-        .selectFrom("Note")
+        .selectFrom("note")
         .select(db.fn.count("id").as("userOwns"))
         .where("id", "in", ids.map(fromBase64Url))
         .where("authorId", "=", authorId)
         .as("userOwns"),
       db
-        .selectFrom("Media_Entity")
+        .selectFrom("media_Entity")
         .select(db.fn.count("mediaHash").as("hasMedia"))
         .where("mediaHash", "=", fromBase64(id))
         .as("hasMedia"),
@@ -437,13 +437,13 @@ export async function userOwnsTemplateAndHasMedia(
   const { hasMedia, userOwns } = await db
     .selectFrom([
       db
-        .selectFrom("Template")
+        .selectFrom("template")
         .select(db.fn.count("id").as("userOwns"))
         .where("id", "in", ids.map(fromBase64Url))
         // .where("authorId", "=", authorId) // highTODO
         .as("userOwns"),
       db
-        .selectFrom("Media_Entity")
+        .selectFrom("media_Entity")
         .select(db.fn.count("mediaHash").as("hasMedia"))
         .where("mediaHash", "=", fromBase64(id))
         .as("hasMedia"),
@@ -461,7 +461,7 @@ export async function lookupMediaHash(
   i: number
 ): Promise<Base64 | undefined> {
   const mediaHash = await db
-    .selectFrom("Media_Entity")
+    .selectFrom("media_Entity")
     .select(sql<Base64>`TO_BASE64(mediaHash)`.as("mediaHash"))
     .where("entityId", "=", fromBase64(entityId))
     .where("i", "=", i)
@@ -475,7 +475,7 @@ export async function insertNotes(authorId: UserId, notes: CreateRemoteNote[]) {
   ).map(fromBase64Url)
   // highTODO validate author
   const templates = await db
-    .selectFrom("Template")
+    .selectFrom("template")
     .select(["nook", "id"])
     .where("id", "in", rtIds)
     .execute()
@@ -491,7 +491,7 @@ export async function insertNotes(authorId: UserId, notes: CreateRemoteNote[]) {
     })
   })
   const noteCreates = noteCreatesAndIds.map((x) => x[0])
-  await db.insertInto("Note").values(noteCreates).execute()
+  await db.insertInto("note").values(noteCreates).execute()
   const remoteIdByLocal = new Map(noteCreatesAndIds.map((x) => x[1]))
   return remoteIdByLocal
 }
@@ -510,7 +510,7 @@ export async function insertTemplates(
     })
   })
   const templateCreates = templateCreatesAndIds.map((x) => x[0])
-  await db.insertInto("Template").values(templateCreates).execute()
+  await db.insertInto("template").values(templateCreates).execute()
   const remoteIdByLocal = new Map(templateCreatesAndIds.map((x) => x[1]))
   return remoteIdByLocal
 }
@@ -521,7 +521,7 @@ export async function subscribeToNote(userId: UserId, noteId: RemoteNoteId) {
     async (tx) =>
       await Promise.all([
         tx
-          .selectFrom("Note")
+          .selectFrom("note")
           .select(["id"])
           .where("id", "=", noteDbId)
           .executeTakeFirst()
@@ -529,14 +529,14 @@ export async function subscribeToNote(userId: UserId, noteId: RemoteNoteId) {
             if (n == null) throwExp(`Note ${noteId} not found.`)
           }),
         tx
-          .updateTable("Note")
+          .updateTable("note")
           .set({
             subscribersCount: (x) => sql`${x.ref("subscribersCount")} + 1`,
           })
-          .where("Note.id", "=", noteDbId)
+          .where("note.id", "=", noteDbId)
           .execute(),
         tx
-          .insertInto("NoteSubscriber")
+          .insertInto("noteSubscriber")
           .values({
             userId,
             noteId: noteDbId,
@@ -573,7 +573,7 @@ function toNoteCreate(
   for (const [field, value] of n.fieldValues) {
     n.fieldValues.set(field, replaceImgSrcs(value, remoteIdBase64url))
   }
-  const noteCreate: InsertObject<DB, "Note"> = {
+  const noteCreate: InsertObject<DB, "note"> = {
     id: unhex(remoteIdHex),
     templateId: fromBase64Url(remoteTemplateId), // highTODO validate
     authorId,
@@ -638,7 +638,7 @@ function toTemplateCreate(
       remoteIdBase64url
     )
   }
-  const templateCreate: InsertObject<DB, "Template"> & { nook: NookId } = {
+  const templateCreate: InsertObject<DB, "template"> & { nook: NookId } = {
     id: unhex(remoteIdHex),
     ankiId: n.ankiId,
     updated,
@@ -689,7 +689,7 @@ export async function editNotes(authorId: UserId, notes: EditRemoteNote[]) {
     .flatMap((t) => Array.from(t.remoteIds.keys()))
     .map(fromBase64Url)
   const count = await db
-    .selectFrom("Note")
+    .selectFrom("note")
     .select(db.fn.count("id").as("c"))
     .where("id", "in", editNoteIds)
     .executeTakeFirstOrThrow()
@@ -703,7 +703,7 @@ export async function editNotes(authorId: UserId, notes: EditRemoteNote[]) {
   // values (UNHEX(?), FROM_BASE64(?), ?, ?, ?, ?)
   // on duplicate key update `templateId` = values(`templateId`), `updated` = values(`updated`), `authorId` = values(`authorId`), `fieldValues` = values(`fieldValues`), `fts` = values(`fts`), `tags` = values(`tags`), `ankiId` = values(`ankiId`)
   await db
-    .insertInto("Note")
+    .insertInto("note")
     .values(noteCreates.flat())
     // https://stackoverflow.com/a/34866431
     .onDuplicateKeyUpdate({
@@ -727,7 +727,7 @@ export async function editTemplates(
     .flatMap((t) => t.remoteIds)
     .map(fromBase64Url)
   const count = await db
-    .selectFrom("Template")
+    .selectFrom("template")
     .select(db.fn.count("id").as("c"))
     .where("id", "in", editTemplateIds)
     .executeTakeFirstOrThrow()
@@ -738,7 +738,7 @@ export async function editTemplates(
     return tcs.map((tc) => tc.templateCreate)
   })
   await db
-    .insertInto("Template")
+    .insertInto("template")
     .values(templateCreates.flat())
     // https://stackoverflow.com/a/34866431
     .onDuplicateKeyUpdate({

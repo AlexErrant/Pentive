@@ -254,7 +254,7 @@ async function postPublicMedia(
       // Grep BC34B055-ECB7-496D-9E71-58EE899A11D1 for details.
       .execute(async (trx) => {
         await trx
-          .insertInto("Media_Entity")
+          .insertInto("media_Entity")
           .values(insertValues)
           .onDuplicateKeyUpdate({ mediaHash })
           .execute()
