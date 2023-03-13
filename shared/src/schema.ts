@@ -9,6 +9,12 @@ import {
   NoteCommentId,
 } from "./brand"
 
+// highTODO are we doing ULIDs, KSUID, or neither?
+
+export const dateSchema = z.preprocess((arg) => {
+  if (typeof arg === "string" || arg instanceof Date) return new Date(arg)
+}, z.date())
+
 export const remoteNoteId = z
   .string()
   .regex(/^[a-zA-Z0-9_-]{22}$/) as unknown as z.Schema<RemoteNoteId>
@@ -25,28 +31,35 @@ const fieldValues = z
   .map(z.string().min(1), z.string())
   .refine((x) => x.size > 0)
 
-export const createRemoteNote = z.object({
-  localId: z.string() as unknown as z.Schema<NoteId>,
-  remoteTemplateIds: z.array(remoteTemplateId).min(1),
+const noteUneditable = {
+  id: true,
+  remoteTemplateId: true,
+  created: true,
+  modified: true,
+} as const
+
+export const remoteNote = z.object({
+  id: remoteNoteId,
+  remoteTemplateId,
+  created: dateSchema,
+  modified: dateSchema,
   fieldValues,
   tags: z.array(z.string()),
   ankiId: z.number().positive().optional(),
+})
+
+export type RemoteNote = z.infer<typeof remoteNote>
+
+export const createRemoteNote = remoteNote.omit(noteUneditable).extend({
+  localId: z.string() as unknown as z.Schema<NoteId>,
+  remoteTemplateIds: z.array(remoteTemplateId).min(1),
 })
 export type CreateRemoteNote = z.infer<typeof createRemoteNote>
 
-export const editRemoteNote = z.object({
+export const editRemoteNote = remoteNote.omit(noteUneditable).extend({
   remoteIds: z.map(remoteNoteId, remoteTemplateId).refine((x) => x.size > 0),
-  fieldValues,
-  tags: z.array(z.string()),
-  ankiId: z.number().positive().optional(),
 })
 export type EditRemoteNote = z.infer<typeof editRemoteNote>
-
-// highTODO are we doing ULIDs, KSUID, or neither?
-
-export const dateSchema = z.preprocess((arg) => {
-  if (typeof arg === "string" || arg instanceof Date) return new Date(arg)
-}, z.date())
 
 export const childTemplate = z.object({
   id: z.number().int() as unknown as z.Schema<Ord>,
@@ -93,23 +106,27 @@ export const remoteTemplate = z.object({
 
 export type RemoteTemplate = z.infer<typeof remoteTemplate>
 
-const uneditable = {
+const templateUneditable = {
   id: true,
   nook: true,
   created: true,
   modified: true,
 } as const
 
-export const createRemoteTemplate = remoteTemplate.omit(uneditable).extend({
-  localId: z.string() as unknown as z.Schema<TemplateId>,
-  nooks: z.array(nookId),
-})
+export const createRemoteTemplate = remoteTemplate
+  .omit(templateUneditable)
+  .extend({
+    localId: z.string() as unknown as z.Schema<TemplateId>,
+    nooks: z.array(nookId),
+  })
 
 export type CreateRemoteTemplate = z.infer<typeof createRemoteTemplate>
 
-export const editRemoteTemplate = remoteTemplate.omit(uneditable).extend({
-  remoteIds: z.array(remoteTemplateId).min(1),
-})
+export const editRemoteTemplate = remoteTemplate
+  .omit(templateUneditable)
+  .extend({
+    remoteIds: z.array(remoteTemplateId).min(1),
+  })
 
 export type EditRemoteTemplate = z.infer<typeof editRemoteTemplate>
 
