@@ -1,8 +1,9 @@
 import { Component, For, Show } from "solid-js"
 import { RouteDataArgs, useRouteData } from "solid-start"
 import { createServerData$ } from "solid-start/server"
-import { NookId, getTemplates } from "shared"
+import { NookId, getTemplates, unproxify } from "shared"
 import ResizingIframe from "~/components/resizingIframe"
+import { getAppMessenger } from "~/root"
 
 export function routeData({ params }: RouteDataArgs) {
   return {
@@ -28,6 +29,15 @@ const Threads: Component = () => {
             {(template) => (
               <li>
                 <h1>{template.name}</h1>
+                <div>
+                  <button
+                    onclick={async () =>
+                      await getAppMessenger().addTemplate(unproxify(template))
+                    }
+                  >
+                    Download
+                  </button>
+                </div>
                 <ResizingIframe
                   i={{
                     tag: "template",

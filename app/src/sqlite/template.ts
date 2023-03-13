@@ -20,7 +20,7 @@ import { InsertObject } from "kysely"
 import { updateLocalMediaIdByRemoteMediaIdAndGetNewDoc } from "./note"
 
 function templateToDocType(template: Template) {
-  const r: InsertObject<DB, "template"> = {
+  const insertTemplate: InsertObject<DB, "template"> = {
     id: template.id,
     name: template.name,
     css: template.css,
@@ -29,7 +29,15 @@ function templateToDocType(template: Template) {
     fields: JSON.stringify(template.fields),
     templateType: JSON.stringify(template.templateType),
   }
-  return r
+  const remoteTemplates: RemoteTemplate[] = Array.from(
+    template.remotes.entries()
+  ).map(([nook, remoteId]) => ({
+    localId: template.id,
+    nook,
+    remoteId,
+    uploadDate: null,
+  }))
+  return { insertTemplate, remoteTemplates }
 }
 
 export function entityToDomain(
@@ -79,14 +87,22 @@ function domainToEditRemote(template: Template) {
 
 export const templateCollectionMethods = {
   insertTemplate: async function (template: Template) {
-    const t = templateToDocType(template)
+    const { insertTemplate, remoteTemplates } = templateToDocType(template)
     const db = await getKysely()
-    await db.insertInto("template").values(t).execute()
+    return await db.transaction().execute(async (tx) => {
+      await tx.insertInto("template").values(insertTemplate).execute()
+      await tx.insertInto("remoteTemplate").values(remoteTemplates).execute()
+    })
   },
   bulkUpsertTemplate: async function (templates: Template[]) {
-    const ts = templates.map(templateToDocType)
+    const entities = templates.map(templateToDocType)
+    const insertTemplates = entities.map((x) => x.insertTemplate)
+    const remoteTemplates = entities.flatMap((x) => x.remoteTemplates)
     const db = await getKysely()
-    await db.insertInto("template").values(ts).execute()
+    return await db.transaction().execute(async (tx) => {
+      await tx.insertInto("template").values(insertTemplates).execute()
+      await tx.insertInto("remoteTemplate").values(remoteTemplates).execute()
+    })
   },
   getTemplate: async function (templateId: TemplateId) {
     const db = await getKysely()
@@ -333,7 +349,10 @@ export const templateCollectionMethods = {
   },
   updateTemplate: async function (template: Template) {
     const db = await getKysely()
-    const { id, ...rest } = templateToDocType(template)
+    const {
+      insertTemplate: { id, ...rest },
+      // maybeTODO handle the returned remoteTemplates
+    } = templateToDocType(template)
     const r = await db
       .updateTable("template")
       .set(rest)

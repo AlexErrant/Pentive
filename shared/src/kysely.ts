@@ -249,12 +249,13 @@ export async function getPost(id: Base64Url): Promise<
     .then((x) => undefinedMap(x, mapIdToBase64Url))
 }
 
-export async function getTemplate(id: RemoteTemplateId, nook: NookId) {
+export async function getTemplate(id: RemoteTemplateId, nook?: NookId) {
   const t = await db
     .selectFrom("Template")
     .selectAll()
     .where("id", "=", fromBase64Url(id))
-    .where("nook", "=", nook)
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    .if(nook != null, (db) => db.where("nook", "=", nook!))
     .executeTakeFirst()
   return undefinedMap(t, templateEntityToDomain)
 }

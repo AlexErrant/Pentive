@@ -22,7 +22,8 @@ export const mediaCollectionMethods = {
                   VALUES ( ?,      ?,       ?,   ?)`
     )
     const created = media.created.getTime()
-    await insert.run(media.id, created, created, new Uint8Array(media.data))
+    const modified = media.modified.getTime()
+    await insert.run(media.id, created, modified, new Uint8Array(media.data))
     insert.finalize()
   },
   async bulkAddMedia(media: Media[]) {
@@ -35,7 +36,8 @@ export const mediaCollectionMethods = {
     )
     for (const m of media) {
       const created = m.created.getTime()
-      await insert.run(m.id, created, created, new Uint8Array(m.data))
+      const modified = m.modified.getTime()
+      await insert.run(m.id, created, modified, new Uint8Array(m.data))
     }
     insert.finalize()
   },
