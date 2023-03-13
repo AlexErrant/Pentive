@@ -238,11 +238,11 @@ export const templateCollectionMethods = {
         .selectAll()
         .where("id", "=", templateId)
         .executeTakeFirstOrThrow()
-      const { localMediaIdByRemoteMediaId } = withLocalMediaIdByRemoteMediaId(
+      const { remoteMediaIdByLocal } = withLocalMediaIdByRemoteMediaId(
         new DOMParser(),
         domainToCreateRemote(entityToDomain(template, [remoteTemplate]))
       )
-      const srcs = new Set(localMediaIdByRemoteMediaId.values())
+      const srcs = new Set(remoteMediaIdByLocal.keys())
       const mediaBinaries = await db
         .selectFrom("media")
         .select(["id", "data"])
@@ -255,17 +255,15 @@ export const templateCollectionMethods = {
         .where("localEntityId", "=", templateId)
         .where("i", ">", srcs.size as RemoteMediaNum)
         .execute()
-      if (localMediaIdByRemoteMediaId.size !== 0) {
+      if (remoteMediaIdByLocal.size !== 0) {
         await db
           .insertInto("remoteMedia")
           .values(
-            Array.from(localMediaIdByRemoteMediaId).map(
-              ([i, localMediaId]) => ({
-                localEntityId: templateId,
-                i,
-                localMediaId,
-              })
-            )
+            Array.from(remoteMediaIdByLocal).map(([localMediaId, i]) => ({
+              localEntityId: templateId,
+              i,
+              localMediaId,
+            }))
           )
           // insert into "remoteMedia" ("localEntityId", "i", "localMediaId") values (?, ?, ?)
           // on conflict do update set "localMediaId" = "excluded"."localMediaId"
@@ -349,40 +347,36 @@ export const templateCollectionMethods = {
 function withLocalMediaIdByRemoteMediaId<
   T extends CreateRemoteTemplate | EditRemoteTemplate
 >(dp: DOMParser, template: T) {
-  const localMediaIdByRemoteMediaId = new Map<RemoteMediaNum, MediaId>()
   const serializer = new XMLSerializer()
   if (template.templateType.tag === "standard") {
+    const rawDoms = template.templateType.templates.flatMap((t) => [
+      t.front,
+      t.back,
+    ])
+    const { docs, remoteMediaIdByLocal } =
+      updateLocalMediaIdByRemoteMediaIdAndGetNewDoc(dp, rawDoms)
+    let i = 0
     for (const t of template.templateType.templates) {
-      const docFront = updateLocalMediaIdByRemoteMediaIdAndGetNewDoc(
-        dp,
-        t.front,
-        localMediaIdByRemoteMediaId
-      )
-      t.front = serializer.serializeToString(docFront)
-      const docBack = updateLocalMediaIdByRemoteMediaIdAndGetNewDoc(
-        dp,
-        t.back,
-        localMediaIdByRemoteMediaId
-      )
-      t.back = serializer.serializeToString(docBack)
+      t.front = serializer.serializeToString(docs[i])
+      i++
+      t.back = serializer.serializeToString(docs[i])
+      i++
+    }
+    return {
+      template,
+      remoteMediaIdByLocal,
     }
   } else {
-    const docFront = updateLocalMediaIdByRemoteMediaIdAndGetNewDoc(
-      dp,
-      template.templateType.template.front,
-      localMediaIdByRemoteMediaId
-    )
-    template.templateType.template.front =
-      serializer.serializeToString(docFront)
-    const docBack = updateLocalMediaIdByRemoteMediaIdAndGetNewDoc(
-      dp,
-      template.templateType.template.back,
-      localMediaIdByRemoteMediaId
-    )
-    template.templateType.template.back = serializer.serializeToString(docBack)
-  }
-  return {
-    template,
-    localMediaIdByRemoteMediaId,
+    const { docs, remoteMediaIdByLocal } =
+      updateLocalMediaIdByRemoteMediaIdAndGetNewDoc(dp, [
+        template.templateType.template.front,
+        template.templateType.template.back,
+      ])
+    template.templateType.template.front = serializer.serializeToString(docs[0])
+    template.templateType.template.back = serializer.serializeToString(docs[1])
+    return {
+      template,
+      remoteMediaIdByLocal,
+    }
   }
 }

@@ -44,6 +44,17 @@ const Thread: Component = () => {
                 ),
               }}
             />
+            <ResizingIframe
+              i={{
+                tag: "card",
+                side: "back",
+                template: data()!.note!.template,
+                ord: 0 as Ord,
+                fieldsAndValues: Array.from(
+                  data()!.note!.fieldValues.entries()
+                ),
+              }}
+            />
           </p>
           <button
             onclick={async () => {

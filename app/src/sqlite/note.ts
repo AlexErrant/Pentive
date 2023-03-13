@@ -376,13 +376,13 @@ export const noteCollectionMethods = {
         .selectAll()
         .where("id", "=", noteId)
         .executeTakeFirstOrThrow()
-      const { localMediaIdByRemoteMediaId } = withLocalMediaIdByRemoteMediaId(
+      const { remoteMediaIdByLocal } = withLocalMediaIdByRemoteMediaId(
         new DOMParser(),
         domainToCreateRemote(entityToDomain(note, [remoteNote]), [
           /* this doesn't need any real values... I think */
         ])
       )
-      const srcs = new Set(localMediaIdByRemoteMediaId.values())
+      const srcs = new Set(remoteMediaIdByLocal.keys())
       const mediaBinaries = await db
         .selectFrom("media")
         .select(["id", "data"])
@@ -395,17 +395,15 @@ export const noteCollectionMethods = {
         .where("localEntityId", "=", noteId)
         .where("i", ">", srcs.size as RemoteMediaNum)
         .execute()
-      if (localMediaIdByRemoteMediaId.size !== 0) {
+      if (remoteMediaIdByLocal.size !== 0) {
         await db
           .insertInto("remoteMedia")
           .values(
-            Array.from(localMediaIdByRemoteMediaId).map(
-              ([i, localMediaId]) => ({
-                localEntityId: noteId,
-                i,
-                localMediaId,
-              })
-            )
+            Array.from(remoteMediaIdByLocal).map(([localMediaId, i]) => ({
+              localEntityId: noteId,
+              i,
+              localMediaId,
+            }))
           )
           // insert into "remoteMedia" ("localEntityId", "i", "localMediaId") values (?, ?, ?)
           // on conflict do update set "localMediaId" = "excluded"."localMediaId"
@@ -489,38 +487,59 @@ export const noteCollectionMethods = {
 function withLocalMediaIdByRemoteMediaId<
   T extends CreateRemoteNote | EditRemoteNote
 >(dp: DOMParser, note: T) {
-  const localMediaIdByRemoteMediaId = new Map<RemoteMediaNum, MediaId>()
   const fieldValues = new Map<string, string>()
-  for (const [field, value] of note.fieldValues) {
-    const doc = updateLocalMediaIdByRemoteMediaIdAndGetNewDoc(
+  const { docs, remoteMediaIdByLocal } =
+    updateLocalMediaIdByRemoteMediaIdAndGetNewDoc(
       dp,
-      value,
-      localMediaIdByRemoteMediaId
+      Array.from(note.fieldValues.values())
     )
-    fieldValues.set(field, doc.body.innerHTML)
+  let i = 0
+  for (const [field] of note.fieldValues) {
+    fieldValues.set(field, docs[i].body.innerHTML)
+    i++
   }
   return {
     note: {
       ...note,
       fieldValues,
     },
-    localMediaIdByRemoteMediaId,
+    remoteMediaIdByLocal,
   }
 }
 
 export function updateLocalMediaIdByRemoteMediaIdAndGetNewDoc(
   dp: DOMParser,
-  rawDom: string,
-  localMediaIdByRemoteMediaId: Map<RemoteMediaNum, MediaId>
+  rawDoms: string[]
 ) {
-  const doc = dp.parseFromString(rawDom, "text/html")
-  for (const image of doc.images) {
-    const src = image.getAttribute("src")
-    if (src != null) {
-      const i = localMediaIdByRemoteMediaId.size as RemoteMediaNum
-      image.setAttribute("src", imgPlaceholder + i.toString())
-      localMediaIdByRemoteMediaId.set(i, src as MediaId)
+  const docs = rawDoms.map((rawDom) => dp.parseFromString(rawDom, "text/html"))
+  const imgSrcs = new Set(
+    docs
+      .flatMap((pd) => Array.from(pd.images))
+      .map((i) => i.getAttribute("src"))
+      .filter((i) => i !== "" && i != null)
+  )
+  const remoteMediaIdByLocal = new Map(
+    Array.from(imgSrcs.values()).map(
+      (src, i) => [src as MediaId, i as RemoteMediaNum] as const
+    )
+  )
+  for (const doc of docs) {
+    for (const image of doc.images) {
+      const src = image.getAttribute("src") as MediaId
+      if (src != null) {
+        const i = remoteMediaIdByLocal.get(src)
+        if (i == null)
+          throwExp(
+            `${src} not found in ${JSON.stringify(
+              Array.from(remoteMediaIdByLocal)
+            )}`
+          )
+        image.setAttribute("src", `${imgPlaceholder}${i}`)
+      }
     }
   }
-  return doc
+  return {
+    docs,
+    remoteMediaIdByLocal,
+  }
 }

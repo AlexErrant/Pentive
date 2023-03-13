@@ -36,6 +36,14 @@ const Threads: Component = () => {
                     index: 0,
                   }}
                 />
+                <ResizingIframe
+                  i={{
+                    tag: "template",
+                    side: "back",
+                    template,
+                    index: 0,
+                  }}
+                />
                 <a href={`./template/${template.id}/edit`}>Edit</a>
               </li>
             )}
