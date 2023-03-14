@@ -91,7 +91,8 @@ export const templateCollectionMethods = {
     const db = await getKysely()
     return await db.transaction().execute(async (tx) => {
       await tx.insertInto("template").values(insertTemplate).execute()
-      await tx.insertInto("remoteTemplate").values(remoteTemplates).execute()
+      if (remoteTemplates.length !== 0)
+        await tx.insertInto("remoteTemplate").values(remoteTemplates).execute()
     })
   },
   bulkUpsertTemplate: async function (templates: Template[]) {
@@ -100,8 +101,10 @@ export const templateCollectionMethods = {
     const remoteTemplates = entities.flatMap((x) => x.remoteTemplates)
     const db = await getKysely()
     return await db.transaction().execute(async (tx) => {
-      await tx.insertInto("template").values(insertTemplates).execute()
-      await tx.insertInto("remoteTemplate").values(remoteTemplates).execute()
+      if (insertTemplates.length !== 0)
+        await tx.insertInto("template").values(insertTemplates).execute()
+      if (remoteTemplates.length !== 0)
+        await tx.insertInto("remoteTemplate").values(remoteTemplates).execute()
     })
   },
   getTemplate: async function (templateId: TemplateId) {

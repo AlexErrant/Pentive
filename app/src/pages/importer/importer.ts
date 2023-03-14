@@ -11,7 +11,7 @@ import {
   Uint8ArrayWriter,
   ZipReader,
 } from "@zip.js/zip.js"
-import { throwExp } from "shared"
+import { notEmpty, throwExp } from "shared"
 import initSqlJs, { Database } from "sql.js"
 import { checkCard, checkCol, checkMedia, checkNote } from "./typeChecker"
 import { parseNote, parseCard, parseTemplates } from "./parser"
@@ -73,16 +73,18 @@ async function addMediaBatch(
           "Impossible since we're using `getEntries` https://github.com/gildas-lormeau/zip.js/issues/371"
         )
       const name = nameByI[entry.filename]
+      const now = new Date()
       return name == null // occurs for entries that aren't media, e.g. collection.anki2
         ? null
         : {
             id: name as MediaId,
-            created: new Date(),
+            created: now,
+            updated: now,
             data: array.buffer,
           }
     })
   )
-  const media = mediaAndNulls.filter((r) => r != null) as Media[]
+  const media = mediaAndNulls.filter(notEmpty)
   await db.bulkAddMedia(media)
 }
 

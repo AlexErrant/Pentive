@@ -52,7 +52,7 @@ export const appExpose = {
   },
 }
 
-// highTODO needs security
+// highTODO needs security on the origin
 Comlink.expose(appExpose, Comlink.windowEndpoint(self.parent))
 
 // VERYlowTODO could sent it over Comlink - though that'll be annoying because it's in hub-ugc
