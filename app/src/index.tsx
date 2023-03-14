@@ -4,11 +4,18 @@ import { Router } from "solid-app-router"
 import App from "./app"
 import { db } from "./db"
 import * as Comlink from "comlink"
-
 import { registerPluginServices } from "./pluginManager"
-import { ChildTemplate, MediaId, RemoteTemplate } from "shared"
+import {
+  ChildTemplate,
+  MediaId,
+  NookId,
+  RemoteNote,
+  RemoteTemplate,
+  throwExp,
+} from "shared"
 import { Template } from "./domain/template"
 import { Media } from "./domain/media"
+import { Note } from "./domain/note"
 
 const plugins = await db.getPlugins()
 
@@ -52,10 +59,37 @@ export const appExpose = {
     }
     return await db.insertTemplate(template)
   },
+  addNote: async (rn: RemoteNote, nook: NookId) => {
+    const templateId =
+      (await db.getTemplateIdByRemoteId(rn.templateId)) ??
+      throwExp(`You don't have the remote template ${rn.templateId}`)
+    const n: Note = {
+      id: rn.id,
+      templateId,
+      // ankiNoteId: rn.ankiNoteId,
+      created: rn.created,
+      updated: rn.updated,
+      tags: new Set(rn.tags),
+      fieldValues: rn.fieldValues,
+      remotes: new Map([[nook, rn.id]]),
+    }
+    await downloadImages(
+      getNoteImages(Array.from(rn.fieldValues.values()), new DOMParser())
+    )
+    return await db.upsertNote(n)
+  },
 }
 
 // highTODO needs security on the origin
 Comlink.expose(appExpose, Comlink.windowEndpoint(self.parent))
+
+function getNoteImages(values: string[], dp: DOMParser) {
+  return new Set(
+    values.flatMap((v) =>
+      Array.from(dp.parseFromString(v, "text/html").images).map((i) => i.src)
+    )
+  )
+}
 
 function getTemplateImages(ct: ChildTemplate, dp: DOMParser) {
   const imgSrcs = new Set<string>()
@@ -65,12 +99,12 @@ function getTemplateImages(ct: ChildTemplate, dp: DOMParser) {
   for (const img of dp.parseFromString(ct.back, "text/html").images) {
     imgSrcs.add(img.src)
   }
-  imgSrcs.delete("") // remove images with no src
   return imgSrcs
 }
 
 // VERYlowTODO could sent it over Comlink - though that'll be annoying because it's in hub-ugc
 async function downloadImages(imgSrcs: Set<string>) {
+  imgSrcs.delete("") // remove images with no src
   const getId = (imgSrc: string) => /([^/]+$)/.exec(imgSrc)![0] as MediaId // everything after the last `/`
   return await Promise.all(
     Array.from(imgSrcs).map(async (imgSrc) => {

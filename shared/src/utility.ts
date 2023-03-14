@@ -80,9 +80,9 @@ export function parseSet<T>(rawSet: string) {
 
 // https://stackoverflow.com/a/69827802
 export function unproxify<T>(val: T): T {
-  // @ts-expect-error unavoidable any
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-  if (val instanceof Array) return val.map(unproxify)
+  if (val instanceof Array) return val.map(unproxify) as T
+  if (val instanceof Map) return new Map(val) as T
+  if (val instanceof Date) return new Date(val) as T
   if (val instanceof Object)
     // @ts-expect-error whatever
     return Object.fromEntries(

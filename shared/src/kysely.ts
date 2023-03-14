@@ -153,7 +153,7 @@ export async function getNote(noteId: RemoteNoteId, userId: UserId | null) {
     authorId: r.authorId as UserId,
     fieldValues: deserializeFieldValues(r.fieldValues),
     tags: deserializeTags(r.tags),
-    ankiId: r.ankiId,
+    ankiId: r.ankiId ?? undefined,
     til: r.til,
     template: {
       css: r.css,

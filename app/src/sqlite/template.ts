@@ -123,6 +123,15 @@ export const templateCollectionMethods = {
       undefinedMap(template, (x) => entityToDomain(x, remoteTemplates)) ?? null
     )
   },
+  getTemplateIdByRemoteId: async function (templateId: RemoteTemplateId) {
+    const db = await getKysely()
+    const template = await db
+      .selectFrom("remoteTemplate")
+      .select(["localId"])
+      .where("remoteId", "=", templateId)
+      .executeTakeFirst()
+    return template?.localId as TemplateId | undefined
+  },
   getTemplates: async function () {
     const db = await getKysely()
     const allTemplates = await db.selectFrom("template").selectAll().execute()

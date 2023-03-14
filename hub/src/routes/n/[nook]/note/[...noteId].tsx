@@ -1,7 +1,14 @@
 import { Component, For, Show, Suspense } from "solid-js"
 import { RouteDataArgs, useRouteData } from "solid-start"
 import { createServerData$ } from "solid-start/server"
-import { Ord, RemoteNoteId, getNote, getNoteComments } from "shared"
+import {
+  NookId,
+  Ord,
+  RemoteNoteId,
+  getNote,
+  getNoteComments,
+  unproxify,
+} from "shared"
 import ResizingIframe from "~/components/resizingIframe"
 import NoteComment from "~/components/noteComment"
 import SubmitComment from "~/components/submitComment"
@@ -11,6 +18,7 @@ import { getAppMessenger } from "~/root"
 
 export function routeData({ params }: RouteDataArgs) {
   return {
+    nook: () => params.nook as NookId,
     noteId: (): string => params.noteId,
     data: createServerData$(
       async (noteId, { request }) => {
@@ -27,7 +35,7 @@ export function routeData({ params }: RouteDataArgs) {
 }
 
 const Thread: Component = () => {
-  const { data } = useRouteData<typeof routeData>()
+  const { data, nook } = useRouteData<typeof routeData>()
   return (
     <Suspense fallback={<p>Loading note...</p>}>
       <Show when={data()?.note} fallback={<p>"404 Not Found"</p>}>
@@ -58,7 +66,7 @@ const Thread: Component = () => {
           </p>
           <button
             onclick={async () => {
-              await getAppMessenger().hiFromApp("Lo!")
+              await getAppMessenger().addNote(unproxify(data()!.note!), nook())
               await apiClient.subscribeToNote.mutate(data()!.note!.id)
             }}
             disabled={data()?.note?.til != null}

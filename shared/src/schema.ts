@@ -33,14 +33,14 @@ const fieldValues = z
 
 const noteUneditable = {
   id: true,
-  remoteTemplateId: true,
+  templateId: true,
   created: true,
   updated: true,
 } as const
 
 export const remoteNote = z.object({
   id: remoteNoteId,
-  remoteTemplateId,
+  templateId: remoteTemplateId,
   created: dateSchema,
   updated: dateSchema,
   fieldValues,

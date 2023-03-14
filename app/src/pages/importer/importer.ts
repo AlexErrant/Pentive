@@ -21,7 +21,6 @@ import { Template } from "../../domain/template"
 import { MediaId, TemplateId } from "../../domain/ids"
 import { db } from "./../../db"
 import _ from "lodash"
-import { Media } from "../../domain/media"
 
 export async function importAnki(
   event: Event & {
