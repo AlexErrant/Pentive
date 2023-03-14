@@ -42,11 +42,13 @@ export const appExpose = {
     if (template.templateType.tag === "standard") {
       await Promise.all(
         template.templateType.templates.map(
-          async (t) => await downloadImages(t, dp)
+          async (t) => await downloadImages(getTemplateImages(t, dp))
         )
       )
     } else {
-      await downloadImages(template.templateType.template, dp)
+      await downloadImages(
+        getTemplateImages(template.templateType.template, dp)
+      )
     }
     return await db.insertTemplate(template)
   },
@@ -55,8 +57,7 @@ export const appExpose = {
 // highTODO needs security on the origin
 Comlink.expose(appExpose, Comlink.windowEndpoint(self.parent))
 
-// VERYlowTODO could sent it over Comlink - though that'll be annoying because it's in hub-ugc
-async function downloadImages(ct: ChildTemplate, dp: DOMParser) {
+function getTemplateImages(ct: ChildTemplate, dp: DOMParser) {
   const imgSrcs = new Set<string>()
   for (const img of dp.parseFromString(ct.front, "text/html").images) {
     imgSrcs.add(img.src)
@@ -65,6 +66,11 @@ async function downloadImages(ct: ChildTemplate, dp: DOMParser) {
     imgSrcs.add(img.src)
   }
   imgSrcs.delete("") // remove images with no src
+  return imgSrcs
+}
+
+// VERYlowTODO could sent it over Comlink - though that'll be annoying because it's in hub-ugc
+async function downloadImages(imgSrcs: Set<string>) {
   const getId = (imgSrc: string) => /([^/]+$)/.exec(imgSrc)![0] as MediaId // everything after the last `/`
   return await Promise.all(
     Array.from(imgSrcs).map(async (imgSrc) => {
