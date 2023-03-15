@@ -111,9 +111,9 @@ export const cardCollectionMethods = {
   getCards: async function (offset: number, limit: number) {
     const db = await getKysely()
     const entities = await db
-      .selectFrom("note")
+      .selectFrom("card")
+      .innerJoin("note", "card.noteId", "note.id")
       .innerJoin("template", "template.id", "note.templateId")
-      .innerJoin("card", "card.noteId", "note.id")
       .select([
         "card.cardSettingId as card_cardSettingId",
         "card.created as card_created",
@@ -146,7 +146,7 @@ export const cardCollectionMethods = {
       .limit(limit)
       .execute()
     const count = await db
-      .selectFrom("note")
+      .selectFrom("card")
       .select(db.fn.count<number>("id").as("c"))
       .executeTakeFirstOrThrow()
     return {
