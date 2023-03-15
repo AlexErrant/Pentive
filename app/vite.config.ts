@@ -36,6 +36,7 @@ export default defineConfig({
   server: {
     port: 3014,
     strictPort: true,
+    hmr: false,
     https: {
       key: fs.readFileSync("./.cert/key.pem"),
       cert: fs.readFileSync("./.cert/cert.pem"),
