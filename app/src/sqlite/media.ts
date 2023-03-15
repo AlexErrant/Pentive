@@ -3,7 +3,8 @@ import { MediaId } from "../domain/ids"
 import { Media } from "../domain/media"
 import * as Comlink from "comlink"
 import { getDb, getKysely } from "./crsqlite"
-import { Media as MediaEntity } from "./database"
+import { DB, Media as MediaEntity } from "./database"
+import { Transaction } from "kysely"
 
 function entityToDomain(entity: MediaEntity): Media {
   return {
@@ -15,6 +16,17 @@ function entityToDomain(entity: MediaEntity): Media {
 }
 
 export const mediaCollectionMethods = {
+  upsertMediaTrx: async function (media: Media, db: Transaction<DB>) {
+    await db
+      .insertInto("media")
+      .values({
+        id: media.id,
+        created: media.created.getTime(),
+        updated: media.updated.getTime(),
+        data: new Uint8Array(media.data),
+      })
+      .execute()
+  },
   upsertMedia: async function (media: Media) {
     const db = await getDb()
     const insert = await db.prepare(

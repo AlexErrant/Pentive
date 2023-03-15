@@ -16,7 +16,7 @@ import {
 } from "shared"
 import { getKysely } from "./crsqlite"
 import { DB, RemoteTemplate, Template as TemplateEntity } from "./database"
-import { InsertObject } from "kysely"
+import { InsertObject, Kysely, Transaction } from "kysely"
 import { updateLocalMediaIdByRemoteMediaIdAndGetNewDoc } from "./note"
 
 function templateToDocType(template: Template) {
@@ -86,14 +86,18 @@ function domainToEditRemote(template: Template) {
 }
 
 export const templateCollectionMethods = {
-  insertTemplate: async function (template: Template) {
+  insertTemplate: async function (template: Template, trx?: Transaction<DB>) {
     const { insertTemplate, remoteTemplates } = templateToDocType(template)
-    const db = await getKysely()
-    return await db.transaction().execute(async (tx) => {
-      await tx.insertInto("template").values(insertTemplate).execute()
+    async function insert(trx: Transaction<DB>) {
+      await trx.insertInto("template").values(insertTemplate).execute()
       if (remoteTemplates.length !== 0)
-        await tx.insertInto("remoteTemplate").values(remoteTemplates).execute()
-    })
+        await trx.insertInto("remoteTemplate").values(remoteTemplates).execute()
+    }
+    if (trx == null) {
+      return await (await getKysely()).transaction().execute(insert)
+    } else {
+      return await insert(trx)
+    }
   },
   bulkUpsertTemplate: async function (templates: Template[]) {
     const entities = templates.map(templateToDocType)
@@ -123,8 +127,11 @@ export const templateCollectionMethods = {
       undefinedMap(template, (x) => entityToDomain(x, remoteTemplates)) ?? null
     )
   },
-  getTemplateIdByRemoteId: async function (templateId: RemoteTemplateId) {
-    const db = await getKysely()
+  getTemplateIdByRemoteId: async function (
+    templateId: RemoteTemplateId,
+    db?: Kysely<DB>
+  ) {
+    db ??= await getKysely()
     const template = await db
       .selectFrom("remoteTemplate")
       .innerJoin("template", "remoteTemplate.localId", "template.id")

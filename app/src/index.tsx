@@ -21,6 +21,9 @@ import { Media } from "./domain/media"
 import { Note } from "./domain/note"
 import { Card } from "./domain/card"
 import { ulidAsBase64Url } from "./domain/utility"
+import { getKysely } from "./sqlite/crsqlite"
+import { Transaction } from "kysely"
+import { DB } from "./sqlite/database"
 
 const plugins = await db.getPlugins()
 
@@ -40,66 +43,74 @@ export const appExpose = {
     console.log("Hi from app! You said:", msg)
   },
   addTemplate: async (rt: RemoteTemplate) => {
-    const template: Template = {
-      id: rt.id,
-      name: rt.name,
-      css: rt.css,
-      created: new Date(),
-      updated: new Date(),
-      templateType: rt.templateType,
-      fields: rt.fields.map((name) => ({ name })),
-      remotes: new Map([[rt.nook, rt.id]]),
-    }
-    const dp = new DOMParser()
-    if (template.templateType.tag === "standard") {
-      await Promise.all(
-        template.templateType.templates.map(
-          async (t) => await downloadImages(getTemplateImages(t, dp))
+    const k = await getKysely()
+    await k.transaction().execute(async (trx) => {
+      const template: Template = {
+        id: rt.id,
+        name: rt.name,
+        css: rt.css,
+        created: new Date(),
+        updated: new Date(),
+        templateType: rt.templateType,
+        fields: rt.fields.map((name) => ({ name })),
+        remotes: new Map([[rt.nook, rt.id]]),
+      }
+      const dp = new DOMParser()
+      if (template.templateType.tag === "standard") {
+        await Promise.all(
+          template.templateType.templates.map(
+            async (t) => await downloadImages(getTemplateImages(t, dp), trx)
+          )
         )
-      )
-    } else {
-      await downloadImages(
-        getTemplateImages(template.templateType.template, dp)
-      )
-    }
-    return await db.insertTemplate(template)
+      } else {
+        await downloadImages(
+          getTemplateImages(template.templateType.template, dp),
+          trx
+        )
+      }
+      return await db.insertTemplate(template, trx)
+    })
   },
   addNote: async (rn: RemoteNote, nook: NookId) => {
-    const template =
-      (await db.getTemplateIdByRemoteId(rn.templateId)) ??
-      throwExp(`You don't have the remote template ${rn.templateId}`)
-    const n: Note = {
-      id: rn.id,
-      templateId: template.id,
-      // ankiNoteId: rn.ankiNoteId,
-      created: rn.created,
-      updated: rn.updated,
-      tags: new Set(rn.tags),
-      fieldValues: rn.fieldValues,
-      remotes: new Map([[nook, rn.id]]),
-    }
-    await downloadImages(
-      getNoteImages(Array.from(rn.fieldValues.values()), new DOMParser())
-    )
-    await db.upsertNote(n)
-    const maxOrd = maxOrdNote.bind(C)(
-      Array.from(n.fieldValues.entries()),
-      template
-    )
-    const cards = Array.from(Array(maxOrd + 1).keys()).map((i) => {
-      const now = new Date()
-      const card: Card = {
-        id: ulidAsBase64Url() as CardId,
-        ord: i as Ord,
-        noteId: n.id,
-        deckIds: new Set(),
-        created: now,
-        updated: now,
-        due: now,
+    const k = await getKysely()
+    await k.transaction().execute(async (trx) => {
+      const template =
+        (await db.getTemplateIdByRemoteId(rn.templateId, trx)) ??
+        throwExp(`You don't have the remote template ${rn.templateId}`)
+      const n: Note = {
+        id: rn.id,
+        templateId: template.id,
+        // ankiNoteId: rn.ankiNoteId,
+        created: rn.created,
+        updated: rn.updated,
+        tags: new Set(rn.tags),
+        fieldValues: rn.fieldValues,
+        remotes: new Map([[nook, rn.id]]),
       }
-      return card
+      await downloadImages(
+        getNoteImages(Array.from(rn.fieldValues.values()), new DOMParser()),
+        trx
+      )
+      await db.upsertNote(n, trx)
+      const maxOrd = maxOrdNote.bind(C)(
+        Array.from(n.fieldValues.entries()),
+        template
+      )
+      const cards = Array.from(Array(maxOrd + 1).keys()).map((i) => {
+        const now = new Date()
+        const card: Card = {
+          id: ulidAsBase64Url() as CardId,
+          ord: i as Ord,
+          noteId: n.id,
+          deckIds: new Set(),
+          created: now,
+          updated: now,
+          due: now,
+        }
+        return card
+      })
+      await db.bulkUpsertCards(cards, trx)
     })
-    await db.bulkUpsertCards(cards)
   },
 }
 
@@ -126,7 +137,7 @@ function getTemplateImages(ct: ChildTemplate, dp: DOMParser) {
 }
 
 // VERYlowTODO could sent it over Comlink - though that'll be annoying because it's in hub-ugc
-async function downloadImages(imgSrcs: Set<string>) {
+async function downloadImages(imgSrcs: Set<string>, trx: Transaction<DB>) {
   imgSrcs.delete("") // remove images with no src
   const getId = (imgSrc: string) => /([^/]+$)/.exec(imgSrc)![0] as MediaId // everything after the last `/`
   return await Promise.all(
@@ -139,7 +150,7 @@ async function downloadImages(imgSrcs: Set<string>) {
         updated: now,
         data: await response.arrayBuffer(),
       }
-      return await db.upsertMedia(media)
+      return await db.upsertMediaTrx(media, trx)
     })
   )
 }

@@ -2,7 +2,7 @@ import { CardId, DeckId, NoteId } from "../domain/ids"
 import { Card, State } from "../domain/card"
 import { getKysely } from "./crsqlite"
 import { DB, Card as CardEntity } from "./database"
-import { InsertObject } from "kysely"
+import { InsertObject, Kysely } from "kysely"
 import _ from "lodash"
 import { assertNever, stringifySet, throwExp, undefinedMap } from "shared"
 
@@ -89,8 +89,8 @@ export const cardCollectionMethods = {
     const db = await getKysely()
     await db.insertInto("card").values(cardToDocType(card)).execute()
   },
-  bulkUpsertCards: async function (cards: Card[]) {
-    const db = await getKysely()
+  bulkUpsertCards: async function (cards: Card[], db?: Kysely<DB>) {
+    db ??= await getKysely()
     const batches = _.chunk(cards.map(cardToDocType), 1000)
     for (let i = 0; i < batches.length; i++) {
       console.log("card batch", i)

@@ -19,7 +19,7 @@ import {
 import { Note } from "../domain/note"
 import { getKysely } from "./crsqlite"
 import { DB, Note as NoteEntity, RemoteNote } from "./database"
-import { InsertObject } from "kysely"
+import { InsertObject, Kysely } from "kysely"
 import _ from "lodash"
 import { entityToDomain as templateEntityToDomain } from "./template"
 import { entityToDomain as cardEntityToDomain } from "./card"
@@ -80,8 +80,8 @@ function entityToDomain(note: NoteEntity, remotes: RemoteNote[]): Note {
 }
 
 export const noteCollectionMethods = {
-  upsertNote: async function (note: Note) {
-    const db = await getKysely()
+  upsertNote: async function (note: Note, db?: Kysely<DB>) {
+    db ??= await getKysely()
     await db.insertInto("note").values(noteToDocType(note)).execute()
   },
   bulkUpsertNotes: async function (notes: Note[]) {
