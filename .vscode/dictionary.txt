@@ -26,6 +26,7 @@ miniflare
 mkcert
 msedge
 oneof
+ords
 passwordless
 pentive
 planetscale

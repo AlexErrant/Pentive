@@ -1,7 +1,7 @@
 import _ from "lodash"
 import { RenderContainer } from "./renderContainer"
 import { Ord } from "./brand"
-import { assertNever, throwExp } from "./utility"
+import { assertNever, notEmpty, throwExp } from "./utility"
 import { Cloze, Standard, TemplateType } from "./schema"
 
 export interface Template {
@@ -325,38 +325,40 @@ export function renderTemplate(
   )
 }
 
-export function maxOrdNote(
+export function noteOrds(
   this: RenderContainer,
   fieldsAndValues: ReadonlyArray<readonly [string, string]>,
   template: Omit<Template, "fields">
 ) {
   if (template.templateType.tag === "standard") {
-    const nullIndex = template.templateType.templates
+    const ords = template.templateType.templates
       .map((t, i) => {
-        return this.body(
+        const body = this.body(
           fieldsAndValues,
           t.front,
           t.back,
           i as Ord,
           template.templateType.tag
         )
+        if (body == null) return null
+        return i as Ord
       })
-      .findIndex((x) => x == null)
-    if (nullIndex === -1) return template.templateType.templates.length as Ord
-    return (nullIndex - 1) as Ord
+      .filter(notEmpty)
+    return distinctAndOrder(ords)
   } else if (template.templateType.tag === "cloze") {
-    const allClozeIndexes = fieldsAndValues.map(([, value]) => {
-      const clozeIndexes = Array.from(value.matchAll(this.clozeRegex)).map(
-        (x) => {
-          const clozeIndex =
-            x.groups?.clozeIndex ??
-            throwExp("This error should never occur - is `clozeRegex` broken?")
-          return parseInt(clozeIndex)
-        }
-      )
-      return Math.max(...clozeIndexes)
-    })
-    return (Math.max(...allClozeIndexes) - 1) as Ord
+    const ords = fieldsAndValues.flatMap(([, value]) =>
+      Array.from(value.matchAll(this.clozeRegex)).map((x) => {
+        const clozeIndex =
+          x.groups?.clozeIndex ??
+          throwExp("This error should never occur - is `clozeRegex` broken?")
+        return (parseInt(clozeIndex) - 1) as Ord
+      })
+    )
+    return distinctAndOrder(ords)
   }
   assertNever(template.templateType)
+}
+
+function distinctAndOrder(ords: Ord[]) {
+  return Array.from(new Set(ords).values()).sort((a, b) => a - b)
 }

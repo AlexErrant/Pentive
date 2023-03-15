@@ -10,11 +10,10 @@ import {
   ChildTemplate,
   MediaId,
   NookId,
-  Ord,
   RemoteNote,
   RemoteTemplate,
   throwExp,
-  maxOrdNote,
+  noteOrds,
 } from "shared"
 import { Template } from "./domain/template"
 import { Media } from "./domain/media"
@@ -92,15 +91,15 @@ export const appExpose = {
         trx
       )
       await db.upsertNote(n, trx)
-      const maxOrd = maxOrdNote.bind(C)(
+      const ords = noteOrds.bind(C)(
         Array.from(n.fieldValues.entries()),
         template
       )
-      const cards = Array.from(Array(maxOrd + 1).keys()).map((i) => {
+      const cards = ords.map((i) => {
         const now = new Date()
         const card: Card = {
           id: ulidAsBase64Url() as CardId,
-          ord: i as Ord,
+          ord: i,
           noteId: n.id,
           deckIds: new Set(),
           created: now,
