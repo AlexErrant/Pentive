@@ -38,10 +38,8 @@ render(
 )
 
 export const appExpose = {
-  hiFromApp: (msg: string) => {
-    console.log("Hi from app! You said:", msg)
-  },
   addTemplate: async (rt: RemoteTemplate) => {
+    const serializer = new XMLSerializer()
     const k = await getKysely()
     await k.transaction().execute(async (trx) => {
       const template: Template = {
@@ -57,15 +55,22 @@ export const appExpose = {
       const dp = new DOMParser()
       if (template.templateType.tag === "standard") {
         await Promise.all(
-          template.templateType.templates.map(
-            async (t) => await downloadImages(getTemplateImages(t, dp), trx)
-          )
+          template.templateType.templates.map(async (t) => {
+            const { imgSrcs, front, back } = getTemplateImages(t, dp)
+            t.front = serializer.serializeToString(front)
+            t.back = serializer.serializeToString(back)
+            return await downloadImages(imgSrcs, trx)
+          })
         )
       } else {
-        await downloadImages(
-          getTemplateImages(template.templateType.template, dp),
-          trx
+        const { imgSrcs, front, back } = getTemplateImages(
+          template.templateType.template,
+          dp
         )
+        await downloadImages(imgSrcs, trx)
+        template.templateType.template.front =
+          serializer.serializeToString(front)
+        template.templateType.template.back = serializer.serializeToString(back)
       }
       return await db.insertTemplate(template, trx)
     })
@@ -125,26 +130,38 @@ function getNoteImages(values: string[], dp: DOMParser) {
 }
 
 function getTemplateImages(ct: ChildTemplate, dp: DOMParser) {
-  const imgSrcs = new Set<string>()
-  for (const img of dp.parseFromString(ct.front, "text/html").images) {
-    imgSrcs.add(img.src)
+  const imgSrcs = new Map<MediaId, string>()
+  const front = dp.parseFromString(ct.front, "text/html")
+  const back = dp.parseFromString(ct.back, "text/html")
+  function mutate(img: HTMLImageElement) {
+    const id = getId(img.src)
+    imgSrcs.set(id, img.src)
+    img.setAttribute("src", id)
   }
-  for (const img of dp.parseFromString(ct.back, "text/html").images) {
-    imgSrcs.add(img.src)
-  }
-  return imgSrcs
+  Array.from(front.images).forEach(mutate)
+  Array.from(back.images).forEach(mutate)
+  return { imgSrcs, front, back }
 }
 
+const getId = (imgSrc: string) =>
+  imgSrc === emptyImgSrc
+    ? emptyImgSrc
+    : (/([^/]+$)/.exec(imgSrc)![0] as MediaId) // everything after the last `/`
+
+const emptyImgSrc = "" as MediaId
+
 // VERYlowTODO could sent it over Comlink - though that'll be annoying because it's in hub-ugc
-async function downloadImages(imgSrcs: Set<string>, trx: Transaction<DB>) {
-  imgSrcs.delete("") // remove images with no src
-  const getId = (imgSrc: string) => /([^/]+$)/.exec(imgSrc)![0] as MediaId // everything after the last `/`
+async function downloadImages(
+  imgSrcs: Map<MediaId, string>,
+  trx: Transaction<DB>
+) {
+  imgSrcs.delete(emptyImgSrc) // remove images with no src
   return await Promise.all(
-    Array.from(imgSrcs).map(async (imgSrc) => {
+    Array.from(imgSrcs).map(async ([id, imgSrc]) => {
       const response = await fetch(imgSrc)
       const now = new Date()
       const media: Media = {
-        id: getId(imgSrc),
+        id,
         created: now,
         updated: now,
         data: await response.arrayBuffer(),
