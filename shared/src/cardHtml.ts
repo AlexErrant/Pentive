@@ -1,7 +1,7 @@
 import _ from "lodash"
 import { RenderContainer } from "./renderContainer"
 import { Ord } from "./brand"
-import { throwExp } from "./utility"
+import { assertNever, throwExp } from "./utility"
 import { Cloze, Standard, TemplateType } from "./schema"
 
 export interface Template {
@@ -323,4 +323,40 @@ export function renderTemplate(
   throw new Error(
     `No renderer found for Template: ${JSON.stringify(template.templateType)}`
   )
+}
+
+export function maxOrdNote(
+  this: RenderContainer,
+  fieldsAndValues: ReadonlyArray<readonly [string, string]>,
+  template: Omit<Template, "fields">
+) {
+  if (template.templateType.tag === "standard") {
+    const nullIndex = template.templateType.templates
+      .map((t, i) => {
+        return this.body(
+          fieldsAndValues,
+          t.front,
+          t.back,
+          i as Ord,
+          template.templateType.tag
+        )
+      })
+      .findIndex((x) => x == null)
+    if (nullIndex === -1) return template.templateType.templates.length as Ord
+    return (nullIndex - 1) as Ord
+  } else if (template.templateType.tag === "cloze") {
+    const allClozeIndexes = fieldsAndValues.map(([, value]) => {
+      const clozeIndexes = Array.from(value.matchAll(this.clozeRegex)).map(
+        (x) => {
+          const clozeIndex =
+            x.groups?.clozeIndex ??
+            throwExp("This error should never occur - is `clozeRegex` broken?")
+          return parseInt(clozeIndex)
+        }
+      )
+      return Math.max(...clozeIndexes)
+    })
+    return (Math.max(...allClozeIndexes) - 1) as Ord
+  }
+  assertNever(template.templateType)
 }

@@ -2,7 +2,7 @@ import { defaultRenderContainer } from "./renderContainer"
 import { expect, test } from "vitest"
 import { Ord } from "./brand"
 import { throwExp } from "./utility"
-import { strip } from "./cardHtml"
+import { maxOrdNote, strip } from "./cardHtml"
 
 function testBody(
   fieldValues: Array<readonly [string, string]>,
@@ -266,6 +266,39 @@ test("CardHtml renders {{cloze:FieldName}} properly", () => {
   )
 })
 
+function maxOrdOfClozeNote(
+  fieldsAndValues: ReadonlyArray<readonly [string, string]>,
+  front: string,
+  back: string
+) {
+  return maxOrdNote.bind(defaultRenderContainer)(fieldsAndValues, {
+    css: "",
+    templateType: {
+      tag: "cloze",
+      template: {
+        name: "",
+        front,
+        back,
+        id: 0 as Ord,
+        shortFront: "",
+        shortBack: "",
+      },
+    },
+  })
+}
+
+test("maxOrdNote of {{cloze:FieldName}} yields 1", () => {
+  const maxOrd = maxOrdOfClozeNote(
+    [
+      ["Text", "Canberra was founded in {{c1::1913}}."],
+      ["Extra", "Some extra stuff."],
+    ],
+    "{{cloze:Text}}",
+    `{{cloze:Text}}<br>{{Extra}}`
+  )
+  expect(maxOrd).toBe(0)
+})
+
 test("CardHtml renders multiple cloze templates properly 1", () => {
   testStrippedBody(
     [
@@ -314,6 +347,19 @@ test("CardHtml renders multiple cloze templates properly 3", () => {
   )
 })
 
+test("maxOrdNote of multiple cloze fields works", () => {
+  const maxOrd = maxOrdOfClozeNote(
+    [
+      ["Field1", "Columbus first crossed the Atlantic in {{c1::1492}}"],
+      ["Field2", "In {{c2::1492}}, Columbus sailed the ocean {{c3::blue}}."],
+      ["Extra", "Some extra info"],
+    ],
+    "{{cloze:Field1}}{{cloze:Field2}}",
+    "{{cloze:Field1}}{{cloze:Field2}}<br>{{Extra}}"
+  )
+  expect(maxOrd).toBe(2)
+})
+
 test("CardHtml renders multiple cloze templates properly 4", () => {
   testStrippedBody(
     [
@@ -328,6 +374,19 @@ test("CardHtml renders multiple cloze templates properly 4", () => {
     "[...] first crossed the Atlantic in [...]",
     "[Columbus] first crossed the Atlantic in [1492]Some extra info"
   )
+})
+
+test("maxOrdNote of multiple cloze fields with the same index works", () => {
+  const maxOrd = maxOrdOfClozeNote(
+    [
+      ["Field1", "{{c1::Columbus}} first crossed the Atlantic in {{c1::1492}}"],
+      ["Field2", "In 1492, Columbus sailed the ocean blue."],
+      ["Extra", "Some extra info"],
+    ],
+    "{{cloze:Field1}}{{cloze:Field2}}",
+    "{{cloze:Field1}}{{cloze:Field2}}<br>{{Extra}}"
+  )
+  expect(maxOrd).toBe(0)
 })
 
 test("CardHtml renders {{cloze:FieldName}} properly with hint", () => {

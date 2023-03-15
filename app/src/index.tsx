@@ -6,16 +6,21 @@ import { db } from "./db"
 import * as Comlink from "comlink"
 import { registerPluginServices } from "./pluginManager"
 import {
+  CardId,
   ChildTemplate,
   MediaId,
   NookId,
+  Ord,
   RemoteNote,
   RemoteTemplate,
   throwExp,
+  maxOrdNote,
 } from "shared"
 import { Template } from "./domain/template"
 import { Media } from "./domain/media"
 import { Note } from "./domain/note"
+import { Card } from "./domain/card"
+import { ulidAsBase64Url } from "./domain/utility"
 
 const plugins = await db.getPlugins()
 
@@ -60,12 +65,12 @@ export const appExpose = {
     return await db.insertTemplate(template)
   },
   addNote: async (rn: RemoteNote, nook: NookId) => {
-    const templateId =
+    const template =
       (await db.getTemplateIdByRemoteId(rn.templateId)) ??
       throwExp(`You don't have the remote template ${rn.templateId}`)
     const n: Note = {
       id: rn.id,
-      templateId,
+      templateId: template.id,
       // ankiNoteId: rn.ankiNoteId,
       created: rn.created,
       updated: rn.updated,
@@ -76,7 +81,25 @@ export const appExpose = {
     await downloadImages(
       getNoteImages(Array.from(rn.fieldValues.values()), new DOMParser())
     )
-    return await db.upsertNote(n)
+    await db.upsertNote(n)
+    const maxOrd = maxOrdNote.bind(C)(
+      Array.from(n.fieldValues.entries()),
+      template
+    )
+    const cards = Array.from(Array(maxOrd + 1).keys()).map((i) => {
+      const now = new Date()
+      const card: Card = {
+        id: ulidAsBase64Url() as CardId,
+        ord: i as Ord,
+        noteId: n.id,
+        deckIds: new Set(),
+        created: now,
+        updated: now,
+        due: now,
+      }
+      return card
+    })
+    await db.bulkUpsertCards(cards)
   },
 }
 

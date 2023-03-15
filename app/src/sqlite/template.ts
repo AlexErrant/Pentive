@@ -127,10 +127,18 @@ export const templateCollectionMethods = {
     const db = await getKysely()
     const template = await db
       .selectFrom("remoteTemplate")
-      .select(["localId"])
+      .innerJoin("template", "remoteTemplate.localId", "template.id")
+      .selectAll("template")
       .where("remoteId", "=", templateId)
       .executeTakeFirst()
-    return template?.localId as TemplateId | undefined
+    const remoteTemplates = await db
+      .selectFrom("remoteTemplate")
+      .selectAll()
+      .where("localId", "=", templateId)
+      .execute()
+    return (
+      undefinedMap(template, (x) => entityToDomain(x, remoteTemplates)) ?? null
+    )
   },
   getTemplates: async function () {
     const db = await getKysely()

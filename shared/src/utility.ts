@@ -1,6 +1,9 @@
 // https://basarat.gitbook.io/typescript/type-system/discriminated-unions#throw-in-exhaustive-checks
-export function assertNever(_: never): never {
-  throw new Error("Unexpected value. Should have been never.")
+export function assertNever(x: never): never {
+  throw new Error(
+    `Expected 'never', but got an unexpected value:
+${JSON.stringify(x)}`
+  )
 }
 
 export function undefinedMap<T, R>(
