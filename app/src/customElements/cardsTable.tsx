@@ -56,7 +56,7 @@ const cacheBlockSize = 100
 const onGridReady = ({ api }: GridReadyEvent) => {
   api.setDatasource({
     getRows: (p: IGetRowsParams) => {
-      db.getNotes(p.startRow, cacheBlockSize) // medTODO could just cache the Template and mutate the NoteCard obj to add it
+      db.getCards(p.startRow, cacheBlockSize) // medTODO could just cache the Template and mutate the NoteCard obj to add it
         .then((x) => p.successCallback(x.noteCards, x.count))
         .catch(() => p.failCallback())
     },

@@ -1,10 +1,12 @@
 import { CardId, DeckId, NoteId } from "../domain/ids"
-import { Card, State } from "../domain/card"
+import { Card, State, NoteCard } from "../domain/card"
 import { getKysely } from "./crsqlite"
 import { DB, Card as CardEntity } from "./database"
 import { InsertObject, Kysely } from "kysely"
 import _ from "lodash"
 import { assertNever, stringifySet, throwExp, undefinedMap } from "shared"
+import { entityToDomain as templateEntityToDomain } from "./template"
+import { entityToDomain as noteEntityToDomain } from "./note"
 
 function serializeState(s: State): number {
   switch (s) {
@@ -63,7 +65,7 @@ function cardToDocType(card: Card): InsertObject<DB, "card"> {
   }
 }
 
-export function entityToDomain(card: CardEntity): Card {
+function entityToDomain(card: CardEntity): Card {
   const r = {
     id: card.id as CardId,
     noteId: card.noteId as NoteId,
@@ -106,18 +108,89 @@ export const cardCollectionMethods = {
       .executeTakeFirst()
     return card == null ? null : entityToDomain(card)
   },
-  getCards: async function (exclusiveStartId?: CardId, limit?: number) {
+  getCards: async function (offset: number, limit: number) {
     const db = await getKysely()
-    const allCards = await db
-      .selectFrom("card")
-      .selectAll()
-      .if(exclusiveStartId != null, (x) =>
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        x.where("id", ">", exclusiveStartId!)
-      )
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      .if(limit != null, (x) => x.limit(limit!))
+    const entities = await db
+      .selectFrom("note")
+      .innerJoin("template", "template.id", "note.templateId")
+      .innerJoin("card", "card.noteId", "note.id")
+      .select([
+        "card.cardSettingId as card_cardSettingId",
+        "card.created as card_created",
+        "card.deckIds as card_deckIds",
+        "card.due as card_due",
+        "card.id as card_id",
+        "card.updated as card_updated",
+        "card.noteId as card_noteId",
+        "card.ord as card_ord",
+        "card.state as card_state",
+
+        "note.ankiNoteId as note_ankiNoteId",
+        "note.created as note_created",
+        "note.fieldValues as note_fieldValues",
+        "note.id as note_id",
+        "note.updated as note_updated",
+        "note.tags as note_tags",
+        "note.templateId as note_templateId",
+
+        "template.ankiId as template_ankiId",
+        "template.created as template_created",
+        "template.css as template_css",
+        "template.fields as template_fields",
+        "template.id as template_id",
+        "template.updated as template_updated",
+        "template.name as template_name",
+        "template.templateType as template_templateType",
+      ])
+      .offset(offset)
+      .limit(limit)
       .execute()
-    return allCards.map(entityToDomain)
+    const count = await db
+      .selectFrom("note")
+      .select(db.fn.count<number>("id").as("c"))
+      .executeTakeFirstOrThrow()
+    return {
+      count: count.c,
+      noteCards: entities.map((tnc) => {
+        const note = noteEntityToDomain(
+          {
+            ankiNoteId: tnc.note_ankiNoteId,
+            created: tnc.note_created,
+            fieldValues: tnc.note_fieldValues,
+            id: tnc.note_id,
+            updated: tnc.note_updated,
+            tags: tnc.note_tags,
+            templateId: tnc.note_templateId,
+          },
+          []
+        )
+        const template = templateEntityToDomain(
+          {
+            ankiId: tnc.template_ankiId,
+            created: tnc.template_created,
+            css: tnc.template_css,
+            fields: tnc.template_fields,
+            id: tnc.template_id,
+            updated: tnc.template_updated,
+            name: tnc.template_name,
+            templateType: tnc.template_templateType,
+          },
+          []
+        )
+        const card = entityToDomain({
+          cardSettingId: tnc.card_cardSettingId,
+          created: tnc.card_created,
+          deckIds: tnc.card_deckIds,
+          due: tnc.card_due,
+          id: tnc.card_id,
+          updated: tnc.card_updated,
+          noteId: tnc.card_noteId,
+          ord: tnc.card_ord,
+          state: tnc.card_state,
+        })
+        const r: NoteCard = { note, template, card }
+        return r
+      }),
+    }
   },
 }
