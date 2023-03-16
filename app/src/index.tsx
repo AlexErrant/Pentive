@@ -91,10 +91,7 @@ export const appExpose = {
         fieldValues: rn.fieldValues,
         remotes: new Map([[nook, rn.id]]),
       }
-      await downloadImages(
-        getNoteImages(Array.from(rn.fieldValues.values()), new DOMParser()),
-        trx
-      )
+      await downloadImages(getNoteImages(n.fieldValues, new DOMParser()), trx)
       await db.upsertNote(n, trx)
       const ords = noteOrds.bind(C)(
         Array.from(n.fieldValues.entries()),
@@ -121,12 +118,19 @@ export const appExpose = {
 // highTODO needs security on the origin
 Comlink.expose(appExpose, Comlink.windowEndpoint(self.parent))
 
-function getNoteImages(values: string[], dp: DOMParser) {
-  return new Set(
-    values.flatMap((v) =>
-      Array.from(dp.parseFromString(v, "text/html").images).map((i) => i.src)
-    )
-  )
+function getNoteImages(fieldValues: Map<string, string>, dp: DOMParser) {
+  const imgSrcs = new Map<MediaId, string>()
+  function mutate(img: HTMLImageElement) {
+    const id = getId(img.src)
+    imgSrcs.set(id, img.src)
+    img.setAttribute("src", id)
+  }
+  for (const [f, v] of fieldValues) {
+    const doc = dp.parseFromString(v, "text/html")
+    Array.from(doc.images).forEach(mutate)
+    fieldValues.set(f, doc.body.innerHTML)
+  }
+  return imgSrcs
 }
 
 function getTemplateImages(ct: ChildTemplate, dp: DOMParser) {
