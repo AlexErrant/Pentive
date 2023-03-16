@@ -595,7 +595,7 @@ export const imgPlaceholder = "3Iptw8cmfkd/KLrTw+9swHnzxxVhtDCraYLejUh3"
 function replaceImgSrcs(value: string, remoteIdBase64url: string) {
   return value.replaceAll(
     imgPlaceholder,
-    "https://api.local.pentive.com:8787/i/" + remoteIdBase64url
+    "https://api.pentive.local:8787/i/" + remoteIdBase64url
   )
 }
 

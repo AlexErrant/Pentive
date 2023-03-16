@@ -4,8 +4,8 @@
 - I couldn't figure out how to get [dev mode](https://vite-pwa-org.netlify.app/guide/development.html) working, so use `npm run build-watch` and `npm run serve` in both app and ugc
 - Make sure your hosts file is updated as per [this doc](./../app/README.md).
 - Service workers require `https`, so open
-  - https://app.local.pentive.com:3014/
-  - https://user-generated-content.local.pentive.com:3015/
+  - https://app.pentive.local:3014/
+  - https://user-generated-content.pentive.local:3015/
 - Open the iframe's domain in a new tab - i.e. go to the link above. Sometimes log messages will appear there.
 - In both tabs, in DevTools > Application, check "Update on reload".
 

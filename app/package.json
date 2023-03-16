@@ -10,8 +10,6 @@
     "build-watch": "vite build --watch",
     "//serve": "IMPORTANT: open https://localhost:3014/ since the cert is for localhost",
     "serve": "vite preview",
-    "//generate-cert": "requires installing https://github.com/FiloSottile/mkcert ",
-    "generate-cert": "mkdir .cert && mkcert -key-file ./.cert/key.pem -cert-file ./.cert/cert.pem localhost app.local.pentive.com",
     "postinstall": "cp ../node_modules/.pnpm/node_modules/@vlcn.io/wa-crsqlite/dist/wa-sqlite-async.wasm ./src/assets/sqlite.wasm",
     "eslint": "eslint .",
     "eslintw": "eslint . --fix",

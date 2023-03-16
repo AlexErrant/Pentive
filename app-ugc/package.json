@@ -10,8 +10,6 @@
     "build-watch": "vite build --watch",
     "//serve": "IMPORTANT: open https://localhost:3015/ since the cert is for localhost. Not sure why you'd ever look at this outside an iframe though.",
     "serve": "vite preview",
-    "//generate-cert": "requires installing https://github.com/FiloSottile/mkcert ",
-    "generate-cert": "mkdir .cert && mkcert -key-file ./.cert/key.pem -cert-file ./.cert/cert.pem user-generated-content.local.pentive.com",
     "eslint": "eslint .",
     "eslintw": "eslint . --fix",
     "prettier": "prettier --check .",

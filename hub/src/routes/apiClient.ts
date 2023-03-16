@@ -6,7 +6,7 @@ import superjson from "superjson"
 export const apiClient = createTRPCProxyClient<AppRouter>({
   links: [
     httpBatchLink({
-      url: "https://api.local.pentive.com:8787/trpc",
+      url: "https://api.pentive.local:8787/trpc",
       headers: {
         [csrfHeaderName]: "",
       },

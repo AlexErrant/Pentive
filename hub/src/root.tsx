@@ -51,7 +51,7 @@ export default function Root(): JSX.Element {
           sandbox="allow-scripts allow-same-origin" // Changing this has security ramifications! https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe#attr-sandbox
           // "When the embedded document has the same origin as the embedding page, it is strongly discouraged to use both allow-scripts and allow-same-origin"
           // Since this iframe hosts `app.pentive.com` and this page is hosted on `pentive.com`, resulting in different origins, we should be safe. https://web.dev/sandboxed-iframes/ https://stackoverflow.com/q/35208161
-          src={`https://app.local.pentive.com:3014/`}
+          src={`https://app.pentive.local:3014/`}
         />
         <Nav />
         <ErrorBoundary>
