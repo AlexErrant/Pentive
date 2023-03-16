@@ -48,6 +48,7 @@
     "eslint": "eslint .",
     "eslint:write": "eslint . --fix",
     "prettier": "prettier --check .",
-    "prettier:write": "prettier --write ."
+    "prettier:write": "prettier --write .",
+    "dbpush": "npx prisma db push"
   }
 }
