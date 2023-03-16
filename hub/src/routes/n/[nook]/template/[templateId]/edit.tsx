@@ -44,7 +44,7 @@ import { html } from "@codemirror/lang-html"
 import ResizingIframe from "~/components/resizingIframe"
 import { ClozeTemplate, StandardTemplate } from "shared/src/cardHtml"
 import { SetStoreFunction, createStore } from "solid-js/store"
-import { apiClient } from "~/routes/apiClient"
+import { cwaClient } from "~/routes/cwaClient"
 
 interface TemplateStore {
   t: RemoteTemplate | undefined
@@ -148,7 +148,7 @@ export default function Submit(): JSX.Element {
         type="button"
         onclick={async () => {
           const t = template.t!
-          await apiClient.editTemplates.mutate([
+          await cwaClient.editTemplates.mutate([
             {
               ...t,
               remoteIds: [t.id],

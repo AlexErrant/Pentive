@@ -6,7 +6,7 @@ export jwsSecret=looks+like+openssl+rand+base64+32+comma+but=
 export csrfSecret=with+spaces+and+hyphens+and+stuff+ZZZZZZZZZ=
 export VITE_DEVELOPMENT_DOMAIN=pentive.local
 export VITE_PRODUCTION_DOMAIN=hub.yourusernamehere.workers.dev
-export VITE_DEVELOPMENT_API_URL=https://api.pentive.local:8787/
-export VITE_PRODUCTION_API_URL=https://api.yourusernamehere.workers.dev/
+export VITE_DEVELOPMENT_CWA_URL=https://cwa.pentive.local:8787/
+export VITE_PRODUCTION_CWA_URL=https://cwa.yourusernamehere.workers.dev/
 export appOrigin=https://app.pentive.local:3014
 export hubOrigin=https://pentive.local:3000

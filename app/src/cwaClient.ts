@@ -3,10 +3,10 @@ import type { AppRouter } from "cwa/src/router"
 import { csrfHeaderName } from "shared"
 import superjson from "superjson"
 
-export const apiClient = createTRPCProxyClient<AppRouter>({
+export const cwaClient = createTRPCProxyClient<AppRouter>({
   links: [
     httpBatchLink({
-      url: "https://api.pentive.local:8787/trpc",
+      url: "https://cwa.pentive.local:8787/trpc",
       headers: {
         [csrfHeaderName]: "",
       },

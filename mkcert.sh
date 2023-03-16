@@ -20,6 +20,6 @@ mkcert -key-file hub-ugc/.cert/key.pem -cert-file hub-ugc/.cert/cert.pem hub-use
 mkdir lrpc/.cert
 mkcert -key-file lrpc/.cert/key.pem    -cert-file lrpc/.cert/cert.pem    lrpc.pentive.local
 
-mkcert -key-file key.pem               -cert-file cert.pem               api.pentive.local
+mkcert -key-file key.pem               -cert-file cert.pem               cwa.pentive.local
 mv key.pem  ~/.config/.wrangler/local-cert/key.pem
 mv cert.pem ~/.config/.wrangler/local-cert/cert.pem

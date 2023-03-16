@@ -8,18 +8,18 @@ import { db } from "../db"
 import { importAnki } from "./importer/importer"
 import { Base64Url, csrfHeaderName, NookId, throwExp } from "shared"
 import { MediaId, RemoteMediaNum } from "../domain/ids"
-import { apiClient } from "../apiClient"
+import { cwaClient } from "../cwaClient"
 import { getDb } from "../sqlite/crsqlite"
 
 async function uploadTemplates(): Promise<void> {
   const newTemplates = await db.getNewTemplatesToUpload()
   if (newTemplates.length > 0) {
-    const remoteIdByLocal = await apiClient.createTemplates.mutate(newTemplates)
+    const remoteIdByLocal = await cwaClient.createTemplates.mutate(newTemplates)
     await db.updateTemplateRemoteIds(remoteIdByLocal)
   }
   const editedTemplates = await db.getEditedTemplatesToUpload()
   if (editedTemplates.length > 0) {
-    await apiClient.editTemplates.mutate(editedTemplates)
+    await cwaClient.editTemplates.mutate(editedTemplates)
     await db.markTemplateAsPushed(editedTemplates.flatMap((n) => n.remoteIds))
   }
   const media = await db.getTemplateMediaToUpload()
@@ -46,12 +46,12 @@ async function makeTemplateUploadable() {
 async function uploadNotes(): Promise<void> {
   const newNotes = await db.getNewNotesToUpload()
   if (newNotes.length > 0) {
-    const remoteIdByLocal = await apiClient.createNote.mutate(newNotes)
+    const remoteIdByLocal = await cwaClient.createNote.mutate(newNotes)
     await db.updateNoteRemoteIds(remoteIdByLocal)
   }
   const editedNotes = await db.getEditedNotesToUpload()
   if (editedNotes.length > 0) {
-    await apiClient.editNote.mutate(editedNotes)
+    await cwaClient.editNote.mutate(editedNotes)
     await db.markNoteAsPushed(
       editedNotes.flatMap((n) => Array.from(n.remoteIds.keys()))
     )
@@ -78,7 +78,7 @@ async function postMedia(
     ]
   )
   const response = await fetch(
-    import.meta.env.VITE_API_URL +
+    import.meta.env.VITE_CWA_URL +
       `media/${type}?` +
       new URLSearchParams(remoteEntityIdAndRemoteMediaNum).toString(),
     {
@@ -110,7 +110,7 @@ async function updateNotes(): Promise<void> {
 }
 
 async function searchNotes(search: string): Promise<void> {
-  const searchBatch = await apiClient.searchNotes.query(search)
+  const searchBatch = await cwaClient.searchNotes.query(search)
   console.log(searchBatch)
 }
 

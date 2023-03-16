@@ -12,7 +12,7 @@ import {
 import ResizingIframe from "~/components/resizingIframe"
 import NoteComment from "~/components/noteComment"
 import SubmitComment from "~/components/submitComment"
-import { apiClient } from "~/routes/apiClient"
+import { cwaClient } from "~/routes/cwaClient"
 import { getUserId } from "~/db/session"
 import { getAppMessenger } from "~/root"
 
@@ -67,7 +67,7 @@ const Thread: Component = () => {
           <button
             onclick={async () => {
               await getAppMessenger().addNote(unproxify(data()!.note!), nook())
-              await apiClient.subscribeToNote.mutate(data()!.note!.id)
+              await cwaClient.subscribeToNote.mutate(data()!.note!.id)
             }}
             disabled={data()?.note?.til != null}
           >
@@ -76,7 +76,7 @@ const Thread: Component = () => {
           <ul class="comment-children">
             <SubmitComment
               onSubmit={async (text) =>
-                await apiClient.insertNoteComment.mutate({
+                await cwaClient.insertNoteComment.mutate({
                   noteId: data()!.note!.id,
                   text,
                 })

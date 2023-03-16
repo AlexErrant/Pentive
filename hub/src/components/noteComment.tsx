@@ -3,7 +3,7 @@ import { A } from "solid-start"
 import { NoteComment as NoteCommentType } from "shared"
 import Toggle from "./toggle"
 import SubmitComment from "./submitComment"
-import { apiClient } from "~/routes/apiClient"
+import { cwaClient } from "~/routes/cwaClient"
 
 const NoteComment: Component<{ comment: NoteCommentType }> = (props) => {
   const [showReply, setShowReply] = createSignal(false)
@@ -26,7 +26,7 @@ const NoteComment: Component<{ comment: NoteCommentType }> = (props) => {
       <div style={{ display: showReply() ? "block" : "none" }}>
         <SubmitComment
           onSubmit={async (text) =>
-            await apiClient.insertNoteChildComment.mutate({
+            await cwaClient.insertNoteChildComment.mutate({
               parentCommentId: props.comment.id,
               text,
             })

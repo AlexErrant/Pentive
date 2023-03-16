@@ -31,7 +31,7 @@ Add the following to your [hosts file](https://www.howtogeek.com/howto/27350/beg
 127.0.0.1 pentive.local
 127.0.0.1 hub-user-generated-content.pentive.local
 127.0.0.1 lrpc.pentive.local
-127.0.0.1 api.pentive.local
+127.0.0.1 cwa.pentive.local
 ```
 
 ## 3. Generate certs
@@ -41,7 +41,7 @@ Run `./rmcert.sh && ./mkcert.sh`.
 ⚠ Note that `rmcert.sh` deletes Wrangler's local-cert's `key.pem` and `cert.pem`. (Then `mkcert.sh` generates a new one.) This "regenerate" may be undesirable if you're using Wrangler for HTTPS anywhere else. If this is the case, add your site to `mkcert.sh` before running it, e.g.
 
 ```bash
-mkcert -key-file key.pem -cert-file cert.pem  api.pentive.local your-wrangler-worker-here.com
+mkcert -key-file key.pem -cert-file cert.pem cwa.pentive.local your-wrangler-worker-here.com
 ```
 
 [More info.](https://github.com/cloudflare/workers-sdk/issues/1908#issuecomment-1416901172) ⚠
