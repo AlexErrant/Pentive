@@ -11,10 +11,10 @@ set -euo pipefail # https://stackoverflow.com/a/2871034
 source ../PentiveSecrets/secrets.sh
 
 # Uncomment if you wanna
-# echo $jwsSecret        | wrangler secret put jwsSecret        --name mediarouter
-# echo $planetscaleDbUrl | wrangler secret put planetscaleDbUrl --name mediarouter
-# echo $mediaTokenSecret | wrangler secret put tokenSecret      --name mediarouter
-# echo $appOrigin        | wrangler secret put tokenSecret      --name mediarouter
+# echo $jwsSecret        | wrangler secret put jwsSecret        --name cwa
+# echo $planetscaleDbUrl | wrangler secret put planetscaleDbUrl --name cwa
+# echo $mediaTokenSecret | wrangler secret put tokenSecret      --name cwa
+# echo $appOrigin        | wrangler secret put tokenSecret      --name cwa
 # echo $jwsSecret        | wrangler secret put jwsSecret        --name hub
 # echo $planetscaleDbUrl | wrangler secret put planetscaleDbUrl --name hub
 # echo $hubSessionSecret | wrangler secret put hubSessionSecret --name hub
@@ -23,15 +23,15 @@ source ../PentiveSecrets/secrets.sh
 # https://developers.cloudflare.com/workers/wrangler/configuration/#environmental-variables
 # https://developers.cloudflare.com/workers/platform/environment-variables/#adding-secrets-via-wrangler
 
-envsubst < ./mediaRouter/.example.dev.vars     > ./mediaRouter/.dev.vars
-envsubst < ./mediaRouter/example.wrangler.toml > ./mediaRouter/wrangler.toml
-envsubst < ./hub/.example.env                  > ./hub/.env
-envsubst < ./hub/.example.env.development      > ./hub/.env.development
-envsubst < ./hub/.example.env.production       > ./hub/.env.production
-envsubst < ./hub/example.wrangler.toml         > ./hub/wrangler.toml
-envsubst < ./lrpc/.example.env                 > ./lrpc/.env
-envsubst < ./app-ugc/example.env.sh            > ./app-ugc/env.sh
-envsubst < ./hub-ugc/example.env.sh            > ./hub-ugc/env.sh
-envsubst < ./app/example.env.sh                > ./app/env.sh
-envsubst < ./app/.example.env.development      > ./app/.env.development
-envsubst < ./app/.example.env.production       > ./app/.env.production
+envsubst < ./cwa/.example.dev.vars        > ./cwa/.dev.vars
+envsubst < ./cwa/example.wrangler.toml    > ./cwa/wrangler.toml
+envsubst < ./hub/.example.env             > ./hub/.env
+envsubst < ./hub/.example.env.development > ./hub/.env.development
+envsubst < ./hub/.example.env.production  > ./hub/.env.production
+envsubst < ./hub/example.wrangler.toml    > ./hub/wrangler.toml
+envsubst < ./lrpc/.example.env            > ./lrpc/.env
+envsubst < ./app-ugc/example.env.sh       > ./app-ugc/env.sh
+envsubst < ./hub-ugc/example.env.sh       > ./hub-ugc/env.sh
+envsubst < ./app/example.env.sh           > ./app/env.sh
+envsubst < ./app/.example.env.development > ./app/.env.development
+envsubst < ./app/.example.env.production  > ./app/.env.production

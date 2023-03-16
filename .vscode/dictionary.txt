@@ -21,7 +21,6 @@ immer
 keymap
 kysely
 lrpc
-mediarouter
 miniflare
 mkcert
 msedge

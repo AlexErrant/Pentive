@@ -5,6 +5,6 @@ packages:
   - "hub-ugc/"
   - "lrpc/"
   - "shared/"
-  - "mediaRouter/"
+  - "cwa/"
   - "workers-test/"
   - "example-plugins/*"

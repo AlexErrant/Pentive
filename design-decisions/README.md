@@ -30,7 +30,7 @@ The primary author of Pentive, Alex, is _not_ a good architect, designer, or web
 - Mostly empty for now, except for the Prisma/PlanetScale schema
 - Server-side syncing may eventually be implemented here
 
-## mediaRouter
+## cwa
 
 - short for Cloudflare Worker API
 - How `app` submits changes to `hub`/PlanetScale
