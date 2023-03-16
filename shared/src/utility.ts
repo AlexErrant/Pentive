@@ -87,9 +87,8 @@ export function unproxify<T>(val: T): T {
   if (val instanceof Map) return new Map(val) as T
   if (val instanceof Date) return new Date(val) as T
   if (val instanceof Object)
-    // @ts-expect-error whatever
     return Object.fromEntries(
       Object.entries(Object.assign({}, val)).map(([k, v]) => [k, unproxify(v)])
-    )
+    ) as T
   return val
 }
