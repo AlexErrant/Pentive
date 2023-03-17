@@ -4,7 +4,7 @@ import {
   clozeTemplateRegex,
   html,
   renderTemplate,
-} from "./cardHtml"
+} from "./cardHtml.js"
 
 export const defaultRenderContainer = {
   clozeRegex,
