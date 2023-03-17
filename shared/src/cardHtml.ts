@@ -1,8 +1,8 @@
 import _ from "lodash"
-import { RenderContainer } from "./renderContainer"
-import { Ord } from "./brand"
-import { assertNever, notEmpty, throwExp } from "./utility"
-import { Cloze, Standard, TemplateType } from "./schema"
+import { RenderContainer } from "./renderContainer.js"
+import { Ord } from "./brand.js"
+import { assertNever, notEmpty, throwExp } from "./utility.js"
+import { Cloze, Standard, TemplateType } from "./schema.js"
 
 export interface Template {
   readonly css: string
