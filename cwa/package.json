@@ -10,7 +10,8 @@
   "scripts": {
     "start": "wrangler dev",
     "dev": "wrangler dev",
-    "deploy": "wrangler publish"
+    "deploy": "wrangler publish",
+    "build": "wrangler publish --dry-run --outdir dist"
   },
   "dependencies": {
     "@planetscale/database": "^1.5.0",
