@@ -6,5 +6,10 @@
   },
   "devDependencies": {
     "concurrently": "^7.6.0"
+  },
+  "scripts": {
+    "//": "ugc and dev are distinct because you may frequently wish to restart `dev`, whereas `ugc` rarely changes",
+    "ugc": "concurrently -p \"[{name}]\" -n \"app-ugc,hub-ugc\" -c \"bgBlue.bold,bgMagenta.bold\" \"pnpm --filter app-ugc build && pnpm --filter app-ugc serve\" \"pnpm --filter hub-ugc build && pnpm --filter hub-ugc serve\"",
+    "dev": "concurrently -p \"[{name}]\" -n \"app,hub,cwa\" -c \"bgBlue.bold,bgMagenta.bold,bgGreen.bold\" \"pnpm --filter app dev\" \"pnpm --filter hub dev\" \"pnpm --filter cwa dev\""
   }
 }

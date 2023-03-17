@@ -74,3 +74,17 @@ pnpm i
 ```bash
 pnpm --filter lrpc dbpush
 ```
+
+## 7. Run!
+
+```bash
+pnpm ugc
+```
+
+And in another terminal:
+
+```bash
+pnpm dev
+```
+
+Visit https://pentive.local:3000/ and https://app.pentive.local:3014/
