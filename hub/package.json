@@ -4,6 +4,7 @@
     "dev": "solid-start dev",
     "build": "solid-start build",
     "start": "solid-start start",
+    "deploy": "wrangler publish",
     "eslint": "eslint .",
     "eslintw": "eslint . --fix",
     "prettier": "prettier --check .",
