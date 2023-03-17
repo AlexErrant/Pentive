@@ -6,7 +6,6 @@ import type {
   PostMessageTypes,
 } from "./registerServiceWorker"
 import type { MediaId } from "app/src/domain/ids"
-import { throwExp } from "shared"
 
 declare let self: ServiceWorkerGlobalScope
 
@@ -126,3 +125,10 @@ self.addEventListener("fetch", (fetch) => {
     fetch.respondWith(getLocalMedia(mediaId, fetch.clientId))
   }
 })
+
+// same as `throwExp` in `shared`, but for some reason adding it causes
+//     Circular dependency: ../node_modules/.pnpm/kysely@0.23.5/node_modules/kysely/dist/esm/parser/table-parser.js -> ../node_modules/.pnpm/kysely@0.23.5/node_modules/kysely/dist/esm/parser/expression-parser.js -> ../node_modules/.pnpm/kysely@0.23.5/node_modules/kysely/dist/esm/parser/parse-utils.js -> ../node_modules/.pnpm/kysely@0.23.5/node_modules/kysely/dist/esm/query-builder/expression-builder.js -> ../node_modules/.pnpm/kysely@0.23.5/node_modules/kysely/dist/esm/query-builder/select-query-builder.js -> ../node_modules/.pnpm/kysely@0.23.5/node_modules/kysely/dist/esm/parser/join-parser.js -> ../node_modules/.pnpm/kysely@0.23.5/node_modules/kysely/dist/esm/parser/table-parser.js
+// with `pnpm build` which I've no idea how to fix
+function throwExp(errorMessage: string): never {
+  throw new Error(errorMessage)
+}
