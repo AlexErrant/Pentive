@@ -10,5 +10,7 @@ export VITE_DEVELOPMENT_CWA_URL=https://cwa.pentive.local:8787/
 export VITE_PRODUCTION_CWA_URL=https://cwa.yourusernamehere.workers.dev/
 export VITE_DEVELOPMENT_APP_ORIGIN=https://app.pentive.local:3014
 export VITE_PRODUCTION_APP_ORIGIN=https://app.yourusernamehere.workers.dev
+export VITE_DEVELOPMENT_HUB_UGC_ORIGIN=https://hub-user-generated-content.pentive.local:3016
+export VITE_PRODUCTION_HUB_UGC_ORIGIN=https://hub-user-generated-content.yourusernamehere.workers.dev
 export appOrigin=https://app.pentive.local:3014
 export hubOrigin=https://pentive.local:3000
