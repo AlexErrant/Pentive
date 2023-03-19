@@ -72,7 +72,7 @@ export function setSessionStorage(x: {
     path: "/",
     maxAge: 60 * 60 * 24 * 30, // 30 days
     httpOnly: true,
-    domain: import.meta.env.VITE_DOMAIN, // sadly, making cookies target specific subdomains from the main domain seems very hacky
+    domain: import.meta.env.VITE_HUB_DOMAIN, // sadly, making cookies target specific subdomains from the main domain seems very hacky
     // expires: "", // intentionally missing because docs say it's calculated off `maxAge` when missing https://github.com/solidjs/solid-start/blob/1b22cad87dd7bd74f73d807e1d60b886e753a6ee/packages/start/session/cookies.ts#L56-L57
   }
   jwtCookie = createPlainCookie(jwtCookieName, jwtCookieOpts)
@@ -89,7 +89,7 @@ export function setSessionStorage(x: {
     path: "/",
     maxAge: 60 * 60 * 24 * 30, // 30 days
     httpOnly: false,
-    domain: import.meta.env.VITE_DOMAIN, // sadly, making cookies target specific subdomains from the main domain seems very hacky
+    domain: import.meta.env.VITE_HUB_DOMAIN, // sadly, making cookies target specific subdomains from the main domain seems very hacky
     // expires: "", // intentionally missing because docs say it's calculated off `maxAge` when missing https://github.com/solidjs/solid-start/blob/1b22cad87dd7bd74f73d807e1d60b886e753a6ee/packages/start/session/cookies.ts#L56-L57
   }
   csrfSignatureCookie = createPlainCookie(

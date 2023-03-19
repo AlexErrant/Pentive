@@ -4,8 +4,8 @@ export mediaTokenSecret=you+should+replace+this+with+a+real+base64+=
 export hubSessionSecret=secret/you+can+run+the+command+which+kinda+=
 export jwsSecret=looks+like+openssl+rand+base64+32+comma+but=
 export csrfSecret=with+spaces+and+hyphens+and+stuff+ZZZZZZZZZ=
-export VITE_DEVELOPMENT_DOMAIN=pentive.local
-export VITE_PRODUCTION_DOMAIN=hub.yourusernamehere.workers.dev
+export VITE_DEVELOPMENT_HUB_DOMAIN=pentive.local
+export VITE_PRODUCTION_HUB_DOMAIN=hub.yourusernamehere.workers.dev
 export VITE_DEVELOPMENT_CWA_URL=https://cwa.pentive.local:8787/
 export VITE_PRODUCTION_CWA_URL=https://cwa.yourusernamehere.workers.dev/
 export appOrigin=https://app.pentive.local:3014
