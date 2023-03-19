@@ -8,7 +8,6 @@
     "deploy": "./deploy.sh",
     "build": "vite build",
     "build-watch": "vite build --watch",
-    "//serve": "IMPORTANT: open https://localhost:3015/ since the cert is for localhost. Not sure why you'd ever look at this outside an iframe though.",
     "serve": "vite preview",
     "eslint": "eslint .",
     "eslintw": "eslint . --fix",

@@ -8,7 +8,6 @@
     "deploy": "./deploy.sh",
     "build": "vite build",
     "build-watch": "vite build --watch",
-    "//serve": "IMPORTANT: open https://localhost:3014/ since the cert is for localhost",
     "serve": "vite preview",
     "postinstall": "cp ../node_modules/.pnpm/node_modules/@vlcn.io/wa-crsqlite/dist/wa-sqlite-async.wasm ./src/assets/sqlite.wasm",
     "eslint": "eslint .",
