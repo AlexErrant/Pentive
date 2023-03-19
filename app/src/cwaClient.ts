@@ -6,7 +6,7 @@ import superjson from "superjson"
 export const cwaClient = createTRPCProxyClient<AppRouter>({
   links: [
     httpBatchLink({
-      url: "https://cwa.pentive.local:8787/trpc",
+      url: import.meta.env.VITE_CWA_URL + "trpc",
       headers: {
         [csrfHeaderName]: "",
       },
