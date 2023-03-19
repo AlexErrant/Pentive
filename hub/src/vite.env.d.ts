@@ -4,6 +4,7 @@
 
 interface ImportMetaEnv {
   readonly VITE_HUB_DOMAIN: string
+  readonly VITE_APP_ORIGIN: string
 }
 
 interface ImportMeta {
