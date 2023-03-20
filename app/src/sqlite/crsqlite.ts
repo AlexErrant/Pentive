@@ -5,6 +5,7 @@ import { stringify as uuidStringify } from "uuid"
 import { DB } from "./database"
 import { CRDatabase, CRDialect } from "./dialect"
 import { Kysely } from "kysely"
+import sqliteUrl from "../assets/sqlite.wasm?url"
 
 let myDatabase: Promise<sqliteWasm.DB> | null = null
 
@@ -19,7 +20,7 @@ async function createDb(): Promise<sqliteWasm.DB> {
   const sqlite = await sqliteWasm.default(
     (file) =>
       // Is this cached by service worker? Grep for F00E815A-C0FD-4AEA-B83C-0BDB641D97CC
-      "/src/assets/sqlite.wasm"
+      sqliteUrl
   )
   const db = await sqlite.open("username.db")
   await db.execMany(initSql)
