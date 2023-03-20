@@ -118,7 +118,7 @@ app
     if (authResult.tag === "Error") return authResult.error
     const userId = authResult.ok
     const buildToken = async (mediaHash: MediaHash): Promise<Base64Url> =>
-      await buildPrivateToken(c.env.tokenSecret, mediaHash, userId)
+      await buildPrivateToken(c.env.mediaTokenSecret, mediaHash, userId)
     const persistDbAndBucket = async ({
       mediaHashBase64,
       readable,
@@ -195,7 +195,7 @@ app
     if (authResult.tag === "Error") return authResult.error
     const userId = authResult.ok
     const mediaHash = await getMediaHash(
-      c.env.tokenSecret,
+      c.env.mediaTokenSecret,
       userId,
       base64url.decode(c.req.param("token"))
     )

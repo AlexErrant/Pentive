@@ -13,7 +13,7 @@ source ../PentiveSecrets/secrets.sh
 # Uncomment if you wanna
 # echo $jwsSecret        | wrangler secret put jwsSecret        --name cwa
 # echo $planetscaleDbUrl | wrangler secret put planetscaleDbUrl --name cwa
-# echo $mediaTokenSecret | wrangler secret put tokenSecret      --name cwa
+# echo $mediaTokenSecret | wrangler secret put mediaTokenSecret --name cwa
 # echo $appOrigin        | wrangler secret put appOrigin        --name cwa
 # echo $hubOrigin        | wrangler secret put hubOrigin        --name cwa
 # echo $jwsSecret        | wrangler secret put jwsSecret        --name hub

@@ -2,7 +2,10 @@ import { base64, Base64Url, base64url, Brand } from "shared"
 import { concat, MediaHash } from "./util"
 
 export type UserId = Brand<string, "userId">
-export type TokenSecretBase64 = Brand<string, "tokenSecretBase64" | "base64">
+export type MediaTokenSecretBase64 = Brand<
+  string,
+  "mediaTokenSecretBase64" | "base64"
+>
 
 /*
 
@@ -32,11 +35,11 @@ export type TokenSecretBase64 = Brand<string, "tokenSecretBase64" | "base64">
 */
 
 export async function buildPrivateToken(
-  tokenSecret: TokenSecretBase64,
+  mediaTokenSecret: MediaTokenSecretBase64,
   mediaHash: MediaHash,
   userId: UserId
 ): Promise<Base64Url> {
-  const signature = await signMessage(tokenSecret, mediaHash, userId)
+  const signature = await signMessage(mediaTokenSecret, mediaHash, userId)
   const token = concat(mediaHash, signature)
   return base64url.encode(token) as Base64Url
 }
@@ -48,11 +51,13 @@ function parseToken(token: ArrayBuffer): [MediaHash, ArrayBuffer] {
 }
 
 let maybeTokenKey: CryptoKey | null = null
-async function getTokenKey(tokenSecret: TokenSecretBase64): Promise<CryptoKey> {
+async function getTokenKey(
+  mediaTokenSecret: MediaTokenSecretBase64
+): Promise<CryptoKey> {
   if (maybeTokenKey == null) {
     maybeTokenKey = await crypto.subtle.importKey(
       "raw",
-      base64.decode(tokenSecret),
+      base64.decode(mediaTokenSecret),
       { name: "HMAC", hash: "SHA-256" },
       false,
       ["sign", "verify"]
@@ -67,22 +72,22 @@ function buildMessage(userId: UserId, mediaHash: MediaHash): ArrayBuffer {
 }
 
 async function signMessage(
-  tokenSecret: TokenSecretBase64,
+  mediaTokenSecret: MediaTokenSecretBase64,
   mediaHash: MediaHash,
   userId: UserId
 ): Promise<ArrayBuffer> {
-  const tokenKey = await getTokenKey(tokenSecret)
+  const tokenKey = await getTokenKey(mediaTokenSecret)
   const message = buildMessage(userId, mediaHash)
   return await crypto.subtle.sign("HMAC", tokenKey, message)
 }
 
 export async function getMediaHash(
-  tokenSecret: TokenSecretBase64,
+  mediaTokenSecret: MediaTokenSecretBase64,
   userId: UserId,
   token: ArrayBuffer
 ): Promise<MediaHash | null> {
   const [mediaHash, signature] = parseToken(token)
-  const tokenKey = await getTokenKey(tokenSecret)
+  const tokenKey = await getTokenKey(mediaTokenSecret)
   const message = buildMessage(userId, mediaHash)
   const isValid = await crypto.subtle.verify(
     "HMAC",

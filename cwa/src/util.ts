@@ -2,7 +2,7 @@ import { Context } from "hono"
 import { jwtVerify, JWTVerifyResult } from "jose"
 import { Brand, csrfHeaderName, jwtCookieName } from "shared"
 import { getJwsSecret } from "./env"
-import { TokenSecretBase64 } from "./privateToken"
+import { MediaTokenSecretBase64 } from "./privateToken"
 
 export type Result<TOk, TError> =
   | {
@@ -59,7 +59,7 @@ export interface Env {
   // Example binding to R2. Learn more at https://developers.cloudflare.com/workers/runtime-apis/r2/
   mediaBucket: R2Bucket
   jwsSecret: string
-  tokenSecret: TokenSecretBase64
+  mediaTokenSecret: MediaTokenSecretBase64
   planetscaleDbUrl: string
   appOrigin: string
   hubOrigin: string
