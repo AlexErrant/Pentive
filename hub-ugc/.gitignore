@@ -3,3 +3,5 @@ dev-dist
 dist
 .cert
 env.sh
+.env.development
+.env.production

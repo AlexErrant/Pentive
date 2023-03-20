@@ -1,6 +1,11 @@
 import contentWindowJs from "iframe-resizer/js/iframeResizer.contentWindow.js?raw" // https://vitejs.dev/guide/assets.html#importing-asset-as-string https://github.com/davidjbradshaw/iframe-resizer/issues/513
 import { RenderBodyInput } from "hub/src/components/resizingIframe"
-import { assertNever, throwExp, registerPluginServices } from "shared"
+import {
+  assertNever,
+  throwExp,
+  registerPluginServices,
+  relativeChar,
+} from "shared"
 
 const C = await registerPluginServices([])
 
@@ -18,10 +23,23 @@ self.addEventListener("message", (event) => {
   }
 })
 
+function relativeImgSrcQueriesCWA(body: string) {
+  const doc = new DOMParser().parseFromString(body, "text/html")
+  for (const i of doc.images) {
+    const src = i.getAttribute("src")
+    // eslint-disable-next-line @typescript-eslint/prefer-optional-chain
+    if (src != null && src.startsWith(relativeChar)) {
+      i.setAttribute("src", import.meta.env.VITE_CWA_URL + "i" + src)
+    }
+  }
+  return doc.body.innerHTML
+}
+
 export function setBody(i: RenderBodyInput) {
   const { body, css } = buildHtml(i)
 
-  document.getElementsByTagName("body")[0].innerHTML = body
+  document.getElementsByTagName("body")[0].innerHTML =
+    relativeImgSrcQueriesCWA(body)
   const resizeScript = document.createElement("script")
   resizeScript.type = "text/javascript"
   resizeScript.text = contentWindowJs

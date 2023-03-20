@@ -591,12 +591,10 @@ function toNoteCreate(
 
 // hacky, but better than my previous solution, which was to parse the value, which was slow(er) and fragile.
 export const imgPlaceholder = "3Iptw8cmfkd/KLrTw+9swHnzxxVhtDCraYLejUh3"
+export const relativeChar = "/"
 
 function replaceImgSrcs(value: string, remoteIdBase64url: string) {
-  return value.replaceAll(
-    imgPlaceholder,
-    "https://cwa.pentive.local:8787/i/" + remoteIdBase64url
-  )
+  return value.replaceAll(imgPlaceholder, relativeChar + remoteIdBase64url)
 }
 
 function toTemplateCreates(
