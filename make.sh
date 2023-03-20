@@ -11,15 +11,15 @@ set -euo pipefail # https://stackoverflow.com/a/2871034
 source ../PentiveSecrets/secrets.sh
 
 # Uncomment if you wanna
-# echo $jwsSecret        | wrangler secret put jwsSecret        --name cwa
-# echo $planetscaleDbUrl | wrangler secret put planetscaleDbUrl --name cwa
-# echo $mediaTokenSecret | wrangler secret put mediaTokenSecret --name cwa
-# echo $appOrigin        | wrangler secret put appOrigin        --name cwa
-# echo $hubOrigin        | wrangler secret put hubOrigin        --name cwa
-# echo $jwsSecret        | wrangler secret put jwsSecret        --name hub
-# echo $planetscaleDbUrl | wrangler secret put planetscaleDbUrl --name hub
-# echo $hubSessionSecret | wrangler secret put hubSessionSecret --name hub
-# echo $csrfSecret       | wrangler secret put csrfSecret       --name hub
+# echo $productionJwsSecret        | wrangler secret put jwsSecret        --name cwa
+# echo $productionPlanetscaleDbUrl | wrangler secret put planetscaleDbUrl --name cwa
+# echo $productionMediaTokenSecret | wrangler secret put mediaTokenSecret --name cwa
+# echo $productionAppOrigin        | wrangler secret put appOrigin        --name cwa
+# echo $productionHubOrigin        | wrangler secret put hubOrigin        --name cwa
+# echo $productionJwsSecret        | wrangler secret put jwsSecret        --name hub
+# echo $productionPlanetscaleDbUrl | wrangler secret put planetscaleDbUrl --name hub
+# echo $productionHubSessionSecret | wrangler secret put hubSessionSecret --name hub
+# echo $productionCsrfSecret       | wrangler secret put csrfSecret       --name hub
 
 # https://developers.cloudflare.com/workers/wrangler/configuration/#environmental-variables
 # https://developers.cloudflare.com/workers/platform/environment-variables/#adding-secrets-via-wrangler
