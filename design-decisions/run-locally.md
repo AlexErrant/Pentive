@@ -88,3 +88,11 @@ pnpm dev
 ```
 
 Visit https://pentive.local:3000/ and https://app.pentive.local:3014/
+
+## 8. Deploy (optional)
+
+For the initial deployment, you may need to `cd` to `/app`, `/app-ugc`, and `/hub-ugc`, then deploy each manually with `pnpm run build && wrangler pages publish ./dist`. This is because `wrangler pages publish` requires that you go through 2 interactive prompts when creating a new project. After that, subsequent deployments may be run with
+
+```bash
+pnpm run deploy
+```
