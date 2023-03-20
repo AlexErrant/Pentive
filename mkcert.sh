@@ -12,7 +12,7 @@ set -euo pipefail # https://stackoverflow.com/a/2871034
 mkdir app/.cert
 mkcert -key-file app/.cert/key.pem     -cert-file app/.cert/cert.pem     app.pentive.local
 mkdir app-ugc/.cert
-mkcert -key-file app-ugc/.cert/key.pem -cert-file app-ugc/.cert/cert.pem user-generated-content.pentive.local
+mkcert -key-file app-ugc/.cert/key.pem -cert-file app-ugc/.cert/cert.pem app-user-generated-content.pentive.local
 mkdir hub/.cert
 mkcert -key-file hub/.cert/key.pem     -cert-file hub/.cert/cert.pem     pentive.local
 mkdir hub-ugc/.cert

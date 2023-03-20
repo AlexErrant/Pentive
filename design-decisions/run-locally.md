@@ -27,7 +27,7 @@ Add the following to your [hosts file](https://www.howtogeek.com/howto/27350/beg
 
 ```
 127.0.0.1 app.pentive.local
-127.0.0.1 user-generated-content.pentive.local
+127.0.0.1 app-user-generated-content.pentive.local
 127.0.0.1 pentive.local
 127.0.0.1 hub-user-generated-content.pentive.local
 127.0.0.1 lrpc.pentive.local

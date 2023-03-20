@@ -126,17 +126,19 @@ const ResizingIframe: VoidComponent<{
 
             // Figure out how to inject the domain https://github.com/davidjbradshaw/iframe-resizer/blob/master/docs/parent_page/options.md#checkorigin
             // `import.meta.env.BASE_URL` could work with some elbow grease, but I'm too lazy to play with https://vitejs.dev/guide/build.html#public-base-path
-            checkOrigin: ["https://user-generated-content.pentive.local:3015"],
+            checkOrigin: [import.meta.env.VITE_APP_UGC_ORIGIN],
           },
           e.currentTarget
         )
       }}
       sandbox="allow-scripts allow-same-origin" // Changing this has security ramifications! https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe#attr-sandbox
       // "When the embedded document has the same origin as the embedding page, it is strongly discouraged to use both allow-scripts and allow-same-origin"
-      // Since this iframe is hosted on `user-generated-content` and this component is hosted on `app`, resulting in different origins, we should be safe. https://web.dev/sandboxed-iframes/ https://stackoverflow.com/q/35208161
-      src={`https://user-generated-content.pentive.local:3015?${new URLSearchParams(
-        props.i
-      ).toString()}`}
+      // Since this iframe is hosted on `app-user-generated-content` and this component is hosted on `app`, resulting in different origins, we should be safe. https://web.dev/sandboxed-iframes/ https://stackoverflow.com/q/35208161
+      src={
+        import.meta.env.VITE_APP_UGC_ORIGIN +
+        `?` +
+        new URLSearchParams(props.i).toString()
+      }
     />
   )
 }

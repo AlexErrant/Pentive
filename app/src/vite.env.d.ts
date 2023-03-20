@@ -4,6 +4,7 @@
 
 interface ImportMetaEnv {
   readonly VITE_CWA_URL: string
+  readonly VITE_APP_UGC_ORIGIN: string
 }
 
 interface ImportMeta {
