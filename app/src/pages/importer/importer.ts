@@ -2,6 +2,11 @@
 // prepared statements https://blog.logrocket.com/detailed-look-basic-sqljs-features/
 // pagination https://stackoverflow.com/q/14468586
 
+// lowTODO It would be nice if we could use wa-sqlite/cr-sqlite instead of sql.js
+// since it would be less dependencies and less wasm binaries being cached by the service worker.
+// However, until I figure out how to read from an existing sqlite file in cr-sqlite, we need both.
+// See https://github.com/rhashimoto/wa-sqlite/discussions/72
+
 import { Buffer } from "buffer"
 import {
   BlobReader,
@@ -21,6 +26,7 @@ import { Template } from "../../domain/template"
 import { MediaId, TemplateId } from "../../domain/ids"
 import { db } from "./../../db"
 import _ from "lodash"
+import sqliteUrl from "../../assets/sql-wasm.wasm?url"
 
 export async function importAnki(
   event: Event & {
@@ -131,11 +137,7 @@ async function importAnkiDb(sqlite: Entry): Promise<void> {
 async function getAnkiDb(sqlite: Entry): Promise<Database> {
   const [sql, sqliteBuffer] = await Promise.all([
     initSqlJs({
-      // Required to load the wasm binary asynchronously. Of course, you can host it wherever you want
-      // Grep for F00E815A-C0FD-4AEA-B83C-0BDB641D97CC
-      // Service worker probably needs a reference. highTODO
-      // https://stackoverflow.com/q/71571129 https://vitejs.dev/guide/features.html#webassembly https://github.com/vitejs/vite/issues/378 https://stackoverflow.com/q/69614671
-      locateFile: (file) => `https://sql.js.org/dist/${file}`,
+      locateFile: () => sqliteUrl,
     }),
     getSqliteBuffer(sqlite),
   ])

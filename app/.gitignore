@@ -9,3 +9,4 @@ env.sh
 .env.development
 .env.production
 src/assets/sqlite.wasm
+src/assets/sql-wasm.wasm

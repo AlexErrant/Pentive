@@ -17,11 +17,7 @@ export async function getDb(): Promise<sqliteWasm.DB> {
 }
 
 async function createDb(): Promise<sqliteWasm.DB> {
-  const sqlite = await sqliteWasm.default(
-    (file) =>
-      // Is this cached by service worker? Grep for F00E815A-C0FD-4AEA-B83C-0BDB641D97CC
-      sqliteUrl
-  )
+  const sqlite = await sqliteWasm.default(() => sqliteUrl)
   const db = await sqlite.open("username.db")
   await db.execMany(initSql)
   return db
