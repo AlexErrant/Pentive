@@ -14,6 +14,7 @@ import {
   RemoteTemplate,
   throwExp,
   noteOrds,
+  relativeChar,
 } from "shared"
 import { Template } from "./domain/template"
 import { Media } from "./domain/media"
@@ -129,9 +130,19 @@ function getNoteImages(fieldValues: Map<string, string>, dp: DOMParser) {
 }
 
 function mutate(img: HTMLImageElement, imgSrcs: Map<MediaId, string>) {
-  const id = getId(img.src)
-  imgSrcs.set(id, img.src)
-  img.setAttribute("src", id)
+  const src = img.getAttribute("src")
+  if (src == null || src === "") {
+    // do nothing
+  } else if (src.startsWith(relativeChar)) {
+    const id = src.slice(1) as MediaId
+    imgSrcs.set(id, import.meta.env.VITE_CWA_URL + "i" + src)
+    img.setAttribute("src", id)
+  } else {
+    // not sure that this branch should ever be hit
+    const id = ulidAsBase64Url() as string as MediaId
+    imgSrcs.set(id, img.src)
+    img.setAttribute("src", id)
+  }
 }
 
 function getTemplateImages(ct: ChildTemplate, dp: DOMParser) {
@@ -143,30 +154,27 @@ function getTemplateImages(ct: ChildTemplate, dp: DOMParser) {
   return { imgSrcs, front, back }
 }
 
-const getId = (imgSrc: string) =>
-  imgSrc === emptyImgSrc
-    ? emptyImgSrc
-    : (/([^/]+$)/.exec(imgSrc)![0] as MediaId) // everything after the last `/`
-
-const emptyImgSrc = "" as MediaId
-
 // VERYlowTODO could sent it over Comlink - though that'll be annoying because it's in hub-ugc
 async function downloadImages(
   imgSrcs: Map<MediaId, string>,
   trx: Transaction<DB>
 ) {
-  imgSrcs.delete(emptyImgSrc) // remove images with no src
   return await Promise.all(
     Array.from(imgSrcs).map(async ([id, imgSrc]) => {
       const response = await fetch(imgSrc)
-      const now = new Date()
-      const media: Media = {
-        id,
-        created: now,
-        updated: now,
-        data: await response.arrayBuffer(),
+      if (response.status === 200) {
+        const now = new Date()
+        const media: Media = {
+          id,
+          created: now,
+          updated: now,
+          data: await response.arrayBuffer(),
+        }
+        return await db.upsertMediaTrx(media, trx)
+      } else {
+        console.error(response)
+        throwExp(`Fetching ${imgSrc} got a status code of ${response.status}`)
       }
-      return await db.upsertMediaTrx(media, trx)
     })
   )
 }
