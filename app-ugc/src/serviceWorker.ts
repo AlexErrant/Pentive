@@ -85,7 +85,8 @@ async function getLocalMedia(
   const media = await messenger.getLocalMedia(mediaId)
   return media == null
     ? new Response(media, { status: 404 })
-    : new Response(media)
+    : // maybe? https://stackoverflow.com/a/28390633
+      new Response(media)
 }
 
 async function getMessenger(
