@@ -79,6 +79,9 @@ async function getLocalMedia(
   clientId: string
 ): Promise<Response> {
   const messenger = await getMessenger(clientId)
+  if (messenger == null) {
+    return new Response(null, { status: 404 }) // lowTODO could return an image saying the messenger is null
+  }
   const media = await messenger.getLocalMedia(mediaId)
   return media == null
     ? new Response(media, { status: 404 })
@@ -87,7 +90,7 @@ async function getLocalMedia(
 
 async function getMessenger(
   clientId: string
-): Promise<Comlink.Remote<Exposed>> {
+): Promise<Comlink.Remote<Exposed> | undefined> {
   let i = 0
   let m = messengers.get(clientId)
   while (m == null) {
@@ -110,6 +113,7 @@ async function getMessenger(
       console.error(
         "Messenger has been null for more than 1 second. Are there any active Pentive windows/clients? Was ComlinkInit called?"
       )
+      break
     }
     await sleep(10)
     m = messengers.get(clientId)
