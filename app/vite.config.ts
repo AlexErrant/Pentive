@@ -8,12 +8,13 @@ export default defineConfig({
   plugins: [
     solidPlugin(),
     VitePWA({
-      strategies: "injectManifest",
-      srcDir: "src",
-      filename: "serviceWorker.ts",
-      injectManifest: {
+      strategies: "generateSW",
+      workbox: {
+        globPatterns: ["**/*.{js,css,html,ico,wasm}"],
         maximumFileSizeToCacheInBytes: 999999999999999,
       },
+      srcDir: "src",
+      filename: "serviceWorker.js",
     }),
     checker({
       overlay: {
