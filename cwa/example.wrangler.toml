@@ -1,6 +1,6 @@
 name = "cwa"
 main = "src/index.ts"
-compatibility_date = "2022-12-14"
+compatibility_date = "2023-03-21"
 
 account_id = "$cloudflareAccountId"
 

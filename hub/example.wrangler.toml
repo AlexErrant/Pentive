@@ -1,5 +1,5 @@
 name = "hub"
-compatibility_date = "2022-12-29"
+compatibility_date = "2023-03-21"
 
 main = "./dist/server.js"
 account_id = "$cloudflareAccountId"
