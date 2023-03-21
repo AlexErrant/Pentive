@@ -120,30 +120,26 @@ Comlink.expose(appExpose, Comlink.windowEndpoint(self.parent))
 
 function getNoteImages(fieldValues: Map<string, string>, dp: DOMParser) {
   const imgSrcs = new Map<MediaId, string>()
-  function mutate(img: HTMLImageElement) {
-    const id = getId(img.src)
-    imgSrcs.set(id, img.src)
-    img.setAttribute("src", id)
-  }
   for (const [f, v] of fieldValues) {
     const doc = dp.parseFromString(v, "text/html")
-    Array.from(doc.images).forEach(mutate)
+    Array.from(doc.images).forEach((i) => mutate(i, imgSrcs))
     fieldValues.set(f, doc.body.innerHTML)
   }
   return imgSrcs
+}
+
+function mutate(img: HTMLImageElement, imgSrcs: Map<MediaId, string>) {
+  const id = getId(img.src)
+  imgSrcs.set(id, img.src)
+  img.setAttribute("src", id)
 }
 
 function getTemplateImages(ct: ChildTemplate, dp: DOMParser) {
   const imgSrcs = new Map<MediaId, string>()
   const front = dp.parseFromString(ct.front, "text/html")
   const back = dp.parseFromString(ct.back, "text/html")
-  function mutate(img: HTMLImageElement) {
-    const id = getId(img.src)
-    imgSrcs.set(id, img.src)
-    img.setAttribute("src", id)
-  }
-  Array.from(front.images).forEach(mutate)
-  Array.from(back.images).forEach(mutate)
+  Array.from(front.images).forEach((i) => mutate(i, imgSrcs))
+  Array.from(back.images).forEach((i) => mutate(i, imgSrcs))
   return { imgSrcs, front, back }
 }
 
