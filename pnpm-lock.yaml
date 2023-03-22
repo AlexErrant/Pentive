@@ -493,7 +493,7 @@ importers:
       '@types/uuid': ^9.0.0
       '@typescript-eslint/eslint-plugin': ^5.31.0
       '@typescript-eslint/parser': ^5.31.0
-      '@vlcn.io/xplat-api': ^0.6.0
+      '@vlcn.io/xplat-api': ^0.8.0
       eslint: ^8.20.0
       eslint-config-prettier: ^8.5.0
       eslint-config-standard-with-typescript: ^22.0.0
@@ -519,7 +519,7 @@ importers:
     dependencies:
       '@planetscale/database': 1.5.0
       '@scure/base': 1.1.1
-      '@vlcn.io/xplat-api': 0.6.0
+      '@vlcn.io/xplat-api': 0.8.0
       html-to-text: 9.0.3
       immer: 9.0.15
       kysely: 0.23.5
@@ -4463,6 +4463,12 @@ packages:
       comlink: 4.3.1
     dev: false
 
+  /@vlcn.io/xplat-api/0.8.0:
+    resolution: {integrity: sha512-7zCuKe5ZrAzqBvSXcnIMA9uu6NYZA7WMJLslCms4y25dv6kD2lfr1jiXNlcYj2RlwMLwJyCO5mHKCos4HEcTCA==}
+    dependencies:
+      comlink: 4.4.1
+    dev: false
+
   /@zip.js/zip.js/2.6.41:
     resolution: {integrity: sha512-dfcWyvDt5GfzuOX3yeUNoT1VhChaEeAX0Oq4Xv4ekLi7WldZE2fDLR/FBI59c1kJIKOqa7fMOXHM1GDPE/fRTw==}
     engines: {deno: '>=1.0.0', node: '>=16.5.0'}
@@ -5437,6 +5443,10 @@ packages:
 
   /comlink/4.3.1:
     resolution: {integrity: sha512-+YbhUdNrpBZggBAHWcgQMLPLH1KDF3wJpeqrCKieWQ8RL7atmgsgTQko1XEBK6PsecfopWNntopJ+ByYG1lRaA==}
+    dev: false
+
+  /comlink/4.4.1:
+    resolution: {integrity: sha512-+1dlx0aY5Jo1vHy/tSsIGpSkN4tS9rZSW8FIhG0JH/crs9wwweswIo/POr451r7bZww3hFbPAKnTpimzL/mm4Q==}
     dev: false
 
   /commander/2.20.3:
