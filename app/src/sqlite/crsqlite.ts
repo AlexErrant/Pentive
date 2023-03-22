@@ -1,23 +1,23 @@
-import * as sqliteWasm from "@vlcn.io/wa-crsqlite"
+import sqliteWasm, { DB as crDB } from "@vlcn.io/crsqlite-wasm"
 import { initSql, wholeDbReplicator } from "shared"
 import { lrpc } from "../lrpcClient"
 import { stringify as uuidStringify } from "uuid"
 import { DB } from "./database"
 import { CRDatabase, CRDialect } from "./dialect"
 import { Kysely } from "kysely"
-import sqliteUrl from "../assets/sqlite.wasm?url"
+import crsqliteUrl from "@vlcn.io/crsqlite-wasm/crsqlite.wasm?url"
 
-let myDatabase: Promise<sqliteWasm.DB> | null = null
+let myDatabase: Promise<crDB> | null = null
 
-export async function getDb(): Promise<sqliteWasm.DB> {
+export async function getDb() {
   if (myDatabase == null) {
     myDatabase = createDb()
   }
   return await myDatabase
 }
 
-async function createDb(): Promise<sqliteWasm.DB> {
-  const sqlite = await sqliteWasm.default(() => sqliteUrl)
+async function createDb() {
+  const sqlite = await sqliteWasm(() => crsqliteUrl)
   const db = await sqlite.open("username.db")
   await db.execMany(initSql)
   return db

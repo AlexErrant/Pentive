@@ -17,18 +17,17 @@ function entityToDomain(entity: PluginEntity): Plugin {
 export const pluginCollectionMethods = {
   upsertPlugin: async function (plugin: Plugin) {
     const db = await getDb()
-    const insert = await db.prepare(
+    await db.exec(
       `INSERT INTO plugin (id,name,created,updated,script)
-                   VALUES ( ?,   ?,      ?,       ?,    ?)`
+                   VALUES ( ?,   ?,      ?,       ?,    ?)`,
+      [
+        plugin.id,
+        plugin.name,
+        plugin.created.getTime(),
+        plugin.updated.getTime(),
+        new Uint8Array(await plugin.script.arrayBuffer()),
+      ]
     )
-    await insert.run(
-      plugin.id,
-      plugin.name,
-      plugin.created.getTime(),
-      plugin.updated.getTime(),
-      new Uint8Array(await plugin.script.arrayBuffer())
-    )
-    insert.finalize()
   },
   getPlugins: async function (): Promise<Plugin[]> {
     const db = await getKysely()

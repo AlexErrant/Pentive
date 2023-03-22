@@ -1,4 +1,4 @@
-import { DB, DBAsync } from "@vlcn.io/xplat-api"
+import { DBAsync } from "@vlcn.io/xplat-api"
 import { parse as uuidParse, stringify as uuidStringify } from "uuid"
 type SiteIDWire = string
 type CID = string
@@ -9,7 +9,7 @@ type Version = number | string
 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
 const isDebug = (globalThis as any).__vlcn_whole_db_dbg
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function log(...data: any[]): void {
+function log(...data: any[]) {
   // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
   if (isDebug) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
@@ -34,20 +34,17 @@ export type Changeset = [
 class WholeDbReplicator {
   constructor(private readonly _db: DBAsync) {}
 
-  async init(): Promise<void> {
+  async init() {
     await this._createPeerTrackingTable()
   }
 
-  private async _createPeerTrackingTable(): Promise<void> {
+  private async _createPeerTrackingTable() {
     await this._db.exec(
       "CREATE TABLE IF NOT EXISTS __crsql_wdbreplicator_peers (site_id BLOB primary key, version INTEGER) STRICT"
     )
   }
 
-  onPoked = async (
-    pokedBy: SiteIDWire,
-    pokerVersion: bigint
-  ): Promise<bigint | null> => {
+  onPoked = async (pokedBy: SiteIDWire, pokerVersion: bigint) => {
     log("received a poke from ", pokedBy)
     const rows = await this._db.execA(
       "SELECT version FROM __crsql_wdbreplicator_peers WHERE site_id = ?",
@@ -77,11 +74,11 @@ class WholeDbReplicator {
   onChangesReceived = async (
     fromSiteId: SiteIDWire,
     changesets: readonly Changeset[]
-  ): Promise<void> => {
-    await this._db.transaction(async () => {
+  ) => {
+    await this._db.tx(async (tx) => {
       let maxVersion = 0n
       log("inserting changesets in tx", changesets)
-      const stmt = await this._db.prepare(
+      const stmt = await tx.prepare(
         'INSERT INTO crsql_changes ("table", "pk", "cid", "val", "col_version", "db_version", "site_id") VALUES (?, ?, ?, ?, ?, ?, ?)'
       )
       // TODO: may want to chunk
@@ -94,6 +91,7 @@ class WholeDbReplicator {
           maxVersion = v > maxVersion ? v : maxVersion
           // cannot use same statement in parallel
           await stmt.run(
+            tx,
             cs[0],
             cs[1],
             cs[2],
@@ -108,20 +106,17 @@ class WholeDbReplicator {
         console.error(e)
         throw e
       } finally {
-        stmt.finalize()
+        await stmt.finalize(tx)
       }
 
-      await this._db.exec(
+      await tx.exec(
         `INSERT OR REPLACE INTO __crsql_wdbreplicator_peers (site_id, version) VALUES (?, ?)`,
         [uuidParse(fromSiteId), maxVersion]
       )
     })
   }
 
-  onChangesRequested = async (
-    from: SiteIDWire,
-    since: bigint
-  ): Promise<Changeset[]> => {
+  onChangesRequested = async (from: SiteIDWire, since: bigint) => {
     const fromAsBlob = uuidParse(from)
     // The casting is due to bigint support problems in various wasm builds of sqlite
     const changes: Changeset[] = await this._db.execA<Changeset>(

@@ -29,29 +29,30 @@ export const mediaCollectionMethods = {
   },
   upsertMedia: async function (media: Media) {
     const db = await getDb()
-    const insert = await db.prepare(
-      `INSERT INTO media (id,created,updated,data)
-                  VALUES ( ?,      ?,      ?,   ?)`
-    )
     const created = media.created.getTime()
     const updated = media.updated.getTime()
-    await insert.run(media.id, created, updated, new Uint8Array(media.data))
-    insert.finalize()
+    await db.exec(
+      `INSERT INTO media (id,created,updated,data)
+                  VALUES ( ?,      ?,      ?,   ?)`,
+      [media.id, created, updated, new Uint8Array(media.data)]
+    )
   },
   async bulkAddMedia(media: Media[]) {
     // wa-sqlite write perf is significantly worse than Dexie's.
     // If moving to SQLite official doesn't improve perf, consider using Origin Private File System
     const db = await getDb()
-    const insert = await db.prepare(
-      `INSERT INTO media (id,created,updated,data)
+    await db.tx(async (tx) => {
+      const insert = await tx.prepare(
+        `INSERT INTO media (id,created,updated,data)
                   VALUES ( ?,      ?,      ?,   ?)`
-    )
-    for (const m of media) {
-      const created = m.created.getTime()
-      const updated = m.updated.getTime()
-      await insert.run(m.id, created, updated, new Uint8Array(m.data))
-    }
-    insert.finalize()
+      )
+      for (const m of media) {
+        const created = m.created.getTime()
+        const updated = m.updated.getTime()
+        await insert.run(tx, m.id, created, updated, new Uint8Array(m.data))
+      }
+      await insert.finalize(tx)
+    })
   },
   async getMedia(id: MediaId) {
     // This helps detect memory leaks - if you see this log 100x, something's very wrong.

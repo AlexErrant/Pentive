@@ -25,7 +25,6 @@ importers:
       '@typescript-eslint/eslint-plugin': ^5.31.0
       '@typescript-eslint/parser': ^5.31.0
       '@vlcn.io/crsqlite-wasm': ^0.9.0
-      '@vlcn.io/wa-crsqlite': ^0.7.1
       '@zip.js/zip.js': ^2.6.41
       ag-grid-community: ^29.1.0
       ag-grid-solid: ^29.1.0
@@ -81,7 +80,6 @@ importers:
       '@trpc/client': 10.11.1_@trpc+server@10.11.1
       '@trpc/server': 10.11.1
       '@vlcn.io/crsqlite-wasm': 0.9.0
-      '@vlcn.io/wa-crsqlite': 0.7.1
       '@zip.js/zip.js': 2.6.41
       ag-grid-community: 29.1.0
       ag-grid-solid: 29.1.0_uzfd74wn5ysgz4dqaulegvj2uq
@@ -4450,26 +4448,8 @@ packages:
     requiresBuild: true
     dev: false
 
-  /@vlcn.io/wa-crsqlite/0.7.1:
-    resolution: {integrity: sha512-6fZSeH9zRQOBE4Rw9QGeksNvOSkTwge8iD3bdoQuMxePzvWdzABntXfxwPePCPvDUwJR0tovdNtsk4JitUYR5Q==}
-    dependencies:
-      '@vlcn.io/wa-sqlite': 0.14.0
-      '@vlcn.io/xplat-api': 0.6.0
-      comlink: 4.3.1
-    dev: false
-
-  /@vlcn.io/wa-sqlite/0.14.0:
-    resolution: {integrity: sha512-V8CC3vsXWikI3XRmaQTwnh01wIlEpsSB5fE0++w3HP7gOnyEmfXEfMkzQduPeYn3fD0+Y8wjm98+NBmMuoKQKg==}
-    dev: false
-
   /@vlcn.io/wa-sqlite/0.15.0:
     resolution: {integrity: sha512-OjALG9fxFU+TCy397ZjxExVfmA0or5max7IIlWB5F3gjntyokEcruP77pttBaATRsuhtunyt9rKevi4bLvC9Gw==}
-    dev: false
-
-  /@vlcn.io/xplat-api/0.6.0:
-    resolution: {integrity: sha512-p0BM4UYQzOHSo69lMjQ50BHWaRIOQ9HJqFoYuu4ZO5RXHRkgtizjlLCGo6BkT6h32cwd9cAFDYbwb9PjGMBPow==}
-    dependencies:
-      comlink: 4.4.1
     dev: false
 
   /@vlcn.io/xplat-api/0.8.0:
