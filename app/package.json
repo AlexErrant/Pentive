@@ -67,6 +67,7 @@
     "@tanstack/solid-table": "^8.5.11",
     "@trpc/client": "^10.11.1",
     "@trpc/server": "^10.11.1",
+    "@vlcn.io/crsqlite-wasm": "^0.9.0",
     "@vlcn.io/wa-crsqlite": "^0.7.1",
     "@zip.js/zip.js": "^2.6.41",
     "ag-grid-community": "^29.1.0",

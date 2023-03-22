@@ -24,6 +24,7 @@ importers:
       '@types/uuid': ^9.0.0
       '@typescript-eslint/eslint-plugin': ^5.31.0
       '@typescript-eslint/parser': ^5.31.0
+      '@vlcn.io/crsqlite-wasm': ^0.9.0
       '@vlcn.io/wa-crsqlite': ^0.7.1
       '@zip.js/zip.js': ^2.6.41
       ag-grid-community: ^29.1.0
@@ -79,6 +80,7 @@ importers:
       '@tanstack/solid-table': 8.5.13_solid-js@1.6.12
       '@trpc/client': 10.11.1_@trpc+server@10.11.1
       '@trpc/server': 10.11.1
+      '@vlcn.io/crsqlite-wasm': 0.9.0
       '@vlcn.io/wa-crsqlite': 0.7.1
       '@zip.js/zip.js': 2.6.41
       ag-grid-community: 29.1.0
@@ -4437,6 +4439,14 @@ packages:
       nanoid: 4.0.0
     dev: false
 
+  /@vlcn.io/crsqlite-wasm/0.9.0:
+    resolution: {integrity: sha512-/G3KT+hqI1hRu0st8fPiJKiycgolZB+ineziVJz1Zxrmy0aOjN8Q9t8RGoqrCmKfknyUKQCvkJz7iDoee15Fvg==}
+    dependencies:
+      '@vlcn.io/wa-sqlite': 0.15.0
+      '@vlcn.io/xplat-api': 0.8.0
+      async-mutex: 0.4.0
+    dev: false
+
   /@vlcn.io/crsqlite/0.7.0:
     resolution: {integrity: sha512-38vFWAsKIqFxqKQHAsiHb8XTrEHTRd8a+EQGk2xg8CgmiDF3osZpL31Ft/5lX1P1VIvq5qB7r+MJBQx3dNUEKA==}
     requiresBuild: true
@@ -4457,10 +4467,14 @@ packages:
     resolution: {integrity: sha512-V8CC3vsXWikI3XRmaQTwnh01wIlEpsSB5fE0++w3HP7gOnyEmfXEfMkzQduPeYn3fD0+Y8wjm98+NBmMuoKQKg==}
     dev: false
 
+  /@vlcn.io/wa-sqlite/0.15.0:
+    resolution: {integrity: sha512-OjALG9fxFU+TCy397ZjxExVfmA0or5max7IIlWB5F3gjntyokEcruP77pttBaATRsuhtunyt9rKevi4bLvC9Gw==}
+    dev: false
+
   /@vlcn.io/xplat-api/0.6.0:
     resolution: {integrity: sha512-p0BM4UYQzOHSo69lMjQ50BHWaRIOQ9HJqFoYuu4ZO5RXHRkgtizjlLCGo6BkT6h32cwd9cAFDYbwb9PjGMBPow==}
     dependencies:
-      comlink: 4.3.1
+      comlink: 4.4.1
     dev: false
 
   /@vlcn.io/xplat-api/0.8.0:
@@ -4763,6 +4777,12 @@ packages:
     resolution: {integrity: sha512-Z7tMw1ytTXt5jqMcOP+OQteU1VuNK9Y02uuJtKQ1Sv69jXQKKg5cibLwGJow8yzZP+eAc18EmLGPal0bp36rvQ==}
     engines: {node: '>=8'}
     dev: true
+
+  /async-mutex/0.4.0:
+    resolution: {integrity: sha512-eJFZ1YhRR8UN8eBLoNzcDPcy/jqjsg6I1AP+KvWQX80BqOSW1oJPJXDylPUEeMr2ZQvHgnQ//Lp6f3RQ1zI7HA==}
+    dependencies:
+      tslib: 2.5.0
+    dev: false
 
   /async/3.2.4:
     resolution: {integrity: sha512-iAB+JbDEGXhyIUavoDl9WP/Jj106Kz9DEn1DPgYw5ruDn0e3Wgi3sKFm55sASdGBNOQB8F59d9qQ7deqrHA8wQ==}
