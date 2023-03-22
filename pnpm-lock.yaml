@@ -432,7 +432,7 @@ importers:
       '@types/node': ^18.7.21
       '@types/node-fetch': ^2.6.2
       '@types/uuid': ^9.0.0
-      '@vlcn.io/crsqlite-allinone': ^0.6.0
+      '@vlcn.io/crsqlite-allinone': ^0.8.0
       aws-lambda: ^1.0.7
       cookie: ^0.5.0
       dotenv: ^16.0.2
@@ -456,7 +456,7 @@ importers:
       '@prisma/client': 4.6.1_prisma@4.6.1
       '@trpc/client': 10.11.1_@trpc+server@10.11.1
       '@trpc/server': 10.11.1
-      '@vlcn.io/crsqlite-allinone': 0.6.0
+      '@vlcn.io/crsqlite-allinone': 0.8.0
       aws-lambda: 1.0.7
       cookie: 0.5.0
       dotenv: 16.0.2
@@ -4429,14 +4429,12 @@ packages:
       picocolors: 1.0.0
       pretty-format: 27.5.1
 
-  /@vlcn.io/crsqlite-allinone/0.6.0:
-    resolution: {integrity: sha512-76P4weHC7ZwB2RKKnE7UrzRystM9bp5/JRC7oeD5j5fcItu7/Eb8X24xEP1mO7BAUQ/y9ax2ml07R2rDk+6ZbA==}
+  /@vlcn.io/crsqlite-allinone/0.8.0:
+    resolution: {integrity: sha512-XF71UQgs/pbVkS7kSU9sNqHlUFDAMqK6PtQA4B0S8zKdZKx/FuA9Mz55sU7ZhaRsQO2NTH7sj3SRa2jkFNOIQA==}
     dependencies:
-      '@vlcn.io/crsqlite': 0.7.0
-      '@vlcn.io/xplat-api': 0.6.0
-      better-sqlite3: 8.0.1
-      import-meta-resolve: 2.2.0
-      nanoid: 4.0.0
+      '@vlcn.io/crsqlite': 0.9.0
+      '@vlcn.io/xplat-api': 0.8.0
+      better-sqlite3: 8.2.0
     dev: false
 
   /@vlcn.io/crsqlite-wasm/0.9.0:
@@ -4447,12 +4445,9 @@ packages:
       async-mutex: 0.4.0
     dev: false
 
-  /@vlcn.io/crsqlite/0.7.0:
-    resolution: {integrity: sha512-38vFWAsKIqFxqKQHAsiHb8XTrEHTRd8a+EQGk2xg8CgmiDF3osZpL31Ft/5lX1P1VIvq5qB7r+MJBQx3dNUEKA==}
+  /@vlcn.io/crsqlite/0.9.0:
+    resolution: {integrity: sha512-RfZhvnk2TwTwSFWb4CV+lTwxjWWCKelH21a/Bt/Tn1unqjcD7d4M4tQP7Uxnt03w+nolELK2wgM8vBc0uwH1wA==}
     requiresBuild: true
-    dependencies:
-      bindings: 1.5.0
-      prebuild-install: 7.1.1
     dev: false
 
   /@vlcn.io/wa-crsqlite/0.7.1:
@@ -4692,7 +4687,7 @@ packages:
       lodash.isplainobject: 4.0.6
       lodash.union: 4.6.0
       normalize-path: 3.0.0
-      readable-stream: 2.3.7
+      readable-stream: 2.3.8
     dev: true
 
   /archiver/5.3.1:
@@ -5018,6 +5013,15 @@ packages:
     dependencies:
       bindings: 1.5.0
       prebuild-install: 7.1.1
+    dev: true
+
+  /better-sqlite3/8.2.0:
+    resolution: {integrity: sha512-8eTzxGk9535SB3oSNu0tQ6I4ZffjVCBUjKHN9QeeIFtphBX0sEd0NxAuglBNR9TO5ThnxBB7GqzfcYo9kjadJQ==}
+    requiresBuild: true
+    dependencies:
+      bindings: 1.5.0
+      prebuild-install: 7.1.1
+    dev: false
 
   /binary-extensions/2.2.0:
     resolution: {integrity: sha512-jDctJ/IVQbZoJykoeHbhXpOlNBqGNcwXJKJog42E5HDPUwQTSdjCHdihjj0DlnheQ7blbT6dHOafNAiS8ooQKA==}
@@ -5031,7 +5035,7 @@ packages:
   /bl/1.2.3:
     resolution: {integrity: sha512-pvcNpa0UU69UT341rO6AYy4FVAIkUHuZXRIWbq+zHnsVcRzDDjIAhGuuYoi0d//cwIwtt4pkpKycWEfjdV+vww==}
     dependencies:
-      readable-stream: 2.3.7
+      readable-stream: 2.3.8
       safe-buffer: 5.2.1
     dev: true
 
@@ -5040,7 +5044,7 @@ packages:
     dependencies:
       buffer: 5.7.1
       inherits: 2.0.4
-      readable-stream: 3.6.0
+      readable-stream: 3.6.2
 
   /blake3-wasm/2.1.5:
     resolution: {integrity: sha512-F1+K8EbfOZE49dtoPtmxUQrpXaBIl3ICvasLh+nJta0xkz+9kF/7uet9fLnwKqhDrmj6g+6K3Tw9yQPUg2ka5g==}
@@ -5144,7 +5148,7 @@ packages:
     resolution: {integrity: sha512-xq+q3SRMOxGivLhBNaUdC64hDTQwejJ+H0T/NB1XMtTVEwNTrfFF3gAxiyW0Bu/xWEGhjVKgUcMhCrUy2+uCWg==}
     dependencies:
       base64-js: 1.5.1
-      ieee754: 1.2.1
+      ieee754: 1.1.13
       isarray: 1.0.0
 
   /buffer/5.7.1:
@@ -7923,10 +7927,6 @@ packages:
       resolve-cwd: 3.0.0
     dev: true
 
-  /import-meta-resolve/2.2.0:
-    resolution: {integrity: sha512-CpPOtiCHxP9HdtDM5F45tNiAe66Cqlv3f5uHoJjt+KlaLrUh9/Wz9vepADZ78SlqEo62aDWZtj9ydMGXV+CPnw==}
-    dev: false
-
   /imurmurhash/0.1.4:
     resolution: {integrity: sha512-JmXMZ6wuvDmLiHEml9ykzqO6lwFbof0GG4IkcGaENdCRDDmMVnny7s5HsIgHCbaq0w2MyPhDqkhTUgS2LU2PHA==}
     engines: {node: '>=0.8.19'}
@@ -8965,7 +8965,7 @@ packages:
   /jsonfile/4.0.0:
     resolution: {integrity: sha512-m6F1R3z8jjlf2imQHS2Qez5sjKWQzbuuhuJ/FKYFRZvPE3PuHcSMVZzfsLhGVOkfd20obL5SWEBew5ShlquNxg==}
     optionalDependencies:
-      graceful-fs: 4.2.11
+      graceful-fs: 4.2.10
     dev: true
 
   /jsonfile/6.1.0:
@@ -9108,7 +9108,7 @@ packages:
     resolution: {integrity: sha512-b94GiNHQNy6JNTrt5w6zNyffMrNkXZb3KTkCZJb2V1xaEGCk093vkZ2jk3tpaeP33/OiXC+WvK9AxUebnf5nbw==}
     engines: {node: '>= 0.6.3'}
     dependencies:
-      readable-stream: 2.3.7
+      readable-stream: 2.3.8
     dev: true
 
   /leac/0.6.0:
@@ -9655,12 +9655,6 @@ packages:
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
     hasBin: true
 
-  /nanoid/4.0.0:
-    resolution: {integrity: sha512-IgBP8piMxe/gf73RTQx7hmnhwz0aaEXYakvqZyE302IXW3HyVNhdNGC+O2MwMAVhLEnvXlvKtGbtJf6wvHihCg==}
-    engines: {node: ^14 || ^16 || >=18}
-    hasBin: true
-    dev: false
-
   /napi-build-utils/1.0.2:
     resolution: {integrity: sha512-ONmRUqK7zj7DWX0D9ADe03wbwOBZxNAfF20PlGfCWQcD3+/MakShIHrMqx9YwPTfxDdF1zLeL+RGZiR9kGMLdg==}
 
@@ -9707,8 +9701,8 @@ packages:
     resolution: {integrity: sha512-1nh45deeb5olNY7eX82BkPO7SSxR5SSYJiPTrTdFUVYwAl8CKMA5N9PjTYkHiRjisVcxcQ1HXdLhx2qxxJzLNQ==}
     dev: true
 
-  /node-abi/3.30.0:
-    resolution: {integrity: sha512-qWO5l3SCqbwQavymOmtTVuCWZE23++S+rxyoHjXqUmPyzRcaoI4lA2gO55/drddGnedAyjA7sk76SfQ5lfUMnw==}
+  /node-abi/3.33.0:
+    resolution: {integrity: sha512-7GGVawqyHF4pfd0YFybhv/eM9JwTtPqx0mAanQ146O3FlSh3pA24zf9IRQTOsfTSqXTNzPSP5iagAJ94jjuVog==}
     engines: {node: '>=10'}
     dependencies:
       semver: 7.3.8
@@ -10420,10 +10414,10 @@ packages:
       detect-libc: 2.0.1
       expand-template: 2.0.3
       github-from-package: 0.0.0
-      minimist: 1.2.7
+      minimist: 1.2.8
       mkdirp-classic: 0.5.3
       napi-build-utils: 1.0.2
-      node-abi: 3.30.0
+      node-abi: 3.33.0
       pump: 3.0.0
       rc: 1.2.8
       simple-get: 4.0.1
@@ -10633,7 +10627,7 @@ packages:
     dependencies:
       deep-extend: 0.6.0
       ini: 1.3.8
-      minimist: 1.2.7
+      minimist: 1.2.8
       strip-json-comments: 2.0.1
 
   /react-is/16.13.1:
@@ -10684,8 +10678,29 @@ packages:
       util-deprecate: 1.0.2
     dev: true
 
+  /readable-stream/2.3.8:
+    resolution: {integrity: sha512-8p0AUk4XODgIewSi0l8Epjs+EVnWiK7NoDIEGU0HhE7+ZyY8D1IMY7odu5lRrFXGg71L15KG8QrPmum45RTtdA==}
+    dependencies:
+      core-util-is: 1.0.3
+      inherits: 2.0.4
+      isarray: 1.0.0
+      process-nextick-args: 2.0.1
+      safe-buffer: 5.1.2
+      string_decoder: 1.1.1
+      util-deprecate: 1.0.2
+    dev: true
+
   /readable-stream/3.6.0:
     resolution: {integrity: sha512-BViHy7LKeTz4oNnkcLJ+lVSL6vpiFeX6/d3oSH8zCW7UxP2onchk+vTGB143xuFjHS3deTgkKoXXymXqymiIdA==}
+    engines: {node: '>= 6'}
+    dependencies:
+      inherits: 2.0.4
+      string_decoder: 1.3.0
+      util-deprecate: 1.0.2
+    dev: true
+
+  /readable-stream/3.6.2:
+    resolution: {integrity: sha512-9u/sniCrY3D5WdsERHzHE4G2YCXqoG5FTHUiCC4SIbr6XcLZBY05ya9EKjYek9O5xOAwjGq+1JdGBAS7Q9ScoA==}
     engines: {node: '>= 6'}
     dependencies:
       inherits: 2.0.4
@@ -10696,7 +10711,7 @@ packages:
     resolution: {integrity: sha512-ePeK6cc1EcKLEhJFt/AebMCLL+GgSKhuygrZ/GLaKZYEecIgIECf4UaUuaByiGtzckwR4ain9VzUh95T1exYGw==}
     engines: {node: '>=8'}
     dependencies:
-      readable-stream: 3.6.0
+      readable-stream: 3.6.2
     dev: true
 
   /readdir-glob/1.1.2:
@@ -11556,7 +11571,7 @@ packages:
   /split2/3.2.2:
     resolution: {integrity: sha512-9NThjpgZnifTkJpzTZ7Eue85S49QwpNhZTq6GRJwObb6jnLFNGB7Qm73V5HewTROPyxD0C29xqmaI68bQtV+hg==}
     dependencies:
-      readable-stream: 3.6.0
+      readable-stream: 3.6.2
     dev: true
 
   /sprintf-js/1.0.3:
@@ -11911,8 +11926,8 @@ packages:
       methods: 1.1.2
       mime: 2.6.0
       qs: 6.11.0
-      readable-stream: 3.6.0
-      semver: 7.3.8
+      readable-stream: 3.6.2
+      semver: 7.3.7
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -12174,7 +12189,7 @@ packages:
       buffer-alloc: 1.2.0
       end-of-stream: 1.4.4
       fs-constants: 1.0.0
-      readable-stream: 2.3.7
+      readable-stream: 2.3.8
       to-buffer: 1.1.1
       xtend: 4.0.2
     dev: true
@@ -12187,7 +12202,7 @@ packages:
       end-of-stream: 1.4.4
       fs-constants: 1.0.0
       inherits: 2.0.4
-      readable-stream: 3.6.0
+      readable-stream: 3.6.2
 
   /tar/6.1.11:
     resolution: {integrity: sha512-an/KZQzQUkZCkuoAA64hM92X0Urb6VpRhAFllDzz44U2mcD5scmT3zBc4VgVpkugF580+DQn8eAFSyoQt0tznA==}
