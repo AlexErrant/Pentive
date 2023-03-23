@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/naming-convention */
 import { DBAsync } from "@vlcn.io/xplat-api"
 import { parse as uuidParse, stringify as uuidStringify } from "uuid"
 export type SiteIDWire = string
@@ -6,11 +8,12 @@ type CID = string
 type QuoteConcatedPKs = string | number
 type TableName = string
 type Version = number | string
-type TODO = any
 
+// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
 const isDebug = (globalThis as any).__vlcn_whole_db_dbg
 function log(...data: any[]) {
-  if (isDebug) {
+  if (isDebug === true) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     console.log("whole-db: ", ...data)
   }
 }
@@ -39,7 +42,7 @@ export interface PokeProtocol {
   requestChanges: (from: SiteIDWire, since: bigint) => void
 
   /**
-   * Receive a poke froma given site.
+   * Receive a poke from a given site.
    * In response, we'll compute what changes we're missing from that site
    * and request those changes.
    */
@@ -129,10 +132,11 @@ export class WholeDbReplicator {
     // remove trigger(s)
     // function extension is fine to stay, it'll get removed on connection termination
     this.crrs.forEach((crr) => {
-      ;["INSERT", "UPDATE", "DELETE"].forEach((verb) =>
-        this.db.exec(
-          `DROP TRIGGER IF EXISTS "${crr}__crsql_wdbreplicator_${verb.toLowerCase()}";`
-        )
+      ;["INSERT", "UPDATE", "DELETE"].forEach(
+        async (verb) =>
+          await this.db.exec(
+            `DROP TRIGGER IF EXISTS "${crr}__crsql_wdbreplicator_${verb.toLowerCase()}";`
+          )
       )
     })
   }
@@ -152,25 +156,27 @@ export class WholeDbReplicator {
       "SELECT name FROM sqlite_master WHERE name LIKE '%__crsql_clock'"
     )
 
-    const baseTableNames = crrs.map((crr) => {
+    const baseTableNames = crrs.map(async (crr) => {
       const fullTblName = crr[0]
       const baseTblName = fullTblName.substring(
         0,
         fullTblName.lastIndexOf("__crsql_clock")
       )
-      ;["INSERT", "UPDATE", "DELETE"].map((verb) => {
-        this.db.exec(
-          `CREATE TEMP TRIGGER IF NOT EXISTS "${baseTblName}__crsql_wdbreplicator_${verb.toLowerCase()}" AFTER ${verb} ON "${baseTblName}"
+      await Promise.all(
+        ["INSERT", "UPDATE", "DELETE"].map(async (verb) => {
+          return await this.db.exec(
+            `CREATE TEMP TRIGGER IF NOT EXISTS "${baseTblName}__crsql_wdbreplicator_${verb.toLowerCase()}" AFTER ${verb} ON "${baseTblName}"
           BEGIN
             select crsql_wdbreplicator() WHERE crsql_internal_sync_bit() = 0;
           END;
         `
-        )
-      })
+          )
+        })
+      )
 
       return baseTblName
     })
-    this.crrs = baseTableNames
+    this.crrs = await Promise.all(baseTableNames)
   }
 
   private async createPeerTrackingTable() {
@@ -209,6 +215,7 @@ export class WholeDbReplicator {
     let ourVersionForPoker = 0n
     if (rows != null && rows.length > 0) {
       // ensure it is a bigint. sqlite will return number if in js int range and bigint if out of range.
+      // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions, @typescript-eslint/no-unsafe-argument
       ourVersionForPoker = BigInt(rows[0][0] || 0)
     }
 
@@ -223,8 +230,8 @@ export class WholeDbReplicator {
     this.network.requestChanges(pokedBy, ourVersionForPoker)
   }
 
-  private readonly newConnection = (siteId: SiteIDWire) => {
-    this.db.exec(
+  private readonly newConnection = async (siteId: SiteIDWire) => {
+    await this.db.exec(
       "INSERT OR IGNORE INTO __crsql_wdbreplicator_peers VALUES (?, ?)",
       [uuidParse(siteId), 0]
     )
@@ -262,6 +269,7 @@ export class WholeDbReplicator {
             cs[3],
             BigInt(cs[4]),
             v,
+            // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
             cs[6] ? uuidParse(cs[6]) : 0
           )
         }
@@ -269,7 +277,7 @@ export class WholeDbReplicator {
         console.error(e)
         throw e
       } finally {
-        stmt.finalize(tx)
+        await stmt.finalize(tx)
       }
 
       await tx.exec(
@@ -292,9 +300,10 @@ export class WholeDbReplicator {
 
     // TODO: temporary. better to `quote` out of db and `unquote` (to implement) into db
     // TODO: further complicated by https://github.com/rhashimoto/wa-sqlite/issues/69
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     changes.forEach((c) => (c[6] = uuidStringify(c[6] as any)))
 
-    if (changes.length == 0) {
+    if (changes.length === 0) {
       return
     }
     log("pushing changesets across the network", changes)

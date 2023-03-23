@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/prefer-optional-chain */
+/* eslint-disable @typescript-eslint/naming-convention */
 import WDB, {
   Changeset,
   PokeProtocol,
@@ -5,14 +7,13 @@ import WDB, {
   SiteIDWire,
   WholeDbReplicator,
 } from "./wholeDbReplicator.js"
-import { DB, DBAsync } from "@vlcn.io/xplat-api"
+import { DBAsync } from "@vlcn.io/xplat-api"
 import Peer, { DataConnection } from "peerjs"
-// @ts-expect-error
 import { stringify as uuidStringify } from "uuid"
 
 type Msg = PokeMsg | ChangesMsg | RequestChangesMsg
 /**
- * TODO: we can improve the poke msg to facilitate daisy chaning of updates among peers.
+ * TODO: we can improve the poke msg to facilitate daisy chaining of updates among peers.
  * If the poke is the result of a sync it should include:
  * - poker id (if we are proxying)
  * - max version for that id
@@ -76,8 +77,13 @@ export class WholeDbRtc implements PokeProtocol {
     this.replicator = await WDB.install(this.siteId, this.db, this)
   }
 
-  schemaChanged() {
-    this.replicator.schemaChanged()
+  async schemaChanged() {
+    const r = this.replicator
+    if (r == null) {
+      console.warn("replicator is null")
+    } else {
+      await r.schemaChanged()
+    }
   }
 
   connectTo(other: SiteIDWire) {
@@ -110,7 +116,7 @@ export class WholeDbRtc implements PokeProtocol {
       changes: changesets,
     }
     const conn = this.establishedConnections.get(to)
-    if (conn) {
+    if (conn != null) {
       conn.send(msg)
     }
   }
@@ -121,7 +127,7 @@ export class WholeDbRtc implements PokeProtocol {
       since: since.toString(),
     }
     const conn = this.establishedConnections.get(from)
-    if (conn) {
+    if (conn != null) {
       conn.send(msg)
     }
   }
@@ -145,7 +151,11 @@ export class WholeDbRtc implements PokeProtocol {
   }
 
   dispose(): void {
-    this.replicator.dispose()
+    const r = this.replicator
+    if (r != null) {
+      r.dispose()
+    }
+
     this.site.destroy()
   }
 
@@ -225,8 +235,8 @@ class WholeDbRtcPublic {
     this.listeners.delete(cb)
   }
 
-  schemaChanged() {
-    this.wdbrtc.schemaChanged()
+  async schemaChanged() {
+    await this.wdbrtc.schemaChanged()
   }
 
   private readonly _connectionsChanged = (
