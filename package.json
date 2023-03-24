@@ -10,7 +10,7 @@
   "scripts": {
     "//": "ugc and dev are distinct because you may frequently wish to restart `dev`, whereas `ugc` rarely changes",
     "ugc": "concurrently -p \"[{name}]\" -n \"app-ugc,hub-ugc\" -c \"bgBlue.bold,bgMagenta.bold\" \"pnpm --filter app-ugc build && pnpm --filter app-ugc serve\" \"pnpm --filter hub-ugc build && pnpm --filter hub-ugc serve\"",
-    "dev": "concurrently -p \"[{name}]\" -n \"app,hub,cwa\" -c \"bgBlue.bold,bgMagenta.bold,bgGreen.bold\" \"pnpm --filter app dev\" \"pnpm --filter hub dev\" \"pnpm --filter cwa dev\"",
+    "dev": "concurrently -p \"[{name}]\" -n \"app,hub,cwa,peer\" -c \"bgBlue.bold,bgMagenta.bold,bgGreen.bold,bgWhiteBright.bold\" \"pnpm --filter app dev\" \"pnpm --filter hub dev\" \"pnpm --filter cwa dev\" \"pnpm --filter peer dev\"",
     "build": "concurrently -p \"[{name}]\" -n \"app,hub,app-ugc,hub-ugc,cwa\" -c \"bgBlue.bold,bgMagenta.bold,bgGreen.bold,bgYellow.bold,bgBlackBright.bold\" \"pnpm --filter app build\" \"pnpm --filter hub build\" \"pnpm --filter app-ugc build\" \"pnpm --filter hub-ugc build\" \"pnpm --filter cwa build\"",
     "deploy": "concurrently -p \"[{name}]\" -n \"app,hub,app-ugc,hub-ugc,cwa\" -c \"bgBlue.bold,bgMagenta.bold,bgGreen.bold,bgYellow.bold,bgBlackBright.bold\" \"pnpm --filter app run deploy\" \"pnpm --filter hub run deploy\" \"pnpm --filter app-ugc run deploy\" \"pnpm --filter hub-ugc run deploy\" \"pnpm --filter cwa run deploy\""
   }

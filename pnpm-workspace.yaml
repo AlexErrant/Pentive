@@ -6,5 +6,6 @@ packages:
   - "lrpc/"
   - "shared/"
   - "cwa/"
+  - "peer/"
   - "workers-test/"
   - "example-plugins/*"
