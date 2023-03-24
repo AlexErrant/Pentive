@@ -19,6 +19,8 @@ mkdir hub-ugc/.cert
 mkcert -key-file hub-ugc/.cert/key.pem -cert-file hub-ugc/.cert/cert.pem hub-user-generated-content.pentive.local
 mkdir lrpc/.cert
 mkcert -key-file lrpc/.cert/key.pem    -cert-file lrpc/.cert/cert.pem    lrpc.pentive.local
+mkdir peer/.cert
+mkcert -key-file peer/.cert/key.pem    -cert-file peer/.cert/cert.pem    peer.pentive.local
 
 mkcert -key-file key.pem               -cert-file cert.pem               cwa.pentive.local
 mv key.pem  ~/.config/.wrangler/local-cert/key.pem

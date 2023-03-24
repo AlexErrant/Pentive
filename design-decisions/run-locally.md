@@ -32,6 +32,7 @@ Add the following to your [hosts file](https://www.howtogeek.com/howto/27350/beg
 127.0.0.1 hub-user-generated-content.pentive.local
 127.0.0.1 lrpc.pentive.local
 127.0.0.1 cwa.pentive.local
+127.0.0.1 peer.pentive.local
 ```
 
 ## 3. Generate certs
