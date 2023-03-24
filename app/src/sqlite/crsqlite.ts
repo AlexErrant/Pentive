@@ -35,9 +35,9 @@ async function createDb() {
 async function createCrRtc() {
   const db = await getDb()
   return await wdbRtc(db, {
-    // @ts-expect-error the option exists https://peerjs.com/docs/#peer-options-secure Also, it defaults to secure for some reason - perhaps because it's being served from https
-    secure: false,
-    host: "localhost",
+    // @ts-expect-error the option exists https://peerjs.com/docs/#peer-options-secure
+    secure: true,
+    host: "peer.pentive.local",
     port: 9000,
     path: "/examples",
   })
