@@ -39,7 +39,6 @@ async function createCrRtc() {
     secure: true,
     host: "peer.pentive.local",
     port: 9000,
-    path: "/examples",
   })
 }
 

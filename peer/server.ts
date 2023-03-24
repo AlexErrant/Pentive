@@ -5,8 +5,6 @@ import express from "express"
 
 const app = express()
 
-app.get("/", (req, res, next) => res.send("Hello world!"))
-
 const server = https.createServer(
   {
     key: fs.readFileSync(".cert/key.pem"),
@@ -15,6 +13,6 @@ const server = https.createServer(
   app
 )
 
-app.use("/examples", ExpressPeerServer(server))
+app.use("/", ExpressPeerServer(server))
 
 server.listen(9000, "0.0.0.0", () => console.log("listening to 9000"))
