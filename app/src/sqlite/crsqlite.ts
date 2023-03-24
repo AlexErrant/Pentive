@@ -38,7 +38,7 @@ async function createCrRtc() {
     // @ts-expect-error the option exists https://peerjs.com/docs/#peer-options-secure
     secure: true,
     host: "peer.pentive.local",
-    port: 9000,
+    port: 3018,
   })
 }
 
