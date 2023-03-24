@@ -35,6 +35,10 @@ The primary author of Pentive, Alex, is _not_ a good architect, designer, or web
 - short for Cloudflare Worker API
 - How `app` submits changes to `hub`/PlanetScale
 
+## peer
+
+- [PeerServer](https://github.com/peers/peerjs-server) that establishes p2p connections between Pentive apps for syncing client-side databases
+
 ## shared
 
 - A library of shared code for the above services
