@@ -35,7 +35,7 @@ export default defineConfig({
     target: "esnext",
   },
   server: {
-    port: 3014,
+    port: 3013,
     strictPort: true,
     hmr: false,
     https: {
@@ -44,7 +44,7 @@ export default defineConfig({
     },
   },
   preview: {
-    port: 3014,
+    port: 3013,
     strictPort: true,
     https: {
       key: fs.readFileSync("./.cert/key.pem"),

@@ -88,7 +88,7 @@ And in another terminal:
 pnpm dev
 ```
 
-Visit https://pentive.local:3000/ and https://app.pentive.local:3014/
+Visit https://pentive.local:3000/ and https://app.pentive.local:3013/
 
 ## 8. Deploy (optional)
 
