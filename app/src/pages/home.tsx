@@ -10,6 +10,7 @@ import { Base64Url, csrfHeaderName, NookId, throwExp } from "shared"
 import { MediaId, RemoteMediaNum } from "../domain/ids"
 import { cwaClient } from "../cwaClient"
 import { getDb } from "../sqlite/crsqlite"
+import Peers from "./peers"
 
 async function uploadTemplates(): Promise<void> {
   const newTemplates = await db.getNewTemplatesToUpload()
@@ -310,6 +311,9 @@ export default function Home(): JSX.Element {
         <button class="px-2" onclick={q("select * from remoteMedia")}>
           remoteMedia
         </button>
+      </div>
+      <div class="mt-4">
+        <Peers />
       </div>
     </section>
   )

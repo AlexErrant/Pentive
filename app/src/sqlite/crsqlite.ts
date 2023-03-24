@@ -6,8 +6,10 @@ import { DB } from "./database"
 import { CRDatabase, CRDialect } from "./dialect"
 import { Kysely } from "kysely"
 import crsqliteUrl from "@vlcn.io/crsqlite-wasm/crsqlite.wasm?url"
+import wdbRtc from "./wholeDbRtc"
 
 let myDatabase: Promise<crDB> | null = null
+let myCrRtc: Awaited<ReturnType<typeof wdbRtc>> | null = null
 
 export async function getDb() {
   if (myDatabase == null) {
@@ -16,11 +18,29 @@ export async function getDb() {
   return await myDatabase
 }
 
+export async function getCrRtc() {
+  if (myCrRtc == null) {
+    myCrRtc = await createCrRtc()
+  }
+  return myCrRtc
+}
+
 async function createDb() {
   const sqlite = await sqliteWasm(() => crsqliteUrl)
   const db = await sqlite.open("username.db")
   await db.execMany(initSql)
   return db
+}
+
+async function createCrRtc() {
+  const db = await getDb()
+  return await wdbRtc(db, {
+    // @ts-expect-error the option exists https://peerjs.com/docs/#peer-options-secure Also, it defaults to secure for some reason - perhaps because it's being served from https
+    secure: false,
+    host: "localhost",
+    port: 9000,
+    path: "/examples",
+  })
 }
 
 let myKysely: Promise<Kysely<DB>> | null = null
