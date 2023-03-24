@@ -11,7 +11,7 @@ export developmentCsrfSecret=with+spaces+and+hyphens+and+stuff+ZZZZZZZZZ=
 export productionCsrfSecret=with+spaces+and+hyphens+and+stuff+ZZZZZZZZZ=
 export developmentAppOrigin=https://app.pentive.local:3013
 export productionAppOrigin=https://app.pentive.com
-export developmentHubOrigin=https://pentive.local:3000
+export developmentHubOrigin=https://pentive.local:3014
 export productionHubOrigin=https://pentive.com
 export VITE_DEVELOPMENT_HUB_DOMAIN=pentive.local
 export VITE_PRODUCTION_HUB_DOMAIN=hub.yourusernamehere.workers.dev
