@@ -489,9 +489,12 @@ importers:
 
   peer:
     specifiers:
+      '@types/node': ^18.7.21
       peer: ^1.0.0
     dependencies:
       peer: 1.0.0
+    devDependencies:
+      '@types/node': 18.15.3
 
   shared:
     specifiers:
