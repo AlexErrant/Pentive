@@ -9,6 +9,7 @@
     "kill-port": "^2.0.1"
   },
   "scripts": {
+    "kill": "kill-port 3012 3013 3014 3015 3016 3017 3018",
     "//": "ugc and dev are distinct because you may frequently wish to restart `dev`, whereas `ugc` rarely changes",
     "ugc": "concurrently -p \"[{name}]\" -n \"app-ugc,hub-ugc\" -c \"bgBlue.bold,bgMagenta.bold\" \"pnpm --filter app-ugc build && pnpm --filter app-ugc serve\" \"pnpm --filter hub-ugc build && pnpm --filter hub-ugc serve\"",
     "dev": "concurrently -p \"[{name}]\" -n \"app,hub,cwa,peer\" -c \"bgBlue.bold,bgMagenta.bold,bgGreen.bold,bgWhiteBright.bold\" \"pnpm --filter app dev\" \"pnpm --filter hub dev\" \"pnpm --filter cwa dev\" \"pnpm --filter peer dev\"",
