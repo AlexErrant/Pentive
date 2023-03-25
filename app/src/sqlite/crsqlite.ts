@@ -37,8 +37,8 @@ async function createCrRtc() {
   return await wdbRtc(db, {
     // @ts-expect-error the option exists https://peerjs.com/docs/#peer-options-secure
     secure: true,
-    host: "peer.pentive.local",
-    port: 3018,
+    host: import.meta.env.VITE_PEER_HOST,
+    port: parseInt(import.meta.env.VITE_PEER_PORT),
   })
 }
 

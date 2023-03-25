@@ -23,3 +23,7 @@ export VITE_DEVELOPMENT_HUB_UGC_ORIGIN=https://hub-user-generated-content.pentiv
 export VITE_PRODUCTION_HUB_UGC_ORIGIN=https://hub-user-generated-content.yourusernamehere.workers.dev
 export VITE_DEVELOPMENT_APP_UGC_ORIGIN=https://app-user-generated-content.pentive.local:3015
 export VITE_PRODUCTION_APP_UGC_ORIGIN=https://app-user-generated-content.yourusernamehere.workers.dev
+export VITE_DEVELOPMENT_PEER_HOST=peer.pentive.local
+export VITE_DEVELOPMENT_PEER_PORT="3018"
+export VITE_PRODUCTION_PEER_HOST="0.peerjs.com"
+export VITE_PRODUCTION_PEER_PORT="443"
