@@ -5,7 +5,8 @@
     "node": "16.13.0"
   },
   "devDependencies": {
-    "concurrently": "^7.6.0"
+    "concurrently": "^7.6.0",
+    "kill-port": "^2.0.1"
   },
   "scripts": {
     "//": "ugc and dev are distinct because you may frequently wish to restart `dev`, whereas `ugc` rarely changes",
