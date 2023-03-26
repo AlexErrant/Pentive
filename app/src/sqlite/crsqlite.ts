@@ -52,7 +52,7 @@ export async function getKysely(): Promise<Kysely<DB>> {
 }
 
 async function createKysely(): Promise<Kysely<DB>> {
-  const db = await createDb()
+  const db = await getDb()
   return new Kysely<DB>({
     dialect: new CRDialect({ database: db as CRDatabase }),
   })
