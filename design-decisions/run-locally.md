@@ -1,4 +1,5 @@
-⚠ This file is called `run-locally`, but there is an online-only dependency: [PlanetScale](https://planetscale.com/). You could spin up a MySQL Docker and change the Kysely dialect from PlanetScale to MySQL, but I don't recommend this; I'm not even sure if a locally running Cloudflare Worker can connect to MySQL. ⚠
+> **Warning**
+> This file is called `run-locally`, but there is an online-only dependency: [PlanetScale](https://planetscale.com/). You could spin up a MySQL Docker and change the Kysely dialect from PlanetScale to MySQL, but I don't recommend this; I'm not even sure if a locally running Cloudflare Worker can connect to MySQL.
 
 # Prerequisites:
 
@@ -39,13 +40,11 @@ Add the following to your [hosts file](https://www.howtogeek.com/howto/27350/beg
 
 Run `./rmcert.sh && ./mkcert.sh`.
 
-⚠ Note that `rmcert.sh` deletes Wrangler's local-cert's `key.pem` and `cert.pem`. (Then `mkcert.sh` generates a new one.) This "regenerate" may be undesirable if you're using Wrangler for HTTPS anywhere else. If this is the case, add your site to `mkcert.sh` before running it, e.g.
+> **Warning** This has only been tested on Ubuntu - make sure the `~/.config/.wrangler/local-cert` paths in _both_ scripts work [for your OS](https://github.com/cloudflare/workers-sdk/issues/2118#issuecomment-1445372298)!
 
-```bash
-mkcert -key-file key.pem -cert-file cert.pem cwa.pentive.local your-wrangler-worker-here.com
-```
+> [`rmcert.sh`](../rmcert.sh) deletes Wrangler's local-cert's `key.pem` and `cert.pem`. (Then [`mkcert.sh`](../make.sh) generates a new one.) This "regenerate" may be undesirable if you're using Wrangler for HTTPS anywhere else. If this is the case, add your site to `mkcert.sh` before running it, e.g. `mkcert -key-file key.pem -cert-file cert.pem cwa.pentive.local your-wrangler-worker-here.com`
 
-[More info.](https://github.com/cloudflare/workers-sdk/issues/1908#issuecomment-1416901172) ⚠
+> [More info.](https://github.com/cloudflare/workers-sdk/issues/1908#issuecomment-1416901172) Note that `NODE_EXTRA_CA_CERTS` isn't helpful since it specifies a [CA cert](https://discord.com/channels/595317990191398933/799437470004412476/1039744087672238110) and we need to trust domains remapped in our `hosts` file.
 
 If you're on WSL2, [do this](https://github.com/FiloSottile/mkcert/issues/357#issuecomment-1466762021).
 

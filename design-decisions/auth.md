@@ -3,3 +3,5 @@ Pentive should avoid managing any passwords. This reduces the phishing attack ve
 Offline only users do not need auth.
 
 It should be possible to associate a _specific_ initially offline profile with an auth. Users may not wish to link all their offline profiles with an auth.
+
+It would be nice if a user could have multiple app profiles. How could this work with subscriber count on hub?
