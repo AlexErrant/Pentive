@@ -1,0 +1,14 @@
+name = "cwa"
+main = "src/index.ts"
+compatibility_date = "2023-03-21"
+
+account_id = "$cloudflareAccountId"
+
+[[r2_buckets]]
+binding = 'mediaBucket'
+bucket_name = 'media'
+preview_bucket_name = 'media-dev'
+
+[dev]
+port = 3017
+local_protocol="https"
