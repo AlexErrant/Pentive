@@ -29,6 +29,8 @@ import {
   UserId,
   TemplateId,
   userOwnsTemplateAndHasMedia,
+  iByEntityIdsValidator,
+  parsePublicToken,
 } from "shared"
 import { SignJWT, jwtVerify } from "jose"
 import { connect } from "@planetscale/database"
@@ -37,7 +39,6 @@ import { appRouter } from "./router"
 import { fetchRequestHandler } from "@trpc/server/adapters/fetch"
 import { createContext } from "./trpc"
 import { getJwsSecret } from "./env"
-import { iByEntityIdsValidator, parsePublicToken } from "./publicToken"
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const app = new Hono<{ Bindings: Env }>()
