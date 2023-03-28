@@ -23,5 +23,5 @@ mkdir peer/.cert
 mkcert -key-file peer/.cert/key.pem    -cert-file peer/.cert/cert.pem    peer.pentive.local
 
 mkcert -key-file key.pem               -cert-file cert.pem               user-generated-content-pentive.local cwa.pentive.local
-mv key.pem  ~/.config/.wrangler/local-cert/key.pem
-mv cert.pem ~/.config/.wrangler/local-cert/cert.pem
+mv key.pem  ~/.wrangler/local-cert/key.pem
+mv cert.pem ~/.wrangler/local-cert/cert.pem

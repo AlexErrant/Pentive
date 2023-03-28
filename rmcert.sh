@@ -14,5 +14,5 @@ rm -rf hub/.cert
 rm -rf hub-ugc/.cert
 rm -rf lrpc/.cert
 rm -rf peer/.cert
-rm -f ~/.config/.wrangler/local-cert/key.pem
-rm -f ~/.config/.wrangler/local-cert/cert.pem
+rm -f ~/.wrangler/local-cert/key.pem
+rm -f ~/.wrangler/local-cert/cert.pem

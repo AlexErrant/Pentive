@@ -41,7 +41,7 @@ Add the following to your [hosts file](https://www.howtogeek.com/howto/27350/beg
 
 Run `./rmcert.sh && ./mkcert.sh`.
 
-> **Warning** This has only been tested on Ubuntu - make sure the `~/.config/.wrangler/local-cert` paths in _both_ scripts work [for your OS](https://github.com/cloudflare/workers-sdk/issues/2118#issuecomment-1445372298)!
+> **Warning** This has only been tested on Ubuntu - make sure the `~/.wrangler/local-cert` paths in _both_ scripts work [for your OS and Wrangler version](https://github.com/cloudflare/workers-sdk/issues/2118#issuecomment-1445372298)!
 
 > [`rmcert.sh`](../rmcert.sh) deletes Wrangler's local-cert's `key.pem` and `cert.pem`. (Then [`mkcert.sh`](../make.sh) generates a new one.) This "regenerate" may be undesirable if you're using Wrangler for HTTPS anywhere else. If this is the case, add your site to `mkcert.sh` before running it, e.g. `mkcert -key-file key.pem -cert-file cert.pem user-generated-content-pentive.local cwa.pentive.local your-wrangler-worker-here.com`
 
