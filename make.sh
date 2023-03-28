@@ -17,7 +17,6 @@ source ../PentiveSecrets/secrets.sh
 # echo $productionAppOrigin        | wrangler secret put appOrigin        --name cwa
 # echo $productionHubOrigin        | wrangler secret put hubOrigin        --name cwa
 # echo $productionPlanetscaleDbUrl | wrangler secret put planetscaleDbUrl --name api-ugc
-# echo $productionMediaTokenSecret | wrangler secret put mediaTokenSecret --name api-ugc
 # echo $productionAppOrigin        | wrangler secret put appOrigin        --name api-ugc
 # echo $productionHubOrigin        | wrangler secret put hubOrigin        --name api-ugc
 # echo $productionJwsSecret        | wrangler secret put jwsSecret        --name hub
