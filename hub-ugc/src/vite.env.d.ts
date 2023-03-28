@@ -3,7 +3,7 @@
 /// <reference types="vite/client" />
 
 interface ImportMetaEnv {
-  readonly VITE_CWA_URL: string
+  readonly VITE_AUGC_URL: string
 }
 
 interface ImportMeta {

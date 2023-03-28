@@ -7,6 +7,7 @@ interface ImportMetaEnv {
   readonly VITE_APP_ORIGIN: string
   readonly VITE_HUB_UGC_ORIGIN: string
   readonly VITE_CWA_URL: string
+  readonly VITE_AUGC_URL: string
 }
 
 interface ImportMeta {
