@@ -135,7 +135,7 @@ function mutate(img: HTMLImageElement, imgSrcs: Map<MediaId, string>) {
     // do nothing
   } else if (src.startsWith(relativeChar)) {
     const id = src.slice(1) as MediaId
-    imgSrcs.set(id, import.meta.env.VITE_CWA_URL + "i" + src)
+    imgSrcs.set(id, import.meta.env.VITE_AUGC_URL + "i" + src)
     img.setAttribute("src", id)
   } else {
     // not sure that this branch should ever be hit

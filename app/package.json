@@ -72,6 +72,7 @@
     "@zip.js/zip.js": "^2.6.41",
     "ag-grid-community": "^29.1.0",
     "ag-grid-solid": "^29.1.0",
+    "api-ugc": "workspace:*",
     "babel-preset-solid": "^1.4.8",
     "buffer": "^6.0.3",
     "comlink": "^4.3.1",

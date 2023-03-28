@@ -61,6 +61,19 @@ app
     if (mediaHash == null) return await c.notFound()
     return await getMedia(c, mediaHash, "public")
   })
+// .get("/private/:token", async (c) => {
+//   const authResult = await getUserId(c)
+//   if (authResult.tag === "Error") return authResult.error
+//   const userId = authResult.ok
+//   const mediaHash = await getMediaHash(
+//     c.env.mediaTokenSecret,
+//     userId,
+//     base64url.decode(c.req.param("token"))
+//   )
+//   if (mediaHash == null) return c.text("Invalid token", 400)
+//   const mediaHashBase64 = base64.encode(mediaHash) as Base64
+//   return await getMedia(c, mediaHashBase64, "private")
+// })
 
 export default app
 

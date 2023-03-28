@@ -18,7 +18,6 @@ const t = initTRPC.context<Context>().create({
 })
 
 export const router = t.router
-export const publicProcedure = t.procedure
 
 const isAuthed = t.middleware(async ({ next, ctx }) => {
   if (ctx.user === undefined) {

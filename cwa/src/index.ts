@@ -15,7 +15,6 @@ import {
   hstsName,
   hstsValue,
   base64,
-  base64url,
   Base64,
   Base64Url,
   setKysely,
@@ -23,26 +22,20 @@ import {
   fromBase64Url,
   fromBase64,
   NoteId,
-  lookupMediaHash,
-  binary16fromBase64URL,
   userOwnsNoteAndHasMedia,
   UserId,
   TemplateId,
   userOwnsTemplateAndHasMedia,
   iByEntityIdsValidator,
-  parsePublicToken,
 } from "shared"
-import { SignJWT, jwtVerify } from "jose"
 import { connect } from "@planetscale/database"
-import { buildPrivateToken, getMediaHash } from "./privateToken"
+import { buildPrivateToken } from "./privateToken"
 import { appRouter } from "./router"
 import { fetchRequestHandler } from "@trpc/server/adapters/fetch"
 import { createContext } from "./trpc"
-import { getJwsSecret } from "./env"
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const app = new Hono<{ Bindings: Env }>()
-const alg = "HS256"
 
 app
   .use("*", async (c, next) => {
@@ -71,46 +64,6 @@ app
     })
   })
   .get("/", (c) => c.text("Hono!!"))
-  .get("/testJws", async (c) => {
-    const jwsSecretBytes = getJwsSecret(c.env.jwsSecret)
-    const jwt = await new SignJWT({})
-      .setProtectedHeader({ alg })
-      .setSubject("someUserName")
-      // .setJti() // highTODO
-      // .setNotBefore()
-      // .setIssuedAt()
-      // .setIssuer("urn:example:issuer")
-      // .setAudience("urn:example:audience")
-      // .setExpirationTime("2h")
-      .sign(jwsSecretBytes)
-    const verifyResult = await jwtVerify(jwt, jwsSecretBytes)
-    console.log(
-      JSON.stringify(
-        {
-          ...verifyResult,
-          jwt,
-        },
-        null,
-        4
-      )
-    )
-    return c.body(null, 200)
-  })
-  .get("/logJwt/:sub", async (c) => {
-    const sub = c.req.param("sub")
-    const jwt = await new SignJWT({})
-      .setProtectedHeader({ alg })
-      .setSubject(sub)
-      // .setJti() // highTODO
-      // .setNotBefore()
-      // .setIssuedAt()
-      // .setIssuer("urn:example:issuer")
-      // .setAudience("urn:example:audience")
-      // .setExpirationTime("2h")
-      .sign(getJwsSecret(c.env.jwsSecret))
-    console.log("jwt:", jwt)
-    return c.body(null)
-  })
   // highTODO needs sanitization and stripping of Exif https://developers.cloudflare.com/workers/tutorials/generate-youtube-thumbnails-with-workers-and-images/ https://github.com/hMatoba/piexifjs https://github.com/hMatoba/exif-library
   // Someday B2? https://walshy.dev/blog/21_09_10-handling-file-uploads-with-cloudflare-workers https://news.ycombinator.com/item?id=28687181
   // Other alternatives https://bunny.net/ https://www.gumlet.com/ https://news.ycombinator.com/item?id=29474743
@@ -190,27 +143,6 @@ app
         await userOwnsTemplateAndHasMedia(templateIds, authorId, mediaHash),
       iByEntityIds
     )
-  })
-  .get("/private/:token", async (c) => {
-    const authResult = await getUserId(c)
-    if (authResult.tag === "Error") return authResult.error
-    const userId = authResult.ok
-    const mediaHash = await getMediaHash(
-      c.env.mediaTokenSecret,
-      userId,
-      base64url.decode(c.req.param("token"))
-    )
-    if (mediaHash == null) return c.text("Invalid token", 400)
-    const mediaHashBase64 = base64.encode(mediaHash) as Base64
-    return await getMedia(c, mediaHashBase64, "private")
-  })
-  .get("/i/:token", async (c) => {
-    setKysely(c.env.planetscaleDbUrl)
-    const [entityId, i] = parsePublicToken(c.req.param("token"))
-    const entityIdBase64 = binary16fromBase64URL(entityId)
-    const mediaHash = await lookupMediaHash(entityIdBase64, i)
-    if (mediaHash == null) return await c.notFound()
-    return await getMedia(c, mediaHash, "public")
   })
 
 export default app
@@ -326,27 +258,4 @@ interface PersistParams {
   mediaHashBase64: Base64
   readable: ReadableStream<Uint8Array>
   headers: Headers
-}
-
-async function getMedia(
-  c: CwaContext,
-  mediaIdBase64: Base64,
-  cacheControl: "public" | "private"
-): Promise<Response> {
-  const file = await c.env.mediaBucket.get(mediaIdBase64)
-  if (file === null) {
-    return await c.notFound()
-  }
-  c.header("ETag", file.httpEtag)
-  const maxAge =
-    cacheControl === "public"
-      ? 1814400 // 21 days
-      : 31536000 // 1 year
-  c.header("Expires", new Date(maxAge * 1000 + Date.now()).toUTCString())
-  c.header("Cache-Control", `${cacheControl}, max-age=${maxAge}, immutable`)
-  if (file.httpMetadata?.contentType != null)
-    c.header("Content-Type", file.httpMetadata.contentType)
-  if (file.httpMetadata?.contentEncoding != null)
-    c.header("Content-Encoding", file.httpMetadata.contentEncoding)
-  return c.body(file.body)
 }

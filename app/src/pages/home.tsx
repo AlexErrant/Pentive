@@ -8,7 +8,7 @@ import { db } from "../db"
 import { importAnki } from "./importer/importer"
 import { Base64Url, csrfHeaderName, NookId, throwExp } from "shared"
 import { MediaId, RemoteMediaNum } from "../domain/ids"
-import { cwaClient } from "../cwaClient"
+import { cwaClient, augcClient } from "../trpcClient"
 import { getDb } from "../sqlite/crsqlite"
 import Peers from "./peers"
 
@@ -111,7 +111,7 @@ async function updateNotes(): Promise<void> {
 }
 
 async function searchNotes(search: string): Promise<void> {
-  const searchBatch = await cwaClient.searchNotes.query(search)
+  const searchBatch = await augcClient.searchNotes.query(search)
   console.log(searchBatch)
 }
 

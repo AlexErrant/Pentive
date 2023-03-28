@@ -1,12 +1,10 @@
 import { z } from "zod"
-import { authedProcedure, publicProcedure } from "./trpc"
+import { authedProcedure } from "./trpc"
 import {
   createRemoteTemplate,
   editRemoteTemplate,
   editTemplates,
-  getTemplate,
   insertTemplates,
-  remoteTemplateId,
 } from "shared"
 
 export const templateRouter = {
@@ -19,7 +17,4 @@ export const templateRouter = {
   editTemplates: authedProcedure
     .input(z.array(editRemoteTemplate).min(1))
     .mutation(async ({ input, ctx }) => await editTemplates(ctx.user, input)),
-  getTemplate: publicProcedure
-    .input(remoteTemplateId)
-    .query(async ({ input }) => await getTemplate(input)),
 }

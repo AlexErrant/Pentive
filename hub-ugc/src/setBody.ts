@@ -29,7 +29,7 @@ function relativeImgSrcQueriesCWA(body: string) {
     const src = i.getAttribute("src")
     // eslint-disable-next-line @typescript-eslint/prefer-optional-chain
     if (src != null && src.startsWith(relativeChar)) {
-      i.setAttribute("src", import.meta.env.VITE_CWA_URL + "i" + src)
+      i.setAttribute("src", import.meta.env.VITE_AUGC_URL + "i" + src)
     }
   }
   return doc.body.innerHTML
