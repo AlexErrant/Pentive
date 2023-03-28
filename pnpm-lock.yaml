@@ -10,6 +10,33 @@ importers:
       concurrently: 7.6.0
       kill-port: 2.0.1
 
+  api-ugc:
+    specifiers:
+      '@cloudflare/workers-types': ^4.20230307.0
+      '@planetscale/database': ^1.5.0
+      '@trpc/server': ^10.11.1
+      hono: ^2.7.7
+      jose: ^4.11.1
+      kysely: ^0.23.5
+      shared: workspace:*
+      superjson: ^1.12.2
+      typescript: ^4.9.4
+      wrangler: 2.13.0
+      zod: ^3.21.4
+    dependencies:
+      '@planetscale/database': 1.6.0
+      '@trpc/server': 10.18.0
+      hono: 2.7.8
+      jose: 4.13.1
+      kysely: 0.23.5
+      shared: link:../shared
+      superjson: 1.12.2
+      zod: 3.21.4
+    devDependencies:
+      '@cloudflare/workers-types': 4.20230321.0
+      typescript: 4.9.5
+      wrangler: 2.13.0
+
   app:
     specifiers:
       '@babel/core': ^7.18.10
@@ -215,7 +242,7 @@ importers:
       shared: workspace:*
       superjson: ^1.12.2
       typescript: ^4.9.4
-      wrangler: 2.12.3
+      wrangler: 2.13.0
       zod: ^3.21.4
     dependencies:
       '@planetscale/database': 1.5.0
@@ -229,7 +256,7 @@ importers:
     devDependencies:
       '@cloudflare/workers-types': 4.20230307.0
       typescript: 4.9.4
-      wrangler: 2.12.3
+      wrangler: 2.13.0
 
   example-plugins/solid-custom-element:
     specifiers:
@@ -315,7 +342,7 @@ importers:
       ulid-workers: ^2.1.0 || See comment on html-to-text
       undici: ^5.11.0
       vite: ^4.1.4
-      wrangler: ^2.12.3
+      wrangler: ^2.13.0
     dependencies:
       '@codemirror/autocomplete': 6.4.2_dtwlkgx6567fllxi7sgvnep6hy
       '@codemirror/commands': 6.2.1
@@ -365,7 +392,7 @@ importers:
       stylelint-config-standard: 26.0.0_stylelint@14.11.0
       typescript: 4.9.4
       vite: 4.1.4
-      wrangler: 2.12.3
+      wrangler: 2.13.0
 
   hub-ugc:
     specifiers:
@@ -585,7 +612,7 @@ importers:
       shared: workspace:*
       ts-jest: 29.0.4
       typescript: ^4.7.4
-      wrangler: 2.12.3
+      wrangler: 2.13.0
     dependencies:
       shared: link:../shared
     devDependencies:
@@ -598,7 +625,7 @@ importers:
       prettier: 2.8.2
       ts-jest: 29.0.4_gknik6k3e7uyjkjtbjkdmrff2q
       typescript: 4.9.4
-      wrangler: 2.12.3
+      wrangler: 2.13.0
 
 packages:
 
@@ -2167,6 +2194,10 @@ packages:
     resolution: {integrity: sha512-Go968aDDcqONHQcUdgIiPRkPdT4QTzD0ecHJsI1u7ZiHPMOoZn+Dy7hYsdUJ5ldX9wTZDrICBM1rDKTRaDUitg==}
     dev: true
 
+  /@cloudflare/workers-types/4.20230321.0:
+    resolution: {integrity: sha512-zyRFz9AUS0tbg3/kJ+3zxvp9fl/O9yOJlChih/o86hhOqRMcZVbWefYAvFPidRvYUHM5YTG1wjU1bF9FFckRVg==}
+    dev: true
+
   /@codemirror/autocomplete/6.4.2_dtwlkgx6567fllxi7sgvnep6hy:
     resolution: {integrity: sha512-8WE2xp+D0MpWEv5lZ6zPW1/tf4AGb358T5GWYiKEuCP8MvFfT3tH2mIF9Y2yr2e3KbHuSvsVhosiEyqCpiJhZQ==}
     peerDependencies:
@@ -3512,6 +3543,11 @@ packages:
     engines: {node: '>=16'}
     dev: false
 
+  /@planetscale/database/1.6.0:
+    resolution: {integrity: sha512-eb02567S706Xme/nVwx+EN/wyoHhHBXl1a7+67R/Xm91myEpLn0vZNl58TvLZztBxje4gga16lc8dLt0elNrJA==}
+    engines: {node: '>=16'}
+    dev: false
+
   /@playwright/test/1.25.2:
     resolution: {integrity: sha512-6qPznIR4Fw02OMbqXUPMG6bFFg1hDVNEdihKy0t9K0dmRbus1DyP5Q5XFQhGwEHQkLG5hrSfBuu9CW/foqhQHQ==}
     engines: {node: '>=14'}
@@ -3927,6 +3963,10 @@ packages:
     resolution: {integrity: sha512-7FnvuaNsSl6HLloh0a297McS4yjhbqg/bw1h/XOAKduNPUQwXNmJf48X1PAsD8ODtO1Rrjz9TeynJD7uCEn0xQ==}
     dev: false
 
+  /@trpc/server/10.18.0:
+    resolution: {integrity: sha512-nVMqdDIF9YLOeC3g6RdAvdCPqkHFjpshSqZGThZ+fyjiWSUXj2ZKCduhJFnY77TjtgODojeaaghmzcnjxb+Onw==}
+    dev: false
+
   /@tsconfig/node10/1.0.9:
     resolution: {integrity: sha512-jNsYVVxU8v5g43Erja32laIDHXeoNvFEpX33OK4d6hljo3jDhCBDhx5dhCCTMWUojscpAagGiRkBKxpdl9fxqA==}
 
@@ -4143,6 +4183,7 @@ packages:
 
   /@types/node/18.7.21:
     resolution: {integrity: sha512-rLFzK5bhM0YPyCoTC8bolBjMk7bwnZ8qeZUBslBfjZQou2ssJdWslx9CZ8DGM+Dx7QXQiiTVZ/6QO6kwtHkZCA==}
+    dev: true
 
   /@types/normalize-package-data/2.4.1:
     resolution: {integrity: sha512-Gj7cI7z+98M282Tqmp2K5EIsoouUEzbBJhQQzDE3jSIRk6r9gsz0oUokqIUR4u1R3dMHo0pDHM7sNOHyhulypw==}
@@ -6800,7 +6841,7 @@ packages:
       eslint-import-resolver-webpack:
         optional: true
     dependencies:
-      '@typescript-eslint/parser': 5.37.0_irgkl5vooow2ydyo6aokmferha
+      '@typescript-eslint/parser': 5.37.0_id2eilsndvzhjjktb64trvy3gu
       debug: 3.2.7
       eslint: 8.23.1
       eslint-import-resolver-node: 0.3.6
@@ -6829,7 +6870,7 @@ packages:
       '@typescript-eslint/parser':
         optional: true
     dependencies:
-      '@typescript-eslint/parser': 5.37.0_irgkl5vooow2ydyo6aokmferha
+      '@typescript-eslint/parser': 5.37.0_id2eilsndvzhjjktb64trvy3gu
       array-includes: 3.1.5
       array.prototype.flat: 1.3.0
       debug: 2.6.9
@@ -7883,6 +7924,11 @@ packages:
 
   /hono/2.7.7:
     resolution: {integrity: sha512-oPzXxqKlR6S7C2eErGa2EATglVUkcDuSlDVudafEjAik+ERYnLz1M9vkvgLjy3HISF1oXlA1ZFamzA99tkzJSg==}
+    engines: {node: '>=16.0.0'}
+    dev: false
+
+  /hono/2.7.8:
+    resolution: {integrity: sha512-LXLXw6LilE16QO0siFBDiNzmaRP6ca5ZyF0gDWcaiUqJJtE/d4lV/Hpst2O33AmJB5n0DQa5w53gZLUVf7uXNg==}
     engines: {node: '>=16.0.0'}
     dev: false
 
@@ -8989,6 +9035,10 @@ packages:
   /jose/4.11.1:
     resolution: {integrity: sha512-YRv4Tk/Wlug8qicwqFNFVEZSdbROCHRAC6qu/i0dyNKr5JQdoa2pIGoS04lLO/jXQX7Z9omoNewYIVIxqZBd9Q==}
 
+  /jose/4.13.1:
+    resolution: {integrity: sha512-MSJQC5vXco5Br38mzaQKiq9mwt7lwj2eXpgpRyQYNHYt2lq1PjkWa7DLXX0WVcQLE9HhMh3jPiufS7fhJf+CLQ==}
+    dev: false
+
   /js-sdsl/4.1.4:
     resolution: {integrity: sha512-Y2/yD55y5jteOAmY50JbUZYwk3CP3wnLPEZnlR1w9oKhITrBEtAxwuWKebFf8hMrPMgbYwFoWK/lH2sBkErELw==}
     dev: true
@@ -9840,6 +9890,12 @@ packages:
     resolution: {integrity: sha512-MqBkQh/OHTS2egovRtLk45wEyNXwF+cokD+1YPf9u5VfJiRdAiRwB2froX5Co9Rh20xs4siNPm8naNotSD6RBw==}
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
     hasBin: true
+
+  /nanoid/3.3.6:
+    resolution: {integrity: sha512-BGcqMMJuToF7i1rt+2PWSNVnWIkGCU78jBG3RxO/bZlnZPK2Cmi2QaffxGO/2RvWi9sL+FAiRiXMgsyxQ1DIDA==}
+    engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
+    hasBin: true
+    dev: true
 
   /napi-build-utils/1.0.2:
     resolution: {integrity: sha512-ONmRUqK7zj7DWX0D9ADe03wbwOBZxNAfF20PlGfCWQcD3+/MakShIHrMqx9YwPTfxDdF1zLeL+RGZiR9kGMLdg==}
@@ -12929,6 +12985,12 @@ packages:
     hasBin: true
     dev: true
 
+  /typescript/4.9.5:
+    resolution: {integrity: sha512-1FXk9E2Hm+QzZQ7z+McJiHL4NW1F2EzMu9Nq9i3zAaGqibafqYwCVU6WyWAuyQRRzOlxou8xZSyXLEN8oKj24g==}
+    engines: {node: '>=4.2.0'}
+    hasBin: true
+    dev: true
+
   /ufo/1.1.1:
     resolution: {integrity: sha512-MvlCc4GHrmZdAllBc0iUDowff36Q9Ndw/UzqmEKyrfSzokTd9ZCy1i+IIk5hrYKkjoYVQyNbrw7/F8XJ2rEwTg==}
 
@@ -13325,7 +13387,7 @@ packages:
       merge-anything: 5.1.4
       solid-js: 1.6.12
       solid-refresh: 0.5.1_solid-js@1.6.12
-      vite: 4.1.4_@types+node@18.7.21
+      vite: 4.1.4
       vitefu: 0.2.4_vite@4.1.4
     transitivePeerDependencies:
       - supports-color
@@ -13427,6 +13489,7 @@ packages:
       rollup: 3.18.0
     optionalDependencies:
       fsevents: 2.3.2
+    dev: true
 
   /vitefu/0.2.4_vite@4.1.4:
     resolution: {integrity: sha512-fanAXjSaf9xXtOOeno8wZXIhgia+CZury481LsDaV++lSvcU2R9Ch2bPh3PYFyoHW+w9LqAeYRISVQjUIew14g==}
@@ -13436,7 +13499,7 @@ packages:
       vite:
         optional: true
     dependencies:
-      vite: 4.1.4_@types+node@18.7.21
+      vite: 4.1.4
 
   /vitest/0.29.2_jsdom@20.0.0:
     resolution: {integrity: sha512-ydK9IGbAvoY8wkg29DQ4ivcVviCaUi3ivuPKfZEVddMTenFHUfB8EEDXQV8+RasEk1ACFLgMUqAaDuQ/Nk+mQA==}
@@ -13846,8 +13909,8 @@ packages:
       workbox-core: 6.5.4
     dev: true
 
-  /wrangler/2.12.3:
-    resolution: {integrity: sha512-0skqT9qBbchiVY57YwQKFCFnuUo2Lg7e0vCChJ9FWcWZ/CXsPXeBMeVA8N/p72LuhrtZlqTFN7TsNOd8jm8KcQ==}
+  /wrangler/2.13.0:
+    resolution: {integrity: sha512-hU7RpOjDcyOlKO0xuNEOKINwSA1lh5nSkTH8aKKdatv2Ryt5gSS26RwS49QpZCYJGxGHzhHPr++TlSggOAsEVA==}
     engines: {node: '>=16.13.0'}
     hasBin: true
     dependencies:
@@ -13861,7 +13924,7 @@ packages:
       chokidar: 3.5.3
       esbuild: 0.16.3
       miniflare: 2.12.1
-      nanoid: 3.3.4
+      nanoid: 3.3.6
       path-to-regexp: 6.2.1
       selfsigned: 2.1.1
       source-map: 0.7.4
