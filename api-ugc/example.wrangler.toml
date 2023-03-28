@@ -1,4 +1,4 @@
-name = "cwa"
+name = "api-ugc"
 main = "src/index.ts"
 compatibility_date = "2023-03-21"
 
@@ -10,5 +10,5 @@ bucket_name = 'media'
 preview_bucket_name = 'media-dev'
 
 [dev]
-port = 3017
+port = 3019
 local_protocol="https"

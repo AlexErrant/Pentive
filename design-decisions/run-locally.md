@@ -34,6 +34,7 @@ Add the following to your [hosts file](https://www.howtogeek.com/howto/27350/beg
 127.0.0.1 lrpc.pentive.local
 127.0.0.1 cwa.pentive.local
 127.0.0.1 peer.pentive.local
+127.0.0.1 user-generated-content-pentive.local
 ```
 
 ## 3. Generate certs
@@ -42,7 +43,7 @@ Run `./rmcert.sh && ./mkcert.sh`.
 
 > **Warning** This has only been tested on Ubuntu - make sure the `~/.config/.wrangler/local-cert` paths in _both_ scripts work [for your OS](https://github.com/cloudflare/workers-sdk/issues/2118#issuecomment-1445372298)!
 
-> [`rmcert.sh`](../rmcert.sh) deletes Wrangler's local-cert's `key.pem` and `cert.pem`. (Then [`mkcert.sh`](../make.sh) generates a new one.) This "regenerate" may be undesirable if you're using Wrangler for HTTPS anywhere else. If this is the case, add your site to `mkcert.sh` before running it, e.g. `mkcert -key-file key.pem -cert-file cert.pem cwa.pentive.local your-wrangler-worker-here.com`
+> [`rmcert.sh`](../rmcert.sh) deletes Wrangler's local-cert's `key.pem` and `cert.pem`. (Then [`mkcert.sh`](../make.sh) generates a new one.) This "regenerate" may be undesirable if you're using Wrangler for HTTPS anywhere else. If this is the case, add your site to `mkcert.sh` before running it, e.g. `mkcert -key-file key.pem -cert-file cert.pem user-generated-content-pentive.local cwa.pentive.local your-wrangler-worker-here.com`
 
 > [More info.](https://github.com/cloudflare/workers-sdk/issues/1908#issuecomment-1416901172) Note that `NODE_EXTRA_CA_CERTS` isn't helpful since it specifies a [CA cert](https://discord.com/channels/595317990191398933/799437470004412476/1039744087672238110) and we need to trust domains remapped in our `hosts` file.
 

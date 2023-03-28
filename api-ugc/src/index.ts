@@ -10,7 +10,7 @@
 
 import { Hono } from "hono"
 import { cors } from "hono/cors"
-import { Env, getUserId, MediaHash, CwaContext } from "./util"
+import { Env, getUserId, MediaHash, ApiUgcContext } from "./util"
 import {
   hstsName,
   hstsValue,
@@ -215,7 +215,7 @@ app
 export default app
 
 async function postPublicMedia(
-  c: CwaContext,
+  c: ApiUgcContext,
   type: "note" | "template",
   userOwnsAndHasMedia: (
     authorId: UserId,
@@ -274,7 +274,7 @@ async function postPublicMedia(
 }
 
 async function postMedia(
-  c: CwaContext,
+  c: ApiUgcContext,
   persistDbAndBucket: (_: PersistParams) => Promise<undefined | Response>,
   buildResponse: (mediaHash: MediaHash) => string | Promise<string>
 ): Promise<Response> {
@@ -328,7 +328,7 @@ interface PersistParams {
 }
 
 async function getMedia(
-  c: CwaContext,
+  c: ApiUgcContext,
   mediaIdBase64: Base64,
   cacheControl: "public" | "private"
 ): Promise<Response> {

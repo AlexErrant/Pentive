@@ -39,7 +39,7 @@ export function concat(a1: Uint8Array, a2: ArrayBuffer): Uint8Array {
 export type MediaHash = Brand<Uint8Array, "mediaHash">
 export type UserId = Brand<string, "userId">
 
-export type CwaContext = Context<
+export type ApiUgcContext = Context<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   any,
   {
@@ -66,7 +66,7 @@ export interface Env {
 }
 
 export async function getUserId(
-  c: CwaContext
+  c: ApiUgcContext
 ): Promise<Result<UserId, Response>> {
   // https://github.com/honojs/hono/pull/884
   if (c.req.header(csrfHeaderName) == null) {

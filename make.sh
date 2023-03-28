@@ -16,6 +16,10 @@ source ../PentiveSecrets/secrets.sh
 # echo $productionMediaTokenSecret | wrangler secret put mediaTokenSecret --name cwa
 # echo $productionAppOrigin        | wrangler secret put appOrigin        --name cwa
 # echo $productionHubOrigin        | wrangler secret put hubOrigin        --name cwa
+# echo $productionPlanetscaleDbUrl | wrangler secret put planetscaleDbUrl --name api-ugc
+# echo $productionMediaTokenSecret | wrangler secret put mediaTokenSecret --name api-ugc
+# echo $productionAppOrigin        | wrangler secret put appOrigin        --name api-ugc
+# echo $productionHubOrigin        | wrangler secret put hubOrigin        --name api-ugc
 # echo $productionJwsSecret        | wrangler secret put jwsSecret        --name hub
 # echo $productionPlanetscaleDbUrl | wrangler secret put planetscaleDbUrl --name hub
 # echo $productionHubSessionSecret | wrangler secret put hubSessionSecret --name hub
@@ -26,6 +30,8 @@ source ../PentiveSecrets/secrets.sh
 
 envsubst < ./cwa/.example.dev.vars            > ./cwa/.dev.vars
 envsubst < ./cwa/example.wrangler.toml        > ./cwa/wrangler.toml
+envsubst < ./api-ugc/.example.dev.vars        > ./api-ugc/.dev.vars
+envsubst < ./api-ugc/example.wrangler.toml    > ./api-ugc/wrangler.toml
 envsubst < ./hub/.example.env                 > ./hub/.env
 envsubst < ./hub/.example.env.development     > ./hub/.env.development
 envsubst < ./hub/.example.env.production      > ./hub/.env.production

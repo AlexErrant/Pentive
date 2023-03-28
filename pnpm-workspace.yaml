@@ -6,6 +6,7 @@ packages:
   - "lrpc/"
   - "shared/"
   - "cwa/"
+  - "api-ugc/"
   - "peer/"
   - "workers-test/"
   - "example-plugins/*"
