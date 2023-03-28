@@ -14,7 +14,7 @@ importers:
     specifiers:
       '@cloudflare/workers-types': ^4.20230307.0
       '@planetscale/database': ^1.5.0
-      '@trpc/server': ^10.11.1
+      '@trpc/server': ^10.18.0
       hono: ^2.7.7
       jose: ^4.11.1
       kysely: ^0.23.5
@@ -44,8 +44,8 @@ importers:
       '@github/time-elements': ^3.1.4
       '@playwright/test': ^1.25.0
       '@tanstack/solid-table': ^8.5.11
-      '@trpc/client': ^10.11.1
-      '@trpc/server': ^10.11.1
+      '@trpc/client': ^10.18.0
+      '@trpc/server': ^10.18.0
       '@types/iframe-resizer': ^3.5.9
       '@types/lodash': ^4.14.182
       '@types/node': ^18.7.21
@@ -108,8 +108,8 @@ importers:
     dependencies:
       '@github/time-elements': 3.1.4
       '@tanstack/solid-table': 8.5.13_solid-js@1.6.12
-      '@trpc/client': 10.11.1_@trpc+server@10.11.1
-      '@trpc/server': 10.11.1
+      '@trpc/client': 10.18.0_@trpc+server@10.18.0
+      '@trpc/server': 10.18.0
       '@vlcn.io/crsqlite-wasm': 0.9.0
       '@vlcn.io/xplat-api': 0.8.0
       '@zip.js/zip.js': 2.6.41
@@ -235,7 +235,7 @@ importers:
     specifiers:
       '@cloudflare/workers-types': ^4.20230307.0
       '@planetscale/database': ^1.5.0
-      '@trpc/server': ^10.11.1
+      '@trpc/server': ^10.18.0
       hono: ^2.7.7
       jose: ^4.11.1
       kysely: ^0.23.5
@@ -246,7 +246,7 @@ importers:
       zod: ^3.21.4
     dependencies:
       '@planetscale/database': 1.5.0
-      '@trpc/server': 10.11.1
+      '@trpc/server': 10.18.0
       hono: 2.7.7
       jose: 4.11.1
       kysely: 0.23.5
@@ -308,8 +308,8 @@ importers:
       '@scure/base': ^1.1.1
       '@solidjs/meta': ^0.28.2
       '@solidjs/router': ^0.7.0
-      '@trpc/client': ^10.11.1
-      '@trpc/server': ^10.11.1
+      '@trpc/client': ^10.18.0
+      '@trpc/server': ^10.18.0
       '@types/cookie': ^0.5.1
       '@types/iframe-resizer': ^3.5.9
       '@typescript-eslint/eslint-plugin': ^5.31.0
@@ -355,8 +355,8 @@ importers:
       '@scure/base': 1.1.1
       '@solidjs/meta': 0.28.2_solid-js@1.6.12
       '@solidjs/router': 0.7.0_solid-js@1.6.12
-      '@trpc/client': 10.11.1_@trpc+server@10.11.1
-      '@trpc/server': 10.11.1
+      '@trpc/client': 10.18.0_@trpc+server@10.18.0
+      '@trpc/server': 10.18.0
       app: link:../app
       comlink: 4.3.1
       cookie: 0.5.0
@@ -454,8 +454,8 @@ importers:
   lrpc:
     specifiers:
       '@prisma/client': ^4.6.1
-      '@trpc/client': ^10.11.1
-      '@trpc/server': ^10.11.1
+      '@trpc/client': ^10.18.0
+      '@trpc/server': ^10.18.0
       '@types/aws-lambda': ^8.10.106
       '@types/cookie': ^0.5.1
       '@types/html-to-text': ^8.1.1
@@ -485,8 +485,8 @@ importers:
       zod: ^3.21.4
     dependencies:
       '@prisma/client': 4.6.1_prisma@4.6.1
-      '@trpc/client': 10.11.1_@trpc+server@10.11.1
-      '@trpc/server': 10.11.1
+      '@trpc/client': 10.18.0_@trpc+server@10.18.0
+      '@trpc/server': 10.18.0
       '@vlcn.io/crsqlite-allinone': 0.8.0
       aws-lambda: 1.0.7
       cookie: 0.5.0
@@ -3951,16 +3951,12 @@ packages:
     resolution: {integrity: sha512-XCuKFP5PS55gnMVu3dty8KPatLqUoy/ZYzDzAGCQ8JNFCkLXzmI7vNHCR+XpbZaMWQK/vQubr7PkYq8g470J/A==}
     engines: {node: '>= 10'}
 
-  /@trpc/client/10.11.1_@trpc+server@10.11.1:
-    resolution: {integrity: sha512-6aHY27YomzyUAlKhJE4jJulzDjc6vAKAKoWqAmoYbEEhApvyDrMo52bdYqqsukjxvA/L/uPhjOcPU5OsO+x+pA==}
+  /@trpc/client/10.18.0_@trpc+server@10.18.0:
+    resolution: {integrity: sha512-2d+6r2C/xygTjDWX9jT66defgHzbQP0Z8vrvyT3XtPjqU6JNlRNuS2ZtB8xDPdOQUUVnndzZ43BMr+Zu49K0OQ==}
     peerDependencies:
-      '@trpc/server': 10.11.1
+      '@trpc/server': 10.18.0
     dependencies:
-      '@trpc/server': 10.11.1
-    dev: false
-
-  /@trpc/server/10.11.1:
-    resolution: {integrity: sha512-7FnvuaNsSl6HLloh0a297McS4yjhbqg/bw1h/XOAKduNPUQwXNmJf48X1PAsD8ODtO1Rrjz9TeynJD7uCEn0xQ==}
+      '@trpc/server': 10.18.0
     dev: false
 
   /@trpc/server/10.18.0:
@@ -9188,7 +9184,7 @@ packages:
   /jsonfile/4.0.0:
     resolution: {integrity: sha512-m6F1R3z8jjlf2imQHS2Qez5sjKWQzbuuhuJ/FKYFRZvPE3PuHcSMVZzfsLhGVOkfd20obL5SWEBew5ShlquNxg==}
     optionalDependencies:
-      graceful-fs: 4.2.11
+      graceful-fs: 4.2.10
     dev: true
 
   /jsonfile/6.1.0:
