@@ -64,9 +64,6 @@ app
     })
   })
   .get("/", (c) => c.text("Hono!!"))
-  // highTODO needs sanitization and stripping of Exif https://developers.cloudflare.com/workers/tutorials/generate-youtube-thumbnails-with-workers-and-images/ https://github.com/hMatoba/piexifjs https://github.com/hMatoba/exif-library
-  // Someday B2? https://walshy.dev/blog/21_09_10-handling-file-uploads-with-cloudflare-workers https://news.ycombinator.com/item?id=28687181
-  // Other alternatives https://bunny.net/ https://www.gumlet.com/ https://news.ycombinator.com/item?id=29474743
   .post("/private", async (c) => {
     const authResult = await getUserId(c)
     if (authResult.tag === "Error") return authResult.error
