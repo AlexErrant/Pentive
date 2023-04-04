@@ -1,4 +1,4 @@
-import { JSX, Show } from "solid-js"
+import { JSX, Show, Suspense, type VoidComponent } from "solid-js"
 import { useParams, useRouteData } from "solid-start"
 import { FormError } from "solid-start/data"
 import {
@@ -8,6 +8,9 @@ import {
 } from "solid-start/server"
 import { db } from "~/db"
 import { createUserSession, getUser, login, register } from "~/db/session"
+import { getSession } from "@auth/solid-start"
+import { signOut, signIn } from "@auth/solid-start/client"
+import { authOpts } from "./api/auth/[...solidAuth]"
 
 function validateUsername(username: unknown): string | undefined {
   if (typeof username !== "string" || username.length < 3) {
@@ -86,6 +89,9 @@ export default function Login(): JSX.Element {
 
   return (
     <main>
+      <Suspense>
+        <AuthShowcase />
+      </Suspense>
       <h1>Login</h1>
       <Form>
         <input
@@ -126,4 +132,36 @@ export default function Login(): JSX.Element {
       </Form>
     </main>
   )
+}
+
+const AuthShowcase: VoidComponent = () => {
+  const sessionData = createSession()
+  return (
+    <div>
+      <Show
+        when={sessionData() == null}
+        fallback={
+          <>
+            <p>
+              <span>Logged in as {sessionData()!.user?.name}</span>
+            </p>
+            <button onClick={async () => await signOut()}>Sign out</button>
+          </>
+        }
+      >
+        <button onClick={async () => await signIn("github")}>
+          Sign in via Github
+        </button>
+        <button onClick={async () => await signIn("discord")}>
+          Sign in via Discord
+        </button>
+      </Show>
+    </div>
+  )
+}
+
+const createSession = () => {
+  return createServerData$(async (_, event) => {
+    return await getSession(event.request, authOpts(event.env))
+  })
 }
