@@ -21,7 +21,7 @@
     "vite-plugin-solid": "^2.6.1"
   },
   "dependencies": {
-    "solid-element": "^1.6.4",
-    "solid-js": "^1.6.12"
+    "solid-element": "^1.7.0",
+    "solid-js": "^1.7.2"
   }
 }
