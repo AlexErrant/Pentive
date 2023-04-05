@@ -9,6 +9,16 @@ export developmentJwsSecret=looks+like+openssl+rand+base64+32+comma+but=
 export productionJwsSecret=looks+like+openssl+rand+base64+32+comma+but=
 export developmentCsrfSecret=with+spaces+and+hyphens+and+stuff+ZZZZZZZZZ=
 export productionCsrfSecret=with+spaces+and+hyphens+and+stuff+ZZZZZZZZZ=
+export developmentAuthJsSecret=also+this+is+the+same+32+bits+of+base64+joy=
+export productionAuthJsSecret=also+this+is+the+same+32+bits+of+base64+joy=
+export developmentDiscordId=create at https://discord.com/developers/applications
+export productionDiscordId=Redirects (callbacks) are https://pentive.local:3014/api/auth/callback/discord or https://pentive.com/api/auth/callback/discord
+export developmentDiscordSecret=
+export productionDiscordSecret=
+export developmentGithubId=create at https://github.com/settings/developers
+export productionGithubId=Authorization callback URL is https://pentive.local:3014/api/auth/callback/github or https://pentive.com/api/auth/callback/github
+export developmentGithubSecret=
+export productionGithubSecret=
 export developmentAppOrigin=https://app.pentive.local:3013
 export productionAppOrigin=https://app.pentive.com
 export developmentHubOrigin=https://pentive.local:3014

@@ -12,6 +12,7 @@ source ../PentiveSecrets/secrets.sh
 
 # Uncomment if you wanna
 # echo $productionJwsSecret        | wrangler secret put jwsSecret        --name cwa
+# echo $productionAuthJsSecret     | wrangler secret put authJsSecret     --name cwa
 # echo $productionPlanetscaleDbUrl | wrangler secret put planetscaleDbUrl --name cwa
 # echo $productionMediaTokenSecret | wrangler secret put mediaTokenSecret --name cwa
 # echo $productionAppOrigin        | wrangler secret put appOrigin        --name cwa
@@ -20,6 +21,11 @@ source ../PentiveSecrets/secrets.sh
 # echo $productionAppOrigin        | wrangler secret put appOrigin        --name api-ugc
 # echo $productionHubOrigin        | wrangler secret put hubOrigin        --name api-ugc
 # echo $productionJwsSecret        | wrangler secret put jwsSecret        --name hub
+# echo $productionAuthJsSecret     | wrangler secret put authJsSecret     --name hub
+# echo $productionDiscordId        | wrangler secret put discordId        --name hub
+# echo $productionDiscordSecret    | wrangler secret put discordSecret    --name hub
+# echo $productionGithubId         | wrangler secret put githubId         --name hub
+# echo $productionGithubSecret     | wrangler secret put githubSecret     --name hub
 # echo $productionPlanetscaleDbUrl | wrangler secret put planetscaleDbUrl --name hub
 # echo $productionHubSessionSecret | wrangler secret put hubSessionSecret --name hub
 # echo $productionCsrfSecret       | wrangler secret put csrfSecret       --name hub
