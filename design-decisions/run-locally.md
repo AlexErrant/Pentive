@@ -17,6 +17,7 @@
   - Required if you want to deploy stuff. They also have a [stupidly good free tier](https://developers.cloudflare.com/workers/platform/pricing/). If you want to run things locally, use [Miniflare](https://miniflare.dev/).
 - [mkcert](https://github.com/FiloSottile/mkcert)
   - `app-ugc` uses a service worker to intercept and return assets (e.g. images). Service workers require HTTPS. We also use `__Secure-` prefixed cookies for auth.
+  - Don't forget to run `mkcert -install`.
 
 # Steps
 
@@ -43,7 +44,7 @@ Add the following to your [hosts file](https://www.howtogeek.com/howto/27350/beg
 
 Run `./rmcert.sh && ./mkcert.sh`.
 
-> **Warning** This has only been tested on Ubuntu - make sure the `~/.wrangler/local-cert` paths in _both_ scripts work [for your OS and Wrangler version](https://github.com/cloudflare/workers-sdk/issues/2118#issuecomment-1445372298)!
+> **Warning** _Both_ scripts expect the Wrangler key/cert to exist at `~/.wrangler/local-cert/`. [This may not be true for your system!](https://github.com/cloudflare/workers-sdk/issues/2118#issuecomment-1445372298) The key/cert may exist at `~/.config/.wrangler/local-cert/`. [I'm not sure why this occurs.](https://github.com/cloudflare/workers-sdk/issues/2118#issuecomment-1486184829) Someday when I get better at bash I'll make the scripts accommodate for this. Until then, you'll need to manually check to see where Wrangler is storing its key/cert. If the key/cert doesn't exist in either location, you've perhaps never run Wrangler on an https project before. Run `pnpm --filter cwa dev`, and you may see `Generating new self-signed certificate...`, upon which you can check to see where that cert is generated.
 
 > [`rmcert.sh`](../rmcert.sh) deletes Wrangler's local-cert's `key.pem` and `cert.pem`. (Then [`mkcert.sh`](../make.sh) generates a new one.) This "regenerate" may be undesirable if you're using Wrangler for HTTPS anywhere else. If this is the case, add your site to `mkcert.sh` before running it, e.g. `mkcert -key-file key.pem -cert-file cert.pem user-generated-content-pentive.local cwa.pentive.local your-wrangler-worker-here.com`
 
