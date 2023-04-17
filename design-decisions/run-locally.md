@@ -6,7 +6,7 @@
 - [Node](https://nodejs.org)
   - You should use a program like [nvm](https://github.com/nvm-sh/nvm) to install and manage the Node version.
 - [pnpm](https://pnpm.io/)
-  - You should use a program like [Corepack](https://nodejs.org/api/corepack.html) to install and manage the pnpm version.
+  - You should use a program like [Corepack](https://nodejs.org/api/corepack.html) to install and manage the pnpm version. If you elect to use Corepack, from the repo's root dir, run `corepack enable`.
 - Linux. (I use WSL2 - I'm going to assume things Just Work for MacOS.)
 
 ## Optional-ish
