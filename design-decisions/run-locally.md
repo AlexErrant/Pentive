@@ -56,9 +56,11 @@ Add the following to your [hosts file](https://www.howtogeek.com/howto/27350/beg
 
 ## 4. Generate certs
 
-Run `./rmcert.sh && ./mkcert.sh`.
+First, run `pnpm --filter cwa dev`. This ensures that Wrangler has a self-signed certificate - you can kill Wrangler pretty much immediately.
 
-> **Warning** _Both_ scripts expect the Wrangler key/cert to exist at `~/.wrangler/local-cert/`. [This may not be true for your system!](https://github.com/cloudflare/workers-sdk/issues/2118#issuecomment-1445372298) The key/cert may exist at `~/.config/.wrangler/local-cert/`. [I'm not sure why this occurs.](https://github.com/cloudflare/workers-sdk/issues/2118#issuecomment-1486184829) Someday when I get better at bash I'll make the scripts accommodate for this. Until then, you'll need to manually check to see where Wrangler is storing its key/cert. If the key/cert doesn't exist in either location, you've perhaps never run Wrangler on an https project before. Run `pnpm --filter cwa dev`, and you may see `Generating new self-signed certificate...`, upon which you can check to see where that cert is generated.
+Then run `./rmcert.sh && ./mkcert.sh`.
+
+> **Warning** _Both_ scripts expect the Wrangler key/cert to exist at `~/.wrangler/local-cert/` or `${XDG_CONFIG_HOME:-$HOME/.config}/.wrangler/local-cert/`. If the key/cert doesn't exist in either location, [open an issue!](https://github.com/AlexErrant/Pentive/issues/new)
 
 > [`rmcert.sh`](../rmcert.sh) deletes Wrangler's local-cert's `key.pem` and `cert.pem`. (Then [`mkcert.sh`](../make.sh) generates a new one.) This "regenerate" may be undesirable if you're using Wrangler for HTTPS anywhere else. If this is the case, add your site to `mkcert.sh` before running it, e.g. `mkcert -key-file key.pem -cert-file cert.pem user-generated-content-pentive.local cwa.pentive.local your-wrangler-worker-here.com`
 
