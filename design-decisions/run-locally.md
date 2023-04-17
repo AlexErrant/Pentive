@@ -1,29 +1,29 @@
 > **Warning**
 > This file is called `run-locally`, but there is an online-only dependency: [PlanetScale](https://planetscale.com/). You could spin up a MySQL Docker and change the Kysely dialect from PlanetScale to MySQL, but I don't recommend this; I'm not even sure if a locally running Cloudflare Worker can connect to MySQL.
 
-# Prerequisites:
-
-- [Node](https://nodejs.org)
-  - You should use a program like [nvm](https://github.com/nvm-sh/nvm) to install and manage the Node version.
-- [pnpm](https://pnpm.io/)
-  - You should use a program like [Corepack](https://nodejs.org/api/corepack.html) to install and manage the pnpm version. If you elect to use Corepack, from the repo's root dir, run `corepack enable`.
-- Linux. (I use WSL2 - I'm going to assume things Just Work for MacOS.)
-
-## Optional-ish
-
-- [PlanetScale account](https://auth.planetscale.com/sign-up)
-  - Required if you want to run `hub`. They have a [_stupidly_ good free tier](https://planetscale.com/pricing) that doesn't need a credit card and doesn't expire like AWS's 12 month free tier.
-- [Cloudflare account](https://dash.cloudflare.com/sign-up)
-  - Required if you want to deploy stuff. They also have a [stupidly good free tier](https://developers.cloudflare.com/workers/platform/pricing/). If you want to run things locally, use [Miniflare](https://miniflare.dev/).
-- [mkcert](https://github.com/FiloSottile/mkcert)
-  - `app-ugc` uses a service worker to intercept and return assets (e.g. images). Service workers require HTTPS. We also use `__Secure-` prefixed cookies for auth.
-  - Don't forget to run `mkcert -install`.
-
 # Steps
 
 _All commands below should be run from the repo's root directory._
 
-## 1. Install everything above
+## 1. Prerequisites
+
+- [Node](https://nodejs.org)
+  - You should use a program like [nvm](https://github.com/nvm-sh/nvm) to install and manage the Node version.
+- [pnpm](https://pnpm.io/)
+  - You should use a program like [Corepack](https://nodejs.org/api/corepack.html) to install and manage the pnpm version. If you elect to use Corepack, run `corepack enable`.
+- Linux. (I use WSL2 - I'm going to assume things Just Work for MacOS.)
+
+### Optional-ish, but _highly_ recommended
+
+These steps assume you've installed these or made the requisite accounts. If you deviate, you'll need to find workarounds.
+
+- [PlanetScale account](https://auth.planetscale.com/sign-up)
+  - Required if you want to run `hub`. They have a [_stupidly_ good free tier](https://planetscale.com/pricing) that doesn't need a credit card and doesn't expire like AWS's 12 month free tier.
+- [Cloudflare account](https://dash.cloudflare.com/sign-up)
+  - Required if you want to deploy stuff or run Wrangler locally. They also have a [stupidly good free tier](https://developers.cloudflare.com/workers/platform/pricing/).
+- [mkcert](https://github.com/FiloSottile/mkcert)
+  - `app-ugc` uses a service worker to intercept and return assets (e.g. images). Service workers require HTTPS. We also use `__Secure-` prefixed cookies for auth.
+  - Don't forget to run `mkcert -install`.
 
 ## 2. Install packages
 
@@ -66,7 +66,7 @@ Run `./rmcert.sh && ./mkcert.sh`.
 
 If you're on WSL2, [do this](https://github.com/FiloSottile/mkcert/issues/357#issuecomment-1466762021).
 
-## 5. Generate secrets
+## 5. Generate secrets and config
 
 From the the repo's root directory, run
 
