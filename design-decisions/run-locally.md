@@ -25,7 +25,13 @@ _All commands below should be run from the repo's root directory._
 
 ## 1. Install everything above
 
-## 2. Update your `hosts` file
+## 2. Install packages
+
+```bash
+pnpm i
+```
+
+## 3. Update your `hosts` file
 
 Add the following to your [hosts file](https://www.howtogeek.com/howto/27350/beginner-geek-how-to-edit-your-hosts-file/):
 
@@ -40,7 +46,7 @@ Add the following to your [hosts file](https://www.howtogeek.com/howto/27350/beg
 127.0.0.1 user-generated-content-pentive.local
 ```
 
-## 3. Generate certs
+## 4. Generate certs
 
 Run `./rmcert.sh && ./mkcert.sh`.
 
@@ -52,7 +58,7 @@ Run `./rmcert.sh && ./mkcert.sh`.
 
 If you're on WSL2, [do this](https://github.com/FiloSottile/mkcert/issues/357#issuecomment-1466762021).
 
-## 4. Generate secrets
+## 5. Generate secrets
 
 From the the repo's root directory, run
 
@@ -66,12 +72,6 @@ Secrets are stored outside the repo so [`git clean -fdx`](https://tysonwilliams.
 - Update `secrets.sh` with your values.
   - Replace the secrets using `openssl rand -base64 32`.
 - Run `./make.sh`.
-
-## 5. Install
-
-```bash
-pnpm i
-```
 
 ## 6. Update PlanetScale schema
 
