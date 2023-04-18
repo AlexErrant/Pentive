@@ -23,6 +23,7 @@ These steps assume you've installed these or made the requisite accounts. If you
   - Required if you want to deploy stuff or run Wrangler locally. They also have a [stupidly good free tier](https://developers.cloudflare.com/workers/platform/pricing/).
 - [mkcert](https://github.com/FiloSottile/mkcert)
   - `app-ugc` uses a service worker to intercept and return assets (e.g. images). Service workers require HTTPS. We also use `__Secure-` prefixed cookies for auth.
+  - If you're on WSL2, [do this](https://github.com/FiloSottile/mkcert/issues/357#issuecomment-1466762021).
   - Don't forget to run `mkcert -install`.
 
 ## 2. Install packages
@@ -54,21 +55,7 @@ Add the following to your [hosts file](https://www.howtogeek.com/howto/27350/beg
 ::1 user-generated-content-pentive.local
 ```
 
-## 4. Generate certs
-
-First, run `pnpm --filter cwa dev`. This ensures that Wrangler has a self-signed certificate - you can kill Wrangler pretty much immediately.
-
-Then run `./rmcert.sh && ./mkcert.sh`.
-
-> **Warning** _Both_ scripts expect the Wrangler key/cert to exist at `~/.wrangler/local-cert/` or `${XDG_CONFIG_HOME:-$HOME/.config}/.wrangler/local-cert/`. If the key/cert doesn't exist in either location, [open an issue!](https://github.com/AlexErrant/Pentive/issues/new)
-
-> [`rmcert.sh`](../rmcert.sh) deletes Wrangler's local-cert's `key.pem` and `cert.pem`. (Then [`mkcert.sh`](../make.sh) generates a new one.) This "regenerate" may be undesirable if you're using Wrangler for HTTPS anywhere else. If this is the case, add your site to `mkcert.sh` before running it, e.g. `mkcert -key-file key.pem -cert-file cert.pem user-generated-content-pentive.local cwa.pentive.local your-wrangler-worker-here.com`
-
-> [More info.](https://github.com/cloudflare/workers-sdk/issues/1908#issuecomment-1416901172) Note that `NODE_EXTRA_CA_CERTS` isn't helpful since it specifies a [CA cert](https://discord.com/channels/595317990191398933/799437470004412476/1039744087672238110) and we need to trust domains remapped in our `hosts` file.
-
-If you're on WSL2, [do this](https://github.com/FiloSottile/mkcert/issues/357#issuecomment-1466762021).
-
-## 5. Generate secrets and config
+## 4. Generate secrets and config
 
 From the the repo's root directory, run
 
@@ -81,7 +68,19 @@ Secrets are stored outside the repo so [`git clean -fdx`](https://tysonwilliams.
 
 - Update `secrets.sh` with your values.
   - Replace the secrets using `openssl rand -base64 32`.
-- Run `./make.sh`.
+- Run `./make.sh`. Rerun this if you ever make changes to `secrets.sh`.
+
+## 5. Generate certs
+
+- Run `pnpm --filter cwa dev`. This ensures that Wrangler has a self-signed certificate - you can kill Wrangler pretty much immediately.
+
+- Run `./rmcert.sh && ./mkcert.sh`.
+
+> **Warning** _Both_ scripts expect the Wrangler key/cert to exist at `~/.wrangler/local-cert/` or `${XDG_CONFIG_HOME:-$HOME/.config}/.wrangler/local-cert/`. If the key/cert doesn't exist in either location, [open an issue!](https://github.com/AlexErrant/Pentive/issues/new)
+
+> [`rmcert.sh`](../rmcert.sh) deletes Wrangler's local-cert's `key.pem` and `cert.pem`. (Then [`mkcert.sh`](../make.sh) generates a new one.) This "regenerate" may be undesirable if you're using Wrangler for HTTPS anywhere else. If this is the case, add your site to `mkcert.sh` before running it, e.g. `mkcert -key-file key.pem -cert-file cert.pem user-generated-content-pentive.local cwa.pentive.local your-wrangler-worker-here.com`
+
+> [More info.](https://github.com/cloudflare/workers-sdk/issues/1908#issuecomment-1416901172) Note that `NODE_EXTRA_CA_CERTS` isn't helpful since it specifies a [CA cert](https://discord.com/channels/595317990191398933/799437470004412476/1039744087672238110) and we need to trust domains remapped in our `hosts` file.
 
 ## 6. Update PlanetScale schema
 
