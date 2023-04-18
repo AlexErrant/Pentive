@@ -1,4 +1,4 @@
-import { ParentComponent, Show } from "solid-js"
+import { type ParentComponent, Show } from "solid-js"
 import { Dynamic } from "solid-js/web"
 import _ from "lodash"
 import { registeredElements } from ".."

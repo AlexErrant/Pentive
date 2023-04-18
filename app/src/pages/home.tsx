@@ -1,13 +1,13 @@
 import { useRouteData } from "solid-app-router"
-import { createEffect, createSignal, JSX } from "solid-js"
-import { sampleCard, Card } from "../domain/card"
-import { sampleNote, Note } from "../domain/note"
-import { defaultTemplate, Template } from "../domain/template"
-import HomeData from "./home.data"
+import { createEffect, createSignal, type JSX } from "solid-js"
+import { sampleCard, type Card } from "../domain/card"
+import { sampleNote, type Note } from "../domain/note"
+import { defaultTemplate, type Template } from "../domain/template"
+import type HomeData from "./home.data"
 import { db } from "../db"
 import { importAnki } from "./importer/importer"
-import { Base64Url, csrfHeaderName, NookId, throwExp } from "shared"
-import { MediaId, RemoteMediaNum } from "../domain/ids"
+import { type Base64Url, csrfHeaderName, type NookId, throwExp } from "shared"
+import { type MediaId, type RemoteMediaNum } from "../domain/ids"
 import { cwaClient, augcClient } from "../trpcClient"
 import { getDb } from "../sqlite/crsqlite"
 import Peers from "./peers"
@@ -166,7 +166,9 @@ export default function Home(): JSX.Element {
       <div class="mt-4">
         <button
           class="border rounded-lg px-2 border-gray-900"
-          onClick={async () => await db.sync()}
+          onClick={async () => {
+            await db.sync()
+          }}
         >
           sync
         </button>
@@ -174,7 +176,9 @@ export default function Home(): JSX.Element {
       <div class="mt-4">
         <button
           class="border rounded-lg px-2 border-gray-900"
-          onClick={async () => await db.insertTemplate(defaultTemplate)}
+          onClick={async () => {
+            await db.insertTemplate(defaultTemplate)
+          }}
         >
           insertTemplate
         </button>
@@ -202,7 +206,9 @@ export default function Home(): JSX.Element {
       <div class="mt-4">
         <button
           class="border rounded-lg px-2 border-gray-900"
-          onClick={async () => await db.upsertNote(sampleNote)}
+          onClick={async () => {
+            await db.upsertNote(sampleNote)
+          }}
         >
           upsertNote
         </button>
@@ -226,13 +232,17 @@ export default function Home(): JSX.Element {
         </button>
         <button
           class="border rounded-lg px-2 border-gray-900"
-          onClick={async () => await searchNotes(search())}
+          onClick={async () => {
+            await searchNotes(search())
+          }}
         >
           searchNotes
         </button>
         <button
           class="border rounded-lg px-2 border-gray-900"
-          onClick={async () => await updateNotes()}
+          onClick={async () => {
+            await updateNotes()
+          }}
         >
           updateNotes
         </button>
@@ -252,7 +262,9 @@ export default function Home(): JSX.Element {
       <div class="mt-4">
         <button
           class="border rounded-lg px-2 border-gray-900"
-          onClick={async () => await db.upsertCard(sampleCard)}
+          onClick={async () => {
+            await db.upsertCard(sampleCard)
+          }}
         >
           upsertCard
         </button>
@@ -278,7 +290,9 @@ export default function Home(): JSX.Element {
       <div class="mt-4">
         <button
           class="border rounded-lg px-2 border-gray-900"
-          onClick={async () => await db.sync()}
+          onClick={async () => {
+            await db.sync()
+          }}
         >
           sync
         </button>
@@ -322,7 +336,7 @@ export default function Home(): JSX.Element {
 function q(rawSql: string) {
   return async () => {
     console.log(rawSql)
-    return console.table(await (await getDb()).execO(rawSql))
+    console.table(await (await getDb()).execO(rawSql))
   }
 }
 

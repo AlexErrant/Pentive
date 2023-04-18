@@ -1,5 +1,5 @@
-import { NookId, RemoteNoteId } from "shared"
-import { TemplateId, NoteId } from "./ids"
+import { type NookId, type RemoteNoteId } from "shared"
+import { type TemplateId, type NoteId } from "./ids"
 
 export interface Note {
   readonly id: NoteId

@@ -1,7 +1,7 @@
 import { Base64, Base64Url, Hex } from "./brand"
 
 import { ulidFactory } from "ulid-workers"
-import { base16, base32crockford, base64url, hex } from "@scure/base"
+import { base16, base32crockford, base64url } from "@scure/base"
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export function toBase64URL_0(base64: Base64): Base64Url {

@@ -11,19 +11,19 @@ import { Buffer } from "buffer"
 import {
   BlobReader,
   BlobWriter,
-  Entry,
+  type Entry,
   TextWriter,
   Uint8ArrayWriter,
   ZipReader,
 } from "@zip.js/zip.js"
 import { notEmpty, throwExp } from "shared"
-import initSqlJs, { Database } from "sql.js"
+import initSqlJs, { type Database } from "sql.js"
 import { checkCard, checkCol, checkMedia, checkNote } from "./typeChecker"
 import { parseNote, parseCard, parseTemplates } from "./parser"
-import { Card as PCard } from "../../domain/card"
-import { Note as PNote } from "../../domain/note"
-import { Template } from "../../domain/template"
-import { MediaId, TemplateId } from "../../domain/ids"
+import { type Card as PCard } from "../../domain/card"
+import { type Note as PNote } from "../../domain/note"
+import { type Template } from "../../domain/template"
+import { type MediaId, type TemplateId } from "../../domain/ids"
 import { db } from "./../../db"
 import _ from "lodash"
 import sqliteUrl from "../../assets/sql-wasm.wasm?url"

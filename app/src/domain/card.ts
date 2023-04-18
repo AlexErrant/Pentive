@@ -1,6 +1,12 @@
-import { CardSettingId, DeckId, CardId, NoteId, Ord } from "./ids"
-import { Note } from "./note"
-import { Template } from "./template"
+import {
+  type CardSettingId,
+  type DeckId,
+  type CardId,
+  type NoteId,
+  type Ord,
+} from "./ids"
+import { type Note } from "./note"
+import { type Template } from "./template"
 
 export const states = [
   "normal",

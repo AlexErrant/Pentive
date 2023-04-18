@@ -1,9 +1,9 @@
-import { Brand } from "shared"
+import { type Brand } from "shared"
 
 export type RemoteTemplateId = Brand<string, "remoteTemplateId" & "base64url">
 export type RemoteCardId = Brand<string, "remoteCardId" & "base64url">
 
-export {
+export type {
   TemplateId,
   NoteId,
   UserId,

@@ -1,6 +1,6 @@
-import { Plugin } from "shared"
+import { type Plugin } from "shared"
 import { getDb, getKysely } from "./crsqlite"
-import { Plugin as PluginEntity } from "./database"
+import { type Plugin as PluginEntity } from "./database"
 
 function entityToDomain(entity: PluginEntity): Plugin {
   return {

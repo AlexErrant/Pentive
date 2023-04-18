@@ -1,9 +1,9 @@
-import { iframeResizer, IFrameComponent } from "iframe-resizer"
-import { onCleanup, VoidComponent } from "solid-js"
+import { iframeResizer, type IFrameComponent } from "iframe-resizer"
+import { onCleanup, type VoidComponent } from "solid-js"
 import * as Comlink from "comlink"
-import { NoteId, TemplateId, assertNever, throwExp } from "shared"
+import { type NoteId, type TemplateId, assertNever, throwExp } from "shared"
 import { C } from ".."
-import { Side, CardId, MediaId } from "../domain/ids"
+import { type Side, type CardId, type MediaId } from "../domain/ids"
 import { db } from "../db"
 
 const targetOrigin = "*" // highTODO make more limiting. Also implement https://stackoverflow.com/q/8169582

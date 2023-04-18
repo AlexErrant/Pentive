@@ -1,5 +1,5 @@
 import { Ulid } from "id128"
-import { Base64Url, base64url, hex } from "shared"
+import { type Base64Url, base64url, hex } from "shared"
 
 // https://stackoverflow.com/a/47140708
 export function strip(html: string): string {

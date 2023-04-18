@@ -1,4 +1,4 @@
-import { JSX } from "solid-js/jsx-runtime"
+import { type JSX } from "solid-js/jsx-runtime"
 import _ from "lodash"
 import { db } from "./../db"
 

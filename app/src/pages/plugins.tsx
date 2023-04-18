@@ -1,8 +1,8 @@
-import { JSX } from "solid-js"
+import { type JSX } from "solid-js"
 import PluginTable from "../customElements/pluginsTable"
 import { db } from "../db"
-import { Plugin } from "shared"
-import { PluginId } from "../domain/ids"
+import { type Plugin } from "shared"
+import { type PluginId } from "../domain/ids"
 import { ulidAsBase64Url } from "../domain/utility"
 
 export default function Plugins(): JSX.Element {

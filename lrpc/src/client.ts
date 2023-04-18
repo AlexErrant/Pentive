@@ -1,6 +1,9 @@
+/* eslint-disable */
+// @ts-nocheck honestly this file should be deleted
+
 import { createTRPCClient } from "@trpc/client"
 import fetch from "node-fetch"
-import type { AppRouter } from "./appRouter"
+import type { AppRouter } from "./appRouter.js"
 
 // @ts-expect-error lowTodo fix whenever we move off node-fetch
 global.fetch = fetch

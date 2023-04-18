@@ -1,10 +1,10 @@
 import { undefinedMap } from "shared"
-import { MediaId } from "../domain/ids"
-import { Media } from "../domain/media"
+import { type MediaId } from "../domain/ids"
+import { type Media } from "../domain/media"
 import * as Comlink from "comlink"
 import { getDb, getKysely } from "./crsqlite"
-import { DB, Media as MediaEntity } from "./database"
-import { Transaction } from "kysely"
+import { type DB, type Media as MediaEntity } from "./database"
+import { type Transaction } from "kysely"
 
 function entityToDomain(entity: MediaEntity): Media {
   return {

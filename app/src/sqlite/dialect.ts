@@ -8,7 +8,7 @@ import {
   SqliteDialect,
   CompiledQuery,
   type DatabaseConnection,
-  SqliteDialectConfig,
+  type SqliteDialectConfig,
 } from "kysely"
 
 class CRDialect extends SqliteDialect {
@@ -96,4 +96,4 @@ interface CRDatabase {
   ) => Promise<T[]>
 }
 
-export { CRDialect, CRDatabase }
+export { CRDialect, type CRDatabase }

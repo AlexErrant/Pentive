@@ -1,17 +1,16 @@
 self.addEventListener("fetch", (e) => {
   ;(e.request.url.includes("localhost") || e.request.url.includes("workers")) &&
     e.respondWith(
-      caches
-        .open("solid-hn")
-        .then((t) =>
-          t
-            .match(e.request)
-            .then(
-              (n) =>
-                n ||
-                fetch(e.request).then((n) => (t.put(e.request, n.clone()), n))
-            )
+      caches.open("solid-hn").then((t) =>
+        t.match(e.request).then(
+          (n) =>
+            n ||
+            fetch(e.request).then(async (n) => {
+              await t.put(e.request, n.clone())
+              return n
+            })
         )
+      )
     )
 })
 

@@ -1,4 +1,3 @@
-import { NoteCommentId, RemoteNoteId } from "shared"
 import { commentText } from "shared"
 
 export default function SubmitComment(props: {

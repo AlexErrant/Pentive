@@ -1,5 +1,4 @@
 import * as dotenv from "dotenv"
-import { importPKCS8 } from "jose"
 import { base64ToArray } from "shared"
 import { z } from "zod"
 

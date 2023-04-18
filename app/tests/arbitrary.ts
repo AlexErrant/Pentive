@@ -1,8 +1,8 @@
 // https://github.com/dubzzz/fast-check/issues/490#issuecomment-1215040121
 
-import fc, { Arbitrary, RecordConstraints } from "fast-check"
+import fc, { type Arbitrary, type RecordConstraints } from "fast-check"
 import { Ulid } from "id128"
-import { Brand, base64url, hex } from "shared"
+import { type Brand, base64url, hex } from "shared"
 
 // https://stackoverflow.com/a/72760489
 type OptionalKeys<T> = Required<{

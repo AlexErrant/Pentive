@@ -1,5 +1,5 @@
 import { defaultRenderContainer } from "shared"
-import { PentiveElement } from "./customElements/registry"
+import { type PentiveElement } from "./customElements/registry"
 
 // the dependency injection container
 export const defaultContainer = {

@@ -1,5 +1,5 @@
 import { Component, Show, Suspense } from "solid-js"
-import ErrorBoundary, { RouteDataArgs, useRouteData } from "solid-start"
+import { RouteDataArgs, useRouteData } from "solid-start"
 import { createServerData$ } from "solid-start/server"
 import { Base64Url, getPost } from "shared"
 

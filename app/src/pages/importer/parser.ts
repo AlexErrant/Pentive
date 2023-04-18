@@ -1,22 +1,22 @@
 import {
-  CardId,
-  CardSettingId,
-  DeckId,
-  Ord,
-  NoteId,
-  TemplateId,
+  type CardId,
+  type CardSettingId,
+  type DeckId,
+  type Ord,
+  type NoteId,
+  type TemplateId,
 } from "../../domain/ids"
-import { Field, Template } from "../../domain/template"
-import { ChildTemplate, TemplateType, throwExp } from "shared"
-import { Card as PCard } from "../../domain/card"
-import { Note as PNote } from "../../domain/note"
+import { type Field, type Template } from "../../domain/template"
+import { type ChildTemplate, type TemplateType, throwExp } from "shared"
+import { type Card as PCard } from "../../domain/card"
+import { type Note as PNote } from "../../domain/note"
 import {
-  Card as ACard,
-  Fld,
-  Model,
-  Models,
-  Note as ANote,
-  Tmpl,
+  type Card as ACard,
+  type Fld,
+  type Model,
+  type Models,
+  type Note as ANote,
+  type Tmpl,
 } from "./typeChecker"
 import _ from "lodash"
 

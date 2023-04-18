@@ -6,24 +6,24 @@ import { db } from "./db"
 import * as Comlink from "comlink"
 import { registerPluginServices } from "./pluginManager"
 import {
-  CardId,
-  ChildTemplate,
-  MediaId,
-  NookId,
-  RemoteNote,
-  RemoteTemplate,
+  type CardId,
+  type ChildTemplate,
+  type MediaId,
+  type NookId,
+  type RemoteNote,
+  type RemoteTemplate,
   throwExp,
   noteOrds,
   relativeChar,
 } from "shared"
-import { Template } from "./domain/template"
-import { Media } from "./domain/media"
-import { Note } from "./domain/note"
-import { Card } from "./domain/card"
+import { type Template } from "./domain/template"
+import { type Media } from "./domain/media"
+import { type Note } from "./domain/note"
+import { type Card } from "./domain/card"
 import { ulidAsBase64Url } from "./domain/utility"
 import { getKysely } from "./sqlite/crsqlite"
-import { Transaction } from "kysely"
-import { DB } from "./sqlite/database"
+import { type Transaction } from "kysely"
+import { type DB } from "./sqlite/database"
 
 const plugins = await db.getPlugins()
 
@@ -73,7 +73,7 @@ export const appExpose = {
           serializer.serializeToString(front)
         template.templateType.template.back = serializer.serializeToString(back)
       }
-      return await db.insertTemplate(template, trx)
+      await db.insertTemplate(template, trx)
     })
   },
   addNote: async (rn: RemoteNote, nook: NookId) => {
@@ -123,7 +123,9 @@ function getNoteImages(fieldValues: Map<string, string>, dp: DOMParser) {
   const imgSrcs = new Map<MediaId, string>()
   for (const [f, v] of fieldValues) {
     const doc = dp.parseFromString(v, "text/html")
-    Array.from(doc.images).forEach((i) => mutate(i, imgSrcs))
+    Array.from(doc.images).forEach((i) => {
+      mutate(i, imgSrcs)
+    })
     fieldValues.set(f, doc.body.innerHTML)
   }
   return imgSrcs
@@ -149,8 +151,12 @@ function getTemplateImages(ct: ChildTemplate, dp: DOMParser) {
   const imgSrcs = new Map<MediaId, string>()
   const front = dp.parseFromString(ct.front, "text/html")
   const back = dp.parseFromString(ct.back, "text/html")
-  Array.from(front.images).forEach((i) => mutate(i, imgSrcs))
-  Array.from(back.images).forEach((i) => mutate(i, imgSrcs))
+  Array.from(front.images).forEach((i) => {
+    mutate(i, imgSrcs)
+  })
+  Array.from(back.images).forEach((i) => {
+    mutate(i, imgSrcs)
+  })
   return { imgSrcs, front, back }
 }
 
@@ -170,7 +176,7 @@ async function downloadImages(
           updated: now,
           data: await response.arrayBuffer(),
         }
-        return await db.upsertMediaTrx(media, trx)
+        await db.upsertMediaTrx(media, trx)
       } else {
         console.error(response)
         throwExp(`Fetching ${imgSrc} got a status code of ${response.status}`)

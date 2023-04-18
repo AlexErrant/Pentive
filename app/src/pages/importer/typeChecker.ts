@@ -1,4 +1,4 @@
-import { Ord } from "shared"
+import { type Ord } from "shared"
 import { z } from "zod"
 
 const tmpl = z.object({

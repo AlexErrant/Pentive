@@ -1,16 +1,16 @@
-import { VoidComponent } from "solid-js"
-import { NoteCard } from "../domain/card"
+import { type VoidComponent } from "solid-js"
+import { type NoteCard } from "../domain/card"
 import "@github/time-elements"
-import AgGridSolid, { AgGridSolidRef } from "ag-grid-solid"
+import AgGridSolid, { type AgGridSolidRef } from "ag-grid-solid"
 import "ag-grid-community/styles/ag-grid.css"
 import "ag-grid-community/styles/ag-theme-alpine.css"
 import {
-  ColDef,
-  GetRowIdParams,
-  GridReadyEvent,
-  IGetRowsParams,
+  type ColDef,
+  type GetRowIdParams,
+  type GridReadyEvent,
+  type IGetRowsParams,
 } from "ag-grid-community"
-import { CardId } from "../domain/ids"
+import { type CardId } from "../domain/ids"
 import { db } from "../db"
 
 let gridRef: AgGridSolidRef
@@ -57,8 +57,12 @@ const onGridReady = ({ api }: GridReadyEvent) => {
   api.setDatasource({
     getRows: (p: IGetRowsParams) => {
       db.getCards(p.startRow, cacheBlockSize) // medTODO could just cache the Template and mutate the NoteCard obj to add it
-        .then((x) => p.successCallback(x.noteCards, x.count))
-        .catch(() => p.failCallback())
+        .then((x) => {
+          p.successCallback(x.noteCards, x.count)
+        })
+        .catch(() => {
+          p.failCallback()
+        })
     },
   })
 }

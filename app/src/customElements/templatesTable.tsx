@@ -1,24 +1,30 @@
 import {
   For,
-  JSX,
-  VoidComponent,
+  type JSX,
+  type VoidComponent,
   Suspense,
   createResource,
   createSignal,
   Show,
-  Setter,
+  type Setter,
 } from "solid-js"
 import {
-  ColumnDef,
+  type ColumnDef,
   createSolidTable,
   flexRender,
   getCoreRowModel,
 } from "@tanstack/solid-table"
-import { Template } from "../domain/template"
+import { type Template } from "../domain/template"
 import _ from "lodash"
 import ResizingIframe from "./resizingIframe"
 import "@github/time-elements"
-import { NookId, RemoteTemplateId, TemplateId, nookId, throwExp } from "shared"
+import {
+  type NookId,
+  type RemoteTemplateId,
+  type TemplateId,
+  nookId,
+  throwExp,
+} from "shared"
 import { db } from "../db"
 
 function id(id: keyof Template): keyof Template {

@@ -1,22 +1,26 @@
 import {
-  MediaId,
-  RemoteMediaNum,
-  RemoteTemplateId,
-  TemplateId,
+  type MediaId,
+  type RemoteMediaNum,
+  type RemoteTemplateId,
+  type TemplateId,
 } from "../domain/ids"
-import { Field, Template } from "../domain/template"
+import { type Field, type Template } from "../domain/template"
 import {
-  CreateRemoteTemplate,
-  EditRemoteTemplate,
-  NookId,
-  TemplateType,
+  type CreateRemoteTemplate,
+  type EditRemoteTemplate,
+  type NookId,
+  type TemplateType,
   notEmpty,
   throwExp,
   undefinedMap,
 } from "shared"
 import { getKysely } from "./crsqlite"
-import { DB, RemoteTemplate, Template as TemplateEntity } from "./database"
-import { InsertObject, Kysely, Transaction } from "kysely"
+import {
+  type DB,
+  type RemoteTemplate,
+  type Template as TemplateEntity,
+} from "./database"
+import { type InsertObject, type Kysely, type Transaction } from "kysely"
 import { updateLocalMediaIdByRemoteMediaIdAndGetNewDoc } from "./note"
 
 function templateToDocType(template: Template) {
@@ -94,9 +98,9 @@ export const templateCollectionMethods = {
         await trx.insertInto("remoteTemplate").values(remoteTemplates).execute()
     }
     if (trx == null) {
-      return await (await getKysely()).transaction().execute(insert)
+      await (await getKysely()).transaction().execute(insert)
     } else {
-      return await insert(trx)
+      await insert(trx)
     }
   },
   bulkUpsertTemplate: async function (templates: Template[]) {
@@ -104,7 +108,7 @@ export const templateCollectionMethods = {
     const insertTemplates = entities.map((x) => x.insertTemplate)
     const remoteTemplates = entities.flatMap((x) => x.remoteTemplates)
     const db = await getKysely()
-    return await db.transaction().execute(async (tx) => {
+    await db.transaction().execute(async (tx) => {
       if (insertTemplates.length !== 0)
         await tx.insertInto("template").values(insertTemplates).execute()
       if (remoteTemplates.length !== 0)

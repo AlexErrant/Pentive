@@ -24,10 +24,13 @@ const config: PlaywrightTestConfig = {
   /* Run tests in files in parallel */
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
+  // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
+  // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
   retries: process.env.CI ? 2 : 0,
   /* Opt out of parallel tests on CI. */
+  // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
   workers: process.env.CI ? 1 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: "html",

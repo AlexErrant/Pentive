@@ -1,14 +1,14 @@
 /* eslint-disable @typescript-eslint/prefer-optional-chain */
 /* eslint-disable @typescript-eslint/naming-convention */
 import WDB, {
-  Changeset,
-  PokeProtocol,
-  SiteIDLocal,
-  SiteIDWire,
-  WholeDbReplicator,
+  type Changeset,
+  type PokeProtocol,
+  type SiteIDLocal,
+  type SiteIDWire,
+  type WholeDbReplicator,
 } from "./wholeDbReplicator.js"
-import { DBAsync } from "@vlcn.io/xplat-api"
-import Peer, { DataConnection } from "peerjs"
+import { type DBAsync } from "@vlcn.io/xplat-api"
+import Peer, { type DataConnection } from "peerjs"
 import { stringify as uuidStringify } from "uuid"
 
 type Msg = PokeMsg | ChangesMsg | RequestChangesMsg
@@ -34,11 +34,12 @@ interface RequestChangesMsg {
 
 export class WholeDbRtc implements PokeProtocol {
   private readonly site: Peer
-  private readonly establishedConnections: Map<SiteIDWire, DataConnection> =
-    new Map()
+  private readonly establishedConnections = new Map<
+    SiteIDWire,
+    DataConnection
+  >()
 
-  private readonly pendingConnections: Map<SiteIDWire, DataConnection> =
-    new Map()
+  private readonly pendingConnections = new Map<SiteIDWire, DataConnection>()
 
   private replicator?: WholeDbReplicator
 
@@ -69,7 +70,9 @@ export class WholeDbRtc implements PokeProtocol {
   ) {
     this.site = new Peer(uuidStringify(siteId), peerServer)
     this.site.on("connection", (c) => {
-      c.on("open", () => this._newConnection(c))
+      c.on("open", () => {
+        this._newConnection(c)
+      })
     })
   }
 
@@ -163,7 +166,9 @@ export class WholeDbRtc implements PokeProtocol {
     const siteId = conn.peer
     this.pendingConnections.delete(conn.peer)
 
-    conn.on("data", (data) => this._dataReceived(siteId, data as Msg))
+    conn.on("data", (data) => {
+      this._dataReceived(siteId, data as Msg)
+    })
     conn.on("close", () => {
       this.establishedConnections.delete(conn.peer)
       this._connectionsChanged()

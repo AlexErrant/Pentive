@@ -17,6 +17,8 @@
     "dev": "concurrently --kill-others -p \"[{name}]\" -n \"app,hub,cwa,peer,api-ugc\" -c \"bgBlue.bold,bgMagenta.bold,bgGreen.bold,bgWhiteBright.bold,bgCyan.bold\" \"pnpm --filter app dev\" \"pnpm --filter hub dev\" \"pnpm --filter cwa dev\" \"pnpm --filter peer dev\" \"pnpm --filter api-ugc dev\"",
     "//dev": "If you get `Error: EMFILE: too many open files...`, running all 3 options here https://stackoverflow.com/a/60881735 and restarting WSL worked for me",
     "build": "concurrently  --kill-others-on-fail -p \"[{name}]\" -n \"app,hub,app-ugc,hub-ugc,cwa,api-ugc\" -c \"bgBlue.bold,bgMagenta.bold,bgGreen.bold,bgYellow.bold,bgBlackBright.bold,bgCyan.bold\" \"pnpm --filter app build\"      \"pnpm --filter hub build\"      \"pnpm --filter app-ugc build\"      \"pnpm --filter hub-ugc build\"      \"pnpm --filter cwa build\"      \"pnpm --filter api-ugc build\"",
-    "deploy": "concurrently                       -p \"[{name}]\" -n \"app,hub,app-ugc,hub-ugc,cwa,api-ugc\" -c \"bgBlue.bold,bgMagenta.bold,bgGreen.bold,bgYellow.bold,bgBlackBright.bold,bgCyan.bold\" \"pnpm --filter app run deploy\" \"pnpm --filter hub run deploy\" \"pnpm --filter app-ugc run deploy\" \"pnpm --filter hub-ugc run deploy\" \"pnpm --filter cwa run deploy\" \"pnpm --filter api-ugc run deploy\""
+    "deploy": "concurrently                       -p \"[{name}]\" -n \"app,hub,app-ugc,hub-ugc,cwa,api-ugc\" -c \"bgBlue.bold,bgMagenta.bold,bgGreen.bold,bgYellow.bold,bgBlackBright.bold,bgCyan.bold\" \"pnpm --filter app run deploy\" \"pnpm --filter hub run deploy\" \"pnpm --filter app-ugc run deploy\" \"pnpm --filter hub-ugc run deploy\" \"pnpm --filter cwa run deploy\" \"pnpm --filter api-ugc run deploy\"",
+    "eslint": "pnpm --parallel --no-bail -r eslint",
+    "eslint:fix": "pnpm --parallel --no-bail -r eslint:fix"
   }
 }

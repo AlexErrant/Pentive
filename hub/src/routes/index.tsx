@@ -1,6 +1,6 @@
-import { Ord } from "shared"
-import { Template } from "shared/src/cardHtml"
-import { JSX, createSignal } from "solid-js"
+import { type Ord } from "shared"
+import { type Template } from "shared/src/cardHtml"
+import { type JSX, createSignal } from "solid-js"
 import { useRouteData } from "solid-start"
 import {
   createServerAction$,

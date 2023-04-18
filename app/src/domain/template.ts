@@ -1,5 +1,5 @@
-import { Ord, RemoteTemplateId, TemplateId } from "./ids"
-import { NookId, TemplateType } from "shared"
+import { type Ord, type RemoteTemplateId, type TemplateId } from "./ids"
+import { type NookId, type TemplateType } from "shared"
 
 export interface Field {
   readonly name: string

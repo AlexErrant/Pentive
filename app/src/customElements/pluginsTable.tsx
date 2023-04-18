@@ -1,11 +1,11 @@
-import { For, VoidComponent, Suspense, createResource } from "solid-js"
+import { For, type VoidComponent, Suspense, createResource } from "solid-js"
 import {
-  ColumnDef,
+  type ColumnDef,
   createSolidTable,
   flexRender,
   getCoreRowModel,
 } from "@tanstack/solid-table"
-import { Plugin } from "shared"
+import { type Plugin } from "shared"
 import "@github/time-elements"
 
 function id(id: keyof Plugin): keyof Plugin {

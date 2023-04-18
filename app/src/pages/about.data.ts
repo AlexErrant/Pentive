@@ -1,4 +1,4 @@
-import { createResource, Resource } from "solid-js"
+import { createResource, type Resource } from "solid-js"
 
 async function wait<T>(ms: number, data: T): Promise<T> {
   return await new Promise((resolve) => setTimeout(resolve, ms, data))

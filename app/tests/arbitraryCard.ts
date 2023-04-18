@@ -1,7 +1,13 @@
 import fc from "fast-check"
-import { Card, Review, Score, states } from "../src/domain/card"
+import { type Card, type Review, type Score, states } from "../src/domain/card"
 
-import { CardId, CardSettingId, Ord, DeckId, NoteId } from "../src/domain/ids"
+import {
+  type CardId,
+  type CardSettingId,
+  type Ord,
+  type DeckId,
+  type NoteId,
+} from "../src/domain/ids"
 
 import { reasonableDates, recordWithOptionalFields } from "./arbitrary"
 

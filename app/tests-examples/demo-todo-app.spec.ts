@@ -305,7 +305,7 @@ test.describe("Persistence", () => {
     await expect(todoItems).toHaveClass(["completed", ""])
 
     // Ensure there is 1 completed item.
-    checkNumberOfCompletedTodosInLocalStorage(page, 1)
+    await checkNumberOfCompletedTodosInLocalStorage(page, 1)
 
     // Now reload.
     await page.reload()
@@ -398,7 +398,9 @@ async function createDefaultTodos(page: Page) {
 
 async function checkNumberOfTodosInLocalStorage(page: Page, expected: number) {
   return await page.waitForFunction((e) => {
-    return JSON.parse(localStorage["react-todos"]).length === e
+    return (
+      (JSON.parse(localStorage["react-todos"] as string) as []).length === e
+    )
   }, expected)
 }
 
@@ -408,8 +410,8 @@ async function checkNumberOfCompletedTodosInLocalStorage(
 ) {
   return await page.waitForFunction((e) => {
     return (
-      JSON.parse(localStorage["react-todos"]).filter(
-        (todo: any) => todo.completed
+      (JSON.parse(localStorage["react-todos"] as string) as []).filter(
+        (todo: { completed: boolean }) => todo.completed
       ).length === e
     )
   }, expected)
@@ -417,8 +419,8 @@ async function checkNumberOfCompletedTodosInLocalStorage(
 
 async function checkTodosInLocalStorage(page: Page, title: string) {
   return await page.waitForFunction((t) => {
-    return JSON.parse(localStorage["react-todos"])
-      .map((todo: any) => todo.title)
+    return (JSON.parse(localStorage["react-todos"] as string) as [])
+      .map((todo: { title: string }) => todo.title)
       .includes(t)
   }, title)
 }

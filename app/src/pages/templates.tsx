@@ -1,4 +1,4 @@
-import { JSX } from "solid-js"
+import { type JSX } from "solid-js"
 import TemplatesTable from "../customElements/templatesTable"
 import { db } from "../db"
 

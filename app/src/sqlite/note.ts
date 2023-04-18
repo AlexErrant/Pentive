@@ -1,8 +1,8 @@
 import {
-  CreateRemoteNote,
-  EditRemoteNote,
-  NookId,
-  RemoteNoteId,
+  type CreateRemoteNote,
+  type EditRemoteNote,
+  type NookId,
+  type RemoteNoteId,
   imgPlaceholder,
   parseMap,
   parseSet,
@@ -11,15 +11,15 @@ import {
   throwExp,
 } from "shared"
 import {
-  NoteId,
-  RemoteMediaNum,
-  MediaId,
-  RemoteTemplateId,
+  type NoteId,
+  type RemoteMediaNum,
+  type MediaId,
+  type RemoteTemplateId,
 } from "../domain/ids"
-import { Note } from "../domain/note"
+import { type Note } from "../domain/note"
 import { getKysely } from "./crsqlite"
-import { DB, Note as NoteEntity, RemoteNote } from "./database"
-import { InsertObject, Kysely } from "kysely"
+import { type DB, type Note as NoteEntity, type RemoteNote } from "./database"
+import { type InsertObject, type Kysely } from "kysely"
 import _ from "lodash"
 
 function noteToDocType(note: Note): InsertObject<DB, "note"> {

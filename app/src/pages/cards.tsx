@@ -1,9 +1,21 @@
-import { createResource, createSignal, For, JSX, Setter, Show } from "solid-js"
+import {
+  createResource,
+  createSignal,
+  For,
+  type JSX,
+  type Setter,
+  Show,
+} from "solid-js"
 import CardsTable from "../customElements/cardsTable"
 import ResizingIframe from "../customElements/resizingIframe"
-import { NoteCard } from "../domain/card"
+import { type NoteCard } from "../domain/card"
 import { db } from "../db"
-import { NookId, NoteId, RemoteNoteId, RemoteTemplateId } from "shared"
+import {
+  type NookId,
+  type NoteId,
+  type RemoteNoteId,
+  type RemoteTemplateId,
+} from "shared"
 
 const [selected, setSelected] = createSignal<NoteCard>()
 

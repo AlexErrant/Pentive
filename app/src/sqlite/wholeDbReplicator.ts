@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/naming-convention */
-import { DBAsync } from "@vlcn.io/xplat-api"
+import { type DBAsync } from "@vlcn.io/xplat-api"
 import { parse as uuidParse, stringify as uuidStringify } from "uuid"
 export type SiteIDWire = string
 export type SiteIDLocal = Uint8Array
@@ -112,7 +112,9 @@ export class WholeDbReplicator {
     private readonly network: PokeProtocol
   ) {
     this.db = db
-    db.createFunction("crsql_wdbreplicator", () => this.crrChanged())
+    db.createFunction("crsql_wdbreplicator", () => {
+      this.crrChanged()
+    })
 
     this.siteId = siteId
     this.siteIdWire = uuidStringify(this.siteId)
@@ -132,17 +134,16 @@ export class WholeDbReplicator {
     // remove trigger(s)
     // function extension is fine to stay, it'll get removed on connection termination
     this.crrs.forEach((crr) => {
-      ;["INSERT", "UPDATE", "DELETE"].forEach(
-        async (verb) =>
-          await this.db.exec(
-            `DROP TRIGGER IF EXISTS "${crr}__crsql_wdbreplicator_${verb.toLowerCase()}";`
-          )
-      )
+      ;["INSERT", "UPDATE", "DELETE"].forEach(async (verb) => {
+        await this.db.exec(
+          `DROP TRIGGER IF EXISTS "${crr}__crsql_wdbreplicator_${verb.toLowerCase()}";`
+        )
+      })
     })
   }
 
   async schemaChanged(): Promise<void> {
-    return await this.installTriggers()
+    await this.installTriggers()
   }
 
   private async installTriggers() {
@@ -164,7 +165,7 @@ export class WholeDbReplicator {
       )
       await Promise.all(
         ["INSERT", "UPDATE", "DELETE"].map(async (verb) => {
-          return await this.db.exec(
+          await this.db.exec(
             `CREATE TEMP TRIGGER IF NOT EXISTS "${baseTblName}__crsql_wdbreplicator_${verb.toLowerCase()}" AFTER ${verb} ON "${baseTblName}"
           BEGIN
             select crsql_wdbreplicator() WHERE crsql_internal_sync_bit() = 0;
