@@ -1,11 +1,11 @@
 // this exists because I couldn't figure out how to `watch` serverless/lambdaHandler.ts
 
 import { createHTTPHandler } from "@trpc/server/adapters/standalone"
-import { IncomingMessage, ServerResponse } from "http"
-import { NodeHTTPCreateContextFnOptions } from "@trpc/server/adapters/node-http"
+import { type IncomingMessage, type ServerResponse } from "http"
+import { type NodeHTTPCreateContextFnOptions } from "@trpc/server/adapters/node-http"
 import { appRouter } from "./appRouter.js"
 import { getUser } from "./core.js"
-import { Context } from "./trpc.js"
+import { type Context } from "./trpc.js"
 import fs from "fs"
 import https from "https"
 import { csrfHeaderName, hstsName, hstsValue } from "shared"
@@ -60,4 +60,6 @@ const server = https.createServer(
   }
 )
 
-server.listen(4050, "0.0.0.0", () => console.log("listening to 4050"))
+server.listen(4050, "0.0.0.0", () => {
+  console.log("listening to 4050")
+})

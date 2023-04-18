@@ -1,6 +1,6 @@
 // https://github.com/remix-run/remix/issues/158
 
-import { Cookie, CookieOptions } from "solid-start/session/cookies"
+import { type Cookie, type CookieOptions } from "solid-start/session/cookies"
 import { parse, serialize } from "cookie"
 
 export const createPlainCookie = (

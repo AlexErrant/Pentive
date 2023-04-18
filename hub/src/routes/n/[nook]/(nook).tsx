@@ -1,7 +1,7 @@
-import { Component, For, Show } from "solid-js"
-import { A, RouteDataArgs, useRouteData } from "solid-start"
+import { type Component, For, Show } from "solid-js"
+import { A, type RouteDataArgs, useRouteData } from "solid-start"
 import { createServerData$ } from "solid-start/server"
-import { getPosts, getNotes, NookId, Ord } from "shared"
+import { getPosts, getNotes, type NookId, type Ord } from "shared"
 import ResizingIframe from "~/components/resizingIframe"
 import { getUserId } from "~/db/session"
 

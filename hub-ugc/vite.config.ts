@@ -1,4 +1,4 @@
-import { BuildOptions, defineConfig } from "vite"
+import { type BuildOptions, defineConfig } from "vite"
 import checker from "vite-plugin-checker"
 import fs from "fs"
 import { VitePWA } from "vite-plugin-pwa"

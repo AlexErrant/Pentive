@@ -16,5 +16,7 @@ export const templateRouter = {
     }),
   editTemplates: authedProcedure
     .input(z.array(editRemoteTemplate).min(1))
-    .mutation(async ({ input, ctx }) => await editTemplates(ctx.user, input)),
+    .mutation(async ({ input, ctx }) => {
+      await editTemplates(ctx.user, input)
+    }),
 }

@@ -1,6 +1,6 @@
 import { defaultRenderContainer } from "./renderContainer"
 import { expect, test } from "vitest"
-import { Ord } from "./brand"
+import { type Ord } from "./brand"
 import { throwExp } from "./utility"
 import { noteOrds, strip } from "./cardHtml"
 

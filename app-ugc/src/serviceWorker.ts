@@ -71,7 +71,7 @@ self.addEventListener("message", (event) => {
 const localMediaPrefix = self.registration.scope + "localMedia/"
 
 async function sleep(ms: number): Promise<void> {
-  return await new Promise((resolve) => setTimeout(resolve, ms))
+  await new Promise((resolve) => setTimeout(resolve, ms))
 }
 
 async function getLocalMedia(

@@ -1,12 +1,12 @@
 import { z } from "zod"
 import {
-  NoteId,
-  TemplateId,
-  RemoteNoteId,
-  Ord,
-  RemoteTemplateId,
-  NookId,
-  NoteCommentId,
+  type NoteId,
+  type TemplateId,
+  type RemoteNoteId,
+  type Ord,
+  type RemoteTemplateId,
+  type NookId,
+  type NoteCommentId,
 } from "./brand"
 
 // highTODO are we doing ULIDs, KSUID, or neither?

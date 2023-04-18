@@ -1,6 +1,6 @@
 import { initTRPC, TRPCError } from "@trpc/server"
 import superjson from "superjson"
-import { Result, UserId } from "./util"
+import { type Result, type UserId } from "./util"
 
 interface Context {
   user: UserId | undefined

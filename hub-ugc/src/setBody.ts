@@ -1,5 +1,5 @@
 import contentWindowJs from "iframe-resizer/js/iframeResizer.contentWindow.js?raw" // https://vitejs.dev/guide/assets.html#importing-asset-as-string https://github.com/davidjbradshaw/iframe-resizer/issues/513
-import { RenderBodyInput } from "hub/src/components/resizingIframe"
+import { type RenderBodyInput } from "hub/src/components/resizingIframe"
 import {
   assertNever,
   throwExp,

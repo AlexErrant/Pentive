@@ -1,7 +1,7 @@
-import { Component, Show, Suspense } from "solid-js"
-import { RouteDataArgs, useRouteData } from "solid-start"
+import { type Component, Show, Suspense } from "solid-js"
+import { type RouteDataArgs, useRouteData } from "solid-start"
 import { createServerData$ } from "solid-start/server"
-import { Base64Url, getPost } from "shared"
+import { type Base64Url, getPost } from "shared"
 
 export function routeData({ params }: RouteDataArgs) {
   return {

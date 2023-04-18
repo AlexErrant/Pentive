@@ -1,5 +1,5 @@
 import {
-  Base64Url,
+  type Base64Url,
   db,
   dbIdToBase64Url,
   fromBase64Url,
@@ -7,9 +7,9 @@ import {
 } from "shared"
 import { z } from "zod"
 import { publicProcedure } from "./trpc"
-import { DB, Note } from "shared/src/database"
-import { Selection, sql } from "kysely"
-import { From } from "kysely/dist/cjs/parser/table-parser"
+import { type DB, type Note } from "shared/src/database"
+import { type Selection, sql } from "kysely"
+import { type From } from "kysely/dist/cjs/parser/table-parser"
 
 type ClientNote = Omit<
   Note,

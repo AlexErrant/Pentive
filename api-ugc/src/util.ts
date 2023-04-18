@@ -1,4 +1,4 @@
-import { Context } from "hono"
+import { type Context } from "hono"
 
 export type ApiUgcContext = Context<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

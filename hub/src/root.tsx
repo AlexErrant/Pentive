@@ -1,6 +1,6 @@
 // @refresh reload
 import { Suspense } from "solid-js"
-import { JSX } from "solid-js/web/types/jsx"
+import { type JSX } from "solid-js/web/types/jsx"
 import {
   Body,
   ErrorBoundary,

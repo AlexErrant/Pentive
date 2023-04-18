@@ -1,8 +1,8 @@
 import _ from "lodash"
-import { RenderContainer } from "./renderContainer.js"
-import { Ord } from "./brand.js"
+import { type RenderContainer } from "./renderContainer.js"
+import { type Ord } from "./brand.js"
 import { assertNever, notEmpty, throwExp } from "./utility.js"
-import { Cloze, Standard, TemplateType } from "./schema.js"
+import { type Cloze, type Standard, type TemplateType } from "./schema.js"
 
 export interface Template {
   readonly css: string
@@ -46,7 +46,7 @@ function escapeRegExp(string: string): string {
 // https://stackoverflow.com/a/32800728
 function isNullOrWhitespace(input: string | undefined): boolean {
   // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
-  return !input || !input.trim()
+  return !input?.trim()
 }
 
 export function body(

@@ -1,8 +1,8 @@
-import { iframeResizer, IFrameComponent } from "iframe-resizer"
-import { createEffect, onCleanup, VoidComponent } from "solid-js"
+import { iframeResizer, type IFrameComponent } from "iframe-resizer"
+import { createEffect, onCleanup, type VoidComponent } from "solid-js"
 import * as Comlink from "comlink"
-import { Ord, Side, unproxify } from "shared"
-import { Template } from "shared/src/cardHtml"
+import { type Ord, type Side, unproxify } from "shared"
+import { type Template } from "shared/src/cardHtml"
 
 const targetOrigin = "*" // highTODO make more limiting. Also implement https://stackoverflow.com/q/8169582
 

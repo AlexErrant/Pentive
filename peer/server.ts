@@ -15,4 +15,6 @@ const server = https.createServer(
 
 app.use("/", ExpressPeerServer(server))
 
-server.listen(3018, "0.0.0.0", () => console.log("listening to 3018"))
+server.listen(3018, "0.0.0.0", () => {
+  console.log("listening to 3018")
+})

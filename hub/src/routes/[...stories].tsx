@@ -1,8 +1,8 @@
-import { Component, createResource, For, JSX, Show } from "solid-js"
-import { A, RouteDataArgs, useRouteData } from "solid-start"
+import { type Component, createResource, For, type JSX, Show } from "solid-js"
+import { A, type RouteDataArgs, useRouteData } from "solid-start"
 import Story from "~/components/story"
 import fetchAPI from "~/lib/api"
-import { IStory } from "~/types"
+import { type IStory } from "~/types"
 
 const mapStories = {
   top: "news",

@@ -1,4 +1,4 @@
-import { JSX, Show, Suspense, type VoidComponent } from "solid-js"
+import { type JSX, Show, Suspense, type VoidComponent } from "solid-js"
 import { useParams, useRouteData } from "solid-start"
 import { FormError } from "solid-start/data"
 import {
@@ -145,7 +145,13 @@ const AuthShowcase: VoidComponent = () => {
             <p>
               <span>Logged in as {sessionData()!.user?.name}</span>
             </p>
-            <button onClick={async () => await signOut()}>Sign out</button>
+            <button
+              onClick={async () => {
+                await signOut()
+              }}
+            >
+              Sign out
+            </button>
           </>
         }
       >

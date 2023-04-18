@@ -1,4 +1,4 @@
-import { DBAsync } from "@vlcn.io/xplat-api"
+import { type DBAsync } from "@vlcn.io/xplat-api"
 import { parse as uuidParse, stringify as uuidStringify } from "uuid"
 type SiteIDWire = string
 type CID = string

@@ -2,7 +2,7 @@ import { jwtVerify } from "jose"
 import { jwsSecret } from "./config.js"
 import { parse } from "cookie"
 import { csrfHeaderName, jwtCookieName } from "shared"
-import { IncomingHttpHeaders } from "http"
+import { type IncomingHttpHeaders } from "http"
 
 export async function getUser(
   headers: IncomingHttpHeaders

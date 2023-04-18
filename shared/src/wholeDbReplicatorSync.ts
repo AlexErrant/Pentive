@@ -1,6 +1,6 @@
-import { DB } from "@vlcn.io/xplat-api"
+import { type DB } from "@vlcn.io/xplat-api"
 import { parse as uuidParse, stringify as uuidStringify } from "uuid"
-import { Changeset } from "./wholeDbReplicator.js"
+import { type Changeset } from "./wholeDbReplicator.js"
 type SiteIDWire = string
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any

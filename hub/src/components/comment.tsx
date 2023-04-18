@@ -1,6 +1,6 @@
-import { Component, For, Show } from "solid-js"
+import { type Component, For, Show } from "solid-js"
 import { A } from "solid-start"
-import { IComment } from "~/types"
+import { type IComment } from "~/types"
 import Toggle from "./toggle"
 
 const Comment: Component<{ comment: IComment }> = (props) => {

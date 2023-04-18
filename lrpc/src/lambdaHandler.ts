@@ -3,7 +3,7 @@ import type { CreateAWSLambdaContextOptions } from "@trpc/server/adapters/aws-la
 import type { APIGatewayProxyEventV2 } from "aws-lambda"
 import { appRouter } from "./appRouter.js"
 import { getUser } from "./core.js"
-import { Context } from "./trpc.js"
+import { type Context } from "./trpc.js"
 
 // highTODO https://github.com/trpc/trpc/discussions/2371
 

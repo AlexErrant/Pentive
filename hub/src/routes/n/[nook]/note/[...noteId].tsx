@@ -1,10 +1,10 @@
-import { Component, For, Show, Suspense } from "solid-js"
-import { RouteDataArgs, useRouteData } from "solid-start"
+import { type Component, For, Show, Suspense } from "solid-js"
+import { type RouteDataArgs, useRouteData } from "solid-start"
 import { createServerData$ } from "solid-start/server"
 import {
-  NookId,
-  Ord,
-  RemoteNoteId,
+  type NookId,
+  type Ord,
+  type RemoteNoteId,
   getNote,
   getNoteComments,
   unproxify,
@@ -75,12 +75,12 @@ const Thread: Component = () => {
           </button>
           <ul class="comment-children">
             <SubmitComment
-              onSubmit={async (text) =>
+              onSubmit={async (text) => {
                 await cwaClient.insertNoteComment.mutate({
                   noteId: data()!.note!.id,
                   text,
                 })
-              }
+              }}
             />
             <For each={data()!.comments}>
               {(comment) => <NoteComment comment={comment} />}

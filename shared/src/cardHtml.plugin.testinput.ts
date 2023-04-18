@@ -2,9 +2,9 @@
 // You can re-generate via
 // npx tsc .\cardHtml.plugin.testinput.ts
 import {
-  defaultRenderContainer,
-  RenderContainer,
-  RenderPluginExports,
+  type defaultRenderContainer,
+  type RenderContainer,
+  type RenderPluginExports,
 } from "./renderContainer"
 
 function clozeTemplateRegex(c: RenderContainer): RegExp {

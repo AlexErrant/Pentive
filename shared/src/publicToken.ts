@@ -1,5 +1,5 @@
 import z from "zod"
-import { Base64Url, NoteId } from "./brand.js"
+import { type Base64Url, type NoteId } from "./brand.js"
 import { throwExp } from "./utility.js"
 
 const entityId = z

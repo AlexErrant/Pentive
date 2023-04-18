@@ -1,4 +1,4 @@
-import { JSX } from "solid-js"
+import { type JSX } from "solid-js"
 import { A } from "solid-start"
 
 function Nav(): JSX.Element {

@@ -1,6 +1,6 @@
 import { expect, test } from "vitest"
-import { Ord, PluginId } from "./brand"
-import { Plugin } from "./plugin"
+import { type Ord, type PluginId } from "./brand"
+import { type Plugin } from "./plugin"
 import { registerPluginServices } from "./pluginManager"
 import { strip } from "./cardHtml"
 import { ulidAsBase64Url } from "./convertBinary"

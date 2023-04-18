@@ -1,18 +1,24 @@
-import { Kysely, sql, InsertResult, RawBuilder, InsertObject } from "kysely"
-import { PlanetScaleDialect } from "kysely-planetscale"
-import { DB } from "./database.js"
 import {
-  Base64,
-  Base64Url,
-  DbId,
-  Hex,
-  NookId,
-  NoteCommentId,
-  NoteId,
-  RemoteNoteId,
-  RemoteTemplateId,
-  TemplateId,
-  UserId,
+  Kysely,
+  sql,
+  type InsertResult,
+  type RawBuilder,
+  type InsertObject,
+} from "kysely"
+import { PlanetScaleDialect } from "kysely-planetscale"
+import { type DB } from "./database.js"
+import {
+  type Base64,
+  type Base64Url,
+  type DbId,
+  type Hex,
+  type NookId,
+  type NoteCommentId,
+  type NoteId,
+  type RemoteNoteId,
+  type RemoteTemplateId,
+  type TemplateId,
+  type UserId,
 } from "./brand.js"
 import { binary16fromBase64URL, ulidAsHex, ulidAsRaw } from "./convertBinary.js"
 import {
@@ -25,12 +31,12 @@ import {
 import { base16, base64url } from "@scure/base"
 import { compile } from "html-to-text"
 import {
-  CreateRemoteNote,
-  CreateRemoteTemplate,
-  EditRemoteNote,
-  EditRemoteTemplate,
-  RemoteTemplate,
-  TemplateType,
+  type CreateRemoteNote,
+  type CreateRemoteTemplate,
+  type EditRemoteNote,
+  type EditRemoteTemplate,
+  type RemoteTemplate,
+  type TemplateType,
 } from "./schema.js"
 
 const convert = compile({})
@@ -327,7 +333,7 @@ export async function insertNoteComment(
   await db.transaction().execute(
     async (tx) =>
       await Promise.all([
-        await db
+        db
           .selectFrom("note")
           .select(["id"])
           .where("note.id", "=", noteDbId)

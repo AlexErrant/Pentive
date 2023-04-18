@@ -10,21 +10,21 @@
 
 import { Hono } from "hono"
 import { cors } from "hono/cors"
-import { Env, getUserId, MediaHash, CwaContext } from "./util"
+import { type Env, getUserId, type MediaHash, type CwaContext } from "./util"
 import {
   hstsName,
   hstsValue,
   base64,
-  Base64,
-  Base64Url,
+  type Base64,
+  type Base64Url,
   setKysely,
   db,
   fromBase64Url,
   fromBase64,
-  NoteId,
+  type NoteId,
   userOwnsNoteAndHasMedia,
-  UserId,
-  TemplateId,
+  type UserId,
+  type TemplateId,
   userOwnsTemplateAndHasMedia,
   iByEntityIdsValidator,
 } from "shared"

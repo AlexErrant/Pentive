@@ -1,6 +1,6 @@
-import { Component, For, Show, createSignal } from "solid-js"
+import { type Component, For, Show, createSignal } from "solid-js"
 import { A } from "solid-start"
-import { NoteComment as NoteCommentType } from "shared"
+import { type NoteComment as NoteCommentType } from "shared"
 import Toggle from "./toggle"
 import SubmitComment from "./submitComment"
 import { cwaClient } from "~/routes/cwaClient"
@@ -25,12 +25,12 @@ const NoteComment: Component<{ comment: NoteCommentType }> = (props) => {
       </button>
       <div style={{ display: showReply() ? "block" : "none" }}>
         <SubmitComment
-          onSubmit={async (text) =>
+          onSubmit={async (text) => {
             await cwaClient.insertNoteChildComment.mutate({
               parentCommentId: props.comment.id,
               text,
             })
-          }
+          }}
         />
       </div>
       <Show when={props.comment.comments.length}>

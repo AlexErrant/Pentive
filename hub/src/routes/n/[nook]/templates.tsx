@@ -1,7 +1,7 @@
-import { Component, For, Show } from "solid-js"
-import { RouteDataArgs, useRouteData } from "solid-start"
+import { type Component, For, Show } from "solid-js"
+import { type RouteDataArgs, useRouteData } from "solid-start"
 import { createServerData$ } from "solid-start/server"
-import { NookId, getTemplates, unproxify } from "shared"
+import { type NookId, getTemplates, unproxify } from "shared"
 import ResizingIframe from "~/components/resizingIframe"
 import { getAppMessenger } from "~/root"
 
@@ -31,9 +31,9 @@ const Threads: Component = () => {
                 <h1>{template.name}</h1>
                 <div>
                   <button
-                    onclick={async () =>
+                    onclick={async () => {
                       await getAppMessenger().addTemplate(unproxify(template))
-                    }
+                    }}
                   >
                     Download
                   </button>

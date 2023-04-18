@@ -1,4 +1,4 @@
-import { EditorState, Transaction } from "@codemirror/state"
+import { EditorState, type Transaction } from "@codemirror/state"
 import {
   EditorView,
   keymap,
@@ -28,9 +28,14 @@ import {
   closeBracketsKeymap,
 } from "@codemirror/autocomplete"
 import { lintKeymap } from "@codemirror/lint"
-import { NookId, RemoteTemplateId, RemoteTemplate, getTemplate } from "shared"
 import {
-  JSX,
+  type NookId,
+  type RemoteTemplateId,
+  type RemoteTemplate,
+  getTemplate,
+} from "shared"
+import {
+  type JSX,
   onMount,
   Show,
   createSignal,
@@ -38,12 +43,12 @@ import {
   on,
   onCleanup,
 } from "solid-js"
-import { RouteDataArgs, useRouteData } from "solid-start"
+import { type RouteDataArgs, useRouteData } from "solid-start"
 import { createServerData$ } from "solid-start/server"
 import { html } from "@codemirror/lang-html"
 import ResizingIframe from "~/components/resizingIframe"
-import { ClozeTemplate, StandardTemplate } from "shared/src/cardHtml"
-import { SetStoreFunction, createStore } from "solid-js/store"
+import { type ClozeTemplate, type StandardTemplate } from "shared/src/cardHtml"
+import { type SetStoreFunction, createStore } from "solid-js/store"
 import { cwaClient } from "~/routes/cwaClient"
 
 interface TemplateStore {
@@ -97,15 +102,17 @@ export default function Submit(): JSX.Element {
     setFrontView(
       new EditorView({
         parent: frontRef,
-        dispatch: (tr) =>
-          dispatch(tr, frontView()!, template, setTemplate, i()!),
+        dispatch: (tr) => {
+          dispatch(tr, frontView()!, template, setTemplate, i()!)
+        },
       })
     )
     setBackView(
       new EditorView({
         parent: backRef,
-        dispatch: (tr) =>
-          dispatch(tr, backView()!, template, setTemplate, i()!),
+        dispatch: (tr) => {
+          dispatch(tr, backView()!, template, setTemplate, i()!)
+        },
       })
     )
   })

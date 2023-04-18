@@ -10,11 +10,11 @@
 
 import { Hono } from "hono"
 import { cors } from "hono/cors"
-import { Env, ApiUgcContext } from "./util"
+import { type Env, type ApiUgcContext } from "./util"
 import {
   hstsName,
   hstsValue,
-  Base64,
+  type Base64,
   setKysely,
   lookupMediaHash,
   binary16fromBase64URL,

@@ -37,5 +37,7 @@ export const noteRouter = {
     }),
   editNote: authedProcedure
     .input(z.array(editRemoteNote).min(1))
-    .mutation(async ({ input, ctx }) => await editNotes(ctx.user, input)),
+    .mutation(async ({ input, ctx }) => {
+      await editNotes(ctx.user, input)
+    }),
 }

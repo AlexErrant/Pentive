@@ -1,7 +1,7 @@
 // eslint-disable-next-line @typescript-eslint/triple-slash-reference
 /// <reference types="@cloudflare/workers-types" />
 
-import { Base64 } from "shared"
+import { type Base64 } from "shared"
 
 export interface EnvVars {
   planetscaleDbUrl: string
