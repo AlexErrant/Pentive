@@ -12,7 +12,9 @@
     "start": "wrangler dev",
     "dev": "wrangler dev",
     "deploy": "wrangler publish",
-    "build": "wrangler publish --dry-run --outdir dist"
+    "build": "wrangler publish --dry-run --outdir dist",
+    "eslint": "eslint . --ignore-path .gitignore",
+    "eslint:fix": "eslint . --fix --ignore-path .gitignore"
   },
   "dependencies": {
     "@planetscale/database": "^1.5.0",
