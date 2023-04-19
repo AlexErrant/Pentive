@@ -13,6 +13,9 @@
     "types": [
       "@cloudflare/workers-types",
       "vite/client",
-    ]
+    ],
+    "composite": true,
+    "declaration": true,
+    "outDir": "dist"
   }
 }

@@ -10,6 +10,7 @@
     "build-watch": "vite build --watch",
     "serve": "vite preview",
     "postinstall": "cp ../node_modules/.pnpm/node_modules/sql.js/dist/sql-wasm.wasm ./src/assets/sql-wasm.wasm",
+    "type:emit": "tsc --emitDeclarationOnly",
     "type:check": "tsc --noEmit",
     "eslint": "eslint . --ignore-path .gitignore",
     "eslint:fix": "eslint . --fix --ignore-path .gitignore",

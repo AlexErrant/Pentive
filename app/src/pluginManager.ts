@@ -1,5 +1,5 @@
 import { freeze } from "immer"
-import { type PentiveElement } from "./customElements/registry"
+import type { PentiveElement } from "./customElements/registry"
 import { type Plugin } from "shared"
 import {
   defaultContainer,

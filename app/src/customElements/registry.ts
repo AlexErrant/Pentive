@@ -3,7 +3,7 @@
 // https://stackoverflow.com/a/72239265
 // https://github.com/solidjs/solid/issues/616
 
-import { type Component } from "solid-js"
+import type { Component } from "solid-js"
 import type Nav from "./nav"
 
 export interface HTMLElementTagNameMap {
