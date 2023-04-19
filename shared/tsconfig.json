@@ -11,6 +11,9 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
+    "composite": true,
+    "declaration": true,
+    "outDir": "dist",
     "lib": [
       "ES2022",
       "DOM"
