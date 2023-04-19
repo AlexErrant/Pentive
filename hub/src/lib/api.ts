@@ -5,7 +5,7 @@ const story = (path: string): string =>
 const user = (path: string): string =>
   `https://hacker-news.firebaseio.com/v0/${path}.json`
 
-export default async function fetchAPI(path: string): Promise<unknown> {
+export default async function fetchAPI(path: string) {
   const url = path.startsWith("user") ? user(path) : story(path)
   const headers: Record<string, string> = isServer
     ? // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -19,7 +19,8 @@ export default async function fetchAPI(path: string): Promise<unknown> {
       if (text === null) {
         return { error: "Not found" }
       }
-      return JSON.parse(text) as unknown
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+      return JSON.parse(text)
     } catch (e) {
       console.error(`Received from API: ${text}`)
       console.error(e)

@@ -8,6 +8,7 @@
     "type:check": "tsc --noEmit",
     "eslint": "eslint . --ignore-path .gitignore",
     "eslint:fix": "eslint . --fix --ignore-path .gitignore",
+    "postinstall": "node add-ts-nocheck.cjs",
     "prettier": "prettier --check .",
     "prettierw": "prettier --write .",
     "stylelint": "stylelint **/*.css",
