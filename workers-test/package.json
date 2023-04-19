@@ -11,6 +11,7 @@
     "test": "npm run build && node --experimental-vm-modules --no-warnings node_modules/jest/bin/jest.js",
     "types:check": "tsc && tsc -p test/tsconfig.json",
     "deploy": "wrangler publish",
+    "type:check": "tsc --noEmit",
     "eslint": "eslint . --ignore-path .gitignore",
     "eslint:fix": "eslint . --fix --ignore-path .gitignore",
     "prettier": "prettier --check .",

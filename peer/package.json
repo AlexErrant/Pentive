@@ -16,6 +16,7 @@
   },
   "scripts": {
     "dev": "nodemon server.ts",
+    "type:check": "tsc --noEmit",
     "eslint": "eslint . --ignore-path .gitignore",
     "eslint:fix": "eslint . --fix --ignore-path .gitignore"
   }

@@ -8,6 +8,7 @@
   "main": "src/index.ts",
   "exports": "./src/index.ts",
   "scripts": {
+    "type:check": "tsc --noEmit",
     "eslint": "eslint . --ignore-path .gitignore",
     "eslint:fix": "eslint . --fix --ignore-path .gitignore",
     "prettier": "prettier --check .",
