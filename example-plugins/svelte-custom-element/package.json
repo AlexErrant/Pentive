@@ -8,6 +8,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "check": "svelte-check --tsconfig ./tsconfig.json",
+    "type:emitCheck": "pnpm --filter shared type:emit && pnpm --filter app type:emit && pnpm type:check",
     "type:check": "tsc --noEmit",
     "eslint": "eslint . --ignore-path .gitignore",
     "eslint:fix": "eslint . --fix --ignore-path .gitignore",

@@ -15,7 +15,9 @@
      */
     "allowJs": true,
     "checkJs": true,
-    "isolatedModules": true
+    "isolatedModules": true,
+    "skipLibCheck": true,
+    "ignoreDeprecations": "5.0", // https://github.com/sveltejs/kit/issues/8650
   },
   "include": [
     "src/**/*.d.ts",
@@ -27,6 +29,12 @@
   "references": [
     {
       "path": "./tsconfig.node.json"
+    },
+    {
+      "path": "../../app"
+    },
+    {
+      "path": "../../shared"
     }
-  ]
+  ],
 }
