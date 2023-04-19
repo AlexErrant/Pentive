@@ -47,7 +47,7 @@ app
     setKysely(c.env.planetscaleDbUrl)
     return await fetchRequestHandler({
       endpoint: "/trpc",
-      req: c.req,
+      req: c.req.raw,
       router: appRouter,
       createContext,
     })
