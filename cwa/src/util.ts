@@ -39,17 +39,14 @@ export function concat(a1: Uint8Array, a2: ArrayBuffer): Uint8Array {
 export type MediaHash = Brand<Uint8Array, "mediaHash">
 export type UserId = Brand<string, "userId">
 
-export type CwaContext = Context<
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  any,
-  {
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    Bindings: Env
-  },
-  unknown
->
+export type CwaContext = Context<{
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  Bindings: Env
+}>
 
-export interface Env {
+// must be `type` https://github.com/honojs/hono/blob/main/docs/MIGRATION.md#use-type-to-define-the-generics-for-new-hono
+// eslint-disable-next-line @typescript-eslint/consistent-type-definitions
+export type Env = {
   // Example binding to KV. Learn more at https://developers.cloudflare.com/workers/runtime-apis/kv/
   // MY_KV_NAMESPACE: KVNamespace;
   //
