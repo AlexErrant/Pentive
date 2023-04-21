@@ -37,7 +37,7 @@ const server = https.createServer(
     // medTODO add caching https://httptoolkit.com/blog/cache-your-cors/ https://techpearl.com/blog/avoid-options-call-to-improve-the-performance-of-your-web-apps/
     res.setHeader(
       "Access-Control-Allow-Origin",
-      "https://app.pentive.local:3013"
+      "https://app.pentive.localhost:3013"
     )
     res.setHeader("Access-Control-Allow-Credentials", "true")
     res.setHeader("Access-Control-Request-Method", "*")

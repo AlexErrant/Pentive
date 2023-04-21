@@ -6,7 +6,7 @@ import superjson from "superjson"
 export const lrpc = createTRPCProxyClient<AppRouter>({
   links: [
     httpBatchLink({
-      url: "https://lrpc.pentive.local:4050",
+      url: "https://lrpc.pentive.localhost:4050",
       headers: {
         [csrfHeaderName]: "",
       },
