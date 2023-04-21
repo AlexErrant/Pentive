@@ -68,7 +68,7 @@ Secrets are stored outside the repo so [`git clean -fdx`](https://tysonwilliams.
 
 - Update `secrets.sh` with your values.
   - Replace the secrets using `openssl rand -base64 32`.
-- Run `./make.sh`. Rerun this if you ever make changes to `secrets.sh`.
+- Run `./mkenv.sh`. Rerun this if you ever make changes to `secrets.sh`.
 
 ## 5. Generate certs
 
@@ -78,7 +78,7 @@ Secrets are stored outside the repo so [`git clean -fdx`](https://tysonwilliams.
 
 > **Warning** _Both_ scripts expect the Wrangler key/cert to exist at `~/.wrangler/local-cert/` or `${XDG_CONFIG_HOME:-$HOME/.config}/.wrangler/local-cert/`. If the key/cert doesn't exist in either location, [open an issue!](https://github.com/AlexErrant/Pentive/issues/new)
 
-> [`rmcert.sh`](../rmcert.sh) deletes Wrangler's local-cert's `key.pem` and `cert.pem`. (Then [`mkcert.sh`](../make.sh) generates a new one.) This "regenerate" may be undesirable if you're using Wrangler for HTTPS anywhere else. If this is the case, add your site to `mkcert.sh` before running it, e.g. `mkcert -key-file key.pem -cert-file cert.pem user-generated-content-pentive.localhost cwa.pentive.localhost your-wrangler-worker-here.com`
+> [`rmcert.sh`](../rmcert.sh) deletes Wrangler's local-cert's `key.pem` and `cert.pem`. (Then [`mkcert.sh`](../mkcert.sh) generates a new one.) This "regenerate" may be undesirable if you're using Wrangler for HTTPS anywhere else. If this is the case, add your site to `mkcert.sh` before running it, e.g. `mkcert -key-file key.pem -cert-file cert.pem user-generated-content-pentive.localhost cwa.pentive.localhost your-wrangler-worker-here.com`
 
 > [More info.](https://github.com/cloudflare/workers-sdk/issues/1908#issuecomment-1416901172) Note that `NODE_EXTRA_CA_CERTS` isn't helpful since it specifies a [CA cert](https://discord.com/channels/595317990191398933/799437470004412476/1039744087672238110) and we need to trust domains remapped in our `hosts` file.
 
