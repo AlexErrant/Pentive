@@ -1,5 +1,5 @@
 import { For, type VoidComponent } from "solid-js"
-import { NavLink, useLocation } from "solid-app-router"
+import { NavLink, useLocation } from "@solidjs/router"
 import { type NavLinkData } from "./contracts"
 
 const ends = new Set(["/"])

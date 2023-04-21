@@ -1,5 +1,5 @@
 import { type JSX, createEffect, Suspense } from "solid-js"
-import { useRouteData } from "solid-app-router"
+import { useRouteData } from "@solidjs/router"
 import type AboutData from "./about.data"
 
 export default function About(): JSX.Element {

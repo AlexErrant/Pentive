@@ -1,5 +1,5 @@
 import type { JSX } from "solid-js"
-import { useRoutes } from "solid-app-router"
+import { useRoutes } from "@solidjs/router"
 
 import { navLinks, routes } from "./routes"
 import { Plugin } from "./components/pluginWrapper"
