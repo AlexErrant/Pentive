@@ -39,7 +39,8 @@
     "vite": "^4.1.4",
     "vite-plugin-checker": "^0.5.6",
     "vite-plugin-pwa": "^0.14.4",
-    "workbox-precaching": "^6.5.4"
+    "workbox-precaching": "^6.5.4",
+    "wrangler": "^2.16.0"
   },
   "dependencies": {
     "comlink": "^4.3.1",

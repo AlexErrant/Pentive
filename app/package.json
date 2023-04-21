@@ -62,7 +62,8 @@
     "vite-plugin-pwa": "^0.14.4",
     "vite-plugin-solid": "^2.6.1",
     "vitest": "^0.29.2",
-    "workbox-precaching": "^6.5.4"
+    "workbox-precaching": "^6.5.4",
+    "wrangler": "^2.16.0"
   },
   "dependencies": {
     "@github/time-elements": "^3.1.4",
