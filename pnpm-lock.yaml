@@ -45,7 +45,7 @@ importers:
         specifier: ^8.38.0
         version: 8.38.0
       typescript:
-        specifier: ^5.0.4
+        specifier: ~5.0.4
         version: 5.0.4
       wrangler:
         specifier: 2.13.0
@@ -235,7 +235,7 @@ importers:
         specifier: ^3.1.6
         version: 3.1.8(postcss@8.4.16)
       typescript:
-        specifier: ^5.0.4
+        specifier: ~5.0.4
         version: 5.0.4
       vite:
         specifier: ^4.1.4
@@ -323,7 +323,7 @@ importers:
         specifier: ^26.0.0
         version: 26.0.0(stylelint@14.11.0)
       typescript:
-        specifier: ^5.0.4
+        specifier: ~5.0.4
         version: 5.0.4
       vite:
         specifier: ^4.1.4
@@ -372,7 +372,7 @@ importers:
         specifier: ^8.38.0
         version: 8.38.0
       typescript:
-        specifier: ^5.0.4
+        specifier: ~5.0.4
         version: 5.0.4
       wrangler:
         specifier: 2.13.0
@@ -391,7 +391,7 @@ importers:
         specifier: ^8.38.0
         version: 8.38.0
       typescript:
-        specifier: ^5.0.4
+        specifier: ~5.0.4
         version: 5.0.4
       vite:
         specifier: ^4.1.4
@@ -424,7 +424,7 @@ importers:
         specifier: ^2.4.0
         version: 2.4.0
       typescript:
-        specifier: ^5.0.4
+        specifier: ~5.0.4
         version: 5.0.4
       vite:
         specifier: ^4.1.4
@@ -575,7 +575,7 @@ importers:
         specifier: ^26.0.0
         version: 26.0.0(stylelint@14.11.0)
       typescript:
-        specifier: ^5.0.4
+        specifier: ~5.0.4
         version: 5.0.4
       vite:
         specifier: ^4.1.4
@@ -651,7 +651,7 @@ importers:
         specifier: ^26.0.0
         version: 26.0.0(stylelint@14.11.0)
       typescript:
-        specifier: ^5.0.4
+        specifier: ~5.0.4
         version: 5.0.4
       vite:
         specifier: ^4.1.4
@@ -760,7 +760,7 @@ importers:
         specifier: ^10.9.1
         version: 10.9.1(@types/node@18.7.21)(typescript@5.0.4)
       typescript:
-        specifier: ^5.0.4
+        specifier: ~5.0.4
         version: 5.0.4
 
   peer:
@@ -788,7 +788,7 @@ importers:
         specifier: ^10.9.1
         version: 10.9.1(@types/node@18.7.21)(typescript@5.0.4)
       typescript:
-        specifier: ^5.0.4
+        specifier: ~5.0.4
         version: 5.0.4
 
   shared:
@@ -885,7 +885,7 @@ importers:
         specifier: ^17.0.0
         version: 17.0.0(@typescript-eslint/parser@5.59.0)
       typescript:
-        specifier: ^5.0.4
+        specifier: ~5.0.4
         version: 5.0.4
 
   workers-test:
@@ -922,7 +922,7 @@ importers:
         specifier: 29.0.4
         version: 29.0.4(@babel/core@7.21.4)(esbuild@0.16.17)(jest@29.3.1)(typescript@5.0.4)
       typescript:
-        specifier: ^5.0.4
+        specifier: ~5.0.4
         version: 5.0.4
       wrangler:
         specifier: 2.13.0
