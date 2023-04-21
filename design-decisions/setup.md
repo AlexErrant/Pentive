@@ -1,5 +1,4 @@
-> **Warning**
-> This file is called `run-locally`, but there is an online-only dependency: [PlanetScale](https://planetscale.com/). You could spin up a MySQL Docker and change the Kysely dialect from PlanetScale to MySQL, but I don't recommend this; I'm not even sure if a locally running Cloudflare Worker can connect to MySQL.
+I apologize in advance for how time consuming setting up Pentive on your local machine may be. Getting HTTPS to work locally is the majority of the effort, so if you already know how to do that things will be easier.
 
 # Steps
 
