@@ -6,12 +6,13 @@ The primary author of Pentive, Alex, is _not_ a good architect, designer, or web
 
 ## app
 
-- The client-side occasionally-online SRS program that stores a user's templates/notes/cards
+- The client-side occasionally-online [SRS](https://en.wikipedia.org/wiki/Spaced_repetition#Software) that stores a user's templates/notes/cards
 - Where card reviews occur
 
 ## app-ugc
 
-- A relatively small occasionally-online site that sandboxes untrusted user generated content - i.e. JavaScript in users' cards
+- A small occasionally-online static site that displays untrusted user generated content (e.g. users' cards)
+- Typically viewed through an iframe on `app` so JavaScript can't access `app`
 - Has a service worker that queries `app` for media (e.g. images)
 
 ## hub
@@ -21,7 +22,7 @@ The primary author of Pentive, Alex, is _not_ a good architect, designer, or web
 
 ## hub-ugc
 
-- Its raison d'être is the same as `app-ugc`'s
+- Its raison d'être is the same as `app-ugc`'s - but for `hub`
 - Always-online, so it doesn't need `app-ugc`'s fancy service worker
 
 ## lrpc
@@ -38,6 +39,7 @@ The primary author of Pentive, Alex, is _not_ a good architect, designer, or web
 ## api-ugc
 
 - The API serving untrusted user generated content from a secondary domain (e.g. `user-generated-content-pentive.com`)
+- This is the _API_ - the other `ugc`s are sites (typically viewed through iframes)
 
 ## peer
 
