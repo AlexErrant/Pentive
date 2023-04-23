@@ -439,11 +439,11 @@ importers:
   hub:
     dependencies:
       '@auth/core':
-        specifier: ^0.5.1
-        version: 0.5.1
+        specifier: ^0.7.0
+        version: 0.7.0
       '@auth/solid-start':
         specifier: ^0.1.1
-        version: 0.1.1(@auth/core@0.5.1)(solid-js@1.7.3)(solid-start@0.2.26)
+        version: 0.1.1(@auth/core@0.7.0)(solid-js@1.7.3)(solid-start@0.2.26)
       '@codemirror/autocomplete':
         specifier: ^6.4.2
         version: 6.4.2(@codemirror/language@6.6.0)(@codemirror/state@6.2.0)(@codemirror/view@6.9.1)(@lezer/common@1.0.2)
@@ -585,7 +585,7 @@ importers:
         version: 5.0.4
       vite:
         specifier: ^4.1.4
-        version: 4.1.4(@types/node@18.15.11)
+        version: 4.1.4
       wrangler:
         specifier: ^2.16.0
         version: 2.16.0
@@ -968,8 +968,8 @@ packages:
       leven: 3.1.0
     dev: true
 
-  /@auth/core@0.5.1:
-    resolution: {integrity: sha512-t9z8F7dkuVceKWBmMy1fd2t6H+vfRju/YJ1lm+6RnJ7pNEvX5qMR874wg0+cYbWvyZazLi8fFK/FA6I3D5sSkA==}
+  /@auth/core@0.7.0:
+    resolution: {integrity: sha512-he6SZkU1WJ2TvFZxn7PnIwPSU6UXp4/HGUCSckahfzqhFZ3b7pGifRBffUKnubMiMZd9c7rCbWoZVNz4AxiiYA==}
     peerDependencies:
       nodemailer: ^6.8.0
     peerDependenciesMeta:
@@ -978,20 +978,20 @@ packages:
     dependencies:
       '@panva/hkdf': 1.0.4
       cookie: 0.5.0
-      jose: 4.13.1
-      oauth4webapi: 2.2.0
+      jose: 4.11.1
+      oauth4webapi: 2.2.3
       preact: 10.11.3
       preact-render-to-string: 5.2.3(preact@10.11.3)
     dev: false
 
-  /@auth/solid-start@0.1.1(@auth/core@0.5.1)(solid-js@1.7.3)(solid-start@0.2.26):
+  /@auth/solid-start@0.1.1(@auth/core@0.7.0)(solid-js@1.7.3)(solid-start@0.2.26):
     resolution: {integrity: sha512-WMWBH/RbQTs5oFBoOjtJgKKZv3QlZQkyiAj1UnKWJ2+3UbuNQAhDBM4ppZD54CdbF/Wb1LVXjUNI6LBbopUK6g==}
     peerDependencies:
       '@auth/core': ~0.2.2 || ^0.2.2
       solid-js: ^1.5.7
       solid-start: ^0.2.14
     dependencies:
-      '@auth/core': 0.5.1
+      '@auth/core': 0.7.0
       solid-js: 1.7.3
       solid-start: 0.2.26(@solidjs/meta@0.28.4)(@solidjs/router@0.8.2)(solid-js@1.7.3)(solid-start-cloudflare-workers@0.2.26)(solid-start-node@0.2.26)(vite@4.1.4)
     dev: false
@@ -4449,6 +4449,7 @@ packages:
 
   /@types/node@18.7.21:
     resolution: {integrity: sha512-rLFzK5bhM0YPyCoTC8bolBjMk7bwnZ8qeZUBslBfjZQou2ssJdWslx9CZ8DGM+Dx7QXQiiTVZ/6QO6kwtHkZCA==}
+    dev: true
 
   /@types/normalize-package-data@2.4.1:
     resolution: {integrity: sha512-Gj7cI7z+98M282Tqmp2K5EIsoouUEzbBJhQQzDE3jSIRk6r9gsz0oUokqIUR4u1R3dMHo0pDHM7sNOHyhulypw==}
@@ -8849,6 +8850,7 @@ packages:
 
   /jose@4.13.1:
     resolution: {integrity: sha512-MSJQC5vXco5Br38mzaQKiq9mwt7lwj2eXpgpRyQYNHYt2lq1PjkWa7DLXX0WVcQLE9HhMh3jPiufS7fhJf+CLQ==}
+    dev: true
 
   /js-sdsl@4.4.0:
     resolution: {integrity: sha512-FfVSdx6pJ41Oa+CF7RDaFmTnCaFhua+SNYQX74riGOpl96x+2jQCqEfQ2bnXu/5DPCqlRuiqyvTJM0Qjz26IVg==}
@@ -9936,8 +9938,8 @@ packages:
   /nwsapi@2.2.2:
     resolution: {integrity: sha512-90yv+6538zuvUMnN+zCr8LuV6bPFdq50304114vJYJ8RDyK8D5O9Phpbd6SZWgI7PwzmmfN1upeOJlvybDSgCw==}
 
-  /oauth4webapi@2.2.0:
-    resolution: {integrity: sha512-yHJIXtjeQil8BfBvu0PUu38a2DNPOPcEOhzNdg/HytfKPGQk1hTg5j94zZ3bon9YBIAhW5PSmFv+n6bqq0v0uQ==}
+  /oauth4webapi@2.2.3:
+    resolution: {integrity: sha512-nukaBmXBkBIz46SGM6FPIlIBPm5D0ZfYVbVPi2U3J5aPEVwluE5SEh/wuxfJgOc0bmZXfVY5pMFwmpHeNw1TOg==}
     dev: false
 
   /object-assign@4.1.1:
@@ -11526,7 +11528,7 @@ packages:
       rollup: 3.20.7
       solid-start: 0.2.26(@solidjs/meta@0.28.4)(@solidjs/router@0.8.2)(solid-js@1.7.3)(solid-start-cloudflare-workers@0.2.26)(solid-start-node@0.2.26)(vite@4.1.4)
       terser: 5.17.1
-      vite: 4.1.4(@types/node@18.15.11)
+      vite: 4.1.4
       ws: 8.13.0
     transitivePeerDependencies:
       - '@miniflare/storage-redis'
@@ -11552,7 +11554,7 @@ packages:
       solid-start: 0.2.26(@solidjs/meta@0.28.4)(@solidjs/router@0.8.2)(solid-js@1.7.3)(solid-start-cloudflare-workers@0.2.26)(solid-start-node@0.2.26)(vite@4.1.4)
       terser: 5.17.1
       undici: 5.14.0
-      vite: 4.1.4(@types/node@18.15.11)
+      vite: 4.1.4
     transitivePeerDependencies:
       - supports-color
 
@@ -11623,7 +11625,7 @@ packages:
       solid-start-node: 0.2.26(solid-start@0.2.26)(undici@5.14.0)(vite@4.1.4)
       terser: 5.17.1
       undici: 5.22.0
-      vite: 4.1.4(@types/node@18.15.11)
+      vite: 4.1.4
       vite-plugin-inspect: 0.7.24(rollup@3.20.7)(vite@4.1.4)
       vite-plugin-solid: 2.7.0(solid-js@1.7.3)(vite@4.1.4)
       wait-on: 6.0.1(debug@4.3.4)
@@ -12963,7 +12965,7 @@ packages:
       fs-extra: 11.1.1
       picocolors: 1.0.0
       sirv: 2.0.2
-      vite: 4.1.4(@types/node@18.15.11)
+      vite: 4.1.4
     transitivePeerDependencies:
       - rollup
       - supports-color
@@ -13000,10 +13002,42 @@ packages:
       merge-anything: 5.1.4
       solid-js: 1.7.3
       solid-refresh: 0.5.2(solid-js@1.7.3)
-      vite: 4.1.4(@types/node@18.7.21)
+      vite: 4.1.4
       vitefu: 0.2.4(vite@4.1.4)
     transitivePeerDependencies:
       - supports-color
+
+  /vite@4.1.4:
+    resolution: {integrity: sha512-3knk/HsbSTKEin43zHu7jTwYWv81f8kgAL99G5NWBcA1LKvtvcVAC4JjBH1arBunO9kQka+1oGbrMKOjk4ZrBg==}
+    engines: {node: ^14.18.0 || >=16.0.0}
+    hasBin: true
+    peerDependencies:
+      '@types/node': '>= 14'
+      less: '*'
+      sass: '*'
+      stylus: '*'
+      sugarss: '*'
+      terser: ^5.4.0
+    peerDependenciesMeta:
+      '@types/node':
+        optional: true
+      less:
+        optional: true
+      sass:
+        optional: true
+      stylus:
+        optional: true
+      sugarss:
+        optional: true
+      terser:
+        optional: true
+    dependencies:
+      esbuild: 0.16.17
+      postcss: 8.4.21
+      resolve: 1.22.2
+      rollup: 3.20.2
+    optionalDependencies:
+      fsevents: 2.3.2
 
   /vite@4.1.4(@types/node@18.15.11):
     resolution: {integrity: sha512-3knk/HsbSTKEin43zHu7jTwYWv81f8kgAL99G5NWBcA1LKvtvcVAC4JjBH1arBunO9kQka+1oGbrMKOjk4ZrBg==}
@@ -13070,6 +13104,7 @@ packages:
       rollup: 3.20.2
     optionalDependencies:
       fsevents: 2.3.2
+    dev: true
 
   /vitefu@0.2.4(vite@4.1.4):
     resolution: {integrity: sha512-fanAXjSaf9xXtOOeno8wZXIhgia+CZury481LsDaV++lSvcU2R9Ch2bPh3PYFyoHW+w9LqAeYRISVQjUIew14g==}
@@ -13079,7 +13114,7 @@ packages:
       vite:
         optional: true
     dependencies:
-      vite: 4.1.4(@types/node@18.7.21)
+      vite: 4.1.4
 
   /vitest@0.29.2(jsdom@20.0.0):
     resolution: {integrity: sha512-ydK9IGbAvoY8wkg29DQ4ivcVviCaUi3ivuPKfZEVddMTenFHUfB8EEDXQV8+RasEk1ACFLgMUqAaDuQ/Nk+mQA==}
