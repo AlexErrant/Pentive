@@ -38,7 +38,7 @@
     "stylelint-config-standard": "^26.0.0",
     "typescript": "~5.0.4",
     "vite": "^4.1.4",
-    "wrangler": "^2.13.0"
+    "wrangler": "^2.16.0"
   },
   "dependencies": {
     "@auth/core": "^0.5.1",

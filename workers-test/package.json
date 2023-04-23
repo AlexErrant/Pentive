@@ -34,6 +34,6 @@
     "prettier": "^2.7.1",
     "ts-jest": "29.0.4",
     "typescript": "~5.0.4",
-    "wrangler": "2.13.0"
+    "wrangler": "2.16.0"
   }
 }

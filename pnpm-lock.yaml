@@ -48,8 +48,8 @@ importers:
         specifier: ~5.0.4
         version: 5.0.4
       wrangler:
-        specifier: 2.13.0
-        version: 2.13.0
+        specifier: 2.16.0
+        version: 2.16.0
 
   app:
     dependencies:
@@ -381,8 +381,8 @@ importers:
         specifier: ~5.0.4
         version: 5.0.4
       wrangler:
-        specifier: 2.13.0
-        version: 2.13.0
+        specifier: 2.16.0
+        version: 2.16.0
 
   example-plugins/solid-custom-element:
     dependencies:
@@ -587,7 +587,7 @@ importers:
         specifier: ^4.1.4
         version: 4.1.4(@types/node@18.15.11)
       wrangler:
-        specifier: ^2.13.0
+        specifier: ^2.16.0
         version: 2.16.0
 
   hub-ugc:
@@ -934,8 +934,8 @@ importers:
         specifier: ~5.0.4
         version: 5.0.4
       wrangler:
-        specifier: 2.13.0
-        version: 2.13.0
+        specifier: 2.16.0
+        version: 2.16.0
 
 packages:
 
@@ -3695,7 +3695,7 @@ packages:
     resolution: {integrity: sha512-N8sHNM5vcvjvO+znQ7Mbqf0FChRlWxy/svUpQf1GGpii9aTXzOTWB+WkFvJrJNx44SUReEGxUAzxpdeWnHahmA==}
     engines: {node: '>=16.13'}
     dependencies:
-      '@types/better-sqlite3': 7.6.3
+      '@types/better-sqlite3': 7.6.4
       kleur: 4.1.5
       npx-import: 1.1.4
       picomatch: 2.3.1
@@ -4290,12 +4290,6 @@ packages:
     resolution: {integrity: sha512-1kbcJ40lLB7MHsj39U4Sh1uTd2E7rLEa79kmDpI6cy+XiXsteB3POdQomoq4FxszMrO3ZYchkhYJw7A2862b3w==}
     dependencies:
       '@babel/types': 7.21.4
-
-  /@types/better-sqlite3@7.6.3:
-    resolution: {integrity: sha512-YS64N9SNDT/NAvou3QNdzAu3E2om/W/0dhORimtPGLef+zSK5l1vDzfsWb4xgXOgfhtOI5ZDTRxnvRPb22AIVQ==}
-    dependencies:
-      '@types/node': 18.15.11
-    dev: true
 
   /@types/better-sqlite3@7.6.4:
     resolution: {integrity: sha512-dzrRZCYPXIXfSR1/surNbJ/grU3scTaygS0OMzjlGf71i9sc2fGyHPXXiXmEvNIoE0cGwsanEFMVJxPXmco9Eg==}
@@ -13483,36 +13477,6 @@ packages:
     dependencies:
       '@types/trusted-types': 2.0.3
       workbox-core: 6.5.4
-    dev: true
-
-  /wrangler@2.13.0:
-    resolution: {integrity: sha512-hU7RpOjDcyOlKO0xuNEOKINwSA1lh5nSkTH8aKKdatv2Ryt5gSS26RwS49QpZCYJGxGHzhHPr++TlSggOAsEVA==}
-    engines: {node: '>=16.13.0'}
-    hasBin: true
-    dependencies:
-      '@cloudflare/kv-asset-handler': 0.2.0
-      '@esbuild-plugins/node-globals-polyfill': 0.1.1(esbuild@0.16.3)
-      '@esbuild-plugins/node-modules-polyfill': 0.1.4(esbuild@0.16.3)
-      '@miniflare/core': 2.12.1
-      '@miniflare/d1': 2.12.1
-      '@miniflare/durable-objects': 2.12.1
-      blake3-wasm: 2.1.5
-      chokidar: 3.5.3
-      esbuild: 0.16.3
-      miniflare: 2.12.1
-      nanoid: 3.3.6
-      path-to-regexp: 6.2.1
-      selfsigned: 2.1.1
-      source-map: 0.7.4
-      xxhash-wasm: 1.0.2
-    optionalDependencies:
-      fsevents: 2.3.2
-    transitivePeerDependencies:
-      - '@miniflare/storage-redis'
-      - bufferutil
-      - cron-schedule
-      - ioredis
-      - utf-8-validate
     dev: true
 
   /wrangler@2.16.0:
