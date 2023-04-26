@@ -63,6 +63,7 @@
     "html-to-text": "^9.0.3 || Hub doesn't use this, but `shared` (actually `cwa`) does. Not including this causes an ESModule error - I've no idea why.",
     "iframe-resizer": "^4.3.2",
     "jose": "^4.11.1",
+    "oauth4webapi": "^2.2.4",
     "shared": "workspace:*",
     "solid-js": "^1.7.3",
     "solid-start": "^0.2.26",
