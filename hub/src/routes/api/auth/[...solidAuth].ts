@@ -1,4 +1,4 @@
-import { SolidAuth, type SolidAuthConfig } from "@auth/solid-start"
+import { type SolidAuthConfig } from "@auth/solid-start"
 import Discord from "@auth/core/providers/discord"
 import Github from "@auth/core/providers/github"
 import { redirect, type PageEvent } from "solid-start"
@@ -13,7 +13,9 @@ import {
   parseWwwAuthenticateChallenges,
   processAuthorizationCodeOAuth2Response,
   validateAuthResponse,
+  generateRandomState,
 } from "oauth4webapi"
+import { createLoginHeaders, getOauthState } from "~/db/session"
 
 export function authOpts(env: EnvVars): SolidAuthConfig {
   return {
@@ -40,11 +42,11 @@ export const githubLoginUrl =
 
 export const GET = async ({ env, request }: PageEvent) => {
   if (request.url === githubLoginUrl) {
-    return handleLogin(env)
+    return await handleLogin(env)
   } else return await handleCallback(env, request)
 }
 
-function handleLogin(env: Env) {
+async function handleLogin(env: Env) {
   const redirectUri =
     import.meta.env.VITE_HUB_ORIGIN + "/api/auth/callback/github"
   const authorizationUrl = new URL("https://github.com/login/oauth/authorize")
@@ -52,7 +54,10 @@ function handleLogin(env: Env) {
   authorizationUrl.searchParams.set("redirect_uri", redirectUri)
   authorizationUrl.searchParams.set("response_type", "code")
   authorizationUrl.searchParams.set("scope", "user:email")
-  return redirect(authorizationUrl.toString())
+  const state = generateRandomState()
+  authorizationUrl.searchParams.set("state", state)
+  const headers = await createLoginHeaders(state)
+  return redirect(authorizationUrl.toString(), { headers })
 }
 
 async function handleCallback(env: Env, request: Request) {
@@ -66,10 +71,12 @@ async function handleCallback(env: Env, request: Request) {
     client_secret: env.githubSecret,
     /* eslint-enable @typescript-eslint/naming-convention */
   }
+  const state = await getOauthState(request)
   const parameters = validateAuthResponse(
     as,
     client,
-    new URL(request.url).searchParams
+    new URL(request.url).searchParams,
+    state
   )
   if (isOAuth2Error(parameters)) {
     console.error(parameters)

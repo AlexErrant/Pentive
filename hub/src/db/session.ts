@@ -101,6 +101,26 @@ export function setSessionStorage(x: {
     maxAge: undefined,
     expires: new Date(0), // https://github.com/remix-run/remix/issues/5150 https://stackoverflow.com/q/5285940
   })
+
+  const oauthStateCookieOpts: CookieOptions = {
+    secure: true,
+    sameSite: "lax",
+    path: "/",
+    maxAge: 60 * 60 * 24, // 1 day
+    httpOnly: true,
+    // domain: "", // intentionally missing to exclude subdomains
+    // expires: "", // intentionally missing because docs say it's calculated off `maxAge` when missing https://github.com/solidjs/solid-start/blob/1b22cad87dd7bd74f73d807e1d60b886e753a6ee/packages/start/session/cookies.ts#L56-L57
+  }
+  const oauthStateCookieName = "__Host-oauthState"
+  oauthStateCookie = createPlainCookie(
+    oauthStateCookieName,
+    oauthStateCookieOpts
+  )
+  destroyOauthStateCookie = createPlainCookie(oauthStateCookieName, {
+    ...oauthStateCookieOpts,
+    maxAge: undefined,
+    expires: new Date(0), // https://github.com/remix-run/remix/issues/5150 https://stackoverflow.com/q/5285940
+  })
 }
 
 // @ts-expect-error session calls should throw null error if not setup
@@ -113,6 +133,10 @@ let destroyJwtCookie = null as Cookie
 let csrfSignatureCookie = null as Cookie
 // @ts-expect-error calls should throw null error if not setup
 let destroyCsrfSignatureCookie = null as Cookie
+// @ts-expect-error calls should throw null error if not setup
+let oauthStateCookie = null as Cookie
+// @ts-expect-error calls should throw null error if not setup
+let destroyOauthStateCookie = null as Cookie
 // @ts-expect-error calls should throw null error if not setup
 let jwsSecret = null as Uint8Array
 // @ts-expect-error calls should throw null error if not setup
@@ -132,6 +156,16 @@ export async function getCsrfSignature(
     return null
   }
   return csrfSignature
+}
+
+export async function getOauthState(request: Request) {
+  const state = (await oauthStateCookie.parse(
+    request.headers.get("Cookie")
+  )) as unknown
+  if (typeof state !== "string" || state.length === 0) {
+    throw new Error("oauth state is empty or not a string")
+  }
+  return state
 }
 
 export interface Jwt {
@@ -249,8 +283,17 @@ export async function createUserSession(
     "Set-Cookie",
     await csrfSignatureCookie.serialize(csrfSignature)
   ) // lowTODO parallelize
+  headers.append("Set-Cookie", await destroyOauthStateCookie.serialize("")) // lowTODO parallelize
   return redirect(redirectTo, {
     headers,
+  })
+}
+
+export async function createLoginHeaders(state: string) {
+  return new Headers({
+    // medTODO https://security.stackexchange.com/a/140889 thinks we should encrypt the state, but I'm not 100% sold
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    "Set-Cookie": await oauthStateCookie.serialize(state),
   })
 }
 
