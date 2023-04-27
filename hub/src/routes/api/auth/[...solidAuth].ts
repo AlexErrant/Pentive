@@ -59,7 +59,7 @@ export const GET = async ({ env, request }: PageEvent) => {
     as,
     client,
     parameters,
-    "https://pentive.localhost:3014/api/auth/callback/github",
+    import.meta.env.VITE_HUB_ORIGIN + "/api/auth/callback/github",
     "x"
   )
 
@@ -86,7 +86,7 @@ export const GET = async ({ env, request }: PageEvent) => {
     headers: {
       /* eslint-disable @typescript-eslint/naming-convention */
       Authorization: `Bearer ${result.access_token}`,
-      "User-Agent": "AlexErrant/Pentive/Dev/Hub", // https://docs.github.com/en/rest/overview/resources-in-the-rest-api?apiVersion=2022-11-28#user-agent-required
+      "User-Agent": `AlexErrant/Pentive/${import.meta.env.MODE}/Hub`, // https://docs.github.com/en/rest/overview/resources-in-the-rest-api?apiVersion=2022-11-28#user-agent-required
       /* eslint-enable @typescript-eslint/naming-convention */
     },
   })

@@ -158,7 +158,7 @@ const AuthShowcase: VoidComponent<{ githubId: string }> = (props) => {
         <button
           onClick={() => {
             const redirectUri =
-              "https://pentive.localhost:3014/api/auth/callback/github"
+              import.meta.env.VITE_HUB_ORIGIN + "/api/auth/callback/github"
             const authorizationUrl = new URL(
               "https://github.com/login/oauth/authorize"
             )
