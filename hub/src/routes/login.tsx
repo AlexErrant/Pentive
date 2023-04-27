@@ -10,7 +10,7 @@ import { db } from "~/db"
 import { createUserSession, getUser, login, register } from "~/db/session"
 import { getSession } from "@auth/solid-start"
 import { signOut } from "@auth/solid-start/client"
-import { authOpts } from "./api/auth/[...solidAuth]"
+import { authOpts, githubLoginUrl } from "./api/auth/[...solidAuth]"
 
 function validateUsername(username: unknown): string | undefined {
   if (typeof username !== "string" || username.length < 3) {
@@ -29,7 +29,7 @@ export function routeData() {
     if ((await getUser(request)) != null) {
       throw redirect("/") as unknown
     }
-    return { githubId: env.githubId }
+    return {}
   })
 }
 
@@ -90,7 +90,7 @@ export default function Login(): JSX.Element {
   return (
     <main>
       <Suspense>
-        <AuthShowcase githubId={data()!.githubId} />
+        <AuthShowcase />
       </Suspense>
       <h1>Login</h1>
       <Form>
@@ -134,7 +134,7 @@ export default function Login(): JSX.Element {
   )
 }
 
-const AuthShowcase: VoidComponent<{ githubId: string }> = (props) => {
+const AuthShowcase: VoidComponent = () => {
   const sessionData = createSession()
   return (
     <div>
@@ -155,22 +155,7 @@ const AuthShowcase: VoidComponent<{ githubId: string }> = (props) => {
           </>
         }
       >
-        <button
-          onClick={() => {
-            const redirectUri =
-              import.meta.env.VITE_HUB_ORIGIN + "/api/auth/callback/github"
-            const authorizationUrl = new URL(
-              "https://github.com/login/oauth/authorize"
-            )
-            authorizationUrl.searchParams.set("client_id", props.githubId)
-            authorizationUrl.searchParams.set("redirect_uri", redirectUri)
-            authorizationUrl.searchParams.set("response_type", "code")
-            authorizationUrl.searchParams.set("scope", "user:email")
-            window.location.href = authorizationUrl.toString()
-          }}
-        >
-          Sign in via Github
-        </button>
+        <a href={githubLoginUrl}>Sign in via Github</a>
       </Show>
     </div>
   )

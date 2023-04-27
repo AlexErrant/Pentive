@@ -35,7 +35,27 @@ export function authOpts(env: EnvVars): SolidAuthConfig {
   }
 }
 
+export const githubLoginUrl =
+  import.meta.env.VITE_HUB_ORIGIN + "/api/auth/login/github"
+
 export const GET = async ({ env, request }: PageEvent) => {
+  if (request.url === githubLoginUrl) {
+    return handleLogin(env)
+  } else return await handleCallback(env, request)
+}
+
+function handleLogin(env: Env) {
+  const redirectUri =
+    import.meta.env.VITE_HUB_ORIGIN + "/api/auth/callback/github"
+  const authorizationUrl = new URL("https://github.com/login/oauth/authorize")
+  authorizationUrl.searchParams.set("client_id", env.githubId)
+  authorizationUrl.searchParams.set("redirect_uri", redirectUri)
+  authorizationUrl.searchParams.set("response_type", "code")
+  authorizationUrl.searchParams.set("scope", "user:email")
+  return redirect(authorizationUrl.toString())
+}
+
+async function handleCallback(env: Env, request: Request) {
   const as: AuthorizationServer = {
     issuer: "https://github.com/login/oauth/authorize",
     /* eslint-disable @typescript-eslint/naming-convention */
