@@ -15,6 +15,7 @@ generator js {
 model user {
   id                    String               @id @db.VarChar(21) // lowercase
   displayName           String               @db.VarChar(21) // cased as user input
+  email                 String               @unique @db.VarChar(254)
   created               DateTime             @default(now())
   templateHistory       templateHistory[]
   templateComments      templateComment[]

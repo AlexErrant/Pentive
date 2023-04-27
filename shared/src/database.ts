@@ -136,6 +136,7 @@ export interface TemplateSubscriber {
 export interface User {
   id: string
   displayName: string
+  email: string
   created: Generated<Date>
 }
 
