@@ -107,7 +107,7 @@ export async function getNotes(nook: NookId, userId: UserId | null) {
       "template.fields",
       "template.type",
     ])
-    .if(userId != null, (a) =>
+    .$if(userId != null, (a) =>
       a.select((b) =>
         b
           .selectFrom("noteSubscriber")
@@ -138,7 +138,7 @@ export async function getNote(noteId: RemoteNoteId, userId: UserId | null) {
       "template.fields",
       "template.type",
     ])
-    .if(userId != null, (a) =>
+    .$if(userId != null, (a) =>
       a.select((b) =>
         b
           .selectFrom("noteSubscriber")
@@ -261,7 +261,7 @@ export async function getTemplate(id: RemoteTemplateId, nook?: NookId) {
     .selectAll()
     .where("id", "=", fromBase64Url(id))
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    .if(nook != null, (db) => db.where("nook", "=", nook!))
+    .$if(nook != null, (db) => db.where("nook", "=", nook!))
     .executeTakeFirst()
   return undefinedMap(t, templateEntityToDomain)
 }
