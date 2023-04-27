@@ -9,7 +9,7 @@ import {
 import { db } from "~/db"
 import { createUserSession, getUser, login, register } from "~/db/session"
 import { getSession } from "@auth/solid-start"
-import { signOut, signIn } from "@auth/solid-start/client"
+import { signOut } from "@auth/solid-start/client"
 import { authOpts } from "./api/auth/[...solidAuth]"
 
 function validateUsername(username: unknown): string | undefined {
@@ -25,11 +25,11 @@ function validatePassword(password: unknown): string | undefined {
 }
 
 export function routeData() {
-  return createServerData$(async (_, { request }) => {
+  return createServerData$(async (_, { request, env }) => {
     if ((await getUser(request)) != null) {
       throw redirect("/") as unknown
     }
-    return {}
+    return { githubId: env.githubId }
   })
 }
 
@@ -90,7 +90,7 @@ export default function Login(): JSX.Element {
   return (
     <main>
       <Suspense>
-        <AuthShowcase />
+        <AuthShowcase githubId={data()!.githubId} />
       </Suspense>
       <h1>Login</h1>
       <Form>
@@ -134,7 +134,7 @@ export default function Login(): JSX.Element {
   )
 }
 
-const AuthShowcase: VoidComponent = () => {
+const AuthShowcase: VoidComponent<{ githubId: string }> = (props) => {
   const sessionData = createSession()
   return (
     <div>
@@ -155,11 +155,21 @@ const AuthShowcase: VoidComponent = () => {
           </>
         }
       >
-        <button onClick={async () => await signIn("github")}>
+        <button
+          onClick={() => {
+            const redirectUri =
+              "https://pentive.localhost:3014/api/auth/callback/github"
+            const authorizationUrl = new URL(
+              "https://github.com/login/oauth/authorize"
+            )
+            authorizationUrl.searchParams.set("client_id", props.githubId)
+            authorizationUrl.searchParams.set("redirect_uri", redirectUri)
+            authorizationUrl.searchParams.set("response_type", "code")
+            authorizationUrl.searchParams.set("scope", "user:email")
+            window.location.href = authorizationUrl.toString()
+          }}
+        >
           Sign in via Github
-        </button>
-        <button onClick={async () => await signIn("discord")}>
-          Sign in via Discord
         </button>
       </Show>
     </div>
