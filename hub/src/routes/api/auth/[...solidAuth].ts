@@ -19,9 +19,11 @@ import {
 } from "oauth4webapi"
 import {
   createLoginHeaders,
+  createUserSession,
   getOauthCodeVerifier,
   getOauthState,
 } from "~/db/session"
+import { getUserIdByEmail } from "shared"
 
 export function authOpts(env: EnvVars): SolidAuthConfig {
   return {
@@ -131,8 +133,10 @@ async function handleCallback(env: Env, request: Request) {
 
   const emails: GitHubEmail[] = await res.json()
   const email = emails.find((e) => e.primary && e.verified)?.email
-  console.log("email is", email)
-  return redirect("/")
+  if (email == null) return redirect("/error") // medTODO create error page
+  const userId = await getUserIdByEmail(email)
+  if (userId == null) return redirect("/registerUsername")
+  return await createUserSession(userId.id, "/")
 }
 
 export interface GitHubEmail {

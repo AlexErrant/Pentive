@@ -14,6 +14,9 @@ generator js {
 
 model user {
   id                    String               @id @db.VarChar(21) // cased as user input
+  // Emails are case sensitive according to the spec. However, the spec is stupid.
+  // So the email column's collation is case insensitive to make the unique constraint case insensitive.
+  // AuthJS had some thoughts https://github.com/nextauthjs/next-auth/blob/1ca87809d603ef96e718871e27c39b4635766735/packages/core/src/providers/email.ts#L75
   email                 String               @unique @db.VarChar(254)
   created               DateTime             @default(now())
   templateHistory       templateHistory[]

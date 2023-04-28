@@ -4,6 +4,7 @@ import {
   type InsertResult,
   type RawBuilder,
   type InsertObject,
+  type Compilable,
 } from "kysely"
 import { PlanetScaleDialect } from "kysely-planetscale"
 import { type DB } from "./database.js"
@@ -92,6 +93,27 @@ function noteToNookView(x: {
       templateType: deserializeTemplateType(x.type),
     },
   }
+}
+
+export async function getUserIdByEmail(email: string) {
+  return await db
+    .selectFrom("user")
+    // Emails are case sensitive, so lookups are case sensitive for max security
+    .where(sql`binary \`email\``, "=", email)
+    .select(["id"])
+    .executeTakeFirst()
+}
+
+export async function getCasedUserId(userId: string) {
+  return await db
+    .selectFrom("user")
+    .where("id", "=", userId)
+    .select(["id"])
+    .executeTakeFirst()
+}
+
+export async function registerUser(id: string, email: string) {
+  await db.insertInto("user").values({ id, email }).execute()
 }
 
 export async function getNotes(nook: NookId, userId: UserId | null) {
@@ -788,4 +810,11 @@ function mapIdToBase64Url<T>(t: T & { id: DbId }): T & {
 export function dbIdToBase64Url(dbId: DbId): Base64Url {
   const array = Uint8Array.from(dbId.split("").map((b) => b.charCodeAt(0))) // https://github.com/planetscale/database-js/issues/78#issuecomment-1376435565
   return base64url.encode(array).substring(0, 22) as Base64Url
+}
+
+// use with .$call(log)
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function log<T extends Compilable>(qb: T): T {
+  console.log("Compiled SQL: ", qb.compile())
+  return qb
 }
