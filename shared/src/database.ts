@@ -19,7 +19,6 @@ export interface MediaEntity {
 
 export interface Nook {
   id: string
-  displayName: string
   created: Generated<Date>
   moderators: string
 }
@@ -135,7 +134,6 @@ export interface TemplateSubscriber {
 
 export interface User {
   id: string
-  displayName: string
   email: string
   created: Generated<Date>
 }

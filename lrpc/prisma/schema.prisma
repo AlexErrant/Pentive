@@ -13,8 +13,7 @@ generator js {
 }
 
 model user {
-  id                    String               @id @db.VarChar(21) // lowercase
-  displayName           String               @db.VarChar(21) // cased as user input
+  id                    String               @id @db.VarChar(21) // cased as user input
   email                 String               @unique @db.VarChar(254)
   created               DateTime             @default(now())
   templateHistory       templateHistory[]
@@ -181,12 +180,11 @@ model media_Entity {
 }
 
 model nook {
-  id          String     @id @db.VarChar(21) // lowercase
-  displayName String     @db.VarChar(21) // cased as user input
-  created     DateTime   @default(now())
-  templates   template[]
-  posts       post[]
-  moderators  String     @db.Text
+  id         String     @id @db.VarChar(21) // lowercase
+  created    DateTime   @default(now())
+  templates  template[]
+  posts      post[]
+  moderators String     @db.Text
 }
 
 model post {
