@@ -14,8 +14,14 @@ import {
   processAuthorizationCodeOAuth2Response,
   validateAuthResponse,
   generateRandomState,
+  generateRandomCodeVerifier,
+  calculatePKCECodeChallenge,
 } from "oauth4webapi"
-import { createLoginHeaders, getOauthState } from "~/db/session"
+import {
+  createLoginHeaders,
+  getOauthCodeVerifier,
+  getOauthState,
+} from "~/db/session"
 
 export function authOpts(env: EnvVars): SolidAuthConfig {
   return {
@@ -55,8 +61,14 @@ async function handleLogin(env: Env) {
   authorizationUrl.searchParams.set("response_type", "code")
   authorizationUrl.searchParams.set("scope", "user:email")
   const state = generateRandomState()
+  const codeVerifier = generateRandomCodeVerifier()
+  authorizationUrl.searchParams.set(
+    "code_challenge",
+    await calculatePKCECodeChallenge(codeVerifier)
+  )
+  authorizationUrl.searchParams.set("code_challenge_method", "S256")
   authorizationUrl.searchParams.set("state", state)
-  const headers = await createLoginHeaders(state)
+  const headers = await createLoginHeaders(state, codeVerifier)
   return redirect(authorizationUrl.toString(), { headers })
 }
 
@@ -71,12 +83,11 @@ async function handleCallback(env: Env, request: Request) {
     client_secret: env.githubSecret,
     /* eslint-enable @typescript-eslint/naming-convention */
   }
-  const state = await getOauthState(request)
   const parameters = validateAuthResponse(
     as,
     client,
     new URL(request.url).searchParams,
-    state
+    await getOauthState(request)
   )
   if (isOAuth2Error(parameters)) {
     console.error(parameters)
@@ -87,7 +98,7 @@ async function handleCallback(env: Env, request: Request) {
     client,
     parameters,
     import.meta.env.VITE_HUB_ORIGIN + "/api/auth/callback/github",
-    "x"
+    await getOauthCodeVerifier(request)
   )
 
   let challenges: WWWAuthenticateChallenge[] | undefined
