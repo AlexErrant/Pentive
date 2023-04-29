@@ -275,22 +275,6 @@ export async function requireJwt(
   return jwt
 }
 
-export async function getUser(
-  request: Request
-): Promise<{ username: string; password: string } | null | undefined> {
-  const userId = await getUserId(request)
-  if (typeof userId !== "string") {
-    return null
-  }
-
-  try {
-    const user = await db.user.findUnique({ where: { username: userId } })
-    return user
-  } catch {
-    throw await logout(request)
-  }
-}
-
 export async function logout(request: Request): Promise<Response> {
   const session = await storage.getSession(request.headers.get("Cookie"))
   const headers = new Headers()

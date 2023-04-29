@@ -8,22 +8,22 @@ import {
   redirect,
 } from "solid-start/server"
 import ResizingIframe from "~/components/resizingIframe"
-import { getUser, logout } from "~/db/session"
+import { getUserId, logout } from "~/db/session"
 
 export function routeData() {
   return createServerData$(async (_, { request }) => {
-    const user = await getUser(request)
+    const userId = await getUserId(request)
 
-    if (user == null) {
+    if (userId == null) {
       throw redirect("/login") as unknown
     }
 
-    return user
+    return userId
   })
 }
 
 export default function Home(): JSX.Element {
-  const user = useRouteData<typeof routeData>()
+  const userId = useRouteData<typeof routeData>()
   const [, { Form }] = createServerAction$(
     async (f: FormData, { request }) => await logout(request)
   )
@@ -48,7 +48,7 @@ export default function Home(): JSX.Element {
 
   return (
     <main class="w-full p-4 space-y-2">
-      <h1 class="font-bold text-3xl">Hello {user()?.username}</h1>
+      <h1 class="font-bold text-3xl">Hello {userId()}</h1>
       <h3 class="font-bold text-xl">Message board</h3>
       <Form>
         <button name="logout" type="submit">

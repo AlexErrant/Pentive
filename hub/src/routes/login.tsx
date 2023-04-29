@@ -7,7 +7,7 @@ import {
   redirect,
 } from "solid-start/server"
 import { db } from "~/db"
-import { createUserSession, getUser, login, register } from "~/db/session"
+import { createUserSession, getUserId, login, register } from "~/db/session"
 import { getSession } from "@auth/solid-start"
 import { signOut } from "@auth/solid-start/client"
 import { authOpts, githubLoginUrl } from "./api/auth/[...solidAuth]"
@@ -26,7 +26,7 @@ function validatePassword(password: unknown): string | undefined {
 
 export function routeData() {
   return createServerData$(async (_, { request, env }) => {
-    if ((await getUser(request)) != null) {
+    if ((await getUserId(request)) != null) {
       throw redirect("/") as unknown
     }
     return {}

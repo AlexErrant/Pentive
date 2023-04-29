@@ -6,7 +6,7 @@ import {
   createServerData$,
   redirect,
 } from "solid-start/server"
-import { createUserSession, getUser } from "~/db/session"
+import { createUserSession, getUserId } from "~/db/session"
 import { getCasedUserId, registerUser } from "shared"
 
 // https://stackoverflow.com/a/25352300
@@ -40,7 +40,7 @@ async function validateUsername(username: unknown) {
 
 export function routeData() {
   return createServerData$(async (_, { request }) => {
-    if ((await getUser(request)) != null) {
+    if ((await getUserId(request)) != null) {
       throw redirect("/") as unknown
     }
     return {}
