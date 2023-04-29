@@ -1,4 +1,5 @@
 import solid from "solid-start/vite"
+import checker from "vite-plugin-checker"
 import { defineConfig, loadEnv } from "vite"
 import cloudflare from "solid-start-cloudflare-workers"
 import fs from "fs"
@@ -17,6 +18,15 @@ export default defineConfig(({ mode }) => {
               ? `https://${env.VITE_HUB_DOMAIN}:${port}`
               : undefined,
         }),
+      }),
+      checker({
+        overlay: {
+          initialIsOpen: false,
+        },
+        typescript: true,
+        eslint: {
+          lintCommand: 'eslint "./src/**/*.{ts,tsx}"',
+        },
       }),
     ],
     server: {
