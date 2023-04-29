@@ -1,6 +1,8 @@
 export cloudflareAccountId=
 export developmentPlanetscaleDbUrl=
 export productionPlanetscaleDbUrl=
+# generate 32 bits of random data in base64, cut off new line character, add it to the clipboard
+# openssl rand -base64 32 | head -c -1 | pbcopy
 export developmentMediaTokenSecret=you+should+replace+this+with+a+real+base64+=
 export productionMediaTokenSecret=you+should+replace+this+with+a+real+base64+=
 export developmentHubSessionSecret=secret/you+can+run+the+command+which+kinda+=
@@ -11,6 +13,12 @@ export developmentCsrfSecret=with+spaces+and+hyphens+and+stuff+ZZZZZZZZZ=
 export productionCsrfSecret=with+spaces+and+hyphens+and+stuff+ZZZZZZZZZ=
 export developmentAuthJsSecret=also+this+is+the+same+32+bits+of+base64+joy=
 export productionAuthJsSecret=also+this+is+the+same+32+bits+of+base64+joy=
+export developmentOauthStateSecret=also+this+is+the+same+32+bits+of+base64+joy=
+export productionOauthStateSecret=also+this+is+the+same+32+bits+of+base64+joy=
+export developmentOauthCodeVerifierSecret=also+this+is+the+same+32+bits+of+base64+joy=
+export productionOauthCodeVerifierSecret=also+this+is+the+same+32+bits+of+base64+joy=
+export developmentHubInfoSecret=also+this+is+the+same+32+bits+of+base64+joy=
+export productionHubInfoSecret=also+this+is+the+same+32+bits+of+base64+joy=
 export developmentDiscordId=create at https://discord.com/developers/applications
 export productionDiscordId=Redirects (callbacks) are https://pentive.localhost:3014/api/auth/callback/discord or https://pentive.com/api/auth/callback/discord
 export developmentDiscordSecret=

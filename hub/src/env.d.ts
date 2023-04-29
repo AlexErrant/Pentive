@@ -13,6 +13,9 @@ export interface EnvVars {
   discordSecret: string
   githubId: string
   githubSecret: string
+  oauthStateSecret: Base64
+  oauthCodeVerifierSecret: Base64
+  hubInfoSecret: Base64
 }
 
 declare global {
