@@ -48,6 +48,7 @@ export function setSessionStorage(x: {
   sessionSecret: Base64
   jwsSecret: Base64
   csrfSecret: Base64
+  hubInfoSecret: Base64
 }): void {
   // highTODO consider removing this when adding Auth.js. We need cross-domain auth, and I'm not sure why this exists if we're using a JWT
   storage = createCookieSessionStorage({
@@ -65,6 +66,7 @@ export function setSessionStorage(x: {
   })
   jwsSecret = base64ToArray(x.jwsSecret)
   csrfSecret = x.csrfSecret
+  hubInfoSecret = base64ToArray(x.hubInfoSecret)
   const jwtCookieOpts: CookieOptions = {
     secure: true,
     secrets: [], // intentionally empty. This cookie should only store a signed JWT!
@@ -182,6 +184,8 @@ let hubInfoCookie = null as Cookie
 let jwsSecret = null as Uint8Array
 // @ts-expect-error calls should throw null error if not setup
 let csrfSecret = null as string
+// @ts-expect-error calls should throw null error if not setup
+let hubInfoSecret = null as Uint8Array
 
 export async function getUserSession(request: Request): Promise<Session> {
   return await storage.getSession(request.headers.get("Cookie"))
@@ -341,19 +345,30 @@ export async function createLoginHeaders(state: string, codeVerifier: string) {
 }
 
 export async function createInfoHeaders(info: string) {
+  // could use crypto.subtle instead of a JWT for less overhead, but I'm tired of subtle and thinking in binary
+  const infoJwt = await new SignJWT({ info })
+    .setProtectedHeader({ alg })
+    .setExpirationTime("2h")
+    .sign(await getHubInfoKey())
   const headers = new Headers()
-  headers.append("Set-Cookie", await hubInfoCookie.serialize(info))
+  headers.append("Set-Cookie", await hubInfoCookie.serialize(infoJwt))
   return headers
 }
 
 export async function getInfo(request: Request) {
-  const info = (await hubInfoCookie.parse(
+  const rawInfoJwt = (await hubInfoCookie.parse(
     request.headers.get("Cookie")
   )) as unknown
-  if (typeof info !== "string" || info.length === 0) {
+  if (typeof rawInfoJwt !== "string" || rawInfoJwt.length === 0) {
     return null
   }
-  return info
+  let jwt: JWTVerifyResult | null = null
+  try {
+    jwt = await jwtVerify(rawInfoJwt, hubInfoSecret)
+  } catch {}
+  return jwt == null
+    ? null
+    : (jwt.payload.info as string) ?? throwExp("`info` is empty")
 }
 
 async function generateJwt(userId: string, csrf: string): Promise<string> {
@@ -381,6 +396,20 @@ async function getCsrfKey(): Promise<CryptoKey> {
     )
   }
   return maybeCsrfKey
+}
+
+let maybeHubInfoKey: CryptoKey | null = null
+async function getHubInfoKey(): Promise<CryptoKey> {
+  if (maybeHubInfoKey == null) {
+    maybeHubInfoKey = await crypto.subtle.importKey(
+      "raw",
+      hubInfoSecret,
+      { name: "HMAC", hash: "SHA-256" },
+      false,
+      ["sign", "verify"]
+    )
+  }
+  return maybeHubInfoKey
 }
 
 async function generateCsrf(): Promise<[string, string]> {

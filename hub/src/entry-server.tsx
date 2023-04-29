@@ -13,6 +13,7 @@ export default createHandler(
       sessionSecret: event.env.hubSessionSecret,
       jwsSecret: event.env.jwsSecret,
       csrfSecret: event.env.csrfSecret,
+      hubInfoSecret: event.env.hubInfoSecret,
     })
     event.responseHeaders.set(hstsName, hstsValue)
     return <StartServer event={event} />
