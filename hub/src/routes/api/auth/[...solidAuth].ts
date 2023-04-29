@@ -18,6 +18,7 @@ import {
   calculatePKCECodeChallenge,
 } from "oauth4webapi"
 import {
+  createInfoHeaders,
   createLoginHeaders,
   createUserSession,
   getOauthCodeVerifier,
@@ -135,7 +136,11 @@ async function handleCallback(env: Env, request: Request) {
   const email = emails.find((e) => e.primary && e.verified)?.email
   if (email == null) return redirect("/error") // medTODO create error page
   const userId = await getUserIdByEmail(email)
-  if (userId == null) return redirect("/registerUsername")
+  if (userId == null) {
+    return redirect("/registerUsername", {
+      headers: await createInfoHeaders(email),
+    })
+  }
   return await createUserSession(userId.id, "/")
 }
 

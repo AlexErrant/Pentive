@@ -144,6 +144,18 @@ export function setSessionStorage(x: {
       expires: new Date(0), // https://github.com/remix-run/remix/issues/5150 https://stackoverflow.com/q/5285940
     }
   )
+
+  const hubInfoCookieOpts: CookieOptions = {
+    secure: true,
+    sameSite: "strict",
+    path: "/",
+    maxAge: 60 * 60 * 2, // 2 hours
+    httpOnly: true,
+    // domain: "", // intentionally missing to exclude subdomains
+    // expires: "", // intentionally missing because docs say it's calculated off `maxAge` when missing https://github.com/solidjs/solid-start/blob/1b22cad87dd7bd74f73d807e1d60b886e753a6ee/packages/start/session/cookies.ts#L56-L57
+  }
+  const hubInfoCookieName = "__Host-hubInfo"
+  hubInfoCookie = createPlainCookie(hubInfoCookieName, hubInfoCookieOpts)
 }
 
 // @ts-expect-error session calls should throw null error if not setup
@@ -164,6 +176,8 @@ let destroyOauthStateCookie = null as Cookie
 let oauthCodeVerifierCookie = null as Cookie
 // @ts-expect-error calls should throw null error if not setup
 let destroyOauthCodeVerifierCookie = null as Cookie
+// @ts-expect-error calls should throw null error if not setup
+let hubInfoCookie = null as Cookie
 // @ts-expect-error calls should throw null error if not setup
 let jwsSecret = null as Uint8Array
 // @ts-expect-error calls should throw null error if not setup
@@ -324,6 +338,22 @@ export async function createLoginHeaders(state: string, codeVerifier: string) {
     await oauthCodeVerifierCookie.serialize(codeVerifier)
   )
   return headers
+}
+
+export async function createInfoHeaders(info: string) {
+  const headers = new Headers()
+  headers.append("Set-Cookie", await hubInfoCookie.serialize(info))
+  return headers
+}
+
+export async function getInfo(request: Request) {
+  const info = (await hubInfoCookie.parse(
+    request.headers.get("Cookie")
+  )) as unknown
+  if (typeof info !== "string" || info.length === 0) {
+    return null
+  }
+  return info
 }
 
 async function generateJwt(userId: string, csrf: string): Promise<string> {

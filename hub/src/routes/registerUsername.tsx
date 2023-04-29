@@ -6,7 +6,7 @@ import {
   createServerData$,
   redirect,
 } from "solid-start/server"
-import { createUserSession, getUserId } from "~/db/session"
+import { createUserSession, getInfo, getUserId } from "~/db/session"
 import { getCasedUserId, registerUser } from "shared"
 
 // https://stackoverflow.com/a/25352300
@@ -52,7 +52,7 @@ export default function RegisterUsername(): JSX.Element {
   const params = useParams()
 
   const [registering, { Form }] = createServerAction$(
-    async (form: FormData) => {
+    async (form: FormData, { request }) => {
       const username = form.get("username")
       const redirectTo = form.get("redirectTo") ?? "/"
       if (typeof username !== "string" || typeof redirectTo !== "string") {
@@ -65,7 +65,9 @@ export default function RegisterUsername(): JSX.Element {
       if (Object.values(fieldErrors).some(Boolean)) {
         throw new FormError("Fields invalid", { fieldErrors, fields })
       }
-      await registerUser(username, "email@nextTODO" + crypto.randomUUID())
+      const email = await getInfo(request)
+      if (email == null) return redirect("/error") // medTODO needs a page
+      await registerUser(username, email)
       return await createUserSession(username, redirectTo)
     }
   )
