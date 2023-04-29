@@ -8,7 +8,8 @@
   "packageManager": "pnpm@8.2.0",
   "devDependencies": {
     "concurrently": "^7.6.0",
-    "kill-port": "^2.0.1"
+    "kill-port": "^2.0.1",
+    "wrangler": "^2.16.0"
   },
   "scripts": {
     "kill": "kill-port 3012 3013 3014 3015 3016 3017 3018 3019",
