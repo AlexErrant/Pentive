@@ -1,8 +1,4 @@
-import { type SolidAuthConfig } from "@auth/solid-start"
-import Discord from "@auth/core/providers/discord"
-import Github from "@auth/core/providers/github"
 import { redirect, type PageEvent } from "solid-start"
-import type { EnvVars } from "~/env"
 
 import {
   type AuthorizationServer,
@@ -25,26 +21,6 @@ import {
   getOauthState,
 } from "~/db/session"
 import { getUserIdByEmail } from "shared"
-
-export function authOpts(env: EnvVars): SolidAuthConfig {
-  return {
-    secret: env.authJsSecret,
-    trustHost: true,
-    providers: [
-      // @ts-expect-error https://github.com/nextauthjs/next-auth/issues/6174c
-      Discord({
-        clientId: env.discordId,
-        clientSecret: env.discordSecret,
-      }),
-      // @ts-expect-error https://github.com/nextauthjs/next-auth/issues/6174c
-      Github({
-        clientId: env.githubId,
-        clientSecret: env.githubSecret,
-      }),
-    ],
-    debug: false,
-  }
-}
 
 export const githubLoginUrl =
   import.meta.env.VITE_HUB_ORIGIN + "/api/auth/login/github"
