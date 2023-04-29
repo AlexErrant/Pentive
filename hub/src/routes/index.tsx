@@ -8,7 +8,7 @@ import {
   redirect,
 } from "solid-start/server"
 import ResizingIframe from "~/components/resizingIframe"
-import { getUserId, logout } from "~/db/session"
+import { getUserId, logout } from "~/session"
 
 export function routeData() {
   return createServerData$(async (_, { request }) => {

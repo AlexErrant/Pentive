@@ -19,7 +19,7 @@ import {
   createUserSession,
   getOauthCodeVerifier,
   getOauthState,
-} from "~/db/session"
+} from "~/session"
 import { getUserIdByEmail } from "shared"
 
 export const githubLoginUrl =

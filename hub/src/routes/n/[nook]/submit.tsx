@@ -11,7 +11,7 @@ import {
   requireSession,
   requireJwt,
   isInvalidCsrf,
-} from "~/db/session"
+} from "~/session"
 
 export function routeData({ params }: RouteDataArgs) {
   const nook = (): string => params.nook

@@ -13,7 +13,7 @@ import ResizingIframe from "~/components/resizingIframe"
 import NoteComment from "~/components/noteComment"
 import SubmitComment from "~/components/submitComment"
 import { cwaClient } from "~/routes/cwaClient"
-import { getUserId } from "~/db/session"
+import { getUserId } from "~/session"
 import { getAppMessenger } from "~/root"
 
 export function routeData({ params }: RouteDataArgs) {

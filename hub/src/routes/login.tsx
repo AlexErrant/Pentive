@@ -2,7 +2,7 @@ import { type JSX, Suspense } from "solid-js"
 import { useRouteData } from "solid-start"
 
 import { createServerData$, redirect } from "solid-start/server"
-import { getUserId } from "~/db/session"
+import { getUserId } from "~/session"
 import { githubLoginUrl } from "./api/auth/[...solidAuth]"
 
 export function routeData() {

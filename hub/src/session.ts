@@ -13,36 +13,11 @@ import { createCookieSessionStorage } from "solid-start/session"
 import { type Cookie, type CookieOptions } from "solid-start/session/cookies"
 import { type Session, type SessionStorage } from "solid-start/session/sessions"
 import { createPlainCookie } from "~/createPlainCookie"
-import { db } from "."
-interface LoginForm {
-  username: string
-  password: string
-}
 
 const sessionUserId = "userId"
 const sessionNames = [sessionUserId] as const
 type SessionName = typeof sessionNames[number]
 export type UserSession = { [K in SessionName]: string }
-
-export async function register({
-  username,
-  password,
-}: LoginForm): Promise<{ username: string; password: string }> {
-  return await db.user.create({
-    data: { username, password },
-  })
-}
-
-export async function login({ username, password }: LoginForm): Promise<{
-  username: string
-  password: string
-} | null> {
-  const user = await db.user.findUnique({ where: { username } })
-  if (user == null) return null
-  const isCorrectPassword = password === user.password
-  if (!isCorrectPassword) return null
-  return user
-}
 
 export function setSessionStorage(x: {
   sessionSecret: Base64

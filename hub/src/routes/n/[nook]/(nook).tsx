@@ -3,7 +3,7 @@ import { A, type RouteDataArgs, useRouteData } from "solid-start"
 import { createServerData$ } from "solid-start/server"
 import { getPosts, getNotes, type NookId, type Ord } from "shared"
 import ResizingIframe from "~/components/resizingIframe"
-import { getUserId } from "~/db/session"
+import { getUserId } from "~/session"
 
 export function routeData({ params }: RouteDataArgs) {
   return {

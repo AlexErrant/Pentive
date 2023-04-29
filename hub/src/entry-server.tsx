@@ -4,7 +4,7 @@ import {
   renderAsync,
   StartServer,
 } from "solid-start/entry-server"
-import { setSessionStorage } from "./db/session"
+import { setSessionStorage } from "./session"
 
 export default createHandler(
   renderAsync((event) => {

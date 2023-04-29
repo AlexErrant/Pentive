@@ -6,7 +6,7 @@ import {
   createServerData$,
   redirect,
 } from "solid-start/server"
-import { createUserSession, getInfo, getUserId } from "~/db/session"
+import { createUserSession, getInfo, getUserId } from "~/session"
 import { getCasedUserId, registerUser } from "shared"
 
 // https://stackoverflow.com/a/25352300
