@@ -14,6 +14,8 @@ export default createHandler(
       jwsSecret: event.env.jwsSecret,
       csrfSecret: event.env.csrfSecret,
       hubInfoSecret: event.env.hubInfoSecret,
+      oauthStateSecret: event.env.oauthStateSecret,
+      oauthCodeVerifierSecret: event.env.oauthCodeVerifierSecret,
     })
     event.responseHeaders.set(hstsName, hstsValue)
     return <StartServer event={event} />

@@ -49,6 +49,8 @@ export function setSessionStorage(x: {
   jwsSecret: Base64
   csrfSecret: Base64
   hubInfoSecret: Base64
+  oauthStateSecret: Base64
+  oauthCodeVerifierSecret: Base64
 }): void {
   // highTODO consider removing this when adding Auth.js. We need cross-domain auth, and I'm not sure why this exists if we're using a JWT
   storage = createCookieSessionStorage({
@@ -106,6 +108,7 @@ export function setSessionStorage(x: {
 
   const oauthStateCookieOpts: CookieOptions = {
     secure: true,
+    secrets: [x.oauthStateSecret], // encrypted due to https://security.stackexchange.com/a/140889
     sameSite: "lax",
     path: "/",
     maxAge: 60 * 60 * 24, // 1 day
@@ -126,6 +129,7 @@ export function setSessionStorage(x: {
 
   const oauthCodeVerifierCookieOpts: CookieOptions = {
     secure: true,
+    secrets: [x.oauthCodeVerifierSecret], // encrypted due to https://stackoverflow.com/a/67520418 https://stackoverflow.com/a/67979777
     sameSite: "lax",
     path: "/",
     maxAge: 60 * 60 * 24, // 1 day
@@ -149,6 +153,7 @@ export function setSessionStorage(x: {
 
   const hubInfoCookieOpts: CookieOptions = {
     secure: true,
+    secrets: [], // intentionally empty. This cookie only stores an HMACed JWT.
     sameSite: "strict",
     path: "/",
     maxAge: 60 * 60 * 2, // 2 hours
@@ -334,9 +339,7 @@ export async function createUserSession(
 
 export async function createLoginHeaders(state: string, codeVerifier: string) {
   const headers = new Headers()
-  // medTODO https://security.stackexchange.com/a/140889 thinks we should encrypt the state, but I'm not 100% sold
   headers.append("Set-Cookie", await oauthStateCookie.serialize(state))
-  // medTODO encrypt https://stackoverflow.com/a/67520418 https://stackoverflow.com/a/67979777
   headers.append(
     "Set-Cookie",
     await oauthCodeVerifierCookie.serialize(codeVerifier)
