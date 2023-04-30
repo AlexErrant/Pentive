@@ -97,10 +97,24 @@ export default function RegisterUsername(): JSX.Element {
         </Show>
         <button type="submit">Register</button>
       </Form>
-      <span>
+      <h2>
+        Until further notice, the database will be deleted often and without
+        warning.
+      </h2>
+      <div>
+        Usernames are case insensitive, yet case preserving. For example, if you
+        choose the username <code>AlexErrant</code>, it will be displayed as{" "}
+        <code>AlexErrant</code>, but links like{" "}
+        <a href="https://pentive.com/u/alexerrant">
+          https://pentive.com/u/alexerrant
+        </a>{" "}
+        will work. Usernames are not modifiable after creation, so make sure the
+        casing is correct!
+      </div>
+      <div>
         If you've changed your email and already have a Pentive account, contact
         support.
-      </span>
+      </div>
     </main>
   )
 }
