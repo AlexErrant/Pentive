@@ -6,19 +6,10 @@ function Nav(): JSX.Element {
     <header class="header">
       <nav class="inner">
         <A href="/">
-          <strong>HN</strong>
+          <strong>Pentive</strong>
         </A>
-        <A href="/new">
-          <strong>New</strong>
-        </A>
-        <A href="/show">
-          <strong>Show</strong>
-        </A>
-        <A href="/ask">
-          <strong>Ask</strong>
-        </A>
-        <A href="/job">
-          <strong>Jobs</strong>
+        <A href={import.meta.env.VITE_APP_ORIGIN}>
+          <strong>App</strong>
         </A>
         <a
           class="github"
