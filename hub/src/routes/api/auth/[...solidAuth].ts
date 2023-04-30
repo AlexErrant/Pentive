@@ -25,7 +25,17 @@ import { getUserIdByEmail } from "shared"
 export const githubLoginUrl =
   import.meta.env.VITE_HUB_ORIGIN + "/api/auth/login/github"
 
+export const devLoginUrl = (username: string) =>
+  import.meta.env.VITE_HUB_ORIGIN + "/api/auth/login/dev?username=" + username
+
 export const GET = async ({ env, request }: PageEvent) => {
+  if (import.meta.env.DEV) {
+    const url = new URL(request.url)
+    const username = url.searchParams.get("username")
+    if (url.pathname === "/api/auth/login/dev" && username != null) {
+      return await createUserSession(username, "/")
+    }
+  }
   if (request.url === githubLoginUrl) {
     return await handleLogin(env)
   } else return await handleCallback(env, request)

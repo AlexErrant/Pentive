@@ -3,7 +3,7 @@ import { useRouteData } from "solid-start"
 
 import { createServerData$, redirect } from "solid-start/server"
 import { getUserId } from "~/session"
-import { githubLoginUrl } from "./api/auth/[...solidAuth]"
+import { devLoginUrl, githubLoginUrl } from "./api/auth/[...solidAuth]"
 
 export function routeData() {
   return createServerData$(async (_, { request, env }) => {
@@ -21,7 +21,23 @@ export default function Login(): JSX.Element {
     <main>
       <h1>Login</h1>
       <Suspense>
-        <a href={githubLoginUrl}>Sign in via Github</a>
+        <div>
+          <a href={githubLoginUrl}>Sign in via Github</a>
+        </div>
+        {import.meta.env.DEV && (
+          <>
+            <h2>Dev Login</h2>
+            <div>
+              <a href={devLoginUrl("Griddle")}>Sign in as Griddle</a>
+            </div>
+            <div>
+              <a href={devLoginUrl("Harry")}>Sign in as Harry</a>
+            </div>
+            <div>
+              <a href={devLoginUrl("Campal")}>Sign in as Campal</a>
+            </div>
+          </>
+        )}
       </Suspense>
     </main>
   )
