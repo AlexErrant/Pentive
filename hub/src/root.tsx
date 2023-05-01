@@ -53,9 +53,9 @@ export default function Root(): JSX.Element {
           // Since this iframe hosts `app.pentive.com` and this page is hosted on `pentive.com`, resulting in different origins, we should be safe. https://web.dev/sandboxed-iframes/ https://stackoverflow.com/q/35208161
           src={import.meta.env.VITE_APP_ORIGIN}
         />
-        <Nav />
         <ErrorBoundary>
           <Suspense fallback={<div class="news-list-nav">Loading...</div>}>
+            <Nav />
             <Routes>
               <FileRoutes />
             </Routes>

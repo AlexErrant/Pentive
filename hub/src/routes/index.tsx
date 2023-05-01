@@ -1,33 +1,9 @@
 import { type Ord } from "shared"
 import { type Template } from "shared/src/cardHtml"
 import { type JSX, createSignal } from "solid-js"
-import { useRouteData } from "solid-start"
-import {
-  createServerAction$,
-  createServerData$,
-  redirect,
-} from "solid-start/server"
 import ResizingIframe from "~/components/resizingIframe"
-import { getUserId, logout } from "~/session"
-
-export function routeData() {
-  return createServerData$(async (_, { request }) => {
-    const userId = await getUserId(request)
-
-    if (userId == null) {
-      throw redirect("/login") as unknown
-    }
-
-    return userId
-  })
-}
 
 export default function Home(): JSX.Element {
-  const userId = useRouteData<typeof routeData>()
-  const [, { Form }] = createServerAction$(
-    async (f: FormData, { request }) => await logout(request)
-  )
-
   const [template, setTemplate] = createSignal<Template>({
     css: "",
     fields: ["Front", "Back"],
@@ -48,13 +24,7 @@ export default function Home(): JSX.Element {
 
   return (
     <main class="w-full p-4 space-y-2">
-      <h1 class="font-bold text-3xl">Hello {userId()}</h1>
       <h3 class="font-bold text-xl">Message board</h3>
-      <Form>
-        <button name="logout" type="submit">
-          Logout
-        </button>
-      </Form>
       <ResizingIframe
         i={{
           tag: "template",
