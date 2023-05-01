@@ -85,8 +85,13 @@ async function getLocalMedia(
   const media = await messenger.getLocalMedia(mediaId)
   return media == null
     ? new Response(media, { status: 404 })
-    : // maybe? https://stackoverflow.com/a/28390633
-      new Response(media)
+    : new Response(media, {
+        headers: {
+          // "image" seems like a valid content-type https://stackoverflow.com/a/28390633
+          // eslint-disable-next-line @typescript-eslint/naming-convention
+          "content-type": mediaId.endsWith(".svg") ? "image/svg+xml" : "image",
+        },
+      })
 }
 
 async function getMessenger(
