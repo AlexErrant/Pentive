@@ -26,7 +26,7 @@ const Threads: Component = () => {
   const { data, nook } = useRouteData<typeof routeData>()
   return (
     <>
-      <a href={`/n/${nook()}/templates`}>Templates</a>
+      <A href={`/n/${nook()}/templates`}>Templates</A>
       <Show when={data()}>
         <ul>
           <For each={data()!.posts}>
@@ -44,9 +44,9 @@ const Threads: Component = () => {
                 </div>
                 <div>{note.subscribers} subscribers</div>
                 <div>
-                  <a href={`/n/${nook()}/note/${note.id}`}>
+                  <A href={`/n/${nook()}/note/${note.id}`}>
                     {note.comments} comments
-                  </a>
+                  </A>
                 </div>
                 <ResizingIframe
                   i={{

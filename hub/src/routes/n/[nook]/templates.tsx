@@ -1,5 +1,5 @@
 import { type Component, For, Show } from "solid-js"
-import { type RouteDataArgs, useRouteData } from "solid-start"
+import { type RouteDataArgs, useRouteData, A } from "solid-start"
 import { createServerData$ } from "solid-start/server"
 import { type NookId, getTemplates, unproxify } from "shared"
 import ResizingIframe from "~/components/resizingIframe"
@@ -54,7 +54,7 @@ const Threads: Component = () => {
                     index: 0,
                   }}
                 />
-                <a href={`./template/${template.id}/edit`}>Edit</a>
+                <A href={`./template/${template.id}/edit`}>Edit</A>
               </li>
             )}
           </For>

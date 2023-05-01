@@ -12,9 +12,9 @@ const Story: Component<{ story: IStory }> = (props) => {
           when={props.story.url}
           fallback={<A href={`/item/${props.story.id}`}>{props.story.title}</A>}
         >
-          <a href={props.story.url} target="_blank" rel="noreferrer">
+          <A href={props.story.url} target="_blank" rel="noreferrer">
             {props.story.title}
-          </a>
+          </A>
           <span class="host"> ({props.story.domain})</span>
         </Show>
       </span>

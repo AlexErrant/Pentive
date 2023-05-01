@@ -24,9 +24,9 @@ const Story: Component = () => {
     <Show when={story()}>
       <div class="item-view">
         <div class="item-view-header">
-          <a href={story()!.url} target="_blank">
+          <A href={story()!.url} target="_blank">
             <h1>{story()!.title}</h1>
-          </a>
+          </A>
           <Show when={story()!.domain}>
             <span class="host">({story()!.domain})</span>
           </Show>

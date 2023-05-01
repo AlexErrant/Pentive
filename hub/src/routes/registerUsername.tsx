@@ -1,5 +1,5 @@
 import { type JSX, Show } from "solid-js"
-import { useParams, useRouteData } from "solid-start"
+import { A, useParams, useRouteData } from "solid-start"
 import { FormError } from "solid-start/data"
 import {
   createServerAction$,
@@ -105,11 +105,9 @@ export default function RegisterUsername(): JSX.Element {
         Usernames are case insensitive, yet case preserving. For example, if you
         choose the username <code>AlexErrant</code>, it will be displayed as{" "}
         <code>AlexErrant</code>, but links like{" "}
-        <a href="https://pentive.com/u/alexerrant">
-          https://pentive.com/u/alexerrant
-        </a>{" "}
-        will work. Usernames are not modifiable after creation, so make sure the
-        casing is correct!
+        <A href="/u/alexerrant">https://pentive.com/u/alexerrant</A> will work.
+        Usernames are not modifiable after creation, so make sure the casing is
+        correct!
       </div>
       <div>
         If you've changed your email and already have a Pentive account, contact
