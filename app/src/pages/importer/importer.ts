@@ -42,8 +42,8 @@ export async function importAnki(
     new BlobReader(ankiExport)
   ).getEntries()
   const sqlite =
-    ankiEntries.find((e) => e.filename === "collection.anki21") ??
-    throwExp("`collection.anki21` not found!")
+    ankiEntries.find((e) => e.filename === "collection.anki2") ??
+    throwExp("`collection.anki2` not found!")
   await importAnkiDb(sqlite)
   await importAnkiMedia(ankiEntries) // running in parallel causes ERR_OUT_OF_MEMORY
 }
@@ -79,7 +79,7 @@ async function addMediaBatch(
         )
       const name = nameByI[entry.filename]
       const now = new Date()
-      return name == null // occurs for entries that aren't media, e.g. collection.anki21
+      return name == null // occurs for entries that aren't media, e.g. collection.anki2
         ? null
         : {
             id: name as MediaId,
