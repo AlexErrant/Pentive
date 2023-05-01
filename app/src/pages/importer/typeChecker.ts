@@ -1,5 +1,5 @@
 import { type Ord } from "shared"
-import { z } from "zod"
+import { z, type SafeParseReturnType } from "zod"
 
 const tmpl = z.object({
   name: z.string(),
@@ -28,7 +28,7 @@ const model = z.object({
   mod: z.number(),
   usn: z.number(),
   sortf: z.number(),
-  did: z.number(),
+  did: z.number().nullable(),
   tmpls: z.array(tmpl),
   flds: z.array(fld),
   css: z.string(),
@@ -147,12 +147,25 @@ type MergedCol = Omit<Col, "conf" | "decks" | "models" | "dconf"> & {
   dconf: Dconf
 }
 
+function parse<Input, Output>(
+  z: { safeParse: (raw: unknown) => SafeParseReturnType<Input, Output> },
+  raw: unknown
+) {
+  const result = z.safeParse(raw)
+  if (result.success) {
+    return result.data
+  } else {
+    console.error("Error parsing: ", raw)
+    throw new Error(result.error.toString())
+  }
+}
+
 export function checkCol(raw: initSqlJs.ParamsObject): MergedCol {
-  const parsedCol = col.parse(raw)
-  const parsedConf = conf.parse(JSON.parse(parsedCol.conf))
-  const parsedModels = models.parse(JSON.parse(parsedCol.models))
-  const parsedDecks = decks.parse(JSON.parse(parsedCol.decks))
-  const parsedDconf = dconf.parse(JSON.parse(parsedCol.dconf))
+  const parsedCol = parse(col, raw)
+  const parsedConf = parse(conf, JSON.parse(parsedCol.conf))
+  const parsedModels = parse(models, JSON.parse(parsedCol.models))
+  const parsedDecks = parse(decks, JSON.parse(parsedCol.decks))
+  const parsedDconf = parse(dconf, JSON.parse(parsedCol.dconf))
   return {
     ...parsedCol,
     conf: parsedConf,

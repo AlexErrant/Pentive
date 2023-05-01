@@ -126,8 +126,6 @@ async function importAnkiDb(sqlite: Entry): Promise<void> {
     }
     cards.free()
     await db.bulkUpsertCards(cardsList)
-  } catch (err) {
-    console.error(err)
   } finally {
     ankiDb.close()
   }
