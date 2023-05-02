@@ -44,9 +44,10 @@ const Threads: Component = () => {
                 </div>
                 <div>{note.subscribers} subscribers</div>
                 <div>
-                  <A href={`/n/${nook()}/note/${note.id}`}>
+                  {/* making this an <A> breaks because maps (e.g. `note.fieldValues`) aren't JSON serializable. Revisit if this issue is ever resolved. https://github.com/TanStack/bling/issues/9 */}
+                  <a href={`/n/${nook()}/note/${note.id}`}>
                     {note.comments} comments
-                  </A>
+                  </a>
                 </div>
                 <ResizingIframe
                   i={{
