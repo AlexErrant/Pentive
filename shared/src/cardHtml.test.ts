@@ -184,6 +184,35 @@ test("CardHtml generates proper basic card template, but with conditional Catego
   )
 })
 
+test("CardHtml generates proper basic card template, but with conditional Category that's shown, with newlines", () => {
+  testBody(
+    [
+      ["Back", "Ottawa"],
+      ["Front", "What is the capital of Canada?"],
+      ["Category", "Nations and Capitals"],
+    ],
+    `{{#Category}}
+Category: {{Category}}<br/>
+{{/Category}}
+{{Front}}`,
+    `{{FrontSide}}
+    <hr id=answer>
+    {{Back}}`,
+    0,
+    "standard",
+    `
+Category: Nations and Capitals<br/>
+
+What is the capital of Canada?`,
+    `
+Category: Nations and Capitals<br/>
+
+What is the capital of Canada?
+    <hr id=answer>
+    Ottawa`
+  )
+})
+
 test("CardHtml generates proper basic card template, with conditional Category (inverted and empty)", () => {
   testBody(
     [
@@ -199,6 +228,35 @@ test("CardHtml generates proper basic card template, with conditional Category (
     "standard",
     "Category: No category was given<br/>What is the capital of Canada?",
     `Category: No category was given<br/>What is the capital of Canada?
+    <hr id=answer>
+    Ottawa`
+  )
+})
+
+test("CardHtml generates proper basic card template, with conditional Category (inverted and empty and with newlines)", () => {
+  testBody(
+    [
+      ["Back", "Ottawa"],
+      ["Front", "What is the capital of Canada?"],
+      ["Category", ""],
+    ],
+    `{{^Category}}
+Category: {{Category}}No category was given<br/>
+{{/Category}}
+{{Front}}`,
+    `{{FrontSide}}
+    <hr id=answer>
+    {{Back}}`,
+    0,
+    "standard",
+    `
+Category: No category was given<br/>
+
+What is the capital of Canada?`,
+    `
+Category: No category was given<br/>
+
+What is the capital of Canada?
     <hr id=answer>
     Ottawa`
   )

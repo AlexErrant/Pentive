@@ -173,7 +173,7 @@ function replaceFields(
 
     const showIfHasText = (() => {
       const fieldName2 = escapeRegExp(fieldName)
-      const regex = new RegExp(`{{#${fieldName2}}}(.*?){{/${fieldName2}}}`)
+      const regex = new RegExp(`{{#${fieldName2}}}(.*?){{/${fieldName2}}}`, "s")
       return isNullOrWhitespace(value)
         ? simple.replace(regex, "")
         : simple.replace(regex, "$1")
@@ -181,7 +181,10 @@ function replaceFields(
 
     const showIfEmpty: string = (() => {
       const fieldName2 = escapeRegExp(fieldName)
-      const regex = new RegExp(`{{\\^${fieldName2}}}(.*?){{/${fieldName2}}}`)
+      const regex = new RegExp(
+        `{{\\^${fieldName2}}}(.*?){{/${fieldName2}}}`,
+        "s"
+      )
       return isNullOrWhitespace(value)
         ? showIfHasText.replace(regex, "$1")
         : showIfHasText.replace(regex, "")
