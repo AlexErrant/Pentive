@@ -446,7 +446,8 @@ export function updateLocalMediaIdByRemoteMediaIdAndGetNewDoc(
               Array.from(remoteMediaIdByLocal)
             )}`
           )
-        image.setAttribute("src", `${imgPlaceholder}${i}`)
+        const extension = src.substring(src.lastIndexOf("."))
+        image.setAttribute("src", `${imgPlaceholder}${i}${extension}`)
       }
     }
   }

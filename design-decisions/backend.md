@@ -4,6 +4,7 @@ Our R2 bucket that hosts user uploaded media. This is temporary; we should move 
 
 ## highTODO
 
+- Sanitize SVGs https://github.com/mattkrick/sanitize-svg https://github.com/cloudflare/svg-hush
 - [pngcrush](https://en.wikipedia.org/wiki/Pngcrush) uploads to prevent [acropalypse](https://www.bleepingcomputer.com/news/microsoft/microsoft-fixes-acropalypse-privacy-bug-in-windows-11-snipping-tool/)
 - Strip exif data
   - https://developers.cloudflare.com/workers/tutorials/generate-youtube-thumbnails-with-workers-and-images/ https://github.com/hMatoba/piexifjs https://github.com/hMatoba/exif-library
