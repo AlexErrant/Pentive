@@ -97,5 +97,6 @@ async function getMedia(
     c.header("Content-Type", file.httpMetadata.contentType)
   if (file.httpMetadata?.contentEncoding != null)
     c.header("Content-Encoding", file.httpMetadata.contentEncoding)
+  if (c.req.url.endsWith(".svg")) c.header("Content-Type", "image/svg+xml")
   return c.body(file.body)
 }
