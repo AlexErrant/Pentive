@@ -1,4 +1,4 @@
-import { type JSX, Suspense } from "solid-js"
+import { type JSX, Suspense, createSignal } from "solid-js"
 import { useRouteData } from "solid-start"
 
 import { createServerData$, redirect } from "solid-start/server"
@@ -16,13 +16,22 @@ export function routeData() {
 
 export default function Login(): JSX.Element {
   useRouteData<typeof routeData>()
+  const [alphaKey, setAlphaKey] = createSignal("")
 
   return (
     <main>
       <h1>Login</h1>
       <Suspense>
         <div>
-          <a href={githubLoginUrl}>Sign in via Github</a>
+          <span>Alpha Key:</span>
+          <input
+            class="w-75px p-1 bg-white text-sm rounded-lg"
+            type="text"
+            onInput={(e) => setAlphaKey(e.currentTarget.value)}
+          />
+          <div>
+            <a href={githubLoginUrl(alphaKey())}>Sign in via Github</a>
+          </div>
         </div>
         {import.meta.env.DEV && (
           <>

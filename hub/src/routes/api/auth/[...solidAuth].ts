@@ -22,8 +22,10 @@ import {
 } from "~/session"
 import { getUserIdByEmail } from "shared"
 
-export const githubLoginUrl =
-  import.meta.env.VITE_HUB_ORIGIN + "/api/auth/login/github"
+export const githubLoginUrl = (alphaKey: string) =>
+  import.meta.env.VITE_HUB_ORIGIN +
+  "/api/auth/login/github?alphaKey=" +
+  alphaKey
 
 export const devLoginUrl = (username: string) =>
   import.meta.env.VITE_HUB_ORIGIN + "/api/auth/login/dev?username=" + username
@@ -36,8 +38,14 @@ export const GET = async ({ env, request }: PageEvent) => {
       return await createUserSession(username, "/")
     }
   }
-  if (request.url === githubLoginUrl) {
-    return await handleLogin(env)
+  const url = new URL(request.url)
+  if (url.pathname === "/api/auth/login/github") {
+    const alphaKey = url.searchParams.get("alphaKey")
+    if (alphaKey === env.alphaKey) {
+      return await handleLogin(env)
+    } else {
+      return redirect("/badAlphaKey")
+    }
   } else return await handleCallback(env, request)
 }
 
