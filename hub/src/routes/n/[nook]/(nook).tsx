@@ -55,7 +55,9 @@ const Threads: Component = () => {
               return (
                 <li>
                   <div>
-                    Til {note.til == null ? "X" : note.til.toLocaleTimeString()}
+                    {note.til == null
+                      ? ""
+                      : "Last synced at" + note.til.toLocaleTimeString()}
                   </div>
                   <div>{note.subscribers} subscribers</div>
                   <div>
