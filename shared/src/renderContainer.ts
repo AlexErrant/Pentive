@@ -4,6 +4,7 @@ import {
   clozeTemplateRegex,
   html,
   renderTemplate,
+  strip,
 } from "./cardHtml.js"
 
 export const defaultRenderContainer = {
@@ -12,6 +13,16 @@ export const defaultRenderContainer = {
   body,
   renderTemplate,
   html,
+  strip,
+}
+
+export const noteOrdsRenderContainer = {
+  clozeRegex,
+  clozeTemplateRegex,
+  body,
+  renderTemplate,
+  html,
+  strip: (x: string) => x,
 }
 
 export type RenderContainer = typeof defaultRenderContainer

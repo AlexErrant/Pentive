@@ -3,7 +3,6 @@ import { type RouteDataArgs, useRouteData } from "solid-start"
 import { createServerData$ } from "solid-start/server"
 import {
   type NookId,
-  type Ord,
   type RemoteNoteId,
   getNote,
   getNoteComments,
@@ -15,6 +14,7 @@ import SubmitComment from "~/components/submitComment"
 import { cwaClient } from "~/routes/cwaClient"
 import { getUserId } from "~/session"
 import { getAppMessenger } from "~/root"
+import { noteOrds, noteOrdsRenderContainer } from "shared"
 
 export function routeData({ params }: RouteDataArgs) {
   return {
@@ -36,33 +36,41 @@ export function routeData({ params }: RouteDataArgs) {
 
 const Thread: Component = () => {
   const { data, nook } = useRouteData<typeof routeData>()
+  const fieldsAndValues = () => Array.from(data()!.note!.fieldValues.entries())
   return (
     <Suspense fallback={<p>Loading note...</p>}>
       <Show when={data()?.note} fallback={<p>"404 Not Found"</p>}>
         <div class="item-view-comments">
           <p class="item-view-comments-header">
-            <ResizingIframe
-              i={{
-                tag: "card",
-                side: "front",
-                template: data()!.note!.template,
-                ord: 0 as Ord,
-                fieldsAndValues: Array.from(
-                  data()!.note!.fieldValues.entries()
-                ),
-              }}
-            />
-            <ResizingIframe
-              i={{
-                tag: "card",
-                side: "back",
-                template: data()!.note!.template,
-                ord: 0 as Ord,
-                fieldsAndValues: Array.from(
-                  data()!.note!.fieldValues.entries()
-                ),
-              }}
-            />
+            <For
+              each={noteOrds.bind(noteOrdsRenderContainer)(
+                fieldsAndValues(),
+                data()!.note!.template
+              )}
+            >
+              {(ord) => (
+                <>
+                  <ResizingIframe
+                    i={{
+                      tag: "card",
+                      side: "front",
+                      template: data()!.note!.template,
+                      ord,
+                      fieldsAndValues: fieldsAndValues(),
+                    }}
+                  />
+                  <ResizingIframe
+                    i={{
+                      tag: "card",
+                      side: "back",
+                      template: data()!.note!.template,
+                      ord,
+                      fieldsAndValues: fieldsAndValues(),
+                    }}
+                  />
+                </>
+              )}
+            </For>
           </p>
           <button
             onclick={async () => {

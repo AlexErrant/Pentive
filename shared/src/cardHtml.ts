@@ -190,7 +190,10 @@ function replaceFields(
         : showIfHasText.replace(regex, "")
     })()
 
-    const stripHtml = showIfEmpty.replace(`{{text:${fieldName}}}`, strip(value))
+    const stripHtml = showIfEmpty.replace(
+      `{{text:${fieldName}}}`,
+      this.strip(value)
+    )
 
     const cloze = (() => {
       if (isFront) {
