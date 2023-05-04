@@ -1,7 +1,14 @@
 import { type Component, For, Show } from "solid-js"
 import { A, type RouteDataArgs, useRouteData } from "solid-start"
 import { createServerData$ } from "solid-start/server"
-import { getPosts, getNotes, type NookId, type Ord } from "shared"
+import {
+  getPosts,
+  getNotes,
+  type NookId,
+  type Ord,
+  noteOrds,
+  noteOrdsRenderContainer,
+} from "shared"
 import ResizingIframe from "~/components/resizingIframe"
 import { getUserId } from "~/session"
 
@@ -37,29 +44,39 @@ const Threads: Component = () => {
             )}
           </For>
           <For each={data()!.notes}>
-            {(note) => (
-              <li>
-                <div>
-                  Til {note.til == null ? "X" : note.til.toLocaleTimeString()}
-                </div>
-                <div>{note.subscribers} subscribers</div>
-                <div>
-                  {/* making this an <A> breaks because maps (e.g. `note.fieldValues`) aren't JSON serializable. Revisit if this issue is ever resolved. https://github.com/TanStack/bling/issues/9 */}
-                  <a href={`/n/${nook()}/note/${note.id}`}>
-                    {note.comments} comments
-                  </a>
-                </div>
-                <ResizingIframe
-                  i={{
-                    tag: "card",
-                    side: "front",
-                    template: note.template,
-                    ord: 0 as Ord,
-                    fieldsAndValues: Array.from(note.fieldValues.entries()),
-                  }}
-                />
-              </li>
-            )}
+            {(note) => {
+              const fieldsAndValues = () =>
+                Array.from(note.fieldValues.entries())
+              const count = () =>
+                noteOrds.bind(noteOrdsRenderContainer)(
+                  fieldsAndValues(),
+                  note.template
+                ).length - 1
+              return (
+                <li>
+                  <div>
+                    Til {note.til == null ? "X" : note.til.toLocaleTimeString()}
+                  </div>
+                  <div>{note.subscribers} subscribers</div>
+                  <div>
+                    {/* making this an <A> breaks because maps (e.g. `note.fieldValues`) aren't JSON serializable. Revisit if this issue is ever resolved. https://github.com/TanStack/bling/issues/9 */}
+                    <a href={`/n/${nook()}/note/${note.id}`}>
+                      {note.comments} comments
+                    </a>
+                  </div>
+                  <ResizingIframe
+                    i={{
+                      tag: "card",
+                      side: "front",
+                      template: note.template,
+                      ord: 0 as Ord,
+                      fieldsAndValues: fieldsAndValues(),
+                    }}
+                  />
+                  <Show when={count() !== 0}>+{count()}</Show>
+                </li>
+              )
+            }}
           </For>
         </ul>
       </Show>
