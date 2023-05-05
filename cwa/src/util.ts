@@ -1,6 +1,6 @@
 import { type Context } from "hono"
 import { jwtVerify, type JWTVerifyResult } from "jose"
-import { type Base64, type Brand, csrfHeaderName, jwtCookieName } from "shared"
+import { type Brand, csrfHeaderName, jwtCookieName } from "shared"
 import { getJwsSecret } from "./env"
 import { type MediaTokenSecretBase64 } from "./privateToken"
 
@@ -56,7 +56,6 @@ export type Env = {
   // Example binding to R2. Learn more at https://developers.cloudflare.com/workers/runtime-apis/r2/
   mediaBucket: R2Bucket
   jwsSecret: string
-  authJsSecret: Base64
   mediaTokenSecret: MediaTokenSecretBase64
   planetscaleDbUrl: string
   appOrigin: string

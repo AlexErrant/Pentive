@@ -1,3 +1,5 @@
+export developmentAlphaKey=
+export productionAlphaKey=
 export cloudflareAccountId=
 export developmentPlanetscaleDbUrl=
 export productionPlanetscaleDbUrl=
@@ -11,8 +13,6 @@ export developmentJwsSecret=looks+like+openssl+rand+base64+32+comma+but=
 export productionJwsSecret=looks+like+openssl+rand+base64+32+comma+but=
 export developmentCsrfSecret=with+spaces+and+hyphens+and+stuff+ZZZZZZZZZ=
 export productionCsrfSecret=with+spaces+and+hyphens+and+stuff+ZZZZZZZZZ=
-export developmentAuthJsSecret=also+this+is+the+same+32+bits+of+base64+joy=
-export productionAuthJsSecret=also+this+is+the+same+32+bits+of+base64+joy=
 export developmentOauthStateSecret=also+this+is+the+same+32+bits+of+base64+joy=
 export productionOauthStateSecret=also+this+is+the+same+32+bits+of+base64+joy=
 export developmentOauthCodeVerifierSecret=also+this+is+the+same+32+bits+of+base64+joy=

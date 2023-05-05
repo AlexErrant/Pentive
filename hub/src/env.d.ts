@@ -8,7 +8,7 @@ export interface EnvVars {
   hubSessionSecret: Base64
   jwsSecret: Base64
   csrfSecret: Base64
-  authJsSecret: Base64
+  alphaKey: string
   discordId: string
   discordSecret: string
   githubId: string
