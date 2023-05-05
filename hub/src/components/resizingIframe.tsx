@@ -23,14 +23,17 @@ export type RenderBodyInput =
 
 export interface HubExpose {
   renderBodyInput: RenderBodyInput
+  resize: () => void
 }
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 const ResizingIframe: VoidComponent<{
   readonly i: RenderBodyInput
 }> = (props) => {
   const hubExpose: HubExpose = {
     renderBodyInput: unproxify(props.i),
+    resize: () => {
+      ;(iframeReference as IFrameComponent)?.iFrameResizer?.resize()
+    },
   }
   createEffect(() => {
     try {
@@ -53,7 +56,6 @@ const ResizingIframe: VoidComponent<{
         Comlink.expose(
           hubExpose,
           Comlink.windowEndpoint(
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             e.currentTarget.contentWindow!,
             self,
             targetOrigin
@@ -68,6 +70,7 @@ const ResizingIframe: VoidComponent<{
             // Figure out how to inject the domain https://github.com/davidjbradshaw/iframe-resizer/blob/master/docs/parent_page/options.md#checkorigin
             // `import.meta.env.BASE_URL` could work with some elbow grease, but I'm too lazy to play with https://vitejs.dev/guide/build.html#public-base-path
             checkOrigin: [import.meta.env.VITE_HUB_UGC_ORIGIN],
+            sizeWidth: true,
           },
           e.currentTarget
         )

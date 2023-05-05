@@ -92,12 +92,12 @@ async function getLocalMedia(id: MediaId): Promise<ArrayBuffer | null> {
   return media?.data ?? null
 }
 
-export const appExpose = {
-  getLocalMedia,
-  renderBody,
+export interface AppExpose {
+  getLocalMedia: typeof getLocalMedia
+  renderBody: typeof renderBody
+  resize: () => void
 }
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 const ResizingIframe: VoidComponent<{
   readonly i: RenderBodyInput
 }> = (props) => {
@@ -105,6 +105,13 @@ const ResizingIframe: VoidComponent<{
   onCleanup(() => {
     ;(iframeReference as IFrameComponent).iFrameResizer.close()
   })
+  const appExpose: AppExpose = {
+    getLocalMedia,
+    renderBody,
+    resize: () => {
+      ;(iframeReference as IFrameComponent)?.iFrameResizer?.resize()
+    },
+  }
   return (
     <iframe
       ref={(x) => (iframeReference = x)}
@@ -112,7 +119,6 @@ const ResizingIframe: VoidComponent<{
         Comlink.expose(
           appExpose,
           Comlink.windowEndpoint(
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             e.currentTarget.contentWindow!,
             self,
             targetOrigin
