@@ -83,7 +83,7 @@
     "cwa": "workspace:*",
     "dexie": "^3.2.2",
     "id128": "^1.6.6",
-    "iframe-resizer": "^4.3.2",
+    "iframe-resizer": "^4.3.6",
     "immer": "^9.0.15",
     "kysely": "^0.23.5",
     "lodash": "^4.17.21",
