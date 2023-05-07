@@ -48,6 +48,7 @@ export default function Root(): JSX.Element {
       <Body>
         <iframe
           hidden
+          style="width: 0; height: 0; border: 0; border: none; position: absolute;"
           id="pentive-app-iframe"
           sandbox="allow-scripts allow-same-origin" // Changing this has security ramifications! https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe#attr-sandbox
           // "When the embedded document has the same origin as the embedding page, it is strongly discouraged to use both allow-scripts and allow-same-origin"
