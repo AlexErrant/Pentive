@@ -32,13 +32,25 @@ jobs:
       - name: typecheck + eslint
         run: pnpm typecheck+eslint
 
-      - name: create wrangler.toml
+      - name: envsubst
         env:
           cloudflareAccountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          VITE_PRODUCTION_HUB_DOMAIN: pentive.com
+          VITE_PRODUCTION_HUB_ORIGIN: https://pentive.com
+          VITE_PRODUCTION_CWA_URL: https://cwa.pentive.com/
+          VITE_PRODUCTION_AUGC_URL: https://api-ugc.alexerrant.workers.dev/
+          VITE_PRODUCTION_APP_ORIGIN: https://app.pentive.com
+          VITE_PRODUCTION_HUB_UGC_ORIGIN: https://hub-ugc.pages.dev
+          VITE_PRODUCTION_APP_UGC_ORIGIN: https://app-ugc.pages.dev
+          VITE_PRODUCTION_PEER_HOST: 0.peerjs.com
+          VITE_PRODUCTION_PEER_PORT: 443
         run: |
-          envsubst <     ./cwa/example.wrangler.toml >     ./cwa/wrangler.toml
-          envsubst < ./api-ugc/example.wrangler.toml > ./api-ugc/wrangler.toml
-          envsubst <     ./hub/example.wrangler.toml >     ./hub/wrangler.toml
+          envsubst <       ./cwa/example.wrangler.toml >     ./cwa/wrangler.toml
+          envsubst <   ./api-ugc/example.wrangler.toml > ./api-ugc/wrangler.toml
+          envsubst <       ./hub/example.wrangler.toml >     ./hub/wrangler.toml
+          envsubst <     ./hub/.example.env.production >     ./hub/.env.production
+          envsubst < ./hub-ugc/.example.env.production > ./hub-ugc/.env.production
+          envsubst <     ./app/.example.env.production >     ./app/.env.production
 
       - name: build
         run: pnpm build
