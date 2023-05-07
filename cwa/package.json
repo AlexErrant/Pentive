@@ -12,7 +12,7 @@
     "start": "wrangler dev",
     "dev": "wrangler dev",
     "deploy": "wrangler publish",
-    "build": "wrangler publish --dry-run --outdir dist",
+    "build": "wrangler publish ./src/index.ts --dry-run --outdir dist",
     "type:check": "tsc --noEmit",
     "type:emitCheck": "pnpm --filter shared type:emit && pnpm type:check",
     "eslint": "eslint . --ignore-path .gitignore",
