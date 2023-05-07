@@ -130,9 +130,10 @@ const ResizingIframe: VoidComponent<{
 
             // If perf becomes an issue consider debouncing https://github.com/davidjbradshaw/iframe-resizer/issues/816
 
-            // Figure out how to inject the domain https://github.com/davidjbradshaw/iframe-resizer/blob/master/docs/parent_page/options.md#checkorigin
-            // `import.meta.env.BASE_URL` could work with some elbow grease, but I'm too lazy to play with https://vitejs.dev/guide/build.html#public-base-path
             checkOrigin: [import.meta.env.VITE_APP_UGC_ORIGIN],
+            sizeWidth: true,
+            widthCalculationMethod: "max",
+            heightCalculationMethod: "max",
           },
           e.currentTarget
         )
