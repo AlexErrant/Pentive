@@ -22,17 +22,25 @@ const betterServiceWorkerDevExperience: BuildOptions = {
   },
 }
 
-export default defineConfig(({ command }) => {
+export default defineConfig(({ mode }) => {
   const baseBuild = {
     target: "ES2022",
   }
   const build: BuildOptions =
-    command === "build" // is prod https://vitejs.dev/config/#conditional-config
+    mode === "production"
       ? baseBuild
       : {
           ...betterServiceWorkerDevExperience,
           ...baseBuild,
         }
+  const keyPath = "./.cert/key.pem"
+  const certPath = "./.cert/cert.pem"
+  let key
+  let cert
+  if (mode === "development") {
+    key = fs.readFileSync(keyPath)
+    cert = fs.readFileSync(certPath)
+  }
   return {
     plugins: [
       // if we ever move off this plugin https://github.com/vitejs/vite/issues/2248
@@ -57,16 +65,16 @@ export default defineConfig(({ command }) => {
       port: 3015,
       strictPort: true,
       https: {
-        key: fs.readFileSync("./.cert/key.pem"),
-        cert: fs.readFileSync("./.cert/cert.pem"),
+        key,
+        cert,
       },
     },
     preview: {
       port: 3015,
       strictPort: true,
       https: {
-        key: fs.readFileSync("./.cert/key.pem"),
-        cert: fs.readFileSync("./.cert/cert.pem"),
+        key,
+        cert,
       },
     },
   }

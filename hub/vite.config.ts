@@ -8,6 +8,14 @@ const port = 3014
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd()) as ImportMetaEnv
+  const keyPath = "./.cert/key.pem"
+  const certPath = "./.cert/cert.pem"
+  let key
+  let cert
+  if (mode === "development") {
+    key = fs.readFileSync(keyPath)
+    cert = fs.readFileSync(certPath)
+  }
   return {
     plugins: [
       solid({
@@ -33,16 +41,16 @@ export default defineConfig(({ mode }) => {
       port,
       strictPort: true,
       https: {
-        key: fs.readFileSync("./.cert/key.pem"),
-        cert: fs.readFileSync("./.cert/cert.pem"),
+        key,
+        cert,
       },
     },
     preview: {
       port,
       strictPort: true,
       https: {
-        key: fs.readFileSync("./.cert/key.pem"),
-        cert: fs.readFileSync("./.cert/cert.pem"),
+        key,
+        cert,
       },
     },
   }
