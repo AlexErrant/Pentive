@@ -1,0 +1,50 @@
+name: CI/CD
+
+on:
+  push:
+    paths-ignore:
+      - "**.md"
+
+jobs:
+  check_and_deploy:
+    name: check and deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          cache: pnpm
+          node-version-file: ".nvmrc"
+
+      - name: pnpm install
+        run: pnpm install
+
+      - name: type:emit
+        run: pnpm type:emit
+
+      - name: typecheck + eslint
+        run: pnpm typecheck+eslint
+
+      - name: create wrangler.toml
+        env:
+          cloudflareAccountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          envsubst <     ./cwa/example.wrangler.toml >     ./cwa/wrangler.toml
+          envsubst < ./api-ugc/example.wrangler.toml > ./api-ugc/wrangler.toml
+          envsubst <     ./hub/example.wrangler.toml >     ./hub/wrangler.toml
+
+      - name: build
+        run: pnpm build
+
+      - name: deploy
+        run: pnpm run deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
