@@ -3,7 +3,6 @@ import {
   type JSX,
   type VoidComponent,
   Suspense,
-  createResource,
   createSignal,
   Show,
   type Setter,
@@ -141,16 +140,12 @@ const columns: Array<ColumnDef<Template>> = [
   },
 ]
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 const TemplatesTable: VoidComponent<{
-  readonly getTemplates: () => Promise<Template[]>
+  readonly templates: Template[]
 }> = (props) => {
-  const [templates] = createResource(async () => await props.getTemplates(), {
-    initialValue: [],
-  })
   const table = createSolidTable({
     get data() {
-      return templates()
+      return props.templates
     },
     columns,
     getCoreRowModel: getCoreRowModel(),

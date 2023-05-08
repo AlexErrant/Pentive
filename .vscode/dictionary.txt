@@ -41,6 +41,7 @@ rxdb
 sandboxed
 scure
 siteid
+solidjs
 srcs
 stylelint
 superjson
