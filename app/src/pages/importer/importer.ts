@@ -42,8 +42,11 @@ export async function importAnki(
     new BlobReader(ankiExport)
   ).getEntries()
   const sqlite =
+    ankiEntries.find((e) => e.filename === "collection.anki21") ??
     ankiEntries.find((e) => e.filename === "collection.anki2") ??
-    throwExp("`collection.anki2` not found!")
+    throwExp(
+      "`collection.anki21` or `collection.anki2` not found. Ensure that `Support older Anki versions` in the `Export` window is checked."
+    )
   await importAnkiDb(sqlite)
   await importAnkiMedia(ankiEntries) // running in parallel causes ERR_OUT_OF_MEMORY
 }
