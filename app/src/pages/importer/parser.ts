@@ -100,7 +100,12 @@ export function parseNote(
     ankiNoteId: note.id,
     templateId,
     fieldValues: new Map(_.zip(fields, values) as Array<[string, string]>),
-    tags: new Set(note.tags.split(" ")),
+    tags: new Set(
+      note.tags
+        .split(" ")
+        .map((t) => t.trim())
+        .filter((t) => t !== "")
+    ),
     remotes: new Map(),
   }
 }
