@@ -39,10 +39,13 @@ export default function Root(): JSX.Element {
   return (
     <Html lang="en">
       <Head>
-        <Title>SolidStart - Hacker News</Title>
+        <Title>Pentive</Title>
         <Meta charset="utf-8" />
         <Meta name="viewport" content="width=device-width, initial-scale=1" />
-        <Meta name="description" content="Hacker News Clone built with Solid" />
+        <Meta
+          name="description"
+          content="A free, open source, offline-first spaced repetition system that has first class support for collaboration, curation, and plugins. It's Reddit for flashcards."
+        />
         <Link rel="manifest" href="/manifest.webmanifest" />
       </Head>
       <Body>
