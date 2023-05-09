@@ -12,12 +12,37 @@ import {
 } from "ag-grid-community"
 import { type CardId } from "../domain/ids"
 import { db } from "../db"
+import { assertNever } from "shared"
 
 let gridRef: AgGridSolidRef
 
 const columnDefs: Array<ColDef<NoteCard>> = [
   { field: "card.id" },
   { field: "note.id" },
+  {
+    headerName: "Card",
+    valueGetter: (x) => {
+      if (x.data != null) {
+        switch (x.data.template.templateType.tag) {
+          case "standard":
+            return x.data.template.templateType.templates.at(x.data.card.ord)
+              ?.name
+          case "cloze":
+            return `Cloze ${x.data.card.ord}`
+          default:
+            return assertNever(x.data.template.templateType)
+        }
+      }
+    },
+  },
+  {
+    headerName: "Due",
+    valueGetter: (x) => x.data?.card.due.toLocaleDateString(),
+  },
+  {
+    headerName: "Tags",
+    valueGetter: (x) => Array.from(x.data?.note.tags.keys() ?? []).join(", "),
+  },
 ]
 
 const defaultColDef: ColDef<NoteCard> = { sortable: true }
