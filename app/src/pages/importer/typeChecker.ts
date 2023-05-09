@@ -42,7 +42,7 @@ const model = z.object({
 
 const conf = z.object({
   estTimes: z.boolean(),
-  curModel: z.number(),
+  // curModel: z.number(),
   activeDecks: z.array(z.number()),
   // schedVer: z.number(),
   newSpread: z.number(),
@@ -67,9 +67,9 @@ const deck = z.object({
   newToday: z.tuple([z.number(), z.number()]),
   timeToday: z.tuple([z.number(), z.number()]),
   collapsed: z.boolean(),
-  browserCollapsed: z.boolean(),
+  // browserCollapsed: z.boolean(),
   desc: z.string(),
-  dyn: z.number(),
+  // dyn: z.number(),
   conf: z.number(),
   extendNew: z.number(),
   extendRev: z.number(),
@@ -107,7 +107,7 @@ const dconfSingle = z.object({
     minInt: z.number(),
     mult: z.number(),
   }),
-  dyn: z.boolean(),
+  // dyn: z.boolean(),
 })
 
 const dconf = z.record(z.string(), dconfSingle)
