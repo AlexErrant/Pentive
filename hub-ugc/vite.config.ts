@@ -8,7 +8,6 @@ const betterServiceWorkerDevExperience: BuildOptions = {
   minify: false,
   sourcemap: false,
   reportCompressedSize: false,
-  watch: {},
   rollupOptions: {
     treeshake: false,
     plugins: [
