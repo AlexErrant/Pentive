@@ -2,12 +2,14 @@ import {
   body,
   clozeRegex,
   clozeTemplateRegex,
+  simpleFieldReplacer,
   html,
   renderTemplate,
   strip,
 } from "./cardHtml.js"
 
 export const defaultRenderContainer = {
+  simpleFieldReplacer,
   clozeRegex,
   clozeTemplateRegex,
   body,
@@ -17,11 +19,7 @@ export const defaultRenderContainer = {
 }
 
 export const noteOrdsRenderContainer = {
-  clozeRegex,
-  clozeTemplateRegex,
-  body,
-  renderTemplate,
-  html,
+  ...defaultRenderContainer,
   strip: (x: string) => x,
 }
 

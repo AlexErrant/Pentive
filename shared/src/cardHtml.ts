@@ -162,6 +162,14 @@ function getFieldsValuesFrontTemplateBackTemplate(
   }
 }
 
+export function simpleFieldReplacer(
+  previous: string,
+  fieldName: string,
+  value: string
+) {
+  return previous.replace(`{{${fieldName}}}`, value)
+}
+
 function replaceFields(
   this: RenderContainer,
   fieldsAndValues: ReadonlyArray<readonly [string, string]>,
@@ -169,7 +177,7 @@ function replaceFields(
   template: string
 ): string {
   return fieldsAndValues.reduce((previous, [fieldName, value]) => {
-    const simple = previous.replace(`{{${fieldName}}}`, value)
+    const simple = this.simpleFieldReplacer(previous, fieldName, value)
 
     const showIfHasText = (() => {
       const fieldName2 = escapeRegExp(fieldName)
