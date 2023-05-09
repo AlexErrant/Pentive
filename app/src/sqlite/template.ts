@@ -1,6 +1,6 @@
-import { type RemoteMediaNum, type RemoteTemplateId } from "../domain/ids"
-import { type Field, type Template } from "../domain/template"
 import {
+  type RemoteMediaNum,
+  type RemoteTemplateId,
   type CreateRemoteTemplate,
   type EditRemoteTemplate,
   type NookId,
@@ -11,6 +11,7 @@ import {
   type TemplateId,
   type MediaId,
 } from "shared"
+import { type Field, type Template } from "../domain/template"
 import { getKysely } from "./crsqlite"
 import {
   type DB,

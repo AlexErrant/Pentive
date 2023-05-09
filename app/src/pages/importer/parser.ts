@@ -6,6 +6,8 @@ import {
   type ChildTemplate,
   type TemplateType,
   throwExp,
+  type CardSettingId,
+  type DeckId,
 } from "shared"
 import { type Field, type Template } from "../../domain/template"
 import { type Card as PCard } from "../../domain/card"
@@ -19,7 +21,6 @@ import {
   type Tmpl,
 } from "./typeChecker"
 import _ from "lodash"
-import { type CardSettingId, type DeckId } from "../../domain/ids"
 
 function parseField(fld: Fld): Field {
   return {

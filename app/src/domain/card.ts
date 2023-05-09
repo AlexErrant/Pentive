@@ -1,7 +1,12 @@
-import { type CardId, type NoteId, type Ord } from "shared"
+import {
+  type CardId,
+  type NoteId,
+  type Ord,
+  type CardSettingId,
+  type DeckId,
+} from "shared"
 import { type Note } from "./note"
 import { type Template } from "./template"
-import { type CardSettingId, type DeckId } from "./ids"
 
 export const states = [
   "normal",

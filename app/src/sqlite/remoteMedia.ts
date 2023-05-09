@@ -1,5 +1,9 @@
-import { type Base64Url, type LDbId, throwExp } from "shared"
-import { type RemoteMediaNum } from "../domain/ids"
+import {
+  type Base64Url,
+  type LDbId,
+  throwExp,
+  type RemoteMediaNum,
+} from "shared"
 import { getKysely } from "./crsqlite"
 
 export const remoteMediaCollectionMethods = {

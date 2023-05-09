@@ -12,8 +12,8 @@ import {
   type NookId,
   throwExp,
   type MediaId,
+  type RemoteMediaNum,
 } from "shared"
-import { type RemoteMediaNum } from "../domain/ids"
 import { cwaClient, augcClient } from "../trpcClient"
 import { getDb } from "../sqlite/crsqlite"
 import Peers from "./peers"

@@ -1,10 +1,15 @@
 import fc from "fast-check"
 import { type Card, type Review, type Score, states } from "../src/domain/card"
 
-import { type CardId, type Ord, type NoteId } from "shared"
+import {
+  type CardId,
+  type Ord,
+  type NoteId,
+  type CardSettingId,
+  type DeckId,
+} from "shared"
 
 import { reasonableDates, recordWithOptionalFields } from "./arbitrary"
-import { type CardSettingId, type DeckId } from "../src/domain/ids"
 
 export const review = recordWithOptionalFields<Review>(
   {

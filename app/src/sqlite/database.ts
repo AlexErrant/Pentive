@@ -1,7 +1,12 @@
 // most of these columns are nullable in SQLite, but they're not nullable here for the sake of my sanity
 
-import { type MediaId, type LDbId, type NookId, type Ord } from "shared"
-import { type RemoteMediaNum } from "../domain/ids"
+import {
+  type MediaId,
+  type LDbId,
+  type NookId,
+  type Ord,
+  type RemoteMediaNum,
+} from "shared"
 
 export interface Card {
   id: LDbId

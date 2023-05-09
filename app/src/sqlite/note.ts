@@ -11,8 +11,9 @@ import {
   throwExp,
   type NoteId,
   type MediaId,
+  type RemoteMediaNum,
+  type RemoteTemplateId,
 } from "shared"
-import { type RemoteMediaNum, type RemoteTemplateId } from "../domain/ids"
 import { type Note } from "../domain/note"
 import { getKysely } from "./crsqlite"
 import { type DB, type Note as NoteEntity, type RemoteNote } from "./database"
