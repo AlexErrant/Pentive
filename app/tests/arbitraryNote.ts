@@ -1,12 +1,11 @@
 import fc from "fast-check"
 import { type Note } from "../src/domain/note"
-import { type NoteId } from "../src/domain/ids"
+import { type NoteId, type NookId, type RemoteNoteId } from "shared"
 import {
   arbitraryUlid,
   reasonableDates,
   recordWithOptionalFields,
 } from "./arbitrary"
-import { type NookId, type RemoteNoteId } from "shared"
 
 export const note = recordWithOptionalFields<Note>(
   {

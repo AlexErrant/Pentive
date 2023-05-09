@@ -1,9 +1,4 @@
-import {
-  type MediaId,
-  type RemoteMediaNum,
-  type RemoteTemplateId,
-  type TemplateId,
-} from "../domain/ids"
+import { type RemoteMediaNum, type RemoteTemplateId } from "../domain/ids"
 import { type Field, type Template } from "../domain/template"
 import {
   type CreateRemoteTemplate,
@@ -13,6 +8,8 @@ import {
   notEmpty,
   throwExp,
   undefinedMap,
+  type TemplateId,
+  type MediaId,
 } from "shared"
 import { getKysely } from "./crsqlite"
 import {

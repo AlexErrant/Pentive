@@ -9,13 +9,10 @@ import {
   stringifyMap,
   stringifySet,
   throwExp,
-} from "shared"
-import {
   type NoteId,
-  type RemoteMediaNum,
   type MediaId,
-  type RemoteTemplateId,
-} from "../domain/ids"
+} from "shared"
+import { type RemoteMediaNum, type RemoteTemplateId } from "../domain/ids"
 import { type Note } from "../domain/note"
 import { getKysely } from "./crsqlite"
 import { type DB, type Note as NoteEntity, type RemoteNote } from "./database"

@@ -1,13 +1,13 @@
 import {
   type CardId,
-  type CardSettingId,
-  type DeckId,
   type Ord,
   type NoteId,
   type TemplateId,
-} from "../../domain/ids"
+  type ChildTemplate,
+  type TemplateType,
+  throwExp,
+} from "shared"
 import { type Field, type Template } from "../../domain/template"
-import { type ChildTemplate, type TemplateType, throwExp } from "shared"
 import { type Card as PCard } from "../../domain/card"
 import { type Note as PNote } from "../../domain/note"
 import {
@@ -19,6 +19,7 @@ import {
   type Tmpl,
 } from "./typeChecker"
 import _ from "lodash"
+import { type CardSettingId, type DeckId } from "../../domain/ids"
 
 function parseField(fld: Fld): Field {
   return {

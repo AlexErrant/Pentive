@@ -1,9 +1,16 @@
 import { iframeResizer, type IFrameComponent } from "iframe-resizer"
 import { onCleanup, type VoidComponent } from "solid-js"
 import * as Comlink from "comlink"
-import { type NoteId, type TemplateId, assertNever, throwExp } from "shared"
+import {
+  type NoteId,
+  type TemplateId,
+  assertNever,
+  throwExp,
+  type Side,
+  type CardId,
+  type MediaId,
+} from "shared"
 import { C } from ".."
-import { type Side, type CardId, type MediaId } from "../domain/ids"
 import { db } from "../db"
 
 const targetOrigin = "*" // highTODO make more limiting. Also implement https://stackoverflow.com/q/8169582

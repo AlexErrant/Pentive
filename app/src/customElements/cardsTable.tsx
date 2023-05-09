@@ -10,7 +10,7 @@ import {
   type GridReadyEvent,
   type IGetRowsParams,
 } from "ag-grid-community"
-import { type CardId } from "../domain/ids"
+import { type CardId } from "shared"
 import { db } from "../db"
 import { assertNever } from "shared"
 

@@ -1,4 +1,4 @@
-import { type MediaId } from "./ids"
+import { type MediaId } from "shared"
 
 export interface Media {
   readonly id: MediaId

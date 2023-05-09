@@ -1,10 +1,17 @@
-import { type CardId, type DeckId, type NoteId } from "../domain/ids"
+import { type DeckId } from "../domain/ids"
 import { type Card, type State, type NoteCard } from "../domain/card"
 import { getKysely } from "./crsqlite"
 import { type DB, type Card as CardEntity } from "./database"
 import { type InsertObject, type Kysely } from "kysely"
 import _ from "lodash"
-import { assertNever, stringifySet, throwExp, undefinedMap } from "shared"
+import {
+  type CardId,
+  type NoteId,
+  assertNever,
+  stringifySet,
+  throwExp,
+  undefinedMap,
+} from "shared"
 import { entityToDomain as templateEntityToDomain } from "./template"
 import { entityToDomain as noteEntityToDomain } from "./note"
 

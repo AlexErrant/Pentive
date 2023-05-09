@@ -4,14 +4,16 @@ import {
   type Ord,
   type RemoteTemplateId,
   type TemplateId,
-} from "../src/domain/ids"
+  type ChildTemplate,
+  type NookId,
+  type TemplateType,
+} from "shared"
 import { type Field, type Template } from "../src/domain/template"
 import {
   arbitraryUlid,
   reasonableDates,
   recordWithOptionalFields,
 } from "./arbitrary"
-import { type ChildTemplate, type NookId, type TemplateType } from "shared"
 
 const field = recordWithOptionalFields<Field>(
   {
