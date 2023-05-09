@@ -11,6 +11,8 @@ function clozeTemplateRegex(c: Container): RegExp {
 const services = (c: Container): Partial<Container> => {
   return {
     clozeTemplateRegex: clozeTemplateRegex(c),
+    simpleFieldReplacer: (previous, fieldName, value) =>
+      previous.replace(new RegExp(`{{(?:edit:)?${fieldName}}}`), value),
   }
 }
 
