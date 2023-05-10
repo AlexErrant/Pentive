@@ -272,23 +272,28 @@ function buildHtml(body: string, css: string): string {
 export function html(
   this: RenderContainer,
   fieldsAndValues: ReadonlyArray<readonly [string, string]>,
-  frontTemplate: string,
-  backTemplate: string,
   ord: Ord,
-  css: string,
-  type: "standard" | "cloze"
+  template: Template
 ): readonly [string, string] | null {
+  const { front, back } =
+    template.templateType.tag === "standard"
+      ? template.templateType.templates.find((t) => t.id === ord) ??
+        throwExp(`Ord ${ord} not found`)
+      : template.templateType.template
   const body2 = this.body(
     fieldsAndValues,
-    frontTemplate,
-    backTemplate,
+    front,
+    back,
     ord,
-    type
+    template.templateType.tag
   )
   if (body2 === null) {
     return null
   } else {
-    return [buildHtml(body2[0], css), buildHtml(body2[1], css)] as const
+    return [
+      buildHtml(body2[0], template.css),
+      buildHtml(body2[1], template.css),
+    ] as const
   }
 }
 

@@ -5,7 +5,6 @@ import {
   type NoteId,
   type TemplateId,
   assertNever,
-  throwExp,
   type Side,
   type CardId,
   type MediaId,
@@ -70,19 +69,7 @@ async function renderBody(
         return { body: `Card ${i.cardId} not found!` }
       }
       const fv = Array.from(note.fieldValues)
-      const { front, back } =
-        template.templateType.tag === "standard"
-          ? template.templateType.templates.find((t) => t.id === card.ord) ??
-            throwExp(`Invalid ord ${card.ord} for template ${template.id}`)
-          : template.templateType.template
-      const frontBack = C.html(
-        fv,
-        front,
-        back,
-        card.ord,
-        template.css,
-        template.templateType.tag
-      )
+      const frontBack = C.html(fv, card.ord, template)
       if (frontBack == null) {
         return { body: "Card is invalid!" }
       }

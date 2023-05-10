@@ -1,11 +1,6 @@
 import contentWindowJs from "iframe-resizer/js/iframeResizer.contentWindow.js?raw" // https://vitejs.dev/guide/assets.html#importing-asset-as-string https://github.com/davidjbradshaw/iframe-resizer/issues/513
 import { type RenderBodyInput } from "hub/src/components/resizingIframe"
-import {
-  assertNever,
-  throwExp,
-  registerPluginServices,
-  relativeChar,
-} from "shared"
+import { assertNever, registerPluginServices, relativeChar } from "shared"
 
 const C = await registerPluginServices([])
 
@@ -72,19 +67,7 @@ function buildHtml(i: RenderBodyInput): { body: string; css?: string } {
       const template = i.template
 
       const fv = i.fieldsAndValues
-      const { front, back } =
-        template.templateType.tag === "standard"
-          ? template.templateType.templates.find((t) => t.id === i.ord) ??
-            throwExp(`Invalid ord ${i.ord}`)
-          : template.templateType.template
-      const frontBack = C.html(
-        fv,
-        front,
-        back,
-        i.ord,
-        i.template.css,
-        i.template.templateType.tag
-      )
+      const frontBack = C.html(fv, i.ord, template)
       if (frontBack == null) {
         return { body: "Card is invalid!" }
       }
