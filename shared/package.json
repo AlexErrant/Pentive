@@ -33,7 +33,7 @@
     "jsdom": "^20.0.0",
     "kysely-codegen": "^0.9.0",
     "mysql2": "^2.3.3",
-    "prettier": "^2.7.1",
+    "prettier": "^2.8.8",
     "standard": "^17.0.0",
     "typescript": "~5.0.4"
   },
