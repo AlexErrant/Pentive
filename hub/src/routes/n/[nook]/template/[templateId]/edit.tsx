@@ -50,6 +50,7 @@ import ResizingIframe from "~/components/resizingIframe"
 import { type ClozeTemplate, type StandardTemplate } from "shared/src/cardHtml"
 import { type SetStoreFunction, createStore } from "solid-js/store"
 import { cwaClient } from "~/routes/cwaClient"
+import { remoteToTemplate } from "~/lib/utility"
 
 interface TemplateStore {
   t: RemoteTemplate | undefined
@@ -136,7 +137,7 @@ export default function Submit(): JSX.Element {
           i={{
             tag: "template",
             side: "front",
-            template: template.t!,
+            template: remoteToTemplate(template.t!),
             index: i()!,
           }}
         />
@@ -144,7 +145,7 @@ export default function Submit(): JSX.Element {
           i={{
             tag: "template",
             side: "back",
-            template: template.t!,
+            template: remoteToTemplate(template.t!),
             index: i()!,
           }}
         />

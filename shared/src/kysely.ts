@@ -39,7 +39,6 @@ import {
   type RemoteTemplate,
   type TemplateType,
 } from "./schema.js"
-import { type Template } from "./domain/template.js"
 
 const convert = compile({})
 
@@ -72,8 +71,35 @@ export async function getPosts({ nook }: { nook: string }): Promise<
     .then((ps) => ps.map(mapIdToBase64Url))
 }
 
+function toTemplate(x: {
+  templateId: DbId
+  templateName: string
+  templateCreated: Date
+  templateUpdated: Date
+  nook: string
+  css: string
+  type: string
+  fields: string
+}): RemoteTemplate {
+  return {
+    id: dbIdToBase64Url(x.templateId) as TemplateId,
+    name: x.templateName,
+    nook: x.nook as NookId,
+    created: x.templateCreated,
+    updated: x.templateUpdated,
+    fields: deserializeFields(x.fields),
+    css: x.css,
+    templateType: deserializeTemplateType(x.type),
+  }
+}
+
 function noteToNookView(x: {
   id: DbId
+  templateId: DbId
+  templateName: string
+  templateCreated: Date
+  templateUpdated: Date
+  nook: string
   fieldValues: string
   css: string
   type: string
@@ -88,11 +114,7 @@ function noteToNookView(x: {
     subscribers: x.subscribers,
     comments: x.comments,
     til: x.til,
-    template: {
-      css: x.css,
-      fields: deserializeFields(x.fields),
-      templateType: deserializeTemplateType(x.type),
-    },
+    template: toTemplate(x),
   }
 }
 
@@ -126,6 +148,11 @@ export async function getNotes(nook: NookId, userId: UserId | null) {
       "note.fieldValues",
       "note.subscribersCount as subscribers",
       "note.commentsCount as comments",
+      "template.id as templateId",
+      "template.name as templateName",
+      "template.created as templateCreated",
+      "template.updated as templateUpdated",
+      "template.nook as nook",
       "template.css",
       "template.fields",
       "template.type",
@@ -157,6 +184,11 @@ export async function getNote(noteId: RemoteNoteId, userId: UserId | null) {
       "note.fieldValues",
       "note.tags",
       "note.ankiId",
+      "template.id as templateId",
+      "template.name as templateName",
+      "template.created as templateCreated",
+      "template.updated as templateUpdated",
+      "template.nook as nook",
       "template.css",
       "template.fields",
       "template.type",
@@ -184,11 +216,7 @@ export async function getNote(noteId: RemoteNoteId, userId: UserId | null) {
     tags: deserializeTags(r.tags),
     ankiId: r.ankiId ?? undefined,
     til: r.til,
-    template: {
-      css: r.css,
-      fields: deserializeFields(r.fields),
-      templateType: deserializeTemplateType(r.type),
-    },
+    template: toTemplate(r),
   }
 }
 

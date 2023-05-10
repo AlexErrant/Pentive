@@ -11,6 +11,7 @@ import {
 } from "shared"
 import ResizingIframe from "~/components/resizingIframe"
 import { getUserId } from "~/session"
+import { remoteToTemplate } from "~/lib/utility"
 
 export function routeData({ params }: RouteDataArgs) {
   return {
@@ -50,7 +51,7 @@ const Threads: Component = () => {
               const count = () =>
                 noteOrds.bind(noteOrdsRenderContainer)(
                   fieldsAndValues(),
-                  note.template
+                  remoteToTemplate(note.template)
                 ).length - 1
               return (
                 <li>
@@ -70,7 +71,7 @@ const Threads: Component = () => {
                     i={{
                       tag: "card",
                       side: "front",
-                      template: note.template,
+                      template: remoteToTemplate(note.template),
                       ord: 0 as Ord,
                       fieldsAndValues: fieldsAndValues(),
                     }}

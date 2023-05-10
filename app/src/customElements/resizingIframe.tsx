@@ -42,7 +42,7 @@ async function renderBody(
         }
       const result = C.renderTemplate({
         ...template,
-        fields: template.fields.map((f) => f.name),
+        fields: template.fields,
       })[parseInt(i.index)]
       if (result == null) {
         return {

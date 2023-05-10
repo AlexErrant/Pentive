@@ -15,6 +15,7 @@ import { cwaClient } from "~/routes/cwaClient"
 import { getUserId } from "~/session"
 import { getAppMessenger } from "~/root"
 import { noteOrds, noteOrdsRenderContainer } from "shared"
+import { remoteToTemplate } from "~/lib/utility"
 
 export function routeData({ params }: RouteDataArgs) {
   return {
@@ -37,6 +38,7 @@ export function routeData({ params }: RouteDataArgs) {
 const Thread: Component = () => {
   const { data, nook } = useRouteData<typeof routeData>()
   const fieldsAndValues = () => Array.from(data()!.note!.fieldValues.entries())
+  const template = () => remoteToTemplate(data()!.note!.template)
   return (
     <Suspense fallback={<p>Loading note...</p>}>
       <Show when={data()?.note} fallback={<p>"404 Not Found"</p>}>
@@ -45,7 +47,7 @@ const Thread: Component = () => {
             <For
               each={noteOrds.bind(noteOrdsRenderContainer)(
                 fieldsAndValues(),
-                data()!.note!.template
+                template()
               )}
             >
               {(ord) => (
@@ -54,7 +56,7 @@ const Thread: Component = () => {
                     i={{
                       tag: "card",
                       side: "front",
-                      template: data()!.note!.template,
+                      template: template(),
                       ord,
                       fieldsAndValues: fieldsAndValues(),
                     }}
@@ -63,7 +65,7 @@ const Thread: Component = () => {
                     i={{
                       tag: "card",
                       side: "back",
-                      template: data()!.note!.template,
+                      template: template(),
                       ord,
                       fieldsAndValues: fieldsAndValues(),
                     }}

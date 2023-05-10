@@ -11,9 +11,14 @@ function expectStrippedToBe(html: string, expected: string): void {
   expect(strip(html).replace(newline, "").trim()).toBe(expected)
 }
 
-const clozeWithRequiredEdit = {
+const clozeWithRequiredEdit: Template = {
+  id: "" as TemplateId,
+  name: "",
+  created: new Date(),
+  updated: new Date(),
+  remotes: new Map(),
   css: "",
-  fields: ["Text", "Extra"],
+  fields: [{ name: "Text" }, { name: "Extra" }],
   templateType: {
     tag: "cloze" as const,
     template: {

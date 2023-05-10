@@ -331,6 +331,11 @@ function ordsOfClozeNote(
   back: string
 ) {
   return noteOrds.bind(defaultRenderContainer)(fieldsAndValues, {
+    id: "" as TemplateId,
+    name: "",
+    created: new Date(),
+    updated: new Date(),
+    remotes: new Map(),
     css: "",
     templateType: {
       tag: "cloze",
@@ -552,9 +557,14 @@ function expectTemplate(
 }
 
 test("renderTemplate works for 1 cloze", () => {
-  const cloze = {
+  const cloze: Template = {
+    id: "" as TemplateId,
+    name: "",
+    created: new Date(),
+    updated: new Date(),
+    remotes: new Map(),
     css: "",
-    fields: ["Text", "Extra"],
+    fields: [{ name: "Text" }, { name: "Extra" }],
     templateType: {
       tag: "cloze" as const,
       template: {
@@ -576,9 +586,14 @@ test("renderTemplate works for 1 cloze", () => {
 })
 
 test("renderTemplate works for 2 cloze deletions", () => {
-  const cloze = {
+  const cloze: Template = {
+    id: "" as TemplateId,
+    name: "",
+    created: new Date(),
+    updated: new Date(),
+    remotes: new Map(),
     css: "",
-    fields: ["Text1", "Text2", "Extra"],
+    fields: [{ name: "Text1" }, { name: "Text2" }, { name: "Extra" }],
     templateType: {
       tag: "cloze" as const,
       template: {
@@ -605,9 +620,14 @@ test("renderTemplate works for 2 cloze deletions", () => {
 })
 
 test("renderTemplate works for standard with 1 child template", () => {
-  const standard = {
+  const standard: Template = {
+    id: "" as TemplateId,
+    name: "",
+    created: new Date(),
+    updated: new Date(),
+    remotes: new Map(),
     css: "",
-    fields: ["English", "Spanish"],
+    fields: [{ name: "English" }, { name: "Spanish" }],
     templateType: {
       tag: "standard" as const,
       templates: [
@@ -628,8 +648,13 @@ test("renderTemplate works for standard with 1 child template", () => {
 
 test("renderTemplate works for standard with 2 child templates", () => {
   const standard = {
+    id: "" as TemplateId,
+    name: "",
+    created: new Date(),
+    updated: new Date(),
+    remotes: new Map(),
     css: "",
-    fields: ["English", "Spanish"],
+    fields: [{ name: "English" }, { name: "Spanish" }],
     templateType: {
       tag: "standard" as const,
       templates: [

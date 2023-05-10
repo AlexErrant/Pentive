@@ -4,6 +4,7 @@ import { createServerData$ } from "solid-start/server"
 import { type NookId, getTemplates, unproxify } from "shared"
 import ResizingIframe from "~/components/resizingIframe"
 import { getAppMessenger } from "~/root"
+import { remoteToTemplate } from "~/lib/utility"
 
 export function routeData({ params }: RouteDataArgs) {
   return {
@@ -42,7 +43,7 @@ const Threads: Component = () => {
                   i={{
                     tag: "template",
                     side: "front",
-                    template,
+                    template: remoteToTemplate(template),
                     index: 0,
                   }}
                 />
@@ -50,7 +51,7 @@ const Threads: Component = () => {
                   i={{
                     tag: "template",
                     side: "back",
-                    template,
+                    template: remoteToTemplate(template),
                     index: 0,
                   }}
                 />

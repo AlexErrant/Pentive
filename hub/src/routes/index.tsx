@@ -4,8 +4,13 @@ import ResizingIframe from "~/components/resizingIframe"
 
 export default function Home(): JSX.Element {
   const [template, setTemplate] = createSignal<Template>({
+    id: "" as TemplateId,
+    name: "",
+    created: new Date(),
+    updated: new Date(),
+    remotes: new Map(),
     css: "",
-    fields: ["Front", "Back"],
+    fields: [{ name: "Front" }, { name: "Back" }],
     templateType: {
       tag: "standard",
       templates: [
