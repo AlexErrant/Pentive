@@ -29,8 +29,8 @@ jobs:
       - name: type:emit
         run: pnpm type:emit
 
-      - name: typecheck + eslint
-        run: pnpm typecheck+eslint
+      - name: typecheck + eslint + test
+        run: pnpm typecheck+eslint+test
 
       - name: envsubst
         env:

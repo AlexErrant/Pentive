@@ -14,7 +14,8 @@
     "eslint:fix": "eslint . --fix --ignore-path .gitignore",
     "prettier": "prettier --check .",
     "prettierw": "prettier --write .",
-    "test": "vitest"
+    "test": "vitest",
+    "test:run": "vitest run"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20230404.0",
