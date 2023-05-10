@@ -5,6 +5,47 @@ import { throwExp } from "./utility"
 import { noteOrds, strip } from "./cardHtml"
 import { type Template } from "./domain/template"
 
+function buildTemplate(
+  fieldValues: Array<readonly [string, string]>,
+  frontTemplate: string,
+  backTemplate: string,
+  type: "standard" | "cloze"
+) {
+  return {
+    id: "" as TemplateId,
+    name: "",
+    css: "",
+    fields: fieldValues.map(([name]) => ({
+      name,
+    })),
+    created: new Date(),
+    updated: new Date(),
+    templateType:
+      type === "cloze"
+        ? {
+            tag: "cloze" as const,
+            template: {
+              name: "",
+              front: frontTemplate,
+              back: backTemplate,
+              id: 0 as Ord,
+            },
+          }
+        : {
+            tag: "standard" as const,
+            templates: [
+              {
+                name: "",
+                front: frontTemplate,
+                back: backTemplate,
+                id: 0 as Ord,
+              },
+            ],
+          },
+    remotes: new Map(),
+  } satisfies Template
+}
+
 function testBody(
   fieldValues: Array<readonly [string, string]>,
   frontTemplate: string,
@@ -14,14 +55,10 @@ function testBody(
   expectedFront: string,
   expectedBack: string
 ): void {
+  const template = buildTemplate(fieldValues, frontTemplate, backTemplate, type)
   const [front, back] =
-    defaultRenderContainer.body(
-      fieldValues,
-      frontTemplate,
-      backTemplate,
-      ord as Ord,
-      type
-    ) ?? throwExp("should never happen")
+    defaultRenderContainer.body(fieldValues, ord as Ord, template) ??
+    throwExp("should never happen")
   expect(front).toBe(expectedFront)
   expect(back).toBe(expectedBack)
 }
@@ -35,14 +72,10 @@ function testStrippedBody(
   expectedFront: string,
   expectedBack: string
 ): void {
+  const template = buildTemplate(fieldValues, frontTemplate, backTemplate, type)
   const [front, back] =
-    defaultRenderContainer.body(
-      fieldValues,
-      frontTemplate,
-      backTemplate,
-      ord as Ord,
-      type
-    ) ?? throwExp("should never happen")
+    defaultRenderContainer.body(fieldValues, ord as Ord, template) ??
+    throwExp("should never happen")
   expectStrippedToBe(front, expectedFront)
   expectStrippedToBe(back, expectedBack)
 }
@@ -59,13 +92,8 @@ function testBodyIsNull(
   ord: number,
   type: "standard" | "cloze"
 ): void {
-  const result = defaultRenderContainer.body(
-    fieldValues,
-    frontTemplate,
-    backTemplate,
-    ord as Ord,
-    type
-  )
+  const template = buildTemplate(fieldValues, frontTemplate, backTemplate, type)
+  const result = defaultRenderContainer.body(fieldValues, ord as Ord, template)
   expect(result).toBeNull()
 }
 
@@ -326,29 +354,14 @@ test("CardHtml renders {{cloze:FieldName}} properly", () => {
 })
 
 function ordsOfClozeNote(
-  fieldsAndValues: ReadonlyArray<readonly [string, string]>,
+  fieldsAndValues: Array<[string, string]>,
   front: string,
   back: string
 ) {
-  return noteOrds.bind(defaultRenderContainer)(fieldsAndValues, {
-    id: "" as TemplateId,
-    name: "",
-    created: new Date(),
-    updated: new Date(),
-    remotes: new Map(),
-    css: "",
-    templateType: {
-      tag: "cloze",
-      template: {
-        name: "",
-        front,
-        back,
-        id: 0 as Ord,
-        shortFront: "",
-        shortBack: "",
-      },
-    },
-  })
+  return noteOrds.bind(defaultRenderContainer)(
+    fieldsAndValues,
+    buildTemplate(fieldsAndValues, front, back, "cloze")
+  )
 }
 
 test("maxOrdNote of {{cloze:FieldName}} yields 1", () => {
@@ -557,7 +570,7 @@ function expectTemplate(
 }
 
 test("renderTemplate works for 1 cloze", () => {
-  const cloze: Template = {
+  const cloze = {
     id: "" as TemplateId,
     name: "",
     created: new Date(),
@@ -586,7 +599,7 @@ test("renderTemplate works for 1 cloze", () => {
 })
 
 test("renderTemplate works for 2 cloze deletions", () => {
-  const cloze: Template = {
+  const cloze = {
     id: "" as TemplateId,
     name: "",
     created: new Date(),
@@ -620,7 +633,7 @@ test("renderTemplate works for 2 cloze deletions", () => {
 })
 
 test("renderTemplate works for standard with 1 child template", () => {
-  const standard: Template = {
+  const standard = {
     id: "" as TemplateId,
     name: "",
     created: new Date(),

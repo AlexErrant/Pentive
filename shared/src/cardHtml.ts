@@ -47,19 +47,15 @@ function isNullOrWhitespace(input: string | undefined): boolean {
 export function body(
   this: RenderContainer,
   fieldsAndValues: ReadonlyArray<readonly [string, string]>,
-  frontTemplate: string,
-  backTemplate: string,
   ord: Ord,
-  type: "standard" | "cloze"
+  template: Template
 ): readonly [string, string] | null {
   const [fieldsAndValues2, frontTemplate2, backTemplate2] =
     getFieldsValuesFrontTemplateBackTemplate.call(
       this,
       fieldsAndValues,
-      frontTemplate,
-      backTemplate,
       ord,
-      type
+      template
     )
   const frontSide = replaceFields.call(
     this,
@@ -97,16 +93,18 @@ function getClozeFields(
 function getFieldsValuesFrontTemplateBackTemplate(
   this: RenderContainer,
   fieldsAndValues: ReadonlyArray<readonly [string, string]>,
-  frontTemplate: string,
-  backTemplate: string,
   ord: Ord,
-  type: "standard" | "cloze"
+  template: Template
 ): readonly [ReadonlyArray<readonly [string, string]>, string, string] {
-  if (type === "standard") {
-    return [fieldsAndValues, frontTemplate, backTemplate]
+  if (template.templateType.tag === "standard") {
+    const { front, back } =
+      template.templateType.templates.find((t) => t.id === ord) ??
+      throwExp(`Ord ${ord} not found`)
+    return [fieldsAndValues, front, back]
   } else {
     const i = (ord.valueOf() + 1).toString()
-    const clozeFields = getClozeFields.call(this, frontTemplate)
+    const { front, back } = template.templateType.template
+    const clozeFields = getClozeFields.call(this, front)
     const [fieldsAndValues2, unusedFields] = _.partition(
       fieldsAndValues,
       ([fieldName, value]) => {
@@ -151,7 +149,7 @@ function getFieldsValuesFrontTemplateBackTemplate(
             bt.replace(irrelevantCloze, ""),
           ]
         },
-        [frontTemplate, backTemplate]
+        [front, back]
       )
     return [fieldsAndValues3, qt, at]
   }
@@ -275,18 +273,7 @@ export function html(
   ord: Ord,
   template: Template
 ): readonly [string, string] | null {
-  const { front, back } =
-    template.templateType.tag === "standard"
-      ? template.templateType.templates.find((t) => t.id === ord) ??
-        throwExp(`Ord ${ord} not found`)
-      : template.templateType.template
-  const body2 = this.body(
-    fieldsAndValues,
-    front,
-    back,
-    ord,
-    template.templateType.tag
-  )
+  const body2 = this.body(fieldsAndValues, ord, template)
   if (body2 === null) {
     return null
   } else {
@@ -308,8 +295,8 @@ export function renderTemplate(
   }
   const fieldsAndValues = template.fields.map(getStandardFieldAndValue) // medTODO consider adding escape characters so you can do e.g. {{Front}}. Apparently Anki doesn't have escape characters - now would be a good time to introduce this feature.
   if (template.templateType.tag === "standard") {
-    return template.templateType.templates.map(({ front, back, id }) =>
-      this.body(fieldsAndValues, front, back, id, template.templateType.tag)
+    return template.templateType.templates.map(({ id }) =>
+      this.body(fieldsAndValues, id, template)
     )
   } else if (template.templateType.tag === "cloze") {
     const getFieldsAndValues = (
@@ -324,17 +311,11 @@ export function renderTemplate(
             ] as const)
           : getStandardFieldAndValue(f)
       })
-    const { front, back } = template.templateType.template
+    const { front } = template.templateType.template
     return getClozeFields
       .call(this, front)
       .map((clozeField, i) =>
-        this.body(
-          getFieldsAndValues(clozeField, i),
-          front,
-          back,
-          i as Ord,
-          template.templateType.tag
-        )
+        this.body(getFieldsAndValues(clozeField, i), i as Ord, template)
       )
   }
   throw new Error(
@@ -345,18 +326,12 @@ export function renderTemplate(
 export function noteOrds(
   this: RenderContainer,
   fieldsAndValues: ReadonlyArray<readonly [string, string]>,
-  template: Omit<Template, "fields">
+  template: Template
 ) {
   if (template.templateType.tag === "standard") {
     const ords = template.templateType.templates
-      .map((t, i) => {
-        const body = this.body(
-          fieldsAndValues,
-          t.front,
-          t.back,
-          i as Ord,
-          template.templateType.tag
-        )
+      .map((_, i) => {
+        const body = this.body(fieldsAndValues, i as Ord, template)
         if (body == null) return null
         return i as Ord
       })
