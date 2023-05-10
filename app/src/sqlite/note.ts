@@ -13,8 +13,8 @@ import {
   type MediaId,
   type RemoteMediaNum,
   type RemoteTemplateId,
+  type Note,
 } from "shared"
-import { type Note } from "../domain/note"
 import { getKysely } from "./crsqlite"
 import { type DB, type Note as NoteEntity, type RemoteNote } from "./database"
 import { type InsertObject, type Kysely } from "kysely"

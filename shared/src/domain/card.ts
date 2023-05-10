@@ -4,7 +4,7 @@ import {
   type Ord,
   type CardSettingId,
   type DeckId,
-} from "shared"
+} from "../brand.js"
 import { type Note } from "./note"
 import { type Template } from "./template"
 

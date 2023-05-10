@@ -8,14 +8,14 @@ import {
 } from "solid-js"
 import CardsTable from "../customElements/cardsTable"
 import ResizingIframe from "../customElements/resizingIframe"
-import { type NoteCard } from "../domain/card"
-import { db } from "../db"
 import {
+  type NoteCard,
   type NookId,
   type NoteId,
   type RemoteNoteId,
   type RemoteTemplateId,
 } from "shared"
+import { db } from "../db"
 
 const [selected, setSelected] = createSignal<NoteCard>()
 

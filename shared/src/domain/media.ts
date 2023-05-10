@@ -1,4 +1,4 @@
-import { type MediaId } from "shared"
+import { type MediaId } from "../brand.js"
 
 export interface Media {
   readonly id: MediaId

@@ -13,17 +13,17 @@ import {
   flexRender,
   getCoreRowModel,
 } from "@tanstack/solid-table"
-import { type Template } from "../domain/template"
-import _ from "lodash"
-import ResizingIframe from "./resizingIframe"
-import "@github/time-elements"
 import {
+  type Template,
   type NookId,
   type RemoteTemplateId,
   type TemplateId,
   nookId,
   throwExp,
 } from "shared"
+import _ from "lodash"
+import ResizingIframe from "./resizingIframe"
+import "@github/time-elements"
 import { db } from "../db"
 
 function id(id: keyof Template): keyof Template {

@@ -2,8 +2,8 @@ import _ from "lodash"
 import { type RenderContainer } from "./renderContainer.js"
 import { type Ord } from "./brand.js"
 import { assertNever, notEmpty, throwExp } from "./utility.js"
-import { type Cloze, type Standard, type TemplateType } from "./schema.js"
-
+import { type Cloze, type Standard } from "./schema.js"
+import { type Field, type Template } from "./domain/template.js"
 export interface Template {
   readonly css: string
   readonly fields: readonly string[]

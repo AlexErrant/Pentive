@@ -1,6 +1,5 @@
 import fc from "fast-check"
-import { type Note } from "../src/domain/note"
-import { type NoteId, type NookId, type RemoteNoteId } from "shared"
+import { type Note, type NoteId, type NookId, type RemoteNoteId } from "shared"
 import {
   arbitraryUlid,
   reasonableDates,

@@ -15,11 +15,11 @@ import {
   throwExp,
   noteOrds,
   relativeChar,
+  type Template,
+  type Media,
+  type Note,
+  type Card,
 } from "shared"
-import { type Template } from "./domain/template"
-import { type Media } from "./domain/media"
-import { type Note } from "./domain/note"
-import { type Card } from "./domain/card"
 import { ulidAsBase64Url } from "./domain/utility"
 import { getKysely } from "./sqlite/crsqlite"
 import { type Transaction } from "kysely"

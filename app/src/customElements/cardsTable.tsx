@@ -1,5 +1,5 @@
 import { type VoidComponent } from "solid-js"
-import { type NoteCard } from "../domain/card"
+import { type NoteCard, type CardId } from "shared"
 import "@github/time-elements"
 import AgGridSolid, { type AgGridSolidRef } from "ag-grid-solid"
 import "ag-grid-community/styles/ag-grid.css"
@@ -10,7 +10,6 @@ import {
   type GridReadyEvent,
   type IGetRowsParams,
 } from "ag-grid-community"
-import { type CardId } from "shared"
 import { db } from "../db"
 import { assertNever } from "shared"
 

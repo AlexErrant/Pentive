@@ -1,6 +1,5 @@
 import { Dexie } from "dexie"
-import { type MediaId, type Plugin } from "shared"
-import { type Media } from "../domain/media"
+import { type MediaId, type Plugin, type Media } from "shared"
 import * as Comlink from "comlink"
 
 class DexieDb extends Dexie {

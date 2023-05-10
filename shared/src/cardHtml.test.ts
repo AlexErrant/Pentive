@@ -1,8 +1,9 @@
 import { defaultRenderContainer } from "./renderContainer"
 import { expect, test } from "vitest"
-import { type Ord } from "./brand"
+import { type TemplateId, type Ord } from "./brand"
 import { throwExp } from "./utility"
 import { noteOrds, strip } from "./cardHtml"
+import { type Template } from "./domain/template"
 
 function testBody(
   fieldValues: Array<readonly [string, string]>,

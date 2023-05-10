@@ -8,10 +8,11 @@ import {
   throwExp,
   type CardSettingId,
   type DeckId,
+  type Field,
+  type Template,
+  type Card as PCard,
+  type Note as PNote,
 } from "shared"
-import { type Field, type Template } from "../../domain/template"
-import { type Card as PCard } from "../../domain/card"
-import { type Note as PNote } from "../../domain/note"
 import {
   type Card as ACard,
   type Fld,

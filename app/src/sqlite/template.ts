@@ -10,8 +10,9 @@ import {
   undefinedMap,
   type TemplateId,
   type MediaId,
+  type Field,
+  type Template,
 } from "shared"
-import { type Field, type Template } from "../domain/template"
 import { getKysely } from "./crsqlite"
 import {
   type DB,

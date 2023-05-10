@@ -7,8 +7,9 @@ import {
   type ChildTemplate,
   type NookId,
   type TemplateType,
+  type Field,
+  type Template,
 } from "shared"
-import { type Field, type Template } from "../src/domain/template"
 import {
   arbitraryUlid,
   reasonableDates,

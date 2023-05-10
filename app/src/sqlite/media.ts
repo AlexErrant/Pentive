@@ -1,6 +1,5 @@
 import { undefinedMap } from "shared"
-import { type MediaId } from "shared"
-import { type Media } from "../domain/media"
+import { type MediaId, type Media } from "shared"
 import * as Comlink from "comlink"
 import { getDb, getKysely } from "./crsqlite"
 import { type DB, type Media as MediaEntity } from "./database"

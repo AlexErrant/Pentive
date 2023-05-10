@@ -1,12 +1,12 @@
 import { useRouteData } from "@solidjs/router"
 import { createEffect, createSignal, type JSX } from "solid-js"
-import { sampleCard, type Card } from "../domain/card"
-import { sampleNote, type Note } from "../domain/note"
-import { defaultTemplate, type Template } from "../domain/template"
-import type HomeData from "./home.data"
-import { db } from "../db"
-import { importAnki } from "./importer/importer"
 import {
+  sampleCard,
+  type Card,
+  sampleNote,
+  type Note,
+  defaultTemplate,
+  type Template,
   type Base64Url,
   csrfHeaderName,
   type NookId,
@@ -14,6 +14,9 @@ import {
   type MediaId,
   type RemoteMediaNum,
 } from "shared"
+import type HomeData from "./home.data"
+import { db } from "../db"
+import { importAnki } from "./importer/importer"
 import { cwaClient, augcClient } from "../trpcClient"
 import { getDb } from "../sqlite/crsqlite"
 import Peers from "./peers"

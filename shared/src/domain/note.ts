@@ -3,7 +3,7 @@ import {
   type RemoteNoteId,
   type TemplateId,
   type NoteId,
-} from "shared"
+} from "../brand.js"
 
 export interface Note {
   readonly id: NoteId

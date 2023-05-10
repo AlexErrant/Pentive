@@ -1,5 +1,4 @@
-import { type Ord } from "shared"
-import { type Template } from "shared/src/cardHtml"
+import { type TemplateId, type Ord, type Template } from "shared"
 import { type JSX, createSignal } from "solid-js"
 import ResizingIframe from "~/components/resizingIframe"
 

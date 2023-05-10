@@ -1,9 +1,10 @@
 import { expect, test } from "vitest"
-import { type Ord, type PluginId } from "./brand"
+import { type TemplateId, type Ord, type PluginId } from "./brand"
 import { type Plugin } from "./plugin"
 import { registerPluginServices } from "./pluginManager"
 import { strip } from "./cardHtml"
 import { ulidAsBase64Url } from "./convertBinary"
+import { type Template } from "./domain/template.js"
 
 function expectStrippedToBe(html: string, expected: string): void {
   const newline = /[\r\n]/g

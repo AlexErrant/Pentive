@@ -6,8 +6,10 @@ import {
   stringifySet,
   throwExp,
   undefinedMap,
+  type Card,
+  type State,
+  type NoteCard,
 } from "shared"
-import { type Card, type State, type NoteCard } from "../domain/card"
 import { getKysely } from "./crsqlite"
 import { type DB, type Card as CardEntity } from "./database"
 import { type InsertObject, type Kysely } from "kysely"

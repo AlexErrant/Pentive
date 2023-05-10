@@ -1,7 +1,9 @@
 import fc from "fast-check"
-import { type Card, type Review, type Score, states } from "../src/domain/card"
-
 import {
+  type Card,
+  type Review,
+  type Score,
+  states,
   type CardId,
   type Ord,
   type NoteId,

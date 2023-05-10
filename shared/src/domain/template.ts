@@ -3,8 +3,8 @@ import {
   type RemoteTemplateId,
   type TemplateId,
   type NookId,
-  type TemplateType,
-} from "shared"
+} from "../brand.js"
+import { type TemplateType } from "../schema.js"
 
 export interface Field {
   readonly name: string

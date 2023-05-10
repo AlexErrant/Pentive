@@ -20,10 +20,13 @@ import { notEmpty, throwExp } from "shared"
 import initSqlJs, { type Database } from "sql.js"
 import { checkCard, checkCol, checkMedia, checkNote } from "./typeChecker"
 import { parseNote, parseCard, parseTemplates } from "./parser"
-import { type Card as PCard } from "../../domain/card"
-import { type Note as PNote } from "../../domain/note"
-import { type Template } from "../../domain/template"
-import { type MediaId, type TemplateId } from "shared"
+import {
+  type Card as PCard,
+  type Note as PNote,
+  type Template,
+  type MediaId,
+  type TemplateId,
+} from "shared"
 import { db } from "./../../db"
 import _ from "lodash"
 import sqliteUrl from "../../assets/sql-wasm.wasm?url"

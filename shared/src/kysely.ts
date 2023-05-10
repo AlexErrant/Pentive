@@ -39,6 +39,7 @@ import {
   type RemoteTemplate,
   type TemplateType,
 } from "./schema.js"
+import { type Template } from "./domain/template.js"
 
 const convert = compile({})
 
