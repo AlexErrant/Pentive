@@ -16,7 +16,7 @@ import { createPlainCookie } from "~/createPlainCookie"
 
 const sessionUserId = "userId"
 const sessionNames = [sessionUserId] as const
-type SessionName = typeof sessionNames[number]
+type SessionName = (typeof sessionNames)[number]
 export type UserSession = { [K in SessionName]: string }
 
 export function setSessionStorage(x: {
