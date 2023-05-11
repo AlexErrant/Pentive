@@ -170,6 +170,71 @@ export function simpleFieldReplacer(
   return previous.replace(`{{${fieldName}}}`, value)
 }
 
+function conditionalReplacer(
+  previous: string,
+  fieldName: string,
+  value: string
+) {
+  const fieldName2 = escapeRegExp(fieldName)
+  const regex = new RegExp(`{{#${fieldName2}}}(.*?){{/${fieldName2}}}`, "s")
+  return isNullOrWhitespace(value)
+    ? previous.replace(regex, "")
+    : previous.replace(regex, "$1")
+}
+
+function antiConditionalReplacer(
+  previous: string,
+  fieldName: string,
+  value: string
+) {
+  const fieldName2 = escapeRegExp(fieldName)
+  const regex = new RegExp(`{{\\^${fieldName2}}}(.*?){{/${fieldName2}}}`, "s")
+  return isNullOrWhitespace(value)
+    ? previous.replace(regex, "$1")
+    : previous.replace(regex, "")
+}
+
+function stripHtmlReplacer(
+  this: RenderContainer,
+  previous: string,
+  fieldName: string,
+  value: string
+) {
+  return previous.replace(`{{text:${fieldName}}}`, this.strip(value))
+}
+
+function clozeReplacer(
+  this: RenderContainer,
+  previous: string,
+  fieldName: string,
+  value: string,
+  isFront: boolean
+) {
+  if (isFront) {
+    const regexMatches: ReadonlyArray<readonly [string | undefined, string]> =
+      Array.from(value.matchAll(this.clozeRegex), (x) => [x.groups?.hint, x[0]])
+    const bracketed = regexMatches.reduce((current, [hint, rawCloze]) => {
+      const brackets = `
+<span class="cloze-brackets-front">[</span>
+<span class="cloze-filler-front">${hint ?? "..."}</span>
+<span class="cloze-brackets-front">]</span>
+`
+      return current.replace(rawCloze, brackets)
+    }, value)
+    return previous.replace(clozeTemplateFor.call(this, fieldName), bracketed)
+  } else {
+    const answer = value.replace(
+      this.clozeRegex,
+      `
+<span class="cloze-brackets-back">[</span>
+$<answer>
+<span class="cloze-brackets-back">]</span>
+`
+    )
+    return previous.replace(clozeTemplateFor.call(this, fieldName), answer)
+  }
+}
+
 function replaceFields(
   this: RenderContainer,
   fieldsAndValues: ReadonlyArray<readonly [string, string]>,
@@ -178,63 +243,14 @@ function replaceFields(
 ): string {
   return fieldsAndValues.reduce((previous, [fieldName, value]) => {
     const simple = this.simpleFieldReplacer(previous, fieldName, value)
-
-    const showIfHasText = (() => {
-      const fieldName2 = escapeRegExp(fieldName)
-      const regex = new RegExp(`{{#${fieldName2}}}(.*?){{/${fieldName2}}}`, "s")
-      return isNullOrWhitespace(value)
-        ? simple.replace(regex, "")
-        : simple.replace(regex, "$1")
-    })()
-
-    const showIfEmpty: string = (() => {
-      const fieldName2 = escapeRegExp(fieldName)
-      const regex = new RegExp(
-        `{{\\^${fieldName2}}}(.*?){{/${fieldName2}}}`,
-        "s"
-      )
-      return isNullOrWhitespace(value)
-        ? showIfHasText.replace(regex, "$1")
-        : showIfHasText.replace(regex, "")
-    })()
-
-    const stripHtml = showIfEmpty.replace(
-      `{{text:${fieldName}}}`,
-      this.strip(value)
+    const showIfHasText = conditionalReplacer(simple, fieldName, value)
+    const showIfEmpty = antiConditionalReplacer(showIfHasText, fieldName, value)
+    const stripHtml = stripHtmlReplacer.bind(this)(
+      showIfEmpty,
+      fieldName,
+      value
     )
-
-    const cloze = (() => {
-      if (isFront) {
-        const regexMatches: ReadonlyArray<
-          readonly [string | undefined, string]
-        > = Array.from(value.matchAll(this.clozeRegex), (x) => [
-          x.groups?.hint,
-          x[0],
-        ])
-        const bracketed = regexMatches.reduce((current, [hint, rawCloze]) => {
-          const brackets = `
-<span class="cloze-brackets-front">[</span>
-<span class="cloze-filler-front">${hint ?? "..."}</span>
-<span class="cloze-brackets-front">]</span>
-`
-          return current.replace(rawCloze, brackets)
-        }, value)
-        return stripHtml.replace(
-          clozeTemplateFor.call(this, fieldName),
-          bracketed
-        )
-      } else {
-        const answer = value.replace(
-          this.clozeRegex,
-          `
-<span class="cloze-brackets-back">[</span>
-$<answer>
-<span class="cloze-brackets-back">]</span>
-`
-        )
-        return stripHtml.replace(clozeTemplateFor.call(this, fieldName), answer)
-      }
-    })()
+    const cloze = clozeReplacer.bind(this)(stripHtml, fieldName, value, isFront)
     return cloze
   }, template)
 }
