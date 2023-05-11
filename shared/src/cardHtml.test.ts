@@ -2,7 +2,7 @@ import { defaultRenderContainer } from "./renderContainer"
 import { expect, test } from "vitest"
 import { type TemplateId, type Ord } from "./brand"
 import { throwExp } from "./utility"
-import { noteOrds, strip } from "./cardHtml"
+import { noteOrds, strip, toSampleCard, toSampleNote } from "./cardHtml"
 import { type Template } from "./domain/template"
 
 function buildTemplate(
@@ -57,8 +57,11 @@ function testBody(
 ): void {
   const template = buildTemplate(fieldValues, frontTemplate, backTemplate, type)
   const [front, back] =
-    defaultRenderContainer.body(fieldValues, ord as Ord, template) ??
-    throwExp("should never happen")
+    defaultRenderContainer.body(
+      toSampleCard(ord as Ord),
+      toSampleNote(new Map(fieldValues)),
+      template
+    ) ?? throwExp("should never happen")
   expect(front).toBe(expectedFront)
   expect(back).toBe(expectedBack)
 }
@@ -74,8 +77,11 @@ function testStrippedBody(
 ): void {
   const template = buildTemplate(fieldValues, frontTemplate, backTemplate, type)
   const [front, back] =
-    defaultRenderContainer.body(fieldValues, ord as Ord, template) ??
-    throwExp("should never happen")
+    defaultRenderContainer.body(
+      toSampleCard(ord as Ord),
+      toSampleNote(new Map(fieldValues)),
+      template
+    ) ?? throwExp("should never happen")
   expectStrippedToBe(front, expectedFront)
   expectStrippedToBe(back, expectedBack)
 }
@@ -93,7 +99,11 @@ function testBodyIsNull(
   type: "standard" | "cloze"
 ): void {
   const template = buildTemplate(fieldValues, frontTemplate, backTemplate, type)
-  const result = defaultRenderContainer.body(fieldValues, ord as Ord, template)
+  const result = defaultRenderContainer.body(
+    toSampleCard(ord as Ord),
+    toSampleNote(new Map(fieldValues)),
+    template
+  )
   expect(result).toBeNull()
 }
 
@@ -359,7 +369,7 @@ function ordsOfClozeNote(
   back: string
 ) {
   return noteOrds.bind(defaultRenderContainer)(
-    fieldsAndValues,
+    toSampleNote(new Map(fieldsAndValues)),
     buildTemplate(fieldsAndValues, front, back, "cloze")
   )
 }

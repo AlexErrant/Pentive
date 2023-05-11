@@ -94,10 +94,7 @@ export const appExpose = {
       }
       await downloadImages(getNoteImages(n.fieldValues, new DOMParser()), trx)
       await db.upsertNote(n, trx)
-      const ords = noteOrds.bind(C)(
-        Array.from(n.fieldValues.entries()),
-        template
-      )
+      const ords = noteOrds.bind(C)(n, template)
       const cards = ords.map((i) => {
         const now = new Date()
         const card: Card = {

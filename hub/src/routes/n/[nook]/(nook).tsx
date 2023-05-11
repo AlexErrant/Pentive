@@ -8,10 +8,11 @@ import {
   type Ord,
   noteOrds,
   noteOrdsRenderContainer,
+  toSampleCard,
 } from "shared"
 import ResizingIframe from "~/components/resizingIframe"
 import { getUserId } from "~/session"
-import { remoteToTemplate } from "~/lib/utility"
+import { remoteToNote, remoteToTemplate } from "~/lib/utility"
 
 export function routeData({ params }: RouteDataArgs) {
   return {
@@ -46,13 +47,11 @@ const Threads: Component = () => {
           </For>
           <For each={data()!.notes}>
             {(note) => {
-              const fieldsAndValues = () =>
-                Array.from(note.fieldValues.entries())
+              const localNote = () => remoteToNote(note.note)
+              const template = () => remoteToTemplate(note.template)
               const count = () =>
-                noteOrds.bind(noteOrdsRenderContainer)(
-                  fieldsAndValues(),
-                  remoteToTemplate(note.template)
-                ).length - 1
+                noteOrds.bind(noteOrdsRenderContainer)(localNote(), template())
+                  .length - 1
               return (
                 <li>
                   <div>
@@ -71,9 +70,9 @@ const Threads: Component = () => {
                     i={{
                       tag: "card",
                       side: "front",
-                      template: remoteToTemplate(note.template),
-                      ord: 0 as Ord,
-                      fieldsAndValues: fieldsAndValues(),
+                      template: template(),
+                      card: toSampleCard(0 as Ord),
+                      note: localNote(),
                     }}
                   />
                   <Show when={count() !== 0}>+{count()}</Show>

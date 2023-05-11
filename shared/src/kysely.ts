@@ -32,6 +32,7 @@ import {
 import { base16, base64url } from "@scure/base"
 import { compile } from "html-to-text"
 import {
+  type RemoteNote,
   type CreateRemoteNote,
   type CreateRemoteTemplate,
   type EditRemoteNote,
@@ -71,18 +72,21 @@ export async function getPosts({ nook }: { nook: string }): Promise<
     .then((ps) => ps.map(mapIdToBase64Url))
 }
 
-function toTemplate(x: {
-  templateId: DbId
-  templateName: string
-  templateCreated: Date
-  templateUpdated: Date
-  nook: string
-  css: string
-  type: string
-  fields: string
-}): RemoteTemplate {
+function toTemplate(
+  x: {
+    templateId: DbId
+    templateName: string
+    templateCreated: Date
+    templateUpdated: Date
+    nook: string
+    css: string
+    type: string
+    fields: string
+  },
+  templateId: RemoteTemplateId
+): RemoteTemplate {
   return {
-    id: dbIdToBase64Url(x.templateId) as TemplateId,
+    id: templateId,
     name: x.templateName,
     nook: x.nook as NookId,
     created: x.templateCreated,
@@ -99,6 +103,9 @@ function noteToNookView(x: {
   templateName: string
   templateCreated: Date
   templateUpdated: Date
+  noteCreated: Date
+  noteUpdated: Date
+  tags: string
   nook: string
   fieldValues: string
   css: string
@@ -108,13 +115,39 @@ function noteToNookView(x: {
   comments: number
   til?: Date
 }) {
+  const noteId = dbIdToBase64Url(x.id) as RemoteNoteId
+  const templateId = dbIdToBase64Url(x.templateId) as RemoteTemplateId
   return {
-    id: dbIdToBase64Url(x.id) as RemoteNoteId,
-    fieldValues: deserializeFieldValues(x.fieldValues),
+    id: noteId,
     subscribers: x.subscribers,
     comments: x.comments,
     til: x.til,
-    template: toTemplate(x),
+    note: toNote(x, noteId, templateId),
+    template: toTemplate(x, templateId),
+  }
+}
+
+function toNote(
+  x: {
+    fieldValues: string
+    id: DbId
+    templateId: DbId
+    ankiNoteId?: number
+    noteCreated: Date
+    noteUpdated: Date
+    tags: string
+  },
+  noteId: RemoteNoteId,
+  templateId: RemoteTemplateId
+): RemoteNote {
+  return {
+    fieldValues: deserializeFieldValues(x.fieldValues),
+    id: noteId,
+    templateId,
+    created: x.noteCreated,
+    updated: x.noteUpdated,
+    tags: deserializeTags(x.tags),
+    ankiId: x.ankiNoteId,
   }
 }
 
@@ -146,6 +179,9 @@ export async function getNotes(nook: NookId, userId: UserId | null) {
     .select([
       "note.id",
       "note.fieldValues",
+      "note.created as noteCreated",
+      "note.updated as noteUpdated",
+      "note.tags",
       "note.subscribersCount as subscribers",
       "note.commentsCount as comments",
       "template.id as templateId",
@@ -216,7 +252,7 @@ export async function getNote(noteId: RemoteNoteId, userId: UserId | null) {
     tags: deserializeTags(r.tags),
     ankiId: r.ankiId ?? undefined,
     til: r.til,
-    template: toTemplate(r),
+    template: toTemplate(r, dbIdToBase64Url(r.templateId) as TemplateId),
   }
 }
 

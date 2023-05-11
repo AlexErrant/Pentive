@@ -125,6 +125,7 @@ export default function Submit(): JSX.Element {
       backView()!.destroy()
     }
   })
+  const localTemplate = () => remoteToTemplate(template.t!)
 
   return (
     <main>
@@ -137,7 +138,7 @@ export default function Submit(): JSX.Element {
           i={{
             tag: "template",
             side: "front",
-            template: remoteToTemplate(template.t!),
+            template: localTemplate(),
             index: i()!,
           }}
         />
@@ -145,7 +146,7 @@ export default function Submit(): JSX.Element {
           i={{
             tag: "template",
             side: "back",
-            template: remoteToTemplate(template.t!),
+            template: localTemplate(),
             index: i()!,
           }}
         />

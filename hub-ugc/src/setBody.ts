@@ -64,10 +64,7 @@ function buildHtml(i: RenderBodyInput): { body: string; css?: string } {
       }
     }
     case "card": {
-      const template = i.template
-
-      const fv = i.fieldsAndValues
-      const frontBack = C.html(fv, i.ord, template)
+      const frontBack = C.html(i.card, i.note, i.template)
       if (frontBack == null) {
         return { body: "Card is invalid!" }
       }

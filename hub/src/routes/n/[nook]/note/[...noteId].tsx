@@ -7,6 +7,7 @@ import {
   getNote,
   getNoteComments,
   unproxify,
+  toSampleCard,
 } from "shared"
 import ResizingIframe from "~/components/resizingIframe"
 import NoteComment from "~/components/noteComment"
@@ -15,7 +16,7 @@ import { cwaClient } from "~/routes/cwaClient"
 import { getUserId } from "~/session"
 import { getAppMessenger } from "~/root"
 import { noteOrds, noteOrdsRenderContainer } from "shared"
-import { remoteToTemplate } from "~/lib/utility"
+import { remoteToNote, remoteToTemplate } from "~/lib/utility"
 
 export function routeData({ params }: RouteDataArgs) {
   return {
@@ -37,41 +38,41 @@ export function routeData({ params }: RouteDataArgs) {
 
 const Thread: Component = () => {
   const { data, nook } = useRouteData<typeof routeData>()
-  const fieldsAndValues = () => Array.from(data()!.note!.fieldValues.entries())
   const template = () => remoteToTemplate(data()!.note!.template)
+  const note = () => remoteToNote(data()!.note!)
   return (
     <Suspense fallback={<p>Loading note...</p>}>
       <Show when={data()?.note} fallback={<p>"404 Not Found"</p>}>
         <div class="item-view-comments">
           <p class="item-view-comments-header">
             <For
-              each={noteOrds.bind(noteOrdsRenderContainer)(
-                fieldsAndValues(),
-                template()
-              )}
+              each={noteOrds.bind(noteOrdsRenderContainer)(note(), template())}
             >
-              {(ord) => (
-                <>
-                  <ResizingIframe
-                    i={{
-                      tag: "card",
-                      side: "front",
-                      template: template(),
-                      ord,
-                      fieldsAndValues: fieldsAndValues(),
-                    }}
-                  />
-                  <ResizingIframe
-                    i={{
-                      tag: "card",
-                      side: "back",
-                      template: template(),
-                      ord,
-                      fieldsAndValues: fieldsAndValues(),
-                    }}
-                  />
-                </>
-              )}
+              {(ord) => {
+                const card = () => toSampleCard(ord)
+                return (
+                  <>
+                    <ResizingIframe
+                      i={{
+                        tag: "card",
+                        side: "front",
+                        template: template(),
+                        card: card(),
+                        note: note(),
+                      }}
+                    />
+                    <ResizingIframe
+                      i={{
+                        tag: "card",
+                        side: "back",
+                        template: template(),
+                        card: card(),
+                        note: note(),
+                      }}
+                    />
+                  </>
+                )
+              }}
             </For>
           </p>
           <button

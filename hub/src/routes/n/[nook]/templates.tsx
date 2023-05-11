@@ -27,37 +27,40 @@ const Threads: Component = () => {
       <Show when={data()}>
         <ul>
           <For each={data()!.templates}>
-            {(template) => (
-              <li>
-                <h1>{template.name}</h1>
-                <div>
-                  <button
-                    onclick={async () => {
-                      await getAppMessenger().addTemplate(unproxify(template))
+            {(template) => {
+              const localTemplate = () => remoteToTemplate(template)
+              return (
+                <li>
+                  <h1>{template.name}</h1>
+                  <div>
+                    <button
+                      onclick={async () => {
+                        await getAppMessenger().addTemplate(unproxify(template))
+                      }}
+                    >
+                      Download
+                    </button>
+                  </div>
+                  <ResizingIframe
+                    i={{
+                      tag: "template",
+                      side: "front",
+                      template: localTemplate(),
+                      index: 0,
                     }}
-                  >
-                    Download
-                  </button>
-                </div>
-                <ResizingIframe
-                  i={{
-                    tag: "template",
-                    side: "front",
-                    template: remoteToTemplate(template),
-                    index: 0,
-                  }}
-                />
-                <ResizingIframe
-                  i={{
-                    tag: "template",
-                    side: "back",
-                    template: remoteToTemplate(template),
-                    index: 0,
-                  }}
-                />
-                <A href={`./template/${template.id}/edit`}>Edit</A>
-              </li>
-            )}
+                  />
+                  <ResizingIframe
+                    i={{
+                      tag: "template",
+                      side: "back",
+                      template: localTemplate(),
+                      index: 0,
+                    }}
+                  />
+                  <A href={`./template/${template.id}/edit`}>Edit</A>
+                </li>
+              )
+            }}
           </For>
         </ul>
       </Show>

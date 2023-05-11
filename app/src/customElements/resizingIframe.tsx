@@ -68,8 +68,7 @@ async function renderBody(
       if (card == null) {
         return { body: `Card ${i.cardId} not found!` }
       }
-      const fv = Array.from(note.fieldValues)
-      const frontBack = C.html(fv, card.ord, template)
+      const frontBack = C.html(card, note, template)
       if (frontBack == null) {
         return { body: "Card is invalid!" }
       }

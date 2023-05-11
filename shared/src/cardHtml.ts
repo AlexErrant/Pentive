@@ -1,9 +1,20 @@
 import _ from "lodash"
 import { type RenderContainer } from "./renderContainer.js"
-import { type Ord } from "./brand.js"
+import {
+  type NoteId,
+  type TemplateId,
+  type Ord,
+  type NookId,
+  type RemoteNoteId,
+  type CardId,
+  type DeckId,
+  type CardSettingId,
+} from "./brand.js"
 import { assertNever, notEmpty, throwExp } from "./utility.js"
 import { type Cloze, type Standard } from "./schema.js"
 import { type Field, type Template } from "./domain/template.js"
+import { type Card } from "./domain/card.js"
+import { type Note } from "./domain/note.js"
 
 export type StandardTemplate = Omit<Template, "templateType"> & {
   templateType: Standard
@@ -46,17 +57,12 @@ function isNullOrWhitespace(input: string | undefined): boolean {
 
 export function body(
   this: RenderContainer,
-  fieldsAndValues: ReadonlyArray<readonly [string, string]>,
-  ord: Ord,
+  card: Card,
+  note: Note,
   template: Template
 ): readonly [string, string] | null {
   const [fieldsAndValues2, frontTemplate2, backTemplate2] =
-    getFieldsValuesFrontTemplateBackTemplate.call(
-      this,
-      fieldsAndValues,
-      ord,
-      template
-    )
+    getFieldsValuesFrontTemplateBackTemplate.call(this, card, note, template)
   const frontSide = replaceFields.call(
     this,
     fieldsAndValues2,
@@ -92,10 +98,11 @@ function getClozeFields(
 
 function getFieldsValuesFrontTemplateBackTemplate(
   this: RenderContainer,
-  fieldsAndValues: ReadonlyArray<readonly [string, string]>,
-  ord: Ord,
+  { ord }: Card,
+  note: Note,
   template: Template
 ): readonly [ReadonlyArray<readonly [string, string]>, string, string] {
+  const fieldsAndValues = Array.from(note.fieldValues.entries())
   if (template.templateType.tag === "standard") {
     const { front, back } =
       template.templateType.templates.find((t) => t.id === ord) ??
@@ -269,11 +276,11 @@ function buildHtml(body: string, css: string): string {
 
 export function html(
   this: RenderContainer,
-  fieldsAndValues: ReadonlyArray<readonly [string, string]>,
-  ord: Ord,
+  card: Card,
+  note: Note,
   template: Template
 ): readonly [string, string] | null {
-  const body2 = this.body(fieldsAndValues, ord, template)
+  const body2 = this.body(card, note, template)
   if (body2 === null) {
     return null
   } else {
@@ -281,6 +288,33 @@ export function html(
       buildHtml(body2[0], template.css),
       buildHtml(body2[1], template.css),
     ] as const
+  }
+}
+
+export function toSampleNote(fieldValues: Map<string, string>): Note {
+  return {
+    id: "SampleNoteId" as NoteId,
+    templateId: "SampleTemplateId" as TemplateId,
+    created: new Date(),
+    updated: new Date(),
+    tags: new Set(["SampleTag"]),
+    fieldValues,
+    remotes: new Map([
+      ["SampleNookId" as NookId, "SampleRemoteNoteId" as RemoteNoteId],
+    ]),
+  }
+}
+
+export function toSampleCard(ord: Ord): Card {
+  return {
+    id: "SampleCardId" as CardId,
+    ord,
+    noteId: "SampleNoteId" as NoteId,
+    deckIds: new Set(["SampleDeckId" as DeckId]),
+    created: new Date(),
+    updated: new Date(),
+    cardSettingId: "SampleCardSettingId" as CardSettingId,
+    due: new Date(),
   }
 }
 
@@ -293,10 +327,11 @@ export function renderTemplate(
   ): readonly [string, string] => {
     return [field.name, `(${field.name})`] as const
   }
-  const fieldsAndValues = template.fields.map(getStandardFieldAndValue) // medTODO consider adding escape characters so you can do e.g. {{Front}}. Apparently Anki doesn't have escape characters - now would be a good time to introduce this feature.
+  const fieldsAndValues = new Map(template.fields.map(getStandardFieldAndValue)) // medTODO consider adding escape characters so you can do e.g. {{Front}}. Apparently Anki doesn't have escape characters - now would be a good time to introduce this feature.
   if (template.templateType.tag === "standard") {
+    const note = toSampleNote(fieldsAndValues)
     return template.templateType.templates.map(({ id }) =>
-      this.body(fieldsAndValues, id, template)
+      this.body(toSampleCard(id), note, template)
     )
   } else if (template.templateType.tag === "cloze") {
     const getFieldsAndValues = (
@@ -315,7 +350,11 @@ export function renderTemplate(
     return getClozeFields
       .call(this, front)
       .map((clozeField, i) =>
-        this.body(getFieldsAndValues(clozeField, i), i as Ord, template)
+        this.body(
+          toSampleCard(i as Ord),
+          toSampleNote(new Map(getFieldsAndValues(clozeField, i))),
+          template
+        )
       )
   }
   throw new Error(
@@ -325,20 +364,20 @@ export function renderTemplate(
 
 export function noteOrds(
   this: RenderContainer,
-  fieldsAndValues: ReadonlyArray<readonly [string, string]>,
+  note: Note,
   template: Template
 ) {
   if (template.templateType.tag === "standard") {
     const ords = template.templateType.templates
       .map((_, i) => {
-        const body = this.body(fieldsAndValues, i as Ord, template)
+        const body = this.body(toSampleCard(i as Ord), note, template)
         if (body == null) return null
         return i as Ord
       })
       .filter(notEmpty)
     return distinctAndOrder(ords)
   } else if (template.templateType.tag === "cloze") {
-    const ords = fieldsAndValues.flatMap(([, value]) =>
+    const ords = Array.from(note.fieldValues.entries()).flatMap(([, value]) =>
       Array.from(value.matchAll(this.clozeRegex)).map((x) => {
         const clozeIndex =
           x.groups?.clozeIndex ??

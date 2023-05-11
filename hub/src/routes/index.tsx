@@ -1,4 +1,10 @@
-import { type TemplateId, type Ord, type Template } from "shared"
+import {
+  type TemplateId,
+  type Ord,
+  type Template,
+  toSampleCard,
+  toSampleNote,
+} from "shared"
 import { type JSX, createSignal } from "solid-js"
 import ResizingIframe from "~/components/resizingIframe"
 
@@ -42,11 +48,13 @@ export default function Home(): JSX.Element {
           tag: "card",
           side: "back",
           template: template(),
-          ord: 0 as Ord,
-          fieldsAndValues: [
-            ["Front", "q"],
-            ["Back", "a"],
-          ],
+          card: toSampleCard(0 as Ord),
+          note: toSampleNote(
+            new Map([
+              ["Front", "q"],
+              ["Back", "a"],
+            ])
+          ),
         }}
       />
       <button
