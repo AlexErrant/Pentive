@@ -36,10 +36,16 @@ const noteUneditable = {
   templateId: true,
   created: true,
   updated: true,
+  nook: true,
 } as const
+
+export const nookId = z
+  .string()
+  .regex(/^[a-z0-9_]{1,22}$/) as unknown as z.Schema<NookId>
 
 export const remoteNote = z.object({
   id: remoteNoteId,
+  nook: nookId,
   templateId: remoteTemplateId,
   created: dateSchema,
   updated: dateSchema,
@@ -87,10 +93,6 @@ export const templateType = z.discriminatedUnion("tag", [standard, cloze])
 export type TemplateType = z.infer<typeof templateType>
 export type Standard = z.infer<typeof standard>
 export type Cloze = z.infer<typeof cloze>
-
-export const nookId = z
-  .string()
-  .regex(/^[a-z0-9_]{1,22}$/) as unknown as z.Schema<NookId>
 
 export const remoteTemplate = z.object({
   id: remoteTemplateId,

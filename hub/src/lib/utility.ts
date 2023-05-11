@@ -16,7 +16,7 @@ export function remoteToTemplate(remote: RemoteTemplate): Template {
 export function remoteToNote(remote: RemoteNote): Note {
   return {
     ...remote,
-    remotes: new Map(), // nextTODO
+    remotes: new Map([[remote.nook, remote.id]]),
     tags: new Set(remote.tags),
   }
 }

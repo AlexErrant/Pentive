@@ -129,6 +129,7 @@ function noteToNookView(x: {
 
 function toNote(
   x: {
+    nook: string
     fieldValues: string
     id: DbId
     templateId: DbId
@@ -141,6 +142,7 @@ function toNote(
   templateId: RemoteTemplateId
 ): RemoteNote {
   return {
+    nook: x.nook as NookId,
     fieldValues: deserializeFieldValues(x.fieldValues),
     id: noteId,
     templateId,
@@ -252,6 +254,7 @@ export async function getNote(noteId: RemoteNoteId, userId: UserId | null) {
     tags: deserializeTags(r.tags),
     ankiId: r.ankiId ?? undefined,
     til: r.til,
+    nook: r.nook,
     template: toTemplate(r, dbIdToBase64Url(r.templateId) as TemplateId),
   }
 }
