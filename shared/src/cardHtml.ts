@@ -69,6 +69,22 @@ export function body(
   }
 }
 
+export type StandardReplacer = (
+  this: RenderContainer,
+  initialValue: string,
+  isFront: boolean,
+  card: Card,
+  note: Note,
+  template: StandardTemplate
+) => string
+
+export const standardReplacers: StandardReplacer[] = [
+  simpleFieldReplacer,
+  conditionalReplacer,
+  antiConditionalReplacer,
+  stripHtmlReplacer,
+]
+
 function handleStandard(
   this: RenderContainer,
   card: Card,
@@ -78,18 +94,12 @@ function handleStandard(
   const { front, back } =
     template.templateType.templates.find((t) => t.id === card.ord) ??
     throwExp(`Ord ${card.ord} not found`)
-  const replacers = [
-    this.simpleFieldReplacer,
-    conditionalReplacer,
-    antiConditionalReplacer,
-    stripHtmlReplacer,
-  ]
   function replaceFields(
     this: RenderContainer,
     isFront: boolean,
     seed: string
   ) {
-    return replacers.reduce(
+    return this.standardReplacers.reduce(
       (s, replacer) => replacer.bind(this)(s, isFront, card, note, template),
       seed
     )
@@ -105,6 +115,23 @@ function handleStandard(
   }
 }
 
+export type ClozeReplacer = (
+  this: RenderContainer,
+  initialValue: string,
+  isFront: boolean,
+  card: Card,
+  note: Note,
+  template: ClozeTemplate
+) => string
+
+export const clozeReplacers: ClozeReplacer[] = [
+  simpleFieldReplacer,
+  conditionalReplacer,
+  antiConditionalReplacer,
+  stripHtmlReplacer,
+  clozeReplacer,
+]
+
 function handleCloze(
   this: RenderContainer,
   card: Card,
@@ -112,19 +139,12 @@ function handleCloze(
   template: ClozeTemplate
 ) {
   const { front, back } = template.templateType.template
-  const replacers = [
-    this.simpleFieldReplacer,
-    conditionalReplacer,
-    antiConditionalReplacer,
-    stripHtmlReplacer,
-    clozeReplacer,
-  ]
   function replaceFields(
     this: RenderContainer,
     isFront: boolean,
     seed: string
   ) {
-    return replacers.reduce(
+    return this.clozeReplacers.reduce(
       (s, replacer) => replacer.bind(this)(s, isFront, card, note, template),
       seed
     )

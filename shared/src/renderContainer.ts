@@ -2,14 +2,16 @@ import {
   body,
   clozeRegex,
   clozeTemplateRegex,
-  simpleFieldReplacer,
   html,
   renderTemplate,
   strip,
+  standardReplacers,
+  clozeReplacers,
 } from "./cardHtml.js"
 
 export const defaultRenderContainer = {
-  simpleFieldReplacer,
+  standardReplacers,
+  clozeReplacers,
   clozeRegex,
   clozeTemplateRegex,
   body,
