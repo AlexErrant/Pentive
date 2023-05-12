@@ -76,22 +76,19 @@ function handleStandard(
   note: Note,
   template: StandardTemplate
 ) {
-  const [fieldsAndValues2, frontTemplate2, backTemplate2] =
-    getFieldsValuesFrontTemplateBackTemplate.call(this, card, note, template)
-  const frontSide = replaceFields.call(
-    this,
-    fieldsAndValues2,
-    true,
-    frontTemplate2
-  )
-  if (frontSide === frontTemplate2) {
+  const fieldsAndValues = Array.from(note.fieldValues.entries())
+  const { front, back } =
+    template.templateType.templates.find((t) => t.id === card.ord) ??
+    throwExp(`Ord ${card.ord} not found`)
+  const frontSide = replaceFields.call(this, fieldsAndValues, true, front)
+  if (frontSide === front) {
     return null
   } else {
     const backSide = replaceFields
-      .call(this, fieldsAndValues2, false, backTemplate2)
+      .call(this, fieldsAndValues, false, back)
       .replace(
         "{{FrontSide}}",
-        replaceFields.call(this, fieldsAndValues2, false, frontTemplate2)
+        replaceFields.call(this, fieldsAndValues, false, front)
       )
     return [frontSide, backSide] as const
   }
@@ -103,22 +100,65 @@ function handleCloze(
   note: Note,
   template: ClozeTemplate
 ) {
-  const [fieldsAndValues2, frontTemplate2, backTemplate2] =
-    getFieldsValuesFrontTemplateBackTemplate.call(this, card, note, template)
-  const frontSide = replaceFields.call(
-    this,
-    fieldsAndValues2,
-    true,
-    frontTemplate2
+  const fieldsAndValues = Array.from(note.fieldValues.entries())
+  const i = (card.ord.valueOf() + 1).toString()
+  const { front, back } = template.templateType.template
+  const clozeFields = getClozeFields.call(this, front)
+  const [fieldsAndValues2, unusedFields] = _.partition(
+    fieldsAndValues,
+    ([fieldName, value]) => {
+      const indexMatch = Array.from(
+        value.matchAll(this.clozeRegex),
+        (x) =>
+          x.groups?.clozeIndex ??
+          throwExp("This error should never occur - is `clozeRegex` broken?")
+      ).includes(i)
+      return indexMatch || !clozeFields.includes(fieldName)
+    }
   )
-  if (frontSide === frontTemplate2) {
+  const fieldsAndValues3 = fieldsAndValues2.map(([fieldName, value]) => {
+    const value2 = Array.from(value.matchAll(this.clozeRegex))
+      .filter(
+        (x) =>
+          (x.groups?.clozeIndex ??
+            throwExp(
+              "This error should never occur - is `clozeRegex` broken?"
+            )) !== i
+      )
+      .map((x) => ({
+        completeMatch: x[0],
+        answer:
+          x.groups?.answer ??
+          throwExp("This error should never occur - is `clozeRegex` broken?"),
+      }))
+      .reduce(
+        (state, { completeMatch, answer }) =>
+          state.replace(completeMatch, answer),
+        value
+      )
+    return [fieldName, value2] as const
+  })
+  const [qt, at] = unusedFields
+    .map(([k]) => k)
+    .reduce(
+      ([ft, bt], fieldName) => {
+        const irrelevantCloze = clozeTemplateFor.call(this, fieldName)
+        return [
+          ft.replace(irrelevantCloze, ""),
+          bt.replace(irrelevantCloze, ""),
+        ]
+      },
+      [front, back]
+    )
+  const frontSide = replaceFields.call(this, fieldsAndValues3, true, qt)
+  if (frontSide === qt) {
     return null
   } else {
     const backSide = replaceFields
-      .call(this, fieldsAndValues2, false, backTemplate2)
+      .call(this, fieldsAndValues3, false, at)
       .replace(
         "{{FrontSide}}",
-        replaceFields.call(this, fieldsAndValues2, false, frontTemplate2)
+        replaceFields.call(this, fieldsAndValues3, false, qt)
       )
     return [frontSide, backSide] as const
   }
@@ -136,72 +176,6 @@ function getClozeFields(
         "This error should never occur - is `clozeTemplateRegex` broken?"
       )
   )
-}
-
-function getFieldsValuesFrontTemplateBackTemplate(
-  this: RenderContainer,
-  { ord }: Card,
-  note: Note,
-  template: Template
-): readonly [ReadonlyArray<readonly [string, string]>, string, string] {
-  const fieldsAndValues = Array.from(note.fieldValues.entries())
-  if (template.templateType.tag === "standard") {
-    const { front, back } =
-      template.templateType.templates.find((t) => t.id === ord) ??
-      throwExp(`Ord ${ord} not found`)
-    return [fieldsAndValues, front, back]
-  } else {
-    const i = (ord.valueOf() + 1).toString()
-    const { front, back } = template.templateType.template
-    const clozeFields = getClozeFields.call(this, front)
-    const [fieldsAndValues2, unusedFields] = _.partition(
-      fieldsAndValues,
-      ([fieldName, value]) => {
-        const indexMatch = Array.from(
-          value.matchAll(this.clozeRegex),
-          (x) =>
-            x.groups?.clozeIndex ??
-            throwExp("This error should never occur - is `clozeRegex` broken?")
-        ).includes(i)
-        return indexMatch || !clozeFields.includes(fieldName)
-      }
-    )
-    const fieldsAndValues3 = fieldsAndValues2.map(([fieldName, value]) => {
-      const value2 = Array.from(value.matchAll(this.clozeRegex))
-        .filter(
-          (x) =>
-            (x.groups?.clozeIndex ??
-              throwExp(
-                "This error should never occur - is `clozeRegex` broken?"
-              )) !== i
-        )
-        .map((x) => ({
-          completeMatch: x[0],
-          answer:
-            x.groups?.answer ??
-            throwExp("This error should never occur - is `clozeRegex` broken?"),
-        }))
-        .reduce(
-          (state, { completeMatch, answer }) =>
-            state.replace(completeMatch, answer),
-          value
-        )
-      return [fieldName, value2] as const
-    })
-    const [qt, at] = unusedFields
-      .map(([k]) => k)
-      .reduce(
-        ([ft, bt], fieldName) => {
-          const irrelevantCloze = clozeTemplateFor.call(this, fieldName)
-          return [
-            ft.replace(irrelevantCloze, ""),
-            bt.replace(irrelevantCloze, ""),
-          ]
-        },
-        [front, back]
-      )
-    return [fieldsAndValues3, qt, at]
-  }
 }
 
 export function simpleFieldReplacer(
