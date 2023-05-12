@@ -84,7 +84,7 @@ function handleStandard(
     isFront: boolean,
     seed: string
   ): string {
-    return fieldsAndValues.reduce((previous, [fieldName, value]) => {
+    const r = fieldsAndValues.reduce((previous, [fieldName, value]) => {
       const simple = this.simpleFieldReplacer(previous, fieldName, value)
       const showIfHasText = conditionalReplacer(simple, fieldName, value)
       const showIfEmpty = antiConditionalReplacer(
@@ -92,13 +92,16 @@ function handleStandard(
         fieldName,
         value
       )
-      const stripHtml = stripHtmlReplacer.bind(this)(
-        showIfEmpty,
-        fieldName,
-        value
-      )
-      return stripHtml
+      return showIfEmpty
     }, seed)
+    const stripHtml = stripHtmlReplacer.bind(this)(
+      r,
+      isFront,
+      card,
+      note,
+      template
+    )
+    return stripHtml
   }
   const frontSide = replaceFields.call(this, true, front)
   if (frontSide === front) {
@@ -132,14 +135,22 @@ function handleCloze(
         fieldName,
         value
       )
-      const stripHtml = stripHtmlReplacer.bind(this)(
-        showIfEmpty,
-        fieldName,
-        value
-      )
-      return stripHtml
+      return showIfEmpty
     }, seed)
-    const cloze = clozeReplacer.bind(this)(r, isFront, card, note, template)
+    const stripHtml = stripHtmlReplacer.bind(this)(
+      r,
+      isFront,
+      card,
+      note,
+      template
+    )
+    const cloze = clozeReplacer.bind(this)(
+      stripHtml,
+      isFront,
+      card,
+      note,
+      template
+    )
     return cloze
   }
   const frontSide = replaceFields.call(this, true, front)
@@ -201,11 +212,17 @@ function antiConditionalReplacer(
 
 function stripHtmlReplacer(
   this: RenderContainer,
-  previous: string,
-  fieldName: string,
-  value: string
+  initialValue: string,
+  isFront: boolean,
+  card: Card,
+  note: Note,
+  template: Template
 ) {
-  return previous.replace(`{{text:${fieldName}}}`, this.strip(value))
+  let r = initialValue
+  note.fieldValues.forEach((value, fieldName) => {
+    r = r.replace(`{{text:${fieldName}}}`, this.strip(value))
+  })
+  return r
 }
 
 function clozeReplacer(
