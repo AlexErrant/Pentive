@@ -116,33 +116,10 @@ function handleCloze(
   template: ClozeTemplate
 ) {
   const fieldsAndValues = Array.from(note.fieldValues.entries())
-  const i = (card.ord.valueOf() + 1).toString()
   const { front, back } = template.templateType.template
-  const fieldsAndValues3 = fieldsAndValues.map(([fieldName, value]) => {
-    const value2 = Array.from(value.matchAll(this.clozeRegex))
-      .filter(
-        (x) =>
-          (x.groups?.clozeIndex ??
-            throwExp(
-              "This error should never occur - is `clozeRegex` broken?"
-            )) !== i
-      )
-      .map((x) => ({
-        completeMatch: x[0],
-        answer:
-          x.groups?.answer ??
-          throwExp("This error should never occur - is `clozeRegex` broken?"),
-      }))
-      .reduce(
-        (state, { completeMatch, answer }) =>
-          state.replace(completeMatch, answer),
-        value
-      )
-    return [fieldName, value2] as const
-  })
   const frontSide = replaceFields.call(
     this,
-    fieldsAndValues3,
+    fieldsAndValues,
     true,
     front,
     card,
@@ -153,12 +130,12 @@ function handleCloze(
     return null
   } else {
     const backSide = replaceFields
-      .call(this, fieldsAndValues3, false, back, card, note, template)
+      .call(this, fieldsAndValues, false, back, card, note, template)
       .replace(
         "{{FrontSide}}",
         replaceFields.call(
           this,
-          fieldsAndValues3,
+          fieldsAndValues,
           false,
           front,
           card,
@@ -248,6 +225,26 @@ function clozeReplacer(
   ).includes(i)
   if (!indexMatch && clozeFields.includes(fieldName)) {
     value = ""
+  } else {
+    value = Array.from(value.matchAll(this.clozeRegex))
+      .filter(
+        (x) =>
+          (x.groups?.clozeIndex ??
+            throwExp(
+              "This error should never occur - is `clozeRegex` broken?"
+            )) !== i
+      )
+      .map((x) => ({
+        completeMatch: x[0],
+        answer:
+          x.groups?.answer ??
+          throwExp("This error should never occur - is `clozeRegex` broken?"),
+      }))
+      .reduce(
+        (state, { completeMatch, answer }) =>
+          state.replace(completeMatch, answer),
+        value
+      )
   }
   if (isFront) {
     const regexMatches: ReadonlyArray<readonly [string | undefined, string]> =
