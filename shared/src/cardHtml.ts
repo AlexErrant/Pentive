@@ -80,15 +80,31 @@ function handleStandard(
   const { front, back } =
     template.templateType.templates.find((t) => t.id === card.ord) ??
     throwExp(`Ord ${card.ord} not found`)
-  const frontSide = replaceFields.call(this, fieldsAndValues, true, front)
+  const frontSide = replaceFields.call(
+    this,
+    fieldsAndValues,
+    true,
+    front,
+    card,
+    note,
+    template
+  )
   if (frontSide === front) {
     return null
   } else {
     const backSide = replaceFields
-      .call(this, fieldsAndValues, false, back)
+      .call(this, fieldsAndValues, false, back, card, note, template)
       .replace(
         "{{FrontSide}}",
-        replaceFields.call(this, fieldsAndValues, false, front)
+        replaceFields.call(
+          this,
+          fieldsAndValues,
+          false,
+          front,
+          card,
+          note,
+          template
+        )
       )
     return [frontSide, backSide] as const
   }
@@ -150,15 +166,31 @@ function handleCloze(
       },
       [front, back]
     )
-  const frontSide = replaceFields.call(this, fieldsAndValues3, true, qt)
+  const frontSide = replaceFields.call(
+    this,
+    fieldsAndValues3,
+    true,
+    qt,
+    card,
+    note,
+    template
+  )
   if (frontSide === qt) {
     return null
   } else {
     const backSide = replaceFields
-      .call(this, fieldsAndValues3, false, at)
+      .call(this, fieldsAndValues3, false, at, card, note, template)
       .replace(
         "{{FrontSide}}",
-        replaceFields.call(this, fieldsAndValues3, false, qt)
+        replaceFields.call(
+          this,
+          fieldsAndValues3,
+          false,
+          qt,
+          card,
+          note,
+          template
+        )
       )
     return [frontSide, backSide] as const
   }
@@ -224,7 +256,10 @@ function clozeReplacer(
   previous: string,
   fieldName: string,
   value: string,
-  isFront: boolean
+  isFront: boolean,
+  card: Card,
+  note: Note,
+  template: Template
 ) {
   if (isFront) {
     const regexMatches: ReadonlyArray<readonly [string | undefined, string]> =
@@ -255,7 +290,10 @@ function replaceFields(
   this: RenderContainer,
   fieldsAndValues: ReadonlyArray<readonly [string, string]>,
   isFront: boolean,
-  template: string
+  seed: string,
+  card: Card,
+  note: Note,
+  template: Template
 ): string {
   return fieldsAndValues.reduce((previous, [fieldName, value]) => {
     const simple = this.simpleFieldReplacer(previous, fieldName, value)
@@ -266,9 +304,17 @@ function replaceFields(
       fieldName,
       value
     )
-    const cloze = clozeReplacer.bind(this)(stripHtml, fieldName, value, isFront)
+    const cloze = clozeReplacer.bind(this)(
+      stripHtml,
+      fieldName,
+      value,
+      isFront,
+      card,
+      note,
+      template
+    )
     return cloze
-  }, template)
+  }, seed)
 }
 
 function buildHtml(body: string, css: string): string {
