@@ -81,7 +81,6 @@ function handleStandard(
     throwExp(`Ord ${card.ord} not found`)
   function replaceFields(
     this: RenderContainer,
-    fieldsAndValues: ReadonlyArray<readonly [string, string]>,
     isFront: boolean,
     seed: string
   ): string {
@@ -101,16 +100,13 @@ function handleStandard(
       return stripHtml
     }, seed)
   }
-  const frontSide = replaceFields.call(this, fieldsAndValues, true, front)
+  const frontSide = replaceFields.call(this, true, front)
   if (frontSide === front) {
     return null
   } else {
     const backSide = replaceFields
-      .call(this, fieldsAndValues, false, back)
-      .replace(
-        "{{FrontSide}}",
-        replaceFields.call(this, fieldsAndValues, false, front)
-      )
+      .call(this, false, back)
+      .replace("{{FrontSide}}", replaceFields.call(this, false, front))
     return [frontSide, backSide] as const
   }
 }
@@ -125,7 +121,6 @@ function handleCloze(
   const { front, back } = template.templateType.template
   function replaceFields(
     this: RenderContainer,
-    fieldsAndValues: ReadonlyArray<readonly [string, string]>,
     isFront: boolean,
     seed: string
   ): string {
@@ -142,31 +137,25 @@ function handleCloze(
         fieldName,
         value
       )
-      if (template.templateType.tag === "cloze") {
-        const cloze = clozeReplacer.bind(this)(
-          stripHtml,
-          fieldName,
-          value,
-          isFront,
-          card,
-          note,
-          template
-        )
-        return cloze
-      }
-      return stripHtml
+      const cloze = clozeReplacer.bind(this)(
+        stripHtml,
+        fieldName,
+        value,
+        isFront,
+        card,
+        note,
+        template
+      )
+      return cloze
     }, seed)
   }
-  const frontSide = replaceFields.call(this, fieldsAndValues, true, front)
+  const frontSide = replaceFields.call(this, true, front)
   if (frontSide === front) {
     return null
   } else {
     const backSide = replaceFields
-      .call(this, fieldsAndValues, false, back)
-      .replace(
-        "{{FrontSide}}",
-        replaceFields.call(this, fieldsAndValues, false, front)
-      )
+      .call(this, false, back)
+      .replace("{{FrontSide}}", replaceFields.call(this, false, front))
     return [frontSide, backSide] as const
   }
 }
