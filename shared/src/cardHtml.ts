@@ -78,36 +78,21 @@ function handleStandard(
   const { front, back } =
     template.templateType.templates.find((t) => t.id === card.ord) ??
     throwExp(`Ord ${card.ord} not found`)
+  const replacers = [
+    this.simpleFieldReplacer,
+    conditionalReplacer,
+    antiConditionalReplacer,
+    stripHtmlReplacer,
+  ]
   function replaceFields(
     this: RenderContainer,
     isFront: boolean,
     seed: string
-  ): string {
-    const r = this.simpleFieldReplacer(seed, isFront, card, note, template)
-    const showIfHasText = conditionalReplacer.call(
-      this,
-      r,
-      isFront,
-      card,
-      note,
-      template
+  ) {
+    return replacers.reduce(
+      (s, replacer) => replacer.bind(this)(s, isFront, card, note, template),
+      seed
     )
-    const showIfEmpty = antiConditionalReplacer.call(
-      this,
-      showIfHasText,
-      isFront,
-      card,
-      note,
-      template
-    )
-    const stripHtml = stripHtmlReplacer.bind(this)(
-      showIfEmpty,
-      isFront,
-      card,
-      note,
-      template
-    )
-    return stripHtml
   }
   const frontSide = replaceFields.call(this, true, front)
   if (frontSide === front) {
@@ -127,43 +112,22 @@ function handleCloze(
   template: ClozeTemplate
 ) {
   const { front, back } = template.templateType.template
+  const replacers = [
+    this.simpleFieldReplacer,
+    conditionalReplacer,
+    antiConditionalReplacer,
+    stripHtmlReplacer,
+    clozeReplacer,
+  ]
   function replaceFields(
     this: RenderContainer,
     isFront: boolean,
     seed: string
-  ): string {
-    const r = this.simpleFieldReplacer(seed, isFront, card, note, template)
-    const showIfHasText = conditionalReplacer.call(
-      this,
-      r,
-      isFront,
-      card,
-      note,
-      template
+  ) {
+    return replacers.reduce(
+      (s, replacer) => replacer.bind(this)(s, isFront, card, note, template),
+      seed
     )
-    const showIfEmpty = antiConditionalReplacer.call(
-      this,
-      showIfHasText,
-      isFront,
-      card,
-      note,
-      template
-    )
-    const stripHtml = stripHtmlReplacer.bind(this)(
-      showIfEmpty,
-      isFront,
-      card,
-      note,
-      template
-    )
-    const cloze = clozeReplacer.bind(this)(
-      stripHtml,
-      isFront,
-      card,
-      note,
-      template
-    )
-    return cloze
   }
   const frontSide = replaceFields.call(this, true, front)
   if (frontSide === front) {
