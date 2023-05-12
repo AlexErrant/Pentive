@@ -11,8 +11,13 @@ function clozeTemplateRegex(c: Container): RegExp {
 const services = (c: Container): Partial<Container> => {
   return {
     clozeTemplateRegex: clozeTemplateRegex(c),
-    simpleFieldReplacer: (previous, fieldName, value) =>
-      previous.replace(new RegExp(`{{(?:edit:)?${fieldName}}}`), value),
+    simpleFieldReplacer: (initialValue, isFront, card, note, template) => {
+      let r = initialValue
+      note.fieldValues.forEach((value, fieldName) => {
+        r = r.replace(new RegExp(`{{(?:edit:)?${fieldName}}}`), value)
+      })
+      return r
+    },
   }
 }
 

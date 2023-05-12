@@ -75,7 +75,6 @@ function handleStandard(
   note: Note,
   template: StandardTemplate
 ) {
-  const fieldsAndValues = Array.from(note.fieldValues.entries())
   const { front, back } =
     template.templateType.templates.find((t) => t.id === card.ord) ??
     throwExp(`Ord ${card.ord} not found`)
@@ -84,18 +83,25 @@ function handleStandard(
     isFront: boolean,
     seed: string
   ): string {
-    const r = fieldsAndValues.reduce((previous, [fieldName, value]) => {
-      const simple = this.simpleFieldReplacer(previous, fieldName, value)
-      const showIfHasText = conditionalReplacer(simple, fieldName, value)
-      const showIfEmpty = antiConditionalReplacer(
-        showIfHasText,
-        fieldName,
-        value
-      )
-      return showIfEmpty
-    }, seed)
-    const stripHtml = stripHtmlReplacer.bind(this)(
+    const r = this.simpleFieldReplacer(seed, isFront, card, note, template)
+    const showIfHasText = conditionalReplacer.call(
+      this,
       r,
+      isFront,
+      card,
+      note,
+      template
+    )
+    const showIfEmpty = antiConditionalReplacer.call(
+      this,
+      showIfHasText,
+      isFront,
+      card,
+      note,
+      template
+    )
+    const stripHtml = stripHtmlReplacer.bind(this)(
+      showIfEmpty,
       isFront,
       card,
       note,
@@ -120,25 +126,31 @@ function handleCloze(
   note: Note,
   template: ClozeTemplate
 ) {
-  const fieldsAndValues = Array.from(note.fieldValues.entries())
   const { front, back } = template.templateType.template
   function replaceFields(
     this: RenderContainer,
     isFront: boolean,
     seed: string
   ): string {
-    const r = fieldsAndValues.reduce((previous, [fieldName, value]) => {
-      const simple = this.simpleFieldReplacer(previous, fieldName, value)
-      const showIfHasText = conditionalReplacer(simple, fieldName, value)
-      const showIfEmpty = antiConditionalReplacer(
-        showIfHasText,
-        fieldName,
-        value
-      )
-      return showIfEmpty
-    }, seed)
-    const stripHtml = stripHtmlReplacer.bind(this)(
+    const r = this.simpleFieldReplacer(seed, isFront, card, note, template)
+    const showIfHasText = conditionalReplacer.call(
+      this,
       r,
+      isFront,
+      card,
+      note,
+      template
+    )
+    const showIfEmpty = antiConditionalReplacer.call(
+      this,
+      showIfHasText,
+      isFront,
+      card,
+      note,
+      template
+    )
+    const stripHtml = stripHtmlReplacer.bind(this)(
+      showIfEmpty,
       isFront,
       card,
       note,
@@ -179,35 +191,56 @@ function getClozeFields(
 }
 
 export function simpleFieldReplacer(
-  previous: string,
-  fieldName: string,
-  value: string
+  this: RenderContainer,
+  initialValue: string,
+  isFront: boolean,
+  card: Card,
+  note: Note,
+  template: Template
 ) {
-  return previous.replace(`{{${fieldName}}}`, value)
+  let r = initialValue
+  note.fieldValues.forEach((value, fieldName) => {
+    r = r.replace(`{{${fieldName}}}`, value)
+  })
+  return r
 }
 
 function conditionalReplacer(
-  previous: string,
-  fieldName: string,
-  value: string
+  this: RenderContainer,
+  initialValue: string,
+  isFront: boolean,
+  card: Card,
+  note: Note,
+  template: Template
 ) {
-  const fieldName2 = escapeRegExp(fieldName)
-  const regex = new RegExp(`{{#${fieldName2}}}(.*?){{/${fieldName2}}}`, "s")
-  return isNullOrWhitespace(value)
-    ? previous.replace(regex, "")
-    : previous.replace(regex, "$1")
+  let r = initialValue
+  note.fieldValues.forEach((value, fieldName) => {
+    const fieldName2 = escapeRegExp(fieldName)
+    const regex = new RegExp(`{{#${fieldName2}}}(.*?){{/${fieldName2}}}`, "s")
+    r = isNullOrWhitespace(value)
+      ? r.replace(regex, "")
+      : r.replace(regex, "$1")
+  })
+  return r
 }
 
 function antiConditionalReplacer(
-  previous: string,
-  fieldName: string,
-  value: string
+  this: RenderContainer,
+  initialValue: string,
+  isFront: boolean,
+  card: Card,
+  note: Note,
+  template: Template
 ) {
-  const fieldName2 = escapeRegExp(fieldName)
-  const regex = new RegExp(`{{\\^${fieldName2}}}(.*?){{/${fieldName2}}}`, "s")
-  return isNullOrWhitespace(value)
-    ? previous.replace(regex, "$1")
-    : previous.replace(regex, "")
+  let r = initialValue
+  note.fieldValues.forEach((value, fieldName) => {
+    const fieldName2 = escapeRegExp(fieldName)
+    const regex = new RegExp(`{{\\^${fieldName2}}}(.*?){{/${fieldName2}}}`, "s")
+    r = isNullOrWhitespace(value)
+      ? r.replace(regex, "$1")
+      : r.replace(regex, "")
+  })
+  return r
 }
 
 function stripHtmlReplacer(
