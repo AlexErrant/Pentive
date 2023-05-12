@@ -119,20 +119,7 @@ function handleCloze(
   const fieldsAndValues = Array.from(note.fieldValues.entries())
   const i = (card.ord.valueOf() + 1).toString()
   const { front, back } = template.templateType.template
-  const clozeFields = getClozeFields.call(this, front)
-  const [fieldsAndValues2, unusedFields] = _.partition(
-    fieldsAndValues,
-    ([fieldName, value]) => {
-      const indexMatch = Array.from(
-        value.matchAll(this.clozeRegex),
-        (x) =>
-          x.groups?.clozeIndex ??
-          throwExp("This error should never occur - is `clozeRegex` broken?")
-      ).includes(i)
-      return indexMatch || !clozeFields.includes(fieldName)
-    }
-  )
-  const fieldsAndValues3 = fieldsAndValues2.map(([fieldName, value]) => {
+  const fieldsAndValues3 = fieldsAndValues.map(([fieldName, value]) => {
     const value2 = Array.from(value.matchAll(this.clozeRegex))
       .filter(
         (x) =>
@@ -154,39 +141,27 @@ function handleCloze(
       )
     return [fieldName, value2] as const
   })
-  const [qt, at] = unusedFields
-    .map(([k]) => k)
-    .reduce(
-      ([ft, bt], fieldName) => {
-        const irrelevantCloze = clozeTemplateFor.call(this, fieldName)
-        return [
-          ft.replace(irrelevantCloze, ""),
-          bt.replace(irrelevantCloze, ""),
-        ]
-      },
-      [front, back]
-    )
   const frontSide = replaceFields.call(
     this,
     fieldsAndValues3,
     true,
-    qt,
+    front,
     card,
     note,
     template
   )
-  if (frontSide === qt) {
+  if (frontSide === front) {
     return null
   } else {
     const backSide = replaceFields
-      .call(this, fieldsAndValues3, false, at, card, note, template)
+      .call(this, fieldsAndValues3, false, back, card, note, template)
       .replace(
         "{{FrontSide}}",
         replaceFields.call(
           this,
           fieldsAndValues3,
           false,
-          qt,
+          front,
           card,
           note,
           template
@@ -259,8 +234,22 @@ function clozeReplacer(
   isFront: boolean,
   card: Card,
   note: Note,
-  template: Template
+  template: ClozeTemplate
 ) {
+  const i = (card.ord.valueOf() + 1).toString()
+  const clozeFields = getClozeFields.call(
+    this,
+    template.templateType.template.front
+  )
+  const indexMatch = Array.from(
+    value.matchAll(this.clozeRegex),
+    (x) =>
+      x.groups?.clozeIndex ??
+      throwExp("This error should never occur - is `clozeRegex` broken?")
+  ).includes(i)
+  if (!(indexMatch || !clozeFields.includes(fieldName))) {
+    value = ""
+  }
   if (isFront) {
     const regexMatches: ReadonlyArray<readonly [string | undefined, string]> =
       Array.from(value.matchAll(this.clozeRegex), (x) => [x.groups?.hint, x[0]])
@@ -304,16 +293,19 @@ function replaceFields(
       fieldName,
       value
     )
-    const cloze = clozeReplacer.bind(this)(
-      stripHtml,
-      fieldName,
-      value,
-      isFront,
-      card,
-      note,
-      template
-    )
-    return cloze
+    if (template.templateType.tag === "cloze") {
+      const cloze = clozeReplacer.bind(this)(
+        stripHtml,
+        fieldName,
+        value,
+        isFront,
+        card,
+        note,
+        template as ClozeTemplate
+      )
+      return cloze
+    }
+    return stripHtml
   }, seed)
 }
 
