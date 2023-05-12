@@ -1,4 +1,3 @@
-import _ from "lodash"
 import { type RenderContainer } from "./renderContainer.js"
 import {
   type NoteId,
@@ -247,7 +246,7 @@ function clozeReplacer(
       x.groups?.clozeIndex ??
       throwExp("This error should never occur - is `clozeRegex` broken?")
   ).includes(i)
-  if (!(indexMatch || !clozeFields.includes(fieldName))) {
+  if (!indexMatch && clozeFields.includes(fieldName)) {
     value = ""
   }
   if (isFront) {
