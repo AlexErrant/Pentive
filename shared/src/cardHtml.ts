@@ -61,6 +61,21 @@ export function body(
   note: Note,
   template: Template
 ): readonly [string, string] | null {
+  if (template.templateType.tag === "standard") {
+    return handleStandard.call(this, card, note, template as StandardTemplate)
+  } else if (template.templateType.tag === "cloze") {
+    return handleCloze.call(this, card, note, template as ClozeTemplate)
+  } else {
+    assertNever(template.templateType)
+  }
+}
+
+function handleStandard(
+  this: RenderContainer,
+  card: Card,
+  note: Note,
+  template: StandardTemplate
+) {
   const [fieldsAndValues2, frontTemplate2, backTemplate2] =
     getFieldsValuesFrontTemplateBackTemplate.call(this, card, note, template)
   const frontSide = replaceFields.call(
@@ -78,7 +93,34 @@ export function body(
         "{{FrontSide}}",
         replaceFields.call(this, fieldsAndValues2, false, frontTemplate2)
       )
-    return [frontSide, backSide]
+    return [frontSide, backSide] as const
+  }
+}
+
+function handleCloze(
+  this: RenderContainer,
+  card: Card,
+  note: Note,
+  template: ClozeTemplate
+) {
+  const [fieldsAndValues2, frontTemplate2, backTemplate2] =
+    getFieldsValuesFrontTemplateBackTemplate.call(this, card, note, template)
+  const frontSide = replaceFields.call(
+    this,
+    fieldsAndValues2,
+    true,
+    frontTemplate2
+  )
+  if (frontSide === frontTemplate2) {
+    return null
+  } else {
+    const backSide = replaceFields
+      .call(this, fieldsAndValues2, false, backTemplate2)
+      .replace(
+        "{{FrontSide}}",
+        replaceFields.call(this, fieldsAndValues2, false, frontTemplate2)
+      )
+    return [frontSide, backSide] as const
   }
 }
 
