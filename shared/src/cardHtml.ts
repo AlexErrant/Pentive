@@ -79,31 +79,37 @@ function handleStandard(
   const { front, back } =
     template.templateType.templates.find((t) => t.id === card.ord) ??
     throwExp(`Ord ${card.ord} not found`)
-  const frontSide = replaceFields.call(
-    this,
-    fieldsAndValues,
-    true,
-    front,
-    card,
-    note,
-    template
-  )
+  function replaceFields(
+    this: RenderContainer,
+    fieldsAndValues: ReadonlyArray<readonly [string, string]>,
+    isFront: boolean,
+    seed: string
+  ): string {
+    return fieldsAndValues.reduce((previous, [fieldName, value]) => {
+      const simple = this.simpleFieldReplacer(previous, fieldName, value)
+      const showIfHasText = conditionalReplacer(simple, fieldName, value)
+      const showIfEmpty = antiConditionalReplacer(
+        showIfHasText,
+        fieldName,
+        value
+      )
+      const stripHtml = stripHtmlReplacer.bind(this)(
+        showIfEmpty,
+        fieldName,
+        value
+      )
+      return stripHtml
+    }, seed)
+  }
+  const frontSide = replaceFields.call(this, fieldsAndValues, true, front)
   if (frontSide === front) {
     return null
   } else {
     const backSide = replaceFields
-      .call(this, fieldsAndValues, false, back, card, note, template)
+      .call(this, fieldsAndValues, false, back)
       .replace(
         "{{FrontSide}}",
-        replaceFields.call(
-          this,
-          fieldsAndValues,
-          false,
-          front,
-          card,
-          note,
-          template
-        )
+        replaceFields.call(this, fieldsAndValues, false, front)
       )
     return [frontSide, backSide] as const
   }
@@ -117,31 +123,49 @@ function handleCloze(
 ) {
   const fieldsAndValues = Array.from(note.fieldValues.entries())
   const { front, back } = template.templateType.template
-  const frontSide = replaceFields.call(
-    this,
-    fieldsAndValues,
-    true,
-    front,
-    card,
-    note,
-    template
-  )
-  if (frontSide === front) {
-    return null
-  } else {
-    const backSide = replaceFields
-      .call(this, fieldsAndValues, false, back, card, note, template)
-      .replace(
-        "{{FrontSide}}",
-        replaceFields.call(
-          this,
-          fieldsAndValues,
-          false,
-          front,
+  function replaceFields(
+    this: RenderContainer,
+    fieldsAndValues: ReadonlyArray<readonly [string, string]>,
+    isFront: boolean,
+    seed: string
+  ): string {
+    return fieldsAndValues.reduce((previous, [fieldName, value]) => {
+      const simple = this.simpleFieldReplacer(previous, fieldName, value)
+      const showIfHasText = conditionalReplacer(simple, fieldName, value)
+      const showIfEmpty = antiConditionalReplacer(
+        showIfHasText,
+        fieldName,
+        value
+      )
+      const stripHtml = stripHtmlReplacer.bind(this)(
+        showIfEmpty,
+        fieldName,
+        value
+      )
+      if (template.templateType.tag === "cloze") {
+        const cloze = clozeReplacer.bind(this)(
+          stripHtml,
+          fieldName,
+          value,
+          isFront,
           card,
           note,
           template
         )
+        return cloze
+      }
+      return stripHtml
+    }, seed)
+  }
+  const frontSide = replaceFields.call(this, fieldsAndValues, true, front)
+  if (frontSide === front) {
+    return null
+  } else {
+    const backSide = replaceFields
+      .call(this, fieldsAndValues, false, back)
+      .replace(
+        "{{FrontSide}}",
+        replaceFields.call(this, fieldsAndValues, false, front)
       )
     return [frontSide, backSide] as const
   }
@@ -269,40 +293,6 @@ $<answer>
     )
     return previous.replace(clozeTemplateFor.call(this, fieldName), answer)
   }
-}
-
-function replaceFields(
-  this: RenderContainer,
-  fieldsAndValues: ReadonlyArray<readonly [string, string]>,
-  isFront: boolean,
-  seed: string,
-  card: Card,
-  note: Note,
-  template: Template
-): string {
-  return fieldsAndValues.reduce((previous, [fieldName, value]) => {
-    const simple = this.simpleFieldReplacer(previous, fieldName, value)
-    const showIfHasText = conditionalReplacer(simple, fieldName, value)
-    const showIfEmpty = antiConditionalReplacer(showIfHasText, fieldName, value)
-    const stripHtml = stripHtmlReplacer.bind(this)(
-      showIfEmpty,
-      fieldName,
-      value
-    )
-    if (template.templateType.tag === "cloze") {
-      const cloze = clozeReplacer.bind(this)(
-        stripHtml,
-        fieldName,
-        value,
-        isFront,
-        card,
-        note,
-        template as ClozeTemplate
-      )
-      return cloze
-    }
-    return stripHtml
-  }, seed)
 }
 
 function buildHtml(body: string, css: string): string {
