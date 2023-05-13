@@ -68,19 +68,25 @@ export function body(
     assertNever(template.templateType)
   }
 }
+export interface ReplacerArgs {
+  initialValue: string
+  isFront: boolean
+  card: Card
+  note: Note
+  template: Template
+}
+
+export type StandardReplacerArgs = Omit<ReplacerArgs, "template"> & {
+  template: StandardTemplate
+}
+
+export type ClozeReplacerArgs = Omit<ReplacerArgs, "template"> & {
+  template: ClozeTemplate
+}
 
 export interface StandardReplacer {
   id: string
-  fn: (
-    this: RenderContainer,
-    args: {
-      initialValue: string
-      isFront: boolean
-      card: Card
-      note: Note
-      template: StandardTemplate
-    }
-  ) => string
+  fn: (this: RenderContainer, args: StandardReplacerArgs) => string
 }
 
 export const standardReplacers: StandardReplacer[] = [
@@ -123,16 +129,7 @@ function handleStandard(
 
 export interface ClozeReplacer {
   id: string
-  fn: (
-    this: RenderContainer,
-    args: {
-      initialValue: string
-      isFront: boolean
-      card: Card
-      note: Note
-      template: ClozeTemplate
-    }
-  ) => string
+  fn: (this: RenderContainer, args: ClozeReplacerArgs) => string
 }
 
 export const clozeReplacers: ClozeReplacer[] = [
@@ -194,19 +191,7 @@ function getClozeFields(
 
 export function simpleFieldReplacer(
   this: RenderContainer,
-  {
-    initialValue,
-    isFront,
-    card,
-    note,
-    template,
-  }: {
-    initialValue: string
-    isFront: boolean
-    card: Card
-    note: Note
-    template: Template
-  }
+  { initialValue, isFront, card, note, template }: ReplacerArgs
 ) {
   let r = initialValue
   note.fieldValues.forEach((value, fieldName) => {
@@ -217,19 +202,7 @@ export function simpleFieldReplacer(
 
 function conditionalReplacer(
   this: RenderContainer,
-  {
-    initialValue,
-    isFront,
-    card,
-    note,
-    template,
-  }: {
-    initialValue: string
-    isFront: boolean
-    card: Card
-    note: Note
-    template: Template
-  }
+  { initialValue, isFront, card, note, template }: ReplacerArgs
 ) {
   let r = initialValue
   note.fieldValues.forEach((value, fieldName) => {
@@ -244,19 +217,7 @@ function conditionalReplacer(
 
 function antiConditionalReplacer(
   this: RenderContainer,
-  {
-    initialValue,
-    isFront,
-    card,
-    note,
-    template,
-  }: {
-    initialValue: string
-    isFront: boolean
-    card: Card
-    note: Note
-    template: Template
-  }
+  { initialValue, isFront, card, note, template }: ReplacerArgs
 ) {
   let r = initialValue
   note.fieldValues.forEach((value, fieldName) => {
@@ -271,19 +232,7 @@ function antiConditionalReplacer(
 
 function stripHtmlReplacer(
   this: RenderContainer,
-  {
-    initialValue,
-    isFront,
-    card,
-    note,
-    template,
-  }: {
-    initialValue: string
-    isFront: boolean
-    card: Card
-    note: Note
-    template: Template
-  }
+  { initialValue, isFront, card, note, template }: ReplacerArgs
 ) {
   let r = initialValue
   note.fieldValues.forEach((value, fieldName) => {
@@ -294,19 +243,7 @@ function stripHtmlReplacer(
 
 function clozeReplacer(
   this: RenderContainer,
-  {
-    initialValue,
-    isFront,
-    card,
-    note,
-    template,
-  }: {
-    initialValue: string
-    isFront: boolean
-    card: Card
-    note: Note
-    template: ClozeTemplate
-  }
+  { initialValue, isFront, card, note, template }: ClozeReplacerArgs
 ) {
   let r = initialValue
   note.fieldValues.forEach((value, fieldName) => {
