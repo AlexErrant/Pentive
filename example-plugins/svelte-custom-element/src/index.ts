@@ -11,26 +11,26 @@ function clozeTemplateRegex(c: Container): RegExp {
 const services = (c: Container): Partial<Container> => {
   return {
     clozeTemplateRegex: clozeTemplateRegex(c),
-    standardReplacers: c.standardReplacers.concat({
-      id: "editFieldReplacer",
-      fn: ({ initialValue, isFront, card, note, template }) => {
+    standardReplacers: new Map(c.standardReplacers).set(
+      "editFieldReplacer",
+      ({ initialValue, isFront, card, note, template }) => {
         let r = initialValue
         note.fieldValues.forEach((value, fieldName) => {
           r = r.replace(new RegExp(`{{(?:edit:)?${fieldName}}}`), value)
         })
         return r
-      },
-    }),
-    clozeReplacers: c.clozeReplacers.concat({
-      id: "editFieldReplacer",
-      fn: ({ initialValue, isFront, card, note, template }) => {
+      }
+    ),
+    clozeReplacers: new Map(c.clozeReplacers).set(
+      "editFieldReplacer",
+      ({ initialValue, isFront, card, note, template }) => {
         let r = initialValue
         note.fieldValues.forEach((value, fieldName) => {
           r = r.replace(new RegExp(`{{(?:edit:)?${fieldName}}}`), value)
         })
         return r
-      },
-    }),
+      }
+    ),
   }
 }
 

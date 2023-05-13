@@ -84,23 +84,26 @@ export type ClozeReplacerArgs = Omit<ReplacerArgs, "template"> & {
   template: ClozeTemplate
 }
 
-export interface StandardReplacer {
-  id: string
-  fn: (this: RenderContainer, args: StandardReplacerArgs) => string
-}
+export type Replacers = Map<
+  string,
+  (this: RenderContainer, args: ReplacerArgs) => string
+>
 
-export interface Replacer {
-  id: string
-  fn: (this: RenderContainer, args: ReplacerArgs) => string
-}
+export type StandardReplacer = (
+  this: RenderContainer,
+  args: StandardReplacerArgs
+) => string
 
-export const standardReplacers: StandardReplacer[] = [
-  { id: "simpleFieldReplacer", fn: simpleFieldReplacer },
-  { id: "conditionalReplacer", fn: conditionalReplacer },
-  { id: "antiConditionalReplacer", fn: antiConditionalReplacer },
-  { id: "tagReplacer", fn: tagReplacer },
-  { id: "stripHtmlReplacer", fn: stripHtmlReplacer },
-]
+export const standardReplacers: Map<string, StandardReplacer> = new Map<
+  string,
+  StandardReplacer
+>([
+  ["simpleFieldReplacer", simpleFieldReplacer],
+  ["conditionalReplacer", conditionalReplacer],
+  ["antiConditionalReplacer", antiConditionalReplacer],
+  ["tagReplacer", tagReplacer],
+  ["stripHtmlReplacer", stripHtmlReplacer],
+])
 
 function handleStandard(
   this: RenderContainer,
@@ -116,11 +119,19 @@ function handleStandard(
     isFront: boolean,
     seed: string
   ) {
-    return this.standardReplacers.reduce(
-      (initialValue, replacer) =>
-        replacer.fn.bind(this)({ initialValue, isFront, card, note, template }),
-      seed
-    )
+    let r = seed
+    const args = {
+      initialValue: seed,
+      isFront,
+      card,
+      note,
+      template,
+    }
+    for (const [, replacer] of this.standardReplacers) {
+      args.initialValue = r
+      r = replacer.bind(this)(args)
+    }
+    return r
   }
   const frontSide = replaceFields.call(this, true, front)
   if (frontSide === front) {
@@ -133,19 +144,22 @@ function handleStandard(
   }
 }
 
-export interface ClozeReplacer {
-  id: string
-  fn: (this: RenderContainer, args: ClozeReplacerArgs) => string
-}
+export type ClozeReplacer = (
+  this: RenderContainer,
+  args: ClozeReplacerArgs
+) => string
 
-export const clozeReplacers: ClozeReplacer[] = [
-  { id: "simpleFieldReplacer", fn: simpleFieldReplacer },
-  { id: "conditionalReplacer", fn: conditionalReplacer },
-  { id: "antiConditionalReplacer", fn: antiConditionalReplacer },
-  { id: "stripHtmlReplacer", fn: stripHtmlReplacer },
-  { id: "tagReplacer", fn: tagReplacer },
-  { id: "clozeReplacer", fn: clozeReplacer },
-]
+export const clozeReplacers: Map<string, ClozeReplacer> = new Map<
+  string,
+  ClozeReplacer
+>([
+  ["simpleFieldReplacer", simpleFieldReplacer],
+  ["conditionalReplacer", conditionalReplacer],
+  ["antiConditionalReplacer", antiConditionalReplacer],
+  ["stripHtmlReplacer", stripHtmlReplacer],
+  ["tagReplacer", tagReplacer],
+  ["clozeReplacer", clozeReplacer],
+])
 
 function handleCloze(
   this: RenderContainer,
@@ -159,17 +173,19 @@ function handleCloze(
     isFront: boolean,
     seed: string
   ) {
-    return this.clozeReplacers.reduce(
-      (initialValue, replacer) =>
-        replacer.fn.bind(this)({
-          initialValue,
-          isFront,
-          card,
-          note,
-          template,
-        }),
-      seed
-    )
+    let r = seed
+    const args = {
+      initialValue: seed,
+      isFront,
+      card,
+      note,
+      template,
+    }
+    for (const [, replacer] of this.clozeReplacers) {
+      args.initialValue = r
+      r = replacer.bind(this)(args)
+    }
+    return r
   }
   const frontSide = replaceFields.call(this, true, front)
   if (frontSide === front) {
@@ -208,17 +224,15 @@ export function simpleFieldReplacer(
 }
 
 function tagReplacer(this: RenderContainer, args: ReplacerArgs) {
-  const replacers = (
+  const replacersMap =
     args.template.templateType.tag === "standard"
-      ? (this.standardReplacers as Replacer[])
-      : (this.clozeReplacers as Replacer[])
-  ).filter((x) =>
-    [
-      "simpleFieldReplacer",
-      "conditionalReplacer",
-      "antiConditionalReplacer",
-    ].includes(x.id)
-  )
+      ? (this.standardReplacers as Replacers)
+      : (this.clozeReplacers as Replacers)
+  const replacers = [
+    replacersMap.get("simpleFieldReplacer"),
+    replacersMap.get("conditionalReplacer"),
+    replacersMap.get("antiConditionalReplacer"),
+  ].filter(notEmpty)
   let r = args.initialValue
   const args2 = {
     ...args,
@@ -231,7 +245,7 @@ function tagReplacer(this: RenderContainer, args: ReplacerArgs) {
   }
   for (const replacer of replacers) {
     args2.initialValue = r
-    r = replacer.fn.call(this, args2)
+    r = replacer.call(this, args2)
   }
   return r
 }
