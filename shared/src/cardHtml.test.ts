@@ -1,9 +1,10 @@
 import { defaultRenderContainer } from "./renderContainer"
-import { expect, test } from "vitest"
+import { describe, expect, test } from "vitest"
 import { type TemplateId, type Ord } from "./brand"
 import { throwExp } from "./utility"
 import { noteOrds, strip, toSampleCard, toSampleNote } from "./cardHtml"
 import { type Template } from "./domain/template"
+import { type Note } from "./domain/note"
 
 function buildTemplate(
   fieldValues: Array<readonly [string, string]>,
@@ -701,4 +702,208 @@ test("renderTemplate works for standard with 2 child templates", () => {
   const [template1, template2] = templates
   expectTemplate(template1, "(English)", "(English)-(Spanish)")
   expectTemplate(template2, "(Spanish)", "(Spanish)-(English)")
+})
+
+function toTestNote(
+  fieldValues: Map<string, string>,
+  note: Partial<Note>
+): Note {
+  const sampleNote = toSampleNote(fieldValues)
+  return {
+    ...sampleNote,
+    ...note,
+  }
+}
+
+describe("standardTemplate tags", () => {
+  const fieldValues = [
+    ["Back", "Ottawa"],
+    ["Front", "What is the capital of Canada?"],
+  ] as Array<[string, string]>
+
+  test("CardHtml generates proper basic card template with no tags", () => {
+    const [front, back] =
+      defaultRenderContainer.body(
+        toSampleCard(0 as Ord),
+        toTestNote(new Map(fieldValues), { tags: new Set() }),
+        buildTemplate(
+          fieldValues,
+          "{{Front}}{{Tags}}",
+          `{{FrontSide}}
+    <hr id=answer>
+    {{Back}}`,
+          "standard"
+        )
+      ) ?? throwExp("should never happen")
+    expect(front).toBe("What is the capital of Canada?")
+    expect(back).toBe(`What is the capital of Canada?
+    <hr id=answer>
+    Ottawa`)
+  })
+
+  test("CardHtml generates proper basic card template with 1 tag", () => {
+    const [front, back] =
+      defaultRenderContainer.body(
+        toSampleCard(0 as Ord),
+        toTestNote(new Map(fieldValues), { tags: new Set(["Geography"]) }),
+        buildTemplate(
+          fieldValues,
+          "{{Front}}{{Tags}}",
+          `{{FrontSide}}
+    <hr id=answer>
+    {{Back}}`,
+          "standard"
+        )
+      ) ?? throwExp("should never happen")
+    expect(front).toBe("What is the capital of Canada?Geography")
+    expect(back).toBe(`What is the capital of Canada?Geography
+    <hr id=answer>
+    Ottawa`)
+  })
+
+  test("CardHtml generates proper basic card template with 2 tags", () => {
+    const [front, back] =
+      defaultRenderContainer.body(
+        toSampleCard(0 as Ord),
+        toTestNote(new Map(fieldValues), {
+          tags: new Set(["Geography", "Capital"]),
+        }),
+        buildTemplate(
+          fieldValues,
+          "{{Front}}{{Tags}}",
+          `{{FrontSide}}
+    <hr id=answer>
+    {{Back}}`,
+          "standard"
+        )
+      ) ?? throwExp("should never happen")
+    expect(front).toBe("What is the capital of Canada?Geography, Capital")
+    expect(back).toBe(`What is the capital of Canada?Geography, Capital
+    <hr id=answer>
+    Ottawa`)
+  })
+
+  test("CardHtml generates proper basic card template with no conditional tags", () => {
+    const [front, back] =
+      defaultRenderContainer.body(
+        toSampleCard(0 as Ord),
+        toTestNote(new Map(fieldValues), { tags: new Set() }),
+        buildTemplate(
+          fieldValues,
+          "{{Front}}{{#Tags}}Tags: {{Tags}}{{/Tags}}",
+          `{{FrontSide}}
+    <hr id=answer>
+    {{Back}}`,
+          "standard"
+        )
+      ) ?? throwExp("should never happen")
+    expect(front).toBe("What is the capital of Canada?")
+    expect(back).toBe(`What is the capital of Canada?
+    <hr id=answer>
+    Ottawa`)
+  })
+
+  test("CardHtml generates proper basic card template with 1 conditional tag", () => {
+    const [front, back] =
+      defaultRenderContainer.body(
+        toSampleCard(0 as Ord),
+        toTestNote(new Map(fieldValues), { tags: new Set(["Geography"]) }),
+        buildTemplate(
+          fieldValues,
+          "{{Front}}{{#Tags}}Tags: {{Tags}}{{/Tags}}",
+          `{{FrontSide}}
+    <hr id=answer>
+    {{Back}}`,
+          "standard"
+        )
+      ) ?? throwExp("should never happen")
+    expect(front).toBe("What is the capital of Canada?Tags: Geography")
+    expect(back).toBe(`What is the capital of Canada?Tags: Geography
+    <hr id=answer>
+    Ottawa`)
+  })
+
+  test("CardHtml generates proper basic card template with 2 conditional tags", () => {
+    const [front, back] =
+      defaultRenderContainer.body(
+        toSampleCard(0 as Ord),
+        toTestNote(new Map(fieldValues), {
+          tags: new Set(["Geography", "Capital"]),
+        }),
+        buildTemplate(
+          fieldValues,
+          "{{Front}}{{#Tags}}Tags: {{Tags}}{{/Tags}}",
+          `{{FrontSide}}
+    <hr id=answer>
+    {{Back}}`,
+          "standard"
+        )
+      ) ?? throwExp("should never happen")
+    expect(front).toBe("What is the capital of Canada?Tags: Geography, Capital")
+    expect(back).toBe(`What is the capital of Canada?Tags: Geography, Capital
+    <hr id=answer>
+    Ottawa`)
+  })
+
+  test("CardHtml generates proper basic card template with no antiConditional tags", () => {
+    const [front, back] =
+      defaultRenderContainer.body(
+        toSampleCard(0 as Ord),
+        toTestNote(new Map(fieldValues), { tags: new Set() }),
+        buildTemplate(
+          fieldValues,
+          "{{Front}}{{^Tags}}Tags: {{Tags}}{{/Tags}}",
+          `{{FrontSide}}
+    <hr id=answer>
+    {{Back}}`,
+          "standard"
+        )
+      ) ?? throwExp("should never happen")
+    expect(front).toBe("What is the capital of Canada?Tags: ")
+    expect(back).toBe(`What is the capital of Canada?Tags: 
+    <hr id=answer>
+    Ottawa`)
+  })
+
+  test("CardHtml generates proper basic card template with 1 antiConditional tag", () => {
+    const [front, back] =
+      defaultRenderContainer.body(
+        toSampleCard(0 as Ord),
+        toTestNote(new Map(fieldValues), { tags: new Set(["Geography"]) }),
+        buildTemplate(
+          fieldValues,
+          "{{Front}}{{^Tags}}Tags: {{Tags}}{{/Tags}}",
+          `{{FrontSide}}
+    <hr id=answer>
+    {{Back}}`,
+          "standard"
+        )
+      ) ?? throwExp("should never happen")
+    expect(front).toBe("What is the capital of Canada?")
+    expect(back).toBe(`What is the capital of Canada?
+    <hr id=answer>
+    Ottawa`)
+  })
+
+  test("CardHtml generates proper basic card template with 2 antiConditional tags", () => {
+    const [front, back] =
+      defaultRenderContainer.body(
+        toSampleCard(0 as Ord),
+        toTestNote(new Map(fieldValues), {
+          tags: new Set(["Geography", "Capital"]),
+        }),
+        buildTemplate(
+          fieldValues,
+          "{{Front}}{{^Tags}}Tags: {{Tags}}{{/Tags}}",
+          `{{FrontSide}}
+    <hr id=answer>
+    {{Back}}`,
+          "standard"
+        )
+      ) ?? throwExp("should never happen")
+    expect(front).toBe("What is the capital of Canada?")
+    expect(back).toBe(`What is the capital of Canada?
+    <hr id=answer>
+    Ottawa`)
+  })
 })

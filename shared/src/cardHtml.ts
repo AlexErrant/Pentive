@@ -89,10 +89,16 @@ export interface StandardReplacer {
   fn: (this: RenderContainer, args: StandardReplacerArgs) => string
 }
 
+export interface Replacer {
+  id: string
+  fn: (this: RenderContainer, args: ReplacerArgs) => string
+}
+
 export const standardReplacers: StandardReplacer[] = [
   { id: "simpleFieldReplacer", fn: simpleFieldReplacer },
   { id: "conditionalReplacer", fn: conditionalReplacer },
   { id: "antiConditionalReplacer", fn: antiConditionalReplacer },
+  { id: "tagReplacer", fn: tagReplacer },
   { id: "stripHtmlReplacer", fn: stripHtmlReplacer },
 ]
 
@@ -137,6 +143,7 @@ export const clozeReplacers: ClozeReplacer[] = [
   { id: "conditionalReplacer", fn: conditionalReplacer },
   { id: "antiConditionalReplacer", fn: antiConditionalReplacer },
   { id: "stripHtmlReplacer", fn: stripHtmlReplacer },
+  { id: "tagReplacer", fn: tagReplacer },
   { id: "clozeReplacer", fn: clozeReplacer },
 ]
 
@@ -197,6 +204,35 @@ export function simpleFieldReplacer(
   note.fieldValues.forEach((value, fieldName) => {
     r = r.replace(`{{${fieldName}}}`, value)
   })
+  return r
+}
+
+function tagReplacer(this: RenderContainer, args: ReplacerArgs) {
+  const replacers = (
+    args.template.templateType.tag === "standard"
+      ? (this.standardReplacers as Replacer[])
+      : (this.clozeReplacers as Replacer[])
+  ).filter((x) =>
+    [
+      "simpleFieldReplacer",
+      "conditionalReplacer",
+      "antiConditionalReplacer",
+    ].includes(x.id)
+  )
+  let r = args.initialValue
+  const args2 = {
+    ...args,
+    note: {
+      ...args.note,
+      fieldValues: new Map([
+        ["Tags", Array.from(args.note.tags.keys()).join(", ")],
+      ]),
+    },
+  }
+  for (const replacer of replacers) {
+    args2.initialValue = r
+    r = replacer.fn.call(this, args2)
+  }
   return r
 }
 
