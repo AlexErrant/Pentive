@@ -69,20 +69,25 @@ export function body(
   }
 }
 
-export type StandardReplacer = (
-  this: RenderContainer,
-  initialValue: string,
-  isFront: boolean,
-  card: Card,
-  note: Note,
-  template: StandardTemplate
-) => string
+export interface StandardReplacer {
+  id: string
+  fn: (
+    this: RenderContainer,
+    args: {
+      initialValue: string
+      isFront: boolean
+      card: Card
+      note: Note
+      template: StandardTemplate
+    }
+  ) => string
+}
 
 export const standardReplacers: StandardReplacer[] = [
-  simpleFieldReplacer,
-  conditionalReplacer,
-  antiConditionalReplacer,
-  stripHtmlReplacer,
+  { id: "simpleFieldReplacer", fn: simpleFieldReplacer },
+  { id: "conditionalReplacer", fn: conditionalReplacer },
+  { id: "antiConditionalReplacer", fn: antiConditionalReplacer },
+  { id: "stripHtmlReplacer", fn: stripHtmlReplacer },
 ]
 
 function handleStandard(
@@ -100,7 +105,8 @@ function handleStandard(
     seed: string
   ) {
     return this.standardReplacers.reduce(
-      (s, replacer) => replacer.bind(this)(s, isFront, card, note, template),
+      (initialValue, replacer) =>
+        replacer.fn.bind(this)({ initialValue, isFront, card, note, template }),
       seed
     )
   }
@@ -115,21 +121,26 @@ function handleStandard(
   }
 }
 
-export type ClozeReplacer = (
-  this: RenderContainer,
-  initialValue: string,
-  isFront: boolean,
-  card: Card,
-  note: Note,
-  template: ClozeTemplate
-) => string
+export interface ClozeReplacer {
+  id: string
+  fn: (
+    this: RenderContainer,
+    args: {
+      initialValue: string
+      isFront: boolean
+      card: Card
+      note: Note
+      template: ClozeTemplate
+    }
+  ) => string
+}
 
 export const clozeReplacers: ClozeReplacer[] = [
-  simpleFieldReplacer,
-  conditionalReplacer,
-  antiConditionalReplacer,
-  stripHtmlReplacer,
-  clozeReplacer,
+  { id: "simpleFieldReplacer", fn: simpleFieldReplacer },
+  { id: "conditionalReplacer", fn: conditionalReplacer },
+  { id: "antiConditionalReplacer", fn: antiConditionalReplacer },
+  { id: "stripHtmlReplacer", fn: stripHtmlReplacer },
+  { id: "clozeReplacer", fn: clozeReplacer },
 ]
 
 function handleCloze(
@@ -145,7 +156,14 @@ function handleCloze(
     seed: string
   ) {
     return this.clozeReplacers.reduce(
-      (s, replacer) => replacer.bind(this)(s, isFront, card, note, template),
+      (initialValue, replacer) =>
+        replacer.fn.bind(this)({
+          initialValue,
+          isFront,
+          card,
+          note,
+          template,
+        }),
       seed
     )
   }
@@ -176,11 +194,19 @@ function getClozeFields(
 
 export function simpleFieldReplacer(
   this: RenderContainer,
-  initialValue: string,
-  isFront: boolean,
-  card: Card,
-  note: Note,
-  template: Template
+  {
+    initialValue,
+    isFront,
+    card,
+    note,
+    template,
+  }: {
+    initialValue: string
+    isFront: boolean
+    card: Card
+    note: Note
+    template: Template
+  }
 ) {
   let r = initialValue
   note.fieldValues.forEach((value, fieldName) => {
@@ -191,11 +217,19 @@ export function simpleFieldReplacer(
 
 function conditionalReplacer(
   this: RenderContainer,
-  initialValue: string,
-  isFront: boolean,
-  card: Card,
-  note: Note,
-  template: Template
+  {
+    initialValue,
+    isFront,
+    card,
+    note,
+    template,
+  }: {
+    initialValue: string
+    isFront: boolean
+    card: Card
+    note: Note
+    template: Template
+  }
 ) {
   let r = initialValue
   note.fieldValues.forEach((value, fieldName) => {
@@ -210,11 +244,19 @@ function conditionalReplacer(
 
 function antiConditionalReplacer(
   this: RenderContainer,
-  initialValue: string,
-  isFront: boolean,
-  card: Card,
-  note: Note,
-  template: Template
+  {
+    initialValue,
+    isFront,
+    card,
+    note,
+    template,
+  }: {
+    initialValue: string
+    isFront: boolean
+    card: Card
+    note: Note
+    template: Template
+  }
 ) {
   let r = initialValue
   note.fieldValues.forEach((value, fieldName) => {
@@ -229,11 +271,19 @@ function antiConditionalReplacer(
 
 function stripHtmlReplacer(
   this: RenderContainer,
-  initialValue: string,
-  isFront: boolean,
-  card: Card,
-  note: Note,
-  template: Template
+  {
+    initialValue,
+    isFront,
+    card,
+    note,
+    template,
+  }: {
+    initialValue: string
+    isFront: boolean
+    card: Card
+    note: Note
+    template: Template
+  }
 ) {
   let r = initialValue
   note.fieldValues.forEach((value, fieldName) => {
@@ -244,11 +294,19 @@ function stripHtmlReplacer(
 
 function clozeReplacer(
   this: RenderContainer,
-  initialValue: string,
-  isFront: boolean,
-  card: Card,
-  note: Note,
-  template: ClozeTemplate
+  {
+    initialValue,
+    isFront,
+    card,
+    note,
+    template,
+  }: {
+    initialValue: string
+    isFront: boolean
+    card: Card
+    note: Note
+    template: ClozeTemplate
+  }
 ) {
   let r = initialValue
   note.fieldValues.forEach((value, fieldName) => {
