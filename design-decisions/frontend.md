@@ -8,11 +8,9 @@ There are many downsides to using Solid, including questionable SSR and a less m
 
 # Plugins
 
-UI plugins are supporting using [custom elements](https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_custom_elements). A significant drawback, however, is that [custom elements have no security model](https://stackoverflow.com/q/45282601).
+UI plugins are supported using [custom elements](https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_custom_elements). A significant drawback, however, is that [custom elements have no security model](https://stackoverflow.com/q/45282601).
 
-Function plugins will be executed using Javascript's [Function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function) object. While better than `eval`, it also suffers from [having no security model](https://stackoverflow.com/q/18060696).
-
-In the future, Pentive may try to provide better security by wrapping the custom element or function in a sandboxed iframe. Until then, users must accept the risk that plugins may do nefarious things. Notably, it looks like [VS Code doesn't sandbox its plugins](https://stackoverflow.com/q/67493012), despite [the risk](https://snyk.io/blog/visual-studio-code-extension-security-vulnerabilities-deep-dive/), so perhaps I should tone down my paranoia. Certainly confining plugins to a browser environment is better than running arbitrary Python modules like Anki. It's a strict improvement.
+In the future, Pentive may try to provide better security by wrapping the custom element or function in a sandboxed iframe. Until then, users must accept the risk that plugins may do nefarious things. Notably, it looks like [VS Code doesn't sandbox its plugins](https://stackoverflow.com/q/67493012), despite [the risk](https://snyk.io/blog/visual-studio-code-extension-security-vulnerabilities-deep-dive/) [[2]](https://www.reddit.com/r/vscode/comments/v0ak78/are_vs_code_plugins_safe/), so perhaps I should tone down my paranoia. Certainly confining plugins to a browser environment is better than running arbitrary Python modules like Anki. It's a strict improvement.
 
 # Security
 
@@ -27,6 +25,8 @@ If, in the future, threat modeling determines that some DB value must be protect
 # Rejected
 
 - [Rescript](https://rescript-lang.org/) only supports React. Sadly [it seems unlikely](https://github.com/rescript-lang/rescript-compiler/issues/4783) that Rescript will support Solid. HyperScript is a possibility, but [it's ugly as sin](https://github.com/solidjs/solid/issues/245#issuecomment-719905295) and [not recommended for perf reasons](https://www.solidjs.com/docs/1.0.0#6.-i-really-dislike-jsx%2C-any-chance-of-a-template-dsl%3F-oh%2C-i-see-you-have-tagged-template-literals%2Fhyperscript.-maybe-i-will-use-those...).
+
+- Javascript's [Function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function) object for sandboxing plugins. While better than `eval`, it also suffers from [having no security model](https://stackoverflow.com/q/18060696).
 
 # Undecided
 
