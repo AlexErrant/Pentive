@@ -1,12 +1,11 @@
 import { freeze } from "immer"
 import type { PentiveElement } from "./customElements/registry"
-import { type Plugin } from "shared"
+import { getMain, type Plugin } from "shared"
 import {
   defaultContainer,
   type Container,
   type PluginExports,
 } from "./services"
-import { getMain } from "./domain/utility"
 
 // https://stackoverflow.com/a/18650249
 async function blobToBase64(blob: Blob): Promise<string> {

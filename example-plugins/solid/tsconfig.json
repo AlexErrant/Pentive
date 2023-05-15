@@ -13,5 +13,10 @@
     "types": [
       "vite/client"
     ]
-  }
+  },
+  "references": [
+    {
+      "path": "../../shared"
+    }
+  ],
 }
