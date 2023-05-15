@@ -1,8 +1,12 @@
 {
-  "name": "svelte-custom-element",
+  "name": "pentive-svelte-plugin-example",
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/index.js",
   "scripts": {
     "dev": "vite",
     "build": "vite build",

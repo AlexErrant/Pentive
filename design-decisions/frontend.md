@@ -12,6 +12,8 @@ UI plugins are supported using [custom elements](https://developer.mozilla.org/e
 
 In the future, Pentive may try to provide better security by wrapping the custom element or function in a sandboxed iframe. Until then, users must accept the risk that plugins may do nefarious things. Notably, it looks like [VS Code doesn't sandbox its plugins](https://stackoverflow.com/q/67493012), despite [the risk](https://snyk.io/blog/visual-studio-code-extension-security-vulnerabilities-deep-dive/) [[2]](https://www.reddit.com/r/vscode/comments/v0ak78/are_vs_code_plugins_safe/), so perhaps I should tone down my paranoia. Certainly confining plugins to a browser environment is better than running arbitrary Python modules like Anki. It's a strict improvement.
 
+Plugins are NPM packages. Specify the entry point with [main](https://docs.npmjs.com/cli/v9/configuring-npm/package-json#main). Only _single file_ Javascript packages are supported. In other words, the entry point is the only Javascript file - it doesn't import any Javascript from adjacent files. (If you feel like fixing this limitation, first open an issue with your proposed architecture. Grep the codebase for 2D96EE4E-61BA-4FCA-93C1-863C80E10A93.)
+
 # Security
 
 `app.pentive.com` should contain no secrets. Auth will be managed via `HttpOnly` cookies. IndexedDB/SQLite will be hosted on `app.pentive.com` to allow direct plugin access.

@@ -1,8 +1,8 @@
 import { type JSX } from "solid-js"
 import PluginTable from "../customElements/pluginsTable"
 import { db } from "../db"
-import { type Plugin, type PluginId } from "shared"
-import { ulidAsBase64Url } from "../domain/utility"
+import { throwExp, type PluginId } from "shared"
+import { getPackageJson, ulidAsBase64Url } from "../domain/utility"
 
 export default function Plugins(): JSX.Element {
   return (
@@ -12,22 +12,33 @@ export default function Plugins(): JSX.Element {
       </section>
       <input
         type="file"
-        accept=".js"
+        accept=".tgz"
         onChange={async (e) => {
-          const target = e.target as HTMLInputElement // https://github.com/microsoft/TypeScript/issues/31816
-          const plugin: Plugin = {
-            id: ulidAsBase64Url() as PluginId,
-            created: new Date(),
-            updated: new Date(),
-            name: "plain pentive nav",
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            script: target.files![0],
-          }
-          await db.upsertPlugin(plugin)
-          console.log("Plugin upserted!")
+          await importPlugin(e)
         }}
       />
       <PluginTable getPlugins={db.getPlugins} />
     </>
   )
+}
+
+async function importPlugin(
+  event: Event & {
+    currentTarget: HTMLInputElement
+    target: HTMLInputElement
+  }
+) {
+  const pluginTgz =
+    // My mental static analysis says to use `currentTarget`, but it seems to randomly be null, hence `target`. I'm confused but whatever.
+    event.target.files?.item(0) ??
+    throwExp("Impossible - there should be a file selected")
+  const packageJson = await getPackageJson(pluginTgz)
+  await db.upsertPlugin({
+    id: ulidAsBase64Url() as PluginId,
+    created: new Date(),
+    updated: new Date(),
+    name: packageJson.name,
+    script: pluginTgz,
+  })
+  console.log("Plugin upserted!")
 }

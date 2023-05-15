@@ -1,3 +1,4 @@
+import { z } from "zod"
 import { type PluginId } from "./brand"
 
 export interface Plugin {
@@ -7,3 +8,8 @@ export interface Plugin {
   readonly updated: Date
   readonly script: Blob
 }
+
+export const packageJsonValidator = z.object({
+  name: z.string(),
+  main: z.string().optional(),
+})

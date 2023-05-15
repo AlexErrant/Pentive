@@ -6,6 +6,7 @@ import {
   type Container,
   type PluginExports,
 } from "./services"
+import { getMain } from "./domain/utility"
 
 // https://stackoverflow.com/a/18650249
 async function blobToBase64(blob: Blob): Promise<string> {
@@ -56,7 +57,11 @@ async function registerPluginService(
   [c, er]: [Container, ElementRegistry],
   plugin: Plugin
 ): Promise<[Container, ElementRegistry]> {
-  const script = await blobToBase64(plugin.script)
+  const main = await getMain(plugin.script)
+  const script = await blobToBase64(main)
+  // A limitation of this import is that it won't resolve other files in the npmpackage.tgz
+  // Does addressing this even make sense? What if two plugins have a `react.js`?
+  // grep 2D96EE4E-61BA-4FCA-93C1-863C80E10A93
   const exports = (await import(/* @vite-ignore */ script)) as {
     default: PluginExports
   }

@@ -1,8 +1,12 @@
 {
-  "name": "vite-template-solid",
+  "name": "pentive-solid-plugin-example",
   "version": "0.0.0",
   "description": "",
   "type": "module",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/index.js",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
