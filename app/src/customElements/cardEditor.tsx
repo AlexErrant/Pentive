@@ -49,19 +49,10 @@ function toggleNook(
 export const CardEditor: VoidComponent<{
   readonly noteCard: NoteCard
 }> = (props) => {
-  const [template] = createResource(
-    props.noteCard,
-    async (noteCard) => await db.getTemplate(noteCard.template.id)
-  )
-  const [note] = createResource(
-    props.noteCard,
-    async (noteCard) => await db.getNote(noteCard.note.id)
-  )
   const [getRemotes, { mutate: setRemotes }] = createResource(
-    [note(), template()],
-    ([note, template]) => {
-      if (note == null || template == null) return []
-      return Array.from(template.remotes).map(([nookId, remoteTemplateId]) => {
+    () => props.noteCard,
+    ({ note, template }) =>
+      Array.from(template.remotes).map(([nookId, remoteTemplateId]) => {
         const remoteNoteId = note.remotes.get(nookId) ?? null
         const uploadable = note.remotes.has(nookId)
         return {
@@ -70,13 +61,12 @@ export const CardEditor: VoidComponent<{
           remoteNoteId,
           uploadable,
         } as const
-      })
-    },
+      }),
     { initialValue: [] }
   )
   return (
     <>
-      <For each={Array.from(note()?.fieldValues.entries() ?? [])}>
+      <For each={Array.from(props.noteCard.note.fieldValues.entries() ?? [])}>
         {([field, value]) => FieldEditor({ field, value })}
       </For>
       <For each={getRemotes()}>
