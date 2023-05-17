@@ -5,6 +5,7 @@ import {
   type JSX,
   type Setter,
   Show,
+  type VoidComponent,
 } from "solid-js"
 import CardsTable from "../customElements/cardsTable"
 import ResizingIframe from "../customElements/resizingIframe"
@@ -17,9 +18,8 @@ import {
 } from "shared"
 import { db } from "../db"
 
-const [selected, setSelected] = createSignal<NoteCard>()
-
 export default function Cards(): JSX.Element {
+  const [selected, setSelected] = createSignal<NoteCard>()
   return (
     <>
       <section class="bg-pink-100 text-gray-700 p-8">
@@ -34,7 +34,7 @@ export default function Cards(): JSX.Element {
           }
         }}
       />
-      {cardPreview()}
+      <CardPreview noteCard={selected()} />
     </>
   )
 }
@@ -69,12 +69,15 @@ function toggleNook(
   )
 }
 
-const cardPreview = (): JSX.Element => {
+// eslint-disable-next-line @typescript-eslint/naming-convention
+const CardPreview: VoidComponent<{
+  readonly noteCard: NoteCard | undefined
+}> = (props) => {
   const [getRemotes, { mutate: setRemotes }] = createResource(
-    selected(),
-    async (selected) => {
-      const template = await db.getTemplate(selected.template.id)
-      const note = await db.getNote(selected.note.id)
+    props.noteCard,
+    async (noteCard) => {
+      const template = await db.getTemplate(noteCard.template.id)
+      const note = await db.getNote(noteCard.note.id)
       return Array.from(template!.remotes).map(([nookId, remoteTemplateId]) => {
         const remoteNoteId = note!.remotes.get(nookId) ?? null
         const uploadable = note!.remotes.has(nookId)
@@ -89,7 +92,7 @@ const cardPreview = (): JSX.Element => {
     { initialValue: [] }
   )
   return (
-    <Show when={selected() != null}>
+    <Show when={props.noteCard != null}>
       <For each={getRemotes()}>
         {(x) => (
           <li class="py-2 px-4">
@@ -101,7 +104,7 @@ const cardPreview = (): JSX.Element => {
             </Show>
             {toggleNook(
               x.uploadable,
-              selected()!.note.id,
+              props.noteCard!.note.id,
               x.nookId,
               setRemotes
             )}
@@ -112,18 +115,18 @@ const cardPreview = (): JSX.Element => {
         i={{
           tag: "card",
           side: "front",
-          templateId: selected()!.template.id,
-          noteId: selected()!.note.id,
-          cardId: selected()!.card.id,
+          templateId: props.noteCard!.template.id,
+          noteId: props.noteCard!.note.id,
+          cardId: props.noteCard!.card.id,
         }}
       ></ResizingIframe>
       <ResizingIframe
         i={{
           tag: "card",
           side: "back",
-          templateId: selected()!.template.id,
-          noteId: selected()!.note.id,
-          cardId: selected()!.card.id,
+          templateId: props.noteCard!.template.id,
+          noteId: props.noteCard!.note.id,
+          cardId: props.noteCard!.card.id,
         }}
       ></ResizingIframe>
     </Show>
