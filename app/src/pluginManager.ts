@@ -1,6 +1,6 @@
 import { freeze } from "immer"
 import type { PentiveElement } from "./customElements/registry"
-import { getMain, type Plugin } from "shared"
+import { type Plugin } from "shared"
 import {
   defaultContainer,
   type Container,
@@ -56,10 +56,13 @@ async function registerPluginService(
   [c, er]: [Container, ElementRegistry],
   plugin: Plugin
 ): Promise<[Container, ElementRegistry]> {
-  const main = await getMain(plugin.script)
-  const script = await blobToBase64(main)
-  // A limitation of this import is that it won't resolve other files in the npmpackage.tgz
+  const script = await blobToBase64(plugin.script)
+  // A limitation of this import is that it won't resolve other files in the npmPackage.tgz
   // Does addressing this even make sense? What if two plugins have a `react.js`?
+  // Also, the Plugin table currently only stores a single `script` per Plugin. If we add support for more than 1 file,
+  // we should consider storing the npmPackage.tgz in sqlite. However, generating npmPackage.tgz for tests (cardHtml.plugin.test.ts)
+  // is *extremely* annoying, because we use DecompressionStream which only works in browsers,
+  // and jsdom doesn't support streams https://github.com/jsdom/jsdom/pull/3200
   // grep 2D96EE4E-61BA-4FCA-93C1-863C80E10A93
   const exports = (await import(/* @vite-ignore */ script)) as {
     default: PluginExports

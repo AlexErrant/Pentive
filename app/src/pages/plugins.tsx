@@ -1,7 +1,7 @@
 import { type JSX } from "solid-js"
 import PluginTable from "../customElements/pluginsTable"
 import { db } from "../db"
-import { throwExp, type PluginId, getPackageJson } from "shared"
+import { throwExp, type PluginId, parsePluginNpmPackage } from "shared"
 import { ulidAsBase64Url } from "../domain/utility"
 
 export default function Plugins(): JSX.Element {
@@ -32,13 +32,13 @@ async function importPlugin(
     // My mental static analysis says to use `currentTarget`, but it seems to randomly be null, hence `target`. I'm confused but whatever.
     event.target.files?.item(0) ??
     throwExp("Impossible - there should be a file selected")
-  const packageJson = await getPackageJson(pluginTgz)
+  const { script, name } = await parsePluginNpmPackage(pluginTgz)
   await db.upsertPlugin({
     id: ulidAsBase64Url() as PluginId,
     created: new Date(),
     updated: new Date(),
-    name: packageJson.name,
-    script: pluginTgz,
+    name,
+    script,
   })
   console.log("Plugin upserted!")
 }

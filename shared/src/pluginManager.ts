@@ -23,6 +23,7 @@ async function registerPluginService(
   plugin: Plugin
 ): Promise<RenderContainer> {
   const script = await blobToBase64(plugin.script)
+  // grep 2D96EE4E-61BA-4FCA-93C1-863C80E10A93
   const exports = (await import(/* @vite-ignore */ script)) as {
     default: RenderPluginExports
   }

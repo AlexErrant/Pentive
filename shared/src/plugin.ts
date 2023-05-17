@@ -11,12 +11,12 @@ export interface Plugin {
   readonly script: Blob
 }
 
-export const packageJsonValidator = z.object({
+const packageJsonValidator = z.object({
   name: z.string(),
   main: z.string().optional(),
 })
 
-export async function getTarReader(blob: Blob) {
+async function getTarReader(blob: Blob) {
   const decompressedStream = (
     blob.stream() as unknown as ReadableStream<Uint8Array>
   ) // not sure why Typescript thinks .stream() yields a Node stream
@@ -26,20 +26,13 @@ export async function getTarReader(blob: Blob) {
   return reader
 }
 
-export async function getPackageJson(file: File) {
-  const reader = await getTarReader(file)
-  const packageJsonText =
-    reader.getTextFile("package/package.json") ??
-    throwExp("`package/package.json` not found")
-  return packageJsonValidator.parse(JSON.parse(packageJsonText))
-}
-
-export async function getMain(blob: Blob) {
+export async function parsePluginNpmPackage(blob: Blob) {
   const reader = await getTarReader(blob)
   const packageJsonText =
     reader.getTextFile("package/package.json") ??
     throwExp("`package/package.json` not found")
-  let { main } = packageJsonValidator.parse(JSON.parse(packageJsonText))
+  const packageJson = packageJsonValidator.parse(JSON.parse(packageJsonText))
+  let { main } = packageJson
   if (main == null) {
     main = "package/index.js"
   } else if (main.startsWith("./")) {
@@ -49,10 +42,13 @@ export async function getMain(blob: Blob) {
   } else {
     main = "package/" + main
   }
-  return (
+  const script =
     reader.getFileBlob(main, "text/javascript") ??
     throwExp(
       `${main} not found. Is the 'main' in your 'package.json' correct? (We add the 'package' top level directory.)`
     )
-  )
+  return {
+    script,
+    name: packageJson.name,
+  }
 }
