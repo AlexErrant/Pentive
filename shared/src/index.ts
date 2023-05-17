@@ -57,8 +57,9 @@ export const initSql = [
     PRIMARY KEY (localEntityId, i)
 ) STRICT;`,
   `CREATE TABLE IF NOT EXISTS plugin (
-    id TEXT PRIMARY KEY, -- make BLOB upon SQLite v3.41 and the landing of UNHEX https://sqlite.org/forum/forumpost/30cca4e613d2fa2a grep F235B7FB-8CEA-4AE2-99CC-2790E607B1EB
-    name TEXT,
+    name TEXT PRIMARY KEY, -- make BLOB upon SQLite v3.41 and the landing of UNHEX https://sqlite.org/forum/forumpost/30cca4e613d2fa2a grep F235B7FB-8CEA-4AE2-99CC-2790E607B1EB
+    version TEXT,
+    dependencies TEXT,
     created INTEGER,
     updated INTEGER,
     script BLOB

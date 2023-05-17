@@ -1,19 +1,22 @@
 import { z } from "zod"
-import { type PluginId } from "./brand"
+import { type PluginVersion, type PluginName } from "./brand.js"
 import { TarReader } from "./tar.js"
 import { throwExp } from "./utility"
 
 export interface Plugin {
-  readonly name: string
-  readonly id: PluginId
+  readonly name: PluginName
+  readonly version: PluginVersion
+  readonly dependencies?: string
   readonly created: Date
   readonly updated: Date
   readonly script: Blob
 }
 
 const packageJsonValidator = z.object({
-  name: z.string(),
+  name: z.string() as unknown as z.Schema<PluginName>,
   main: z.string().optional(),
+  version: z.string() as unknown as z.Schema<PluginVersion>,
+  pentivePluginDependencies: z.string().optional(),
 })
 
 async function getTarReader(blob: Blob) {
@@ -50,5 +53,7 @@ export async function parsePluginNpmPackage(blob: Blob) {
   return {
     script,
     name: packageJson.name,
+    version: packageJson.version,
+    dependencies: packageJson.pentivePluginDependencies,
   }
 }

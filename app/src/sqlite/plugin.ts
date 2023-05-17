@@ -4,8 +4,9 @@ import { type Plugin as PluginEntity } from "./database"
 
 function entityToDomain(entity: PluginEntity): Plugin {
   return {
-    id: entity.id,
     name: entity.name,
+    version: entity.version,
+    dependencies: entity.dependencies ?? undefined,
     created: new Date(entity.created),
     updated: new Date(entity.updated),
     script: new Blob([entity.script], {
@@ -18,11 +19,12 @@ export const pluginCollectionMethods = {
   upsertPlugin: async function (plugin: Plugin) {
     const db = await getDb()
     await db.exec(
-      `INSERT INTO plugin (id,name,created,updated,script)
-                   VALUES ( ?,   ?,      ?,       ?,    ?)`,
+      `INSERT INTO plugin (name,version,dependencies,created,updated,script)
+                   VALUES (   ?,      ?,           ?,      ?,       ?,    ?)`,
       [
-        plugin.id,
         plugin.name,
+        plugin.version,
+        plugin.dependencies ?? null,
         plugin.created.getTime(),
         plugin.updated.getTime(),
         new Uint8Array(await plugin.script.arrayBuffer()),

@@ -1,5 +1,10 @@
 import { expect, test } from "vitest"
-import { type TemplateId, type Ord, type PluginId } from "./brand"
+import {
+  type TemplateId,
+  type Ord,
+  type PluginName,
+  type PluginVersion,
+} from "./brand.js"
 import { type Plugin } from "./plugin"
 import { registerPluginServices } from "./pluginManager"
 import { strip } from "./cardHtml"
@@ -35,8 +40,8 @@ function buildPlugin(src: string): Plugin {
     script: new Blob([src], {
       type: "text/javascript",
     }),
-    id: ulidAsBase64Url() as PluginId,
-    name: "",
+    name: ulidAsBase64Url() as string as PluginName,
+    version: "0.0.0" as PluginVersion,
     created: new Date(),
     updated: new Date(),
   }

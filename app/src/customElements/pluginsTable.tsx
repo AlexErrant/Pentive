@@ -18,6 +18,14 @@ const columns: Array<ColumnDef<Plugin>> = [
     accessorKey: id("name"),
   },
   {
+    header: "Version",
+    accessorKey: id("version"),
+  },
+  {
+    header: "Dependencies",
+    accessorKey: id("dependencies"),
+  },
+  {
     header: "Created",
     accessorKey: id("created"),
     cell: (info) => {

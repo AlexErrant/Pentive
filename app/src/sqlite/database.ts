@@ -6,6 +6,8 @@ import {
   type NookId,
   type Ord,
   type RemoteMediaNum,
+  type PluginName,
+  type PluginVersion,
 } from "shared"
 
 export interface Card {
@@ -45,8 +47,9 @@ export interface RemoteNote {
 }
 
 export interface Plugin {
-  id: LDbId
-  name: string
+  name: PluginName
+  version: PluginVersion
+  dependencies: string | null
   created: number
   updated: number
   script: Uint8Array
