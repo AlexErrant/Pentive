@@ -75,14 +75,21 @@ function toggleNook(
 const CardPreview: VoidComponent<{
   readonly noteCard: NoteCard
 }> = (props) => {
-  const [getRemotes, { mutate: setRemotes }] = createResource(
+  const [template] = createResource(
     props.noteCard,
-    async (noteCard) => {
-      const template = await db.getTemplate(noteCard.template.id)
-      const note = await db.getNote(noteCard.note.id)
-      return Array.from(template!.remotes).map(([nookId, remoteTemplateId]) => {
-        const remoteNoteId = note!.remotes.get(nookId) ?? null
-        const uploadable = note!.remotes.has(nookId)
+    async (noteCard) => await db.getTemplate(noteCard.template.id)
+  )
+  const [note] = createResource(
+    props.noteCard,
+    async (noteCard) => await db.getNote(noteCard.note.id)
+  )
+  const [getRemotes, { mutate: setRemotes }] = createResource(
+    [note(), template()],
+    ([note, template]) => {
+      if (note == null || template == null) return []
+      return Array.from(template.remotes).map(([nookId, remoteTemplateId]) => {
+        const remoteNoteId = note.remotes.get(nookId) ?? null
+        const uploadable = note.remotes.has(nookId)
         return {
           nookId,
           remoteTemplateId,
