@@ -1,23 +1,11 @@
 import { freeze } from "immer"
 import type { PentiveElement } from "./customElements/registry"
-import { type Plugin } from "shared"
+import { blobToBase64, type Plugin } from "shared"
 import {
   defaultContainer,
   type Container,
   type PluginExports,
 } from "./services"
-
-// https://stackoverflow.com/a/18650249
-async function blobToBase64(blob: Blob): Promise<string> {
-  return await new Promise((resolve) => {
-    const reader = new FileReader()
-    reader.onloadend = () => {
-      resolve(reader.result as string)
-    }
-    reader.readAsDataURL(blob) // https://developer.mozilla.org/en-US/docs/Web/API/FileReader/readAsDataURL
-    // The `data:text/javascript;base64,` on the return value of from `readAsDataURL` is used by this function's callers https://stackoverflow.com/a/57255653
-  })
-}
 
 // Some links for when we decide to support "hot" updates of custom elements
 // https://github.com/WICG/webcomponents/issues/754 https://github.com/caridy/redefine-custom-elements https://stackoverflow.com/q/47805288 https://github.com/ryansolid/component-register#hot-module-replacement-new

@@ -7,14 +7,14 @@ import {
 } from "./renderContainer.js"
 
 // https://stackoverflow.com/a/18650249
-async function blobToBase64(blob: Blob): Promise<string> {
+export async function blobToBase64(blob: Blob): Promise<string> {
   return await new Promise((resolve) => {
     const reader = new FileReader()
     reader.onloadend = () => {
       resolve(reader.result as string)
     }
-    reader.readAsDataURL(blob) // https://developer.mozilla.org/en-US/docs/Web/API/FileReader/readAsDataURL
     // The `data:text/javascript;base64,` on the return value of from `readAsDataURL` is used by this function's callers https://stackoverflow.com/a/57255653
+    reader.readAsDataURL(blob) // https://developer.mozilla.org/en-US/docs/Web/API/FileReader/readAsDataURL
   })
 }
 
