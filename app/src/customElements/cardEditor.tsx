@@ -14,6 +14,7 @@ import {
   type RemoteTemplateId,
 } from "shared"
 import { db } from "../db"
+import { FieldEditor } from "./fieldEditor"
 
 function toggleNook(
   uploadable: boolean,
@@ -75,6 +76,9 @@ export const CardEditor: VoidComponent<{
   )
   return (
     <>
+      <For each={Array.from(note()?.fieldValues.entries() ?? [])}>
+        {([field, value]) => FieldEditor({ field, value })}
+      </For>
       <For each={getRemotes()}>
         {(x) => (
           <li class="py-2 px-4">
