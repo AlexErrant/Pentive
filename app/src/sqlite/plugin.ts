@@ -20,7 +20,12 @@ export const pluginCollectionMethods = {
     const db = await getDb()
     await db.exec(
       `INSERT INTO plugin (name,version,dependencies,created,updated,script)
-                   VALUES (   ?,      ?,           ?,      ?,       ?,    ?)`,
+                   VALUES (   ?,      ?,           ?,      ?,       ?,    ?)
+       ON CONFLICT(name) DO UPDATE SET
+         version=excluded.version,
+         dependencies=excluded.dependencies,
+         updated=excluded.updated,
+         script=excluded.script`,
       [
         plugin.name,
         plugin.version,
