@@ -34,7 +34,9 @@ export default function Cards(): JSX.Element {
           }
         }}
       />
-      <CardPreview noteCard={selected()} />
+      <Show when={selected() != null}>
+        <CardPreview noteCard={selected()!} />
+      </Show>
     </>
   )
 }
@@ -71,7 +73,7 @@ function toggleNook(
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const CardPreview: VoidComponent<{
-  readonly noteCard: NoteCard | undefined
+  readonly noteCard: NoteCard
 }> = (props) => {
   const [getRemotes, { mutate: setRemotes }] = createResource(
     props.noteCard,
@@ -92,7 +94,7 @@ const CardPreview: VoidComponent<{
     { initialValue: [] }
   )
   return (
-    <Show when={props.noteCard != null}>
+    <>
       <For each={getRemotes()}>
         {(x) => (
           <li class="py-2 px-4">
@@ -104,7 +106,7 @@ const CardPreview: VoidComponent<{
             </Show>
             {toggleNook(
               x.uploadable,
-              props.noteCard!.note.id,
+              props.noteCard.note.id,
               x.nookId,
               setRemotes
             )}
@@ -115,20 +117,20 @@ const CardPreview: VoidComponent<{
         i={{
           tag: "card",
           side: "front",
-          templateId: props.noteCard!.template.id,
-          noteId: props.noteCard!.note.id,
-          cardId: props.noteCard!.card.id,
+          templateId: props.noteCard.template.id,
+          noteId: props.noteCard.note.id,
+          cardId: props.noteCard.card.id,
         }}
       ></ResizingIframe>
       <ResizingIframe
         i={{
           tag: "card",
           side: "back",
-          templateId: props.noteCard!.template.id,
-          noteId: props.noteCard!.note.id,
-          cardId: props.noteCard!.card.id,
+          templateId: props.noteCard.template.id,
+          noteId: props.noteCard.note.id,
+          cardId: props.noteCard.card.id,
         }}
       ></ResizingIframe>
-    </Show>
+    </>
   )
 }
