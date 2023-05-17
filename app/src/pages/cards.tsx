@@ -35,7 +35,7 @@ export default function Cards(): JSX.Element {
         }}
       />
       <Show when={selected() != null}>
-        <CardPreview noteCard={selected()!} />
+        <CardEditor noteCard={selected()!} />
       </Show>
     </>
   )
@@ -72,7 +72,7 @@ function toggleNook(
 }
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
-const CardPreview: VoidComponent<{
+const CardEditor: VoidComponent<{
   readonly noteCard: NoteCard
 }> = (props) => {
   const [template] = createResource(
