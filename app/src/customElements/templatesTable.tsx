@@ -134,7 +134,7 @@ const columns: Array<ColumnDef<Template>> = [
             templateId: info.row.original.id,
             index: "0",
           }}
-        ></ResizingIframe>
+        />
       )
     },
   },

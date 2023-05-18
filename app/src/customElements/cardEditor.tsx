@@ -66,9 +66,6 @@ export const CardEditor: VoidComponent<{
   )
   return (
     <>
-      <For each={Array.from(props.noteCard.note.fieldValues.entries() ?? [])}>
-        {([field, value]) => FieldEditor({ field, value })}
-      </For>
       <For each={getRemotes()}>
         {(x) => (
           <li class="py-2 px-4">
@@ -87,6 +84,9 @@ export const CardEditor: VoidComponent<{
           </li>
         )}
       </For>
+      <For each={Array.from(props.noteCard.note.fieldValues.entries() ?? [])}>
+        {([field, value]) => FieldEditor({ field, value })}
+      </For>
       <ResizingIframe
         i={{
           tag: "card",
@@ -95,7 +95,7 @@ export const CardEditor: VoidComponent<{
           noteId: props.noteCard.note.id,
           cardId: props.noteCard.card.id,
         }}
-      ></ResizingIframe>
+      />
       <ResizingIframe
         i={{
           tag: "card",
@@ -104,7 +104,7 @@ export const CardEditor: VoidComponent<{
           noteId: props.noteCard.note.id,
           cardId: props.noteCard.card.id,
         }}
-      ></ResizingIframe>
+      />
     </>
   )
 }
