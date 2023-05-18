@@ -1,13 +1,15 @@
 import { onMount, type VoidComponent } from "solid-js"
 import { EditorState } from "prosemirror-state"
 import { EditorView } from "prosemirror-view"
-import { Schema, DOMParser as PMDOMParser } from "prosemirror-model"
+import { Schema, DOMParser as ProseMirrorDOMParser } from "prosemirror-model"
 import { schema } from "prosemirror-schema-basic"
 import { addListNodes } from "prosemirror-schema-list"
 import { exampleSetup } from "prosemirror-example-setup"
 import "prosemirror-view/style/prosemirror.css"
 import "prosemirror-menu/style/menu.css"
 import "prosemirror-example-setup/style/style.css"
+import { type MediaId, blobToBase64 } from "shared"
+import { db } from "../db"
 
 export const FieldEditor: VoidComponent<{
   readonly field: string
@@ -20,12 +22,17 @@ export const FieldEditor: VoidComponent<{
     marks: schema.spec.marks,
   })
   let editor: HTMLDivElement | undefined
-  onMount(() => {
+  onMount(async () => {
     const doc = new DOMParser().parseFromString(props.value, "text/html")
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    await Promise.all(
+      Array.from(doc.images).map(async (i) => {
+        await updateImgSrc(i)
+      })
+    )
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars -- not sure wtf to do with editorView
     const editorView = new EditorView(editor!, {
       state: EditorState.create({
-        doc: PMDOMParser.fromSchema(mySchema).parse(doc),
+        doc: ProseMirrorDOMParser.fromSchema(mySchema).parse(doc),
         plugins: exampleSetup({ schema: mySchema }),
       }),
     })
@@ -38,4 +45,18 @@ export const FieldEditor: VoidComponent<{
       </div>
     </>
   )
+}
+
+async function updateImgSrc(img: HTMLImageElement) {
+  const src = img.getAttribute("src")
+  if (src == null || src === "" || src.startsWith("http")) {
+    // do nothing
+  } else {
+    const media = await db.getMedia(src as MediaId)
+    if (media == null) return
+    const type = src.endsWith(".svg") ? "image/svg+xml" : "image"
+    const blob = new Blob([media.data], { type })
+    const dataUrl = await blobToBase64(blob)
+    img.setAttribute("src", dataUrl)
+  }
 }

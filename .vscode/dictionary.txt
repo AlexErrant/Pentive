@@ -35,6 +35,7 @@ PKCE
 planetscale
 precache
 precaching
+prosemirror
 proxying
 resizer
 rxdb
