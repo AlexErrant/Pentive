@@ -1,6 +1,6 @@
 import { type VoidComponent } from "solid-js"
 import { type NoteCard } from "shared"
-import { CardRemote } from "./cardRemote"
+import { CardsRemote } from "./cardsRemote"
 import { FieldsEditor } from "./fieldsEditor"
 import { CardsPreview } from "./cardsPreview"
 
@@ -9,7 +9,7 @@ export const CardEditor: VoidComponent<{
 }> = (props) => {
   return (
     <>
-      <CardRemote noteCard={props.noteCard} />
+      <CardsRemote noteCard={props.noteCard} />
       <FieldsEditor noteCard={props.noteCard} />
       <CardsPreview noteCard={props.noteCard} />
     </>

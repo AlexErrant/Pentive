@@ -44,7 +44,7 @@ function toggleNook(
   )
 }
 
-export const CardRemote: VoidComponent<{
+export const CardsRemote: VoidComponent<{
   readonly noteCard: NoteCard
 }> = (props) => {
   const [getRemotes, { mutate: setRemotes }] = createResource(
