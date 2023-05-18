@@ -1,8 +1,8 @@
-import { For, type VoidComponent } from "solid-js"
+import { type VoidComponent } from "solid-js"
 import ResizingIframe from "../customElements/resizingIframe"
 import { type NoteCard } from "shared"
-import { FieldEditor } from "./fieldEditor"
 import { CardRemote } from "./cardRemote"
+import { FieldsEditor } from "./fieldsEditor"
 
 export const CardEditor: VoidComponent<{
   readonly noteCard: NoteCard
@@ -10,9 +10,7 @@ export const CardEditor: VoidComponent<{
   return (
     <>
       <CardRemote noteCard={props.noteCard} />
-      <For each={Array.from(props.noteCard.note.fieldValues.entries() ?? [])}>
-        {([field, value]) => FieldEditor({ field, value })}
-      </For>
+      <FieldsEditor noteCard={props.noteCard} />
       <ResizingIframe
         i={{
           tag: "card",
