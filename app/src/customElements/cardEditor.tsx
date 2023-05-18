@@ -71,7 +71,9 @@ export const CardEditor: VoidComponent<{
           <li class="py-2 px-4">
             {x.uploadable ? "✔" : ""}
             <Show when={x.remoteNoteId != null} fallback={x.nookId}>
-              <a href={`https://pentive.com/n/${x.remoteNoteId!}`}>
+              <a
+                href={`${import.meta.env.VITE_HUB_ORIGIN}/n/${x.remoteNoteId!}`}
+              >
                 {x.nookId}
               </a>
             </Show>

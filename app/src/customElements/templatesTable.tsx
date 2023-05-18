@@ -57,7 +57,11 @@ function remoteCell(template: Template): JSX.Element {
           {([nookId, remoteTemplateId]) => (
             <li class="py-2 px-4">
               <Show when={remoteTemplateId != null} fallback={nookId}>
-                <a href={`https://pentive.com/t/${remoteTemplateId!}`}>
+                <a
+                  href={`${
+                    import.meta.env.VITE_HUB_ORIGIN
+                  }/t/${remoteTemplateId!}`}
+                >
                   {nookId}
                 </a>
               </Show>
