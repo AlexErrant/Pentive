@@ -48,6 +48,7 @@ stylelint
 superjson
 sveltejs
 tailwindcss
+tanstack
 Tauri
 tinyint
 trpc

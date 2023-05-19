@@ -38,7 +38,7 @@ function removeNook(
   return (
     <button
       type="button"
-      onclick={async () => {
+      onClick={async () => {
         await db.makeTemplateNotUploadable(templateId, nook)
         setRemotes((rs) => rs.filter(([n]) => n !== nook))
       }}
@@ -116,14 +116,14 @@ const columns: Array<ColumnDef<Template>> = [
     header: "Created",
     accessorKey: id("created"),
     cell: (info) => {
-      return <time-ago attr:datetime={info.getValue<Date>()}></time-ago>
+      return <time-ago attr:datetime={info.getValue<Date>()} />
     },
   },
   {
     header: "Updated",
     accessorKey: id("updated"),
     cell: (info) => {
-      return <time-ago attr:datetime={info.getValue<Date>()}></time-ago>
+      return <time-ago attr:datetime={info.getValue<Date>()} />
     },
   },
   {

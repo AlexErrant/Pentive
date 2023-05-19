@@ -15,7 +15,7 @@ const NoteComment: Component<{ comment: NoteCommentType }> = (props) => {
         </A>{" "}
         {props.comment.updated.toLocaleString()}
       </div>
-      <div class="text" innerHTML={props.comment.text} />
+      <div class="text">{props.comment.text}</div>
       <button
         type="button"
         style={{ display: showReply() ? "none" : "block" }}
@@ -25,6 +25,7 @@ const NoteComment: Component<{ comment: NoteCommentType }> = (props) => {
       </button>
       <div style={{ display: showReply() ? "block" : "none" }}>
         <SubmitComment
+          // eslint-disable-next-line solid/reactivity -- doesn't need to be reactive
           onSubmit={async (text) => {
             await cwaClient.insertNoteChildComment.mutate({
               parentCommentId: props.comment.id,

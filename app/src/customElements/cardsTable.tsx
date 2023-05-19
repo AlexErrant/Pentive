@@ -49,12 +49,11 @@ const defaultColDef: ColDef<NoteCard> = { sortable: true }
 const getRowId = (params: GetRowIdParams<NoteCard>): CardId =>
   params.data.card.id
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 const CardsTable: VoidComponent<{
   readonly onSelectionChanged: (noteCards: NoteCard[]) => void
 }> = (props) => {
   return (
-    <div class="ag-theme-alpine" style="height: 500px">
+    <div class="ag-theme-alpine" style={{ height: "500px" }}>
       <AgGridSolid
         columnDefs={columnDefs}
         defaultColDef={defaultColDef}

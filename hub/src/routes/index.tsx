@@ -58,7 +58,7 @@ export default function Home(): JSX.Element {
         }}
       />
       <button
-        onclick={() => {
+        onClick={() => {
           setTemplate((t) => {
             if (t.templateType.tag === "cloze") {
               return {

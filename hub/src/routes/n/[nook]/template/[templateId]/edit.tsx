@@ -155,7 +155,7 @@ export default function Submit(): JSX.Element {
       <div ref={backRef} />
       <button
         type="button"
-        onclick={async () => {
+        onClick={async () => {
           const t = template.t!
           await cwaClient.editTemplates.mutate([
             {

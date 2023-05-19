@@ -113,7 +113,7 @@ export default function Submit(): JSX.Element {
         </Show>
         <div>
           <label for="text-input">Text</label>
-          <textarea id="text-input" name="text" rows="4" cols="50"></textarea>
+          <textarea id="text-input" name="text" rows="4" cols="50" />
         </div>
         <Show when={error()?.fieldErrors?.text}>
           <p>{error()!.fieldErrors!.text}</p>

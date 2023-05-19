@@ -33,7 +33,7 @@ const User: Component = () => {
               <span class="label">Karma:</span> {user()!.karma}
             </li>
             <Show when={user()!.about}>
-              <li innerHTML={user()!.about} class="about" />{" "}
+              <li class="about">{user()!.about}</li>{" "}
             </Show>
           </ul>
           <p class="links">

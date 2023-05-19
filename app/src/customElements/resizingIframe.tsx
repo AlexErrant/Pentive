@@ -108,7 +108,7 @@ const ResizingIframe: VoidComponent<{
   return (
     <iframe
       ref={(x) => (iframeReference = x)}
-      onload={(e) => {
+      onLoad={(e) => {
         Comlink.expose(
           appExpose,
           Comlink.windowEndpoint(

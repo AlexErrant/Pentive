@@ -132,7 +132,6 @@ export default function Home(): JSX.Element {
   const [note, setNote] = createSignal<Note | null>(null)
   const age = useRouteData<typeof HomeData>()
 
-  console.log(count())
   createEffect(() => {
     console.log(age())
     setCount(age() as number) // not sure why, but changing to a mono repo changed the signature of this to include `undefined` - which is wrong. Whatever.
@@ -287,13 +286,13 @@ export default function Home(): JSX.Element {
       <div class="mt-4">
         <label>
           Import Anki apkg
-          <input type="file" onchange={importAnki} accept=".apkg"></input>
+          <input type="file" onChange={importAnki} accept=".apkg" />
         </label>
       </div>
       <div class="mt-4">
         <label>
           Upload Media
-          <input type="file" onchange={uploadMedia} accept="image/*"></input>
+          <input type="file" onChange={uploadMedia} accept="image/*" />
         </label>
       </div>
       <div class="mt-4">
@@ -322,16 +321,16 @@ export default function Home(): JSX.Element {
             type="text"
           />
         </form>
-        <button class="px-2" onclick={q("select * from template")}>
+        <button class="px-2" onClick={q("select * from template")}>
           template
         </button>
-        <button class="px-2" onclick={q("select * from remoteTemplate")}>
+        <button class="px-2" onClick={q("select * from remoteTemplate")}>
           remoteTemplate
         </button>
-        <button class="px-2" onclick={q("select * from remoteNote")}>
+        <button class="px-2" onClick={q("select * from remoteNote")}>
           remoteNote
         </button>
-        <button class="px-2" onclick={q("select * from remoteMedia")}>
+        <button class="px-2" onClick={q("select * from remoteMedia")}>
           remoteMedia
         </button>
       </div>

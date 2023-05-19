@@ -34,7 +34,7 @@ const Threads: Component = () => {
                   <h1>{template.name}</h1>
                   <div>
                     <button
-                      onclick={async () => {
+                      onClick={async () => {
                         await getAppMessenger().addTemplate(unproxify(template))
                       }}
                     >

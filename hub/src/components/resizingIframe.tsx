@@ -34,12 +34,6 @@ export interface HubExpose {
 const ResizingIframe: VoidComponent<{
   readonly i: RenderBodyInput
 }> = (props) => {
-  const hubExpose: HubExpose = {
-    renderBodyInput: unproxify(props.i),
-    resize: () => {
-      ;(iframeReference as IFrameComponent)?.iFrameResizer?.resize()
-    },
-  }
   createEffect(() => {
     try {
       iframeReference.contentWindow!.postMessage(
@@ -57,9 +51,14 @@ const ResizingIframe: VoidComponent<{
   return (
     <iframe
       ref={(x) => (iframeReference = x)}
-      onload={(e) => {
+      onLoad={(e) => {
         Comlink.expose(
-          hubExpose,
+          {
+            renderBodyInput: unproxify(props.i),
+            resize: () => {
+              ;(iframeReference as IFrameComponent)?.iFrameResizer?.resize()
+            },
+          },
           Comlink.windowEndpoint(
             e.currentTarget.contentWindow!,
             self,

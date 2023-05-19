@@ -17,16 +17,15 @@ function kebabCaseKeys(x: Record<string, unknown>): Record<string, unknown> {
   )
 }
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const Plugin: ParentComponent<{
   readonly name: string
   readonly attrs: Record<string, unknown>
 }> = (props) => {
-  const attrs = kebabCaseKeys(props.attrs)
+  // eslint-disable-next-line solid/reactivity -- props.name is not reactive
   const elementName = "pentive-" + props.name
   return (
     <Show when={registeredElements.has(elementName)} fallback={props.children}>
-      <Dynamic component={elementName} {...attrs} />
+      <Dynamic component={elementName} {...kebabCaseKeys(props.attrs)} />
     </Show>
   )
 }

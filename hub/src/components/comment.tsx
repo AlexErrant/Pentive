@@ -10,7 +10,7 @@ const Comment: Component<{ comment: IComment }> = (props) => {
         <A href={`/users/${props.comment.user}`}>{props.comment.user}</A>{" "}
         {props.comment.timeAgo} ago
       </div>
-      <div class="text" innerHTML={props.comment.content} />
+      <div class="text">{props.comment.content}</div>
       <Show when={props.comment.comments.length}>
         <Toggle>
           <For each={props.comment.comments}>

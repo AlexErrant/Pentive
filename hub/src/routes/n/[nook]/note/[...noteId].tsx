@@ -76,7 +76,7 @@ const Thread: Component = () => {
             </For>
           </p>
           <button
-            onclick={async () => {
+            onClick={async () => {
               await getAppMessenger().addNote(unproxify(data()!.note!), nook())
               await cwaClient.subscribeToNote.mutate(data()!.note!.id)
             }}
@@ -86,6 +86,7 @@ const Thread: Component = () => {
           </button>
           <ul class="comment-children">
             <SubmitComment
+              // eslint-disable-next-line solid/reactivity -- doesn't need to be reactive
               onSubmit={async (text) => {
                 await cwaClient.insertNoteComment.mutate({
                   noteId: data()!.note!.id,

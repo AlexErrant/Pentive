@@ -14,12 +14,7 @@ export default function SubmitComment(props: {
           await props.onSubmit(text)
         }}
       >
-        <textarea
-          name="comment"
-          autocomplete="off"
-          rows="4"
-          cols="50"
-        ></textarea>
+        <textarea name="comment" autocomplete="off" rows="4" cols="50" />
         <button type="submit">Submit</button>
       </form>
     </main>

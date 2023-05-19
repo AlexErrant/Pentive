@@ -1,5 +1,5 @@
 import { type JSX } from "solid-js"
-import PluginTable from "../customElements/pluginsTable"
+import PluginsTable from "../customElements/pluginsTable"
 import { db } from "../db"
 import { throwExp, parsePluginNpmPackage } from "shared"
 
@@ -16,7 +16,7 @@ export default function Plugins(): JSX.Element {
           await importPlugin(e)
         }}
       />
-      <PluginTable getPlugins={db.getPlugins} />
+      <PluginsTable />
     </>
   )
 }

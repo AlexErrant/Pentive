@@ -7,6 +7,7 @@ import {
 } from "@tanstack/solid-table"
 import { type Plugin } from "shared"
 import "@github/time-elements"
+import { db } from "../db"
 
 function id(id: keyof Plugin): keyof Plugin {
   return id
@@ -29,23 +30,20 @@ const columns: Array<ColumnDef<Plugin>> = [
     header: "Created",
     accessorKey: id("created"),
     cell: (info) => {
-      return <time-ago attr:datetime={info.getValue<Date>()}></time-ago>
+      return <time-ago attr:datetime={info.getValue<Date>()} />
     },
   },
   {
     header: "Updated",
     accessorKey: id("updated"),
     cell: (info) => {
-      return <time-ago attr:datetime={info.getValue<Date>()}></time-ago>
+      return <time-ago attr:datetime={info.getValue<Date>()} />
     },
   },
 ]
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
-const PluginsTable: VoidComponent<{
-  readonly getPlugins: () => Promise<Plugin[]>
-}> = (props) => {
-  const [plugins] = createResource(async () => await props.getPlugins(), {
+const PluginsTable: VoidComponent = () => {
+  const [plugins] = createResource(db.getPlugins, {
     initialValue: [],
   })
   const table = createSolidTable({

@@ -41,7 +41,7 @@ export const FieldEditor: VoidComponent<{
     <>
       <div>{props.field}</div>
       <div>
-        <div ref={editor}></div>
+        <div ref={editor} />
       </div>
     </>
   )

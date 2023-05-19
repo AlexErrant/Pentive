@@ -44,11 +44,13 @@ export default function Peers() {
         />
       </form>
       <ul>
-        <For each={pending()}>{(p) => <li style="color:orange">{p}</li>}</For>
+        <For each={pending()}>
+          {(p) => <li style={{ color: "orange" }}>{p}</li>}
+        </For>
       </ul>
       <ul class="established">
         <For each={established()}>
-          {(p) => <li style="color:green">{p}</li>}
+          {(p) => <li style={{ color: "green" }}>{p}</li>}
         </For>
       </ul>
     </div>
