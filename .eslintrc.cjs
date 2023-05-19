@@ -19,7 +19,7 @@ module.exports = {
         "plugin:@typescript-eslint/recommended-requiring-type-checking",
         "plugin:prettier/recommended", // Last to disable conflicting rules
       ],
-      plugins: ["@typescript-eslint"],
+      plugins: ["@typescript-eslint", "solid"],
       parser: "@typescript-eslint/parser",
       parserOptions: {
         project: ["./tsconfig.json", "./test/tsconfig.json"],
@@ -74,6 +74,7 @@ module.exports = {
     {
       files: ["*.tsx"],
       extends: [
+        "plugin:solid/typescript",
         "standard-with-typescript",
         "plugin:@typescript-eslint/recommended",
         "plugin:@typescript-eslint/recommended-requiring-type-checking",
