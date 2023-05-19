@@ -6,7 +6,6 @@ import { Plugin } from "./components/pluginWrapper"
 import Nav from "./customElements/nav"
 
 export default function App(): JSX.Element {
-  // eslint-disable-next-line @typescript-eslint/naming-convention
   const Route = useRoutes(routes)
 
   return (

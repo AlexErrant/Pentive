@@ -3,7 +3,6 @@
 import { For, type VoidComponent } from "solid-js"
 import { type NavLinkData } from "../../../app/src/customElements/contracts"
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const Nav: VoidComponent<{ navLinks: NavLinkData[] }> = (props) => {
   return (
     <nav class="bg-gray-200 text-gray-900 px-4">

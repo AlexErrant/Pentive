@@ -4,7 +4,6 @@ import { type NavLinkData } from "./contracts"
 
 const ends = new Set(["/"])
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 const Nav: VoidComponent<{ readonly navLinks: readonly NavLinkData[] }> = (
   props
 ) => {
