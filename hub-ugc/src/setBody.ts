@@ -1,6 +1,7 @@
 import contentWindowJs from "iframe-resizer/js/iframeResizer.contentWindow.js?raw" // https://vitejs.dev/guide/assets.html#importing-asset-as-string https://github.com/davidjbradshaw/iframe-resizer/issues/513
 import { type RenderBodyInput } from "hub/src/components/resizingIframe"
-import { assertNever, registerPluginServices, relativeChar } from "shared"
+import { assertNever, relativeChar } from "shared"
+import { registerPluginServices } from "shared-dom"
 
 const C = await registerPluginServices([])
 

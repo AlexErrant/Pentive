@@ -1,5 +1,5 @@
 import { freeze } from "immer"
-import { type Plugin } from "./plugin"
+import type { Plugin } from "./plugin"
 import {
   defaultRenderContainer,
   type RenderContainer,

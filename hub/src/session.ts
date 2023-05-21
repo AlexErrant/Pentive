@@ -1,13 +1,13 @@
 import { jwtVerify, type JWTVerifyResult, SignJWT } from "jose"
 import {
   type Base64,
-  base64ToArray,
   base64url,
   csrfSignatureCookieName,
   jwtCookieName,
   throwExp,
   type UserId,
 } from "shared"
+import { base64ToArray } from "shared-edge"
 import { redirect } from "solid-start/server"
 import { createCookieSessionStorage } from "solid-start/session"
 import { type Cookie, type CookieOptions } from "solid-start/session/cookies"

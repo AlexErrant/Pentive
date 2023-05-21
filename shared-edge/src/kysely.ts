@@ -7,7 +7,7 @@ import {
   type Compilable,
 } from "kysely"
 import { PlanetScaleDialect } from "kysely-planetscale"
-import { type DB } from "./database.js"
+import { type DB } from "../database.js"
 import {
   type Base64,
   type Base64Url,
@@ -20,18 +20,6 @@ import {
   type RemoteTemplateId,
   type TemplateId,
   type UserId,
-} from "./brand.js"
-import { binary16fromBase64URL, ulidAsHex, ulidAsRaw } from "./convertBinary.js"
-import {
-  nullMap,
-  parseMap,
-  stringifyMap,
-  throwExp,
-  undefinedMap,
-} from "./utility.js"
-import { base16, base64url } from "@scure/base"
-import { compile } from "html-to-text"
-import {
   type RemoteNote,
   type CreateRemoteNote,
   type CreateRemoteTemplate,
@@ -39,7 +27,13 @@ import {
   type EditRemoteTemplate,
   type RemoteTemplate,
   type TemplateType,
-} from "./schema.js"
+  imgPlaceholder,
+  relativeChar,
+} from "shared"
+import { binary16fromBase64URL, ulidAsHex, ulidAsRaw } from "./convertBinary.js"
+import { nullMap, parseMap, stringifyMap, throwExp, undefinedMap } from "shared"
+import { base16, base64url } from "@scure/base"
+import { compile } from "html-to-text"
 
 const convert = compile({})
 
@@ -684,10 +678,6 @@ function toNoteCreate(
   }
   return { noteCreate, remoteIdBase64url, remoteTemplateId }
 }
-
-// hacky, but better than my previous solution, which was to parse the value, which was slow(er) and fragile.
-export const imgPlaceholder = "3Iptw8cmfkd/KLrTw+9swHnzxxVhtDCraYLejUh3"
-export const relativeChar = "/"
 
 function replaceImgSrcs(value: string, remoteIdBase64url: string) {
   return value.replaceAll(imgPlaceholder, relativeChar + remoteIdBase64url)

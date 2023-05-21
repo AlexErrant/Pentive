@@ -8,8 +8,9 @@ import { exampleSetup } from "prosemirror-example-setup"
 import "prosemirror-view/style/prosemirror.css"
 import "prosemirror-menu/style/menu.css"
 import "prosemirror-example-setup/style/style.css"
-import { type MediaId, blobToBase64 } from "shared"
+import { type MediaId } from "shared"
 import { db } from "../db"
+import { blobToBase64 } from "shared-dom"
 
 export const FieldEditor: VoidComponent<{
   readonly field: string

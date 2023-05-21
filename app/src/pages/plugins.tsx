@@ -1,7 +1,8 @@
 import { type JSX } from "solid-js"
 import PluginsTable from "../customElements/pluginsTable"
 import { db } from "../db"
-import { throwExp, parsePluginNpmPackage } from "shared"
+import { throwExp } from "shared"
+import { parsePluginNpmPackage } from "shared-dom"
 
 export default function Plugins(): JSX.Element {
   return (

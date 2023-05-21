@@ -1,4 +1,4 @@
-import { type Plugin } from "shared"
+import { type Plugin } from "shared-dom"
 import { getDb, getKysely } from "./crsqlite"
 import { type Plugin as PluginEntity } from "./database"
 

@@ -1,4 +1,4 @@
-import { base64ToArray } from "shared"
+import { base64ToArray } from "shared-edge"
 
 let jwsSecret: null | Uint8Array = null
 

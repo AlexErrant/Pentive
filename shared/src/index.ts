@@ -74,18 +74,14 @@ export const initSql = [
   `SELECT crsql_as_crr('plugin');`,
 ]
 
-export * from "./wholeDbReplicator.js"
-export * from "./wholeDbReplicatorSync.js"
-export * from "./kysely.js"
-export * from "./convertBinary.js"
+// hacky, but better than my previous solution, which was to parse the value, which was slow(er) and fragile.
+export const imgPlaceholder = "3Iptw8cmfkd/KLrTw+9swHnzxxVhtDCraYLejUh3"
+export const relativeChar = "/"
+
 export * from "./brand.js"
 export * from "./schema.js"
 export * from "./utility.js"
 export * from "./headers.js"
-export * from "./plugin.js"
-export * from "./cardHtml.js"
-export * from "./renderContainer.js"
-export * from "./pluginManager.js"
 export * from "./publicToken.js"
 export * from "./domain/card.js"
 export * from "./domain/note.js"

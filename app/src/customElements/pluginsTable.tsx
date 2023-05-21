@@ -5,7 +5,7 @@ import {
   flexRender,
   getCoreRowModel,
 } from "@tanstack/solid-table"
-import { type Plugin } from "shared"
+import { type Plugin } from "shared-dom"
 import "@github/time-elements"
 import { db } from "../db"
 

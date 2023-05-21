@@ -1,17 +1,19 @@
 import {
   commentText,
   createRemoteNote,
-  editNotes,
   editRemoteNote,
-  insertNoteChildComment,
-  insertNoteComment,
-  insertNotes,
   noteCommentId,
   remoteNoteId,
-  subscribeToNote,
 } from "shared"
 import { z } from "zod"
 import { authedProcedure } from "./trpc"
+import {
+  editNotes,
+  insertNoteChildComment,
+  insertNoteComment,
+  insertNotes,
+  subscribeToNote,
+} from "shared-edge"
 
 export const noteRouter = {
   createNote: authedProcedure

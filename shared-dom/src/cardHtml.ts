@@ -1,19 +1,21 @@
-import { type RenderContainer } from "./renderContainer.js"
-import {
-  type NoteId,
-  type TemplateId,
-  type Ord,
-  type NookId,
-  type RemoteNoteId,
-  type CardId,
-  type DeckId,
-  type CardSettingId,
-} from "./brand.js"
-import { assertNever, notEmpty, throwExp } from "./utility.js"
-import { type Cloze, type Standard } from "./schema.js"
-import { type Field, type Template } from "./domain/template.js"
-import { type Card } from "./domain/card.js"
-import { type Note } from "./domain/note.js"
+import type { RenderContainer } from "./renderContainer.js"
+import type {
+  NoteId,
+  TemplateId,
+  Ord,
+  NookId,
+  RemoteNoteId,
+  CardId,
+  DeckId,
+  CardSettingId,
+  Cloze,
+  Standard,
+  Field,
+  Template,
+  Card,
+  Note,
+} from "shared"
+import { assertNever, notEmpty, throwExp } from "shared"
 
 export type StandardTemplate = Omit<Template, "templateType"> & {
   templateType: Standard

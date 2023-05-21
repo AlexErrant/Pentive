@@ -47,6 +47,7 @@
     "comlink": "^4.3.1",
     "hub": "workspace:*",
     "iframe-resizer": "^4.3.6",
-    "shared": "workspace:*"
+    "shared": "workspace:*",
+    "shared-dom": "workspace:*"
   }
 }

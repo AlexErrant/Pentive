@@ -1,11 +1,7 @@
 import { z } from "zod"
 import { authedProcedure } from "./trpc"
-import {
-  createRemoteTemplate,
-  editRemoteTemplate,
-  editTemplates,
-  insertTemplates,
-} from "shared"
+import { createRemoteTemplate, editRemoteTemplate } from "shared"
+import { editTemplates, insertTemplates } from "shared-edge"
 
 export const templateRouter = {
   createTemplates: authedProcedure

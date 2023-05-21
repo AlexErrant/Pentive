@@ -13,7 +13,6 @@ import {
   type RemoteNote,
   type RemoteTemplate,
   throwExp,
-  noteOrds,
   relativeChar,
   type Template,
   type Media,
@@ -24,6 +23,7 @@ import { ulidAsBase64Url } from "./domain/utility"
 import { getKysely } from "./sqlite/crsqlite"
 import { type Transaction } from "kysely"
 import { type DB } from "./sqlite/database"
+import { noteOrds } from "shared-dom"
 
 const plugins = await db.getPlugins()
 

@@ -1,4 +1,5 @@
-import { setKysely, hstsName, hstsValue } from "shared"
+import { hstsName, hstsValue } from "shared"
+import { setKysely } from "shared-edge"
 import {
   createHandler,
   renderAsync,

@@ -65,6 +65,8 @@
     "jose": "^4.11.1",
     "oauth4webapi": "^2.2.4",
     "shared": "workspace:*",
+    "shared-dom": "workspace:*",
+    "shared-edge": "workspace:*",
     "solid-js": "^1.7.3",
     "solid-start": "^0.2.26",
     "superjson": "^1.12.2",

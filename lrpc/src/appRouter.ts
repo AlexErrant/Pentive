@@ -1,8 +1,9 @@
 import { z } from "zod"
 import { authedProcedure, publicProcedure, router } from "./trpc.js"
 import aio from "@vlcn.io/crsqlite-allinone"
-import { initSql, wholeDbReplicatorSync } from "shared"
+import { initSql } from "shared"
 import { stringify as uuidStringify } from "uuid"
+import { wholeDbReplicatorSync } from "./wholeDbReplicatorSync.js"
 
 const tableName = z.string()
 const quoteConcatedPKs = z.string().or(z.number())

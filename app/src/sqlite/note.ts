@@ -3,7 +3,6 @@ import {
   type EditRemoteNote,
   type NookId,
   type RemoteNoteId,
-  imgPlaceholder,
   parseMap,
   parseSet,
   stringifyMap,
@@ -14,6 +13,7 @@ import {
   type RemoteMediaNum,
   type RemoteTemplateId,
   type Note,
+  imgPlaceholder,
 } from "shared"
 import { getKysely } from "./crsqlite"
 import { type DB, type Note as NoteEntity, type RemoteNote } from "./database"

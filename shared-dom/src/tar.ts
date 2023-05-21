@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable @typescript-eslint/naming-convention */
 
-import { throwExp } from "./utility.js"
+import { throwExp } from "shared"
 
 export class TarReader {
   constructor() {

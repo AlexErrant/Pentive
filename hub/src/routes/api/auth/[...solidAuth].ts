@@ -20,7 +20,7 @@ import {
   getOauthCodeVerifier,
   getOauthState,
 } from "~/session"
-import { getUserIdByEmail } from "shared"
+import { getUserIdByEmail } from "shared-edge"
 
 export const githubLoginUrl = (alphaKey: string) =>
   import.meta.env.VITE_HUB_ORIGIN +

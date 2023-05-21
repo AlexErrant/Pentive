@@ -1,4 +1,4 @@
-import { defaultRenderContainer } from "shared"
+import { defaultRenderContainer } from "shared-dom"
 import type { PentiveElement } from "./customElements/registry"
 
 // the dependency injection container

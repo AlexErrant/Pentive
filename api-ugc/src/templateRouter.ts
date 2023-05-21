@@ -1,5 +1,6 @@
+import { getTemplate } from "shared-edge"
 import { publicProcedure } from "./trpc"
-import { getTemplate, remoteTemplateId } from "shared"
+import { remoteTemplateId } from "shared"
 
 export const templateRouter = {
   getTemplate: publicProcedure

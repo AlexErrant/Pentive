@@ -5,6 +5,8 @@ packages:
   - "hub-ugc/"
   - "lrpc/"
   - "shared/"
+  - "shared-dom/"
+  - "shared-edge/"
   - "cwa/"
   - "api-ugc/"
   - "peer/"

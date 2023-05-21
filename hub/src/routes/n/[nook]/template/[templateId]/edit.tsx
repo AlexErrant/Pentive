@@ -28,12 +28,8 @@ import {
   closeBracketsKeymap,
 } from "@codemirror/autocomplete"
 import { lintKeymap } from "@codemirror/lint"
-import {
-  type NookId,
-  type RemoteTemplateId,
-  type RemoteTemplate,
-  getTemplate,
-} from "shared"
+import { type NookId, type RemoteTemplateId, type RemoteTemplate } from "shared"
+import { getTemplate } from "shared-edge"
 import {
   type JSX,
   onMount,
@@ -47,7 +43,7 @@ import { type RouteDataArgs, useRouteData } from "solid-start"
 import { createServerData$ } from "solid-start/server"
 import { html } from "@codemirror/lang-html"
 import ResizingIframe from "~/components/resizingIframe"
-import { type ClozeTemplate, type StandardTemplate } from "shared/src/cardHtml"
+import { type ClozeTemplate, type StandardTemplate } from "shared-dom"
 import { type SetStoreFunction, createStore } from "solid-js/store"
 import { cwaClient } from "~/routes/cwaClient"
 import { remoteToTemplate } from "~/lib/utility"

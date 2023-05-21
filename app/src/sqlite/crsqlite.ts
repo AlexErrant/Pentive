@@ -1,5 +1,5 @@
 import sqliteWasm, { type DB as crDB } from "@vlcn.io/crsqlite-wasm"
-import { initSql, wholeDbReplicator } from "shared"
+import { initSql } from "shared"
 import { lrpc } from "../lrpcClient"
 import { stringify as uuidStringify } from "uuid"
 import { type DB } from "./database"
@@ -7,6 +7,7 @@ import { type CRDatabase, CRDialect } from "./dialect"
 import { Kysely } from "kysely"
 import crsqliteUrl from "@vlcn.io/crsqlite-wasm/crsqlite.wasm?url"
 import wdbRtc from "./wholeDbRtc"
+import { wholeDbReplicator } from "shared-dom"
 
 let myDatabase: Promise<crDB> | null = null
 let myCrRtc: Awaited<ReturnType<typeof wdbRtc>> | null = null

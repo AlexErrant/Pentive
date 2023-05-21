@@ -11,15 +11,8 @@
 import { Hono } from "hono"
 import { cors } from "hono/cors"
 import { type Env, type ApiUgcContext } from "./util"
-import {
-  hstsName,
-  hstsValue,
-  type Base64,
-  setKysely,
-  lookupMediaHash,
-  binary16fromBase64URL,
-  parsePublicToken,
-} from "shared"
+import { hstsName, hstsValue, type Base64, parsePublicToken } from "shared"
+import { setKysely, lookupMediaHash, binary16fromBase64URL } from "shared-edge"
 import { appRouter } from "./router"
 import { fetchRequestHandler } from "@trpc/server/adapters/fetch"
 import { createContext } from "./trpc"

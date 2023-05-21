@@ -1,7 +1,7 @@
 import { z } from "zod"
-import { type PluginVersion, type PluginName } from "./brand.js"
+import type { PluginVersion, PluginName } from "shared"
 import { TarReader } from "./tar.js"
-import { throwExp } from "./utility"
+import { throwExp } from "shared"
 
 export interface Plugin {
   readonly name: PluginName
@@ -18,6 +18,14 @@ const packageJsonValidator = z.object({
   version: z.string() as unknown as z.Schema<PluginVersion>,
   pentivePluginDependencies: z.string().optional(),
 })
+
+// copied from cloudflare's definition. Use until this gets a better answer https://stackoverflow.com/q/75754724
+declare class DecompressionStream extends TransformStream<
+  ArrayBuffer | ArrayBufferView,
+  Uint8Array
+> {
+  constructor(format: "gzip" | "deflate" | "deflate-raw")
+}
 
 async function getTarReader(blob: Blob) {
   const decompressedStream = (

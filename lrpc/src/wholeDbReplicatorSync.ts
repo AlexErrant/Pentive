@@ -1,7 +1,19 @@
 import { type DB } from "@vlcn.io/xplat-api"
 import { parse as uuidParse, stringify as uuidStringify } from "uuid"
-import { type Changeset } from "./wholeDbReplicator.js"
 type SiteIDWire = string
+type CID = string
+type QuoteConcatedPKs = string | number
+type TableName = string
+type Version = number | string
+export type Changeset = [
+  TableName,
+  QuoteConcatedPKs,
+  CID,
+  unknown,
+  Version,
+  Version,
+  SiteIDWire
+]
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
 const isDebug = (globalThis as any).__vlcn_whole_db_dbg

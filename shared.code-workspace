@@ -1,0 +1,13 @@
+{
+    "folders": [
+        {
+            "path": "shared"
+        },
+        {
+            "path": "shared-dom"
+        },
+        {
+            "path": "shared-edge"
+        }
+    ]
+}

@@ -1,6 +1,6 @@
 import { freeze } from "immer"
 import type { PentiveElement } from "./customElements/registry"
-import { blobToBase64, type Plugin } from "shared"
+import { blobToBase64, type Plugin } from "shared-dom"
 import {
   defaultContainer,
   type Container,

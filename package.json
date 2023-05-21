@@ -25,6 +25,6 @@
     "eslint": "pnpm --parallel --no-bail -r eslint --max-warnings 0",
     "eslint:fix": "pnpm --parallel --no-bail -r eslint:fix --max-warnings 0",
     "typecheck+eslint+test": "concurrently -p \"[{name}]\" -n \"lint,type,test\" -c \"bgBlue.bold,bgMagenta.bold,bgGreen.bold\" \"pnpm eslint\" \"pnpm type:check\" \"pnpm test\"",
-    "test": "pnpm --filter shared test:run"
+    "test": "pnpm --filter shared-dom test:run"
   }
 }

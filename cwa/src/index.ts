@@ -17,17 +17,19 @@ import {
   base64,
   type Base64,
   type Base64Url,
+  type NoteId,
+  type UserId,
+  type TemplateId,
+  iByEntityIdsValidator,
+} from "shared"
+import {
   setKysely,
   db,
   fromBase64Url,
   fromBase64,
-  type NoteId,
   userOwnsNoteAndHasMedia,
-  type UserId,
-  type TemplateId,
   userOwnsTemplateAndHasMedia,
-  iByEntityIdsValidator,
-} from "shared"
+} from "shared-edge"
 import { connect } from "@planetscale/database"
 import { buildPrivateToken } from "./privateToken"
 import { appRouter } from "./router"

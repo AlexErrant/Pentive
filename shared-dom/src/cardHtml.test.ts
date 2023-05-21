@@ -1,10 +1,8 @@
 import { defaultRenderContainer } from "./renderContainer"
 import { describe, expect, test } from "vitest"
-import { type TemplateId, type Ord } from "./brand"
-import { throwExp } from "./utility"
+import { type TemplateId, type Ord, type Template, type Note } from "shared"
+import { throwExp } from "shared"
 import { noteOrds, strip, toSampleCard, toSampleNote } from "./cardHtml"
-import { type Template } from "./domain/template"
-import { type Note } from "./domain/note"
 
 function buildTemplate(
   fieldValues: Array<readonly [string, string]>,

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import type { ColumnType } from "kysely"
-import type { DbId, NookId } from "./brand"
+import type { DbId, NookId } from "shared"
 
 export type Generated<T> = T extends ColumnType<infer S, infer I, infer U>
   ? ColumnType<S, I | undefined, U>

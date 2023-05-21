@@ -1,6 +1,6 @@
 import { Show, type JSX } from "solid-js"
 import { FormError, type RouteDataArgs, useRouteData } from "solid-start"
-import { insertPost, ulidAsHex } from "shared"
+import { insertPost, ulidAsHex } from "shared-edge"
 import {
   createServerAction$,
   createServerData$,

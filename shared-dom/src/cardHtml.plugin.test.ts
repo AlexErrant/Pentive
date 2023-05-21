@@ -4,12 +4,11 @@ import {
   type Ord,
   type PluginName,
   type PluginVersion,
-} from "./brand.js"
-import { type Plugin } from "./plugin"
-import { registerPluginServices } from "./pluginManager"
+  type Template,
+} from "shared"
+import { type Plugin } from "./plugin.js"
+import { registerPluginServices } from "./pluginManager.js"
 import { strip } from "./cardHtml"
-import { ulidAsBase64Url } from "./convertBinary"
-import { type Template } from "./domain/template.js"
 
 function expectStrippedToBe(html: string, expected: string): void {
   const newline = /[\r\n]/g
@@ -40,7 +39,7 @@ function buildPlugin(src: string): Plugin {
     script: new Blob([src], {
       type: "text/javascript",
     }),
-    name: ulidAsBase64Url() as string as PluginName,
+    name: "somePluginName" as string as PluginName,
     version: "0.0.0" as PluginVersion,
     created: new Date(),
     updated: new Date(),
