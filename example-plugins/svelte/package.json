@@ -13,7 +13,7 @@
     "preview": "vite preview",
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "type:emitCheck": "pnpm --filter shared type:emit && pnpm --filter app type:emit && pnpm type:check",
-    "type:check": "tsc --noEmit",
+    "type:check": "tsc",
     "eslint": "eslint . --ignore-path .gitignore",
     "eslint:fix": "eslint . --fix --ignore-path .gitignore",
     "prettier": "prettier --check .",

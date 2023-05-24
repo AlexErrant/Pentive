@@ -9,7 +9,7 @@
   "exports": "./src/index.ts",
   "scripts": {
     "type:emit": "tsc --emitDeclarationOnly",
-    "type:check": "tsc --noEmit",
+    "type:check": "tsc",
     "eslint": "eslint . --ignore-path .gitignore",
     "eslint:fix": "eslint . --fix --ignore-path .gitignore",
     "prettier": "prettier --check .",

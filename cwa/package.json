@@ -13,7 +13,7 @@
     "dev": "wrangler dev",
     "deploy": "wrangler publish",
     "build": "wrangler publish ./src/index.ts --dry-run --outdir dist",
-    "type:check": "tsc --noEmit",
+    "type:check": "tsc",
     "type:emitCheck": "pnpm --filter shared type:emit && pnpm type:check",
     "eslint": "eslint . --ignore-path .gitignore",
     "eslint:fix": "eslint . --fix --ignore-path .gitignore"
