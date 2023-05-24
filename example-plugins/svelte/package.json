@@ -12,8 +12,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "check": "svelte-check --tsconfig ./tsconfig.json",
-    "type:emitCheck": "pnpm --filter shared type:emit && pnpm --filter app type:emit && pnpm type:check",
-    "type:check": "tsc",
+    "tsc-build": "tsc --build",
     "eslint": "eslint . --ignore-path .gitignore",
     "eslint:fix": "eslint . --fix --ignore-path .gitignore",
     "prettier": "prettier --check .",
@@ -31,7 +30,7 @@
     "tslib": "^2.4.0",
     "typescript": "~5.0.4",
     "vite": "^4.1.4"
-  }, 
+  },
   "dependencies": {
     "app": "workspace:*"
   }

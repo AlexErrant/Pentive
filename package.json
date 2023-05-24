@@ -20,13 +20,10 @@
     "//dev": "If you get `Error: EMFILE: too many open files...`, running all 3 options here https://stackoverflow.com/a/60881735 and restarting WSL worked for me",
     "build": "concurrently  --kill-others-on-fail -p \"[{name}]\" -n \"app,hub,app-ugc,hub-ugc,cwa,api-ugc\" -c \"bgBlue.bold,bgMagenta.bold,bgGreen.bold,bgYellow.bold,bgBlackBright.bold,bgCyan.bold\" \"pnpm --filter app build\"      \"pnpm --filter hub build\"      \"pnpm --filter app-ugc build\"      \"pnpm --filter hub-ugc build\"      \"pnpm --filter cwa build\"      \"pnpm --filter api-ugc build\"",
     "deploy": "concurrently                       -p \"[{name}]\" -n \"app,hub,app-ugc,hub-ugc,cwa,api-ugc\" -c \"bgBlue.bold,bgMagenta.bold,bgGreen.bold,bgYellow.bold,bgBlackBright.bold,bgCyan.bold\" \"pnpm --filter app run deploy\" \"pnpm --filter hub run deploy\" \"pnpm --filter app-ugc run deploy\" \"pnpm --filter hub-ugc run deploy\" \"pnpm --filter cwa run deploy\" \"pnpm --filter api-ugc run deploy\"",
-    "// type:emit": "On clean installs `type:emit` fails due to https://github.com/microsoft/TypeScript/issues/47663 or https://github.com/microsoft/TypeScript/issues/42873 but running it a second time works",
-    "type:emit": "pnpm --filter shared type:emit 1> /dev/null && pnpm --filter app type:emit 1> /dev/null || pnpm --filter shared type:emit && pnpm --filter app type:emit",
-    "type:check": "pnpm --parallel --no-bail -r type:check",
     "eslint": "pnpm --parallel --no-bail -r eslint --max-warnings 0",
     "eslint:fix": "pnpm --parallel --no-bail -r eslint:fix --max-warnings 0",
-    "typecheck+eslint+test": "concurrently -p \"[{name}]\" -n \"lint,type,test\" -c \"bgBlue.bold,bgMagenta.bold,bgGreen.bold\" \"pnpm eslint\" \"pnpm type:check\" \"pnpm test\"",
+    "eslint+test": "concurrently -p \"[{name}]\" -n \"lint,test\" -c \"bgBlue.bold,bgGreen.bold\" \"pnpm eslint\" \"pnpm test\"",
     "test": "pnpm --filter shared-dom test:run",
-    "tsc:build": "tsc --build"
+    "tsc-build": "tsc --build"
   }
 }

@@ -11,7 +11,7 @@
     "dev": "vite",
     "build": "vite build",
     "serve": "vite preview",
-    "type:check": "tsc",
+    "tsc-build": "tsc --build",
     "eslint": "eslint . --ignore-path .gitignore",
     "eslint:fix": "eslint . --fix --ignore-path .gitignore",
     "prettier": "prettier --check .",

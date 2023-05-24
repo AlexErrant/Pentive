@@ -47,7 +47,7 @@
     "rebuild-offline": "npm run build && npm run start-offline",
     "start-client": "yarn ts-node src/client.ts",
     "http-rest-client": "yarn ts-node src/payloadFormatVersionClient.ts",
-    "type:check": "tsc",
+    "tsc-build": "tsc --build",
     "eslint": "eslint . --ignore-path .gitignore",
     "eslint:fix": "eslint . --fix --ignore-path .gitignore",
     "prettier": "prettier --check .",

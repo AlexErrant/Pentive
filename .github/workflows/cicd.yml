@@ -26,11 +26,11 @@ jobs:
       - name: pnpm install
         run: pnpm install
 
-      - name: type:emit
-        run: pnpm type:emit
+      - name: tsc-build
+        run: pnpm tsc-build
 
-      - name: typecheck + eslint + test
-        run: pnpm typecheck+eslint+test
+      - name: eslint + test
+        run: pnpm eslint+test
 
       - name: envsubst
         env:
