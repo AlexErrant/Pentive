@@ -11,6 +11,7 @@ const cid = z.string()
 const val = z.any()
 const version = z.string().or(z.number())
 const siteIdWire = z.string()
+export type * from "@trpc/server"
 
 const changeSet = z.tuple([
   tableName,

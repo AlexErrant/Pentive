@@ -2,6 +2,8 @@ import { z } from "zod"
 import { authedProcedure } from "./trpc"
 import { createRemoteTemplate, editRemoteTemplate } from "shared"
 import { editTemplates, insertTemplates } from "shared-edge"
+// eslint-disable-next-line @typescript-eslint/no-unused-vars -- needed for the emitted types
+import type * as edge from "shared-edge"
 
 export const templateRouter = {
   createTemplates: authedProcedure

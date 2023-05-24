@@ -34,6 +34,7 @@ import { binary16fromBase64URL, ulidAsHex, ulidAsRaw } from "./convertBinary.js"
 import { nullMap, parseMap, stringifyMap, throwExp, undefinedMap } from "shared"
 import { base16, base64url } from "@scure/base"
 import { compile } from "html-to-text"
+export type * from "kysely"
 
 const convert = compile({})
 

@@ -35,6 +35,8 @@ import { buildPrivateToken } from "./privateToken"
 import { appRouter } from "./router"
 import { fetchRequestHandler } from "@trpc/server/adapters/fetch"
 import { createContext } from "./trpc"
+export type * from "@trpc/server"
+export type * from "shared-edge"
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const app = new Hono<{ Bindings: Env }>()
