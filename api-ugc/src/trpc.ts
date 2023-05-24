@@ -2,7 +2,7 @@ import { initTRPC } from "@trpc/server"
 import superjson from "superjson"
 
 //  eslint-disable-next-line @typescript-eslint/no-empty-interface
-interface Context {}
+export interface Context {}
 
 export function createContext(): Context {
   return {}

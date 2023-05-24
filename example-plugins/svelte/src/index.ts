@@ -1,4 +1,4 @@
-import type { Container, PluginExports } from "../../../app/src/services"
+import type { Container, PluginExports } from "app/src/services"
 import App from "./App.svelte"
 
 function clozeTemplateRegex(c: Container): RegExp {

@@ -15,11 +15,11 @@ provider:
 
 functions:
   http-api:
-    handler: .build/src/lambdaHandler.handler
+    handler: dist/src/lambdaHandler.handler
     events:
       - httpApi: "*"
   rest-api:
-    handler: .build/src/lambdaHandler.handler
+    handler: dist/src/lambdaHandler.handler
     events:
       - http:
           path: /{proxy+}

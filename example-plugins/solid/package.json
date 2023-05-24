@@ -27,6 +27,7 @@
     "vite-plugin-solid": "^2.7.0"
   },
   "dependencies": {
+    "app": "workspace:*",
     "solid-element": "^1.7.0",
     "solid-js": "^1.7.3"
   }

@@ -1,4 +1,5 @@
 {
+  "extends": "../tsconfig.options.json",
   "compilerOptions": {
     "strict": true,
     "target": "ES2021",
@@ -16,6 +17,26 @@
     ],
     "composite": true,
     "declaration": true,
-    "outDir": "dist"
-  }
+    "outDir": "dist",
+  },
+  "references": [
+    {
+      "path": "../api-ugc"
+    },
+    {
+      "path": "../cwa"
+    },
+    {
+      "path": "../lrpc"
+    },
+    {
+      "path": "../shared"
+    },
+    {
+      "path": "../shared-dom"
+    },
+    {
+      "path": "../shared-edge"
+    },
+  ],
 }

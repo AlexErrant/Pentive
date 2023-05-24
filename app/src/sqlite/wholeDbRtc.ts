@@ -201,7 +201,7 @@ export class WholeDbRtc implements PokeProtocol {
     }
   }
 
-  private _connectionsChanged() {
+  _connectionsChanged() {
     this.onConnectionsChanged != null &&
       this.onConnectionsChanged(
         this.pendingConnections,
@@ -211,45 +211,45 @@ export class WholeDbRtc implements PokeProtocol {
 }
 
 class WholeDbRtcPublic {
-  private readonly listeners = new Set<
+  readonly _listeners = new Set<
     (pending: SiteIDWire[], established: SiteIDWire[]) => void
   >()
 
-  constructor(private readonly wdbrtc: WholeDbRtc) {
-    wdbrtc.onConnectionsChanged = this._connectionsChanged
+  constructor(readonly _wdbrtc: WholeDbRtc) {
+    _wdbrtc.onConnectionsChanged = this._connectionsChanged
   }
 
   get siteId() {
-    return this.wdbrtc.siteId
+    return this._wdbrtc.siteId
   }
 
   connectTo(other: SiteIDWire) {
-    this.wdbrtc.connectTo(other)
+    this._wdbrtc.connectTo(other)
   }
 
   onConnectionsChanged(
     cb: (pending: SiteIDWire[], established: SiteIDWire[]) => void
   ) {
-    this.listeners.add(cb)
-    return () => this.listeners.delete(cb)
+    this._listeners.add(cb)
+    return () => this._listeners.delete(cb)
   }
 
   offConnectionsChanged(
     cb: (pending: SiteIDWire[], established: SiteIDWire[]) => void
   ) {
-    this.listeners.delete(cb)
+    this._listeners.delete(cb)
   }
 
   async schemaChanged() {
-    await this.wdbrtc.schemaChanged()
+    await this._wdbrtc.schemaChanged()
   }
 
-  private readonly _connectionsChanged = (
+  readonly _connectionsChanged = (
     pending: Map<SiteIDWire, DataConnection>,
     established: Map<SiteIDWire, DataConnection>
   ): void => {
     // notify listeners
-    for (const l of this.listeners) {
+    for (const l of this._listeners) {
       try {
         l([...pending.keys()], [...established.keys()])
       } catch (e) {
@@ -259,7 +259,7 @@ class WholeDbRtcPublic {
   }
 
   dispose(): void {
-    this.wdbrtc.dispose()
+    this._wdbrtc.dispose()
   }
 }
 

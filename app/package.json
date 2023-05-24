@@ -101,6 +101,7 @@
     "prosemirror-view": "^1.31.3",
     "shared": "workspace:*",
     "shared-dom": "workspace:*",
+    "shared-edge": "workspace:*",
     "solid-element": "^1.7.0",
     "solid-js": "^1.7.3",
     "sql.js": "^1.8.0",

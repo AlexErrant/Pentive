@@ -1,5 +1,8 @@
 {
+  "extends": "../../tsconfig.options.json",
   "compilerOptions": {
+    "emitDeclarationOnly": false,
+    "noEmit": true,
     "strict": true,
     "target": "ES2022",
     "module": "ESNext",
@@ -16,7 +19,7 @@
   },
   "references": [
     {
-      "path": "../../shared"
-    }
+      "path": "../../app"
+    },
   ],
 }

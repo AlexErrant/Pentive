@@ -10,6 +10,9 @@ importers:
       kill-port:
         specifier: ^2.0.1
         version: 2.0.1
+      typescript:
+        specifier: ~5.0.4
+        version: 5.0.4
       wrangler:
         specifier: ^2.16.0
         version: 2.16.0
@@ -158,6 +161,9 @@ importers:
       shared-dom:
         specifier: workspace:*
         version: link:../shared-dom
+      shared-edge:
+        specifier: workspace:*
+        version: link:../shared-edge
       solid-element:
         specifier: ^1.7.0
         version: 1.7.0(solid-js@1.7.3)
@@ -431,6 +437,9 @@ importers:
 
   example-plugins/solid:
     dependencies:
+      app:
+        specifier: workspace:*
+        version: link:../../app
       solid-element:
         specifier: ^1.7.0
         version: 1.7.0(solid-js@1.7.3)
@@ -452,6 +461,10 @@ importers:
         version: 2.7.0(solid-js@1.7.3)(vite@4.1.4)
 
   example-plugins/svelte:
+    dependencies:
+      app:
+        specifier: workspace:*
+        version: link:../../app
     devDependencies:
       '@sveltejs/vite-plugin-svelte':
         specifier: ^2.0.3

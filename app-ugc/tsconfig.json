@@ -1,5 +1,7 @@
 {
+  "extends": "../tsconfig.options.json",
   "compilerOptions": {
+    "outDir": "dist",
     "strict": true,
     "target": "ES2021",
     "module": "ESNext",
@@ -20,5 +22,13 @@
       "@cloudflare/workers-types",
       "vite/client",
     ]
-  }
+  },
+  "references": [
+    {
+      "path": "../app"
+    },
+    {
+      "path": "../shared"
+    },
+  ],
 }

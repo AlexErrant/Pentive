@@ -1,5 +1,8 @@
 {
+  "extends": "../tsconfig.options.json",
   "compilerOptions": {
+    "emitDeclarationOnly": false,
+    "noEmit": true,
     "target": "esnext",
     "module": "esnext",
     "lib": [
@@ -11,7 +14,6 @@
     "moduleResolution": "node",
     "strict": true,
     "skipLibCheck": true,
-    "noEmit": true,
     "esModuleInterop": true,
     "baseUrl": "./",
     "paths": {
@@ -24,5 +26,10 @@
     "src/**/*",
     "bindings.d.ts",
     "jest.config.ts"
-  ]
+  ],
+  "references": [
+    {
+      "path": "../shared",
+    }
+  ],
 }

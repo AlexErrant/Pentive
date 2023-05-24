@@ -56,3 +56,33 @@ async function addTsNoCheck(file) {
     console.log(JSON.stringify(ADDED_STR), "added into", file)
   }
 }
+
+const ADDED_STR_TYPE =
+  'import type * as StartServerTypes from "./StartServer";\n\n'
+const FILES_TYPE = ["node_modules/solid-start/entry-server/render.ts"]
+
+Promise.allSettled(FILES_TYPE.map(addTypeImport)).then((results) => {
+  let hasErrors = false
+
+  for (const result of results) {
+    if (result.status === "rejected") {
+      hasErrors = true
+      console.error(result.reason)
+    }
+  }
+
+  if (hasErrors) {
+    process.exit(1)
+  }
+})
+
+async function addTypeImport(file) {
+  const content = fs.readFileSync(file).toString()
+
+  if (content.includes(ADDED_STR_TYPE)) {
+    console.log(JSON.stringify(ADDED_STR_TYPE), "is already in", file)
+  } else {
+    fs.writeFileSync(file, ADDED_STR_TYPE + content)
+    console.log(JSON.stringify(ADDED_STR_TYPE), "added into", file)
+  }
+}

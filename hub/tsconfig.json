@@ -1,5 +1,7 @@
 {
+  "extends": "../tsconfig.options.json",
   "compilerOptions": {
+    "outDir": "dist",
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
@@ -17,5 +19,22 @@
         "./src/*"
       ]
     }
-  }
+  },
+  "references": [
+    {
+      "path": "../app"
+    },
+    {
+      "path": "../cwa"
+    },
+    {
+      "path": "../shared"
+    },
+    {
+      "path": "../shared-dom"
+    },
+    {
+      "path": "../shared-edge"
+    },
+  ]
 }

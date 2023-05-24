@@ -1,4 +1,5 @@
 {
+  "extends": "../tsconfig.options.json",
   "compilerOptions": {
     "strict": true,
     "target": "ES2021",
@@ -16,6 +17,11 @@
     "outDir": "dist",
     "lib": [
       "ES2022",
-    ]
-  }
+    ],
+  },
+  "references": [
+    {
+      "path": "../shared",
+    }
+  ],
 }

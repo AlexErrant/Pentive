@@ -9,6 +9,7 @@
   "devDependencies": {
     "concurrently": "^7.6.0",
     "kill-port": "^2.0.1",
+    "typescript": "~5.0.4",
     "wrangler": "^2.16.0"
   },
   "scripts": {
@@ -25,6 +26,7 @@
     "eslint": "pnpm --parallel --no-bail -r eslint --max-warnings 0",
     "eslint:fix": "pnpm --parallel --no-bail -r eslint:fix --max-warnings 0",
     "typecheck+eslint+test": "concurrently -p \"[{name}]\" -n \"lint,type,test\" -c \"bgBlue.bold,bgMagenta.bold,bgGreen.bold\" \"pnpm eslint\" \"pnpm type:check\" \"pnpm test\"",
-    "test": "pnpm --filter shared-dom test:run"
+    "test": "pnpm --filter shared-dom test:run",
+    "tsc:build": "tsc --build"
   }
 }

@@ -16,7 +16,7 @@
 <svelte:options tag={null} />
 
 <script lang="ts">
-  import type { NavLinkData } from "../../../app/src/custom-elements/contracts";
+  import type { NavLinkData } from "app/src/custom-elements/contracts";
   export let navLinks: NavLinkData[] = [];
 </script>
 
