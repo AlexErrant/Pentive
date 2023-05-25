@@ -1,0 +1,44 @@
+{
+  "extends": "../tsconfig.options.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "strict": true,
+    "target": "ES2021",
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "jsx": "preserve",
+    "jsxImportSource": "solid-js",
+    "lib": [
+      "WebWorker",
+      "DOM",
+      "DOM.Iterable",
+      "ES2021.String"
+    ],
+    "types": [
+      "@cloudflare/workers-types",
+      "vite/client",
+    ]
+  },
+  "references": [
+    // grep 18D6F474-350E-4C59-AD61-7604C5D0758F
+    // `app` has two possible compile outputs - dist and publish.
+    // (These names are scoped to this comment only - they aren't reflected anywhere else in code!)
+    // * dist is the output of `pnpm build` and is shipped to Cloudflare
+    // * publish is the output of `pnpm tsc-build` and is what's (eventually) published to npm
+    // CICD produces `publish` first using `tsconfig.json`. It then produces `dist` using `tsconfig.dist.json`
+    // Including the `app` reference below causes the build to complain with
+    //     Output file '/app/dist/src/index.d.ts' has not been built from source file '/app/src/index.tsx'.
+    // because the `dist` has been run. Someday I'll figure out how to split the compiled output folders.
+    // Today is not that day.
+    // {
+    //   "path": "../app"
+    // },
+    {
+      "path": "../shared"
+    },
+  ],
+}
