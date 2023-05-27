@@ -1,4 +1,3 @@
-import { customElement } from "solid-element"
 import type { Container, PluginExports } from "app/src/services"
 import { Nav } from "./nav"
 
@@ -32,17 +31,12 @@ const services = (c: Container): Partial<Container> => {
         return r
       }
     ),
+    nav: Nav,
   }
 }
 
 const exports: PluginExports = {
   services,
-  customElements: {
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    "pentive-nav": () => {
-      customElement("pentive-nav", { navLinks: [] }, Nav)
-    },
-  },
 }
 
 export default exports

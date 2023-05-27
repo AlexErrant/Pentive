@@ -18,7 +18,8 @@
     "prettier": "prettier --check .",
     "prettierw": "prettier --write .",
     "stylelint": "stylelint **/*.css",
-    "stylelintw": "stylelint **/*.css --fix"
+    "stylelintw": "stylelint **/*.css --fix",
+    "prepack": "pnpm build"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^2.0.3",

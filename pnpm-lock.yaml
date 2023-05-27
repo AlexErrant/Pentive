@@ -440,9 +440,6 @@ importers:
       app:
         specifier: workspace:*
         version: link:../../app
-      solid-element:
-        specifier: ^1.7.0
-        version: 1.7.0(solid-js@1.7.3)
       solid-js:
         specifier: ^1.7.3
         version: 1.7.3

@@ -4,7 +4,7 @@
   lowTODO improve the build https://www.thisdot.co/blog/web-components-with-svelte
  -->
 
- <!--
+<!--
   Change the tag's value below to `"pentive-nav"` to preview with `npm run dev`.
   I tried to register the component manually in a `preview.ts` script called from index.html,
   but I kept running into "Unrecoverable HMR error in <App>: next update will trigger a full reload"
@@ -13,18 +13,16 @@
   you to register the component lazily and explicitly, as demonstrated in `index.ts`.
 -->
 
-<svelte:options tag={null} />
-
 <script lang="ts">
-  import type { NavLinkData } from "app/lib/src/customElements/contracts";
-  export let navLinks: NavLinkData[] = [];
+  import type { NavLinkData } from "app/lib/src/customElements/contracts"
+  export let navLinks: NavLinkData[] = []
 </script>
 
 <nav>
   <ul>
-    {#each navLinks as {name, href}}
+    {#each navLinks as { name, href }}
       <li>
-        <a href={href}>
+        <a {href}>
           {name}
         </a>
       </li>

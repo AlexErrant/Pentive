@@ -4,9 +4,7 @@ import { type NavLinkData } from "./contracts"
 
 const ends = new Set(["/"])
 
-const Nav: VoidComponent<{ readonly navLinks: readonly NavLinkData[] }> = (
-  props
-) => {
+const Nav: VoidComponent<{ navLinks: NavLinkData[] }> = (props) => {
   const location = useLocation()
   return (
     <nav class="bg-gray-200 text-gray-900 px-4">

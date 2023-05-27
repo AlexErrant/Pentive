@@ -1,9 +1,13 @@
 import { defaultRenderContainer } from "shared-dom"
 import type { PentiveElement } from "./customElements/registry"
+import Nav from "./customElements/nav"
+
+export const domContainer = { nav: Nav }
 
 // the dependency injection container
 export const defaultContainer = {
   ...defaultRenderContainer,
+  ...domContainer,
   // todo - add other (non-render) services
 }
 

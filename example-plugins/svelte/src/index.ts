@@ -31,20 +31,20 @@ const services = (c: Container): Partial<Container> => {
         return r
       }
     ),
+    nav: (p) => {
+      const div = document.createElement("div")
+      // eslint-disable-next-line no-new -- svelte API requires that we side effect
+      new App({
+        target: div,
+        props: { navLinks: p.navLinks },
+      })
+      return div
+    },
   }
 }
 
 const exports: PluginExports = {
   services,
-  customElements: {
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    "pentive-nav": () => {
-      customElements.define(
-        "pentive-nav",
-        App as unknown as CustomElementConstructor // ¯\_(ツ)_/¯ as per https://svelte.dev/docs#run-time-custom-element-api:~:text=customElements.define(%27my%2Delement%27%2C%20MyElement)%3B
-      )
-    },
-  },
 }
 
 export default exports

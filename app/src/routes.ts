@@ -7,7 +7,7 @@ import AboutData from "./pages/about.data"
 import TemplatesData from "./pages/templates.data"
 import { type NavLinkData } from "./customElements/contracts"
 
-export const navLinks: readonly NavLinkData[] = [
+export const navLinks: NavLinkData[] = [
   {
     name: "Home",
     href: "/",

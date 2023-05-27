@@ -17,7 +17,8 @@
     "prettier": "prettier --check .",
     "prettierw": "prettier --write .",
     "stylelint": "stylelint **/*.css",
-    "stylelintw": "stylelint **/*.css --fix"
+    "stylelintw": "stylelint **/*.css --fix",
+    "prepack": "pnpm build"
   },
   "license": "MIT",
   "devDependencies": {
@@ -28,7 +29,6 @@
   },
   "dependencies": {
     "app": "workspace:*",
-    "solid-element": "^1.7.0",
     "solid-js": "^1.7.3"
   }
 }
