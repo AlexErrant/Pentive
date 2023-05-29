@@ -46,7 +46,7 @@
       "path": "./tsconfig.node.json"
     },
     {
-      "path": "../../app"
+      "path": "../../app/tsconfig.lib.json"
     }
   ],
 }

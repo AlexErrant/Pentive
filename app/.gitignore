@@ -1,6 +1,7 @@
 node_modules
 dev-dist
 dist
+lib
 /test-results/
 /playwright-report/
 /playwright/.cache/

@@ -22,7 +22,7 @@
   },
   "references": [
     {
-      "path": "../app"
+      "path": "../app/tsconfig.lib.json"
     },
     {
       "path": "../cwa"

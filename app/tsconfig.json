@@ -39,4 +39,8 @@
       "path": "../shared-edge"
     },
   ],
+  "exclude": [
+    "lib",
+    "dist"
+  ]
 }
