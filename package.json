@@ -22,7 +22,7 @@
     "deploy": "concurrently                       -p \"[{name}]\" -n \"app,hub,app-ugc,hub-ugc,cwa,api-ugc\" -c \"bgBlue.bold,bgMagenta.bold,bgGreen.bold,bgYellow.bold,bgBlackBright.bold,bgCyan.bold\" \"pnpm --filter app run deploy\" \"pnpm --filter hub run deploy\" \"pnpm --filter app-ugc run deploy\" \"pnpm --filter hub-ugc run deploy\" \"pnpm --filter cwa run deploy\" \"pnpm --filter api-ugc run deploy\"",
     "eslint": "pnpm --parallel --no-bail -r eslint --max-warnings 0",
     "eslint:fix": "pnpm --parallel --no-bail -r eslint:fix --max-warnings 0",
-    "eslint+test": "concurrently -p \"[{name}]\" -n \"lint,test\" -c \"bgBlue.bold,bgGreen.bold\" \"pnpm eslint\" \"pnpm test\"",
+    "eslint+test": "concurrently -p \"[{name}]\" -n \"lint,test,check\" -c \"bgBlue.bold,bgGreen.bold,bgMagenta.bold\" \"pnpm eslint\" \"pnpm test\" \"pnpm --filter pentive-svelte-plugin-example check\"",
     "test": "pnpm --filter shared-dom test:run",
     "tsc-build": "tsc --build"
   }
