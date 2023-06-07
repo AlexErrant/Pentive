@@ -1,8 +1,9 @@
 import { defaultRenderContainer } from "shared-dom"
 import type { PentiveElement } from "./customElements/registry"
 import Nav from "./customElements/nav"
+import ExamplePlugin from "./customElements/examplePlugin"
 
-export const domContainer = { nav: Nav }
+export const domContainer = { nav: Nav, examplePlugin: ExamplePlugin }
 
 // the dependency injection container
 export const defaultContainer = {

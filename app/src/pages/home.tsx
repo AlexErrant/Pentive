@@ -1,5 +1,11 @@
 import { useRouteData } from "@solidjs/router"
-import { createEffect, createSignal, type JSX } from "solid-js"
+import {
+  createEffect,
+  createSignal,
+  type VoidComponent,
+  type JSX,
+  type Setter,
+} from "solid-js"
 import {
   sampleCard,
   type Card,
@@ -20,6 +26,7 @@ import { importAnki } from "./importer/importer"
 import { cwaClient, augcClient } from "../trpcClient"
 import { getDb } from "../sqlite/crsqlite"
 import Peers from "./peers"
+import { C } from ".."
 
 async function uploadTemplates(): Promise<void> {
   const newTemplates = await db.getNewTemplatesToUpload()
@@ -124,6 +131,30 @@ async function searchNotes(search: string): Promise<void> {
   console.log(searchBatch)
 }
 
+const PluginChild: VoidComponent<{
+  count: number
+  setCount: Setter<number>
+}> = (props) => {
+  return (
+    <div class="border rounded-lg p-1 m-1 border-gray-900">
+      <h1>My Plugin Baby</h1>
+      <button
+        class="border rounded-lg px-2 mx-2 border-gray-900"
+        onClick={() => props.setCount(props.count - 1)}
+      >
+        -
+      </button>
+      <output>Negative Count: {props.count * -1}</output>
+      <button
+        class="border rounded-lg px-2 mx-2 border-gray-900"
+        onClick={() => props.setCount(props.count + 1)}
+      >
+        +
+      </button>
+    </div>
+  )
+}
+
 export default function Home(): JSX.Element {
   const [count, setCount] = createSignal(1)
   const [search, setSearch] = createSignal("")
@@ -170,6 +201,13 @@ export default function Home(): JSX.Element {
         >
           +
         </button>
+      </div>
+      <div class="flex items-center space-x-2">
+        <C.examplePlugin
+          count={count()}
+          setCount={setCount}
+          child={PluginChild}
+        />
       </div>
       <div class="mt-4">
         <button
