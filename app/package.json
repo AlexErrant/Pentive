@@ -8,7 +8,7 @@
     "deploy": "./deploy.sh",
     "build": "vite build",
     "build-watch": "vite build --watch",
-    "serve": "vite preview",
+    "serve": "vite preview --mode development",
     "postinstall": "cp ../node_modules/.pnpm/node_modules/sql.js/dist/sql-wasm.wasm ./src/assets/sql-wasm.wasm",
     "tsc-build": "tsc --build",
     "eslint": "eslint . --ignore-path .gitignore",

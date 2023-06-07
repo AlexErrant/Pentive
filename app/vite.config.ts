@@ -1,10 +1,10 @@
-import { defineConfig } from "vite"
+import { defineConfig, type UserConfig } from "vite"
 import solidPlugin from "vite-plugin-solid"
 import checker from "vite-plugin-checker"
 import fs from "fs"
 import { VitePWA } from "vite-plugin-pwa"
 
-export default defineConfig(({ mode }) => {
+export default defineConfig(({ mode }: UserConfig) => {
   const keyPath = "./.cert/key.pem"
   const certPath = "./.cert/cert.pem"
   let key
