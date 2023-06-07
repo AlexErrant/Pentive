@@ -472,6 +472,9 @@ importers:
       eslint:
         specifier: ^8.38.0
         version: 8.38.0
+      solid-js:
+        specifier: ^1.7.3
+        version: 1.7.3
       svelte:
         specifier: ^3.55.1
         version: 3.55.1
@@ -14538,7 +14541,7 @@ packages:
       vite:
         optional: true
     dependencies:
-      vite: 4.1.4(@types/node@18.7.21)
+      vite: 4.1.4(@types/node@18.15.11)
 
   /vitest@0.29.2(jsdom@20.0.0):
     resolution: {integrity: sha512-ydK9IGbAvoY8wkg29DQ4ivcVviCaUi3ivuPKfZEVddMTenFHUfB8EEDXQV8+RasEk1ACFLgMUqAaDuQ/Nk+mQA==}
