@@ -351,12 +351,12 @@ function q(rawSql: string) {
 async function uploadMedia(
   event: Event & {
     currentTarget: HTMLInputElement
-    target: Element
+    target: HTMLInputElement
   }
 ): Promise<void> {
   const file =
     // My mental static analysis says to use `currentTarget`, but it seems to randomly be null, hence `target`. I'm confused but whatever.
-    (event.target as HTMLInputElement).files?.item(0) ??
+    event.target.files?.item(0) ??
     throwExp("Impossible - there should be a file selected")
   await db.bulkAddMedia([
     {

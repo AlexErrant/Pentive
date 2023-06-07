@@ -8,17 +8,6 @@ const Nav: VoidComponent<{ navLinks: NavLinkData[] }> = (props) => {
   const location = useLocation()
   return (
     <nav class="bg-gray-200 text-gray-900 px-4">
-      {/* this iframe exists to make ensure app-ugc's service worker is cached, so that app may be taken offline at any time */}
-      <iframe
-        hidden
-        style={{
-          width: "0",
-          height: "0",
-          border: "none",
-          position: "absolute",
-        }}
-        src={import.meta.env.VITE_APP_UGC_ORIGIN}
-      />
       <ul class="flex items-center">
         <For each={props.navLinks}>
           {({ href, name }) => (
