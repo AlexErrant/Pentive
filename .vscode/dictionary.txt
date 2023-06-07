@@ -20,6 +20,7 @@ idempotency
 iframe
 iframes
 immer
+importmap
 keymap
 kysely
 lrpc

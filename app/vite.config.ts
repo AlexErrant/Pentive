@@ -42,6 +42,12 @@ export default defineConfig(({ mode }: UserConfig) => {
     },
     build: {
       target: "esnext",
+      rollupOptions: {
+        external: [
+          "solid-js",
+          "solid-js/web"
+        ],
+      },
     },
     server: {
       port: 3013,

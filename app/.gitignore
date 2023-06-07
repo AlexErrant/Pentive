@@ -10,3 +10,5 @@ env.sh
 .env.development
 .env.production
 src/assets/sql-wasm.wasm
+public/assets/solid.js
+public/assets/solidWeb.js

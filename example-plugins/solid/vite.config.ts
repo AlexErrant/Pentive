@@ -9,6 +9,12 @@ export default defineConfig({
   build: {
     minify: false,
     target: "esnext",
+    rollupOptions: {
+      external: [
+        "solid-js",
+        "solid-js/web"
+      ],
+    },
     lib: {
       entry: "src/index.ts",
       fileName: "index",
