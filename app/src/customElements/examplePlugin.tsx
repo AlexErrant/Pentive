@@ -8,7 +8,7 @@ const ExamplePlugin: VoidComponent<{
 }> = (props) => {
   return (
     <div class="border rounded-lg p-1 m-1 border-gray-900">
-      <h1>Example Plugin</h1>
+      <h1>Default Plugin Placeholder</h1>
       <button
         class="border rounded-lg px-2 mx-2 border-gray-900"
         onClick={() => props.setCount(props.count - 2)}

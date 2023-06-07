@@ -10,10 +10,7 @@ export default defineConfig({
     minify: false,
     target: "esnext",
     rollupOptions: {
-      external: [
-        "solid-js",
-        "solid-js/web"
-      ],
+      external: ["solid-js", "solid-js/web"],
     },
     lib: {
       entry: "src/index.ts",

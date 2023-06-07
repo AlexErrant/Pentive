@@ -1,5 +1,6 @@
 import type { Container, PluginExports } from "app/src/services"
 import { Nav } from "./nav"
+import ExamplePlugin from "./examplePlugin"
 
 function clozeTemplateRegex(c: Container): RegExp {
   return new RegExp(
@@ -32,6 +33,7 @@ const services = (c: Container): Partial<Container> => {
       }
     ),
     nav: Nav,
+    examplePlugin: ExamplePlugin,
   }
 }
 
