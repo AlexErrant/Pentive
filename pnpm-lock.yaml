@@ -164,9 +164,6 @@ importers:
       shared-edge:
         specifier: workspace:*
         version: link:../shared-edge
-      solid-element:
-        specifier: ^1.7.0
-        version: 1.7.0(solid-js@1.7.3)
       solid-js:
         specifier: ^1.7.3
         version: 1.7.3
@@ -7002,10 +6999,6 @@ packages:
     resolution: {integrity: sha512-Rd3se6QB+sO1TwqZjscQrurpEPIfO0/yYnSin6Q/rD3mOutHvUrCAhJub3r90uNb+SESBuE0QYoB90YdfatsRg==}
     dev: true
 
-  /component-register@0.8.3:
-    resolution: {integrity: sha512-/0u8ov0WPWi2FL78rgB9aFOcfY8pJT4jP/l9NTOukGNLVQ6hk35sEJE1RkEnNQU3yk48Qr7HlDQjRQKEVfgeWg==}
-    dev: false
-
   /compress-commons@4.1.1:
     resolution: {integrity: sha512-QLdDLCKNV2dtoTorqgxngQCMA+gWXkM/Nwu7FpeBhk/RdkzimqC3jueb/FDmaZeXh+uby1jkBqE3xArsLBE5wQ==}
     engines: {node: '>= 10'}
@@ -12910,15 +12903,6 @@ packages:
       is-fullwidth-code-point: 4.0.0
     dev: true
 
-  /solid-element@1.7.0(solid-js@1.7.3):
-    resolution: {integrity: sha512-VUMNqunL3acgtpqbiI9bbUwOyXyz9cAHvGy1Zki1znx+gZJYFgjzckpjpTb2u/Gxud8LSYL+LRTgMGIHdUY4bg==}
-    peerDependencies:
-      solid-js: ^1.7.0
-    dependencies:
-      component-register: 0.8.3
-      solid-js: 1.7.3
-    dev: false
-
   /solid-js@1.7.3:
     resolution: {integrity: sha512-4hwaF/zV/xbNeBBIYDyu3dcReOZBECbO//mrra6GqOrKy4Soyo+fnKjpZSa0nODm6j1aL0iQRh/7ofYowH+jzw==}
     dependencies:
@@ -14541,7 +14525,7 @@ packages:
       vite:
         optional: true
     dependencies:
-      vite: 4.1.4(@types/node@18.15.11)
+      vite: 4.1.4(@types/node@18.7.21)
 
   /vitest@0.29.2(jsdom@20.0.0):
     resolution: {integrity: sha512-ydK9IGbAvoY8wkg29DQ4ivcVviCaUi3ivuPKfZEVddMTenFHUfB8EEDXQV8+RasEk1ACFLgMUqAaDuQ/Nk+mQA==}

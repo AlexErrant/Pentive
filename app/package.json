@@ -101,7 +101,6 @@
     "shared": "workspace:*",
     "shared-dom": "workspace:*",
     "shared-edge": "workspace:*",
-    "solid-element": "^1.7.0",
     "solid-js": "^1.7.3",
     "sql.js": "^1.8.0",
     "superjson": "^1.12.2",
