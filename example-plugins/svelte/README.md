@@ -1,5 +1,7 @@
 Plugins are NPM packages. Build and package with `pnpm build && npm pack`.
 
+`pnpm dev` doesn't give you a friendly preview. At least, the nested SolidJS component doesn't sync state. I started to work on this on the [svelte-preview-wip](https://github.com/AlexErrant/Pentive/tree/svelte-preview-wip) branch, but realized that I need the _root_ application to be Solid; not Svelte. See [this repo](https://github.com/AlexErrant/solid-plugin-host) for a working example/proof of concept. medTODO actually finish the work.
+
 # Svelte + TS + Vite
 
 This template should help get you started developing with Svelte and TypeScript in Vite.
