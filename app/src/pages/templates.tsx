@@ -1,5 +1,5 @@
 import { type JSX } from "solid-js"
-import TemplatesTable from "../customElements/templatesTable"
+import TemplatesTable from "../components/templatesTable"
 import type TemplatesData from "./templates.data"
 import { useRouteData } from "@solidjs/router"
 

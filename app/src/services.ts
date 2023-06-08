@@ -1,7 +1,7 @@
 import { defaultRenderContainer } from "shared-dom"
-import type { PentiveElement } from "./customElements/registry"
-import Nav from "./customElements/nav"
-import ExamplePlugin from "./customElements/examplePlugin"
+import type { PentiveElement } from "./components/registry"
+import Nav from "./components/nav"
+import ExamplePlugin from "./components/examplePlugin"
 
 export const domContainer = { nav: Nav, examplePlugin: ExamplePlugin }
 

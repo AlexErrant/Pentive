@@ -1,7 +1,7 @@
 // todo - investigate a less trash build setup. https://www.reddit.com/r/solidjs/comments/gym0ed/bundling_a_web_components/
 
 import { For, type VoidComponent } from "solid-js"
-import { type NavLinkData } from "app/src/customElements/contracts"
+import { type NavLinkData } from "app/src/components/contracts"
 
 export const Nav: VoidComponent<{ navLinks: NavLinkData[] }> = (props) => {
   return (

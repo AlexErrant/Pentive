@@ -1,9 +1,9 @@
 import { createSignal, type JSX, Show } from "solid-js"
-import CardsTable from "../customElements/cardsTable"
+import CardsTable from "../components/cardsTable"
 import { type NoteCard } from "shared"
-import { CardsRemote } from "../customElements/cardsRemote"
-import { FieldsEditor } from "../customElements/fieldsEditor"
-import { CardsPreview } from "../customElements/cardsPreview"
+import { CardsRemote } from "../components/cardsRemote"
+import { FieldsEditor } from "../components/fieldsEditor"
+import { CardsPreview } from "../components/cardsPreview"
 
 export default function Cards(): JSX.Element {
   const [selected, setSelected] = createSignal<NoteCard>()

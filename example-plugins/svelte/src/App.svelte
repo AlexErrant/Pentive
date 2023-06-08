@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { NavLinkData } from "app/lib/src/customElements/contracts"
+  import type { NavLinkData } from "app/lib/src/components/contracts"
   export let navLinks: NavLinkData[] = []
 </script>
 
