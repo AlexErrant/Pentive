@@ -1,5 +1,4 @@
 import { defaultRenderContainer } from "shared-dom"
-import type { PentiveElement } from "./components/registry"
 import Nav from "./components/nav"
 import ExamplePlugin from "./components/examplePlugin"
 
@@ -16,5 +15,4 @@ export type Container = typeof defaultContainer
 
 export interface PluginExports {
   services?: (c: Container) => Partial<Container>
-  customElements?: Record<PentiveElement, () => void> // highTODO is this really the best name you can come up with
 }

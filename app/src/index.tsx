@@ -27,7 +27,7 @@ import { noteOrds } from "shared-dom"
 
 const plugins = await db.getPlugins()
 
-export const [C, registeredElements] = await registerPluginServices(plugins)
+export const C = await registerPluginServices(plugins)
 
 render(
   () => (

@@ -4,13 +4,6 @@
 // https://github.com/solidjs/solid/issues/616
 
 import type { Component } from "solid-js"
-import type Nav from "./nav"
-
-export interface HTMLElementTagNameMap {
-  "pentive-nav": typeof Nav
-}
-
-export type PentiveElement = keyof HTMLElementTagNameMap
 
 declare module "solid-js" {
   // eslint-disable-next-line @typescript-eslint/no-namespace
