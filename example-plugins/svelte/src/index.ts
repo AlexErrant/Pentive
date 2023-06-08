@@ -1,5 +1,5 @@
 import type { Container, PluginExports } from "app/lib/src/services"
-import App from "./App.svelte"
+import App from "./Nav.svelte"
 import { createEffect, type Setter, type VoidComponent } from "solid-js"
 import ExamplePlugin from "./ExamplePlugin.svelte"
 
@@ -52,7 +52,7 @@ const exports: PluginExports = {
 
 export default exports
 
-const examplePlugin: VoidComponent<{
+export const examplePlugin: VoidComponent<{
   count: number
   setCount: Setter<number>
   child: VoidComponent<{ count: number; setCount: Setter<number> }>

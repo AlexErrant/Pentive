@@ -1,0 +1,28 @@
+import { render, Dynamic } from "solid-js/web"
+import { type VoidComponent, createComponent } from "solid-js"
+
+import { type Setter } from "solid-js"
+
+const PluginChild: VoidComponent<{
+  count: number
+  setCount: Setter<number>
+}> = (props) => {
+  return (
+    <div class="border rounded-lg p-1 m-1 border-gray-900">
+      <h1>My Plugin Baby</h1>
+      <button
+        class="border rounded-lg px-2 mx-2 border-gray-900"
+        onClick={() => props.setCount(props.count - 1)}
+      >
+        -
+      </button>
+      <output>Negative Count: {props.count * -1}</output>
+      <button
+        class="border rounded-lg px-2 mx-2 border-gray-900"
+        onClick={() => props.setCount(props.count + 1)}
+      >
+        +
+      </button>
+    </div>
+  )
+}

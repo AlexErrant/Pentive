@@ -1,5 +1,10 @@
 <script lang="ts">
-  import type { Accessor, Setter, VoidComponent } from "solid-js"
+  import {
+    createEffect,
+    type Accessor,
+    type Setter,
+    type VoidComponent,
+  } from "solid-js"
   import { Dynamic } from "solid-js/web"
   import { onMount } from "svelte"
   export let solidProps: {
@@ -23,6 +28,7 @@
         return solidProps.child
       },
       get count() {
+        console.log("rerun count", count)
         return solidProps.count
       },
       get setCount() {
@@ -31,6 +37,13 @@
     }) as unknown as Accessor<Node> // https://github.com/solidjs/solid/issues/1763
     placeholder.replaceWith(dynamic())
   })
+  $: {
+    console.log("count", count)
+    createEffect(() => {
+      console.log("count solid", count)
+      solidProps.setCount(count)
+    })
+  }
 </script>
 
 <!-- medTODO not sure why `border-orange-500` isn't working, figure out later when it's time to learn CSS. grep B4197330-831F-4CD8-84F1-0CF7AE2FA22F -->
