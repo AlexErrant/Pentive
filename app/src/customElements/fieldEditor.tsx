@@ -25,11 +25,7 @@ export const FieldEditor: VoidComponent<{
   let editor: HTMLDivElement | undefined
   onMount(async () => {
     const doc = new DOMParser().parseFromString(props.value, "text/html")
-    await Promise.all(
-      Array.from(doc.images).map(async (i) => {
-        await updateImgSrc(i)
-      })
-    )
+    await Promise.all(Array.from(doc.images).map(updateImgSrc))
     // eslint-disable-next-line @typescript-eslint/no-unused-vars -- not sure wtf to do with editorView
     const editorView = new EditorView(editor!, {
       state: EditorState.create({
