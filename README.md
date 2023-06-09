@@ -4,7 +4,7 @@ A free, open source, offline-first [spaced repetition system](https://en.wikiped
 
 ## Plugins
 
-Pentive has an extremely powerful plugin system. There is literally no limit to modding the UI. Any default UI component (I'm using [SolidJS](https://www.solidjs.com/)) may be overwritten with a [custom element](https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_custom_elements). See [example plugins](./example-plugins/).
+Pentive's plugin system allows developers to directly modify the dependency injection container. Any UI component may be overwritten with a function that returns any DOM node. See [example plugins](./example-plugins/).
 
 ## Contributing
 

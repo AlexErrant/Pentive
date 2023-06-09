@@ -12,7 +12,7 @@ async function registerPluginService(
 ): Promise<Container> {
   const script = await blobToBase64(plugin.script)
   // A limitation of this import is that it won't resolve other files in the npmPackage.tgz
-  // Does addressing this even make sense? What if two plugins have a `react.js`?
+  // Does addressing this even make sense? How could one resolve relative file imports anyway?
   // Also, the Plugin table currently only stores a single `script` per Plugin. If we add support for more than 1 file,
   // we should consider storing the npmPackage.tgz in sqlite. However, generating npmPackage.tgz for tests (cardHtml.plugin.test.ts)
   // is *extremely* annoying, because we use DecompressionStream which only works in browsers,

@@ -8,7 +8,6 @@ export const domContainer = { nav: Nav, examplePlugin: ExamplePlugin }
 export const defaultContainer = {
   ...defaultRenderContainer,
   ...domContainer,
-  // todo - add other (non-render) services
 }
 
 export type Container = typeof defaultContainer
