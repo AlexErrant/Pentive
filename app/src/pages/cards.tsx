@@ -9,9 +9,6 @@ export default function Cards(): JSX.Element {
   const [selected, setSelected] = createSignal<NoteCard>()
   return (
     <>
-      <section class="bg-pink-100 text-gray-700 p-8">
-        <h1 class="text-2xl font-bold">Cards</h1>
-      </section>
       <CardsTable
         onSelectionChanged={(ncs) => {
           if (ncs.length > 0) {
