@@ -188,15 +188,21 @@ export class WholeDbRtc implements PokeProtocol {
   private _dataReceived(from: SiteIDWire, data: Msg) {
     switch (data.tag) {
       case "poke":
+        console.log(`Poking with v${data.version}...`)
         this._onPoked != null && this._onPoked(from, BigInt(data.version))
+        console.log(`Poked!`)
         break
       case "apply-changes":
+        console.log(`Applying ${data.changes.length} changes...`)
         this._onChangesReceived != null &&
           this._onChangesReceived(from, data.changes)
+        console.log("Applied changes!")
         break
       case "request-changes":
+        console.log("Requesting changes since", data.since)
         this._onChangesRequested != null &&
           this._onChangesRequested(from, BigInt(data.since))
+        console.log("Requested changes!")
         break
     }
   }
