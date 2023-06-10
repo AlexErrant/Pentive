@@ -1,3 +1,5 @@
+// I think this file can be deleted if/when lrpc actually starts to do real server-side syncing, since it looks like cr-sqlite now has https://github.com/vlcn-io/cr-sqlite/tree/main/js/packages/direct-connect-nodejs
+
 import type { DBAsync } from "@vlcn.io/xplat-api"
 import { parse as uuidParse, stringify as uuidStringify } from "uuid"
 type SiteIDWire = string

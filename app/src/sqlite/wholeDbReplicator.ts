@@ -295,14 +295,18 @@ export class WholeDbReplicator {
     const fromAsBlob = uuidParse(from)
     // The casting is due to bigint support problems in various wasm builds of sqlite
     const changes: Changeset[] = await this.db.execA<Changeset>(
-      `SELECT "table", "pk", "cid", "val", "col_version", "db_version", "site_id" FROM crsql_changes WHERE site_id != ? AND db_version > ?`,
+      `SELECT "table", "pk", "cid", "val", "col_version", "db_version", COALESCE("site_id", crsql_siteid()) FROM crsql_changes WHERE site_id IS NOT ? AND db_version > ?`,
       [fromAsBlob, since]
     )
 
     // TODO: temporary. better to `quote` out of db and `unquote` (to implement) into db
     // TODO: further complicated by https://github.com/rhashimoto/wa-sqlite/issues/69
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    changes.forEach((c) => (c[6] = uuidStringify(c[6] as any)))
+    changes.forEach((c) => {
+      // nextTODO create a repro for this bug
+      if (typeof c[6] === "string") return
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+      return (c[6] = uuidStringify(c[6] as any))
+    })
 
     if (changes.length === 0) {
       return
