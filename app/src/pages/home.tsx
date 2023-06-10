@@ -131,13 +131,13 @@ async function searchNotes(search: string): Promise<void> {
   console.log(searchBatch)
 }
 
-const PluginChild: VoidComponent<{
+const MyPluginBaby: VoidComponent<{
   count: number
   setCount: Setter<number>
 }> = (props) => {
   return (
     <div class="border rounded-lg p-1 m-1 border-gray-900">
-      <h1>My Plugin Baby</h1>
+      <h1>App's Child Component</h1>
       <button
         class="border rounded-lg px-2 mx-2 border-gray-900"
         onClick={() => props.setCount(props.count - 1)}
@@ -206,7 +206,7 @@ export default function Home(): JSX.Element {
         <C.examplePlugin
           count={count()}
           setCount={setCount}
-          child={PluginChild}
+          child={MyPluginBaby}
         />
       </div>
       <div class="mt-4">
