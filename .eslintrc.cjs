@@ -1,3 +1,24 @@
+const path = require("path")
+
+const project = [
+  "./tsconfig.json",
+  path.join(__dirname, "app/tsconfig.lib.json"),
+  path.join(__dirname, "app-ugc/tsconfig.json"),
+  path.join(__dirname, "hub/tsconfig.json"),
+  path.join(__dirname, "hub-ugc/tsconfig.json"),
+  path.join(__dirname, "lrpc/tsconfig.json"),
+  path.join(__dirname, "shared/tsconfig.json"),
+  path.join(__dirname, "shared-dom/tsconfig.json"),
+  path.join(__dirname, "shared-edge/tsconfig.json"),
+  path.join(__dirname, "cwa/tsconfig.json"),
+  path.join(__dirname, "api-ugc/tsconfig.json"),
+  path.join(__dirname, "peer/tsconfig.json"),
+  path.join(__dirname, "workers-test/tsconfig.json"),
+  path.join(__dirname, "workers-test/test/tsconfig.json"),
+  path.join(__dirname, "example-plugins/solid/tsconfig.json"),
+  path.join(__dirname, "example-plugins/svelte/tsconfig.json"),
+]
+
 /* eslint-env node */
 module.exports = {
   root: true,
@@ -23,7 +44,7 @@ module.exports = {
       plugins: ["@typescript-eslint", "solid"],
       parser: "@typescript-eslint/parser",
       parserOptions: {
-        project: ["./tsconfig.json", "./test/tsconfig.json"],
+        project,
       },
       rules: {
         "@typescript-eslint/explicit-function-return-type": "off",
@@ -84,7 +105,7 @@ module.exports = {
       plugins: ["@typescript-eslint"],
       parser: "@typescript-eslint/parser",
       parserOptions: {
-        project: "./tsconfig.json",
+        project,
       },
       rules: {
         "@typescript-eslint/no-non-null-assertion": "off",

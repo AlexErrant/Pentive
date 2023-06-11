@@ -44,5 +44,6 @@
         {
             "path": "example-plugins/svelte"
         },
+        // if adding or removing a project, also update the `./eslintrc.cjs`!
     ]
 }
