@@ -95,6 +95,17 @@ function entityToDomain(card: CardEntity): Card {
   return r
 }
 
+// https://stackoverflow.com/a/64489535
+const groupByToMap = <T, Q>(
+  array: T[],
+  predicate: (value: T, index: number, array: T[]) => Q
+) =>
+  array.reduce((map, value, index, array) => {
+    const key = predicate(value, index, array)
+    map.get(key)?.push(value) ?? map.set(key, [value])
+    return map
+  }, new Map<Q, T[]>())
+
 export const cardCollectionMethods = {
   upsertCard: async function (card: Card) {
     const db = await getKysely()
@@ -123,6 +134,8 @@ export const cardCollectionMethods = {
       .selectFrom("card")
       .innerJoin("note", "card.noteId", "note.id")
       .innerJoin("template", "template.id", "note.templateId")
+      .leftJoin("remoteNote", "note.id", "remoteNote.localId")
+      .leftJoin("remoteTemplate", "template.id", "remoteTemplate.localId")
       .select([
         "card.cardSettingId as card_cardSettingId",
         "card.created as card_created",
@@ -150,6 +163,14 @@ export const cardCollectionMethods = {
         "template.updated as template_updated",
         "template.name as template_name",
         "template.templateType as template_templateType",
+
+        "remoteTemplate.nook as remoteTemplateNook",
+        "remoteTemplate.remoteId as remoteTemplateId",
+        "remoteTemplate.uploadDate as remoteTemplateUploadDate",
+
+        "remoteNote.nook as remoteNoteNook",
+        "remoteNote.remoteId as remoteNoteId",
+        "remoteNote.uploadDate as remoteNoteUploadDate",
       ])
       .offset(offset)
       .limit(limit)
@@ -160,7 +181,10 @@ export const cardCollectionMethods = {
       .executeTakeFirstOrThrow()
     return {
       count: count.c,
-      noteCards: entities.map((tnc) => {
+      noteCards: Array.from(
+        groupByToMap(entities, (x) => x.card_id).values()
+      ).map((tncR) => {
+        const tnc = tncR[0]
         const note = noteEntityToDomain(
           {
             ankiNoteId: tnc.note_ankiNoteId,
@@ -171,7 +195,16 @@ export const cardCollectionMethods = {
             tags: tnc.note_tags,
             templateId: tnc.note_templateId,
           },
-          []
+          tncR
+            .filter((x) => x.remoteNoteNook != null)
+            .map((x) => ({
+              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+              remoteId: x.remoteNoteId!,
+              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+              nook: x.remoteNoteNook!,
+              uploadDate: x.remoteNoteUploadDate,
+              localId: x.note_id,
+            }))
         )
         const template = templateEntityToDomain(
           {
@@ -184,7 +217,16 @@ export const cardCollectionMethods = {
             name: tnc.template_name,
             templateType: tnc.template_templateType,
           },
-          []
+          tncR
+            .filter((x) => x.remoteTemplateNook != null)
+            .map((x) => ({
+              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+              remoteId: x.remoteTemplateId!,
+              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+              nook: x.remoteTemplateNook!,
+              uploadDate: x.remoteTemplateUploadDate,
+              localId: x.template_id,
+            }))
         )
         const card = entityToDomain({
           cardSettingId: tnc.card_cardSettingId,

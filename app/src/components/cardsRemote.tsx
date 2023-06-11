@@ -63,7 +63,8 @@ export const CardsRemote: VoidComponent<{
     { initialValue: [] }
   )
   return (
-    <>
+    <Show when={getRemotes().length !== 0}>
+      Remote Nooks:
       <For each={getRemotes()}>
         {(x) => (
           <li class="py-2 px-4">
@@ -84,6 +85,6 @@ export const CardsRemote: VoidComponent<{
           </li>
         )}
       </For>
-    </>
+    </Show>
   )
 }
