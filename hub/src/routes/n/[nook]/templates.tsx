@@ -1,11 +1,12 @@
 import { type Component, For, Show } from "solid-js"
 import { type RouteDataArgs, useRouteData, A } from "solid-start"
 import { createServerData$ } from "solid-start/server"
-import { type NookId, unproxify } from "shared"
+import { type NookId } from "shared"
 import { getTemplates } from "shared-edge"
 import ResizingIframe from "~/components/resizingIframe"
 import { getAppMessenger } from "~/root"
 import { remoteToTemplate } from "~/lib/utility"
+import { unwrap } from "solid-js/store"
 
 export function routeData({ params }: RouteDataArgs) {
   return {
@@ -36,7 +37,7 @@ const Threads: Component = () => {
                   <div>
                     <button
                       onClick={async () => {
-                        await getAppMessenger().addTemplate(unproxify(template))
+                        await getAppMessenger().addTemplate(unwrap(template))
                       }}
                     >
                       Download

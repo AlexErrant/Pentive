@@ -56,7 +56,6 @@ trpc
 typecheck
 ulids
 unhex
-unproxify
 upserted
 viewports
 vite

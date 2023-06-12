@@ -1,7 +1,7 @@
 import { type Component, For, Show, Suspense } from "solid-js"
 import { type RouteDataArgs, useRouteData } from "solid-start"
 import { createServerData$ } from "solid-start/server"
-import { type NookId, type RemoteNoteId, unproxify } from "shared"
+import { type NookId, type RemoteNoteId } from "shared"
 import { getNote, getNoteComments } from "shared-edge"
 import ResizingIframe from "~/components/resizingIframe"
 import NoteComment from "~/components/noteComment"
@@ -11,6 +11,7 @@ import { getUserId } from "~/session"
 import { getAppMessenger } from "~/root"
 import { noteOrds, noteOrdsRenderContainer, toSampleCard } from "shared-dom"
 import { remoteToNote, remoteToTemplate } from "~/lib/utility"
+import { unwrap } from "solid-js/store"
 
 export function routeData({ params }: RouteDataArgs) {
   return {
@@ -71,7 +72,7 @@ const Thread: Component = () => {
           </p>
           <button
             onClick={async () => {
-              await getAppMessenger().addNote(unproxify(data()!.note!), nook())
+              await getAppMessenger().addNote(unwrap(data()!.note!), nook())
               await cwaClient.subscribeToNote.mutate(data()!.note!.id)
             }}
             disabled={data()?.note?.til != null}

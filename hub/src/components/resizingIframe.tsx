@@ -1,13 +1,8 @@
 import { iframeResizer, type IFrameComponent } from "iframe-resizer"
 import { createEffect, onCleanup, type VoidComponent } from "solid-js"
 import * as Comlink from "comlink"
-import {
-  type Side,
-  unproxify,
-  type Template,
-  type Card,
-  type Note,
-} from "shared"
+import { type Side, type Template, type Card, type Note } from "shared"
+import { unwrap } from "solid-js/store"
 
 const targetOrigin = "*" // highTODO make more limiting. Also implement https://stackoverflow.com/q/8169582
 
@@ -37,7 +32,7 @@ const ResizingIframe: VoidComponent<{
   createEffect(() => {
     try {
       iframeReference.contentWindow!.postMessage(
-        { type: "pleaseRerender", i: unproxify(props.i) },
+        { type: "pleaseRerender", i: unwrap(props.i) },
         targetOrigin
       )
     } catch (error) {
@@ -54,7 +49,7 @@ const ResizingIframe: VoidComponent<{
       onLoad={(e) => {
         Comlink.expose(
           {
-            renderBodyInput: unproxify(props.i),
+            renderBodyInput: unwrap(props.i),
             resize: () => {
               ;(iframeReference as IFrameComponent)?.iFrameResizer?.resize()
             },

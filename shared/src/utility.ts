@@ -55,15 +55,3 @@ export function parseSet<T>(rawSet: string) {
   const parsed = JSON.parse(rawSet) as T[]
   return new Set(parsed)
 }
-
-// https://stackoverflow.com/a/69827802
-export function unproxify<T>(val: T): T {
-  if (val instanceof Array) return val.map(unproxify) as T
-  if (val instanceof Map) return new Map(val) as T
-  if (val instanceof Date) return new Date(val) as T
-  if (val instanceof Object)
-    return Object.fromEntries(
-      Object.entries(Object.assign({}, val)).map(([k, v]) => [k, unproxify(v)])
-    ) as T
-  return val
-}
