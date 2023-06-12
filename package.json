@@ -25,6 +25,8 @@
     "eslint+test": "concurrently -p \"[{name}]\" -n \"lint,test,check\" -c \"bgBlue.bold,bgGreen.bold,bgMagenta.bold\" \"pnpm eslint\" \"pnpm test\" \"pnpm --filter pentive-svelte-plugin-example check\"",
     "test": "pnpm --filter shared-dom test:run",
     "tsc-build": "tsc --build",
-    "tsc-clean": "rm -rf **/tsconfig.tsbuildinfo"
+    "tsc-clean": "rm -rf **/tsconfig.tsbuildinfo",
+    "//ci": "simulate cicd locally",
+    "ci": "git clean -xdf && pnpm i && pnpm tsc-build && pnpm eslint+test && ./mkenv.sh && ./rmcert.sh && ./mkcert.sh && pnpm build"
   }
 }
