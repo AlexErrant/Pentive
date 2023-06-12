@@ -100,7 +100,7 @@ export default function Submit(): JSX.Element {
       new EditorView({
         parent: frontRef,
         dispatch: (tr) => {
-          dispatch(tr, frontView()!, template, setTemplate, i()!)
+          dispatch("front", tr, frontView()!, template, setTemplate, i()!)
         },
       })
     )
@@ -108,7 +108,7 @@ export default function Submit(): JSX.Element {
       new EditorView({
         parent: backRef,
         dispatch: (tr) => {
-          dispatch(tr, backView()!, template, setTemplate, i()!)
+          dispatch("back", tr, backView()!, template, setTemplate, i()!)
         },
       })
     )
@@ -198,6 +198,7 @@ const basicSetup = [
 ]
 
 function dispatch(
+  side: "front" | "back",
   tr: Transaction,
   editorView: EditorView,
   template: TemplateStore,
@@ -213,7 +214,7 @@ function dispatch(
         "t",
         "templateType",
         "template",
-        "front",
+        side,
         newCode
       )
     } else {
@@ -222,7 +223,7 @@ function dispatch(
         "templateType",
         "templates",
         i,
-        "front",
+        side,
         newCode
       )
     }
