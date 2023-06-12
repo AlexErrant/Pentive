@@ -22,7 +22,7 @@ export function routeData({ params }: RouteDataArgs) {
 }
 
 const Threads: Component = () => {
-  const { data } = useRouteData<typeof routeData>()
+  const { data, nook } = useRouteData<typeof routeData>()
   return (
     <>
       <Show when={data()}>
@@ -58,7 +58,7 @@ const Threads: Component = () => {
                       index: 0,
                     }}
                   />
-                  <A href={`./template/${template.id}/edit`}>Edit</A>
+                  <A href={`/n/${nook()}/template/${template.id}/edit`}>Edit</A>
                 </li>
               )
             }}
