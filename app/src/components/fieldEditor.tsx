@@ -1,7 +1,11 @@
 import { onMount, type VoidComponent } from "solid-js"
-import { EditorState } from "prosemirror-state"
+import { EditorState, type Transaction } from "prosemirror-state"
 import { EditorView } from "prosemirror-view"
-import { Schema, DOMParser as ProseMirrorDOMParser } from "prosemirror-model"
+import {
+  DOMSerializer,
+  Schema,
+  DOMParser as ProseMirrorDOMParser,
+} from "prosemirror-model"
 import { schema } from "prosemirror-schema-basic"
 import { addListNodes } from "prosemirror-schema-list"
 import { exampleSetup } from "prosemirror-example-setup"
@@ -11,10 +15,19 @@ import "prosemirror-example-setup/style/style.css"
 import { type MediaId } from "shared"
 import { db } from "../db"
 import { blobToBase64 } from "shared-dom"
+import { type NoteCardView } from "../pages/cards"
+import { type SetStoreFunction } from "solid-js/store"
+
+const xmlSerializer = new XMLSerializer()
+const domSerializer = DOMSerializer.fromSchema(schema)
 
 export const FieldEditor: VoidComponent<{
   readonly field: string
   readonly value: string
+  readonly i: number
+  readonly setNoteCard: SetStoreFunction<{
+    selected?: NoteCardView
+  }>
 }> = (props) => {
   // Mix the nodes from prosemirror-schema-list into the basic schema to
   // create a schema with list support.
@@ -32,6 +45,20 @@ export const FieldEditor: VoidComponent<{
         doc: ProseMirrorDOMParser.fromSchema(mySchema).parse(doc),
         plugins: exampleSetup({ schema: mySchema }),
       }),
+      dispatchTransaction(this: EditorView, tr: Transaction) {
+        this.updateState(this.state.apply(tr))
+        if (tr.docChanged) {
+          const xml = domSerializer.serializeFragment(this.state.doc.content)
+          props.setNoteCard(
+            "selected",
+            "note",
+            "fieldValues",
+            props.i,
+            1,
+            xmlSerializer.serializeToString(xml)
+          )
+        }
+      },
     })
   })
   return (

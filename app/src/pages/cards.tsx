@@ -34,7 +34,7 @@ export default function Cards(): JSX.Element {
       />
       <Show when={selected.selected != null}>
         <CardsRemote noteCard={selected.selected!} />
-        <FieldsEditor noteCard={selected.selected!} />
+        <FieldsEditor noteCard={selected.selected!} setNoteCard={setSelected} />
         <CardsPreview noteCard={selected.selected!} />
       </Show>
     </>
