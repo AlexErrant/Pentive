@@ -55,3 +55,10 @@ export function parseSet<T>(rawSet: string) {
   const parsed = JSON.parse(rawSet) as T[]
   return new Set(parsed)
 }
+
+// https://stackoverflow.com/questions/51599481/replacing-property-of-a-typescript-type#comment134810492_72983690
+export type Override<T, U extends Partial<Record<keyof T, unknown>>> = Omit<
+  T,
+  keyof U
+> &
+  U

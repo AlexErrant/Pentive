@@ -1,9 +1,9 @@
 import { type VoidComponent } from "solid-js"
 import ResizingIframe from "./resizingIframe"
-import { type NoteCard } from "shared"
+import { type NoteCardView } from "../pages/cards"
 
 export const CardsPreview: VoidComponent<{
-  readonly noteCard: NoteCard
+  readonly noteCard: NoteCardView
 }> = (props) => {
   return (
     <>

@@ -6,13 +6,13 @@ import {
   type VoidComponent,
 } from "solid-js"
 import {
-  type NoteCard,
   type NookId,
   type NoteId,
   type RemoteNoteId,
   type RemoteTemplateId,
 } from "shared"
 import { db } from "../db"
+import { type NoteCardView } from "../pages/cards"
 
 function toggleNook(
   uploadable: boolean,
@@ -45,7 +45,7 @@ function toggleNook(
 }
 
 export const CardsRemote: VoidComponent<{
-  readonly noteCard: NoteCard
+  readonly noteCard: NoteCardView
 }> = (props) => {
   const [getRemotes, { mutate: setRemotes }] = createResource(
     () => props.noteCard,
