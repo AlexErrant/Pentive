@@ -1,5 +1,5 @@
 import { onMount, type VoidComponent } from "solid-js"
-import { EditorState, type Transaction } from "prosemirror-state"
+import { EditorState } from "prosemirror-state"
 import { EditorView } from "prosemirror-view"
 import {
   DOMSerializer,
@@ -92,6 +92,28 @@ const imageSpecSerializer: NodeSpec = {
   },
 }
 
+// Mix the nodes from prosemirror-schema-list into the basic schema to
+// create a schema with list support.
+const mySchema = new Schema({
+  nodes: addListNodes(schema.spec.nodes, "paragraph block*", "block").addToEnd(
+    "image",
+    imageSpec
+  ),
+  marks: schema.spec.marks,
+})
+const mySchemaSerializer = new Schema({
+  nodes: addListNodes(schema.spec.nodes, "paragraph block*", "block").addToEnd(
+    "image",
+    imageSpecSerializer
+  ),
+  marks: schema.spec.marks,
+})
+
+const xmlSerializer = new XMLSerializer()
+const domSerializer = DOMSerializer.fromSchema(mySchemaSerializer)
+const domParser = new DOMParser()
+const proseMirrorDOMParser = ProseMirrorDOMParser.fromSchema(mySchema)
+
 export const FieldEditor: VoidComponent<{
   readonly field: string
   readonly value: string
@@ -100,37 +122,17 @@ export const FieldEditor: VoidComponent<{
     selected?: NoteCardView
   }>
 }> = (props) => {
-  // Mix the nodes from prosemirror-schema-list into the basic schema to
-  // create a schema with list support.
-  const mySchema = new Schema({
-    nodes: addListNodes(
-      schema.spec.nodes,
-      "paragraph block*",
-      "block"
-    ).addToEnd("image", imageSpec),
-    marks: schema.spec.marks,
-  })
-  const mySchemaSerializer = new Schema({
-    nodes: addListNodes(
-      schema.spec.nodes,
-      "paragraph block*",
-      "block"
-    ).addToEnd("image", imageSpecSerializer),
-    marks: schema.spec.marks,
-  })
   let editor: HTMLDivElement | undefined
   onMount(async () => {
-    const doc = new DOMParser().parseFromString(props.value, "text/html")
+    const doc = domParser.parseFromString(props.value, "text/html")
     await Promise.all(Array.from(doc.images).map(updateImgSrc))
-    const xmlSerializer = new XMLSerializer()
-    const domSerializer = DOMSerializer.fromSchema(mySchemaSerializer)
     // eslint-disable-next-line @typescript-eslint/no-unused-vars -- not sure wtf to do with editorView
     const editorView = new EditorView(editor!, {
       state: EditorState.create({
-        doc: ProseMirrorDOMParser.fromSchema(mySchema).parse(doc),
+        doc: proseMirrorDOMParser.parse(doc),
         plugins: exampleSetup({ schema: mySchema }),
       }),
-      dispatchTransaction(this: EditorView, tr: Transaction) {
+      dispatchTransaction(this: EditorView, tr) {
         this.updateState(this.state.apply(tr))
         if (tr.docChanged) {
           const xml = domSerializer.serializeFragment(this.state.doc.content)
@@ -156,6 +158,19 @@ export const FieldEditor: VoidComponent<{
   )
 }
 
+/*
+  Displaying the field's value verbatim doesn't display images in ProseMirror because the src won't resolve.
+  Images are stored in the database, after all. There are a few solutions to this:
+  
+  1. Prefix all <img> srcs with a well known value (e.g. `/media`) and use app's service worker to intercept all `/media` requests
+     Cons: Passing image through service worker is slow.
+  2. Put ProseMirror in an iframe and give it a dedicated service worker, similar to app-ugc
+     Cons: iframes are slow. Passing image through service worker, then iframe is doubly slow. Some complexity with iframe sizing and message passing through an iframe.
+  3. Rewrite all <img> srcs to use data URLs for display and convert back to the standard URL upon persistance
+     Cons: When ProseMirror sets an <img> src attribute in `serializeFragment`, it makes a network request, filling console with 404s
+
+  I'm going with Option 3 for now due to speed of implementation and performance, but that might be something that I have to rewrite in the future.
+*/
 async function updateImgSrc(img: HTMLImageElement) {
   const src = img.getAttribute("src")
   if (src == null || src === "" || src.startsWith("http")) {
