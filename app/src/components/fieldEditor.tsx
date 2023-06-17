@@ -5,6 +5,7 @@ import {
   DOMSerializer,
   Schema,
   DOMParser as ProseMirrorDOMParser,
+  type NodeSpec,
 } from "prosemirror-model"
 import { schema } from "prosemirror-schema-basic"
 import { addListNodes } from "prosemirror-schema-list"
@@ -18,6 +19,41 @@ import { blobToBase64 } from "shared-dom"
 import { type NoteCardView } from "../pages/cards"
 import { type SetStoreFunction } from "solid-js/store"
 
+// c.f. https://github.com/ProseMirror/prosemirror-schema-basic/blob/cbd834fed35ce70c56a42d387fe1c3109187935e/src/schema-basic.ts#LL74-L94
+const imageSpec: NodeSpec = {
+  inline: true,
+  attrs: {
+    src: {},
+    alt: { default: null },
+    title: { default: null },
+  },
+  group: "inline",
+  draggable: true,
+  parseDOM: [
+    {
+      tag: "img[src]",
+      getAttrs(dom) {
+        dom = dom as HTMLElement
+        return {
+          src: dom.getAttribute("src"),
+          title: dom.getAttribute("title"),
+          alt: dom.getAttribute("alt"),
+        }
+      },
+    },
+  ],
+  toDOM(node) {
+    return [
+      "img",
+      {
+        src: node.attrs.src as string,
+        alt: node.attrs.alt as string,
+        title: node.attrs.title as string,
+      },
+    ]
+  },
+}
+
 export const FieldEditor: VoidComponent<{
   readonly field: string
   readonly value: string
@@ -29,7 +65,11 @@ export const FieldEditor: VoidComponent<{
   // Mix the nodes from prosemirror-schema-list into the basic schema to
   // create a schema with list support.
   const mySchema = new Schema({
-    nodes: addListNodes(schema.spec.nodes, "paragraph block*", "block"),
+    nodes: addListNodes(
+      schema.spec.nodes,
+      "paragraph block*",
+      "block"
+    ).addToEnd("image", imageSpec),
     marks: schema.spec.marks,
   })
   let editor: HTMLDivElement | undefined
