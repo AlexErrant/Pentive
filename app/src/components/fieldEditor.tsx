@@ -24,6 +24,7 @@ const imageSpec: NodeSpec = {
   inline: true,
   attrs: {
     src: {},
+    srcx: {},
     alt: { default: null },
     title: { default: null },
   },
@@ -36,6 +37,7 @@ const imageSpec: NodeSpec = {
         dom = dom as HTMLElement
         return {
           src: dom.getAttribute("src"),
+          srcx: dom.getAttribute("srcx"),
           title: dom.getAttribute("title"),
           alt: dom.getAttribute("alt"),
         }
@@ -47,6 +49,42 @@ const imageSpec: NodeSpec = {
       "img",
       {
         src: node.attrs.src as string,
+        srcx: node.attrs.srcx as string,
+        alt: node.attrs.alt as string,
+        title: node.attrs.title as string,
+      },
+    ]
+  },
+}
+const imageSpecSerializer: NodeSpec = {
+  inline: true,
+  attrs: {
+    src: {},
+    srcx: {},
+    alt: { default: null },
+    title: { default: null },
+  },
+  group: "inline",
+  draggable: true,
+  parseDOM: [
+    {
+      tag: "img[src]",
+      getAttrs(dom) {
+        dom = dom as HTMLElement
+        return {
+          src: dom.getAttribute("src"),
+          srcx: dom.getAttribute("srcx"),
+          title: dom.getAttribute("title"),
+          alt: dom.getAttribute("alt"),
+        }
+      },
+    },
+  ],
+  toDOM(node) {
+    return [
+      "img",
+      {
+        src: node.attrs.srcx as string,
         alt: node.attrs.alt as string,
         title: node.attrs.title as string,
       },
@@ -72,12 +110,20 @@ export const FieldEditor: VoidComponent<{
     ).addToEnd("image", imageSpec),
     marks: schema.spec.marks,
   })
+  const mySchemaSerializer = new Schema({
+    nodes: addListNodes(
+      schema.spec.nodes,
+      "paragraph block*",
+      "block"
+    ).addToEnd("image", imageSpecSerializer),
+    marks: schema.spec.marks,
+  })
   let editor: HTMLDivElement | undefined
   onMount(async () => {
     const doc = new DOMParser().parseFromString(props.value, "text/html")
     await Promise.all(Array.from(doc.images).map(updateImgSrc))
     const xmlSerializer = new XMLSerializer()
-    const domSerializer = DOMSerializer.fromSchema(mySchema)
+    const domSerializer = DOMSerializer.fromSchema(mySchemaSerializer)
     // eslint-disable-next-line @typescript-eslint/no-unused-vars -- not sure wtf to do with editorView
     const editorView = new EditorView(editor!, {
       state: EditorState.create({
@@ -121,5 +167,6 @@ async function updateImgSrc(img: HTMLImageElement) {
     const blob = new Blob([media.data], { type })
     const dataUrl = await blobToBase64(blob)
     img.setAttribute("src", dataUrl)
+    img.setAttribute("srcx", src)
   }
 }

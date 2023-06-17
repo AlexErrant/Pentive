@@ -45,6 +45,7 @@ scure
 siteid
 solidjs
 srcs
+srcx
 stylelint
 superjson
 sveltejs
