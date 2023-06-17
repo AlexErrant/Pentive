@@ -6,6 +6,8 @@ import {
   Schema,
   DOMParser as ProseMirrorDOMParser,
   type NodeSpec,
+  type Node,
+  type DOMOutputSpec,
 } from "prosemirror-model"
 import { schema } from "prosemirror-schema-basic"
 import { addListNodes } from "prosemirror-schema-list"
@@ -19,94 +21,66 @@ import { blobToBase64 } from "shared-dom"
 import { type NoteCardView } from "../pages/cards"
 import { type SetStoreFunction } from "solid-js/store"
 
-// c.f. https://github.com/ProseMirror/prosemirror-schema-basic/blob/cbd834fed35ce70c56a42d387fe1c3109187935e/src/schema-basic.ts#LL74-L94
-const imageSpec: NodeSpec = {
-  inline: true,
-  attrs: {
-    src: {},
-    srcx: {},
-    alt: { default: null },
-    title: { default: null },
-  },
-  group: "inline",
-  draggable: true,
-  parseDOM: [
-    {
-      tag: "img[src]",
-      getAttrs(dom) {
-        dom = dom as HTMLElement
-        return {
-          src: dom.getAttribute("src"),
-          srcx: dom.getAttribute("srcx"),
-          title: dom.getAttribute("title"),
-          alt: dom.getAttribute("alt"),
-        }
-      },
+function makeSchema(toDOM: (node: Node) => DOMOutputSpec) {
+  // c.f. https://github.com/ProseMirror/prosemirror-schema-basic/blob/cbd834fed35ce70c56a42d387fe1c3109187935e/src/schema-basic.ts#LL74-L94
+  const imageSpec: NodeSpec = {
+    inline: true,
+    attrs: {
+      src: {},
+      srcx: {},
+      alt: { default: null },
+      title: { default: null },
     },
-  ],
-  toDOM(node) {
-    return [
-      "img",
+    group: "inline",
+    draggable: true,
+    parseDOM: [
       {
-        src: node.attrs.src as string,
-        srcx: node.attrs.srcx as string,
-        alt: node.attrs.alt as string,
-        title: node.attrs.title as string,
+        tag: "img[src]",
+        getAttrs(dom) {
+          dom = dom as HTMLElement
+          return {
+            src: dom.getAttribute("src"),
+            srcx: dom.getAttribute("srcx"),
+            title: dom.getAttribute("title"),
+            alt: dom.getAttribute("alt"),
+          }
+        },
       },
-    ]
-  },
-}
-const imageSpecSerializer: NodeSpec = {
-  inline: true,
-  attrs: {
-    src: {},
-    srcx: {},
-    alt: { default: null },
-    title: { default: null },
-  },
-  group: "inline",
-  draggable: true,
-  parseDOM: [
-    {
-      tag: "img[src]",
-      getAttrs(dom) {
-        dom = dom as HTMLElement
-        return {
-          src: dom.getAttribute("src"),
-          srcx: dom.getAttribute("srcx"),
-          title: dom.getAttribute("title"),
-          alt: dom.getAttribute("alt"),
-        }
-      },
-    },
-  ],
-  toDOM(node) {
-    return [
-      "img",
-      {
-        src: node.attrs.srcx as string,
-        alt: node.attrs.alt as string,
-        title: node.attrs.title as string,
-      },
-    ]
-  },
+    ],
+    toDOM,
+  }
+  // Mix the nodes from prosemirror-schema-list into the basic schema to
+  // create a schema with list support.
+  return new Schema({
+    nodes: addListNodes(
+      schema.spec.nodes,
+      "paragraph block*",
+      "block"
+    ).addToEnd("image", imageSpec),
+    marks: schema.spec.marks,
+  })
 }
 
-// Mix the nodes from prosemirror-schema-list into the basic schema to
-// create a schema with list support.
-const mySchema = new Schema({
-  nodes: addListNodes(schema.spec.nodes, "paragraph block*", "block").addToEnd(
-    "image",
-    imageSpec
-  ),
-  marks: schema.spec.marks,
+const mySchema = makeSchema((node) => {
+  return [
+    "img",
+    {
+      src: node.attrs.src as string,
+      srcx: node.attrs.srcx as string,
+      alt: node.attrs.alt as string,
+      title: node.attrs.title as string,
+    },
+  ]
 })
-const mySchemaSerializer = new Schema({
-  nodes: addListNodes(schema.spec.nodes, "paragraph block*", "block").addToEnd(
-    "image",
-    imageSpecSerializer
-  ),
-  marks: schema.spec.marks,
+const mySchemaSerializer = makeSchema((node) => {
+  return [
+    "img",
+    {
+      src: node.attrs.srcx as string,
+      alt: node.attrs.alt as string,
+      title: node.attrs.title as string,
+    },
+  ]
 })
 
 const xmlSerializer = new XMLSerializer()
