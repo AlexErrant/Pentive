@@ -18,9 +18,6 @@ import { blobToBase64 } from "shared-dom"
 import { type NoteCardView } from "../pages/cards"
 import { type SetStoreFunction } from "solid-js/store"
 
-const xmlSerializer = new XMLSerializer()
-const domSerializer = DOMSerializer.fromSchema(schema)
-
 export const FieldEditor: VoidComponent<{
   readonly field: string
   readonly value: string
@@ -39,6 +36,8 @@ export const FieldEditor: VoidComponent<{
   onMount(async () => {
     const doc = new DOMParser().parseFromString(props.value, "text/html")
     await Promise.all(Array.from(doc.images).map(updateImgSrc))
+    const xmlSerializer = new XMLSerializer()
+    const domSerializer = DOMSerializer.fromSchema(mySchema)
     // eslint-disable-next-line @typescript-eslint/no-unused-vars -- not sure wtf to do with editorView
     const editorView = new EditorView(editor!, {
       state: EditorState.create({
