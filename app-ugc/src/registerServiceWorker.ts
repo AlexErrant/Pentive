@@ -109,7 +109,7 @@ function closeComlink(): void {
 // https://github.com/davidjbradshaw/iframe-resizer/blob/1ab689163f9e2505779b5f200b4f28adbddfc165/src/iframeResizer.contentWindow.js#L758
 // but debugging it is annoying and slow, so this is the hacky fix
 // grep 52496928-5C27-4057-932E-E0C3876AB26E
-const resizeIframe = async () => {
+export const resizeIframe = async () => {
   await Promise.all(
     Array.from(document.images)
       .filter((img) => !img.complete)
