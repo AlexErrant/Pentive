@@ -34,9 +34,45 @@ export type RenderBodyInput =
       readonly side: Side
     }
 
-const renderBody =
-  (getNoteCard: () => NoteCard) =>
-  async (i: RenderBodyInput): Promise<{ body: string; css?: string }> => {
+async function getLocalMedia(id: MediaId): Promise<ArrayBuffer | null> {
+  const media = await db.getMedia(id)
+  return media?.data ?? null
+}
+
+export interface AppExpose {
+  getLocalMedia: typeof getLocalMedia
+  renderBody: (i: RenderBodyInput) => Promise<{ body: string; css?: string }>
+  resize: () => void
+}
+
+const ResizingIframe: VoidComponent<{
+  readonly i: RenderBodyInput
+  readonly noteCard?: NoteCard
+}> = (props) => {
+  let iframeReference: HTMLIFrameElement
+  onCleanup(() => {
+    ;(iframeReference as IFrameComponent).iFrameResizer.close()
+  })
+  createEffect(
+    on(
+      () => props.noteCard,
+      () => {
+        try {
+          iframeReference.contentWindow!.postMessage(
+            {
+              type: "pleaseRerender",
+            },
+            targetOrigin
+          )
+        } catch (error) {
+          console.error(error)
+        }
+      }
+    )
+  )
+  const renderBody = async (
+    i: RenderBodyInput
+  ): Promise<{ body: string; css?: string }> => {
     switch (i.tag) {
       case "template": {
         const template = await db.getTemplate(i.templateId)
@@ -81,7 +117,7 @@ const renderBody =
         return { body }
       }
       case "manualCard": {
-        const { card, note, template } = getNoteCard()
+        const { card, note, template } = props.noteCard!
         const frontBack = C.html(card, note, template)
         if (frontBack == null) {
           return { body: "Card is invalid!" }
@@ -94,50 +130,13 @@ const renderBody =
     }
   }
 
-async function getLocalMedia(id: MediaId): Promise<ArrayBuffer | null> {
-  const media = await db.getMedia(id)
-  return media?.data ?? null
-}
-
-export interface AppExpose {
-  getLocalMedia: typeof getLocalMedia
-  renderBody: ReturnType<typeof renderBody>
-  resize: () => void
-}
-
-const ResizingIframe: VoidComponent<{
-  readonly i: RenderBodyInput
-  readonly noteCard?: NoteCard
-}> = (props) => {
-  let iframeReference: HTMLIFrameElement
-  onCleanup(() => {
-    ;(iframeReference as IFrameComponent).iFrameResizer.close()
-  })
-  createEffect(
-    on(
-      () => props.noteCard,
-      () => {
-        try {
-          iframeReference.contentWindow!.postMessage(
-            {
-              type: "pleaseRerender",
-            },
-            targetOrigin
-          )
-        } catch (error) {
-          console.error(error)
-        }
-      }
-    )
-  )
-
   return (
     <iframe
       ref={(x) => (iframeReference = x)}
       onLoad={(e) => {
         const appExpose: AppExpose = {
           getLocalMedia,
-          renderBody: renderBody(() => props.noteCard!),
+          renderBody,
           resize: () => {
             ;(iframeReference as IFrameComponent)?.iFrameResizer?.resize()
           },
