@@ -11,6 +11,17 @@ export type NoteCardView = Override<
   { note: Override<NoteCard["note"], { fieldValues: Array<[string, string]> }> }
 >
 
+export function toNoteCard(noteCardView: NoteCardView) {
+  const r: NoteCard = {
+    ...noteCardView,
+    note: {
+      ...noteCardView.note,
+      fieldValues: new Map(noteCardView.note.fieldValues),
+    },
+  }
+  return r
+}
+
 export default function Cards(): JSX.Element {
   const [selected, setSelected] = createStore<{ selected?: NoteCardView }>({})
   return (

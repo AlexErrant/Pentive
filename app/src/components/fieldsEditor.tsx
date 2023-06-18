@@ -1,7 +1,8 @@
 import { For, type VoidComponent } from "solid-js"
 import { FieldEditor } from "./fieldEditor"
-import { type NoteCardView } from "../pages/cards"
+import { toNoteCard, type NoteCardView } from "../pages/cards"
 import { type SetStoreFunction } from "solid-js/store"
+import { db } from "../db"
 
 export const FieldsEditor: VoidComponent<{
   readonly noteCard: NoteCardView
@@ -21,6 +22,13 @@ export const FieldsEditor: VoidComponent<{
           />
         )}
       </For>
+      <button
+        onClick={async () => {
+          await db.upsertNote(toNoteCard(props.noteCard).note)
+        }}
+      >
+        Save
+      </button>
     </>
   )
 }

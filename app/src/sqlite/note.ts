@@ -77,7 +77,13 @@ export function entityToDomain(note: NoteEntity, remotes: RemoteNote[]): Note {
 export const noteCollectionMethods = {
   upsertNote: async function (note: Note, db?: Kysely<DB>) {
     db ??= await getKysely()
-    await db.insertInto("note").values(noteToDocType(note)).execute()
+    const values = noteToDocType(note)
+    const conflictValues = { ...values, id: undefined }
+    await db
+      .insertInto("note")
+      .values(values)
+      .onConflict((db) => db.doUpdateSet(conflictValues))
+      .execute()
   },
   bulkUpsertNotes: async function (notes: Note[]) {
     const db = await getKysely()
@@ -437,8 +443,8 @@ export function updateLocalMediaIdByRemoteMediaIdAndGetNewDoc(
     for (const image of doc.images) {
       const src = image.getAttribute("src") as MediaId
       if (src != null) {
-        const i = remoteMediaIdByLocal.get(src)
-        if (i == null)
+        const i =
+          remoteMediaIdByLocal.get(src) ??
           throwExp(
             `${src} not found in ${JSON.stringify(
               Array.from(remoteMediaIdByLocal)
