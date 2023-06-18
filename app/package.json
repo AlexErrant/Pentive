@@ -70,6 +70,7 @@
     "@github/time-elements": "^3.1.4",
     "@solidjs/router": "^0.8.2",
     "@tanstack/solid-table": "^8.8.5",
+    "@thisbeyond/solid-select": "^0.14.0",
     "@trpc/client": "^10.18.0",
     "@trpc/server": "^10.18.0",
     "@vlcn.io/crsqlite-wasm": "0.12.0",

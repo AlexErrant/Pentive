@@ -71,6 +71,9 @@ importers:
       '@tanstack/solid-table':
         specifier: ^8.8.5
         version: 8.8.5(solid-js@1.7.3)
+      '@thisbeyond/solid-select':
+        specifier: ^0.14.0
+        version: 0.14.0(solid-js@1.7.3)
       '@trpc/client':
         specifier: ^10.18.0
         version: 10.18.0(@trpc/server@10.18.0)
@@ -5743,6 +5746,14 @@ packages:
   /@tanstack/table-core@8.8.5:
     resolution: {integrity: sha512-Xnwa1qxpgvSW7ozLiexmKp2PIYcLBiY/IizbdGriYCL6OOHuZ9baRhrrH51zjyz+61ly6K59rmt6AI/3RR+97Q==}
     engines: {node: '>=12'}
+    dev: false
+
+  /@thisbeyond/solid-select@0.14.0(solid-js@1.7.3):
+    resolution: {integrity: sha512-ecq4U3Vnc/nJbU84ARuPg2scNuYt994ljF5AmBlzuZW87x43mWiGJ5hEWufIJJMpDT6CcnCIx/xbrdDkaDEHQw==}
+    peerDependencies:
+      solid-js: ^1.5
+    dependencies:
+      solid-js: 1.7.3
     dev: false
 
   /@tokenizer/token@0.3.0:
