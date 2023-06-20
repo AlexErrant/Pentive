@@ -1,27 +1,31 @@
-import { type VoidComponent } from "solid-js"
+import { For, type VoidComponent } from "solid-js"
 import ResizingIframe from "./resizingIframe"
-import { toNoteCard, type NoteCardView } from "../pages/cards"
+import { toNoteCards, type NoteCardView } from "../pages/cards"
 
 export const CardsPreview: VoidComponent<{
   readonly noteCard: NoteCardView
 }> = (props) => {
-  const noteCard = () => toNoteCard(props.noteCard)
+  const noteCards = () => toNoteCards(props.noteCard)
   return (
-    <>
-      <ResizingIframe
-        i={{
-          tag: "manualCard",
-          side: "front",
-        }}
-        noteCard={noteCard()}
-      />
-      <ResizingIframe
-        i={{
-          tag: "manualCard",
-          side: "back",
-        }}
-        noteCard={noteCard()}
-      />
-    </>
+    <For each={noteCards()}>
+      {(noteCard) => (
+        <>
+          <ResizingIframe
+            i={{
+              tag: "manualCard",
+              side: "front",
+            }}
+            noteCard={noteCard}
+          />
+          <ResizingIframe
+            i={{
+              tag: "manualCard",
+              side: "back",
+            }}
+            noteCard={noteCard}
+          />
+        </>
+      )}
+    </For>
   )
 }

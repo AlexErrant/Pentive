@@ -1,8 +1,10 @@
 import { For, type VoidComponent } from "solid-js"
 import { FieldEditor } from "./fieldEditor"
-import { toNoteCard, type NoteCardView } from "../pages/cards"
+import { toNoteCards, type NoteCardView } from "../pages/cards"
 import { type SetStoreFunction } from "solid-js/store"
 import { db } from "../db"
+import { getKysely } from "../sqlite/crsqlite"
+import { throwExp } from "shared"
 
 export const FieldsEditor: VoidComponent<{
   readonly noteCard: NoteCardView
@@ -24,7 +26,16 @@ export const FieldsEditor: VoidComponent<{
       </For>
       <button
         onClick={async () => {
-          await db.upsertNote(toNoteCard(props.noteCard).note)
+          const noteCards = toNoteCards(props.noteCard)
+          if (noteCards.length === 0) throwExp("There must be at least 1 card")
+          const kysely = await getKysely()
+          await kysely.transaction().execute(async (trx) => {
+            await db.upsertNote(noteCards[0].note, trx)
+            await db.bulkUpsertCards(
+              noteCards.map((nc) => nc.card),
+              trx
+            )
+          })
         }}
       >
         Save

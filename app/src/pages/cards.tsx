@@ -1,25 +1,26 @@
 import { type JSX, Show } from "solid-js"
 import { createStore } from "solid-js/store"
 import CardsTable from "../components/cardsTable"
-import { type Override, type NoteCard } from "shared"
+import { type Override, type NoteCard, type Template, type Card } from "shared"
 import { CardsRemote } from "../components/cardsRemote"
 import { FieldsEditor } from "../components/fieldsEditor"
 import { CardsPreview } from "../components/cardsPreview"
 
-export type NoteCardView = Override<
-  NoteCard,
-  { note: Override<NoteCard["note"], { fieldValues: Array<[string, string]> }> }
->
+export interface NoteCardView {
+  template: Template
+  note: Override<NoteCard["note"], { fieldValues: Array<[string, string]> }>
+  cards: Card[]
+}
 
-export function toNoteCard(noteCardView: NoteCardView) {
-  const r: NoteCard = {
-    ...noteCardView,
+export function toNoteCards(noteCardView: NoteCardView): NoteCard[] {
+  return noteCardView.cards.map((card) => ({
+    template: noteCardView.template,
     note: {
       ...noteCardView.note,
       fieldValues: new Map(noteCardView.note.fieldValues),
     },
-  }
-  return r
+    card,
+  }))
 }
 
 export default function Cards(): JSX.Element {
@@ -36,6 +37,7 @@ export default function Cards(): JSX.Element {
                 ...nc.note,
                 fieldValues: Array.from(nc.note.fieldValues.entries()),
               },
+              cards: [nc.card],
             }
             setSelected("selected", selected)
           } else {

@@ -12,7 +12,14 @@ import {
 } from "shared"
 import { getKysely } from "./crsqlite"
 import { type DB, type Card as CardEntity } from "./database"
-import { type InsertObject, type Kysely } from "kysely"
+import {
+  type ExpressionBuilder,
+  type OnConflictDatabase,
+  type InsertObject,
+  type Kysely,
+  type OnConflictTables,
+  type RawBuilder,
+} from "kysely"
 import _ from "lodash"
 import { entityToDomain as templateEntityToDomain } from "./template"
 import { entityToDomain as noteEntityToDomain } from "./note"
@@ -106,6 +113,16 @@ const groupByToMap = <T, Q>(
     return map
   }, new Map<Q, T[]>())
 
+// the point of this type is to cause an error if something is added to CardEntity
+type OnConflictUpdateCardSet = {
+  [K in keyof CardEntity as Exclude<K, "id" | "noteId" | "created" | "ord">]: (
+    x: ExpressionBuilder<
+      OnConflictDatabase<DB, "card">,
+      OnConflictTables<"card">
+    >
+  ) => RawBuilder<CardEntity[K]>
+}
+
 export const cardCollectionMethods = {
   upsertCard: async function (card: Card) {
     const db = await getKysely()
@@ -116,7 +133,19 @@ export const cardCollectionMethods = {
     const batches = _.chunk(cards.map(cardToDocType), 1000)
     for (let i = 0; i < batches.length; i++) {
       console.log("card batch", i)
-      await db.insertInto("card").values(batches[i]).execute()
+      await db
+        .insertInto("card")
+        .values(batches[i])
+        .onConflict((db) =>
+          db.doUpdateSet({
+            updated: (x) => x.ref("excluded.updated"),
+            due: (x) => x.ref("excluded.due"),
+            deckIds: (x) => x.ref("excluded.deckIds"),
+            cardSettingId: (x) => x.ref("excluded.cardSettingId"),
+            state: (x) => x.ref("excluded.state"),
+          } satisfies OnConflictUpdateCardSet)
+        )
+        .execute()
     }
   },
   getCard: async function (cardId: CardId) {
