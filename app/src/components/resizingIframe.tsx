@@ -51,7 +51,7 @@ const ResizingIframe: VoidComponent<{
 }> = (props) => {
   let iframeReference: HTMLIFrameElement
   onCleanup(() => {
-    ;(iframeReference as IFrameComponent).iFrameResizer.close()
+    ;(iframeReference as IFrameComponent).iFrameResizer?.close()
   })
   createEffect(
     on(
