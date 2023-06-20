@@ -157,6 +157,15 @@ export const cardCollectionMethods = {
       .executeTakeFirst()
     return card == null ? null : entityToDomain(card)
   },
+  getCardsByNote: async function (noteId: NoteId) {
+    const db = await getKysely()
+    const cards = await db
+      .selectFrom("card")
+      .selectAll()
+      .where("noteId", "=", noteId)
+      .execute()
+    return cards.map(entityToDomain)
+  },
   getCards: async function (offset: number, limit: number) {
     const db = await getKysely()
     const entities = await db
