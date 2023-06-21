@@ -114,9 +114,12 @@ export const FieldEditor: VoidComponent<{
             domSerializer.serializeFragment(this.state.doc.content)
           ) // https://stackoverflow.com/a/51461773
           const value =
-            div.childNodes.length === 1 &&
-            div.childNodes[0].nodeName === "P" &&
-            (div.childNodes[0] as HTMLParagraphElement).attributes.length === 0
+            strip(div.innerHTML) === ""
+              ? ""
+              : div.childNodes.length === 1 &&
+                div.childNodes[0].nodeName === "P" &&
+                (div.childNodes[0] as HTMLParagraphElement).attributes
+                  .length === 0
               ? (div.childNodes[0] as HTMLParagraphElement).innerHTML
               : div.innerHTML
           props.setNoteCard(
