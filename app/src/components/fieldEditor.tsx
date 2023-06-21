@@ -20,6 +20,7 @@ import { db } from "../db"
 import { blobToBase64 } from "shared-dom"
 import { type NoteCardView } from "../pages/cards"
 import { type SetStoreFunction } from "solid-js/store"
+import { strip } from "../domain/utility"
 
 function makeSchema(toDOM: (node: Node) => DOMOutputSpec) {
   // c.f. https://github.com/ProseMirror/prosemirror-schema-basic/blob/cbd834fed35ce70c56a42d387fe1c3109187935e/src/schema-basic.ts#LL74-L94
@@ -112,13 +113,19 @@ export const FieldEditor: VoidComponent<{
           div.appendChild(
             domSerializer.serializeFragment(this.state.doc.content)
           ) // https://stackoverflow.com/a/51461773
+          const value =
+            div.childNodes.length === 1 &&
+            div.childNodes[0].nodeName === "P" &&
+            (div.childNodes[0] as HTMLParagraphElement).attributes.length === 0
+              ? (div.childNodes[0] as HTMLParagraphElement).innerHTML
+              : div.innerHTML
           props.setNoteCard(
             "selected",
             "note",
             "fieldValues",
             props.i,
             1,
-            div.innerHTML
+            value
           )
         }
       },
