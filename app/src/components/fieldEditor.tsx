@@ -83,7 +83,6 @@ const mySchemaSerializer = makeSchema((node) => {
   ]
 })
 
-const xmlSerializer = new XMLSerializer()
 const domSerializer = DOMSerializer.fromSchema(mySchemaSerializer)
 const domParser = new DOMParser()
 const proseMirrorDOMParser = ProseMirrorDOMParser.fromSchema(mySchema)
@@ -109,14 +108,17 @@ export const FieldEditor: VoidComponent<{
       dispatchTransaction(this: EditorView, tr) {
         this.updateState(this.state.apply(tr))
         if (tr.docChanged) {
-          const xml = domSerializer.serializeFragment(this.state.doc.content)
+          const div = document.createElement("div")
+          div.appendChild(
+            domSerializer.serializeFragment(this.state.doc.content)
+          ) // https://stackoverflow.com/a/51461773
           props.setNoteCard(
             "selected",
             "note",
             "fieldValues",
             props.i,
             1,
-            xmlSerializer.serializeToString(xml)
+            div.innerHTML
           )
         }
       },
