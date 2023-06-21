@@ -15,7 +15,10 @@ import { db } from "../db"
 
 export interface NoteCardView {
   template: Template
-  note: Override<NoteCard["note"], { fieldValues: Array<[string, string]> }>
+  note: Override<
+    NoteCard["note"],
+    { fieldValues: Array<readonly [string, string]> }
+  >
   mainCard?: Card
   cards: Card[]
 }

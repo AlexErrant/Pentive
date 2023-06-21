@@ -136,7 +136,7 @@ function handleStandard(
     return r
   }
   const frontSide = replaceFields.call(this, true, front)
-  if (frontSide === front) {
+  if (frontSide === front || frontSide === "") {
     return null
   } else {
     const backSide = replaceFields

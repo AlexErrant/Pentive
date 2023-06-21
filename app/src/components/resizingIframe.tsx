@@ -55,7 +55,7 @@ const ResizingIframe: VoidComponent<{
   })
   createEffect(
     on(
-      () => props.noteCard,
+      () => props.noteCard?.note.fieldValues,
       () => {
         try {
           iframeReference.contentWindow!.postMessage(
