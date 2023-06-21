@@ -42,22 +42,22 @@ export default function AddNote() {
   const data = useRouteData<typeof AddNoteData>()
   const templateNames = () => data()?.map((t) => t.name) ?? []
   const [template, setTemplate] = createSignal<Template>()
-  const [selected, setSelected] = createStore<{ selected?: NoteCardView }>({})
+  const [wip, setWip] = createStore<{ noteCard?: NoteCardView }>({})
   createEffect(() => {
     if (template() != null) {
       const t = template()!
-      setSelected("selected", toView(t))
+      setWip("noteCard", toView(t))
     }
   })
   createEffect(
     on(
       () => [
-        selected.selected?.template,
-        selected.selected?.note.fieldValues.map((x) => x[1]),
+        wip.noteCard?.template,
+        wip.noteCard?.note.fieldValues.map((x) => x[1]),
       ],
       () => {
-        const note = selected.selected?.note
-        const template = selected.selected?.template
+        const note = wip.noteCard?.note
+        const template = wip.noteCard?.template
         if (note != null && template != null) {
           const ords = C.noteOrds(toNote(note), template)
           const now = new Date()
@@ -72,7 +72,7 @@ export default function AddNote() {
               due: now,
             } satisfies Card
           })
-          setSelected("selected", "cards", cards)
+          setWip("noteCard", "cards", cards)
         }
       }
     )
@@ -90,12 +90,9 @@ export default function AddNote() {
             setTemplate(data()?.find((t) => t.name === value))
           }
         />
-        <Show when={selected.selected}>
-          <FieldsEditor
-            setNoteCard={setSelected}
-            noteCard={selected.selected!}
-          />
-          <CardsPreview noteCard={selected.selected!} />
+        <Show when={wip.noteCard}>
+          <FieldsEditor setNoteCard={setWip} noteCard={wip.noteCard!} />
+          <CardsPreview noteCard={wip.noteCard!} />
         </Show>
       </Suspense>
     </>

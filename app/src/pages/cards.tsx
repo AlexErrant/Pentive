@@ -46,13 +46,13 @@ export function toMainNoteCards(noteCardView: NoteCardView): NoteCard {
 }
 
 export default function Cards(): JSX.Element {
-  const [selected, setSelected] = createStore<{ selected?: NoteCardView }>({})
+  const [selected, setSelected] = createStore<{ noteCard?: NoteCardView }>({})
   const [cards] = createResource(
-    () => selected.selected?.note.id,
+    () => selected.noteCard?.note.id,
     db.getCardsByNote
   )
   createEffect(() => {
-    if (cards() != null) setSelected("selected", "cards", cards()!)
+    if (cards() != null) setSelected("noteCard", "cards", cards()!)
   })
   return (
     <>
@@ -69,16 +69,16 @@ export default function Cards(): JSX.Element {
               mainCard: nc.card,
               cards: [],
             }
-            setSelected("selected", selected)
+            setSelected("noteCard", selected)
           } else {
-            setSelected("selected", undefined)
+            setSelected("noteCard", undefined)
           }
         }}
       />
-      <Show when={selected.selected != null}>
-        <CardsRemote noteCard={selected.selected!} />
-        <FieldsEditor noteCard={selected.selected!} setNoteCard={setSelected} />
-        <CardsPreview noteCard={selected.selected!} />
+      <Show when={selected.noteCard != null}>
+        <CardsRemote noteCard={selected.noteCard!} />
+        <FieldsEditor noteCard={selected.noteCard!} setNoteCard={setSelected} />
+        <CardsPreview noteCard={selected.noteCard!} />
       </Show>
     </>
   )

@@ -9,7 +9,7 @@ import { throwExp } from "shared"
 export const FieldsEditor: VoidComponent<{
   readonly noteCard: NoteCardView
   readonly setNoteCard: SetStoreFunction<{
-    selected?: NoteCardView
+    noteCard?: NoteCardView
   }>
 }> = (props) => {
   return (

@@ -93,7 +93,7 @@ export const FieldEditor: VoidComponent<{
   readonly value: string
   readonly i: number
   readonly setNoteCard: SetStoreFunction<{
-    selected?: NoteCardView
+    noteCard?: NoteCardView
   }>
 }> = (props) => {
   let editor: HTMLDivElement | undefined
@@ -120,7 +120,7 @@ export const FieldEditor: VoidComponent<{
               ? (div.childNodes[0] as HTMLParagraphElement).innerHTML
               : div.innerHTML
           props.setNoteCard(
-            "selected",
+            "noteCard",
             "note",
             "fieldValues",
             props.i,
