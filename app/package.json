@@ -93,6 +93,7 @@
     "lrpc": "workspace:*",
     "peerjs": "^1.4.7",
     "prosemirror-example-setup": "^1.2.2",
+    "prosemirror-image-plugin": "^2.6.0",
     "prosemirror-menu": "^1.2.2",
     "prosemirror-model": "^1.19.1",
     "prosemirror-schema-basic": "^1.2.2",
