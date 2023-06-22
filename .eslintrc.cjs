@@ -17,6 +17,7 @@ const project = [
   path.join(__dirname, "workers-test/test/tsconfig.json"),
   path.join(__dirname, "example-plugins/solid/tsconfig.json"),
   path.join(__dirname, "example-plugins/svelte/tsconfig.json"),
+  path.join(__dirname, "prosemirror-image-plugin/tsconfig.json"),
 ]
 
 /* eslint-env node */
