@@ -23,6 +23,7 @@ import { blobToBase64 } from "shared-dom"
 import { type NoteCardView } from "../pages/cards"
 import { type SetStoreFunction } from "solid-js/store"
 import { strip } from "../domain/utility"
+import { type ImagePluginSettings } from "prosemirror-image-plugin"
 
 // cf. https://gitlab.com/emergence-engineering/prosemirror-image-plugin/-/blob/master/src/updateImageNode.ts
 const updateImageNode = (
@@ -34,14 +35,12 @@ const updateImageNode = (
   const attributesUpdate = Object.keys(extraAttributes)
     .map((attrKey) => ({
       [attrKey]: {
-        default: extraAttributes[attrKey] || null,
+        default: extraAttributes[attrKey] ?? null,
       },
     }))
     .reduce((acc, curr) => ({ ...acc, ...curr }), {})
 
   const attributeKeys = [...Object.keys(extraAttributes), "src", "alt"]
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-expect-error
   return nodes.update("image", {
     ...(pluginSettings.hasTitle ? { content: "inline*" } : {}),
     attrs: {
@@ -59,7 +58,9 @@ const updateImageNode = (
     draggable: true,
     toDOM(node: Node) {
       const toAttributes = attributeKeys
-        .map((attrKey) => ({ [`imageplugin-${attrKey}`]: node.attrs[attrKey] }))
+        .map((attrKey) => ({
+          [`imageplugin-${attrKey}`]: node.attrs[attrKey] as unknown,
+        }))
         // merge
         .reduce((acc, curr) => ({ ...acc, ...curr }), {})
       return [
