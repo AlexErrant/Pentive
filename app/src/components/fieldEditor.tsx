@@ -5,11 +5,7 @@ import {
   DOMSerializer,
   Schema,
   DOMParser as ProseMirrorDOMParser,
-  type NodeSpec,
   type Node,
-  type DOMOutputSpec,
-  type Node,
-  Schema,
 } from "prosemirror-model"
 import { schema } from "prosemirror-schema-basic"
 import { addListNodes } from "prosemirror-schema-list"
@@ -24,9 +20,17 @@ import { type NoteCardView } from "../pages/cards"
 import { type SetStoreFunction } from "solid-js/store"
 import { strip } from "../domain/utility"
 import { type ImagePluginSettings } from "prosemirror-image-plugin"
+import {
+  defaultSettings as imageSettings,
+  imagePlugin,
+} from "prosemirror-image-plugin"
+import "prosemirror-image-plugin/dist/styles/common.css"
+import "prosemirror-image-plugin/dist/styles/withResize.css"
+// import "prosemirror-image-plugin/dist/styles/sideResize.css"
 
 // cf. https://gitlab.com/emergence-engineering/prosemirror-image-plugin/-/blob/master/src/updateImageNode.ts
 const updateImageNode = (
+  type: "serializer" | "editor",
   nodes: Schema["spec"]["nodes"],
   // Additional attributes where the keys are attribute names and values are default values
   pluginSettings: ImagePluginSettings
@@ -49,6 +53,8 @@ const updateImageNode = (
       height: { default: null },
       width: { default: null },
       maxWidth: { default: null },
+      srcx: { default: null },
+      title: { default: null },
       ...attributesUpdate,
     },
     atom: true,
@@ -57,6 +63,21 @@ const updateImageNode = (
       : { group: "inline", inline: true }),
     draggable: true,
     toDOM(node: Node) {
+      if (type === "serializer") {
+        const { src, ...toAttributes } = attributeKeys
+          .map((attrKey) => ({
+            [`${attrKey}`]: node.attrs[attrKey] as unknown,
+          }))
+          // merge
+          .reduce((acc, curr) => ({ ...acc, ...curr }), {})
+        return [
+          "img",
+          {
+            src: (node.attrs.srcx as string) ?? src,
+            ...toAttributes,
+          },
+        ]
+      }
       const toAttributes = attributeKeys
         .map((attrKey) => ({
           [`imageplugin-${attrKey}`]: node.attrs[attrKey] as unknown,
@@ -73,6 +94,18 @@ const updateImageNode = (
       ]
     },
     parseDOM: [
+      {
+        tag: "img[src]",
+        getAttrs(dom) {
+          dom = dom as HTMLElement
+          return {
+            src: dom.getAttribute("src"),
+            srcx: dom.getAttribute("srcx"),
+            title: dom.getAttribute("title"),
+            alt: dom.getAttribute("alt"),
+          }
+        },
+      },
       {
         tag: "div.imagePluginRoot",
         getAttrs(dom) {
@@ -91,67 +124,19 @@ const updateImageNode = (
   })
 }
 
-function makeSchema(toDOM: (node: Node) => DOMOutputSpec) {
+function makeSchema(type: "serializer" | "editor") {
   // c.f. https://github.com/ProseMirror/prosemirror-schema-basic/blob/cbd834fed35ce70c56a42d387fe1c3109187935e/src/schema-basic.ts#LL74-L94
-  const imageSpec: NodeSpec = {
-    inline: true,
-    attrs: {
-      src: {},
-      srcx: {},
-      alt: { default: null },
-      title: { default: null },
-    },
-    group: "inline",
-    draggable: true,
-    parseDOM: [
-      {
-        tag: "img[src]",
-        getAttrs(dom) {
-          dom = dom as HTMLElement
-          return {
-            src: dom.getAttribute("src"),
-            srcx: dom.getAttribute("srcx"),
-            title: dom.getAttribute("title"),
-            alt: dom.getAttribute("alt"),
-          }
-        },
-      },
-    ],
-    toDOM,
-  }
   // Mix the nodes from prosemirror-schema-list into the basic schema to
   // create a schema with list support.
+  const nodes1 = addListNodes(schema.spec.nodes, "paragraph block*", "block")
   return new Schema({
-    nodes: addListNodes(
-      schema.spec.nodes,
-      "paragraph block*",
-      "block"
-    ).addToEnd("image", imageSpec),
+    nodes: updateImageNode(type, nodes1, imageSettings),
     marks: schema.spec.marks,
   })
 }
 
-const mySchema = makeSchema((node) => {
-  return [
-    "img",
-    {
-      src: node.attrs.src as string,
-      srcx: node.attrs.srcx as string,
-      alt: node.attrs.alt as string,
-      title: node.attrs.title as string,
-    },
-  ]
-})
-const mySchemaSerializer = makeSchema((node) => {
-  return [
-    "img",
-    {
-      src: node.attrs.srcx as string,
-      alt: node.attrs.alt as string,
-      title: node.attrs.title as string,
-    },
-  ]
-})
+const mySchema = makeSchema("editor")
+const mySchemaSerializer = makeSchema("serializer")
 
 const domSerializer = DOMSerializer.fromSchema(mySchemaSerializer)
 const domParser = new DOMParser()
@@ -173,7 +158,10 @@ export const FieldEditor: VoidComponent<{
     const editorView = new EditorView(editor!, {
       state: EditorState.create({
         doc: proseMirrorDOMParser.parse(doc),
-        plugins: exampleSetup({ schema: mySchema }),
+        plugins: [
+          ...exampleSetup({ schema: mySchema }),
+          imagePlugin(imageSettings),
+        ],
       }),
       dispatchTransaction(this: EditorView, tr) {
         this.updateState(this.state.apply(tr))
