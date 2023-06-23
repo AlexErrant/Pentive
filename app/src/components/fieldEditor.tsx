@@ -64,34 +64,22 @@ const updateImageNode = (
     draggable: true,
     toDOM(node: Node) {
       if (type === "serializer") {
-        const { src, ...toAttributes } = attributeKeys
-          .map((attrKey) => ({
-            [`${attrKey}`]: node.attrs[attrKey] as unknown,
-          }))
-          // merge
-          .reduce((acc, curr) => ({ ...acc, ...curr }), {})
-        return [
-          "img",
-          {
-            src: (node.attrs.srcx as string) ?? src,
-            ...toAttributes,
-          },
-        ]
+        const toAttributes = Object.fromEntries(
+          attributeKeys.map((attrKey) =>
+            attrKey === "src"
+              ? [attrKey, node.attrs.srcx ?? node.attrs[attrKey]]
+              : [attrKey, node.attrs[attrKey] as unknown]
+          )
+        )
+        return ["img", toAttributes]
       }
-      const toAttributes = attributeKeys
-        .map((attrKey) => ({
-          [`imageplugin-${attrKey}`]: node.attrs[attrKey] as unknown,
-        }))
-        // merge
-        .reduce((acc, curr) => ({ ...acc, ...curr }), {})
-      return [
-        "div",
-        {
-          class: `imagePluginRoot`,
-          ...toAttributes,
-        },
-        ...(pluginSettings.hasTitle ? [0] : []),
-      ]
+      const entries = attributeKeys.map((attrKey) => [
+        `imageplugin-${attrKey}`,
+        node.attrs[attrKey] as unknown,
+      ])
+      entries.push(["class", "imagePluginRoot"])
+      const toAttributes = Object.fromEntries(entries) as unknown
+      return ["div", toAttributes, ...(pluginSettings.hasTitle ? [0] : [])]
     },
     parseDOM: [
       {
