@@ -8,6 +8,8 @@ import {
   type NodeSpec,
   type Node,
   type DOMOutputSpec,
+  type Node,
+  Schema,
 } from "prosemirror-model"
 import { schema } from "prosemirror-schema-basic"
 import { addListNodes } from "prosemirror-schema-list"
@@ -21,6 +23,72 @@ import { blobToBase64 } from "shared-dom"
 import { type NoteCardView } from "../pages/cards"
 import { type SetStoreFunction } from "solid-js/store"
 import { strip } from "../domain/utility"
+
+// cf. https://gitlab.com/emergence-engineering/prosemirror-image-plugin/-/blob/master/src/updateImageNode.ts
+const updateImageNode = (
+  nodes: Schema["spec"]["nodes"],
+  // Additional attributes where the keys are attribute names and values are default values
+  pluginSettings: ImagePluginSettings
+): typeof nodes => {
+  const { extraAttributes } = pluginSettings
+  const attributesUpdate = Object.keys(extraAttributes)
+    .map((attrKey) => ({
+      [attrKey]: {
+        default: extraAttributes[attrKey] || null,
+      },
+    }))
+    .reduce((acc, curr) => ({ ...acc, ...curr }), {})
+
+  const attributeKeys = [...Object.keys(extraAttributes), "src", "alt"]
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-expect-error
+  return nodes.update("image", {
+    ...(pluginSettings.hasTitle ? { content: "inline*" } : {}),
+    attrs: {
+      src: { default: null },
+      alt: { default: null },
+      height: { default: null },
+      width: { default: null },
+      maxWidth: { default: null },
+      ...attributesUpdate,
+    },
+    atom: true,
+    ...(pluginSettings.isBlock
+      ? { group: "block" }
+      : { group: "inline", inline: true }),
+    draggable: true,
+    toDOM(node: Node) {
+      const toAttributes = attributeKeys
+        .map((attrKey) => ({ [`imageplugin-${attrKey}`]: node.attrs[attrKey] }))
+        // merge
+        .reduce((acc, curr) => ({ ...acc, ...curr }), {})
+      return [
+        "div",
+        {
+          class: `imagePluginRoot`,
+          ...toAttributes,
+        },
+        ...(pluginSettings.hasTitle ? [0] : []),
+      ]
+    },
+    parseDOM: [
+      {
+        tag: "div.imagePluginRoot",
+        getAttrs(dom) {
+          if (typeof dom === "string") return {}
+          return (
+            attributeKeys
+              .map((attrKey) => ({
+                [attrKey]: dom.getAttribute(`imageplugin-${attrKey}`),
+              }))
+              // merge
+              .reduce((acc, curr) => ({ ...acc, ...curr }), {})
+          )
+        },
+      },
+    ],
+  })
+}
 
 function makeSchema(toDOM: (node: Node) => DOMOutputSpec) {
   // c.f. https://github.com/ProseMirror/prosemirror-schema-basic/blob/cbd834fed35ce70c56a42d387fe1c3109187935e/src/schema-basic.ts#LL74-L94
