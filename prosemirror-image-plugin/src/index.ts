@@ -2,12 +2,12 @@ import { defaultSettings } from "./defaults";
 import imagePlugin from "./plugin/index";
 
 import {
-  imageAlign,
-  ImagePluginSettings,
-  RemoveImagePlaceholder,
-  InsertImagePlaceholder,
-  ImagePluginAction,
-  ImagePluginState,
+  type imageAlign,
+  type ImagePluginSettings,
+  type RemoveImagePlaceholder,
+  type InsertImagePlaceholder,
+  type ImagePluginAction,
+  type ImagePluginState,
 } from "./types";
 
 import updateImageNode from "./updateImageNode";
