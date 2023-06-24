@@ -19,6 +19,7 @@ const imagePlugin = (
         drop: dropHandler(pluginSettings),
       },
       nodeViews: {
+        // @ts-expect-error nextTODO
         image: imageNodeView(pluginSettings),
       },
     },

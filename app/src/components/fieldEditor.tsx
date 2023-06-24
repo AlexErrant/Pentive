@@ -24,9 +24,9 @@ import {
   defaultSettings as imageSettings,
   imagePlugin,
 } from "prosemirror-image-plugin"
-import "prosemirror-image-plugin/dist/styles/common.css"
-import "prosemirror-image-plugin/dist/styles/withResize.css"
-// import "prosemirror-image-plugin/dist/styles/sideResize.css"
+import "prosemirror-image-plugin/src/styles/common.css"
+import "prosemirror-image-plugin/src/styles/withResize.css"
+// import "prosemirror-image-plugin/src/styles/sideResize.css"
 
 // cf. https://gitlab.com/emergence-engineering/prosemirror-image-plugin/-/blob/master/src/updateImageNode.ts
 const updateImageNode = (

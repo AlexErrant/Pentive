@@ -2,9 +2,8 @@
   "name": "prosemirror-image-plugin",
   "version": "2.6.0",
   "description": "ProseMirror image plugin for advanced image features",
-  "main": "dist/index.js",
-  "module": "dist/index.es.js",
-  "types": "dist/index.d.ts",
+  "main": "src/index.ts",
+  "type": "module",
   "scripts": {
     "prebuild": "rimraf dist",
     "build": "rollup -c --bundleConfigAsCjs",

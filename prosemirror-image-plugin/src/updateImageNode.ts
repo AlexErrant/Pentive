@@ -1,5 +1,6 @@
 import { Node, Schema } from "prosemirror-model";
 import { ImagePluginSettings } from "./types";
+import type OrderedMap from "orderedmap"
 
 const updateImageNode = (
   nodes: Schema["spec"]["nodes"],
