@@ -1,0 +1,41 @@
+.imagePluginRoot[imageplugin-align="left"] {
+    width: 51%;
+    float: left;
+    margin: 1rem 2rem 0 0;
+}
+.imagePluginRoot[imageplugin-align="right"] {
+    width: 51%;
+    float: right;
+    margin: 0;
+}
+.imagePluginRoot[imageplugin-align="center"] {
+    width: 51%;
+    float: none;
+    margin: 0 auto;
+}
+
+.imagePluginRoot[imageplugin-align="fullWidth"] {
+    width: auto;
+    float: none;
+    clear: both;
+}
+
+.alignFullWidthButton,
+.alignRightButton,
+.alignLeftButton,
+.alignCenterButton {
+    width: 5rem;
+}
+
+.imagePluginRoot[imageplugin-align="left"] [imagealign="left"] {
+    background-color: red;
+}
+.imagePluginRoot[imageplugin-align="right"] [imagealign="right"] {
+    background-color: red;
+}
+.imagePluginRoot[imageplugin-align="center"] [imagealign="center"] {
+    background-color: red;
+}
+.imagePluginRoot[imageplugin-align="fullWidth"] [imagealign="fullWidth"] {
+    background-color: red;
+}
