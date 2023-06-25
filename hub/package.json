@@ -31,6 +31,7 @@
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-promise": "^6.1.1",
     "eslint-plugin-solid": "^0.12.1",
+    "html-to-text": "^9.0.5 || Hub doesn't use this, but `shared-edge` (actually `cwa`) does. Not including this causes an ESModule error in dev - I've no idea why.",
     "prettier": "^2.8.8",
     "solid-start-cloudflare-workers": "^0.2.26",
     "solid-start-node": "^0.2.26",
@@ -38,6 +39,7 @@
     "stylelint-config-prettier": "^9.0.5",
     "stylelint-config-standard": "^26.0.0",
     "typescript": "~5.0.4",
+    "ulid-workers": "^2.1.0 || See comment on html-to-text",
     "vite": "^4.1.4",
     "vite-plugin-checker": "^0.5.6",
     "wrangler": "^2.16.0"
@@ -60,7 +62,6 @@
     "comlink": "^4.3.1",
     "cookie": "^0.5.0",
     "cwa": "workspace:*",
-    "html-to-text": "^9.0.3 || Hub doesn't use this, but `shared` (actually `cwa`) does. Not including this causes an ESModule error - I've no idea why.",
     "iframe-resizer": "^4.3.6",
     "jose": "^4.11.1",
     "oauth4webapi": "^2.2.4",
@@ -70,7 +71,6 @@
     "solid-js": "^1.7.3",
     "solid-start": "^0.2.26",
     "superjson": "^1.12.2",
-    "ulid-workers": "^2.1.0 || See comment on html-to-text",
     "undici": "^5.11.0"
   },
   "engines": {

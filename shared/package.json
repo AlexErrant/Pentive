@@ -16,7 +16,6 @@
     "test": "vitest"
   },
   "devDependencies": {
-    "@types/html-to-text": "^9.0.0",
     "@types/lodash": "4.14.182",
     "@types/uuid": "^9.0.0",
     "@typescript-eslint/eslint-plugin": "^5.59.0",
@@ -34,7 +33,6 @@
   },
   "dependencies": {
     "@scure/base": "^1.1.1",
-    "html-to-text": "^9.0.3",
     "lodash": "4.17.21",
     "uuid": "^9.0.0",
     "zod": "^3.21.4"
