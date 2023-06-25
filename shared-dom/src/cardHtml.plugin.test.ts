@@ -78,8 +78,8 @@ export default exports;`)
   const [template] = templates
   expectTemplate(
     template,
-    "This is a cloze deletion for [...].",
-    "This is a cloze deletion for [Text].(Extra)"
+    "This is a cloze deletion for [ ... ] .",
+    "This is a cloze deletion for [ Text ] .(Extra)"
   )
 })
 
@@ -113,8 +113,8 @@ export default exports;`)
   const [template] = templates
   expectTemplate(
     template,
-    "THIS IS A CLOZE DELETION FOR [...].",
-    "THIS IS A CLOZE DELETION FOR [TEXT].(EXTRA)"
+    "THIS IS A CLOZE DELETION FOR [ ... ] .",
+    "THIS IS A CLOZE DELETION FOR [ TEXT ] .(EXTRA)"
   )
 })
 

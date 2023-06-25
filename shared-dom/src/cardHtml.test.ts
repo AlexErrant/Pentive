@@ -396,8 +396,8 @@ test("CardHtml renders multiple cloze templates properly 1", () => {
     `{{cloze:Field1}}{{cloze:Field2}}<br>{{Extra}}`,
     0,
     "cloze",
-    "Columbus first crossed the Atlantic in [...]",
-    `Columbus first crossed the Atlantic in [1492]Some extra info`
+    "Columbus first crossed the Atlantic in [ ... ]",
+    `Columbus first crossed the Atlantic in [ 1492 ]Some extra info`
   )
 })
 
@@ -412,8 +412,8 @@ test("CardHtml renders multiple cloze templates properly 2", () => {
     `{{cloze:Field1}}{{cloze:Field2}}<br>{{Extra}}`,
     1,
     "cloze",
-    "In [...], Columbus sailed the ocean blue.",
-    "In [1492], Columbus sailed the ocean blue.Some extra info"
+    "In [ ... ] , Columbus sailed the ocean blue.",
+    "In [ 1492 ] , Columbus sailed the ocean blue.Some extra info"
   )
 })
 
@@ -428,8 +428,8 @@ test("CardHtml renders multiple cloze templates properly 3", () => {
     "{{cloze:Field1}}{{cloze:Field2}}<br>{{Extra}}",
     2,
     "cloze",
-    "In 1492, Columbus sailed the ocean [...].",
-    "In 1492, Columbus sailed the ocean [blue].Some extra info"
+    "In 1492, Columbus sailed the ocean [ ... ] .",
+    "In 1492, Columbus sailed the ocean [ blue ] .Some extra info"
   )
 })
 
@@ -457,8 +457,8 @@ test("CardHtml renders multiple cloze templates properly 4", () => {
     "{{cloze:Field1}}{{cloze:Field2}}<br>{{Extra}}",
     0,
     "cloze",
-    "[...] first crossed the Atlantic in [...]",
-    "[Columbus] first crossed the Atlantic in [1492]Some extra info"
+    "[ ... ] first crossed the Atlantic in [ ... ]",
+    "[ Columbus ] first crossed the Atlantic in [ 1492 ]Some extra info"
   )
 })
 
@@ -485,8 +485,8 @@ test("CardHtml renders {{cloze:FieldName}} properly with hint", () => {
     "{{cloze:Text}}<br>{{Extra}}",
     0,
     "cloze",
-    "Canberra was founded in [year].",
-    "Canberra was founded in [1913].Some extra stuff."
+    "Canberra was founded in [ year ] .",
+    "Canberra was founded in [ 1913 ] .Some extra stuff."
   )
 })
 
@@ -504,8 +504,8 @@ test("CardHtml renders multiple cloze templates properly 1 with hint", () => {
     "{{cloze:Field1}}{{cloze:Field2}}<br>{{Extra}}",
     0,
     "cloze",
-    "Columbus first crossed the Atlantic in [year]",
-    "Columbus first crossed the Atlantic in [1492]Some extra info"
+    "Columbus first crossed the Atlantic in [ year ]",
+    "Columbus first crossed the Atlantic in [ 1492 ]Some extra info"
   )
 })
 
@@ -523,8 +523,8 @@ test("CardHtml renders multiple cloze templates properly 2 with hint", () => {
     "{{cloze:Field1}}{{cloze:Field2}}<br>{{Extra}}",
     1,
     "cloze",
-    "In [year], Columbus sailed the ocean blue.",
-    "In [1492], Columbus sailed the ocean blue.Some extra info"
+    "In [ year ] , Columbus sailed the ocean blue.",
+    "In [ 1492 ] , Columbus sailed the ocean blue.Some extra info"
   )
 })
 
@@ -542,8 +542,8 @@ test("CardHtml renders multiple cloze templates properly 3 with hint", () => {
     "{{cloze:Field1}}{{cloze:Field2}}<br>{{Extra}}",
     2,
     "cloze",
-    "In 1492, Columbus sailed the ocean [color].",
-    "In 1492, Columbus sailed the ocean [blue].Some extra info"
+    "In 1492, Columbus sailed the ocean [ color ] .",
+    "In 1492, Columbus sailed the ocean [ blue ] .Some extra info"
   )
 })
 
@@ -561,8 +561,8 @@ test("CardHtml renders multiple cloze templates properly 4 with hint", () => {
     "{{cloze:Field1}}{{cloze:Field2}}<br>{{Extra}}",
     0,
     "cloze",
-    "[person] first crossed the Atlantic in [year]",
-    "[Columbus] first crossed the Atlantic in [1492]Some extra info"
+    "[ person ] first crossed the Atlantic in [ year ]",
+    "[ Columbus ] first crossed the Atlantic in [ 1492 ]Some extra info"
   )
 })
 
@@ -602,8 +602,8 @@ test("renderTemplate works for 1 cloze", () => {
   const [template] = templates
   expectTemplate(
     template,
-    "This is a cloze deletion for [...].",
-    "This is a cloze deletion for [Text].(Extra)"
+    "This is a cloze deletion for [ ... ] .",
+    "This is a cloze deletion for [ Text ] .(Extra)"
   )
 })
 
@@ -631,13 +631,13 @@ test("renderTemplate works for 2 cloze deletions", () => {
   const [template1, template2] = templates
   expectTemplate(
     template1,
-    "This is a cloze deletion for [...].",
-    "This is a cloze deletion for [Text1].(Extra)"
+    "This is a cloze deletion for [ ... ] .",
+    "This is a cloze deletion for [ Text1 ] .(Extra)"
   )
   expectTemplate(
     template2,
-    "This is a cloze deletion for [...].",
-    "This is a cloze deletion for [Text2].(Extra)"
+    "This is a cloze deletion for [ ... ] .",
+    "This is a cloze deletion for [ Text2 ] .(Extra)"
   )
 })
 

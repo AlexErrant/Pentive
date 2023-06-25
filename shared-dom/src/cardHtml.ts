@@ -16,6 +16,7 @@ import type {
   Note,
 } from "shared"
 import { assertNever, notEmpty, throwExp } from "shared"
+import { compile } from "html-to-text"
 
 export type StandardTemplate = Omit<Template, "templateType"> & {
   templateType: Standard
@@ -24,12 +25,8 @@ export type StandardTemplate = Omit<Template, "templateType"> & {
 export type ClozeTemplate = Omit<Template, "templateType"> & {
   templateType: Cloze
 }
-
-// https://stackoverflow.com/a/47140708
-export function strip(html: string): string {
-  const doc = new DOMParser().parseFromString(html, "text/html")
-  return doc.body.textContent ?? ""
-}
+const convert = compile({})
+export const strip = convert
 
 // These have hidden state - don't use `match` or `exec`!
 // https://www.tsmean.com/articles/regex/javascript-regex-match-vs-exec-vs-matchall/
