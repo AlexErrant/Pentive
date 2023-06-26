@@ -68,7 +68,7 @@
     "wrangler": "^2.16.0"
   },
   "dependencies": {
-    "@github/time-elements": "^3.1.4",
+    "@github/relative-time-element": "^4.3.0",
     "@solidjs/router": "^0.8.2",
     "@tanstack/solid-table": "^8.8.5",
     "@thisbeyond/solid-select": "^0.14.0",

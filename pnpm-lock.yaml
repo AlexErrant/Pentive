@@ -62,9 +62,9 @@ importers:
 
   app:
     dependencies:
-      '@github/time-elements':
-        specifier: ^3.1.4
-        version: 3.1.4
+      '@github/relative-time-element':
+        specifier: ^4.3.0
+        version: 4.3.0
       '@solidjs/router':
         specifier: ^0.8.2
         version: 0.8.2(solid-js@1.7.3)
@@ -4471,9 +4471,8 @@ packages:
     resolution: {integrity: sha512-IoD2MfUnOV58ghIHCiil01PcohxjbYR/qCxsoC+xNgUwh1EY8jOOrYmu3d3a71+tJJ23uscEV4X2HJWMsPJu4g==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
 
-  /@github/time-elements@3.1.4:
-    resolution: {integrity: sha512-DTe/w0uKVeciKzGtYadNdfS8D86pXdGF+OrKg+vi8PKlotJ45zAc26zNpmmfCcMblBBg2+uoi3OxmUm7am/0sg==}
-    deprecated: Please use @github/relative-time-element insteadd
+  /@github/relative-time-element@4.3.0:
+    resolution: {integrity: sha512-+tFjX9//HRS1HnBa5cNgfEtE52arwiutYg1TOF+Trk40SPxst9Q8Rtc3BKD6aKsvfbtub68vfhipgchGjj9o7g==}
     dev: false
 
   /@hapi/accept@5.0.2:
