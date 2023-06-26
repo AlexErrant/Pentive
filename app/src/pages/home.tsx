@@ -396,7 +396,7 @@ async function uploadMedia(
     // My mental static analysis says to use `currentTarget`, but it seems to randomly be null, hence `target`. I'm confused but whatever.
     event.target.files?.item(0) ??
     throwExp("Impossible - there should be a file selected")
-  await db.bulkAddMedia([
+  await db.bulkInsertMedia([
     {
       id: file.name as MediaId,
       created: new Date(),

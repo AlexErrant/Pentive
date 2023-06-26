@@ -15,7 +15,7 @@ function entityToDomain(entity: MediaEntity): Media {
 }
 
 export const mediaCollectionMethods = {
-  upsertMediaTrx: async function (media: Media, db: Transaction<DB>) {
+  insertMediaTrx: async function (media: Media, db: Transaction<DB>) {
     await db
       .insertInto("media")
       .values({
@@ -26,7 +26,7 @@ export const mediaCollectionMethods = {
       })
       .execute()
   },
-  upsertMedia: async function (media: Media) {
+  insertMedia: async function (media: Media) {
     const db = await getDb()
     const created = media.created.getTime()
     const updated = media.updated.getTime()
@@ -36,7 +36,7 @@ export const mediaCollectionMethods = {
       [media.id, created, updated, new Uint8Array(media.data)]
     )
   },
-  async bulkAddMedia(media: Media[]) {
+  async bulkInsertMedia(media: Media[]) {
     // wa-sqlite write perf is significantly worse than Dexie's.
     // If moving to SQLite official doesn't improve perf, consider using Origin Private File System
     const db = await getDb()

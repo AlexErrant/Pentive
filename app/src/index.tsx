@@ -173,7 +173,7 @@ async function downloadImages(
           updated: now,
           data: await response.arrayBuffer(),
         }
-        await db.upsertMediaTrx(media, trx)
+        await db.insertMediaTrx(media, trx)
       } else {
         console.error(response)
         throwExp(`Fetching ${imgSrc} got a status code of ${response.status}`)

@@ -96,7 +96,7 @@ async function addMediaBatch(
     })
   )
   const media = mediaAndNulls.filter(notEmpty)
-  await db.bulkAddMedia(media)
+  await db.bulkInsertMedia(media)
 }
 
 async function importAnkiDb(sqlite: Entry): Promise<void> {
