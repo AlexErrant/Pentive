@@ -5,4 +5,5 @@ export interface Media {
   readonly created: Date
   readonly updated: Date
   readonly data: ArrayBuffer
+  readonly hash: ArrayBuffer
 }

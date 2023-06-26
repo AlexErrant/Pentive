@@ -11,11 +11,15 @@ function entityToDomain(entity: MediaEntity): Media {
     created: new Date(entity.created),
     updated: new Date(entity.updated),
     data: entity.data.buffer,
+    hash: entity.hash.buffer,
   }
 }
 
+type MediaSansHash = Omit<Media, "hash">
+
 export const mediaCollectionMethods = {
-  insertMediaTrx: async function (media: Media, db: Transaction<DB>) {
+  insertMediaTrx: async function (media: MediaSansHash, db: Transaction<DB>) {
+    const hash = await crypto.subtle.digest("SHA-256", media.data)
     await db
       .insertInto("media")
       .values({
@@ -23,32 +27,48 @@ export const mediaCollectionMethods = {
         created: media.created.getTime(),
         updated: media.updated.getTime(),
         data: new Uint8Array(media.data),
+        hash: new Uint8Array(hash),
       })
       .execute()
   },
-  insertMedia: async function (media: Media) {
+  insertMedia: async function (media: MediaSansHash) {
     const db = await getDb()
     const created = media.created.getTime()
     const updated = media.updated.getTime()
+    const hash = await crypto.subtle.digest("SHA-256", media.data)
     await db.exec(
-      `INSERT INTO media (id,created,updated,data)
-                  VALUES ( ?,      ?,      ?,   ?)`,
-      [media.id, created, updated, new Uint8Array(media.data)]
+      `INSERT INTO media (id,created,updated,data,hash)
+                  VALUES ( ?,      ?,      ?,   ?,   ?)`,
+      [
+        media.id,
+        created,
+        updated,
+        new Uint8Array(media.data),
+        new Uint8Array(hash),
+      ]
     )
   },
-  async bulkInsertMedia(media: Media[]) {
+  async bulkInsertMedia(media: MediaSansHash[]) {
     // wa-sqlite write perf is significantly worse than Dexie's.
     // If moving to SQLite official doesn't improve perf, consider using Origin Private File System
     const db = await getDb()
     await db.tx(async (tx) => {
       const insert = await tx.prepare(
-        `INSERT INTO media (id,created,updated,data)
-                  VALUES ( ?,      ?,      ?,   ?)`
+        `INSERT INTO media (id,created,updated,data,hash)
+                    VALUES ( ?,      ?,      ?,   ?,   ?)`
       )
       for (const m of media) {
         const created = m.created.getTime()
         const updated = m.updated.getTime()
-        await insert.run(tx, m.id, created, updated, new Uint8Array(m.data))
+        const hash = await crypto.subtle.digest("SHA-256", m.data)
+        await insert.run(
+          tx,
+          m.id,
+          created,
+          updated,
+          new Uint8Array(m.data),
+          new Uint8Array(hash)
+        )
       }
       await insert.finalize(tx)
     })
@@ -63,11 +83,10 @@ export const mediaCollectionMethods = {
       .where("id", "=", id)
       .executeTakeFirst()
       .then((r) => undefinedMap(r, entityToDomain))
-    const data = media?.data ?? undefined
-    if (data == null) {
-      return data
+    if (media?.data == null) {
+      return undefined
     } else {
-      return Comlink.transfer(media, [data])
+      return Comlink.transfer(media, [media.data, media.hash])
     }
   },
 }

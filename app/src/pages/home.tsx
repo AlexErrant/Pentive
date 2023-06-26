@@ -371,6 +371,15 @@ export default function Home(): JSX.Element {
         <button class="px-2" onClick={q("select * from remoteMedia")}>
           remoteMedia
         </button>
+        <button
+          class="px-2"
+          onClick={q(
+            "select hash, count(*) c from media group by hash having c > 1"
+          )}
+        >
+          dupMedia
+          {/* medTODO add de-duping of media using their hash. Implement after adding full text search, since we'll need to search existing notes for images using dupes. */}
+        </button>
       </div>
       <div class="mt-4">
         <Peers />

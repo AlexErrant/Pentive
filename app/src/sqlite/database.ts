@@ -27,6 +27,7 @@ export interface Media {
   created: number
   updated: number
   data: Uint8Array
+  hash: Uint8Array
 }
 
 export interface Note {

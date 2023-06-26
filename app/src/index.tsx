@@ -15,7 +15,6 @@ import {
   throwExp,
   relativeChar,
   type Template,
-  type Media,
   type Note,
   type Card,
 } from "shared"
@@ -167,13 +166,15 @@ async function downloadImages(
       const response = await fetch(imgSrc)
       if (response.status === 200) {
         const now = new Date()
-        const media: Media = {
-          id,
-          created: now,
-          updated: now,
-          data: await response.arrayBuffer(),
-        }
-        await db.insertMediaTrx(media, trx)
+        await db.insertMediaTrx(
+          {
+            id,
+            created: now,
+            updated: now,
+            data: await response.arrayBuffer(),
+          },
+          trx
+        )
       } else {
         console.error(response)
         throwExp(`Fetching ${imgSrc} got a status code of ${response.status}`)
