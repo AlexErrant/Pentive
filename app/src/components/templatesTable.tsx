@@ -23,7 +23,7 @@ import {
 } from "shared"
 import _ from "lodash"
 import ResizingIframe from "./resizingIframe"
-import "@github/time-elements"
+import "@github/relative-time-element"
 import { db } from "../db"
 
 function id(id: keyof Template): keyof Template {
@@ -116,14 +116,14 @@ const columns: Array<ColumnDef<Template>> = [
     header: "Created",
     accessorKey: id("created"),
     cell: (info) => {
-      return <time-ago attr:datetime={info.getValue<Date>()} />
+      return <relative-time date={info.getValue<Date>()} />
     },
   },
   {
     header: "Updated",
     accessorKey: id("updated"),
     cell: (info) => {
-      return <time-ago attr:datetime={info.getValue<Date>()} />
+      return <relative-time date={info.getValue<Date>()} />
     },
   },
   {

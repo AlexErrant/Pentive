@@ -6,7 +6,7 @@ import {
   getCoreRowModel,
 } from "@tanstack/solid-table"
 import { type Plugin } from "shared-dom"
-import "@github/time-elements"
+import "@github/relative-time-element"
 import { db } from "../db"
 
 function id(id: keyof Plugin): keyof Plugin {
@@ -30,14 +30,14 @@ const columns: Array<ColumnDef<Plugin>> = [
     header: "Created",
     accessorKey: id("created"),
     cell: (info) => {
-      return <time-ago attr:datetime={info.getValue<Date>()} />
+      return <relative-time date={info.getValue<Date>()} />
     },
   },
   {
     header: "Updated",
     accessorKey: id("updated"),
     cell: (info) => {
-      return <time-ago attr:datetime={info.getValue<Date>()} />
+      return <relative-time date={info.getValue<Date>()} />
     },
   },
 ]

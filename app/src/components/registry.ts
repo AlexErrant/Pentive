@@ -3,20 +3,15 @@
 // https://stackoverflow.com/a/72239265
 // https://github.com/solidjs/solid/issues/616
 
-import type { Component } from "solid-js"
+import type RelativeTimeElement from "@github/relative-time-element"
 
 declare module "solid-js" {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace JSX {
-    type ElementProps<T> = {
-      readonly [K in keyof T]: T[K] extends Component<infer P> ? P : never
-    }
-
-    interface IntrinsicElements extends ElementProps<HTMLElementTagNameMap> {
-      "time-ago": {
-        // A value of `TimeAgoElement` doesn't seem to work, so we gotta do it manually. https://github.com/github/time-elements/issues/163
-        "attr:datetime": Date
-      }
+    interface IntrinsicElements {
+      // https://github.com/github/relative-time-element/blob/3a8f30f1a66edbe8d4e76c721ff1767c49b0ed27/src/relative-time-element-define.ts#L27
+      "relative-time": JSX.IntrinsicElements["span"] &
+        Partial<Omit<RelativeTimeElement, keyof HTMLElement>>
     }
   }
 }

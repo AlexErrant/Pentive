@@ -1,6 +1,6 @@
 import { type VoidComponent } from "solid-js"
 import { type NoteCard, type CardId } from "shared"
-import "@github/time-elements"
+import "@github/relative-time-element"
 import AgGridSolid, { type AgGridSolidRef } from "ag-grid-solid"
 import "ag-grid-community/styles/ag-grid.css"
 import "ag-grid-community/styles/ag-theme-alpine.css"
