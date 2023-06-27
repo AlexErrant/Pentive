@@ -5,6 +5,7 @@ import AgGridSolid, { type AgGridSolidRef } from "ag-grid-solid"
 import "ag-grid-community/styles/ag-grid.css"
 import "ag-grid-community/styles/ag-theme-alpine.css"
 import {
+  type ICellRendererParams,
   type ColDef,
   type GetRowIdParams,
   type GridReadyEvent,
@@ -36,7 +37,10 @@ const columnDefs: Array<ColDef<NoteCard>> = [
   },
   {
     headerName: "Due",
-    valueGetter: (x) => x.data?.card.due.toLocaleDateString(),
+    valueGetter: (x) => x.data?.card.due,
+    cellRenderer: (
+      props: ICellRendererParams<NoteCard, NoteCard["card"]["due"]>
+    ) => <relative-time date={props.value} />,
   },
   {
     headerName: "Tags",
