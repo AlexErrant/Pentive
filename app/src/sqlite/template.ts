@@ -164,6 +164,26 @@ export const templateCollectionMethods = {
       )
     )
   },
+  // lowTODO actually use the offset/limit
+  getTemplatesInfinitely: async function (offset: number, limit: number) {
+    const db = await getKysely()
+    const allTemplates = await db.selectFrom("template").selectAll().execute()
+    const remoteTemplates = await db
+      .selectFrom("remoteTemplate")
+      .selectAll()
+      .execute()
+    const templates = allTemplates.map((alt) =>
+      entityToDomain(
+        alt,
+        remoteTemplates.filter((rt) => rt.localId === alt.id)
+      )
+    )
+    const { count } = await db
+      .selectFrom("card")
+      .select(db.fn.count<number>("id").as("count"))
+      .executeTakeFirstOrThrow()
+    return { templates, count }
+  },
   getNewTemplatesToUpload: async function () {
     const db = await getKysely()
     const dp = new DOMParser()

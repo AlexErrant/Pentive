@@ -2,17 +2,20 @@ import {
   For,
   type JSX,
   type VoidComponent,
-  Suspense,
   createSignal,
   Show,
   type Setter,
 } from "solid-js"
+import AgGridSolid, { type AgGridSolidRef } from "ag-grid-solid"
+import "ag-grid-community/styles/ag-grid.css"
+import "ag-grid-community/styles/ag-theme-alpine.css"
 import {
-  type ColumnDef,
-  createSolidTable,
-  flexRender,
-  getCoreRowModel,
-} from "@tanstack/solid-table"
+  type ICellRendererParams,
+  type ColDef,
+  type GetRowIdParams,
+  type GridReadyEvent,
+  type IGetRowsParams,
+} from "ag-grid-community"
 import {
   type Template,
   type NookId,
@@ -26,9 +29,7 @@ import ResizingIframe from "./resizingIframe"
 import "@github/relative-time-element"
 import { db } from "../db"
 
-function id(id: keyof Template): keyof Template {
-  return id
-}
+let gridRef: AgGridSolidRef
 
 function removeNook(
   templateId: TemplateId,
@@ -95,109 +96,100 @@ function remoteCell(template: Template): JSX.Element {
   )
 }
 
-const columns: Array<ColumnDef<Template>> = [
+const columnDefs: Array<ColDef<Template>> = [
   {
-    header: "Name",
-    accessorKey: id("name"),
+    headerName: "Name",
+    valueGetter: (row) => row.data?.name,
   },
   {
-    header: "Type",
-    accessorFn: (row) => _.startCase(row.templateType.tag),
+    headerName: "Type",
+    valueGetter: (row) => _.startCase(row?.data?.templateType.tag),
   },
   {
-    header: "Upload",
-    cell: (info) => remoteCell(info.row.original),
+    headerName: "Upload",
+    cellRenderer: (props: ICellRendererParams<Template>) => (
+      <Show when={props.data != null}>{remoteCell(props.data!)}</Show>
+    ),
   },
   {
-    header: "Fields",
-    accessorFn: (row) => row.fields.map((f) => f.name).join(", "),
+    headerName: "Fields",
+    valueGetter: (row) => row.data?.fields.map((f) => f.name).join(", "),
   },
   {
-    header: "Created",
-    accessorKey: id("created"),
-    cell: (info) => {
-      return <relative-time date={info.getValue<Date>()} />
-    },
+    headerName: "Created",
+    cellRenderer: (props: ICellRendererParams<Template>) => (
+      <relative-time date={props.data?.created} />
+    ),
   },
   {
-    header: "Updated",
-    accessorKey: id("updated"),
-    cell: (info) => {
-      return <relative-time date={info.getValue<Date>()} />
-    },
+    headerName: "Updated",
+    cellRenderer: (props: ICellRendererParams<Template>) => (
+      <relative-time date={props.data?.updated} />
+    ),
   },
   {
-    header: "Preview",
-    cell: (info) => {
+    headerName: "Preview",
+    cellRenderer: (props: ICellRendererParams<Template>) => {
       return (
         // lowTODO: iterate over all templates... or not. If there are 10 it'll look ugly
-        <ResizingIframe
-          i={{
-            tag: "template",
-            side: "front",
-            templateId: info.row.original.id,
-            index: "0",
-          }}
-        />
+        <Show when={props.data?.id != null}>
+          <ResizingIframe
+            i={{
+              tag: "template",
+              side: "front",
+              templateId: props.data!.id,
+              index: "0",
+            }}
+          />
+        </Show>
       )
     },
   },
 ]
 
+const defaultColDef: ColDef<Template> = { sortable: true }
+
+const getRowId = (params: GetRowIdParams<Template>): TemplateId =>
+  params.data.id
+
 const TemplatesTable: VoidComponent<{
   readonly templates: Template[]
 }> = (props) => {
-  const table = createSolidTable({
-    get data() {
-      return props.templates
-    },
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-  })
   return (
-    <Suspense fallback={<span>Loading...</span>}>
-      <table>
-        <thead>
-          <For each={table.getHeaderGroups()}>
-            {(headerGroup) => (
-              <tr>
-                <For each={headerGroup.headers}>
-                  {(header) => (
-                    <th>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                    </th>
-                  )}
-                </For>
-              </tr>
-            )}
-          </For>
-        </thead>
-        <tbody>
-          <For each={table.getRowModel().rows}>
-            {(row) => (
-              <tr>
-                <For each={row.getVisibleCells()}>
-                  {(cell) => (
-                    <td>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </td>
-                  )}
-                </For>
-              </tr>
-            )}
-          </For>
-        </tbody>
-      </table>
-    </Suspense>
+    <div class="ag-theme-alpine" style={{ height: "500px" }}>
+      <AgGridSolid
+        columnDefs={columnDefs}
+        defaultColDef={defaultColDef}
+        ref={gridRef}
+        getRowId={getRowId}
+        rowSelection="multiple"
+        rowModelType="infinite"
+        onGridReady={onGridReady}
+        cacheBlockSize={cacheBlockSize}
+        onSelectionChanged={(event) => {
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars -- nextTODO
+          const ncs = event.api.getSelectedRows() as Template[]
+          // props.onSelectionChanged(ncs)
+        }}
+      />
+    </div>
   )
 }
 
 export default TemplatesTable
+
+const cacheBlockSize = 100
+
+const onGridReady = ({ api }: GridReadyEvent) => {
+  api.setDatasource({
+    getRows: (p: IGetRowsParams) => {
+      db.getTemplatesInfinitely(p.startRow, cacheBlockSize)
+        .then((x) => {
+          p.successCallback(x.templates, x.count)
+        })
+        .catch(() => {
+          p.failCallback()
+        })
+    },
+  })
+}
