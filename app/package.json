@@ -79,6 +79,7 @@
     "@vlcn.io/xplat-api": "0.11.0",
     "@zip.js/zip.js": "^2.6.41",
     "ag-grid-community": "^30.0.2",
+    "ag-grid-enterprise": "^30.0.2",
     "ag-grid-solid": "^30.0.2",
     "api-ugc": "workspace:*",
     "babel-preset-solid": "^1.7.3",
