@@ -57,7 +57,7 @@ const CardsTable: VoidComponent<{
   readonly onSelectionChanged: (noteCards: NoteCard[]) => void
 }> = (props) => {
   return (
-    <div class="ag-theme-alpine" style={{ height: "500px" }}>
+    <div class="ag-theme-alpine" style={{ width: "50%" }}>
       <AgGridSolid
         columnDefs={columnDefs}
         defaultColDef={defaultColDef}

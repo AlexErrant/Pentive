@@ -55,7 +55,8 @@ export default function Cards(): JSX.Element {
     if (cards() != null) setSelected("noteCard", "cards", cards()!)
   })
   return (
-    <>
+    // https://stackoverflow.com/a/24979148
+    <div class="flex-auto flex flex-row overflow-auto">
       <CardsTable
         onSelectionChanged={(ncs) => {
           if (ncs.length > 0) {
@@ -76,10 +77,15 @@ export default function Cards(): JSX.Element {
         }}
       />
       <Show when={selected.noteCard != null}>
-        <CardsRemote noteCard={selected.noteCard!} />
-        <FieldsEditor noteCard={selected.noteCard!} setNoteCard={setSelected} />
-        <CardsPreview noteCard={selected.noteCard!} />
+        <div class="overflow-auto w-1/2">
+          <CardsRemote noteCard={selected.noteCard!} />
+          <FieldsEditor
+            noteCard={selected.noteCard!}
+            setNoteCard={setSelected}
+          />
+          <CardsPreview noteCard={selected.noteCard!} />
+        </div>
       </Show>
-    </>
+    </div>
   )
 }

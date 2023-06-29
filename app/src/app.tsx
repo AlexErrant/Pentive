@@ -22,7 +22,7 @@ export default function App(): JSX.Element {
       />
       <C.nav navLinks={navLinks} />
 
-      <main>
+      <main class="contents">
         <Route />
       </main>
     </>
