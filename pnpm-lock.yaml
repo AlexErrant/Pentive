@@ -93,14 +93,14 @@ importers:
         specifier: ^2.6.41
         version: 2.6.41
       ag-grid-community:
-        specifier: ^30.0.2
-        version: 30.0.2
+        specifier: 29.2.0
+        version: 29.2.0
       ag-grid-enterprise:
-        specifier: ^30.0.2
-        version: 30.0.2
+        specifier: 29.2.0
+        version: 29.2.0
       ag-grid-solid:
-        specifier: ^30.0.2
-        version: 30.0.2(ag-grid-community@30.0.2)(solid-js@1.7.3)
+        specifier: 29.2.0
+        version: 29.2.0(ag-grid-community@29.2.0)(solid-js@1.7.3)
       api-ugc:
         specifier: workspace:*
         version: link:../api-ugc
@@ -6641,21 +6641,21 @@ packages:
     engines: {node: '>=6.0'}
     dev: true
 
-  /ag-grid-community@30.0.2:
-    resolution: {integrity: sha512-yJ+H/y2UvuzJpDdD1osLswZFBaUVd8vHxyOhreUihYC763Yz16jgIgP/8vmqpbSHHmJZ7bqs5ojV2uehLJ8BGQ==}
+  /ag-grid-community@29.2.0:
+    resolution: {integrity: sha512-1xP1fpM8gXp2ALzBLONejZNul9hA3//ddszSlhq79QZ1FskQ1Z7E2WvvFeCeLJTJZrfhQkT1q1LO5DGfGeiBvg==}
     dev: false
 
-  /ag-grid-enterprise@30.0.2:
-    resolution: {integrity: sha512-6uPMuKl6eh466kgVdqhgqdsfIqV8FHkrvahHTze3pq4fUNNwVXwCYR9HYq6HE5P6v3omy91WyDQrxWrL0fdJIg==}
+  /ag-grid-enterprise@29.2.0:
+    resolution: {integrity: sha512-LYwX6Z8O2FBzN2c0N+h9mMX5hQQMpBzZ+ztmTiboxIVE6DB1MrpfVy0A8YfR31JtzLaj/lRjCqsx6BcnbvkSmA==}
     dev: false
 
-  /ag-grid-solid@30.0.2(ag-grid-community@30.0.2)(solid-js@1.7.3):
-    resolution: {integrity: sha512-ENo485eB65dvRZqMi5/mAHkUK58PMAzD5WmlOdZ1Ip/lEGlUieGg60GcDoHss8AAJ9XrhIi1Jncx+UrXbNrIPw==}
+  /ag-grid-solid@29.2.0(ag-grid-community@29.2.0)(solid-js@1.7.3):
+    resolution: {integrity: sha512-03+sm7uyLS0j4i4u2hSA9WOD0Mz/mOYXfX6yDqNceBXpLw7U0ZOOOeDfw7oDVXf1sZbfuCIETOXgL03LpoFkug==}
     peerDependencies:
-      ag-grid-community: ~30.0.2
+      ag-grid-community: ~29.2.0
       solid-js: '>=1.0.0'
     dependencies:
-      ag-grid-community: 30.0.2
+      ag-grid-community: 29.2.0
       solid-js: 1.7.3
     dev: false
 
