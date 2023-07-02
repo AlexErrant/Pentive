@@ -179,7 +179,7 @@ export const templateCollectionMethods = {
       )
     )
     const { count } = await db
-      .selectFrom("card")
+      .selectFrom("template")
       .select(db.fn.count<number>("id").as("count"))
       .executeTakeFirstOrThrow()
     return { templates, count }
