@@ -27,39 +27,42 @@ export const FieldsEditor: VoidComponent<{
           />
         )}
       </For>
-      <button
-        onClick={async () => {
-          if (props.noteCard.cards.length === 0)
-            throwExp("There must be at least 1 card")
-          const kysely = await getKysely()
-          const dp = new DOMParser()
-          // eslint-disable-next-line solid/reactivity -- the fn isn't reactive
-          await kysely.transaction().execute(async (trx) => {
-            const fieldValues = await Promise.all(
-              props.noteCard.note.fieldValues.map(async ([f, v]) => {
-                const doc = dp.parseFromString(v, "text/html")
-                await Promise.all(
-                  Array.from(doc.images).map(async (i) => {
-                    await mutate(i, trx)
-                  })
-                )
-                return [f, doc.body.innerHTML] as const
+      <div>
+        <button
+          class="bg-green-600 hover:bg-green-700 text-white font-bold p-2 px-4 rounded"
+          onClick={async () => {
+            if (props.noteCard.cards.length === 0)
+              throwExp("There must be at least 1 card")
+            const kysely = await getKysely()
+            const dp = new DOMParser()
+            // eslint-disable-next-line solid/reactivity -- the fn isn't reactive
+            await kysely.transaction().execute(async (trx) => {
+              const fieldValues = await Promise.all(
+                props.noteCard.note.fieldValues.map(async ([f, v]) => {
+                  const doc = dp.parseFromString(v, "text/html")
+                  await Promise.all(
+                    Array.from(doc.images).map(async (i) => {
+                      await mutate(i, trx)
+                    })
+                  )
+                  return [f, doc.body.innerHTML] as const
+                })
+              )
+              const noteCards = toNoteCards({
+                ...props.noteCard,
+                note: { ...props.noteCard.note, fieldValues },
               })
-            )
-            const noteCards = toNoteCards({
-              ...props.noteCard,
-              note: { ...props.noteCard.note, fieldValues },
+              await db.upsertNote(noteCards[0].note, trx)
+              await db.bulkUpsertCards(
+                noteCards.map((nc) => nc.card),
+                trx
+              )
             })
-            await db.upsertNote(noteCards[0].note, trx)
-            await db.bulkUpsertCards(
-              noteCards.map((nc) => nc.card),
-              trx
-            )
-          })
-        }}
-      >
-        Save
-      </button>
+          }}
+        >
+          Save
+        </button>
+      </div>
     </>
   )
 }
