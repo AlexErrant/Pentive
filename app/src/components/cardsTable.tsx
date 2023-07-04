@@ -17,8 +17,8 @@ import { assertNever } from "shared"
 let gridRef: AgGridSolidRef
 
 const columnDefs: Array<ColDef<NoteCard>> = [
-  { field: "card.id" },
-  { field: "note.id" },
+  { field: "card.id", hide: true },
+  { field: "note.id", hide: true },
   {
     headerName: "Card",
     valueGetter: (x) => {
