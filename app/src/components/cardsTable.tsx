@@ -57,21 +57,26 @@ const CardsTable: VoidComponent<{
   readonly onSelectionChanged: (noteCards: NoteCard[]) => void
 }> = (props) => {
   return (
-    <div class="ag-theme-alpine" style={{ width: "50%" }}>
-      <AgGridSolid
-        columnDefs={columnDefs}
-        defaultColDef={defaultColDef}
-        ref={gridRef}
-        getRowId={getRowId}
-        rowSelection="multiple"
-        rowModelType="infinite"
-        onGridReady={onGridReady}
-        cacheBlockSize={cacheBlockSize}
-        onSelectionChanged={(event) => {
-          const ncs = event.api.getSelectedRows() as NoteCard[]
-          props.onSelectionChanged(ncs)
-        }}
-      />
+    <div class="flex flex-col" style={{ width: "50%" }}>
+      <div class="m-0.5 p-0.5">
+        <input class="w-full border" type="text" placeholder="Search" />
+      </div>
+      <div class="ag-theme-alpine h-full">
+        <AgGridSolid
+          columnDefs={columnDefs}
+          defaultColDef={defaultColDef}
+          ref={gridRef}
+          getRowId={getRowId}
+          rowSelection="multiple"
+          rowModelType="infinite"
+          onGridReady={onGridReady}
+          cacheBlockSize={cacheBlockSize}
+          onSelectionChanged={(event) => {
+            const ncs = event.api.getSelectedRows() as NoteCard[]
+            props.onSelectionChanged(ncs)
+          }}
+        />
+      </div>
     </div>
   )
 }
