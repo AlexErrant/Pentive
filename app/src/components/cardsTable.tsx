@@ -38,6 +38,8 @@ const columnDefs: Array<ColDef<NoteCard>> = [
   {
     headerName: "Due",
     valueGetter: (x) => x.data?.card.due,
+    colId: "due",
+    sortable: true,
     cellRenderer: (
       props: ICellRendererParams<NoteCard, NoteCard["card"]["due"]>
     ) => <relative-time date={props.value} />,
@@ -47,8 +49,6 @@ const columnDefs: Array<ColDef<NoteCard>> = [
     valueGetter: (x) => Array.from(x.data?.note.tags.keys() ?? []).join(", "),
   },
 ]
-
-const defaultColDef: ColDef<NoteCard> = { sortable: true }
 
 const getRowId = (params: GetRowIdParams<NoteCard>): CardId =>
   params.data.card.id
@@ -64,7 +64,6 @@ const CardsTable: VoidComponent<{
       <div class="ag-theme-alpine h-full">
         <AgGridSolid
           columnDefs={columnDefs}
-          defaultColDef={defaultColDef}
           ref={gridRef}
           getRowId={getRowId}
           rowSelection="multiple"
@@ -88,7 +87,14 @@ const cacheBlockSize = 100
 const onGridReady = ({ api }: GridReadyEvent) => {
   api.setDatasource({
     getRows: (p: IGetRowsParams) => {
-      db.getCards(p.startRow, cacheBlockSize) // medTODO could just cache the Template and mutate the NoteCard obj to add it
+      const sort =
+        p.sortModel.length === 1
+          ? {
+              col: p.sortModel[0].colId as "due",
+              direction: p.sortModel[0].sort,
+            }
+          : undefined
+      db.getCards(p.startRow, cacheBlockSize, sort) // medTODO could just cache the Template and mutate the NoteCard obj to add it
         .then((x) => {
           p.successCallback(x.noteCards, x.count)
         })

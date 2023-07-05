@@ -147,8 +147,6 @@ const columnDefs: Array<ColDef<Template>> = [
   },
 ]
 
-const defaultColDef: ColDef<Template> = { sortable: true }
-
 const getRowId = (params: GetRowIdParams<Template>): TemplateId =>
   params.data.id
 
@@ -159,7 +157,6 @@ const TemplatesTable: VoidComponent<{
     <div class="ag-theme-alpine" style={{ height: "500px" }}>
       <AgGridSolid
         columnDefs={columnDefs}
-        defaultColDef={defaultColDef}
         ref={gridRef}
         getRowId={getRowId}
         rowSelection="multiple"

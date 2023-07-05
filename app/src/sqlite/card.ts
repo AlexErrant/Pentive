@@ -166,7 +166,11 @@ export const cardCollectionMethods = {
       .execute()
     return cards.map(entityToDomain)
   },
-  getCards: async function (offset: number, limit: number) {
+  getCards: async function (
+    offset: number,
+    limit: number,
+    sort?: { col: "due"; direction: "asc" | "desc" }
+  ) {
     const db = await getKysely()
     const entities = await db
       .selectFrom("card")
@@ -212,6 +216,8 @@ export const cardCollectionMethods = {
       ])
       .offset(offset)
       .limit(limit)
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      .$if(sort != null, (db) => db.orderBy(sort!.col, sort!.direction))
       .execute()
     const count = await db
       .selectFrom("card")
