@@ -11,8 +11,11 @@ import {
   type GridReadyEvent,
   type IGetRowsParams,
 } from "ag-grid-community"
+import { LicenseManager } from "ag-grid-enterprise"
 import { db } from "../db"
 import { assertNever } from "shared"
+
+LicenseManager.setLicenseKey(import.meta.env.VITE_AG_GRID_LICENSE)
 
 let gridRef: AgGridSolidRef
 

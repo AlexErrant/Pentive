@@ -32,6 +32,8 @@ export productionAppOrigin=https://app.pentive.com
 export developmentHubOrigin=https://pentive.localhost:3014
 export productionHubOrigin=https://pentive.com
 # If you add any `VITE_PRODUCTION_*`, also update `cicd.yml`
+export VITE_DEVELOPMENT_AG_GRID_LICENSE=
+export VITE_PRODUCTION_AG_GRID_LICENSE=
 export VITE_DEVELOPMENT_HUB_DOMAIN=pentive.localhost
 export VITE_PRODUCTION_HUB_DOMAIN=hub.yourusernamehere.workers.dev
 export VITE_DEVELOPMENT_HUB_ORIGIN=https://pentive.localhost:3014

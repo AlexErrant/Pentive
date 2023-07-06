@@ -16,6 +16,7 @@ import {
   type GridReadyEvent,
   type IGetRowsParams,
 } from "ag-grid-community"
+import { LicenseManager } from "ag-grid-enterprise"
 import {
   type Template,
   type NookId,
@@ -28,6 +29,8 @@ import _ from "lodash"
 import ResizingIframe from "./resizingIframe"
 import "@github/relative-time-element"
 import { db } from "../db"
+
+LicenseManager.setLicenseKey(import.meta.env.VITE_AG_GRID_LICENSE)
 
 let gridRef: AgGridSolidRef
 
