@@ -159,6 +159,7 @@ const TemplatesTable: VoidComponent<{
   return (
     <div class="ag-theme-alpine" style={{ height: "500px" }}>
       <AgGridSolid
+        sideBar={{ toolPanels: ["columns"] }}
         columnDefs={columnDefs}
         ref={gridRef}
         getRowId={getRowId}
