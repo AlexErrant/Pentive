@@ -1,4 +1,4 @@
-import { type VoidComponent } from "solid-js"
+import { createEffect, createSignal, on, type VoidComponent } from "solid-js"
 import { type NoteCard, type CardId } from "shared"
 import "@github/relative-time-element"
 import AgGridSolid, { type AgGridSolidRef } from "ag-grid-solid"
@@ -56,13 +56,25 @@ const columnDefs: Array<ColDef<NoteCard>> = [
 const getRowId = (params: GetRowIdParams<NoteCard>): CardId =>
   params.data.card.id
 
+const [generalSearch, setGeneralSearch] = createSignal("")
+
 const CardsTable: VoidComponent<{
   readonly onSelectionChanged: (noteCards: NoteCard[]) => void
 }> = (props) => {
+  createEffect(
+    on(generalSearch, () => {
+      gridRef?.api.setDatasource(dataSource)
+    })
+  )
   return (
     <div class="flex flex-col" style={{ width: "50%" }}>
       <div class="m-0.5 p-0.5">
-        <input class="w-full border" type="text" placeholder="Search" />
+        <input
+          class="w-full border"
+          type="text"
+          placeholder="Search"
+          onInput={(e) => setGeneralSearch(e.currentTarget.value)}
+        />
       </div>
       <div class="ag-theme-alpine h-full">
         <AgGridSolid
@@ -89,22 +101,29 @@ export default CardsTable
 const cacheBlockSize = 100
 
 const onGridReady = ({ api }: GridReadyEvent) => {
-  api.setDatasource({
-    getRows: (p: IGetRowsParams) => {
-      const sort =
-        p.sortModel.length === 1
-          ? {
-              col: p.sortModel[0].colId as "due",
-              direction: p.sortModel[0].sort,
-            }
-          : undefined
-      db.getCards(p.startRow, cacheBlockSize, sort) // medTODO could just cache the Template and mutate the NoteCard obj to add it
-        .then((x) => {
-          p.successCallback(x.noteCards, x.count)
-        })
-        .catch(() => {
-          p.failCallback()
-        })
-    },
-  })
+  api.setDatasource(dataSource)
+}
+
+const dataSource = {
+  getRows: (p: IGetRowsParams) => {
+    const sort =
+      p.sortModel.length === 1
+        ? {
+            col: p.sortModel[0].colId as "due",
+            direction: p.sortModel[0].sort,
+          }
+        : undefined
+    const generalSearchActual = generalSearch()
+    const search =
+      generalSearchActual === ""
+        ? undefined
+        : { generalSearch: generalSearchActual }
+    db.getCards(p.startRow, cacheBlockSize, sort, search) // medTODO could just cache the Template and mutate the NoteCard obj to add it
+      .then((x) => {
+        p.successCallback(x.noteCards, x.count)
+      })
+      .catch(() => {
+        p.failCallback()
+      })
+  },
 }

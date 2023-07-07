@@ -169,7 +169,8 @@ export const cardCollectionMethods = {
   getCards: async function (
     offset: number,
     limit: number,
-    sort?: { col: "due"; direction: "asc" | "desc" }
+    sort?: { col: "due"; direction: "asc" | "desc" },
+    search?: { generalSearch: string }
   ) {
     const db = await getKysely()
     const entities = await db
@@ -218,10 +219,19 @@ export const cardCollectionMethods = {
       .limit(limit)
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       .$if(sort != null, (db) => db.orderBy(sort!.col, sort!.direction))
+      .$if(search != null, (db) =>
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        db.where("note.fieldValues", "like", "%" + search!.generalSearch + "%")
+      )
       .execute()
     const count = await db
       .selectFrom("card")
-      .select(db.fn.count<number>("id").as("c"))
+      .innerJoin("note", "card.noteId", "note.id")
+      .$if(search != null, (db) =>
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        db.where("note.fieldValues", "like", "%" + search!.generalSearch + "%")
+      )
+      .select(db.fn.count<number>("card.id").as("c"))
       .executeTakeFirstOrThrow()
     return {
       count: count.c,
