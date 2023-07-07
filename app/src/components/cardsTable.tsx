@@ -78,7 +78,21 @@ const CardsTable: VoidComponent<{
       </div>
       <div class="ag-theme-alpine h-full">
         <AgGridSolid
-          sideBar={{ toolPanels: ["columns"] }}
+          sideBar={{
+            toolPanels: [
+              {
+                id: "columns",
+                labelDefault: "Columns",
+                labelKey: "columns",
+                iconKey: "columns",
+                toolPanel: "agColumnsToolPanel",
+                toolPanelParams: {
+                  suppressRowGroups: true,
+                  suppressValues: true,
+                },
+              },
+            ],
+          }}
           columnDefs={columnDefs}
           ref={gridRef}
           getRowId={getRowId}
