@@ -13,6 +13,7 @@ crsqlite
 datasource
 dexie
 Exif
+goldenlayout
 graphiql
 hono
 hsts
@@ -24,6 +25,7 @@ importmap
 keymap
 kysely
 lrpc
+maximise
 miniflare
 mkcert
 msedge
@@ -34,6 +36,7 @@ peerjs
 pentive
 PKCE
 planetscale
+popout
 precache
 precaching
 prosemirror

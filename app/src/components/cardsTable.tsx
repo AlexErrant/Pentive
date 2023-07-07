@@ -67,7 +67,7 @@ const CardsTable: VoidComponent<{
     })
   )
   return (
-    <div class="flex flex-col" style={{ width: "50%" }}>
+    <div class="flex flex-col h-full">
       <div class="m-0.5 p-0.5">
         <input
           class="w-full border"
