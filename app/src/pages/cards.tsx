@@ -92,14 +92,13 @@ export default function Cards(): JSX.Element {
     goldenLayout.registerComponentFactoryFunction("CardDetail", (container) => {
       render(
         () => (
-          <Show when={selected.noteCard != null} fallback={<span />}>
+          <Show when={selected.noteCard != null}>
             <div class="overflow-auto h-full">
               <CardsRemote noteCard={selected.noteCard!} />
               <FieldsEditor
                 noteCard={selected.noteCard!}
                 setNoteCard={setSelected}
               />
-              <CardsPreview noteCard={selected.noteCard!} />
             </div>
           </Show>
         ),
@@ -113,14 +112,35 @@ export default function Cards(): JSX.Element {
           () => (
             <div>
               <button
-                class="border"
+                class="bg-green-600 hover:bg-green-700 text-white font-bold p-2 px-4 rounded m-2"
                 onClick={() => {
                   goldenLayout.addComponent("CardDetail")
                 }}
               >
                 Add CardDetail
               </button>
+              <button
+                class="bg-green-600 hover:bg-green-700 text-white font-bold p-2 px-4 rounded m-2"
+                onClick={() => {
+                  goldenLayout.addComponent("Preview Card")
+                }}
+              >
+                Add Preview Card
+              </button>
             </div>
+          ),
+          container.element
+        )
+      }
+    )
+    goldenLayout.registerComponentFactoryFunction(
+      "Preview Card",
+      (container) => {
+        render(
+          () => (
+            <Show when={selected.noteCard != null}>
+              <CardsPreview noteCard={selected.noteCard!} />
+            </Show>
           ),
           container.element
         )
@@ -148,8 +168,17 @@ export default function Cards(): JSX.Element {
             ],
           },
           {
-            type: "component",
-            componentType: "CardDetail",
+            type: "stack",
+            content: [
+              {
+                type: "component",
+                componentType: "CardDetail",
+              },
+              {
+                type: "component",
+                componentType: "Preview Card",
+              },
+            ],
           },
         ],
       },
