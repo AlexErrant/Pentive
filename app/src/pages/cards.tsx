@@ -109,6 +109,30 @@ export default function Cards(): JSX.Element {
         container.element.appendChild(cd)
       })
     })
+    goldenLayout.registerComponentFactoryFunction(
+      "Layout Manager",
+      (container) => {
+        const layoutManager = (
+          <div>
+            <button
+              class="border"
+              onClick={() => {
+                goldenLayout.addComponent("CardDetail")
+              }}
+            >
+              Add CardDetail
+            </button>
+          </div>
+        ) as unknown as Node
+        createEffect(() => {
+          // lowTODO use import.meta.env.DEV
+          const lm = (
+            layoutManager instanceof Function ? layoutManager() : layoutManager
+          ) as Node
+          container.element.appendChild(lm)
+        })
+      }
+    )
     goldenLayout.loadLayout({
       header: {
         popout: false,
@@ -118,8 +142,17 @@ export default function Cards(): JSX.Element {
         type: "row",
         content: [
           {
-            type: "component",
-            componentType: "CardsTable",
+            type: "stack",
+            content: [
+              {
+                type: "component",
+                componentType: "CardsTable",
+              },
+              {
+                type: "component",
+                componentType: "Layout Manager",
+              },
+            ],
           },
           {
             type: "component",
