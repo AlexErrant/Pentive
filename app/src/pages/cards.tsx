@@ -114,6 +114,14 @@ export default function Cards(): JSX.Element {
               <button
                 class="bg-green-600 hover:bg-green-700 text-white font-bold p-2 px-4 rounded m-2"
                 onClick={() => {
+                  goldenLayout.addComponent("CardsTable")
+                }}
+              >
+                Add CardsTable
+              </button>
+              <button
+                class="bg-green-600 hover:bg-green-700 text-white font-bold p-2 px-4 rounded m-2"
+                onClick={() => {
                   goldenLayout.addComponent("CardDetail")
                 }}
               >
