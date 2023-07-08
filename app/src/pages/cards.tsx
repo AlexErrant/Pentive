@@ -85,7 +85,9 @@ export default function Cards(): JSX.Element {
         />
       ) as unknown as () => Node
       createEffect(() => {
-        container.element.appendChild(cardsTable())
+        // lowTODO use import.meta.env.DEV
+        const ct = cardsTable instanceof Function ? cardsTable() : cardsTable
+        container.element.appendChild(ct)
       })
     })
     goldenLayout.registerComponentFactoryFunction("CardDetail", (container) => {
@@ -102,7 +104,9 @@ export default function Cards(): JSX.Element {
         </Show>
       ) as unknown as () => Node
       createEffect(() => {
-        container.element.appendChild(cardDetail())
+        // lowTODO use import.meta.env.DEV
+        const cd = cardDetail instanceof Function ? cardDetail() : cardDetail
+        container.element.appendChild(cd)
       })
     })
     goldenLayout.loadLayout({
