@@ -58,7 +58,7 @@ const ResizingIframe: VoidComponent<{
       () => props.noteCard?.note.fieldValues,
       () => {
         try {
-          iframeReference.contentWindow!.postMessage(
+          iframeReference?.contentWindow?.postMessage(
             {
               type: "pleaseRerender",
             },
