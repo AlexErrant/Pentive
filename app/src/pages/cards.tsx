@@ -16,6 +16,7 @@ import { db } from "../db"
 
 import "golden-layout/dist/css/goldenlayout-base.css"
 import "golden-layout/dist/css/themes/goldenlayout-light-theme.css"
+import { render } from "solid-js/web"
 
 export interface NoteCardView {
   template: Template
@@ -63,74 +64,66 @@ export default function Cards(): JSX.Element {
     const goldenLayout = new GoldenLayout(glRoot)
     goldenLayout.resizeWithContainerAutomatically = true
     goldenLayout.registerComponentFactoryFunction("CardsTable", (container) => {
-      const cardsTable = (
-        <CardsTable
-          onSelectionChanged={(ncs) => {
-            if (ncs.length > 0) {
-              const nc = ncs[0]
-              const selected: NoteCardView = {
-                ...nc,
-                note: {
-                  ...nc.note,
-                  fieldValues: Array.from(nc.note.fieldValues.entries()),
-                },
-                mainCard: nc.card,
-                cards: [],
+      render(
+        () => (
+          <CardsTable
+            onSelectionChanged={(ncs) => {
+              if (ncs.length > 0) {
+                const nc = ncs[0]
+                const selected: NoteCardView = {
+                  ...nc,
+                  note: {
+                    ...nc.note,
+                    fieldValues: Array.from(nc.note.fieldValues.entries()),
+                  },
+                  mainCard: nc.card,
+                  cards: [],
+                }
+                setSelected("noteCard", selected)
+              } else {
+                setSelected("noteCard", undefined)
               }
-              setSelected("noteCard", selected)
-            } else {
-              setSelected("noteCard", undefined)
-            }
-          }}
-        />
-      ) as unknown as () => Node
-      createEffect(() => {
-        // lowTODO use import.meta.env.DEV
-        const ct = cardsTable instanceof Function ? cardsTable() : cardsTable
-        container.element.appendChild(ct)
-      })
+            }}
+          />
+        ),
+        container.element
+      )
     })
     goldenLayout.registerComponentFactoryFunction("CardDetail", (container) => {
-      const cardDetail = (
-        <Show when={selected.noteCard != null} fallback={<span />}>
-          <div class="overflow-auto h-full">
-            <CardsRemote noteCard={selected.noteCard!} />
-            <FieldsEditor
-              noteCard={selected.noteCard!}
-              setNoteCard={setSelected}
-            />
-            <CardsPreview noteCard={selected.noteCard!} />
-          </div>
-        </Show>
-      ) as unknown as () => Node
-      createEffect(() => {
-        // lowTODO use import.meta.env.DEV
-        const cd = cardDetail instanceof Function ? cardDetail() : cardDetail
-        container.element.appendChild(cd)
-      })
+      render(
+        () => (
+          <Show when={selected.noteCard != null} fallback={<span />}>
+            <div class="overflow-auto h-full">
+              <CardsRemote noteCard={selected.noteCard!} />
+              <FieldsEditor
+                noteCard={selected.noteCard!}
+                setNoteCard={setSelected}
+              />
+              <CardsPreview noteCard={selected.noteCard!} />
+            </div>
+          </Show>
+        ),
+        container.element
+      )
     })
     goldenLayout.registerComponentFactoryFunction(
       "Layout Manager",
       (container) => {
-        const layoutManager = (
-          <div>
-            <button
-              class="border"
-              onClick={() => {
-                goldenLayout.addComponent("CardDetail")
-              }}
-            >
-              Add CardDetail
-            </button>
-          </div>
-        ) as unknown as Node
-        createEffect(() => {
-          // lowTODO use import.meta.env.DEV
-          const lm = (
-            layoutManager instanceof Function ? layoutManager() : layoutManager
-          ) as Node
-          container.element.appendChild(lm)
-        })
+        render(
+          () => (
+            <div>
+              <button
+                class="border"
+                onClick={() => {
+                  goldenLayout.addComponent("CardDetail")
+                }}
+              >
+                Add CardDetail
+              </button>
+            </div>
+          ),
+          container.element
+        )
       }
     )
     goldenLayout.loadLayout({
