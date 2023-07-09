@@ -1,5 +1,5 @@
 import { type JSX, Show, createResource, createEffect, onMount } from "solid-js"
-import { GoldenLayout } from "golden-layout"
+import { GoldenLayout, LayoutConfig } from "golden-layout"
 import { createStore } from "solid-js/store"
 import CardsTable from "../components/cardsTable"
 import {
@@ -154,43 +154,52 @@ export default function Cards(): JSX.Element {
         )
       }
     )
-    goldenLayout.loadLayout({
-      header: {
-        popout: false,
-        maximise: false, // disabling for now because using it causes the other panels to be at the bottom of the screen for some reason https://github.com/golden-layout/golden-layout/issues/847
-      },
-      root: {
-        type: "row",
-        content: [
-          {
-            type: "stack",
-            content: [
-              {
-                type: "component",
-                componentType: "CardsTable",
-              },
-              {
-                type: "component",
-                componentType: "Layout Manager",
-              },
-            ],
-          },
-          {
-            type: "stack",
-            content: [
-              {
-                type: "component",
-                componentType: "CardDetail",
-              },
-              {
-                type: "component",
-                componentType: "Preview Card",
-              },
-            ],
-          },
-        ],
-      },
+    goldenLayout.on("stateChanged", () => {
+      const config = LayoutConfig.fromResolved(goldenLayout.saveLayout())
+      localStorage.setItem("cardPageLayoutConfig", JSON.stringify(config))
     })
+    const layoutConfig = localStorage.getItem("cardPageLayoutConfig")
+    if (layoutConfig != null) {
+      goldenLayout.loadLayout(JSON.parse(layoutConfig) as LayoutConfig)
+    } else {
+      goldenLayout.loadLayout({
+        header: {
+          popout: false,
+          maximise: false, // disabling for now because using it causes the other panels to be at the bottom of the screen for some reason https://github.com/golden-layout/golden-layout/issues/847
+        },
+        root: {
+          type: "row",
+          content: [
+            {
+              type: "stack",
+              content: [
+                {
+                  type: "component",
+                  componentType: "CardsTable",
+                },
+                {
+                  type: "component",
+                  componentType: "Layout Manager",
+                },
+              ],
+            },
+            {
+              type: "stack",
+              content: [
+                {
+                  type: "component",
+                  componentType: "CardDetail",
+                },
+                {
+                  type: "component",
+                  componentType: "Preview Card",
+                },
+              ],
+            },
+          ],
+        },
+      })
+    }
   })
   return <div ref={(e) => (glRoot = e)} class="h-full" />
 }
