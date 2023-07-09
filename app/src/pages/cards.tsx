@@ -157,7 +157,7 @@ export default function Cards(): JSX.Element {
     goldenLayout.loadLayout({
       header: {
         popout: false,
-        maximise: false, // disabling for now because using it causes the other panels to be at the bottom of the screen for some reason
+        maximise: false, // disabling for now because using it causes the other panels to be at the bottom of the screen for some reason https://github.com/golden-layout/golden-layout/issues/847
       },
       root: {
         type: "row",

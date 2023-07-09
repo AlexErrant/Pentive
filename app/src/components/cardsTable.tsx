@@ -89,6 +89,7 @@ const CardsTable: VoidComponent<{
                 toolPanelParams: {
                   suppressRowGroups: true,
                   suppressValues: true,
+                  suppressPivotMode: true,
                 },
               },
             ],
