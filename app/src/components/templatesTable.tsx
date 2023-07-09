@@ -130,24 +130,6 @@ const columnDefs: Array<ColDef<Template>> = [
       <relative-time date={props.data?.updated} />
     ),
   },
-  {
-    headerName: "Preview",
-    cellRenderer: (props: ICellRendererParams<Template>) => {
-      return (
-        // lowTODO: iterate over all templates... or not. If there are 10 it'll look ugly
-        <Show when={props.data?.id != null}>
-          <ResizingIframe
-            i={{
-              tag: "template",
-              side: "front",
-              templateId: props.data!.id,
-              index: "0",
-            }}
-          />
-        </Show>
-      )
-    },
-  },
 ]
 
 const getRowId = (params: GetRowIdParams<Template>): TemplateId =>
@@ -155,6 +137,7 @@ const getRowId = (params: GetRowIdParams<Template>): TemplateId =>
 
 const TemplatesTable: VoidComponent<{
   readonly templates: Template[]
+  readonly onSelectionChanged: (templates: Template[]) => void
 }> = (props) => {
   return (
     <div class="ag-theme-alpine" style={{ height: "500px" }}>
@@ -183,9 +166,8 @@ const TemplatesTable: VoidComponent<{
         onGridReady={onGridReady}
         cacheBlockSize={cacheBlockSize}
         onSelectionChanged={(event) => {
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars -- nextTODO
           const ncs = event.api.getSelectedRows() as Template[]
-          // props.onSelectionChanged(ncs)
+          props.onSelectionChanged(ncs)
         }}
       />
     </div>
