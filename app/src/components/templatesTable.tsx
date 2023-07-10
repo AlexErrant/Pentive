@@ -26,7 +26,6 @@ import {
   throwExp,
 } from "shared"
 import _ from "lodash"
-import ResizingIframe from "./resizingIframe"
 import "@github/relative-time-element"
 import { db } from "../db"
 
@@ -115,10 +114,6 @@ const columnDefs: Array<ColDef<Template>> = [
     ),
   },
   {
-    headerName: "Fields",
-    valueGetter: (row) => row.data?.fields.map((f) => f.name).join(", "),
-  },
-  {
     headerName: "Created",
     cellRenderer: (props: ICellRendererParams<Template>) => (
       <relative-time date={props.data?.created} />
@@ -140,7 +135,7 @@ const TemplatesTable: VoidComponent<{
   readonly onSelectionChanged: (templates: Template[]) => void
 }> = (props) => {
   return (
-    <div class="ag-theme-alpine" style={{ height: "500px" }}>
+    <div class="ag-theme-alpine h-full">
       <AgGridSolid
         sideBar={{
           toolPanels: [

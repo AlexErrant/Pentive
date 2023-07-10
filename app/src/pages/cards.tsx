@@ -13,10 +13,10 @@ import { CardsRemote } from "../components/cardsRemote"
 import { FieldsEditor } from "../components/fieldsEditor"
 import { CardsPreview } from "../components/cardsPreview"
 import { db } from "../db"
+import { render } from "solid-js/web"
 
 import "golden-layout/dist/css/goldenlayout-base.css"
 import "golden-layout/dist/css/themes/goldenlayout-light-theme.css"
-import { render } from "solid-js/web"
 
 export interface NoteCardView {
   template: Template
