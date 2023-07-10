@@ -18,27 +18,27 @@ export type State = "normal" | "scheduler buried" | "user buried" | "suspended"
 export type Score = "again" | "hard" | "good" | "easy"
 
 export interface Review {
-  readonly score: Score
-  readonly created: Date
-  readonly ease: number // factor
-  readonly time: number // milliseconds from seeing front to score
+  score: Score
+  created: Date
+  ease: number // factor
+  time: number // milliseconds from seeing front to score
 
   // the following three are mutually exclusive
-  readonly newStep?: number // index - see card settings
-  readonly lapsed?: number // index - see card settings
-  readonly interval?: number // in seconds
+  newStep?: number // index - see card settings
+  lapsed?: number // index - see card settings
+  interval?: number // in seconds
 }
 
 export interface Card {
-  readonly id: CardId
-  readonly ord: Ord
-  readonly noteId: NoteId
-  readonly deckIds: ReadonlySet<DeckId>
-  readonly created: Date
-  readonly updated: Date
-  readonly cardSettingId?: CardSettingId
-  readonly due: Date
-  readonly state?: State
+  id: CardId
+  ord: Ord
+  noteId: NoteId
+  deckIds: Set<DeckId>
+  created: Date
+  updated: Date
+  cardSettingId?: CardSettingId
+  due: Date
+  state?: State
 }
 
 export const sampleCard: Card = {

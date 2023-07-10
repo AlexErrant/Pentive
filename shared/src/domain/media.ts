@@ -1,9 +1,9 @@
 import { type MediaId } from "../brand.js"
 
 export interface Media {
-  readonly id: MediaId
-  readonly created: Date
-  readonly updated: Date
-  readonly data: ArrayBuffer
-  readonly hash: ArrayBuffer
+  id: MediaId
+  created: Date
+  updated: Date
+  data: ArrayBuffer
+  hash: ArrayBuffer
 }

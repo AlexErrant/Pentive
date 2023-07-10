@@ -6,14 +6,14 @@ import {
 } from "../brand.js"
 
 export interface Note {
-  readonly id: NoteId
-  readonly templateId: TemplateId
+  id: NoteId
+  templateId: TemplateId
   ankiNoteId?: number
-  readonly created: Date
-  readonly updated: Date
-  readonly tags: ReadonlySet<string>
-  readonly fieldValues: Map<string, string>
-  readonly remotes: Map<NookId, RemoteNoteId | null>
+  created: Date
+  updated: Date
+  tags: Set<string>
+  fieldValues: Map<string, string>
+  remotes: Map<NookId, RemoteNoteId | null>
 }
 
 export const sampleNote: Note = {

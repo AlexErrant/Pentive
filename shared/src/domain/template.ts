@@ -7,21 +7,21 @@ import {
 import { type TemplateType } from "../schema.js"
 
 export interface Field {
-  readonly name: string
-  readonly rightToLeft?: boolean
-  readonly sticky?: boolean
-  readonly private?: boolean
+  name: string
+  rightToLeft?: boolean
+  sticky?: boolean
+  private?: boolean
 }
 
 export interface Template {
-  readonly id: TemplateId
-  readonly name: string // todo limit to 100
-  readonly css: string
-  readonly fields: readonly Field[]
-  readonly created: Date
-  readonly updated: Date
-  readonly templateType: TemplateType
-  readonly remotes: Map<NookId, RemoteTemplateId | null>
+  id: TemplateId
+  name: string // todo limit to 100
+  css: string
+  fields: Field[]
+  created: Date
+  updated: Date
+  templateType: TemplateType
+  remotes: Map<NookId, RemoteTemplateId | null>
 }
 
 export const defaultTemplate: Template = {
