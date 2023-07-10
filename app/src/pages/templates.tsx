@@ -130,6 +130,7 @@ export default function Templates(): JSX.Element {
                 {
                   type: "component",
                   componentType: "Layout Manager",
+                  isClosable: false,
                 },
               ],
             },

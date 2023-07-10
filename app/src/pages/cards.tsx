@@ -180,6 +180,7 @@ export default function Cards(): JSX.Element {
                 {
                   type: "component",
                   componentType: "Layout Manager",
+                  isClosable: false,
                 },
               ],
             },
