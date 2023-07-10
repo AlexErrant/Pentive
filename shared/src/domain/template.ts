@@ -46,10 +46,34 @@ export const defaultTemplate: Template = {
         name: "My Template",
         front: "{{Front}}",
         back: `{{FrontSide}}<hr id=answer>{{Back}}<img src="book.jpg" >`, // highTODO nix book.jpg
-        shortFront: "{{Front}}",
-        shortBack: "{{Back}}",
       },
     ],
+  },
+  remotes: new Map(),
+}
+
+export const defaultClozeTemplate: Template = {
+  id: "FANOeCfrTeGKVgAAek3FQg" as TemplateId,
+  name: "New Template",
+  css: "",
+  fields: [
+    {
+      name: "Text",
+    },
+    {
+      name: "Back Extra",
+    },
+  ],
+  created: new Date(),
+  updated: new Date(),
+  templateType: {
+    tag: "cloze",
+    template: {
+      id: 0 as Ord,
+      name: "My Template",
+      front: "{{cloze:Text}}",
+      back: `{{cloze:Text}}<br>{{Back Extra}}`,
+    },
   },
   remotes: new Map(),
 }
