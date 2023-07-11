@@ -1,32 +1,16 @@
-import { type SetStoreFunction, createStore } from "solid-js/store"
-import { type JSX, Show, onMount, For } from "solid-js"
+import { createStore } from "solid-js/store"
+import { type JSX, Show, onMount } from "solid-js"
 import TemplatesTable from "../components/templatesTable"
 import type TemplatesData from "./templates.data"
 import { useRouteData } from "@solidjs/router"
-import {
-  defaultTemplate,
-  getDefaultTemplate,
-  type Template,
-  defaultClozeTemplate,
-  type ChildTemplate,
-} from "shared"
+import { type Template } from "shared"
 import ResizingIframe from "../components/resizingIframe"
 import { GoldenLayout, LayoutConfig } from "golden-layout"
 import { render } from "solid-js/web"
-import { type ClozeTemplate, type StandardTemplate } from "shared-dom"
-import { Select } from "@thisbeyond/solid-select"
 
 import "golden-layout/dist/css/goldenlayout-base.css"
 import "golden-layout/dist/css/themes/goldenlayout-light-theme.css"
-import "@thisbeyond/solid-select/style.css"
-import EditChildTemplate from "../components/editChildTemplate"
-
-interface ClozeTemplateStore {
-  template: ClozeTemplate
-}
-interface StandardTemplateStore {
-  template: StandardTemplate
-}
+import EditTemplate from "../components/editTemplate"
 
 export default function Templates(): JSX.Element {
   const templates = useRouteData<typeof TemplatesData>()
@@ -67,125 +51,7 @@ export default function Templates(): JSX.Element {
     goldenLayout.registerComponentFactoryFunction(
       "Add Template",
       (container) => {
-        const [template, setTemplate] = createStore<{ template: Template }>({
-          template: getDefaultTemplate(), // setTemplate mutates this so we gotta get a new object reference
-        })
-        render(
-          () => (
-            <>
-              <Select
-                initialValue={"standard"}
-                options={["standard", "cloze"]}
-                onChange={(value: string) => {
-                  setTemplate(
-                    "template",
-                    value === "standard"
-                      ? defaultTemplate
-                      : defaultClozeTemplate
-                  )
-                }}
-              />
-              Name
-              <input
-                class="w-full border"
-                type="text"
-                value={template.template.name}
-                onInput={(e) => {
-                  setTemplate("template", "name", e.currentTarget.value)
-                }}
-              />
-              <fieldset class="border border-black p-2">
-                <legend>
-                  <span class="p-2 px-4 font-bold">Fields</span>
-                  <button
-                    class="bg-green-600 hover:bg-green-700 text-white  py-1/2 px-2 m-2 rounded"
-                    onClick={() => {
-                      setTemplate("template", "fields", [
-                        ...template.template.fields,
-                        { name: "New Field" },
-                      ])
-                    }}
-                  >
-                    +
-                  </button>
-                </legend>
-                <For each={template.template.fields}>
-                  {(field, i) => {
-                    return (
-                      <input
-                        class="w-full border"
-                        type="text"
-                        value={field.name}
-                        onInput={(e) => {
-                          setTemplate(
-                            "template",
-                            "fields",
-                            i(),
-                            "name",
-                            e.currentTarget.value
-                          )
-                        }}
-                      />
-                    )
-                  }}
-                </For>
-              </fieldset>
-              <Show
-                when={template.template.templateType.tag === "standard"}
-                fallback={
-                  <EditChildTemplate
-                    template={
-                      (template.template as ClozeTemplate).templateType.template
-                    }
-                    setTemplate={<K extends keyof ChildTemplate>(
-                      key: K,
-                      val: ChildTemplate[K]
-                    ) => {
-                      ;(setTemplate as SetStoreFunction<ClozeTemplateStore>)(
-                        "template",
-                        "templateType",
-                        "template",
-                        key,
-                        val
-                      )
-                    }}
-                  />
-                }
-              >
-                <For
-                  each={
-                    (template.template as StandardTemplate).templateType
-                      .templates
-                  }
-                >
-                  {(template, i) => {
-                    return (
-                      <EditChildTemplate
-                        template={template}
-                        setTemplate={<K extends keyof ChildTemplate>(
-                          key: K,
-                          val: ChildTemplate[K]
-                        ) => {
-                          ;(
-                            setTemplate as SetStoreFunction<StandardTemplateStore>
-                          )(
-                            "template",
-                            "templateType",
-                            "templates",
-                            i(),
-                            key,
-                            val
-                          )
-                        }}
-                      />
-                    )
-                  }}
-                </For>
-              </Show>
-            </>
-          ),
-          container.element
-        )
+        render(() => <EditTemplate />, container.element)
       }
     )
     goldenLayout.registerComponentFactoryFunction(

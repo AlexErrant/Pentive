@@ -55,6 +55,7 @@ sveltejs
 tailwindcss
 tanstack
 Tauri
+thisbeyond
 tinyint
 trpc
 typecheck
