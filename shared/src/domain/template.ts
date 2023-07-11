@@ -23,8 +23,7 @@ export interface Template {
   templateType: TemplateType
   remotes: Map<NookId, RemoteTemplateId | null>
 }
-
-export const defaultTemplate: Template = {
+export const getDefaultTemplate = (): Template => ({
   id: "fanOeCfrTeGKVgAAek3FQg" as TemplateId,
   name: "New Template",
   css: "",
@@ -50,7 +49,9 @@ export const defaultTemplate: Template = {
     ],
   },
   remotes: new Map(),
-}
+})
+
+export const defaultTemplate = getDefaultTemplate()
 
 export const defaultClozeTemplate: Template = {
   id: "FANOeCfrTeGKVgAAek3FQg" as TemplateId,
