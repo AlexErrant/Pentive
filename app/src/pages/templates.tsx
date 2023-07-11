@@ -8,6 +8,7 @@ import {
   getDefaultTemplate,
   type Template,
   defaultClozeTemplate,
+  type ChildTemplate,
 } from "shared"
 import ResizingIframe from "../components/resizingIframe"
 import { GoldenLayout, LayoutConfig } from "golden-layout"
@@ -18,6 +19,7 @@ import { Select } from "@thisbeyond/solid-select"
 import "golden-layout/dist/css/goldenlayout-base.css"
 import "golden-layout/dist/css/themes/goldenlayout-light-theme.css"
 import "@thisbeyond/solid-select/style.css"
+import EditChildTemplate from "../components/editChildTemplate"
 
 interface ClozeTemplateStore {
   template: ClozeTemplate
@@ -131,20 +133,20 @@ export default function Templates(): JSX.Element {
               <Show
                 when={template.template.templateType.tag === "standard"}
                 fallback={
-                  <input
-                    class="w-full border"
-                    type="text"
-                    value={
+                  <EditChildTemplate
+                    template={
                       (template.template as ClozeTemplate).templateType.template
-                        .name
                     }
-                    onInput={(e) => {
+                    setTemplate={<K extends keyof ChildTemplate>(
+                      key: K,
+                      val: ChildTemplate[K]
+                    ) => {
                       ;(setTemplate as SetStoreFunction<ClozeTemplateStore>)(
                         "template",
                         "templateType",
                         "template",
-                        "name",
-                        e.currentTarget.value
+                        key,
+                        val
                       )
                     }}
                   />
@@ -158,11 +160,12 @@ export default function Templates(): JSX.Element {
                 >
                   {(template, i) => {
                     return (
-                      <input
-                        class="w-full border"
-                        type="text"
-                        value={template.name}
-                        onInput={(e) => {
+                      <EditChildTemplate
+                        template={template}
+                        setTemplate={<K extends keyof ChildTemplate>(
+                          key: K,
+                          val: ChildTemplate[K]
+                        ) => {
                           ;(
                             setTemplate as SetStoreFunction<StandardTemplateStore>
                           )(
@@ -170,8 +173,8 @@ export default function Templates(): JSX.Element {
                             "templateType",
                             "templates",
                             i(),
-                            "name",
-                            e.currentTarget.value
+                            key,
+                            val
                           )
                         }}
                       />
