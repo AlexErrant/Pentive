@@ -68,7 +68,7 @@ export function routeData({ params }: RouteDataArgs) {
   }
 }
 
-export default function Submit(): JSX.Element {
+export default function Edit(): JSX.Element {
   const { template: templatePrime } = useRouteData<typeof routeData>()
   const [template, setTemplate] = createStore<TemplateStore>({
     t: templatePrime(),
