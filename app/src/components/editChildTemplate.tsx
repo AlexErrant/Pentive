@@ -91,20 +91,6 @@ const EditChildTemplate: VoidComponent<{
       /> */}
       <div ref={frontRef} />
       <div ref={backRef} />
-      <button
-        type="button"
-        onClick={async () => {
-          // const t = template.t!
-          // await cwaClient.editTemplates.mutate([
-          //   {
-          //     ...t,
-          //     remoteIds: [t.id],
-          //   },
-          // ])
-        }}
-      >
-        Save
-      </button>
     </>
   )
 }
