@@ -101,8 +101,8 @@ export default function Templates(): JSX.Element {
                 i={{
                   tag: "template",
                   side: "front",
-                  templateId: selected.template!.id,
-                  index: "0",
+                  template: selected.template!,
+                  index: 0,
                 }}
               />
             </Show>

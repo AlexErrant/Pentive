@@ -1,17 +1,16 @@
 import { iframeResizer, type IFrameComponent } from "iframe-resizer"
-import { createEffect, on, onCleanup, type VoidComponent } from "solid-js"
+import { createEffect, onCleanup, type VoidComponent } from "solid-js"
 import * as Comlink from "comlink"
 import {
-  type NoteId,
-  type TemplateId,
-  assertNever,
+  type Template,
+  type Card,
+  type Note,
   type Side,
-  type CardId,
   type MediaId,
-  type NoteCard,
 } from "shared"
-import { C } from ".."
+import { unwrap } from "solid-js/store"
 import { db } from "../db"
+import { C } from ".."
 
 const targetOrigin = "*" // highTODO make more limiting. Also implement https://stackoverflow.com/q/8169582
 
@@ -19,19 +18,15 @@ export type RenderBodyInput =
   | {
       readonly tag: "template"
       readonly side: Side
-      readonly templateId: TemplateId
-      readonly index: string // string due to `new URLSearchParams()`, which expects everything to be a string.
+      readonly template: Template
+      readonly index: number
     }
   | {
       readonly tag: "card"
       readonly side: Side
-      readonly templateId: TemplateId
-      readonly noteId: NoteId
-      readonly cardId: CardId
-    }
-  | {
-      readonly tag: "manualCard"
-      readonly side: Side
+      readonly card: Card
+      readonly note: Note
+      readonly template: Template
     }
 
 async function getLocalMedia(id: MediaId): Promise<ArrayBuffer | null> {
@@ -40,103 +35,39 @@ async function getLocalMedia(id: MediaId): Promise<ArrayBuffer | null> {
 }
 
 export interface AppExpose {
+  renderTemplate: typeof C.renderTemplate
+  html: typeof C.html
   getLocalMedia: typeof getLocalMedia
-  renderBody: (i: RenderBodyInput) => Promise<{ body: string; css?: string }>
+  renderBodyInput: RenderBodyInput
   resize: () => void
 }
 
 const ResizingIframe: VoidComponent<{
   readonly i: RenderBodyInput
-  readonly noteCard?: NoteCard
 }> = (props) => {
   let iframeReference: HTMLIFrameElement
   onCleanup(() => {
-    ;(iframeReference as IFrameComponent).iFrameResizer?.close()
+    ;(iframeReference as IFrameComponent)?.iFrameResizer?.close()
   })
-  createEffect(
-    on(
-      () => props.noteCard?.note.fieldValues,
-      () => {
-        try {
-          iframeReference?.contentWindow?.postMessage(
-            {
-              type: "pleaseRerender",
-            },
-            targetOrigin
-          )
-        } catch (error) {
-          console.error(error)
-        }
-      }
-    )
-  )
-  const renderBody = async (
-    i: RenderBodyInput
-  ): Promise<{ body: string; css?: string }> => {
-    switch (i.tag) {
-      case "template": {
-        const template = await db.getTemplate(i.templateId)
-        if (template == null)
-          return {
-            body: `Template ${i.templateId} not found.`,
-          }
-        const result = C.renderTemplate({
-          ...template,
-          fields: template.fields,
-        })[parseInt(i.index)]
-        if (result == null) {
-          return {
-            body: `Error rendering Template ${i.templateId}: "${template.name}".`,
-            css: template.css,
-          }
-        } else {
-          return {
-            body: i.side === "front" ? result[0] : result[1],
-            css: template.css,
-          }
-        }
-      }
-      case "card": {
-        const template = await db.getTemplate(i.templateId)
-        const note = await db.getNote(i.noteId)
-        const card = await db.getCard(i.cardId)
-        if (template == null) {
-          return { body: `Template ${i.templateId} not found!` }
-        }
-        if (note == null) {
-          return { body: `Note ${i.noteId} not found!` }
-        }
-        if (card == null) {
-          return { body: `Card ${i.cardId} not found!` }
-        }
-        const frontBack = C.html(card, note, template)
-        if (frontBack == null) {
-          return { body: "Card is invalid!" }
-        }
-        const body = i.side === "front" ? frontBack[0] : frontBack[1]
-        return { body }
-      }
-      case "manualCard": {
-        const { card, note, template } = props.noteCard!
-        const frontBack = C.html(card, note, template)
-        if (frontBack == null) {
-          return { body: "Card is invalid!" }
-        }
-        const body = i.side === "front" ? frontBack[0] : frontBack[1]
-        return { body }
-      }
-      default:
-        return assertNever(i)
+  createEffect(() => {
+    try {
+      iframeReference?.contentWindow?.postMessage(
+        { type: "pleaseRerender", i: unwrap(props.i) },
+        targetOrigin
+      )
+    } catch (error) {
+      console.error(error)
     }
-  }
-
+  })
   return (
     <iframe
       ref={(x) => (iframeReference = x)}
       onLoad={(e) => {
         const appExpose: AppExpose = {
+          renderTemplate: (x) => C.renderTemplate(x), // do not eta-reduce. `C`'s `this` binding apparently doesn't work across Comlink
+          html: (x, y, z) => C.html(x, y, z), // do not eta-reduce. `C`'s `this` binding apparently doesn't work across Comlink
           getLocalMedia,
-          renderBody,
+          renderBodyInput: unwrap(props.i),
           resize: () => {
             ;(iframeReference as IFrameComponent)?.iFrameResizer?.resize()
           },
@@ -166,11 +97,7 @@ const ResizingIframe: VoidComponent<{
       sandbox="allow-scripts allow-same-origin" // Changing this has security ramifications! https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe#attr-sandbox
       // "When the embedded document has the same origin as the embedding page, it is strongly discouraged to use both allow-scripts and allow-same-origin"
       // Since this iframe is hosted on `app-user-generated-content` and this component is hosted on `app`, resulting in different origins, we should be safe. https://web.dev/sandboxed-iframes/ https://stackoverflow.com/q/35208161
-      src={
-        import.meta.env.VITE_APP_UGC_ORIGIN +
-        `?` +
-        new URLSearchParams(props.i).toString()
-      }
+      src={import.meta.env.VITE_APP_UGC_ORIGIN}
     />
   )
 }

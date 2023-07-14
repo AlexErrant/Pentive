@@ -26,17 +26,21 @@ function CardPreview(props: { noteCard: NoteCard }) {
     <>
       <ResizingIframe
         i={{
-          tag: "manualCard",
+          tag: "card",
           side: "front",
+          card: props.noteCard.card,
+          note: props.noteCard.note,
+          template: props.noteCard.template,
         }}
-        noteCard={props.noteCard}
       />
       <ResizingIframe
         i={{
-          tag: "manualCard",
+          tag: "card",
           side: "back",
+          card: props.noteCard.card,
+          note: props.noteCard.note,
+          template: props.noteCard.template,
         }}
-        noteCard={props.noteCard}
       />
     </>
   )
