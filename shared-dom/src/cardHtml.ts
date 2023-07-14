@@ -439,15 +439,13 @@ export function toSampleCard(ord: Ord): Card {
   }
 }
 
+const getStandardFieldAndValue = (field: Field) =>
+  [field.name, `(${field.name})`] as const
+
 export function renderTemplate(
   this: RenderContainer,
   template: Template
 ): ReadonlyArray<readonly [string, string] | null> {
-  const getStandardFieldAndValue = (
-    field: Field
-  ): readonly [string, string] => {
-    return [field.name, `(${field.name})`] as const
-  }
   const fieldsAndValues = new Map(template.fields.map(getStandardFieldAndValue)) // medTODO consider adding escape characters so you can do e.g. {{Front}}. Apparently Anki doesn't have escape characters - now would be a good time to introduce this feature.
   if (template.templateType.tag === "standard") {
     const note = toSampleNote(fieldsAndValues)

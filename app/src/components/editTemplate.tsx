@@ -85,9 +85,11 @@ const EditTemplate: VoidComponent = () => {
         when={template.template.templateType.tag === "standard"}
         fallback={
           <EditChildTemplate
-            template={
+            template={template.template}
+            childTemplate={
               (template.template as ClozeTemplate).templateType.template
             }
+            i={0}
             setTemplate={<K extends keyof ChildTemplate>(
               key: K,
               val: ChildTemplate[K]
@@ -106,10 +108,12 @@ const EditTemplate: VoidComponent = () => {
         <For
           each={(template.template as StandardTemplate).templateType.templates}
         >
-          {(template, i) => {
+          {(childTemplate, i) => {
             return (
               <EditChildTemplate
-                template={template}
+                template={template.template}
+                childTemplate={childTemplate}
+                i={i()}
                 setTemplate={<K extends keyof ChildTemplate>(
                   key: K,
                   val: ChildTemplate[K]

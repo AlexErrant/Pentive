@@ -30,10 +30,13 @@ import {
 import { lintKeymap } from "@codemirror/lint"
 import { html } from "@codemirror/lang-html"
 import { onCleanup, onMount, type VoidComponent } from "solid-js"
-import { type ChildTemplate } from "shared"
+import { type Template, type ChildTemplate } from "shared"
+import ResizingIframe from "./resizingIframe"
 
 const EditChildTemplate: VoidComponent<{
-  template: ChildTemplate
+  template: Template
+  childTemplate: ChildTemplate
+  i: number
   setTemplate: (
     key: keyof ChildTemplate,
     val: ChildTemplate[keyof ChildTemplate]
@@ -49,14 +52,14 @@ const EditChildTemplate: VoidComponent<{
       dispatch: (tr) => {
         dispatch("front", tr, frontView, props.setTemplate)
       },
-      state: createEditorState(props.template.front),
+      state: createEditorState(props.childTemplate.front),
     })
     backView = new EditorView({
       parent: backRef,
       dispatch: (tr) => {
         dispatch("back", tr, backView, props.setTemplate)
       },
-      state: createEditorState(props.template.back),
+      state: createEditorState(props.childTemplate.back),
     })
   })
   onCleanup(() => {
@@ -68,27 +71,27 @@ const EditChildTemplate: VoidComponent<{
       <input
         class="w-full border"
         type="text"
-        value={props.template.name}
+        value={props.childTemplate.name}
         onInput={(e) => {
           props.setTemplate("name", e.currentTarget.value)
         }}
       />
-      {/* <ResizingIframe
+      <ResizingIframe
         i={{
           tag: "template",
           side: "front",
-          template: localTemplate(),
-          index: i()!,
+          template: props.template,
+          index: props.i,
         }}
       />
       <ResizingIframe
         i={{
           tag: "template",
           side: "back",
-          template: localTemplate(),
-          index: i()!,
+          template: props.template,
+          index: props.i,
         }}
-      /> */}
+      />
       <div ref={frontRef} />
       <div ref={backRef} />
     </>
