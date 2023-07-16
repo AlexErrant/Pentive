@@ -45,11 +45,23 @@ export interface AppExpose {
 const ResizingIframe: VoidComponent<{
   readonly i: RenderBodyInput
 }> = (props) => {
-  let iframeReference: HTMLIFrameElement
+  let iframeReference: IFrameComponent | undefined
   onCleanup(() => {
-    ;(iframeReference as IFrameComponent)?.iFrameResizer?.close()
+    iframeReference?.iFrameResizer?.close()
   })
   createEffect(() => {
+    if (props.i.tag === "template") {
+      // "touch" certain fields so they're reactive
+      /* eslint-disable @typescript-eslint/no-unused-expressions */
+      if (props.i.template.templateType.tag === "cloze") {
+        props.i.template.templateType.template.front
+        props.i.template.templateType.template.back
+      } else {
+        props.i.template.templateType.templates[props.i.index].front
+        props.i.template.templateType.templates[props.i.index].back
+      }
+      /* eslint-enable @typescript-eslint/no-unused-expressions */
+    }
     try {
       iframeReference?.contentWindow?.postMessage(
         { type: "pleaseRerender", i: unwrap(props.i) },
@@ -61,7 +73,7 @@ const ResizingIframe: VoidComponent<{
   })
   return (
     <iframe
-      ref={(x) => (iframeReference = x)}
+      ref={(x) => (iframeReference = x as IFrameComponent)}
       onLoad={(e) => {
         const appExpose: AppExpose = {
           renderTemplate: (x) => C.renderTemplate(x), // do not eta-reduce. `C`'s `this` binding apparently doesn't work across Comlink
@@ -69,7 +81,7 @@ const ResizingIframe: VoidComponent<{
           getLocalMedia,
           renderBodyInput: unwrap(props.i),
           resize: () => {
-            ;(iframeReference as IFrameComponent)?.iFrameResizer?.resize()
+            iframeReference?.iFrameResizer?.resize()
           },
         }
         Comlink.expose(
