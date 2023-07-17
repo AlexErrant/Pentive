@@ -78,6 +78,7 @@ const EditChildTemplate: VoidComponent<{
           }}
         />
       </legend>
+      <div ref={frontRef} />
       <ResizingIframe
         i={{
           tag: "template",
@@ -86,6 +87,7 @@ const EditChildTemplate: VoidComponent<{
           index: props.i,
         }}
       />
+      <div ref={backRef} />
       <ResizingIframe
         i={{
           tag: "template",
@@ -94,8 +96,6 @@ const EditChildTemplate: VoidComponent<{
           index: props.i,
         }}
       />
-      <div ref={frontRef} />
-      <div ref={backRef} />
     </fieldset>
   )
 }
