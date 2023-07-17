@@ -67,15 +67,17 @@ const EditChildTemplate: VoidComponent<{
     backView?.destroy()
   })
   return (
-    <>
-      <input
-        class="w-full border"
-        type="text"
-        value={props.childTemplate.name}
-        onInput={(e) => {
-          props.setTemplate("name", e.currentTarget.value)
-        }}
-      />
+    <fieldset class="border border-black p-2">
+      <legend>
+        <input
+          class="w-full border"
+          type="text"
+          value={props.childTemplate.name}
+          onInput={(e) => {
+            props.setTemplate("name", e.currentTarget.value)
+          }}
+        />
+      </legend>
       <ResizingIframe
         i={{
           tag: "template",
@@ -94,7 +96,7 @@ const EditChildTemplate: VoidComponent<{
       />
       <div ref={frontRef} />
       <div ref={backRef} />
-    </>
+    </fieldset>
   )
 }
 
