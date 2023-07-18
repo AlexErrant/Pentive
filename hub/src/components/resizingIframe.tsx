@@ -6,6 +6,7 @@ import { unwrap } from "solid-js/store"
 
 const targetOrigin = "*" // highTODO make more limiting. Also implement https://stackoverflow.com/q/8169582
 
+// this intentionally takes the client's Card/Note/Template - hub previews should be the same as the client's
 export type RenderBodyInput =
   | {
       readonly tag: "template"

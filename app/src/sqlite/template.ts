@@ -34,11 +34,11 @@ function templateToDocType(template: Template) {
   }
   const remoteTemplates: RemoteTemplate[] = Array.from(
     template.remotes.entries()
-  ).map(([nook, remoteId]) => ({
+  ).map(([nook, remote]) => ({
     localId: template.id,
     nook,
-    remoteId,
-    uploadDate: null,
+    remoteId: remote?.remoteTemplateId ?? null,
+    uploadDate: remote?.uploadDate.getTime() ?? null,
   }))
   return { insertTemplate, remoteTemplates }
 }
@@ -56,7 +56,16 @@ export function entityToDomain(
     css: template.css,
     templateType: JSON.parse(template.templateType) as TemplateType,
     remotes: new Map(
-      remotes.map((r) => [r.nook as NookId, r.remoteId as RemoteTemplateId])
+      remotes.map((r) => {
+        const value =
+          r.remoteId == null || r.uploadDate == null
+            ? null
+            : {
+                remoteTemplateId: r.remoteId as RemoteTemplateId,
+                uploadDate: new Date(r.uploadDate),
+              }
+        return [r.nook as NookId, value]
+      })
     ),
   }
   return r
@@ -82,7 +91,9 @@ function domainToEditRemote(template: Template) {
     name: template.name,
     css: template.css,
     templateType: template.templateType,
-    remoteIds,
+    remoteIds: Array.from(template.remotes)
+      .map(([, v]) => v?.remoteTemplateId)
+      .filter(notEmpty),
     fields: template.fields.map((x) => x.name),
   }
   return r

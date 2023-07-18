@@ -21,7 +21,10 @@ export interface Template {
   created: Date
   updated: Date
   templateType: TemplateType
-  remotes: Map<NookId, RemoteTemplateId | null>
+  remotes: Map<
+    NookId,
+    { remoteTemplateId: RemoteTemplateId; uploadDate: Date } | null
+  >
 }
 export const getDefaultTemplate = (): Template => ({
   id: "fanOeCfrTeGKVgAAek3FQg" as TemplateId,

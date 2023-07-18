@@ -57,13 +57,13 @@ function remoteCell(template: Template): JSX.Element {
     <>
       <ul>
         <For each={getRemotes()}>
-          {([nookId, remoteTemplateId]) => (
+          {([nookId, remoteTemplate]) => (
             <li class="py-2 px-4">
-              <Show when={remoteTemplateId != null} fallback={nookId}>
+              <Show when={remoteTemplate != null} fallback={nookId}>
                 <a
-                  href={`${
-                    import.meta.env.VITE_HUB_ORIGIN
-                  }/t/${remoteTemplateId!}`}
+                  href={`${import.meta.env.VITE_HUB_ORIGIN}/t/${
+                    remoteTemplate!.remoteTemplateId
+                  }`}
                 >
                   {nookId}
                 </a>
