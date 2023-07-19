@@ -4,11 +4,13 @@ import {
   type ChildTemplate,
   type Template,
   getDefaultClozeTemplate,
+  type TemplateId,
 } from "shared"
 import { type SetStoreFunction, createStore } from "solid-js/store"
 import { Select } from "@thisbeyond/solid-select"
 import { type ClozeTemplate, type StandardTemplate } from "shared-dom"
 import EditChildTemplate from "./editChildTemplate"
+import { ulidAsBase64Url } from "../domain/utility"
 
 import "@thisbeyond/solid-select/style.css"
 
@@ -21,7 +23,7 @@ interface StandardTemplateStore {
 
 const EditTemplate: VoidComponent = () => {
   const [template, setTemplate] = createStore<{ template: Template }>({
-    template: getDefaultTemplate(), // setTemplate mutates this so we gotta get a new object reference
+    template: getDefaultTemplate(ulidAsBase64Url() as TemplateId),
   })
   return (
     <>
@@ -32,8 +34,8 @@ const EditTemplate: VoidComponent = () => {
           setTemplate(
             "template",
             value === "standard"
-              ? getDefaultTemplate()
-              : getDefaultClozeTemplate()
+              ? getDefaultTemplate(ulidAsBase64Url() as TemplateId)
+              : getDefaultClozeTemplate(ulidAsBase64Url() as TemplateId)
           )
         }}
       />

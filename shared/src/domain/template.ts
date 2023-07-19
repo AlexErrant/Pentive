@@ -26,8 +26,8 @@ export interface Template {
     { remoteTemplateId: RemoteTemplateId; uploadDate: Date } | null
   >
 }
-export const getDefaultTemplate = (): Template => ({
-  id: "fanOeCfrTeGKVgAAek3FQg" as TemplateId,
+export const getDefaultTemplate = (id: TemplateId): Template => ({
+  id,
   name: "New Template",
   css: "",
   fields: [
@@ -54,8 +54,8 @@ export const getDefaultTemplate = (): Template => ({
   remotes: new Map(),
 })
 
-export const getDefaultClozeTemplate = (): Template => ({
-  id: "FANOeCfrTeGKVgAAek3FQg" as TemplateId,
+export const getDefaultClozeTemplate = (id: TemplateId): Template => ({
+  id,
   name: "New Template",
   css: "",
   fields: [
