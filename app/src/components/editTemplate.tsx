@@ -3,7 +3,7 @@ import {
   getDefaultTemplate,
   type ChildTemplate,
   type Template,
-  defaultClozeTemplate,
+  getDefaultClozeTemplate,
 } from "shared"
 import { type SetStoreFunction, createStore } from "solid-js/store"
 import { Select } from "@thisbeyond/solid-select"
@@ -31,7 +31,9 @@ const EditTemplate: VoidComponent = () => {
         onChange={(value: string) => {
           setTemplate(
             "template",
-            value === "standard" ? getDefaultTemplate() : defaultClozeTemplate
+            value === "standard"
+              ? getDefaultTemplate()
+              : getDefaultClozeTemplate()
           )
         }}
       />

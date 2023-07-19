@@ -54,7 +54,7 @@ export const getDefaultTemplate = (): Template => ({
   remotes: new Map(),
 })
 
-export const defaultClozeTemplate: Template = {
+export const getDefaultClozeTemplate = (): Template => ({
   id: "FANOeCfrTeGKVgAAek3FQg" as TemplateId,
   name: "New Template",
   css: "",
@@ -78,4 +78,4 @@ export const defaultClozeTemplate: Template = {
     },
   },
   remotes: new Map(),
-}
+})
