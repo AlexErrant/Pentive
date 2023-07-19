@@ -11,8 +11,6 @@ import {
   type Card,
   sampleNote,
   type Note,
-  defaultTemplate,
-  type Template,
   type Base64Url,
   csrfHeaderName,
   type NookId,
@@ -54,10 +52,6 @@ async function uploadTemplates(): Promise<void> {
 
 async function makeNoteUploadable() {
   await db.makeNoteUploadable(sampleNote.id, "a_random_nook" as NookId)
-}
-
-async function makeTemplateUploadable() {
-  await db.makeTemplateUploadable(defaultTemplate.id, "a_random_nook" as NookId)
 }
 
 async function uploadNotes(): Promise<void> {
@@ -158,7 +152,6 @@ const MyPluginBaby: VoidComponent<{
 export default function Home(): JSX.Element {
   const [count, setCount] = createSignal(1)
   const [search, setSearch] = createSignal("")
-  const [template, setTemplate] = createSignal<Template | null>(null)
   const [card, setCard] = createSignal<Card | null>(null)
   const [note, setNote] = createSignal<Note | null>(null)
   const age = useRouteData<typeof HomeData>()
@@ -166,10 +159,6 @@ export default function Home(): JSX.Element {
   createEffect(() => {
     console.log(age())
     setCount(age() as number) // not sure why, but changing to a mono repo changed the signature of this to include `undefined` - which is wrong. Whatever.
-  })
-
-  createEffect(() => {
-    console.log(template())
   })
 
   createEffect(() => {
@@ -220,28 +209,6 @@ export default function Home(): JSX.Element {
         </button>
       </div>
       <div class="mt-4">
-        <button
-          class="border rounded-lg px-2 border-gray-900"
-          onClick={async () => {
-            await db.insertTemplate(defaultTemplate)
-          }}
-        >
-          insertTemplate
-        </button>
-        <button
-          class="border rounded-lg px-2 border-gray-900"
-          onClick={async () =>
-            setTemplate(await db.getTemplate(defaultTemplate.id))
-          }
-        >
-          getTemplate
-        </button>
-        <button
-          class="border rounded-lg px-2 border-gray-900"
-          onClick={makeTemplateUploadable}
-        >
-          makeTemplateUploadable
-        </button>
         <button
           class="border rounded-lg px-2 border-gray-900"
           onClick={uploadTemplates}
