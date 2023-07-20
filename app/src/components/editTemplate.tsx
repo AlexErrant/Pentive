@@ -11,6 +11,7 @@ import { Select } from "@thisbeyond/solid-select"
 import { type ClozeTemplate, type StandardTemplate } from "shared-dom"
 import EditChildTemplate from "./editChildTemplate"
 import { ulidAsBase64Url } from "../domain/utility"
+import { db } from "../db"
 
 import "@thisbeyond/solid-select/style.css"
 
@@ -135,6 +136,13 @@ const EditTemplate: VoidComponent = () => {
           }}
         </For>
       </Show>
+      <button
+        onClick={async () => {
+          await db.bulkUpsertTemplate([template.template])
+        }}
+      >
+        Save
+      </button>
     </>
   )
 }

@@ -19,7 +19,15 @@ import {
   type RemoteTemplate,
   type Template as TemplateEntity,
 } from "./database"
-import { type InsertObject, type Kysely, type Transaction } from "kysely"
+import {
+  type ExpressionBuilder,
+  type OnConflictDatabase,
+  type InsertObject,
+  type Kysely,
+  type Transaction,
+  type OnConflictTables,
+  type RawBuilder,
+} from "kysely"
 import { updateLocalMediaIdByRemoteMediaIdAndGetNewDoc } from "./note"
 
 function templateToDocType(template: Template) {
@@ -102,10 +110,53 @@ function domainToEditRemote(template: Template) {
 export const templateCollectionMethods = {
   insertTemplate: async function (template: Template, trx?: Transaction<DB>) {
     const { insertTemplate, remoteTemplates } = templateToDocType(template)
+    const conflictValues = { ...insertTemplate, id: undefined }
     async function insert(trx: Transaction<DB>) {
-      await trx.insertInto("template").values(insertTemplate).execute()
-      if (remoteTemplates.length !== 0)
-        await trx.insertInto("remoteTemplate").values(remoteTemplates).execute()
+      await trx
+        .insertInto("template")
+        .values(insertTemplate)
+        .onConflict((db) => db.doUpdateSet(conflictValues))
+        .execute()
+      const oldRts = await trx
+        .selectFrom("remoteTemplate")
+        .selectAll()
+        .where("localId", "=", template.id)
+        .execute()
+      // the following deleted/added/updated logic assumes ONE template
+      const newRts = remoteTemplates
+      const deleted = oldRts.filter((o) =>
+        newRts.some((n) => n.nook !== o.nook)
+      )
+      const added = newRts.filter((o) => oldRts.some((n) => n.nook !== o.nook))
+      const updated = newRts.filter((o) =>
+        oldRts.some((n) => n.nook === o.nook)
+      )
+      if (deleted.length !== 0) {
+        await trx
+          .deleteFrom("remoteTemplate")
+          .where("localId", "=", template.id)
+          .where(
+            "nook",
+            "in",
+            deleted.map((t) => t.nook)
+          )
+          .execute()
+      }
+      if (added.length !== 0) {
+        await trx.insertInto("remoteTemplate").values(added).execute()
+      }
+      if (updated.length !== 0) {
+        await trx
+          .insertInto("remoteTemplate")
+          .values(updated)
+          .onConflict((db) =>
+            db.doUpdateSet({
+              uploadDate: (x) => x.ref("excluded.uploadDate"),
+              remoteId: (x) => x.ref("excluded.remoteId"),
+            } satisfies OnConflictUpdateRemoteTemplateSet)
+          )
+          .execute()
+      }
     }
     if (trx == null) {
       await (await getKysely()).transaction().execute(insert)
@@ -408,20 +459,6 @@ export const templateCollectionMethods = {
         )} not found. (This is the worst error message ever - medTODO.)`
       )
   },
-  updateTemplate: async function (template: Template) {
-    const db = await getKysely()
-    const {
-      insertTemplate: { id, ...rest },
-      // maybeTODO handle the returned remoteTemplates
-    } = templateToDocType(template)
-    const r = await db
-      .updateTable("template")
-      .set(rest)
-      .where("id", "=", id)
-      .returningAll()
-      .execute()
-    if (r.length !== 1) throwExp(`No template found for id '${template.id}'.`)
-  },
 }
 
 function withLocalMediaIdByRemoteMediaId<
@@ -459,4 +496,14 @@ function withLocalMediaIdByRemoteMediaId<
       remoteMediaIdByLocal,
     }
   }
+}
+
+// the point of this type is to cause an error if something is added to RemoteTemplate
+type OnConflictUpdateRemoteTemplateSet = {
+  [K in keyof RemoteTemplate as Exclude<K, "nook" | "localId">]: (
+    x: ExpressionBuilder<
+      OnConflictDatabase<DB, "remoteTemplate">,
+      OnConflictTables<"remoteTemplate">
+    >
+  ) => RawBuilder<RemoteTemplate[K]>
 }
