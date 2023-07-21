@@ -11,6 +11,7 @@ import { render } from "solid-js/web"
 import "golden-layout/dist/css/goldenlayout-base.css"
 import "golden-layout/dist/css/themes/goldenlayout-light-theme.css"
 import EditTemplate from "../components/editTemplate"
+import _ from "lodash"
 
 export default function Templates(): JSX.Element {
   const templates = useRouteData<typeof TemplatesData>()
@@ -26,8 +27,9 @@ export default function Templates(): JSX.Element {
           () => (
             <TemplatesTable
               templates={templates()}
-              onSelectionChanged={(ncs) => {
-                setSelected("template", ncs.at(0))
+              onSelectionChanged={(templates) => {
+                const t = _.cloneDeep(templates.at(0)) // some fns mutate the selectedTemplate, so clone to avoid issues
+                setSelected("template", t)
               }}
             />
           ),
