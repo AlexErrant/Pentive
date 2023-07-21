@@ -11,7 +11,7 @@ import { note as arbitraryNote } from "../../tests/arbitraryNote"
 async function testTemplate(): Promise<boolean> {
   await fc.assert(
     fc.asyncProperty(arbitraryTemplate, async (expected) => {
-      await db.insertTemplate(expected)
+      await db.upsertTemplate(expected)
       const actual = await db.getTemplate(expected.id)
       const r = _.isEqual(expected, actual)
       console.assert(r, { expected, actual })

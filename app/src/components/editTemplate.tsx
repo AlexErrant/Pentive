@@ -145,7 +145,7 @@ const EditTemplate: VoidComponent<{ template: Template }> = (props) => {
       </Show>
       <button
         onClick={async () => {
-          await db.bulkUpsertTemplate([template.template])
+          await db.upsertTemplate(template.template)
         }}
       >
         Save

@@ -74,7 +74,7 @@ export const appExpose = {
           serializer.serializeToString(front)
         template.templateType.template.back = serializer.serializeToString(back)
       }
-      await db.insertTemplate(template, trx)
+      await db.upsertTemplate(template, trx)
     })
   },
   addNote: async (rn: RemoteNote, nook: NookId) => {

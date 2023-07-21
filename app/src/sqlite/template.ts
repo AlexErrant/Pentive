@@ -108,7 +108,7 @@ function domainToEditRemote(template: Template) {
 }
 
 export const templateCollectionMethods = {
-  insertTemplate: async function (template: Template, trx?: Transaction<DB>) {
+  upsertTemplate: async function (template: Template, trx?: Transaction<DB>) {
     const { insertTemplate, remoteTemplates } = templateToDocType(template)
     const conflictValues = { ...insertTemplate, id: undefined }
     async function insert(trx: Transaction<DB>) {
