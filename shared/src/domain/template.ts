@@ -47,7 +47,7 @@ export const getDefaultTemplate = (id: TemplateId): Template => ({
         id: 0 as Ord,
         name: "My Template",
         front: "{{Front}}",
-        back: `{{FrontSide}}<hr id=answer>{{Back}}<img src="book.jpg" >`, // highTODO nix book.jpg
+        back: `{{FrontSide}}<hr id=answer>{{Back}}`,
       },
     ],
   },

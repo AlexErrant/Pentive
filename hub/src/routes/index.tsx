@@ -19,7 +19,7 @@ export default function Home(): JSX.Element {
           id: 0 as Ord,
           name: "My Template",
           front: "{{Front}}",
-          back: `{{FrontSide}}<hr id=answer>{{Back}}<img src="book.jpg" >`, // highTODO nix book.jpg
+          back: `{{FrontSide}}<hr id=answer>{{Back}}`,
           shortFront: "{{Front}}",
           shortBack: "{{Back}}",
         },
