@@ -1,4 +1,4 @@
-import { type VoidComponent, For, Show } from "solid-js"
+import { type VoidComponent, For, Show, createEffect } from "solid-js"
 import {
   getDefaultTemplate,
   type ChildTemplate,
@@ -22,22 +22,29 @@ interface StandardTemplateStore {
   template: StandardTemplate
 }
 
-const EditTemplate: VoidComponent = () => {
+const EditTemplate: VoidComponent<{ template: Template }> = (props) => {
   const [template, setTemplate] = createStore<{ template: Template }>({
     template: getDefaultTemplate(ulidAsBase64Url() as TemplateId),
+  })
+  createEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions -- touch template.id so we setTemplate if template changes
+    props.template.id
+    setTemplate("template", props.template)
   })
   return (
     <>
       <Select
-        initialValue={"standard"}
+        initialValue={props.template.templateType.tag}
         options={["standard", "cloze"]}
         onChange={(value: string) => {
-          setTemplate(
-            "template",
-            value === "standard"
-              ? getDefaultTemplate(ulidAsBase64Url() as TemplateId)
-              : getDefaultClozeTemplate(ulidAsBase64Url() as TemplateId)
-          )
+          if (template.template.templateType.tag !== value) {
+            setTemplate(
+              "template",
+              value === "standard"
+                ? getDefaultTemplate(template.template.id)
+                : getDefaultClozeTemplate(template.template.id)
+            )
+          }
         }}
       />
       Name

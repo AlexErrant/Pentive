@@ -3,6 +3,7 @@ apkg
 AUGC
 authed
 ciphertext
+cloze
 codemirror
 comlink
 concated
@@ -61,6 +62,7 @@ trpc
 typecheck
 ulids
 unhex
+upsert
 upserted
 viewports
 vite

@@ -3,7 +3,7 @@ import { type JSX, Show, onMount } from "solid-js"
 import TemplatesTable from "../components/templatesTable"
 import type TemplatesData from "./templates.data"
 import { useRouteData } from "@solidjs/router"
-import { type Template } from "shared"
+import { type TemplateId, type Template, getDefaultTemplate } from "shared"
 import ResizingIframe from "../components/resizingIframe"
 import { GoldenLayout, LayoutConfig } from "golden-layout"
 import { render } from "solid-js/web"
@@ -12,6 +12,7 @@ import "golden-layout/dist/css/goldenlayout-base.css"
 import "golden-layout/dist/css/themes/goldenlayout-light-theme.css"
 import EditTemplate from "../components/editTemplate"
 import _ from "lodash"
+import { ulidAsBase64Url } from "../domain/utility"
 
 export default function Templates(): JSX.Element {
   const templates = useRouteData<typeof TemplatesData>()
@@ -43,7 +44,7 @@ export default function Templates(): JSX.Element {
         render(
           () => (
             <Show when={selected.template != null}>
-              {selected.template!.fields.map((f) => f.name).join(", ")}
+              <EditTemplate template={selected.template!} />
             </Show>
           ),
           container.element
@@ -53,7 +54,14 @@ export default function Templates(): JSX.Element {
     goldenLayout.registerComponentFactoryFunction(
       "Add Template",
       (container) => {
-        render(() => <EditTemplate />, container.element)
+        render(
+          () => (
+            <EditTemplate
+              template={getDefaultTemplate(ulidAsBase64Url() as TemplateId)}
+            />
+          ),
+          container.element
+        )
       }
     )
     goldenLayout.registerComponentFactoryFunction(
