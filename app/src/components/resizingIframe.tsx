@@ -73,6 +73,7 @@ const ResizingIframe: VoidComponent<{
   })
   return (
     <iframe
+      class="w-full"
       ref={(x) => (iframeReference = x as IFrameComponent)}
       onLoad={(e) => {
         const appExpose: AppExpose = {

@@ -46,6 +46,7 @@ const ResizingIframe: VoidComponent<{
   })
   return (
     <iframe
+      class="w-full"
       ref={(x) => (iframeReference = x)}
       onLoad={(e) => {
         Comlink.expose(
