@@ -21,7 +21,7 @@ export interface Template {
   created: Date
   updated: Date
   templateType: TemplateType
-  remotes: Map<
+  remotes: Record<
     NookId,
     { remoteTemplateId: RemoteTemplateId; uploadDate: Date } | null
   >
@@ -51,7 +51,7 @@ export const getDefaultTemplate = (id: TemplateId): Template => ({
       },
     ],
   },
-  remotes: new Map(),
+  remotes: {},
 })
 
 export const getDefaultClozeTemplate = (id: TemplateId): Template => ({
@@ -77,5 +77,5 @@ export const getDefaultClozeTemplate = (id: TemplateId): Template => ({
       back: `{{cloze:Text}}<br>{{Back Extra}}`,
     },
   },
-  remotes: new Map(),
+  remotes: {},
 })

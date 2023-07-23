@@ -17,6 +17,7 @@ import {
   type RemoteTemplateId,
   nookId,
   throwExp,
+  objEntries,
 } from "shared"
 import { type SetStoreFunction, createStore } from "solid-js/store"
 import { Select } from "@thisbeyond/solid-select"
@@ -52,7 +53,7 @@ function removeNook(
 }
 
 function remoteCell(template: Template): JSX.Element {
-  const [getRemotes, setRemotes] = createSignal(Array.from(template.remotes))
+  const [getRemotes, setRemotes] = createSignal(objEntries(template.remotes))
   return (
     <>
       <ul>

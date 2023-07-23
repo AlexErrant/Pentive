@@ -50,9 +50,9 @@ export const appExpose = {
         updated: new Date(),
         templateType: rt.templateType,
         fields: rt.fields.map((name) => ({ name })),
-        remotes: new Map([
-          [rt.nook, { remoteTemplateId: rt.id, uploadDate: new Date() }],
-        ]),
+        remotes: {
+          [rt.nook]: { remoteTemplateId: rt.id, uploadDate: new Date() },
+        },
       }
       const dp = new DOMParser()
       if (template.templateType.tag === "standard") {

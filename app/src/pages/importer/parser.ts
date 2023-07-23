@@ -78,7 +78,7 @@ export function parseTemplates(models: Models): Template[] {
       updated: new Date(m.mod * 1000),
       templateType: parseTemplateType(m),
       ankiId: m.id,
-      remotes: new Map(),
+      remotes: {},
     }
   })
 }

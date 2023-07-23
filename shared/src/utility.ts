@@ -62,3 +62,11 @@ export type Override<T, U extends Partial<Record<keyof T, unknown>>> = Omit<
   keyof U
 > &
   U
+
+export function objKeys<TKey extends string, TVal>(obj: Record<TKey, TVal>) {
+  return Object.keys(obj) as TKey[]
+}
+
+export function objEntries<TKey extends string, TVal>(obj: Record<TKey, TVal>) {
+  return Object.entries(obj) as Array<[TKey, TVal]>
+}

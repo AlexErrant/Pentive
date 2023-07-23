@@ -9,7 +9,7 @@ export default function Home(): JSX.Element {
     name: "",
     created: new Date(),
     updated: new Date(),
-    remotes: new Map(),
+    remotes: {},
     css: "",
     fields: [{ name: "Front" }, { name: "Back" }],
     templateType: {

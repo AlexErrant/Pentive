@@ -5,7 +5,6 @@ import {
   type RemoteTemplateId,
   type TemplateId,
   type ChildTemplate,
-  type NookId,
   type TemplateType,
   type Field,
   type Template,
@@ -61,29 +60,16 @@ export const template = recordWithOptionalFields<Template>(
     created: reasonableDates,
     updated: reasonableDates,
     templateType,
-    remotes: fc
-      .dictionary(
-        fc.string(),
-        fc.oneof(
-          fc.constant(null),
-          fc.record<{ remoteTemplateId: RemoteTemplateId; uploadDate: Date }>({
-            remoteTemplateId: arbitraryUlid<RemoteTemplateId>(),
-            uploadDate: fc.date(),
-          })
-        )
+    remotes: fc.dictionary(
+      fc.string(),
+      fc.oneof(
+        fc.constant(null),
+        fc.record<{ remoteTemplateId: RemoteTemplateId; uploadDate: Date }>({
+          remoteTemplateId: arbitraryUlid<RemoteTemplateId>(),
+          uploadDate: fc.date(),
+        })
       )
-      .map(
-        (x) =>
-          new Map(
-            Object.entries(x) as Array<
-              // don't bother trying to get rid of this cast - fc.dictionary forces the key to be a string (when it needs to be a NookId)
-              [
-                NookId,
-                { remoteTemplateId: RemoteTemplateId; uploadDate: Date } | null
-              ]
-            >
-          )
-      ),
+    ),
   },
   {}
 )

@@ -12,6 +12,8 @@ import {
   type MediaId,
   type Field,
   type Template,
+  objKeys,
+  objEntries,
 } from "shared"
 import { getKysely } from "./crsqlite"
 import {
@@ -40,14 +42,14 @@ function templateToDocType(template: Template) {
     fields: JSON.stringify(template.fields),
     templateType: JSON.stringify(template.templateType),
   }
-  const remoteTemplates: RemoteTemplate[] = Array.from(
-    template.remotes.entries()
-  ).map(([nook, remote]) => ({
-    localId: template.id,
-    nook,
-    remoteId: remote?.remoteTemplateId ?? null,
-    uploadDate: remote?.uploadDate.getTime() ?? null,
-  }))
+  const remoteTemplates: RemoteTemplate[] = objEntries(template.remotes).map(
+    ([nook, remote]) => ({
+      localId: template.id,
+      nook,
+      remoteId: remote?.remoteTemplateId ?? null,
+      uploadDate: remote?.uploadDate.getTime() ?? null,
+    })
+  )
   return { insertTemplate, remoteTemplates }
 }
 
@@ -63,7 +65,7 @@ export function entityToDomain(
     fields: JSON.parse(template.fields) as Field[],
     css: template.css,
     templateType: JSON.parse(template.templateType) as TemplateType,
-    remotes: new Map(
+    remotes: Object.fromEntries(
       remotes.map((r) => {
         const value =
           r.remoteId == null || r.uploadDate == null
@@ -84,7 +86,7 @@ function domainToCreateRemote(t: Template) {
     localId: t.id,
     name: t.name,
     css: t.css,
-    nooks: Array.from(t.remotes.keys()),
+    nooks: objKeys(t.remotes),
     templateType: t.templateType,
     fields: t.fields.map((x) => x.name),
   }
@@ -92,16 +94,16 @@ function domainToCreateRemote(t: Template) {
 }
 
 function domainToEditRemote(template: Template) {
-  const remoteIds = Array.from(template.remotes.values()).filter(notEmpty)
+  const remoteIds = Object.entries(template.remotes)
+    .map(([, v]) => v?.remoteTemplateId)
+    .filter(notEmpty)
   if (remoteIds.length === 0)
     throwExp(`Zero remoteIds - is something wrong with the SQL query?`)
   const r: EditRemoteTemplate = {
     name: template.name,
     css: template.css,
     templateType: template.templateType,
-    remoteIds: Array.from(template.remotes)
-      .map(([, v]) => v?.remoteTemplateId)
-      .filter(notEmpty),
+    remoteIds,
     fields: template.fields.map((x) => x.name),
   }
   return r

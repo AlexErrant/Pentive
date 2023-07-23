@@ -20,7 +20,7 @@ const clozeWithRequiredEdit: Template = {
   name: "",
   created: new Date(),
   updated: new Date(),
-  remotes: new Map(),
+  remotes: {},
   css: "",
   fields: [{ name: "Text" }, { name: "Extra" }],
   templateType: {

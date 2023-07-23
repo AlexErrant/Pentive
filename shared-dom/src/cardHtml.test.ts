@@ -41,7 +41,7 @@ function buildTemplate(
               },
             ],
           },
-    remotes: new Map(),
+    remotes: {},
   } satisfies Template
 }
 
@@ -584,7 +584,7 @@ test("renderTemplate works for 1 cloze", () => {
     name: "",
     created: new Date(),
     updated: new Date(),
-    remotes: new Map(),
+    remotes: {},
     css: "",
     fields: [{ name: "Text" }, { name: "Extra" }],
     templateType: {
@@ -613,7 +613,7 @@ test("renderTemplate works for 2 cloze deletions", () => {
     name: "",
     created: new Date(),
     updated: new Date(),
-    remotes: new Map(),
+    remotes: {},
     css: "",
     fields: [{ name: "Text1" }, { name: "Text2" }, { name: "Extra" }],
     templateType: {
@@ -647,7 +647,7 @@ test("renderTemplate works for standard with 1 child template", () => {
     name: "",
     created: new Date(),
     updated: new Date(),
-    remotes: new Map(),
+    remotes: {},
     css: "",
     fields: [{ name: "English" }, { name: "Spanish" }],
     templateType: {
@@ -674,7 +674,7 @@ test("renderTemplate works for standard with 2 child templates", () => {
     name: "",
     created: new Date(),
     updated: new Date(),
-    remotes: new Map(),
+    remotes: {},
     css: "",
     fields: [{ name: "English" }, { name: "Spanish" }],
     templateType: {

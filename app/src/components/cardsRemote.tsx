@@ -6,6 +6,7 @@ import {
   type VoidComponent,
 } from "solid-js"
 import {
+  objEntries,
   type NookId,
   type NoteId,
   type RemoteNoteId,
@@ -50,7 +51,7 @@ export const CardsRemote: VoidComponent<{
   const [getRemotes, { mutate: setRemotes }] = createResource(
     () => props.noteCard,
     ({ note, template }) =>
-      Array.from(template.remotes).map(([nookId, remoteTemplateId]) => {
+      objEntries(template.remotes).map(([nookId, remoteTemplateId]) => {
         const remoteNoteId = note.remotes.get(nookId) ?? null
         const uploadable = note.remotes.has(nookId)
         return {
