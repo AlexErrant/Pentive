@@ -126,10 +126,10 @@ export const templateCollectionMethods = {
         .execute()
       // the following deleted/added/updated logic assumes ONE template
       const newRts = remoteTemplates
-      const deleted = oldRts.filter((o) =>
-        newRts.some((n) => n.nook !== o.nook)
+      const deleted = oldRts.filter(
+        (o) => !newRts.some((n) => n.nook === o.nook)
       )
-      const added = newRts.filter((o) => oldRts.some((n) => n.nook !== o.nook))
+      const added = newRts.filter((o) => !oldRts.some((n) => n.nook === o.nook))
       const updated = newRts.filter((o) =>
         oldRts.some((n) => n.nook === o.nook)
       )

@@ -1,12 +1,4 @@
-import {
-  type VoidComponent,
-  For,
-  Show,
-  createEffect,
-  type Setter,
-  createSignal,
-  type JSX,
-} from "solid-js"
+import { type VoidComponent, For, Show, createEffect, type JSX } from "solid-js"
 import {
   getDefaultTemplate,
   type ChildTemplate,
@@ -14,9 +6,6 @@ import {
   getDefaultClozeTemplate,
   type TemplateId,
   type NookId,
-  type RemoteTemplateId,
-  nookId,
-  throwExp,
   objEntries,
 } from "shared"
 import { type SetStoreFunction, createStore } from "solid-js/store"
@@ -34,17 +23,18 @@ interface ClozeTemplateStore {
 interface StandardTemplateStore {
   template: StandardTemplate
 }
+
 function removeNook(
-  templateId: TemplateId,
   nook: NookId,
-  setRemotes: Setter<Array<[NookId, RemoteTemplateId | null]>>
+  setTemplate: SetStoreFunction<{
+    template: Template
+  }>
 ) {
   return (
     <button
       type="button"
-      onClick={async () => {
-        await db.makeTemplateNotUploadable(templateId, nook)
-        setRemotes((rs) => rs.filter(([n]) => n !== nook))
+      onClick={() => {
+        setTemplate("template", "remotes", (x) => ({ ...x, [nook]: undefined }))
       }}
     >
       ❌
@@ -52,12 +42,16 @@ function removeNook(
   )
 }
 
-function remoteCell(template: Template): JSX.Element {
-  const [getRemotes, setRemotes] = createSignal(objEntries(template.remotes))
+function remoteCell(
+  template: Template,
+  setTemplate: SetStoreFunction<{
+    template: Template
+  }>
+): JSX.Element {
   return (
     <>
       <ul>
-        <For each={getRemotes()}>
+        <For each={objEntries(template.remotes)}>
           {([nookId, remoteTemplate]) => (
             <li class="py-2 px-4">
               <Show when={remoteTemplate != null} fallback={nookId}>
@@ -69,32 +63,24 @@ function remoteCell(template: Template): JSX.Element {
                   {nookId}
                 </a>
               </Show>
-              {removeNook(template.id, nookId, setRemotes)}
+              {removeNook(nookId, setTemplate)}
             </li>
           )}
         </For>
       </ul>
-      <form
-        onSubmit={async (e) => {
-          e.preventDefault()
-          const formData = new FormData(e.target as HTMLFormElement)
-          const newNookId = nookId.parse(formData.get("newNookId"))
-          if (
-            getRemotes()
-              .map(([n]) => n)
-              .includes(newNookId)
+      <input
+        name="newNookId"
+        class="w-75px p-1 bg-white text-sm rounded-lg border"
+        type="text"
+        onChange={(e) => {
+          setTemplate(
+            "template",
+            "remotes",
+            e.currentTarget.value as NookId,
+            null
           )
-            throwExp("No dupes")
-          await db.makeTemplateUploadable(template.id, newNookId)
-          setRemotes((x) => [...x, [newNookId, null]])
         }}
-      >
-        <input
-          name="newNookId"
-          class="w-75px p-1 bg-white text-sm rounded-lg border"
-          type="text"
-        />
-      </form>
+      />
     </>
   )
 }
@@ -133,7 +119,7 @@ const EditTemplate: VoidComponent<{ template: Template }> = (props) => {
           setTemplate("template", "name", e.currentTarget.value)
         }}
       />
-      {remoteCell(template.template)}
+      {remoteCell(template.template, setTemplate)}
       <fieldset class="border border-black p-2">
         <legend>
           <span class="p-2 px-4 font-bold">Fields</span>
