@@ -1,11 +1,4 @@
-import {
-  For,
-  type JSX,
-  type VoidComponent,
-  createSignal,
-  Show,
-  type Setter,
-} from "solid-js"
+import { type VoidComponent } from "solid-js"
 import AgGridSolid, { type AgGridSolidRef } from "ag-grid-solid"
 import "ag-grid-community/styles/ag-grid.css"
 import "ag-grid-community/styles/ag-theme-alpine.css"
@@ -17,14 +10,7 @@ import {
   type IGetRowsParams,
 } from "ag-grid-community"
 import { LicenseManager } from "ag-grid-enterprise"
-import {
-  type Template,
-  type NookId,
-  type RemoteTemplateId,
-  type TemplateId,
-  nookId,
-  throwExp,
-} from "shared"
+import { type Template, type TemplateId } from "shared"
 import _ from "lodash"
 import "@github/relative-time-element"
 import { db } from "../db"
@@ -32,71 +18,6 @@ import { db } from "../db"
 LicenseManager.setLicenseKey(import.meta.env.VITE_AG_GRID_LICENSE)
 
 let gridRef: AgGridSolidRef
-
-function removeNook(
-  templateId: TemplateId,
-  nook: NookId,
-  setRemotes: Setter<Array<[NookId, RemoteTemplateId | null]>>
-) {
-  return (
-    <button
-      type="button"
-      onClick={async () => {
-        await db.makeTemplateNotUploadable(templateId, nook)
-        setRemotes((rs) => rs.filter(([n]) => n !== nook))
-      }}
-    >
-      ❌
-    </button>
-  )
-}
-
-function remoteCell(template: Template): JSX.Element {
-  const [getRemotes, setRemotes] = createSignal(Array.from(template.remotes))
-  return (
-    <>
-      <ul>
-        <For each={getRemotes()}>
-          {([nookId, remoteTemplate]) => (
-            <li class="py-2 px-4">
-              <Show when={remoteTemplate != null} fallback={nookId}>
-                <a
-                  href={`${import.meta.env.VITE_HUB_ORIGIN}/t/${
-                    remoteTemplate!.remoteTemplateId
-                  }`}
-                >
-                  {nookId}
-                </a>
-              </Show>
-              {removeNook(template.id, nookId, setRemotes)}
-            </li>
-          )}
-        </For>
-      </ul>
-      <form
-        onSubmit={async (e) => {
-          e.preventDefault()
-          const formData = new FormData(e.target as HTMLFormElement)
-          const newNookId = nookId.parse(formData.get("newNookId"))
-          if (
-            getRemotes()
-              .map(([n]) => n)
-              .includes(newNookId)
-          )
-            throwExp("No dupes")
-          await db.makeTemplateUploadable(template.id, newNookId)
-          setRemotes((x) => [...x, [newNookId, null]])
-        }}
-      >
-        <input
-          name="newNookId"
-          class="w-75px p-1 bg-white text-sm rounded-lg border"
-          type="text"
-        />
-      </form>
-    </>
-  )
-}
 
 const columnDefs: Array<ColDef<Template>> = [
   {
@@ -106,12 +27,6 @@ const columnDefs: Array<ColDef<Template>> = [
   {
     headerName: "Type",
     valueGetter: (row) => _.startCase(row?.data?.templateType.tag),
-  },
-  {
-    headerName: "Upload",
-    cellRenderer: (props: ICellRendererParams<Template>) => (
-      <Show when={props.data != null}>{remoteCell(props.data!)}</Show>
-    ),
   },
   {
     headerName: "Created",

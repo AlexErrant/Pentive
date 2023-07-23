@@ -1,10 +1,22 @@
-import { type VoidComponent, For, Show, createEffect } from "solid-js"
+import {
+  type VoidComponent,
+  For,
+  Show,
+  createEffect,
+  type Setter,
+  createSignal,
+  type JSX,
+} from "solid-js"
 import {
   getDefaultTemplate,
   type ChildTemplate,
   type Template,
   getDefaultClozeTemplate,
   type TemplateId,
+  type NookId,
+  type RemoteTemplateId,
+  nookId,
+  throwExp,
 } from "shared"
 import { type SetStoreFunction, createStore } from "solid-js/store"
 import { Select } from "@thisbeyond/solid-select"
@@ -20,6 +32,70 @@ interface ClozeTemplateStore {
 }
 interface StandardTemplateStore {
   template: StandardTemplate
+}
+function removeNook(
+  templateId: TemplateId,
+  nook: NookId,
+  setRemotes: Setter<Array<[NookId, RemoteTemplateId | null]>>
+) {
+  return (
+    <button
+      type="button"
+      onClick={async () => {
+        await db.makeTemplateNotUploadable(templateId, nook)
+        setRemotes((rs) => rs.filter(([n]) => n !== nook))
+      }}
+    >
+      ❌
+    </button>
+  )
+}
+
+function remoteCell(template: Template): JSX.Element {
+  const [getRemotes, setRemotes] = createSignal(Array.from(template.remotes))
+  return (
+    <>
+      <ul>
+        <For each={getRemotes()}>
+          {([nookId, remoteTemplate]) => (
+            <li class="py-2 px-4">
+              <Show when={remoteTemplate != null} fallback={nookId}>
+                <a
+                  href={`${import.meta.env.VITE_HUB_ORIGIN}/t/${
+                    remoteTemplate!.remoteTemplateId
+                  }`}
+                >
+                  {nookId}
+                </a>
+              </Show>
+              {removeNook(template.id, nookId, setRemotes)}
+            </li>
+          )}
+        </For>
+      </ul>
+      <form
+        onSubmit={async (e) => {
+          e.preventDefault()
+          const formData = new FormData(e.target as HTMLFormElement)
+          const newNookId = nookId.parse(formData.get("newNookId"))
+          if (
+            getRemotes()
+              .map(([n]) => n)
+              .includes(newNookId)
+          )
+            throwExp("No dupes")
+          await db.makeTemplateUploadable(template.id, newNookId)
+          setRemotes((x) => [...x, [newNookId, null]])
+        }}
+      >
+        <input
+          name="newNookId"
+          class="w-75px p-1 bg-white text-sm rounded-lg border"
+          type="text"
+        />
+      </form>
+    </>
+  )
 }
 
 const EditTemplate: VoidComponent<{ template: Template }> = (props) => {
@@ -56,6 +132,7 @@ const EditTemplate: VoidComponent<{ template: Template }> = (props) => {
           setTemplate("template", "name", e.currentTarget.value)
         }}
       />
+      {remoteCell(template.template)}
       <fieldset class="border border-black p-2">
         <legend>
           <span class="p-2 px-4 font-bold">Fields</span>
