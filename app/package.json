@@ -92,7 +92,7 @@
     "api-ugc": "workspace:*",
     "babel-preset-solid": "^1.7.3",
     "buffer": "^6.0.3",
-    "comlink": "^4.3.1",
+    "comlink": "^4.4.1",
     "cwa": "workspace:*",
     "dexie": "^3.2.2",
     "golden-layout": "^2.6.0",

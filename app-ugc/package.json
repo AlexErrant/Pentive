@@ -45,7 +45,7 @@
   },
   "dependencies": {
     "app": "workspace:*",
-    "comlink": "^4.3.1",
+    "comlink": "^4.4.1",
     "iframe-resizer": "^4.3.6",
     "shared": "workspace:*"
   }

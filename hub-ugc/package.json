@@ -44,7 +44,7 @@
     "wrangler": "^2.16.0"
   },
   "dependencies": {
-    "comlink": "^4.3.1",
+    "comlink": "^4.4.1",
     "hub": "workspace:*",
     "iframe-resizer": "^4.3.6",
     "shared": "workspace:*",
