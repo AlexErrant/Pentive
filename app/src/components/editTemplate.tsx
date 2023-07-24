@@ -49,7 +49,10 @@ function remoteCell(
   }>
 ): JSX.Element {
   return (
-    <>
+    <fieldset class="border border-black p-2">
+      <legend>
+        <span class="p-2 px-2 font-bold">Nooks</span>
+      </legend>
       <ul>
         <For each={objEntries(template.remotes)}>
           {([nookId, remoteTemplate]) => (
@@ -81,7 +84,7 @@ function remoteCell(
           )
         }}
       />
-    </>
+    </fieldset>
   )
 }
 
@@ -119,7 +122,6 @@ const EditTemplate: VoidComponent<{ template: Template }> = (props) => {
           setTemplate("template", "name", e.currentTarget.value)
         }}
       />
-      {remoteCell(template.template, setTemplate)}
       <fieldset class="border border-black p-2">
         <legend>
           <span class="p-2 px-4 font-bold">Fields</span>
@@ -207,6 +209,7 @@ const EditTemplate: VoidComponent<{ template: Template }> = (props) => {
           }}
         </For>
       </Show>
+      {remoteCell(template.template, setTemplate)}
       <button
         onClick={async () => {
           await db.upsertTemplate(template.template)

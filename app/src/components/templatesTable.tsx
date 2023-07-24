@@ -30,12 +30,14 @@ const columnDefs: Array<ColDef<Template>> = [
   },
   {
     headerName: "Created",
+    hide: true,
     cellRenderer: (props: ICellRendererParams<Template>) => (
       <relative-time date={props.data?.created} />
     ),
   },
   {
     headerName: "Updated",
+    hide: true,
     cellRenderer: (props: ICellRendererParams<Template>) => (
       <relative-time date={props.data?.updated} />
     ),
