@@ -5,6 +5,7 @@ export const appMessenger = Comlink.wrap<AppExpose>(
   Comlink.windowEndpoint(self.parent)
 )
 
-addEventListener("unload", () => {
-  appMessenger[Comlink.releaseProxy]()
-})
+// uncommenting this kills updates on the /templates page. lowTODO figure out the right way to dispose the proxy
+// addEventListener("unload", () => {
+//   appMessenger[Comlink.releaseProxy]()
+// })
