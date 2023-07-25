@@ -158,57 +158,7 @@ const EditTemplate: VoidComponent<{ template: Template }> = (props) => {
           }}
         </For>
       </fieldset>
-      <Show
-        when={template.template.templateType.tag === "standard"}
-        fallback={
-          <EditChildTemplate
-            template={template.template}
-            childTemplate={
-              (template.template as ClozeTemplate).templateType.template
-            }
-            i={0}
-            setTemplate={<K extends keyof ChildTemplate>(
-              key: K,
-              val: ChildTemplate[K]
-            ) => {
-              ;(setTemplate as SetStoreFunction<ClozeTemplateStore>)(
-                "template",
-                "templateType",
-                "template",
-                key,
-                val
-              )
-            }}
-          />
-        }
-      >
-        <For
-          each={(template.template as StandardTemplate).templateType.templates}
-        >
-          {(childTemplate, i) => {
-            return (
-              <EditChildTemplate
-                template={template.template}
-                childTemplate={childTemplate}
-                i={i()}
-                setTemplate={<K extends keyof ChildTemplate>(
-                  key: K,
-                  val: ChildTemplate[K]
-                ) => {
-                  ;(setTemplate as SetStoreFunction<StandardTemplateStore>)(
-                    "template",
-                    "templateType",
-                    "templates",
-                    i(),
-                    key,
-                    val
-                  )
-                }}
-              />
-            )
-          }}
-        </For>
-      </Show>
+      {childTemplates(template, setTemplate)}
       {remoteCell(template.template, setTemplate)}
       <button
         onClick={async () => {
@@ -222,3 +172,66 @@ const EditTemplate: VoidComponent<{ template: Template }> = (props) => {
 }
 
 export default EditTemplate
+
+function childTemplates(
+  template: {
+    template: Template
+  },
+  setTemplate: SetStoreFunction<{
+    template: Template
+  }>
+) {
+  return (
+    <Show
+      when={template.template.templateType.tag === "standard"}
+      fallback={
+        <EditChildTemplate
+          template={template.template}
+          childTemplate={
+            (template.template as ClozeTemplate).templateType.template
+          }
+          i={0}
+          setTemplate={<K extends keyof ChildTemplate>(
+            key: K,
+            val: ChildTemplate[K]
+          ) => {
+            ;(setTemplate as SetStoreFunction<ClozeTemplateStore>)(
+              "template",
+              "templateType",
+              "template",
+              key,
+              val
+            )
+          }}
+        />
+      }
+    >
+      <For
+        each={(template.template as StandardTemplate).templateType.templates}
+      >
+        {(childTemplate, i) => {
+          return (
+            <EditChildTemplate
+              template={template.template}
+              childTemplate={childTemplate}
+              i={i()}
+              setTemplate={<K extends keyof ChildTemplate>(
+                key: K,
+                val: ChildTemplate[K]
+              ) => {
+                ;(setTemplate as SetStoreFunction<StandardTemplateStore>)(
+                  "template",
+                  "templateType",
+                  "templates",
+                  i(),
+                  key,
+                  val
+                )
+              }}
+            />
+          )
+        }}
+      </For>
+    </Show>
+  )
+}
