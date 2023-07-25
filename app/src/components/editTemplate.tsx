@@ -7,6 +7,7 @@ import {
   type TemplateId,
   type NookId,
   objEntries,
+  type Ord,
 } from "shared"
 import { type SetStoreFunction, createStore } from "solid-js/store"
 import { Select } from "@thisbeyond/solid-select"
@@ -182,56 +183,90 @@ function childTemplates(
   }>
 ) {
   return (
-    <Show
-      when={template.template.templateType.tag === "standard"}
-      fallback={
-        <EditChildTemplate
-          template={template.template}
-          childTemplate={
-            (template.template as ClozeTemplate).templateType.template
-          }
-          i={0}
-          setTemplate={<K extends keyof ChildTemplate>(
-            key: K,
-            val: ChildTemplate[K]
-          ) => {
-            ;(setTemplate as SetStoreFunction<ClozeTemplateStore>)(
-              "template",
-              "templateType",
-              "template",
-              key,
-              val
+    <fieldset class="border border-black p-2">
+      <legend>
+        <Show
+          when={template.template.templateType.tag === "standard"}
+          fallback={<span class="p-2 px-4 font-bold">Template</span>}
+        >
+          <span class="p-2 px-4 font-bold">Child Templates</span>
+          <button
+            class="bg-green-600 hover:bg-green-700 text-white  py-1/2 px-2 m-2 rounded"
+            onClick={() => {
+              ;(setTemplate as SetStoreFunction<StandardTemplateStore>)(
+                "template",
+                "templateType",
+                "templates",
+                (templates) => {
+                  const lastChildTemplate = templates.at(-1)!
+                  return [
+                    ...templates,
+                    {
+                      id: (lastChildTemplate.id + 1) as Ord,
+                      name: lastChildTemplate.name + " (2)",
+                      front: lastChildTemplate.front,
+                      back: lastChildTemplate.back,
+                    },
+                  ]
+                }
+              )
+            }}
+          >
+            +
+          </button>
+        </Show>
+      </legend>
+      <Show
+        when={template.template.templateType.tag === "standard"}
+        fallback={
+          <EditChildTemplate
+            template={template.template}
+            childTemplate={
+              (template.template as ClozeTemplate).templateType.template
+            }
+            i={0}
+            setTemplate={<K extends keyof ChildTemplate>(
+              key: K,
+              val: ChildTemplate[K]
+            ) => {
+              ;(setTemplate as SetStoreFunction<ClozeTemplateStore>)(
+                "template",
+                "templateType",
+                "template",
+                key,
+                val
+              )
+            }}
+          />
+        }
+      >
+        <For
+          each={(template.template as StandardTemplate).templateType.templates}
+        >
+          {(childTemplate, i) => {
+            return (
+              <EditChildTemplate
+                template={template.template}
+                childTemplate={childTemplate}
+                i={i()}
+                setTemplate={<K extends keyof ChildTemplate>(
+                  key: K,
+                  val: ChildTemplate[K]
+                ) => {
+                  ;(setTemplate as SetStoreFunction<StandardTemplateStore>)(
+                    "template",
+                    "templateType",
+                    "templates",
+                    i(),
+                    key,
+                    val
+                  )
+                }}
+              />
             )
           }}
-        />
-      }
-    >
-      <For
-        each={(template.template as StandardTemplate).templateType.templates}
-      >
-        {(childTemplate, i) => {
-          return (
-            <EditChildTemplate
-              template={template.template}
-              childTemplate={childTemplate}
-              i={i()}
-              setTemplate={<K extends keyof ChildTemplate>(
-                key: K,
-                val: ChildTemplate[K]
-              ) => {
-                ;(setTemplate as SetStoreFunction<StandardTemplateStore>)(
-                  "template",
-                  "templateType",
-                  "templates",
-                  i(),
-                  key,
-                  val
-                )
-              }}
-            />
-          )
-        }}
-      </For>
-    </Show>
+        </For>
+      </Show>
+    </fieldset>
   )
 }
