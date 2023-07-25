@@ -5,6 +5,7 @@ export const hubMessenger = Comlink.wrap<HubExpose>(
   Comlink.windowEndpoint(self.parent)
 )
 
-addEventListener("unload", () => {
-  hubMessenger[Comlink.releaseProxy]()
-})
+// grep A08D0084-685D-4359-9949-3EAAEC5CC979
+// addEventListener("unload", () => {
+//   hubMessenger[Comlink.releaseProxy]()
+// })
