@@ -1,5 +1,5 @@
 import { createStore } from "solid-js/store"
-import { type JSX, Show, onMount } from "solid-js"
+import { type JSX, Show, onMount, For } from "solid-js"
 import TemplatesTable from "../components/templatesTable"
 import type TemplatesData from "./templates.data"
 import { useRouteData } from "@solidjs/router"
@@ -13,6 +13,7 @@ import "golden-layout/dist/css/themes/goldenlayout-light-theme.css"
 import EditTemplate from "../components/editTemplate"
 import _ from "lodash"
 import { ulidAsBase64Url } from "../domain/utility"
+import { C } from ".."
 
 export default function Templates(): JSX.Element {
   const templates = useRouteData<typeof TemplatesData>()
@@ -105,16 +106,29 @@ export default function Templates(): JSX.Element {
       (container) => {
         render(
           () => (
-            // lowTODO: iterate over all templates... or not. If there are 10 it'll look ugly
             <Show when={selected.template != null}>
-              <ResizingIframe
-                i={{
-                  tag: "template",
-                  side: "front",
-                  template: selected.template!,
-                  index: 0,
-                }}
-              />
+              <For each={C.templateIndexes(selected.template!)}>
+                {(index) => (
+                  <>
+                    <ResizingIframe
+                      i={{
+                        tag: "template",
+                        side: "front",
+                        template: selected.template!,
+                        index,
+                      }}
+                    />
+                    <ResizingIframe
+                      i={{
+                        tag: "template",
+                        side: "back",
+                        template: selected.template!,
+                        index,
+                      }}
+                    />
+                  </>
+                )}
+              </For>
             </Show>
           ),
           container.element

@@ -481,6 +481,11 @@ export function renderTemplate(
   )
 }
 
+export function templateIndexes(this: RenderContainer, template: Template) {
+  const length = this.renderTemplate(template).length
+  return Array.from(Array(length).keys())
+}
+
 export function noteOrds(
   this: RenderContainer,
   note: Note,

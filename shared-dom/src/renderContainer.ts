@@ -8,6 +8,7 @@ import {
   standardReplacers,
   clozeReplacers,
   noteOrds,
+  templateIndexes,
 } from "./cardHtml.js"
 
 export const defaultRenderContainer = {
@@ -20,6 +21,7 @@ export const defaultRenderContainer = {
   html,
   strip,
   noteOrds,
+  templateIndexes,
 }
 
 export const noteOrdsRenderContainer = {
