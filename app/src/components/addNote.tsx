@@ -1,8 +1,13 @@
 import { Select } from "@thisbeyond/solid-select"
 import "@thisbeyond/solid-select/style.css"
-import { Show, Suspense, createEffect, createSignal, on } from "solid-js"
-import type AddNoteData from "./addNote.data"
-import { useRouteData } from "@solidjs/router"
+import {
+  Show,
+  Suspense,
+  createEffect,
+  createResource,
+  createSignal,
+  on,
+} from "solid-js"
 import { FieldsEditor } from "../components/fieldsEditor"
 import {
   type Note,
@@ -13,9 +18,10 @@ import {
 } from "shared"
 import { ulidAsBase64Url } from "../domain/utility"
 import { createStore } from "solid-js/store"
-import { type NoteCardView } from "./cards"
+import { type NoteCardView } from "../pages/cards"
 import { C } from ".."
 import { CardsPreview } from "../components/cardsPreview"
+import { db } from "../db"
 
 function toView(template: Template): NoteCardView {
   const now = new Date()
@@ -39,8 +45,8 @@ function toNote(note: NoteCardView["note"]) {
 }
 
 export default function AddNote() {
-  const data = useRouteData<typeof AddNoteData>()
-  const templateNames = () => data()?.map((t) => t.name) ?? []
+  const [templates] = createResource(db.getTemplates, { initialValue: [] })
+  const templateNames = () => templates()?.map((t) => t.name) ?? []
   const [template, setTemplate] = createSignal<Template>()
   const [wip, setWip] = createStore<{ noteCard?: NoteCardView }>({})
   createEffect(() => {
@@ -87,7 +93,7 @@ export default function AddNote() {
           initialValue={templateNames().at(0)}
           options={templateNames()}
           onChange={(value: string) =>
-            setTemplate(data()?.find((t) => t.name === value))
+            setTemplate(templates()?.find((t) => t.name === value))
           }
         />
         <Show when={wip.noteCard}>

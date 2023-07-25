@@ -4,7 +4,6 @@ import type { RouteDefinition } from "@solidjs/router"
 import Home from "./pages/home"
 import HomeData from "./pages/home.data"
 import AboutData from "./pages/about.data"
-import AddNoteData from "./pages/addNote.data"
 import TemplatesData from "./pages/templates.data"
 import { type NavLinkData } from "./components/contracts"
 
@@ -20,10 +19,6 @@ export const navLinks: NavLinkData[] = [
   {
     name: "Templates",
     href: "/templates",
-  },
-  {
-    name: "Add Note",
-    href: "/addNote",
   },
   {
     name: "Cards",
@@ -54,11 +49,6 @@ export const routes: RouteDefinition[] = [
     path: "/templates",
     component: lazy(async () => await import("./pages/templates")),
     data: TemplatesData,
-  },
-  {
-    path: "/addNote",
-    component: lazy(async () => await import("./pages/addNote")),
-    data: AddNoteData,
   },
   {
     path: "/cards",

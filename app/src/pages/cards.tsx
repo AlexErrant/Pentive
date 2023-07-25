@@ -17,6 +17,7 @@ import { render } from "solid-js/web"
 
 import "golden-layout/dist/css/goldenlayout-base.css"
 import "golden-layout/dist/css/themes/goldenlayout-light-theme.css"
+import AddNote from "../components/addNote"
 
 export interface NoteCardView {
   template: Template
@@ -63,6 +64,10 @@ export default function Cards(): JSX.Element {
   onMount(() => {
     const goldenLayout = new GoldenLayout(glRoot)
     goldenLayout.resizeWithContainerAutomatically = true
+    goldenLayout.registerComponentFactoryFunction("Add Note", (container) => {
+      container.element.style.overflow = "auto"
+      render(() => <AddNote />, container.element)
+    })
     goldenLayout.registerComponentFactoryFunction("CardsTable", (container) => {
       render(
         () => (
@@ -184,6 +189,10 @@ export default function Cards(): JSX.Element {
                   type: "component",
                   componentType: "Layout Manager",
                   isClosable: false,
+                },
+                {
+                  type: "component",
+                  componentType: "Add Note",
                 },
               ],
             },
