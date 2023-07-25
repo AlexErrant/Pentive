@@ -90,6 +90,7 @@ export default function Cards(): JSX.Element {
       )
     })
     goldenLayout.registerComponentFactoryFunction("CardDetail", (container) => {
+      container.element.style.overflow = "auto"
       render(
         () => (
           <Show when={selected.noteCard != null}>
@@ -108,6 +109,7 @@ export default function Cards(): JSX.Element {
     goldenLayout.registerComponentFactoryFunction(
       "Layout Manager",
       (container) => {
+        container.element.style.overflow = "auto"
         render(
           () => (
             <div>
@@ -144,6 +146,7 @@ export default function Cards(): JSX.Element {
     goldenLayout.registerComponentFactoryFunction(
       "Preview Card",
       (container) => {
+        container.element.style.overflow = "auto"
         render(
           () => (
             <Show when={selected.noteCard != null}>

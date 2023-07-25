@@ -42,6 +42,7 @@ export default function Templates(): JSX.Element {
     goldenLayout.registerComponentFactoryFunction(
       "TemplateDetail",
       (container) => {
+        container.element.style.overflow = "auto"
         render(
           () => (
             <Show when={selected.template != null}>
@@ -55,6 +56,7 @@ export default function Templates(): JSX.Element {
     goldenLayout.registerComponentFactoryFunction(
       "Add Template",
       (container) => {
+        container.element.style.overflow = "auto"
         render(
           () => (
             <EditTemplate
@@ -68,6 +70,7 @@ export default function Templates(): JSX.Element {
     goldenLayout.registerComponentFactoryFunction(
       "Layout Manager",
       (container) => {
+        container.element.style.overflow = "auto"
         render(
           () => (
             <div>
@@ -104,6 +107,7 @@ export default function Templates(): JSX.Element {
     goldenLayout.registerComponentFactoryFunction(
       "Preview Template",
       (container) => {
+        container.element.style.overflow = "auto"
         render(
           () => (
             <Show when={selected.template != null}>
