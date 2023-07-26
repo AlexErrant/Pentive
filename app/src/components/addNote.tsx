@@ -86,8 +86,6 @@ export default function AddNote() {
 
   return (
     <>
-      <h1 class="text-2xl font-bold">Add Note</h1>
-      Template:
       <Suspense fallback={<span>Loading...</span>}>
         <Select
           initialValue={templateNames().at(0)}
