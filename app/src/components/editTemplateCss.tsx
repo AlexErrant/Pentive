@@ -28,7 +28,7 @@ import {
   closeBracketsKeymap,
 } from "@codemirror/autocomplete"
 import { lintKeymap } from "@codemirror/lint"
-import { html } from "@codemirror/lang-html"
+import { css } from "@codemirror/lang-css"
 import {
   createEffect,
   on,
@@ -127,6 +127,6 @@ function dispatch(
 function createEditorState(doc: string) {
   return EditorState.create({
     doc,
-    extensions: [[...basicSetup], html()],
+    extensions: [[...basicSetup], css()],
   })
 }
