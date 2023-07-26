@@ -17,6 +17,7 @@ import { ulidAsBase64Url } from "../domain/utility"
 import { db } from "../db"
 
 import "@thisbeyond/solid-select/style.css"
+import EditTemplateCss from "./editTemplateCss"
 
 interface ClozeTemplateStore {
   template: ClozeTemplate
@@ -160,6 +161,7 @@ const EditTemplate: VoidComponent<{ template: Template }> = (props) => {
         </For>
       </fieldset>
       {childTemplates(template, setTemplate)}
+      <EditTemplateCss template={template.template} setTemplate={setTemplate} />
       {remoteCell(template.template, setTemplate)}
       <button
         onClick={async () => {

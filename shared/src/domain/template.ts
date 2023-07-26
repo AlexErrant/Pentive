@@ -57,7 +57,24 @@ export const getDefaultTemplate = (id: TemplateId): Template => ({
 export const getDefaultClozeTemplate = (id: TemplateId): Template => ({
   id,
   name: "New Template",
-  css: "",
+  css: `.cloze-brackets-front {
+    font-size: 150%%;
+    font-family: monospace;
+    font-weight: bolder;
+    color: dodgerblue;
+}
+.cloze-filler-front {
+    font-size: 150%%;
+    font-family: monospace;
+    font-weight: bolder;
+    color: dodgerblue;
+}
+.cloze-brackets-back {
+    font-size: 150%%;
+    font-family: monospace;
+    font-weight: bolder;
+    color: red;
+}`,
   fields: [
     {
       name: "Text",
