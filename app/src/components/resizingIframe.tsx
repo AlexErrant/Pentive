@@ -53,6 +53,7 @@ const ResizingIframe: VoidComponent<{
     if (props.i.tag === "template") {
       // "touch" certain fields so they're reactive
       /* eslint-disable @typescript-eslint/no-unused-expressions */
+      props.i.template.css
       if (props.i.template.templateType.tag === "cloze") {
         props.i.template.templateType.template.front
         props.i.template.templateType.template.back
