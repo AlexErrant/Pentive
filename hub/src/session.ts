@@ -231,6 +231,18 @@ export async function getUserId(request: Request) {
   return userId as UserId
 }
 
+export async function requireUserId(
+  request: Request,
+  redirectTo: string = new URL(request.url).pathname
+) {
+  const r = await getUserId(request)
+  if (r == null) {
+    const searchParams = new URLSearchParams([["redirectTo", redirectTo]])
+    throw redirect(`/login?${searchParams.toString()}`) as unknown
+  }
+  return r
+}
+
 export async function requireSession(
   request: Request,
   redirectTo: string = new URL(request.url).pathname

@@ -183,11 +183,13 @@ model media_Entity {
 }
 
 model nook {
-  id         String     @id @db.VarChar(21) // lowercase
-  created    DateTime   @default(now())
-  templates  template[]
-  posts      post[]
-  moderators String     @db.Text
+  id          String     @id @db.VarChar(21) // lowercase
+  created     DateTime   @default(now())
+  templates   template[]
+  posts       post[]
+  moderators  String     @db.Text
+  description String     @db.Text
+  sidebar     String     @db.Text
 }
 
 model post {

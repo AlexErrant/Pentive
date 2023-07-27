@@ -38,6 +38,8 @@ export async function createNook({
     .values({
       id: nook,
       moderators: serializeModerators(userId),
+      description,
+      sidebar,
     })
     .execute()
 }

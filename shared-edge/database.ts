@@ -21,6 +21,8 @@ export interface Nook {
   id: string
   created: Generated<Date>
   moderators: string
+  sidebar: string
+  description: string
 }
 
 export interface Note {
