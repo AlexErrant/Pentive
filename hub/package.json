@@ -53,6 +53,8 @@
     "@codemirror/search": "^6.2.3",
     "@codemirror/state": "^6.2.0",
     "@codemirror/view": "^6.9.1",
+    "@kobalte/core": "^0.9.8",
+    "@kobalte/tailwindcss": "^0.6.5",
     "@scure/base": "^1.1.1",
     "@solidjs/meta": "^0.28.4",
     "@solidjs/router": "^0.8.2",
