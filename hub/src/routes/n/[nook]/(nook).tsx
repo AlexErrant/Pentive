@@ -1,7 +1,7 @@
 import { type Component, For, Show } from "solid-js"
 import { A, type RouteDataArgs, useRouteData } from "solid-start"
 import { createServerData$ } from "solid-start/server"
-import { getPosts, getNotes } from "shared-edge"
+import { getPosts, getNotes, getNook } from "shared-edge"
 import { noteOrdsRenderContainer, noteOrds, toSampleCard } from "shared-dom"
 import { type NookId, type Ord } from "shared"
 import ResizingIframe from "~/components/resizingIframe"
@@ -14,6 +14,7 @@ export function routeData({ params }: RouteDataArgs) {
     data: createServerData$(
       async (nook, { request }) => {
         return {
+          nookDetails: await getNook(nook as NookId),
           posts: await getPosts({ nook }),
           notes: await getUserId(request).then(
             async (userId) => await getNotes(nook as NookId, userId)
@@ -28,8 +29,12 @@ export function routeData({ params }: RouteDataArgs) {
 const Threads: Component = () => {
   const { data, nook } = useRouteData<typeof routeData>()
   return (
-    <>
+    <Show
+      when={data()?.nookDetails != null}
+      fallback={<a href={`/nooks/create`}>Create Nook</a>}
+    >
       <A href={`/n/${nook()}/templates`}>Templates</A>
+      {data()?.nookDetails?.moderators}
       <Show when={data()}>
         <ul>
           <For each={data()!.posts}>
@@ -76,7 +81,7 @@ const Threads: Component = () => {
           </For>
         </ul>
       </Show>
-    </>
+    </Show>
   )
 }
 
