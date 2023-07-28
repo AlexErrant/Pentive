@@ -1,4 +1,11 @@
-import { type NookId, throwExp, type UserId, undefinedMap } from "shared"
+import {
+  type NookId,
+  throwExp,
+  type UserId,
+  undefinedMap,
+  type NookType,
+  assertNever,
+} from "shared"
 import { db } from "./kysely"
 
 export async function getNook(nook: NookId) {
@@ -21,13 +28,42 @@ function validateNook(nook: NookId) {
   }
 }
 
+function serializeNookType(nookType: NookType) {
+  switch (nookType) {
+    case "public":
+      return 0
+    case "restricted":
+      return 1
+    case "private":
+      return 2
+    default:
+      return assertNever(nookType)
+  }
+}
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function deserializeNookType(i: number): NookType {
+  switch (i) {
+    case 0:
+      return "public" as const
+    case 1:
+      return "restricted" as const
+    case 2:
+      return "private" as const
+    default:
+      return throwExp(`Expected 0, 1, or 2, but got ${i}`)
+  }
+}
+
 export async function createNook({
   nook,
+  nookType,
   userId,
   description,
   sidebar,
 }: {
   nook: NookId
+  nookType: NookType
   userId: UserId
   description: string
   sidebar: string
@@ -40,6 +76,8 @@ export async function createNook({
       moderators: serializeModerators(userId),
       description,
       sidebar,
+      type: serializeNookType(nookType),
+      approved: null,
     })
     .execute()
 }

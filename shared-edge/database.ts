@@ -23,6 +23,8 @@ export interface Nook {
   moderators: string
   sidebar: string
   description: string
+  approved: string | null
+  type: number
 }
 
 export interface Note {

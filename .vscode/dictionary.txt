@@ -24,6 +24,7 @@ iframes
 immer
 importmap
 keymap
+kobalte
 kysely
 lrpc
 maximise

@@ -190,6 +190,8 @@ model nook {
   moderators  String     @db.Text
   description String     @db.Text
   sidebar     String     @db.Text
+  type        Int        @db.UnsignedTinyInt
+  approved    String?    @db.Text
 }
 
 model post {

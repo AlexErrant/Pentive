@@ -1,4 +1,4 @@
-import { Show, type JSX } from "solid-js"
+import { Show, type JSX, For } from "solid-js"
 import { FormError, useRouteData } from "solid-start"
 import { createNook } from "shared-edge"
 import {
@@ -12,7 +12,9 @@ import {
   isInvalidCsrf,
   requireUserId,
 } from "~/session"
-import { type NookId } from "shared"
+import { type NookType, type NookId, nookTypes } from "shared"
+import { RadioGroup } from "@kobalte/core"
+import "../../radio.css"
 
 export function routeData() {
   return {
@@ -49,6 +51,7 @@ export default function Submit(): JSX.Element {
       const sidebar = form.get("sidebar")
       const description = form.get("description")
       const nook = form.get("nook") as NookId
+      const nookType = form.get("nookType") as NookType
       const csrfSignature = form.get("csrfSignature")
       if (
         typeof sidebar !== "string" ||
@@ -80,6 +83,7 @@ export default function Submit(): JSX.Element {
 
       await createNook({
         userId,
+        nookType,
         sidebar,
         description,
         nook,
@@ -127,6 +131,26 @@ export default function Submit(): JSX.Element {
         <Show when={error()}>
           <p>{error()!.message}</p>
         </Show>
+        <RadioGroup.Root class="radio-group" name="nookType">
+          <RadioGroup.Label class="radio-group__label">
+            Nook Type
+          </RadioGroup.Label>
+          <div class="radio-group__items">
+            <For each={nookTypes}>
+              {(nookType) => (
+                <RadioGroup.Item value={nookType} class="radio">
+                  <RadioGroup.ItemInput class="radio__input" />
+                  <RadioGroup.ItemControl class="radio__control">
+                    <RadioGroup.ItemIndicator class="radio__indicator" />
+                  </RadioGroup.ItemControl>
+                  <RadioGroup.ItemLabel class="radio__label">
+                    {nookType}
+                  </RadioGroup.ItemLabel>
+                </RadioGroup.Item>
+              )}
+            </For>
+          </div>
+        </RadioGroup.Root>
         <button type="submit">Create Nook</button>
       </Form>
     </main>
