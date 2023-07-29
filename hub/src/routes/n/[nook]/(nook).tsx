@@ -33,23 +33,49 @@ const Threads: Component = () => {
       when={data()?.nookDetails != null}
       fallback={<a href={`/nooks/create`}>Create Nook</a>}
     >
-      <A href={`/n/${nook()}/templates`}>Templates</A>
-      {data()?.nookDetails?.moderators}
       <Show when={data()}>
-        <MainContent
-          nook={nook()}
-          nookDetails={data()!.nookDetails}
-          posts={data()!.posts}
-          notes={data()!.notes}
-        />
+        <div class="flex">
+          <div class="grow">
+            <MainContent
+              nook={nook()}
+              nookDetails={data()!.nookDetails!}
+              posts={data()!.posts}
+              notes={data()!.notes}
+            />
+          </div>
+          <aside class="basis-40">
+            <Sidebar
+              nook={nook()}
+              nookDetails={data()!.nookDetails!}
+              posts={data()!.posts}
+              notes={data()!.notes}
+            />
+          </aside>
+        </div>
       </Show>
     </Show>
   )
 }
 
+const Sidebar: VoidComponent<{
+  nook: string
+  nookDetails: NonNullable<Awaited<ReturnType<typeof getNook>>>
+  posts: Awaited<ReturnType<typeof getPosts>>
+  notes: Awaited<ReturnType<typeof getNotes>>
+}> = (props) => {
+  return (
+    <>
+      <h1 class="font-bold text-lg">/n/{props.nook}</h1>
+      <A href={`/n/${props.nook}/templates`}>Templates</A>
+      <div>Est. {props.nookDetails.created.toDateString()}</div>
+      <div>mods:{props.nookDetails.moderators}</div>
+    </>
+  )
+}
+
 const MainContent: VoidComponent<{
   nook: string
-  nookDetails: Awaited<ReturnType<typeof getNook>>
+  nookDetails: NonNullable<Awaited<ReturnType<typeof getNook>>>
   posts: Awaited<ReturnType<typeof getPosts>>
   notes: Awaited<ReturnType<typeof getNotes>>
 }> = (props) => {
