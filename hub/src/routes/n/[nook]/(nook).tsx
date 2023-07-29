@@ -1,4 +1,4 @@
-import { type Component, For, Show } from "solid-js"
+import { type Component, For, Show, type VoidComponent } from "solid-js"
 import { A, type RouteDataArgs, useRouteData } from "solid-start"
 import { createServerData$ } from "solid-start/server"
 import { getPosts, getNotes, getNook } from "shared-edge"
@@ -36,52 +36,68 @@ const Threads: Component = () => {
       <A href={`/n/${nook()}/templates`}>Templates</A>
       {data()?.nookDetails?.moderators}
       <Show when={data()}>
-        <ul>
-          <For each={data()!.posts}>
-            {(post) => (
-              <li>
-                <A href={`thread/${post.id}`}>{post.title}</A>
-              </li>
-            )}
-          </For>
-          <For each={data()!.notes}>
-            {(note) => {
-              const localNote = () => remoteToNote(note.note)
-              const template = () => remoteToTemplate(note.template)
-              const count = () =>
-                noteOrds.bind(noteOrdsRenderContainer)(localNote(), template())
-                  .length - 1
-              return (
-                <li>
-                  <div>
-                    {note.til == null
-                      ? ""
-                      : "Last synced at" + note.til.toLocaleTimeString()}
-                  </div>
-                  <div>{note.subscribers} subscribers</div>
-                  <div>
-                    {/* making this an <A> breaks because maps (e.g. `note.fieldValues`) aren't JSON serializable. Revisit if this issue is ever resolved. https://github.com/TanStack/bling/issues/9 */}
-                    <a href={`/n/${nook()}/note/${note.id}`}>
-                      {note.comments} comments
-                    </a>
-                  </div>
-                  <ResizingIframe
-                    i={{
-                      tag: "card",
-                      side: "front",
-                      template: template(),
-                      card: toSampleCard(0 as Ord),
-                      note: localNote(),
-                    }}
-                  />
-                  <Show when={count() !== 0}>+{count()}</Show>
-                </li>
-              )
-            }}
-          </For>
-        </ul>
+        <MainContent
+          nook={nook()}
+          nookDetails={data()!.nookDetails}
+          posts={data()!.posts}
+          notes={data()!.notes}
+        />
       </Show>
     </Show>
+  )
+}
+
+const MainContent: VoidComponent<{
+  nook: string
+  nookDetails: Awaited<ReturnType<typeof getNook>>
+  posts: Awaited<ReturnType<typeof getPosts>>
+  notes: Awaited<ReturnType<typeof getNotes>>
+}> = (props) => {
+  return (
+    <ul>
+      <For each={props.posts}>
+        {(post) => (
+          <li>
+            <A href={`thread/${post.id}`}>{post.title}</A>
+          </li>
+        )}
+      </For>
+      <For each={props.notes}>
+        {(note) => {
+          const localNote = () => remoteToNote(note.note)
+          const template = () => remoteToTemplate(note.template)
+          const count = () =>
+            noteOrds.bind(noteOrdsRenderContainer)(localNote(), template())
+              .length - 1
+          return (
+            <li>
+              <div>
+                {note.til == null
+                  ? ""
+                  : "Last synced at" + note.til.toLocaleTimeString()}
+              </div>
+              <div>{note.subscribers} subscribers</div>
+              <div>
+                {/* making this an <A> breaks because maps (e.g. `note.fieldValues`) aren't JSON serializable. Revisit if this issue is ever resolved. https://github.com/TanStack/bling/issues/9 */}
+                <a href={`/n/${props.nook}/note/${note.id}`}>
+                  {note.comments} comments
+                </a>
+              </div>
+              <ResizingIframe
+                i={{
+                  tag: "card",
+                  side: "front",
+                  template: template(),
+                  card: toSampleCard(0 as Ord),
+                  note: localNote(),
+                }}
+              />
+              <Show when={count() !== 0}>+{count()}</Show>
+            </li>
+          )
+        }}
+      </For>
+    </ul>
   )
 }
 
