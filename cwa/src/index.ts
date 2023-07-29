@@ -81,6 +81,13 @@ app
     }: PersistParams): Promise<undefined> => {
       await connect({
         url: c.env.planetscaleDbUrl,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- medtodo remove https://github.com/planetscale/database-js/pull/102#issuecomment-1508219636
+        fetch: async (url: string, init: any) => {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+          delete init.cache
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+          return await fetch(url, init)
+        },
       }).transaction(async (tx) => {
         // Not a "real" transaction since the final `COMMIT` still needs to be sent as a fetch, but whatever.
         // Just means we could PUT something into the mediaBucket and have no record of it in PlanetScale. Not great, but _fine_.
