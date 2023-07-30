@@ -31,20 +31,22 @@ model user {
 }
 
 model template {
-  id          Bytes                @id @db.Binary(16)
-  created     DateTime             @default(now())
-  updated     DateTime             @default(now())
-  name        String               @db.VarChar(255)
-  nook        String               @db.VarChar(21)
-  nookRef     nook                 @relation(fields: [nook], references: [id])
-  type        String               @db.Text // medTODO compress
-  fields      String               @db.Text // medTODO compress
-  css         String               @db.Text // medTODO compress
-  history     templateHistory[]
-  comments    templateComment[]
-  ankiId      BigInt?              @db.UnsignedBigInt // should be its own table
-  subscribers templateSubscriber[]
-  notes       note[]
+  id               Bytes                @id @db.Binary(16)
+  created          DateTime             @default(now())
+  updated          DateTime             @default(now())
+  name             String               @db.VarChar(255)
+  nook             String               @db.VarChar(21)
+  nookRef          nook                 @relation(fields: [nook], references: [id])
+  type             String               @db.Text // medTODO compress
+  fields           String               @db.Text // medTODO compress
+  css              String               @db.Text // medTODO compress
+  history          templateHistory[]
+  comments         templateComment[]
+  ankiId           BigInt?              @db.UnsignedBigInt // should be its own table
+  subscribersCount Int                  @default(0) @db.UnsignedSmallInt
+  commentsCount    Int                  @default(0) @db.UnsignedMediumInt
+  subscribers      templateSubscriber[]
+  notes            note[]
 
   @@index([ankiId])
   @@index([nook])

@@ -7,14 +7,17 @@ import ResizingIframe from "~/components/resizingIframe"
 import { getAppMessenger } from "~/root"
 import { remoteToTemplate } from "~/lib/utility"
 import { unwrap } from "solid-js/store"
+import { getUserId } from "~/session"
+import { cwaClient } from "app/src/trpcClient"
 
 export function routeData({ params }: RouteDataArgs) {
   return {
     nook: () => params.nook,
     data: createServerData$(
-      async (nook) => {
+      async (nook, { request }) => {
+        const userId = (await getUserId(request)) ?? undefined
         return {
-          templates: await getTemplates(nook as NookId),
+          templates: await getTemplates(nook as NookId, userId),
         }
       },
       { key: () => params.nook }
@@ -38,10 +41,17 @@ const Threads: Component = () => {
                     <button
                       onClick={async () => {
                         await getAppMessenger().addTemplate(unwrap(template))
+                        await cwaClient.subscribeToTemplate.mutate(template.id)
                       }}
+                      disabled={template.til != null}
                     >
                       Download
                     </button>
+                    <div>
+                      {template.til == null
+                        ? ""
+                        : "Last synced at" + template.til.toLocaleTimeString()}
+                    </div>
                   </div>
                   <ResizingIframe
                     i={{

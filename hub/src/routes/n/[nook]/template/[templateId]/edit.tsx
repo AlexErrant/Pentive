@@ -47,6 +47,7 @@ import { type ClozeTemplate, type StandardTemplate } from "shared-dom"
 import { type SetStoreFunction, createStore } from "solid-js/store"
 import { cwaClient } from "~/routes/cwaClient"
 import { remoteToTemplate } from "~/lib/utility"
+import { getUserId } from "~/session"
 
 interface TemplateStore {
   t: RemoteTemplate | undefined
@@ -61,8 +62,13 @@ interface StandardTemplateStore {
 export function routeData({ params }: RouteDataArgs) {
   return {
     template: createServerData$(
-      async ([nook, templateId]) =>
-        await getTemplate(templateId as RemoteTemplateId, nook as NookId),
+      async ([nook, templateId], { request }) => {
+        const userId = (await getUserId(request)) ?? undefined
+        return await getTemplate(templateId as RemoteTemplateId, {
+          nook: nook as NookId,
+          userId,
+        })
+      },
       { key: () => [params.nook, params.templateId] }
     ),
   }

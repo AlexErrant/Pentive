@@ -105,6 +105,8 @@ export interface Template {
   fields: string
   css: string
   ankiId: number | null
+  subscribersCount: Generated<number>
+  commentsCount: Generated<number>
 }
 
 export interface TemplateComment {

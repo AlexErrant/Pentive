@@ -347,22 +347,47 @@ export async function getPost(id: Base64Url): Promise<
     .then((x) => undefinedMap(x, mapIdToBase64Url))
 }
 
-export async function getTemplate(id: RemoteTemplateId, nook?: NookId) {
+export async function getTemplate(
+  id: RemoteTemplateId,
+  opts?: { nook?: NookId; userId?: UserId }
+) {
   const t = await db
     .selectFrom("template")
     .selectAll()
     .where("id", "=", fromBase64Url(id))
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    .$if(nook != null, (db) => db.where("nook", "=", nook!))
+    .$if(opts?.nook != null, (db) => db.where("nook", "=", opts!.nook!))
+    .$if(opts?.userId != null, (a) =>
+      a.select((b) =>
+        b
+          .selectFrom("templateSubscriber")
+          .select(["til"])
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          .where("userId", "=", opts!.userId!)
+          .whereRef("templateSubscriber.templateId", "=", "template.id")
+          .as("til")
+      )
+    )
     .executeTakeFirst()
   return undefinedMap(t, templateEntityToDomain)
 }
 
-export async function getTemplates(nook: NookId) {
+export async function getTemplates(nook: NookId, userId?: UserId) {
   const ts = await db
     .selectFrom("template")
     .selectAll()
     .where("nook", "=", nook)
+    .$if(userId != null, (a) =>
+      a.select((b) =>
+        b
+          .selectFrom("templateSubscriber")
+          .select(["til"])
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          .where("userId", "=", userId!)
+          .whereRef("templateSubscriber.templateId", "=", "template.id")
+          .as("til")
+      )
+    )
     .execute()
   return ts.map(templateEntityToDomain)
 }
@@ -377,8 +402,10 @@ function templateEntityToDomain(t: {
   fields: string
   css: string
   ankiId: number | null
+  subscribersCount: number
+  til?: Date | undefined
 }) {
-  const r: RemoteTemplate = {
+  const r = {
     id: dbIdToBase64Url(t.id) as RemoteTemplateId,
     name: t.name,
     nook: t.nook,
@@ -387,7 +414,9 @@ function templateEntityToDomain(t: {
     created: t.created,
     updated: t.updated,
     templateType: deserializeTemplateType(t.type),
-  }
+    subscribers: t.subscribersCount,
+    til: t.til,
+  } satisfies RemoteTemplate & Record<string, unknown>
   return r
 }
 
@@ -608,9 +637,58 @@ export async function insertTemplates(
     })
   })
   const templateCreates = templateCreatesAndIds.map((x) => x[0])
-  await db.insertInto("template").values(templateCreates).execute()
+  const subscriptions = templateCreates.map((t) => ({
+    templateId: t.id as DbId,
+    userId: authorId,
+  }))
+  await db
+    .transaction()
+    .execute(
+      async (tx) =>
+        await Promise.all([
+          await tx.insertInto("template").values(templateCreates).execute(),
+          await tx
+            .insertInto("templateSubscriber")
+            .values(subscriptions)
+            .execute(),
+        ])
+    )
   const remoteIdByLocal = new Map(templateCreatesAndIds.map((x) => x[1]))
   return remoteIdByLocal
+}
+
+export async function subscribeToTemplate(
+  userId: UserId,
+  templateId: RemoteTemplateId
+) {
+  const templateDbId = fromBase64Url(templateId)
+  await db.transaction().execute(
+    async (tx) =>
+      await Promise.all([
+        tx
+          .selectFrom("template")
+          .select(["id"])
+          .where("id", "=", templateDbId)
+          .executeTakeFirst()
+          .then((n) => {
+            if (n == null) throwExp(`Template ${templateId} not found.`)
+          }),
+        tx
+          .updateTable("template")
+          .set({
+            subscribersCount: (x) => sql`${x.ref("subscribersCount")} + 1`,
+          })
+          .where("template.id", "=", templateDbId)
+          .execute(),
+        tx
+          .insertInto("templateSubscriber")
+          .values({
+            userId,
+            templateId: templateDbId,
+          })
+          .execute(),
+      ])
+  )
 }
 
 export async function subscribeToNote(userId: UserId, noteId: RemoteNoteId) {
@@ -739,6 +817,7 @@ function toTemplateCreate(
     type: serializeTemplateType(n.templateType),
     fields: serializeFields(n.fields),
     css: n.css,
+    subscribersCount: 1,
   }
   return { templateCreate, remoteIdBase64url }
 }
