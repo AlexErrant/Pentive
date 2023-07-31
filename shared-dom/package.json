@@ -39,6 +39,7 @@
     "html-to-text": "^9.0.5",
     "immer": "^9.0.15",
     "shared": "workspace:*",
+    "solid-js": "^1.7.3",
     "uuid": "^9.0.0",
     "zod": "^3.21.4"
   }
