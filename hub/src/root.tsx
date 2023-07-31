@@ -18,7 +18,6 @@ import "./root.css"
 import type { appExpose } from "app/src/index"
 import * as Comlink from "comlink"
 import { throwExp } from "shared"
-import nightwind from "nightwind/helper"
 
 let appMessenger: Comlink.Remote<typeof appExpose> | null
 
@@ -48,7 +47,37 @@ export default function Root(): JSX.Element {
           content="A free, open source, offline-first spaced repetition system that has first class support for collaboration, curation, and plugins. It's Reddit for flashcards."
         />
         <Link rel="manifest" href="/manifest.webmanifest" />
-        <script>{nightwind.init()}</script>
+        <script>
+          {`
+;(function () {
+  // https://github.com/jjranalli/nightwind/pull/57/files
+  function getInitialColorMode() {
+    const persistedColorPreference =
+      window.localStorage.getItem("nightwind-mode")
+    const hasPersistedPreference =
+      typeof persistedColorPreference === "string"
+    if (hasPersistedPreference) {
+      return persistedColorPreference
+    }
+    const mql = window.matchMedia("(prefers-color-scheme: dark)")
+    const hasMediaQueryPreference = typeof mql.matches === "boolean"
+    if (hasMediaQueryPreference) {
+      return mql.matches ? "dark" : "light"
+    }
+    return "light"
+  }
+  function setTheme() {
+    getInitialColorMode() == "light"
+      ? document.documentElement.classList.remove("dark")
+      : document.documentElement.classList.add("dark")
+  }
+  window
+    .matchMedia("(prefers-color-scheme: dark)")
+    .addEventListener("change", setTheme)
+  setTheme()
+})()
+`}
+        </script>
       </Head>
       <Body class="bg-white text-black">
         <iframe

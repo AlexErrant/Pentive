@@ -3,5 +3,6 @@ module.exports = {
   theme: {
     extend: {},
   },
-  plugins: [],
+  plugins: [require("nightwind")],
+  darkMode: "class",
 }
