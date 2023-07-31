@@ -4,5 +4,6 @@ export default {
   theme: {
     extend: {},
   },
-  plugins: [],
+  plugins: [require("nightwind")],
+  darkMode: "class",
 }

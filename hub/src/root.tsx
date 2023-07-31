@@ -18,6 +18,7 @@ import "./root.css"
 import type { appExpose } from "app/src/index"
 import * as Comlink from "comlink"
 import { throwExp } from "shared"
+import nightwind from "nightwind/helper"
 
 let appMessenger: Comlink.Remote<typeof appExpose> | null
 
@@ -47,8 +48,9 @@ export default function Root(): JSX.Element {
           content="A free, open source, offline-first spaced repetition system that has first class support for collaboration, curation, and plugins. It's Reddit for flashcards."
         />
         <Link rel="manifest" href="/manifest.webmanifest" />
+        <script>{nightwind.init()}</script>
       </Head>
-      <Body>
+      <Body class="bg-white text-black">
         <iframe
           hidden
           style={{
