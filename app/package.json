@@ -104,6 +104,7 @@
     "kysely": "^0.23.5",
     "lodash": "^4.17.21",
     "lrpc": "workspace:*",
+    "nightwind": "^1.1.13",
     "peerjs": "^1.4.7",
     "prosemirror-example-setup": "^1.2.2",
     "prosemirror-image-plugin": "workspace:*",
