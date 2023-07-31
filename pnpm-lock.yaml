@@ -604,6 +604,9 @@ importers:
       jose:
         specifier: ^4.11.1
         version: 4.11.1
+      nightwind:
+        specifier: ^1.1.13
+        version: 1.1.13(tailwindcss@3.3.3)
       oauth4webapi:
         specifier: ^2.2.4
         version: 2.2.4
@@ -12807,6 +12810,14 @@ packages:
   /nice-try@1.0.5:
     resolution: {integrity: sha512-1nh45deeb5olNY7eX82BkPO7SSxR5SSYJiPTrTdFUVYwAl8CKMA5N9PjTYkHiRjisVcxcQ1HXdLhx2qxxJzLNQ==}
     dev: true
+
+  /nightwind@1.1.13(tailwindcss@3.3.3):
+    resolution: {integrity: sha512-ipTD+u64LXa03wDf1v0EawdsFC6vtS4xzzXknRd50BBtckDYzZAendkE+4VjSLrwQcTpk0XphWxFk4ORIDdrOg==}
+    peerDependencies:
+      tailwindcss: ^2.0.0 || ^3.0.0
+    dependencies:
+      tailwindcss: 3.3.3
+    dev: false
 
   /node-abi@3.33.0:
     resolution: {integrity: sha512-7GGVawqyHF4pfd0YFybhv/eM9JwTtPqx0mAanQ146O3FlSh3pA24zf9IRQTOsfTSqXTNzPSP5iagAJ94jjuVog==}
