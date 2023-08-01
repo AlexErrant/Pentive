@@ -1,3 +1,4 @@
+import { ThemeSelector } from "shared-dom"
 import { For, type VoidComponent } from "solid-js"
 import { NavLink, useLocation } from "@solidjs/router"
 import { type NavLinkData } from "./contracts"
@@ -23,6 +24,9 @@ const Nav: VoidComponent<{ navLinks: NavLinkData[] }> = (props) => {
             </li>
           )}
         </For>
+        <li>
+          <ThemeSelector />
+        </li>
 
         <li class="text-sm flex items-center space-x-1 ml-auto">
           <span>URL:</span>

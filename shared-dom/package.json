@@ -5,8 +5,8 @@
   "//comment": "Making `shared` an esmodule is necessary for lrpc. We need  'main' because 'app' empirically fails without it. I have no idea if this is a good idea or not, but I'm out of give-a-damn juice.",
   "//comment2": "From https://nodejs.org/api/packages.html#main - 'When a package has an \"exports\" field, this will take precedence over the \"main\" field when importing the package by name.' ...raise eyebrows.",
   "type": "module",
-  "main": "src/index.ts",
-  "exports": "./src/index.ts",
+  "main": "src/index.tsx",
+  "exports": "./src/index.tsx",
   "scripts": {
     "tsc-build": "tsc --build",
     "eslint": "eslint . --ignore-path .gitignore",
