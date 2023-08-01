@@ -92,6 +92,12 @@ importers:
       '@github/relative-time-element':
         specifier: ^4.3.0
         version: 4.3.0
+      '@kobalte/core':
+        specifier: ^0.9.8
+        version: 0.9.8(solid-js@1.7.3)
+      '@kobalte/tailwindcss':
+        specifier: ^0.6.5
+        version: 0.6.5(tailwindcss@3.1.8)
       '@solidjs/router':
         specifier: ^0.8.2
         version: 0.8.2(solid-js@1.7.3)
@@ -500,7 +506,7 @@ importers:
         version: 5.0.4
       vite:
         specifier: ^4.1.4
-        version: 4.1.4(@types/node@18.7.21)
+        version: 4.1.4(@types/node@18.15.11)
       vite-plugin-solid:
         specifier: ^2.7.0
         version: 2.7.0(solid-js@1.7.3)(vite@4.1.4)
@@ -540,7 +546,7 @@ importers:
         version: 5.0.4
       vite:
         specifier: ^4.1.4
-        version: 4.1.4(@types/node@18.7.21)
+        version: 4.1.4(@types/node@18.15.11)
 
   hub:
     dependencies:
@@ -712,7 +718,7 @@ importers:
         version: 2.1.0
       vite:
         specifier: ^4.1.4
-        version: 4.1.4(@types/node@18.7.21)
+        version: 4.1.4(@types/node@18.15.11)
       vite-plugin-checker:
         specifier: ^0.5.6
         version: 0.5.6(eslint@8.38.0)(stylelint@14.11.0)(typescript@5.0.4)(vite@4.1.4)
@@ -1069,6 +1075,12 @@ importers:
 
   shared-dom:
     dependencies:
+      '@kobalte/core':
+        specifier: ^0.9.8
+        version: 0.9.8(solid-js@1.7.3)
+      '@kobalte/tailwindcss':
+        specifier: ^0.6.5
+        version: 0.6.5(tailwindcss@3.3.3)
       html-to-text:
         specifier: ^9.0.5
         version: 9.0.5
@@ -5122,6 +5134,14 @@ packages:
       solid-js: 1.7.3
     dev: false
 
+  /@kobalte/tailwindcss@0.6.5(tailwindcss@3.1.8):
+    resolution: {integrity: sha512-E8iAOtC05WVYUIbj4rdsjnmu6qedT1uZFV2SUnO3rUcZMPtLvHcv2EIqUpEzaIoO7HMbWIrer53/IGtv+MOwEA==}
+    peerDependencies:
+      tailwindcss: ^3.3.0
+    dependencies:
+      tailwindcss: 3.1.8(postcss@8.4.16)(ts-node@10.9.1)
+    dev: false
+
   /@kobalte/tailwindcss@0.6.5(tailwindcss@3.3.3):
     resolution: {integrity: sha512-E8iAOtC05WVYUIbj4rdsjnmu6qedT1uZFV2SUnO3rUcZMPtLvHcv2EIqUpEzaIoO7HMbWIrer53/IGtv+MOwEA==}
     peerDependencies:
@@ -6032,7 +6052,7 @@ packages:
       magic-string: 0.29.0
       svelte: 3.55.1
       svelte-hmr: 0.15.1(svelte@3.55.1)
-      vite: 4.1.4(@types/node@18.7.21)
+      vite: 4.1.4(@types/node@18.15.11)
       vitefu: 0.2.4(vite@4.1.4)
     transitivePeerDependencies:
       - supports-color
@@ -6311,7 +6331,6 @@ packages:
 
   /@types/node@18.15.11:
     resolution: {integrity: sha512-E5Kwq2n4SbMzQOn6wnmBjuK9ouqlURrcZDVfbo9ftDDTFt3nk7ZKK4GMOzoYgnpQJKcxwQw+lGaBvvlMo0qN/Q==}
-    dev: true
 
   /@types/node@18.15.13:
     resolution: {integrity: sha512-N+0kuo9KgrUQ1Sn/ifDXsvg0TTleP7rIy4zOBGECxAljqvqfqpTfzx0Q1NUedOixRMBfe2Whhb056a42cWs26Q==}
@@ -15054,7 +15073,7 @@ packages:
       rollup: 3.20.7
       solid-start: 0.2.26(@solidjs/meta@0.28.4)(@solidjs/router@0.8.2)(solid-js@1.7.3)(solid-start-cloudflare-workers@0.2.26)(solid-start-node@0.2.26)(vite@4.1.4)
       terser: 5.17.1
-      vite: 4.1.4(@types/node@18.7.21)
+      vite: 4.1.4(@types/node@18.15.11)
       ws: 8.13.0
     transitivePeerDependencies:
       - '@miniflare/storage-redis'
@@ -15080,7 +15099,7 @@ packages:
       solid-start: 0.2.26(@solidjs/meta@0.28.4)(@solidjs/router@0.8.2)(solid-js@1.7.3)(solid-start-cloudflare-workers@0.2.26)(solid-start-node@0.2.26)(vite@4.1.4)
       terser: 5.17.1
       undici: 5.14.0
-      vite: 4.1.4(@types/node@18.7.21)
+      vite: 4.1.4(@types/node@18.15.11)
     transitivePeerDependencies:
       - supports-color
 
@@ -15151,7 +15170,7 @@ packages:
       solid-start-node: 0.2.26(solid-start@0.2.26)(undici@5.14.0)(vite@4.1.4)
       terser: 5.17.1
       undici: 5.22.0
-      vite: 4.1.4(@types/node@18.7.21)
+      vite: 4.1.4(@types/node@18.15.11)
       vite-plugin-inspect: 0.7.24(rollup@3.20.7)(vite@4.1.4)
       vite-plugin-solid: 2.7.0(solid-js@1.7.3)(vite@4.1.4)
       wait-on: 6.0.1(debug@4.3.4)
@@ -16730,7 +16749,7 @@ packages:
       fs-extra: 11.1.1
       picocolors: 1.0.0
       sirv: 2.0.2
-      vite: 4.1.4(@types/node@18.7.21)
+      vite: 4.1.4(@types/node@18.15.11)
     transitivePeerDependencies:
       - rollup
       - supports-color
@@ -16804,7 +16823,6 @@ packages:
       rollup: 3.20.7
     optionalDependencies:
       fsevents: 2.3.2
-    dev: true
 
   /vite@4.1.4(@types/node@18.7.21):
     resolution: {integrity: sha512-3knk/HsbSTKEin43zHu7jTwYWv81f8kgAL99G5NWBcA1LKvtvcVAC4JjBH1arBunO9kQka+1oGbrMKOjk4ZrBg==}

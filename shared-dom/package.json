@@ -36,6 +36,8 @@
     "vitest": "^0.29.2"
   },
   "dependencies": {
+    "@kobalte/core": "^0.9.8",
+    "@kobalte/tailwindcss": "^0.6.5",
     "html-to-text": "^9.0.5",
     "immer": "^9.0.15",
     "shared": "workspace:*",

@@ -78,6 +78,8 @@
     "@codemirror/state": "^6.2.0",
     "@codemirror/view": "^6.9.1",
     "@github/relative-time-element": "^4.3.0",
+    "@kobalte/core": "^0.9.8",
+    "@kobalte/tailwindcss": "^0.6.5",
     "@solidjs/router": "^0.8.2",
     "@tanstack/solid-table": "^8.8.5",
     "@thisbeyond/solid-select": "^0.14.0",
