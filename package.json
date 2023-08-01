@@ -28,5 +28,10 @@
     "tsc-clean": "rm -rf **/tsconfig.tsbuildinfo",
     "//ci": "simulate cicd locally",
     "ci": "git clean -xdf && pnpm i && pnpm tsc-build && pnpm eslint+test && ./mkenv.sh && ./rmcert.sh && ./mkcert.sh && pnpm build"
+  },
+  "pnpm": {
+    "patchedDependencies": {
+      "nightwind@1.1.13": "patches/nightwind@1.1.13.patch"
+    }
   }
 }

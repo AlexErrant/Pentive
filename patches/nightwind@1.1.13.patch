@@ -1,0 +1,26 @@
+diff --git a/helper.d.ts b/helper.d.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..e0399dcf3573c380181085798b69be33ca2f6cb9
+--- /dev/null
++++ b/helper.d.ts
+@@ -0,0 +1,20 @@
++// https://github.com/jjranalli/nightwind/issues/74#issuecomment-1639973119
++
++declare module "nightwind/helper" {
++  interface NightwindHelperModule {
++    init: () => string;
++    beforeTransition: () => void;
++    toggle: () => void;
++    enable: (dark: boolean) => void;
++    checkNightMode: () => boolean;
++    watchNightMode: () => void;
++    addNightModeSelector: () => void;
++    addNightTransitions: () => void;
++    initNightwind: () => void;
++    toggleNightMode: () => void;
++  }
++
++  const nightwindHelper: NightwindHelperModule;
++
++  export default nightwindHelper;
++}
