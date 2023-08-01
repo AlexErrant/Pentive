@@ -40,6 +40,7 @@
     "@kobalte/tailwindcss": "^0.6.5",
     "html-to-text": "^9.0.5",
     "immer": "^9.0.15",
+    "nightwind": "^1.1.13",
     "shared": "workspace:*",
     "solid-js": "^1.7.3",
     "uuid": "^9.0.0",
