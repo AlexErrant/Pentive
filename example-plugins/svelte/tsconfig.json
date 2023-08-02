@@ -32,6 +32,11 @@
     "checkJs": true,
     "isolatedModules": true,
     "skipLibCheck": true,
+    // next two lines were added because otherwise we get
+    //     example-plugins/svelte/src/index.ts:18:10 - error TS7031: Binding element 'initialValue' implicitly has an 'any' type.
+    // It's annoying that a Svelte plugin needs to handle JSX, but I'm out of give-a-damn juice. Chalk it up to monorepo bullshit.
+    "jsx": "preserve",
+    "jsxImportSource": "solid-js",
     "ignoreDeprecations": "5.0", // https://github.com/sveltejs/kit/issues/8650
     // This fixes errors like:
     //     File 'shared-dom/src/cardHtml.ts' is not under 'rootDir' 'example-plugins/svelte'. 'rootDir' is expected to contain all source files.
