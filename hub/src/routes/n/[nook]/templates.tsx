@@ -52,6 +52,9 @@ const Threads: Component = () => {
                         ? ""
                         : "Last synced at" + template.til.toLocaleTimeString()}
                     </div>
+                    <a href={`/n/${nook()}/template/${template.id}`}>
+                      Comments: {template.comments}
+                    </a>
                   </div>
                   <ResizingIframe
                     i={{

@@ -285,7 +285,8 @@ function listToTree(list: Comment[]) {
 export interface Comment {
   id: CommentId
   parentId: CommentId | null
-  noteId: DbId
+  noteId?: DbId
+  templateId?: DbId
   created: Date
   updated: Date
   text: string
@@ -293,6 +294,41 @@ export interface Comment {
   votes: string
   level: number
   comments: Comment[]
+}
+
+export async function getTemplateComments(templateId: RemoteTemplateId) {
+  const cs = await db
+    .selectFrom("templateComment")
+    .select([
+      "id",
+      "parentId",
+      "created",
+      "updated",
+      "text",
+      "authorId",
+      "votes",
+      "level",
+    ])
+    .where("templateComment.templateId", "=", fromBase64Url(templateId))
+    .orderBy("level", "asc")
+    .orderBy("votes", "desc")
+    .execute()
+  const commentsList = cs.map((c) => {
+    const r: Comment = {
+      id: dbIdToBase64Url(c.id) as CommentId,
+      parentId: nullMap(c.parentId, dbIdToBase64Url) as CommentId | null,
+      templateId,
+      created: c.created,
+      updated: c.updated,
+      text: c.text,
+      authorId: c.authorId as UserId,
+      votes: c.votes,
+      level: c.level,
+      comments: [],
+    }
+    return r
+  })
+  return listToTree(commentsList)
 }
 
 export async function getNoteComments(noteId: RemoteNoteId) {
@@ -403,6 +439,7 @@ function templateEntityToDomain(t: {
   css: string
   ankiId: number | null
   subscribersCount: number
+  commentsCount: number
   til?: Date | undefined
 }) {
   const r = {
@@ -415,6 +452,7 @@ function templateEntityToDomain(t: {
     updated: t.updated,
     templateType: deserializeTemplateType(t.type),
     subscribers: t.subscribersCount,
+    comments: t.commentsCount,
     til: t.til,
   } satisfies RemoteTemplate & Record<string, unknown>
   return r
@@ -443,6 +481,45 @@ export async function insertPost({
       title,
     })
     .execute()
+}
+
+export async function insertTemplateComment(
+  templateId: RemoteTemplateId,
+  text: string,
+  authorId: UserId
+) {
+  const templateDbId = fromBase64Url(templateId)
+  await db.transaction().execute(
+    async (tx) =>
+      await Promise.all([
+        db
+          .selectFrom("template")
+          .select(["id"])
+          .where("template.id", "=", templateDbId)
+          .executeTakeFirst()
+          .then((r) => {
+            if (r == null) throwExp(`Template ${templateId} not found.`)
+          }),
+        tx
+          .updateTable("template")
+          .set({
+            commentsCount: (x) => sql`${x.ref("commentsCount")} + 1`,
+          })
+          .where("template.id", "=", templateDbId)
+          .execute(),
+        tx
+          .insertInto("templateComment")
+          .values({
+            id: unhex(ulidAsHex()),
+            authorId,
+            level: 0,
+            templateId: templateDbId,
+            votes: "",
+            text,
+          })
+          .execute(),
+      ])
+  )
 }
 
 export async function insertNoteComment(

@@ -1,6 +1,7 @@
 import { z } from "zod"
 import { authedProcedure } from "./trpc"
 import {
+  commentText,
   createRemoteTemplate,
   editRemoteTemplate,
   remoteTemplateId,
@@ -8,6 +9,7 @@ import {
 import {
   editTemplates,
   insertTemplates,
+  insertTemplateComment,
   subscribeToTemplate,
 } from "shared-edge"
 // eslint-disable-next-line @typescript-eslint/no-unused-vars -- needed for the emitted types
@@ -29,5 +31,10 @@ export const templateRouter = {
     .input(remoteTemplateId)
     .mutation(async ({ input, ctx }) => {
       await subscribeToTemplate(ctx.user, input)
+    }),
+  insertTemplateComment: authedProcedure
+    .input(z.object({ templateId: remoteTemplateId, text: commentText }))
+    .mutation(async ({ input, ctx }) => {
+      await insertTemplateComment(input.templateId, input.text, ctx.user)
     }),
 }
