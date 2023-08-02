@@ -1,3 +1,4 @@
+import solidPlugin from "vite-plugin-solid"
 import { type BuildOptions, defineConfig } from "vite"
 import checker from "vite-plugin-checker"
 import fs from "fs"
@@ -42,6 +43,7 @@ export default defineConfig(({ mode }) => {
   }
   return {
     plugins: [
+      solidPlugin(),
       // if we ever move off this plugin https://github.com/vitejs/vite/issues/2248
       VitePWA({
         strategies: "injectManifest",
