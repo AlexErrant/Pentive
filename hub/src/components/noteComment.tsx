@@ -1,11 +1,11 @@
 import { type Component, For, Show, createSignal } from "solid-js"
 import { A } from "solid-start"
-import { type NoteComment as NoteCommentType } from "shared-edge"
+import { type Comment as CommentType } from "shared-edge"
 import Toggle from "./toggle"
 import SubmitComment from "./submitComment"
 import { cwaClient } from "~/routes/cwaClient"
 
-const NoteComment: Component<{ comment: NoteCommentType }> = (props) => {
+const NoteComment: Component<{ comment: CommentType }> = (props) => {
   const [showReply, setShowReply] = createSignal(false)
   return (
     <li class="comment">

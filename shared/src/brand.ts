@@ -31,7 +31,7 @@ export type PluginVersion = Brand<string, "pluginVersion">
 
 export type MediaId = Brand<string, "mediaId">
 
-export type NoteCommentId = Brand<string, "noteCommentId" & "base64url">
+export type CommentId = Brand<string, "commentId" & "base64url">
 
 //
 

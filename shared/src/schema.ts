@@ -6,7 +6,7 @@ import {
   type Ord,
   type RemoteTemplateId,
   type NookId,
-  type NoteCommentId,
+  type CommentId,
 } from "./brand"
 
 // highTODO are we doing ULIDs, KSUID, or neither?
@@ -23,9 +23,9 @@ export const remoteTemplateId = z
   .string()
   .regex(/^[a-zA-Z0-9_-]{22}$/) as unknown as z.Schema<RemoteTemplateId>
 
-export const noteCommentId = z
+export const commentId = z
   .string()
-  .regex(/^[a-zA-Z0-9_-]{22}$/) as unknown as z.Schema<NoteCommentId>
+  .regex(/^[a-zA-Z0-9_-]{22}$/) as unknown as z.Schema<CommentId>
 
 const fieldValues = z
   .map(z.string().min(1), z.string())
