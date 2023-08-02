@@ -5,7 +5,7 @@ import Toggle from "./toggle"
 import SubmitComment from "./submitComment"
 import { cwaClient } from "~/routes/cwaClient"
 
-const NoteComment: Component<{ comment: CommentType }> = (props) => {
+const Comment: Component<{ comment: CommentType }> = (props) => {
   const [showReply, setShowReply] = createSignal(false)
   return (
     <li class="comment">
@@ -38,7 +38,7 @@ const NoteComment: Component<{ comment: CommentType }> = (props) => {
         <Toggle>
           <div class="comment-children">
             <For each={props.comment.comments}>
-              {(comment) => <NoteComment comment={comment} />}
+              {(comment) => <Comment comment={comment} />}
             </For>
           </div>
         </Toggle>
@@ -47,4 +47,4 @@ const NoteComment: Component<{ comment: CommentType }> = (props) => {
   )
 }
 
-export default NoteComment
+export default Comment

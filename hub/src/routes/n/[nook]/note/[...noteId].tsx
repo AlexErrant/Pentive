@@ -4,7 +4,7 @@ import { createServerData$ } from "solid-start/server"
 import { type NookId, type RemoteNoteId } from "shared"
 import { getNote, getNoteComments } from "shared-edge"
 import ResizingIframe from "~/components/resizingIframe"
-import NoteComment from "~/components/noteComment"
+import Comment from "~/components/comment"
 import SubmitComment from "~/components/submitComment"
 import { cwaClient } from "~/routes/cwaClient"
 import { getUserId } from "~/session"
@@ -90,7 +90,7 @@ const Thread: Component = () => {
               }}
             />
             <For each={data()!.comments}>
-              {(comment) => <NoteComment comment={comment} />}
+              {(comment) => <Comment comment={comment} />}
             </For>
           </ul>
         </div>
