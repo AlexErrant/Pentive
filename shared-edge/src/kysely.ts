@@ -262,7 +262,7 @@ export async function getNote(noteId: RemoteNoteId, userId: UserId | null) {
 }
 
 // https://stackoverflow.com/a/18018037
-function listToTree(list: Comment[]) {
+function listToTree<T extends Base64Url>(list: Array<Comment<T>>) {
   const map = new Map<Base64Url, number>()
   let node
   const roots = []
@@ -282,19 +282,21 @@ function listToTree(list: Comment[]) {
   return roots
 }
 
-export interface Comment {
+export interface Comment<T extends Base64Url> {
   id: CommentId
   parentId: CommentId | null
-  noteId?: DbId
-  templateId?: DbId
+  entityId: T
   created: Date
   updated: Date
   text: string
   authorId: string
   votes: string
   level: number
-  comments: Comment[]
+  comments: Array<Comment<T>>
 }
+
+export type TemplateComment = Comment<TemplateId>
+export type NoteComment = Comment<NoteId>
 
 export async function getTemplateComments(templateId: RemoteTemplateId) {
   const cs = await db
@@ -314,10 +316,10 @@ export async function getTemplateComments(templateId: RemoteTemplateId) {
     .orderBy("votes", "desc")
     .execute()
   const commentsList = cs.map((c) => {
-    const r: Comment = {
+    const r: TemplateComment = {
       id: dbIdToBase64Url(c.id) as CommentId,
       parentId: nullMap(c.parentId, dbIdToBase64Url) as CommentId | null,
-      templateId,
+      entityId: templateId,
       created: c.created,
       updated: c.updated,
       text: c.text,
@@ -349,10 +351,10 @@ export async function getNoteComments(noteId: RemoteNoteId) {
     .orderBy("votes", "desc")
     .execute()
   const commentsList = cs.map((c) => {
-    const r: Comment = {
+    const r: NoteComment = {
       id: dbIdToBase64Url(c.id) as CommentId,
       parentId: nullMap(c.parentId, dbIdToBase64Url) as CommentId | null,
-      noteId,
+      entityId: noteId,
       created: c.created,
       updated: c.updated,
       text: c.text,
@@ -516,6 +518,45 @@ export async function insertTemplateComment(
             templateId: templateDbId,
             votes: "",
             text,
+          })
+          .execute(),
+      ])
+  )
+}
+
+export async function insertTemplateChildComment(
+  parentCommentId: CommentId,
+  text: string,
+  authorId: UserId
+) {
+  const parentCommentDbId = fromBase64Url(parentCommentId)
+  const parent = await db
+    .selectFrom("templateComment")
+    .select(["level", sql<Base64>`TO_BASE64(templateId)`.as("templateId")])
+    .where("id", "=", parentCommentDbId)
+    .executeTakeFirst()
+  if (parent == null) throwExp(`Comment ${parentCommentId} not found.`)
+  const templateId = fromBase64(parent.templateId)
+  await db.transaction().execute(
+    async (tx) =>
+      await Promise.all([
+        tx
+          .updateTable("template")
+          .set({
+            commentsCount: (x) => sql`${x.ref("commentsCount")} + 1`,
+          })
+          .where("template.id", "=", templateId)
+          .execute(),
+        await tx
+          .insertInto("templateComment")
+          .values({
+            id: unhex(ulidAsHex()),
+            authorId,
+            level: parent.level + 1,
+            templateId,
+            votes: "",
+            text,
+            parentId: parentCommentDbId,
           })
           .execute(),
       ])

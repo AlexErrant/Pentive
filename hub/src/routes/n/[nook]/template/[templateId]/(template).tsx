@@ -89,7 +89,7 @@ const Thread: Component = () => {
               }}
             />
             <For each={data()!.comments}>
-              {(comment) => <Comment comment={comment} />}
+              {(comment) => <Comment comment={comment} type="template" />}
             </For>
           </ul>
         </div>

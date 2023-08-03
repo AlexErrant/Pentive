@@ -4,8 +4,12 @@ import { type Comment as CommentType } from "shared-edge"
 import Toggle from "./toggle"
 import SubmitComment from "./submitComment"
 import { cwaClient } from "~/routes/cwaClient"
+import { type Base64Url } from "shared"
 
-const Comment: Component<{ comment: CommentType }> = (props) => {
+const Comment: Component<{
+  comment: CommentType<Base64Url>
+  type: "note" | "template"
+}> = (props) => {
   const [showReply, setShowReply] = createSignal(false)
   return (
     <li class="comment">
@@ -27,10 +31,17 @@ const Comment: Component<{ comment: CommentType }> = (props) => {
         <SubmitComment
           // eslint-disable-next-line solid/reactivity -- doesn't need to be reactive
           onSubmit={async (text) => {
-            await cwaClient.insertNoteChildComment.mutate({
-              parentCommentId: props.comment.id,
-              text,
-            })
+            if (props.type === "note") {
+              await cwaClient.insertNoteChildComment.mutate({
+                parentCommentId: props.comment.id,
+                text,
+              })
+            } else {
+              await cwaClient.insertTemplateChildComment.mutate({
+                parentCommentId: props.comment.id,
+                text,
+              })
+            }
           }}
         />
       </div>
@@ -38,7 +49,7 @@ const Comment: Component<{ comment: CommentType }> = (props) => {
         <Toggle>
           <div class="comment-children">
             <For each={props.comment.comments}>
-              {(comment) => <Comment comment={comment} />}
+              {(comment) => <Comment comment={comment} type={props.type} />}
             </For>
           </div>
         </Toggle>
