@@ -1,3 +1,4 @@
+// https://moonrepo.dev/docs/guides/javascript/typescript-project-refs
 {
     "extends": "./tsconfig.options.json",
     "files": [],
