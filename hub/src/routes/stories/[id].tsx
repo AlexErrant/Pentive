@@ -6,7 +6,7 @@ import {
   Show,
 } from "solid-js"
 import { A, type RouteDataArgs, useRouteData } from "solid-start"
-import Comment from "~/components/comment"
+import Comment from "~/components/hnComment"
 import fetchAPI from "~/lib/api"
 import { type IStory } from "~/types"
 

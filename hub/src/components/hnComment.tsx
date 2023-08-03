@@ -3,7 +3,7 @@ import { A } from "solid-start"
 import { type IComment } from "~/types"
 import Toggle from "./toggle"
 
-const Comment: Component<{ comment: IComment }> = (props) => {
+const HNComment: Component<{ comment: IComment }> = (props) => {
   return (
     <li class="comment">
       <div class="by">
@@ -14,7 +14,7 @@ const Comment: Component<{ comment: IComment }> = (props) => {
       <Show when={props.comment.comments.length}>
         <Toggle>
           <For each={props.comment.comments}>
-            {(comment) => <Comment comment={comment} />}
+            {(comment) => <HNComment comment={comment} />}
           </For>
         </Toggle>
       </Show>
@@ -22,4 +22,4 @@ const Comment: Component<{ comment: IComment }> = (props) => {
   )
 }
 
-export default Comment
+export default HNComment
