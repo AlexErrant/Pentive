@@ -159,6 +159,21 @@ module.exports = {
             modifiers: ["exported"],
             format: ["camelCase", "PascalCase"],
           },
+          // Ignore properties that require quotes https://typescript-eslint.io/rules/naming-convention/#ignore-properties-that-require-quotes
+          {
+            selector: [
+              "classProperty",
+              "objectLiteralProperty",
+              "typeProperty",
+              "classMethod",
+              "objectLiteralMethod",
+              "typeMethod",
+              "accessor",
+              "enumMember",
+            ],
+            format: null,
+            modifiers: ["requiresQuotes"],
+          },
         ],
       },
     },

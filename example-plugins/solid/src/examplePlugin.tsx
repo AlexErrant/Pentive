@@ -8,7 +8,7 @@ const ExamplePlugin: VoidComponent<{
 }> = (props) => {
   return (
     <div
-      // eslint-disable-next-line @typescript-eslint/naming-convention -- medTODO not sure why `border-red-900` isn't working, figure out later when it's time to learn CSS. grep B4197330-831F-4CD8-84F1-0CF7AE2FA22F
+      // medTODO not sure why `border-red-900` isn't working, figure out later when it's time to learn CSS. grep B4197330-831F-4CD8-84F1-0CF7AE2FA22F
       style={{ "border-color": "red" }}
       class="border rounded-lg p-1 m-1 border-red-900"
     >
