@@ -20,7 +20,6 @@ import { db } from "../db"
 import { importAnki } from "./importer/importer"
 import { augcClient } from "../trpcClient"
 import { getDb } from "../sqlite/crsqlite"
-import Peers from "./peers"
 import { C } from ".."
 
 async function makeNoteUploadable() {
@@ -117,16 +116,6 @@ export default function Home(): JSX.Element {
         <button
           class="border rounded-lg px-2 border-gray-900"
           onClick={async () => {
-            await db.sync()
-          }}
-        >
-          sync
-        </button>
-      </div>
-      <div class="mt-4">
-        <button
-          class="border rounded-lg px-2 border-gray-900"
-          onClick={async () => {
             await db.upsertNote(sampleNote)
           }}
         >
@@ -202,16 +191,6 @@ export default function Home(): JSX.Element {
         </label>
       </div>
       <div class="mt-4">
-        <button
-          class="border rounded-lg px-2 border-gray-900"
-          onClick={async () => {
-            await db.sync()
-          }}
-        >
-          sync
-        </button>
-      </div>
-      <div class="mt-4">
         <form
           onSubmit={async (e) => {
             e.preventDefault()
@@ -248,9 +227,6 @@ export default function Home(): JSX.Element {
           dupMedia
           {/* medTODO add de-duping of media using their hash. Implement after adding full text search, since we'll need to search existing notes for images using dupes. */}
         </button>
-      </div>
-      <div class="mt-4">
-        <Peers />
       </div>
     </section>
   )

@@ -29,6 +29,10 @@ export const navLinks: NavLinkData[] = [
     href: "/plugins",
   },
   {
+    name: "Sync",
+    href: "/sync",
+  },
+  {
     name: "Error",
     href: "/error",
   },
@@ -57,6 +61,10 @@ export const routes: RouteDefinition[] = [
   {
     path: "/plugins",
     component: lazy(async () => await import("./pages/plugins")),
+  },
+  {
+    path: "/sync",
+    component: lazy(async () => await import("./pages/sync")),
   },
   {
     path: "/testdb",
