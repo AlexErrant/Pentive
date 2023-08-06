@@ -6,6 +6,7 @@ import HomeData from "./pages/home.data"
 import AboutData from "./pages/about.data"
 import TemplatesData from "./pages/templates.data"
 import { type NavLinkData } from "./components/contracts"
+import { Upload } from "./components/upload"
 
 export const navLinks: NavLinkData[] = [
   {
@@ -29,7 +30,7 @@ export const navLinks: NavLinkData[] = [
     href: "/plugins",
   },
   {
-    name: "Sync",
+    name: Upload(),
     href: "/sync",
   },
   {

@@ -1,4 +1,3 @@
-import { NavLink } from "@solidjs/router"
 import { db } from "../db"
 import { Show, createResource } from "solid-js"
 
@@ -20,19 +19,14 @@ export function Upload() {
     initialValue: 0,
   })
   return (
-    <NavLink
-      href="/sync"
-      activeClass="font-bold"
-      class="relative mx-4 no-underline hover:underline
-flex p-2.5 rounded-md cursor-pointer items-center justify-center transition text-zinc-700 hover:text-zinc-800 hover:bg-zinc-100"
-    >
+    <div class="relative mx-4">
       Sync
       <Show when={count() > 0}>
         <div
           // https://stackoverflow.com/a/71440299
           class="absolute border border-black bg-lime-300 flex justify-center items-center font-normal px-1"
           style={{
-            bottom: "0em",
+            bottom: "-1em",
             right: "-1.3em",
             "min-width": "1.6em",
             height: "1.6em",
@@ -43,6 +37,6 @@ flex p-2.5 rounded-md cursor-pointer items-center justify-center transition text
           {count()}
         </div>
       </Show>
-    </NavLink>
+    </div>
   )
 }

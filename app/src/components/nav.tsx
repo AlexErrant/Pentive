@@ -2,7 +2,6 @@ import { ThemeSelector } from "shared-dom"
 import { For, type VoidComponent } from "solid-js"
 import { NavLink, useLocation } from "@solidjs/router"
 import { type NavLinkData } from "./contracts"
-import { Upload } from "./upload"
 const ends = new Set(["/"])
 
 const Nav: VoidComponent<{ navLinks: NavLinkData[] }> = (props) => {
@@ -26,9 +25,6 @@ const Nav: VoidComponent<{ navLinks: NavLinkData[] }> = (props) => {
         </For>
         <li>
           <ThemeSelector />
-        </li>
-        <li>
-          <Upload />
         </li>
         <li class="text-sm flex items-center space-x-1 ml-auto">
           <span>URL:</span>
