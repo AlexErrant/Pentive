@@ -6,33 +6,13 @@ import {
   type JSX,
   type Setter,
 } from "solid-js"
-import {
-  sampleCard,
-  type Card,
-  sampleNote,
-  type Note,
-  type NookId,
-  throwExp,
-  type MediaId,
-} from "shared"
+import { throwExp, type MediaId } from "shared"
 import type HomeData from "./home.data"
 import { db } from "../db"
 import { importAnki } from "./importer/importer"
 import { augcClient } from "../trpcClient"
 import { getDb } from "../sqlite/crsqlite"
 import { C } from ".."
-
-async function makeNoteUploadable() {
-  await db.makeNoteUploadable(sampleNote.id, "a_random_nook" as NookId)
-}
-
-async function updateNotes(): Promise<void> {
-  const note = await db.getNote(sampleNote.id)
-  if (note == null) throwExp("No note!")
-  note.fieldValues.set("front", note.fieldValues.get("front")! + "!")
-  note.fieldValues.set("back", note.fieldValues.get("back")! + "!")
-  await db.updateNote(note)
-}
 
 async function searchNotes(search: string): Promise<void> {
   const searchBatch = await augcClient.searchNotes.query(search)
@@ -66,21 +46,11 @@ const MyPluginBaby: VoidComponent<{
 export default function Home(): JSX.Element {
   const [count, setCount] = createSignal(1)
   const [search, setSearch] = createSignal("")
-  const [card, setCard] = createSignal<Card | null>(null)
-  const [note, setNote] = createSignal<Note | null>(null)
   const age = useRouteData<typeof HomeData>()
 
   createEffect(() => {
     console.log(age())
     setCount(age() as number) // not sure why, but changing to a mono repo changed the signature of this to include `undefined` - which is wrong. Whatever.
-  })
-
-  createEffect(() => {
-    console.log(card())
-  })
-
-  createEffect(() => {
-    console.log(note())
   })
 
   return (
@@ -116,38 +86,10 @@ export default function Home(): JSX.Element {
         <button
           class="border rounded-lg px-2 border-gray-900"
           onClick={async () => {
-            await db.upsertNote(sampleNote)
-          }}
-        >
-          upsertNote
-        </button>
-        <button
-          class="border rounded-lg px-2 border-gray-900"
-          onClick={async () => setNote(await db.getNote(sampleNote.id))}
-        >
-          getNote
-        </button>
-        <button
-          class="border rounded-lg px-2 border-gray-900"
-          onClick={makeNoteUploadable}
-        >
-          makeNoteUploadable
-        </button>
-        <button
-          class="border rounded-lg px-2 border-gray-900"
-          onClick={async () => {
             await searchNotes(search())
           }}
         >
           searchNotes
-        </button>
-        <button
-          class="border rounded-lg px-2 border-gray-900"
-          onClick={async () => {
-            await updateNotes()
-          }}
-        >
-          updateNotes
         </button>
         <form
           onSubmit={async (e) => {
@@ -161,22 +103,6 @@ export default function Home(): JSX.Element {
             onInput={(e) => setSearch(e.currentTarget.value)}
           />
         </form>
-      </div>
-      <div class="mt-4">
-        <button
-          class="border rounded-lg px-2 border-gray-900"
-          onClick={async () => {
-            await db.upsertCard(sampleCard)
-          }}
-        >
-          upsertCard
-        </button>
-        <button
-          class="border rounded-lg px-2 border-gray-900"
-          onClick={async () => setCard(await db.getCard(sampleCard.id))}
-        >
-          getCard
-        </button>
       </div>
       <div class="mt-4">
         <label>

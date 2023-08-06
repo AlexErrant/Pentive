@@ -41,16 +41,6 @@ export interface Card {
   state?: State
 }
 
-export const sampleCard: Card = {
-  id: "tZipXyNyRd63pgAAKcpnoQ" as CardId,
-  noteId: "dZA8bN6wQMCfjwAAxwL72w" as NoteId,
-  deckIds: new Set(),
-  created: new Date(),
-  updated: new Date(),
-  due: new Date(),
-  ord: 0 as Ord,
-}
-
 export interface NoteCard {
   template: Template
   note: Note
