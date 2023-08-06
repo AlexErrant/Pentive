@@ -36,7 +36,6 @@ async function createDb() {
 async function createCrRtc() {
   const db = await getDb()
   return await wdbRtc(db, {
-    // @ts-expect-error the option exists https://peerjs.com/docs/#peer-options-secure
     secure: true,
     host: import.meta.env.VITE_PEER_HOST,
     port: parseInt(import.meta.env.VITE_PEER_PORT),

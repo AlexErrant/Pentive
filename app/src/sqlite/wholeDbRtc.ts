@@ -8,7 +8,7 @@ import WDB, {
   type WholeDbReplicator,
 } from "./wholeDbReplicator.js"
 import { type DBAsync } from "@vlcn.io/xplat-api"
-import Peer, { type DataConnection } from "peerjs"
+import Peer, { type PeerJSOption, type DataConnection } from "peerjs"
 import { stringify as uuidStringify } from "uuid"
 
 type Msg = PokeMsg | ChangesMsg | RequestChangesMsg
@@ -66,9 +66,9 @@ export class WholeDbRtc implements PokeProtocol {
   constructor(
     public readonly siteId: SiteIDLocal,
     private readonly db: DBAsync,
-    peerServer?: PeerOptions
+    peerOption?: PeerJSOption
   ) {
-    this.site = new Peer(uuidStringify(siteId), peerServer)
+    this.site = new Peer(uuidStringify(siteId), peerOption)
     this.site.on("connection", (c) => {
       c.on("open", () => {
         this._newConnection(c)
@@ -269,18 +269,12 @@ class WholeDbRtcPublic {
   }
 }
 
-export interface PeerOptions {
-  host: string
-  port: number
-  path: string
-}
-
 export default async function wholeDbRtc(
   db: DBAsync,
-  peerServer?: PeerOptions
+  peerOption?: PeerJSOption
 ): Promise<WholeDbRtcPublic> {
   const siteId = (await db.execA<[Uint8Array]>("SELECT crsql_siteid();"))[0][0]
-  const internal = new WholeDbRtc(siteId, db, peerServer)
+  const internal = new WholeDbRtc(siteId, db, peerOption)
   await internal._init()
   return new WholeDbRtcPublic(internal)
 }
