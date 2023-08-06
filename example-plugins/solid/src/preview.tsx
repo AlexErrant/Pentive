@@ -34,23 +34,23 @@ render(() => {
       <Nav
         navLinks={[
           {
-            name: "Home",
+            child: "Home",
             href: "/",
           },
           {
-            name: "About",
+            child: "About",
             href: "/about",
           },
           {
-            name: "Templates",
+            child: "Templates",
             href: "/templates",
           },
           {
-            name: "Plugins",
+            child: "Plugins",
             href: "/plugins",
           },
           {
-            name: "Error",
+            child: "Error",
             href: "/error",
           },
         ]}

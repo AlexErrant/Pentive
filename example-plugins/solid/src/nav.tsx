@@ -8,10 +8,10 @@ export const Nav: VoidComponent<{ navLinks: NavLinkData[] }> = (props) => {
     <nav class="bg-gray-200 text-gray-900 px-4">
       <ul class="flex items-center">
         <For each={props.navLinks}>
-          {({ href, name }) => (
+          {({ href, child }) => (
             <li class="py-2 px-4">
               <a href={href} class="no-underline hover:underline">
-                {name}
+                {child}
               </a>
             </li>
           )}

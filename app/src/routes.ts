@@ -10,31 +10,31 @@ import { Upload } from "./components/upload"
 
 export const navLinks: NavLinkData[] = [
   {
-    name: "Home",
+    child: "Home",
     href: "/",
   },
   {
-    name: "About",
+    child: "About",
     href: "/about",
   },
   {
-    name: "Templates",
+    child: "Templates",
     href: "/templates",
   },
   {
-    name: "Cards",
+    child: "Cards",
     href: "/cards",
   },
   {
-    name: "Plugins",
+    child: "Plugins",
     href: "/plugins",
   },
   {
-    name: Upload(),
+    child: Upload(),
     href: "/sync",
   },
   {
-    name: "Error",
+    child: "Error",
     href: "/error",
   },
 ]

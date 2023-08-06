@@ -5,10 +5,10 @@
 
 <nav>
   <ul>
-    {#each navLinks as { name, href }}
+    {#each navLinks as { child, href }}
       <li>
         <a {href}>
-          {name}
+          {child} 
         </a>
       </li>
     {/each}
