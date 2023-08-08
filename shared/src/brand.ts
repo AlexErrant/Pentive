@@ -42,3 +42,5 @@ export type CardSettingId = Brand<string, "cardSettingId" & "base64url">
 export type DeckId = Brand<string, "deckId">
 
 export type RemoteMediaNum = Brand<number, "remoteMediaNum">
+
+export type PeerJsId = Brand<string, "peerJsId"> // in uuid format

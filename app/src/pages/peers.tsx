@@ -1,6 +1,7 @@
 import { For, Show, createResource, createSignal } from "solid-js"
 import { getCrRtc } from "../sqlite/crsqlite"
 import { stringify as uuidStringify } from "uuid"
+import { cwaClient } from "../trpcClient"
 
 export default function Peers() {
   const [pending, setPending] = createSignal<string[]>([])
@@ -18,6 +19,15 @@ export default function Peers() {
   return (
     <div class="peers">
       <Show when={siteId()}>
+        <button
+          type="button"
+          class="border rounded-lg px-2 border-gray-900"
+          onClick={async () => {
+            await cwaClient.setPeer.mutate(siteId()!)
+          }}
+        >
+          Add {siteId()!} as peer
+        </button>
         <button
           type="button"
           onClick={async () => {

@@ -20,6 +20,7 @@ model user {
   email                 String               @unique @db.VarChar(254)
   created               DateTime             @default(now())
   templateHistory       templateHistory[]
+  peer                  Json?
   templateComments      templateComment[]
   templateSubscriptions templateSubscriber[]
   notes                 note[]

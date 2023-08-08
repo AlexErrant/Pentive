@@ -141,6 +141,7 @@ export interface TemplateSubscriber {
 export interface User {
   id: string
   email: string
+  peer: string | null
   created: Generated<Date>
 }
 
