@@ -2,6 +2,7 @@ import { For, Show, createResource, createSignal } from "solid-js"
 import { getCrRtc } from "../sqlite/crsqlite"
 import { stringify as uuidStringify } from "uuid"
 import { cwaClient } from "../trpcClient"
+import { peerValidator } from "shared"
 
 export default function Peers() {
   const [pending, setPending] = createSignal<string[]>([])
@@ -19,6 +20,7 @@ export default function Peers() {
   return (
     <div class="peers">
       <Show when={siteId()}>
+        {peers()}
         <button
           type="button"
           class="border rounded-lg px-2 border-gray-900"
@@ -64,5 +66,25 @@ export default function Peers() {
         </For>
       </ul>
     </div>
+  )
+}
+
+function peers() {
+  // eslint-disable-next-line solid/reactivity
+  const [peers] = createResource(async () => await cwaClient.getPeer.query(), {
+    initialValue: null,
+  })
+  const peerIds = () => {
+    if (peers() != null) {
+      return Object.keys(peerValidator.parse(peers()))
+    }
+    return null
+  }
+  return (
+    <Show when={peerIds()}>
+      <ul>
+        <For each={peerIds()}>{(peerId) => <li>{peerId}</li>}</For>
+      </ul>
+    </Show>
   )
 }

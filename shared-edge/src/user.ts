@@ -14,3 +14,12 @@ export async function setUserPeer(userId: UserId, peerId: PeerJsId) {
     .where("id", "=", userId)
     .execute()
 }
+
+export async function getUserPeer(userId: UserId) {
+  const peer = await db
+    .selectFrom("user")
+    .select("peer")
+    .where("user.id", "=", userId)
+    .executeTakeFirst()
+  return peer?.peer ?? null
+}

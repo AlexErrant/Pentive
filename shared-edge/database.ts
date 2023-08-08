@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import type { ColumnType } from "kysely"
-import type { DbId, NookId } from "shared"
+import type { DbId, NookId, PeerValidator } from "shared"
 
 export type Generated<T> = T extends ColumnType<infer S, infer I, infer U>
   ? ColumnType<S, I | undefined, U>
@@ -141,7 +141,7 @@ export interface TemplateSubscriber {
 export interface User {
   id: string
   email: string
-  peer: string | null
+  peer: PeerValidator | null
   created: Generated<Date>
 }
 
