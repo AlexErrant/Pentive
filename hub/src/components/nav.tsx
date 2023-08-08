@@ -9,7 +9,7 @@ function Nav(): JSX.Element {
     async (_, { request }) => await getUserId(request)
   )
   const [, { Form }] = createServerAction$(
-    async (f: FormData, { request }) => await logout(request)
+    async (_: FormData) => await logout()
   )
   return (
     <header class="header">

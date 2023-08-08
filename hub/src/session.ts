@@ -9,38 +9,16 @@ import {
 } from "shared"
 import { base64ToArray } from "shared-edge"
 import { redirect } from "solid-start/server"
-import { createCookieSessionStorage } from "solid-start/session"
 import { type Cookie, type CookieOptions } from "solid-start/session/cookies"
-import { type Session, type SessionStorage } from "solid-start/session/sessions"
 import { createPlainCookie } from "~/createPlainCookie"
 
-const sessionUserId = "userId"
-const sessionNames = [sessionUserId] as const
-type SessionName = (typeof sessionNames)[number]
-export type UserSession = { [K in SessionName]: string }
-
 export function setSessionStorage(x: {
-  sessionSecret: Base64
   jwsSecret: Base64
   csrfSecret: Base64
   hubInfoSecret: Base64
   oauthStateSecret: Base64
   oauthCodeVerifierSecret: Base64
 }): void {
-  // highTODO consider removing this when adding Auth.js. We need cross-domain auth, and I'm not sure why this exists if we're using a JWT
-  storage = createCookieSessionStorage({
-    cookie: {
-      name: "__Host-session",
-      secure: true,
-      secrets: [x.sessionSecret],
-      sameSite: "lax",
-      path: "/",
-      maxAge: 60 * 60 * 24 * 30, // 30 days
-      httpOnly: true,
-      // domain: "", // intentionally missing https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html#cookie-with-__host-prefix
-      // expires: "", // intentionally missing because docs say it's calculated off `maxAge` when missing https://github.com/solidjs/solid-start/blob/1b22cad87dd7bd74f73d807e1d60b886e753a6ee/packages/start/session/cookies.ts#L56-L57
-    },
-  })
   jwsSecret = base64ToArray(x.jwsSecret)
   csrfSecret = x.csrfSecret
   hubInfoSecret = base64ToArray(x.hubInfoSecret)
@@ -140,8 +118,6 @@ export function setSessionStorage(x: {
   hubInfoCookie = createPlainCookie(hubInfoCookieName, hubInfoCookieOpts)
 }
 
-// @ts-expect-error session calls should throw null error if not setup
-let storage = null as SessionStorage
 // @ts-expect-error calls should throw null error if not setup
 let jwtCookie = null as Cookie
 // @ts-expect-error calls should throw null error if not setup
@@ -166,10 +142,6 @@ let jwsSecret = null as Uint8Array
 let csrfSecret = null as string
 // @ts-expect-error calls should throw null error if not setup
 let hubInfoSecret = null as Uint8Array
-
-export async function getUserSession(request: Request): Promise<Session> {
-  return await storage.getSession(request.headers.get("Cookie"))
-}
 
 export async function getCsrfSignature(
   request: Request
@@ -204,7 +176,7 @@ export async function getOauthCodeVerifier(request: Request) {
 }
 
 export interface Jwt {
-  sub: string
+  sub: UserId
   jti: string
 }
 
@@ -219,16 +191,14 @@ export async function getJwt(request: Request): Promise<Jwt | null> {
   return jwt == null
     ? null
     : {
-        sub: jwt.payload.sub ?? throwExp("`sub` is empty"),
+        sub: (jwt.payload.sub as UserId) ?? throwExp("`sub` is empty"),
         jti: jwt.payload.jti ?? throwExp("`jti` is empty"),
       }
 }
 
 export async function getUserId(request: Request) {
-  const session = await getUserSession(request)
-  const userId = session.get(sessionUserId) as unknown
-  if (typeof userId !== "string" || userId.length === 0) return null
-  return userId as UserId
+  const jwt = await getJwt(request)
+  return jwt?.sub ?? null
 }
 
 export async function requireUserId(
@@ -239,24 +209,6 @@ export async function requireUserId(
   if (r == null) {
     const searchParams = new URLSearchParams([["redirectTo", redirectTo]])
     throw redirect(`/login?${searchParams.toString()}`) as unknown
-  }
-  return r
-}
-
-export async function requireSession(
-  request: Request,
-  redirectTo: string = new URL(request.url).pathname
-): Promise<UserSession> {
-  const session = await getUserSession(request)
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-  const r = {} as UserSession
-  for (const sessionName of sessionNames) {
-    const sessionValue = session.get(sessionName) as unknown
-    if (typeof sessionValue !== "string" || sessionValue.length === 0) {
-      const searchParams = new URLSearchParams([["redirectTo", redirectTo]])
-      throw redirect(`/login?${searchParams.toString()}`) as unknown
-    }
-    r[sessionName] = sessionValue
   }
   return r
 }
@@ -285,10 +237,8 @@ export async function requireJwt(
   return jwt
 }
 
-export async function logout(request: Request): Promise<Response> {
-  const session = await storage.getSession(request.headers.get("Cookie"))
+export async function logout() {
   const headers = new Headers()
-  headers.append("Set-Cookie", await storage.destroySession(session)) // lowTODO parallelize
   headers.append("Set-Cookie", await destroyJwtCookie.serialize("")) // lowTODO parallelize
   headers.append("Set-Cookie", await destroyCsrfSignatureCookie.serialize("")) // lowTODO parallelize
   return redirect("/login", {
@@ -300,11 +250,8 @@ export async function createUserSession(
   userId: string,
   redirectTo: string
 ): Promise<Response> {
-  const session = await storage.getSession()
-  session.set(sessionUserId, userId)
   const [csrf, csrfSignature] = await generateCsrf()
   const headers = new Headers()
-  headers.append("Set-Cookie", await storage.commitSession(session)) // lowTODO parallelize
   const jwt = await generateJwt(userId, csrf)
   headers.append("Set-Cookie", await jwtCookie.serialize(jwt)) // lowTODO parallelize
   // https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html#double-submit-cookie

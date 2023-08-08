@@ -6,12 +6,7 @@ import {
   createServerData$,
   redirect,
 } from "solid-start/server"
-import {
-  requireCsrfSignature,
-  requireSession,
-  requireJwt,
-  isInvalidCsrf,
-} from "~/session"
+import { requireCsrfSignature, requireJwt, isInvalidCsrf } from "~/session"
 
 export function routeData({ params }: RouteDataArgs) {
   const nook = (): string => params.nook
@@ -70,7 +65,6 @@ export default function Submit(): JSX.Element {
       if (Object.values(fieldErrors).some(Boolean)) {
         throw new FormError("Some fields are invalid", { fieldErrors, fields })
       }
-      const session = await requireSession(request)
       const jwt = await requireJwt(request)
       if (await isInvalidCsrf(csrfSignature, jwt.jti)) {
         const searchParams = new URLSearchParams([
@@ -81,7 +75,7 @@ export default function Submit(): JSX.Element {
 
       await insertPost({
         id: ulidAsHex(),
-        authorId: session.userId,
+        authorId: jwt.sub,
         title,
         text,
         nook,

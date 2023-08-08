@@ -26,7 +26,6 @@ source ../PentiveSecrets/secrets.sh
 # echo $productionGithubId                | npx wrangler secret put githubId                --name hub
 # echo $productionGithubSecret            | npx wrangler secret put githubSecret            --name hub
 # echo $productionPlanetscaleDbUrl        | npx wrangler secret put planetscaleDbUrl        --name hub
-# echo $productionHubSessionSecret        | npx wrangler secret put hubSessionSecret        --name hub
 # echo $productionCsrfSecret              | npx wrangler secret put csrfSecret              --name hub
 # echo $productionOauthStateSecret        | npx wrangler secret put oauthStateSecret        --name hub
 # echo $productionOauthCodeVerifierSecret | npx wrangler secret put oauthCodeVerifierSecret --name hub

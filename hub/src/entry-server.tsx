@@ -12,7 +12,6 @@ export default createHandler(
     /* eslint-disable solid/reactivity -- event.env and event.responseHeaders should never change at runtime */
     setKysely(event.env.planetscaleDbUrl)
     setSessionStorage({
-      sessionSecret: event.env.hubSessionSecret,
       jwsSecret: event.env.jwsSecret,
       csrfSecret: event.env.csrfSecret,
       hubInfoSecret: event.env.hubInfoSecret,
