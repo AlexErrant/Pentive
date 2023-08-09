@@ -64,7 +64,7 @@ app
       endpoint: "/trpc",
       req: c.req.raw,
       router: appRouter,
-      createContext: () => createContext(userId),
+      createContext: () => createContext(userId, c.env),
     })
   })
   .get("/", (c) => c.text("Hono!!"))

@@ -1,14 +1,18 @@
 import { initTRPC, TRPCError } from "@trpc/server"
 import superjson from "superjson"
-import { type Result, type UserId } from "./util"
+import { type Env, type Result, type UserId } from "./util"
 
 export interface Context {
   user: UserId | undefined
+  env: Env
 }
 
-export function createContext(userId: Result<UserId, Response>): Context {
+export function createContext(
+  userId: Result<UserId, Response>,
+  env: Env
+): Context {
   const user = userId.tag === "Ok" ? userId.ok : undefined
-  return { user }
+  return { user, env }
 }
 
 // We export only the functionality that we use so we can enforce which base procedures should be used

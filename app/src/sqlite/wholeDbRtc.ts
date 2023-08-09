@@ -66,7 +66,7 @@ export class WholeDbRtc implements PokeProtocol {
   constructor(
     public readonly siteId: SiteIDLocal,
     private readonly db: DBAsync,
-    peerOption?: PeerJSOption
+    peerOption: PeerJSOption
   ) {
     this.site = new Peer(uuidStringify(siteId), peerOption)
     this.site.on("connection", (c) => {
@@ -271,7 +271,7 @@ class WholeDbRtcPublic {
 
 export default async function wholeDbRtc(
   db: DBAsync,
-  peerOption?: PeerJSOption
+  peerOption: PeerJSOption
 ): Promise<WholeDbRtcPublic> {
   const siteId = (await db.execA<[Uint8Array]>("SELECT crsql_siteid();"))[0][0]
   const internal = new WholeDbRtc(siteId, db, peerOption)
