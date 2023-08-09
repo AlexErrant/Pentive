@@ -3,7 +3,7 @@ import {
   type Base64,
   base64url,
   csrfSignatureCookieName,
-  jwtCookieName,
+  hubSessionCookieName,
   throwExp,
   type UserId,
 } from "shared"
@@ -22,7 +22,7 @@ export function setSessionStorage(x: {
   jwsSecret = base64ToArray(x.jwsSecret)
   csrfSecret = x.csrfSecret
   hubInfoSecret = base64ToArray(x.hubInfoSecret)
-  const jwtCookieOpts: CookieOptions = {
+  const sessionCookieOpts: CookieOptions = {
     secure: true,
     secrets: [], // intentionally empty. This cookie should only store a signed JWT!
     sameSite: "strict",
@@ -32,9 +32,9 @@ export function setSessionStorage(x: {
     domain: import.meta.env.VITE_HUB_DOMAIN, // sadly, making cookies target specific subdomains from the main domain seems very hacky
     // expires: "", // intentionally missing because docs say it's calculated off `maxAge` when missing https://github.com/solidjs/solid-start/blob/1b22cad87dd7bd74f73d807e1d60b886e753a6ee/packages/start/session/cookies.ts#L56-L57
   }
-  jwtCookie = createPlainCookie(jwtCookieName, jwtCookieOpts)
-  destroyJwtCookie = createPlainCookie(jwtCookieName, {
-    ...jwtCookieOpts,
+  sessionCookie = createPlainCookie(hubSessionCookieName, sessionCookieOpts)
+  destroySessionCookie = createPlainCookie(hubSessionCookieName, {
+    ...sessionCookieOpts,
     maxAge: undefined,
     expires: new Date(0), // https://github.com/remix-run/remix/issues/5150 https://stackoverflow.com/q/5285940
   })
@@ -119,9 +119,9 @@ export function setSessionStorage(x: {
 }
 
 // @ts-expect-error calls should throw null error if not setup
-let jwtCookie = null as Cookie
+let sessionCookie = null as Cookie
 // @ts-expect-error calls should throw null error if not setup
-let destroyJwtCookie = null as Cookie
+let destroySessionCookie = null as Cookie
 // @ts-expect-error calls should throw null error if not setup
 let csrfSignatureCookie = null as Cookie
 // @ts-expect-error calls should throw null error if not setup
@@ -175,30 +175,30 @@ export async function getOauthCodeVerifier(request: Request) {
   return codeVerifier
 }
 
-export interface Jwt {
+export interface HubSession {
   sub: UserId
   jti: string
 }
 
-export async function getJwt(request: Request): Promise<Jwt | null> {
-  const rawJwt = (await jwtCookie.parse(
+export async function getSession(request: Request): Promise<HubSession | null> {
+  const rawSession = (await sessionCookie.parse(
     request.headers.get("Cookie")
   )) as string
-  let jwt: JWTVerifyResult | null = null
+  let session: JWTVerifyResult | null = null
   try {
-    jwt = await jwtVerify(rawJwt, jwsSecret)
+    session = await jwtVerify(rawSession, jwsSecret)
   } catch {}
-  return jwt == null
+  return session == null
     ? null
     : {
-        sub: (jwt.payload.sub as UserId) ?? throwExp("`sub` is empty"),
-        jti: jwt.payload.jti ?? throwExp("`jti` is empty"),
+        sub: (session.payload.sub as UserId) ?? throwExp("`sub` is empty"),
+        jti: session.payload.jti ?? throwExp("`jti` is empty"),
       }
 }
 
 export async function getUserId(request: Request) {
-  const jwt = await getJwt(request)
-  return jwt?.sub ?? null
+  const session = await getSession(request)
+  return session?.sub ?? null
 }
 
 export async function requireUserId(
@@ -225,21 +225,21 @@ export async function requireCsrfSignature(
   return csrfSignature
 }
 
-export async function requireJwt(
+export async function requireSession(
   request: Request,
   redirectTo: string = new URL(request.url).pathname
-): Promise<Jwt> {
-  const jwt = await getJwt(request)
-  if (jwt == null) {
+): Promise<HubSession> {
+  const session = await getSession(request)
+  if (session == null) {
     const searchParams = new URLSearchParams([["redirectTo", redirectTo]])
     throw redirect(`/login?${searchParams.toString()}`) as unknown
   }
-  return jwt
+  return session
 }
 
 export async function logout() {
   const headers = new Headers()
-  headers.append("Set-Cookie", await destroyJwtCookie.serialize("")) // lowTODO parallelize
+  headers.append("Set-Cookie", await destroySessionCookie.serialize("")) // lowTODO parallelize
   headers.append("Set-Cookie", await destroyCsrfSignatureCookie.serialize("")) // lowTODO parallelize
   return redirect("/login", {
     headers,
@@ -252,8 +252,8 @@ export async function createUserSession(
 ): Promise<Response> {
   const [csrf, csrfSignature] = await generateCsrf()
   const headers = new Headers()
-  const jwt = await generateJwt(userId, csrf)
-  headers.append("Set-Cookie", await jwtCookie.serialize(jwt)) // lowTODO parallelize
+  const session = await generateSession(userId, csrf)
+  headers.append("Set-Cookie", await sessionCookie.serialize(session)) // lowTODO parallelize
   // https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html#double-submit-cookie
   // If you ever separate csrf from the session cookie https://security.stackexchange.com/a/220810 https://security.stackexchange.com/a/248434
   // REST endpoints may need csrf https://security.stackexchange.com/q/166724
@@ -308,7 +308,7 @@ export async function getInfo(request: Request) {
     : (jwt.payload.info as string) ?? throwExp("`info` is empty")
 }
 
-async function generateJwt(userId: string, csrf: string): Promise<string> {
+async function generateSession(userId: string, csrf: string): Promise<string> {
   return await new SignJWT({})
     .setProtectedHeader({ alg })
     .setSubject(userId)

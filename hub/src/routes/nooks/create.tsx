@@ -8,7 +8,7 @@ import {
 } from "solid-start/server"
 import {
   requireCsrfSignature,
-  requireJwt,
+  requireSession,
   isInvalidCsrf,
   requireUserId,
 } from "~/session"
@@ -73,8 +73,8 @@ export default function Submit(): JSX.Element {
         throw new FormError("Some fields are invalid", { fieldErrors, fields })
       }
       const userId = await requireUserId(request)
-      const jwt = await requireJwt(request)
-      if (await isInvalidCsrf(csrfSignature, jwt.jti)) {
+      const session = await requireSession(request)
+      if (await isInvalidCsrf(csrfSignature, session.jti)) {
         const searchParams = new URLSearchParams([
           ["redirectTo", new URL(request.url).pathname],
         ])

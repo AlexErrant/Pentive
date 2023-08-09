@@ -1,6 +1,6 @@
 import { type Context } from "hono"
 import { jwtVerify, type JWTVerifyResult } from "jose"
-import { type Brand, csrfHeaderName, jwtCookieName } from "shared"
+import { type Brand, csrfHeaderName, hubSessionCookieName } from "shared"
 import { getJwsSecret } from "./env"
 import { type MediaTokenSecretBase64 } from "./privateToken"
 
@@ -69,16 +69,16 @@ export async function getUserId(
   if (c.req.header(csrfHeaderName) == null) {
     return toError(c.text(`Missing '${csrfHeaderName}' header`, 401))
   }
-  const jwt = c.req.cookie(jwtCookieName)
-  if (jwt == null) {
-    return toError(c.text(`Missing '${jwtCookieName}' cookie.`, 401))
+  const session = c.req.cookie(hubSessionCookieName)
+  if (session == null) {
+    return toError(c.text(`Missing '${hubSessionCookieName}' cookie.`, 401))
   } else {
     let verifyResult: JWTVerifyResult
     try {
-      verifyResult = await jwtVerify(jwt, getJwsSecret(c.env.jwsSecret))
+      verifyResult = await jwtVerify(session, getJwsSecret(c.env.jwsSecret))
     } catch {
       return toError(
-        c.text(`Failed to verify JWT in '${jwtCookieName}' cookie.`, 401)
+        c.text(`Failed to verify JWT in '${hubSessionCookieName}' cookie.`, 401)
       )
     }
     if (verifyResult.payload.sub == null) {
