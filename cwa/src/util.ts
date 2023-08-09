@@ -60,6 +60,8 @@ export type Env = {
   planetscaleDbUrl: string
   appOrigin: string
   hubOrigin: string
+  peerSyncPublicKey: string
+  peerSyncPrivateKey: string
 }
 
 export async function getUserId(

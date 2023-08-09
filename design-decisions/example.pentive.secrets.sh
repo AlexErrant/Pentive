@@ -34,6 +34,22 @@ export productionGithubId=
 export developmentGithubSecret=
 export productionGithubSecret=
 
+# generate via:
+#     openssl genpkey -algorithm ed25519 -out peerSyncPrivateKey.key
+#     openssl pkey -in peerSyncPrivateKey.key -pubout -out peerSyncPublicKey.pem
+export developmentPeerSyncPublicKey="-----BEGIN PUBLIC KEY-----
+foo
+-----END PUBLIC KEY-----"
+export developmentPeerSyncPrivateKey="-----BEGIN PRIVATE KEY-----
+bar
+-----END PRIVATE KEY-----"
+export productionPeerSyncPublicKey="-----BEGIN PUBLIC KEY-----
+biz
+-----END PUBLIC KEY-----"
+export productionPeerSyncPrivateKey="-----BEGIN PRIVATE KEY-----
+baz
+-----END PRIVATE KEY-----"
+
 export developmentAppOrigin=https://app.pentive.localhost:3013
 export productionAppOrigin=https://app.pentive.com
 export developmentHubOrigin=https://pentive.localhost:3014

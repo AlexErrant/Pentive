@@ -16,6 +16,8 @@ source ../PentiveSecrets/secrets.sh
 # echo $productionMediaTokenSecret        | npx wrangler secret put mediaTokenSecret        --name cwa
 # echo $productionAppOrigin               | npx wrangler secret put appOrigin               --name cwa
 # echo $productionHubOrigin               | npx wrangler secret put hubOrigin               --name cwa
+# echo $productionPeerSyncPublicKey       | npx wrangler secret put peerSyncPublicKey       --name cwa
+# echo $productionPeerSyncPrivateKey      | npx wrangler secret put peerSyncPrivateKey      --name cwa
 # echo $productionPlanetscaleDbUrl        | npx wrangler secret put planetscaleDbUrl        --name api-ugc
 # echo $productionAppOrigin               | npx wrangler secret put appOrigin               --name api-ugc
 # echo $productionHubOrigin               | npx wrangler secret put hubOrigin               --name api-ugc
