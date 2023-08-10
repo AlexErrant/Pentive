@@ -1,7 +1,7 @@
 import { importPKCS8, SignJWT } from "jose"
 import { type UserId } from "shared"
 
-export const alg = "EdDSA"
+export const alg = "ES512"
 
 export async function getPeerToken(userId: UserId, privateKeyString: string) {
   const privateKey = await importPKCS8(privateKeyString, alg)

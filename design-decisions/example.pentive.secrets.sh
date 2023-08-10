@@ -35,8 +35,10 @@ export developmentGithubSecret=
 export productionGithubSecret=
 
 # generate via:
-#     openssl genpkey -algorithm ed25519 -out peerSyncPrivateKey.key
-#     openssl pkey -in peerSyncPrivateKey.key -pubout -out peerSyncPublicKey.pem
+#     openssl ecparam -name secp521r1 -genkey -noout -out private.ec.key
+#     openssl pkcs8 -topk8 -nocrypt -in private.ec.key -out private.pem
+#     openssl ec -in private.pem -pubout -out public.pem
+# use public.pem and private.pem
 export developmentPeerSyncPublicKey="-----BEGIN PUBLIC KEY-----
 foo
 -----END PUBLIC KEY-----"
