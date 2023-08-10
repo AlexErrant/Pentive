@@ -1,7 +1,8 @@
 import { ThemeSelector } from "shared-dom"
-import { For, type VoidComponent } from "solid-js"
+import { For, type VoidComponent, Show } from "solid-js"
 import { NavLink, useLocation } from "@solidjs/router"
 import { type NavLinkData } from "./contracts"
+import { getUserId } from "../globalState"
 const ends = new Set(["/"])
 
 const Nav: VoidComponent<{ navLinks: NavLinkData[] }> = (props) => {
@@ -26,6 +27,18 @@ const Nav: VoidComponent<{ navLinks: NavLinkData[] }> = (props) => {
         <li>
           <ThemeSelector />
         </li>
+        <span class="profile">
+          <Show
+            when={getUserId() != null}
+            fallback={
+              <a href={import.meta.env.VITE_HUB_ORIGIN + `/login`}>Login</a>
+            }
+          >
+            <a href={import.meta.env.VITE_HUB_ORIGIN + `/u/${getUserId()!}`}>
+              {getUserId()!}
+            </a>
+          </Show>
+        </span>
         <li class="text-sm flex items-center space-x-1 ml-auto">
           <span>URL:</span>
           <input

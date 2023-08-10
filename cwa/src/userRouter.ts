@@ -1,6 +1,6 @@
 import { type PeerJsId } from "shared"
 import { z } from "zod"
-import { authedProcedure } from "./trpc"
+import { authedProcedure, publicProcedure } from "./trpc"
 import { getUserPeer, setUserPeer } from "shared-edge"
 import { getPeerToken } from "./peerSync"
 
@@ -16,4 +16,5 @@ export const userRouter = {
   getPeerSyncToken: authedProcedure.query(
     async ({ ctx }) => await getPeerToken(ctx.user, ctx.env.peerSyncPrivateKey)
   ),
+  getUser: publicProcedure.query((x) => x.ctx.user),
 }

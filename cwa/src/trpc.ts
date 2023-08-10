@@ -37,3 +37,4 @@ const isAuthed = t.middleware(async ({ next, ctx }) => {
 })
 
 export const authedProcedure = t.procedure.use(isAuthed)
+export const publicProcedure = t.procedure
