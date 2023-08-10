@@ -172,6 +172,9 @@ importers:
       immer:
         specifier: ^9.0.15
         version: 9.0.15
+      jose:
+        specifier: ^4.11.1
+        version: 4.13.1
       kysely:
         specifier: ^0.23.5
         version: 0.23.5
@@ -11475,7 +11478,6 @@ packages:
 
   /jose@4.13.1:
     resolution: {integrity: sha512-MSJQC5vXco5Br38mzaQKiq9mwt7lwj2eXpgpRyQYNHYt2lq1PjkWa7DLXX0WVcQLE9HhMh3jPiufS7fhJf+CLQ==}
-    dev: true
 
   /js-sdsl@4.4.0:
     resolution: {integrity: sha512-FfVSdx6pJ41Oa+CF7RDaFmTnCaFhua+SNYQX74riGOpl96x+2jQCqEfQ2bnXu/5DPCqlRuiqyvTJM0Qjz26IVg==}
