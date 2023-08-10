@@ -14,7 +14,7 @@ if (rawConfig.error !== undefined) {
 const envZ = z.object({
   /* eslint-disable @typescript-eslint/naming-convention */
   planetscaleDbUrl: z.string(),
-  jwsSecret: z.string(),
+  hubSessionSecret: z.string(),
   IS_OFFLINE: z.literal("true").or(z.undefined()),
   /* eslint-enable @typescript-eslint/naming-convention */
 })
@@ -33,4 +33,4 @@ export function base64ToArray(base64: string): Uint8Array {
   return bytes
 }
 
-export const jwsSecret = base64ToArray(config.jwsSecret)
+export const hubSessionSecret = base64ToArray(config.hubSessionSecret)

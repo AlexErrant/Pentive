@@ -1,7 +1,7 @@
 import { type Context } from "hono"
 import { jwtVerify, type JWTVerifyResult } from "jose"
 import { type Brand, csrfHeaderName, hubSessionCookieName } from "shared"
-import { getJwsSecret } from "./env"
+import { getHubSessionSecret } from "./env"
 import { type MediaTokenSecretBase64 } from "./privateToken"
 
 export type Result<TOk, TError> =
@@ -55,7 +55,7 @@ export type Env = {
   //
   // Example binding to R2. Learn more at https://developers.cloudflare.com/workers/runtime-apis/r2/
   mediaBucket: R2Bucket
-  jwsSecret: string
+  hubSessionSecret: string
   mediaTokenSecret: MediaTokenSecretBase64
   planetscaleDbUrl: string
   appOrigin: string
@@ -69,13 +69,16 @@ export async function getUserId(
   if (c.req.header(csrfHeaderName) == null) {
     return toError(c.text(`Missing '${csrfHeaderName}' header`, 401))
   }
-  const session = c.req.cookie(hubSessionCookieName)
-  if (session == null) {
+  const hubSession = c.req.cookie(hubSessionCookieName)
+  if (hubSession == null) {
     return toError(c.text(`Missing '${hubSessionCookieName}' cookie.`, 401))
   } else {
     let verifyResult: JWTVerifyResult
     try {
-      verifyResult = await jwtVerify(session, getJwsSecret(c.env.jwsSecret))
+      verifyResult = await jwtVerify(
+        hubSession,
+        getHubSessionSecret(c.env.hubSessionSecret)
+      )
     } catch {
       return toError(
         c.text(`Failed to verify JWT in '${hubSessionCookieName}' cookie.`, 401)

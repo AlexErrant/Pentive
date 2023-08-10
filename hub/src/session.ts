@@ -13,13 +13,13 @@ import { type Cookie, type CookieOptions } from "solid-start/session/cookies"
 import { createPlainCookie } from "~/createPlainCookie"
 
 export function setSessionStorage(x: {
-  jwsSecret: Base64
+  hubSessionSecret: Base64
   csrfSecret: Base64
   hubInfoSecret: Base64
   oauthStateSecret: Base64
   oauthCodeVerifierSecret: Base64
 }): void {
-  jwsSecret = base64ToArray(x.jwsSecret)
+  hubSessionSecret = base64ToArray(x.hubSessionSecret)
   csrfSecret = x.csrfSecret
   hubInfoSecret = base64ToArray(x.hubInfoSecret)
   const sessionCookieOpts: CookieOptions = {
@@ -137,7 +137,7 @@ let destroyOauthCodeVerifierCookie = null as Cookie
 // @ts-expect-error calls should throw null error if not setup
 let hubInfoCookie = null as Cookie
 // @ts-expect-error calls should throw null error if not setup
-let jwsSecret = null as Uint8Array
+let hubSessionSecret = null as Uint8Array
 // @ts-expect-error calls should throw null error if not setup
 let csrfSecret = null as string
 // @ts-expect-error calls should throw null error if not setup
@@ -186,7 +186,7 @@ export async function getSession(request: Request): Promise<HubSession | null> {
   )) as string
   let session: JWTVerifyResult | null = null
   try {
-    session = await jwtVerify(rawSession, jwsSecret)
+    session = await jwtVerify(rawSession, hubSessionSecret)
   } catch {}
   return session == null
     ? null
@@ -318,7 +318,7 @@ async function generateSession(userId: string, csrf: string): Promise<string> {
     // .setIssuer("urn:example:issuer")
     // .setAudience("urn:example:audience")
     // .setExpirationTime("2h")
-    .sign(jwsSecret)
+    .sign(hubSessionSecret)
 }
 
 let maybeCsrfKey: CryptoKey | null = null

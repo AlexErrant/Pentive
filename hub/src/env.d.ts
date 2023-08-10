@@ -5,7 +5,7 @@ import { type Base64 } from "shared"
 
 export interface EnvVars {
   planetscaleDbUrl: string
-  jwsSecret: Base64
+  hubSessionSecret: Base64
   csrfSecret: Base64
   alphaKey: string
   discordId: string

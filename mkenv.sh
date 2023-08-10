@@ -11,7 +11,7 @@ set -euo pipefail # https://stackoverflow.com/a/2871034
 source ../PentiveSecrets/secrets.sh
 
 # Uncomment if you wanna
-# echo $productionJwsSecret               | npx wrangler secret put jwsSecret               --name cwa
+# echo $productionHubSessionSecret        | npx wrangler secret put hubSessionSecret        --name cwa
 # echo $productionPlanetscaleDbUrl        | npx wrangler secret put planetscaleDbUrl        --name cwa
 # echo $productionMediaTokenSecret        | npx wrangler secret put mediaTokenSecret        --name cwa
 # echo $productionAppOrigin               | npx wrangler secret put appOrigin               --name cwa
@@ -19,7 +19,7 @@ source ../PentiveSecrets/secrets.sh
 # echo $productionPlanetscaleDbUrl        | npx wrangler secret put planetscaleDbUrl        --name api-ugc
 # echo $productionAppOrigin               | npx wrangler secret put appOrigin               --name api-ugc
 # echo $productionHubOrigin               | npx wrangler secret put hubOrigin               --name api-ugc
-# echo $productionJwsSecret               | npx wrangler secret put jwsSecret               --name hub
+# echo $productionHubSessionSecret        | npx wrangler secret put hubSessionSecret        --name hub
 # echo $productionAlphaKey                | npx wrangler secret put alphaKey                --name hub
 # echo $productionDiscordId               | npx wrangler secret put discordId               --name hub
 # echo $productionDiscordSecret           | npx wrangler secret put discordSecret           --name hub

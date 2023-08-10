@@ -1,5 +1,5 @@
 import { jwtVerify } from "jose"
-import { jwsSecret } from "./config.js"
+import { hubSessionSecret } from "./config.js"
 import { parse } from "cookie"
 import { csrfHeaderName, hubSessionCookieName } from "shared"
 import { type IncomingHttpHeaders } from "http"
@@ -12,7 +12,7 @@ export async function getUser(
     const sessionCookie = cookies[hubSessionCookieName]
     if (sessionCookie != null && csrfHeaderName in headers) {
       try {
-        const session = await jwtVerify(sessionCookie, jwsSecret)
+        const session = await jwtVerify(sessionCookie, hubSessionSecret)
         return session.payload.sub
       } catch {}
     }

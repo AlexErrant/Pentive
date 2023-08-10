@@ -9,8 +9,8 @@ export productionPlanetscaleDbUrl=
 # this generates 32 bits of random data in base64, cuts off the new line character, and adds it to the clipboard
 export developmentMediaTokenSecret=
 export productionMediaTokenSecret=
-export developmentJwsSecret=
-export productionJwsSecret=
+export developmentHubSessionSecret=
+export productionHubSessionSecret=
 export developmentCsrfSecret=
 export productionCsrfSecret=
 export developmentOauthStateSecret=

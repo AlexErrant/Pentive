@@ -1,10 +1,12 @@
 import { base64ToArray } from "shared-edge"
 
-let jwsSecret: null | Uint8Array = null
+let hubSessionSecret: null | Uint8Array = null
 
-export function getJwsSecret(jwsSecretString: string): Uint8Array {
-  if (jwsSecret === null) {
-    jwsSecret = base64ToArray(jwsSecretString)
+export function getHubSessionSecret(
+  hubSessionSecretString: string
+): Uint8Array {
+  if (hubSessionSecret === null) {
+    hubSessionSecret = base64ToArray(hubSessionSecretString)
   }
-  return jwsSecret
+  return hubSessionSecret
 }
