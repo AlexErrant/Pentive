@@ -295,7 +295,16 @@ export default async function wholeDbRtc(
 
 async function validateToken(token: string | undefined) {
   if (token == null) return false
+  const r = await validateTokenWithKey(
+    import.meta.env.VITE_PEER_SYNC_PUBLIC_KEY,
+    token
+  )
+  if (r) return r
   const publicKeyString = await cwaClient.getPeerSyncPublicKey.query()
+  return await validateTokenWithKey(publicKeyString, token)
+}
+
+async function validateTokenWithKey(publicKeyString: string, token: string) {
   const publicKey = await importSPKI(publicKeyString, alg)
   let jwt: JWTVerifyResult | null = null
   try {

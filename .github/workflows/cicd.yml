@@ -37,6 +37,7 @@ jobs:
       - name: envsubst
         env:
           cloudflareAccountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          productionPeerSyncPublicKey: ${{ secrets.PEER_SYNC_PUBLIC_KEY }}
           VITE_PRODUCTION_AG_GRID_LICENSE: ${{ secrets.AG_GRID_LICENSE }}
           VITE_PRODUCTION_HUB_DOMAIN: pentive.com
           VITE_PRODUCTION_HUB_ORIGIN: https://pentive.com
