@@ -9,7 +9,12 @@ import WDB, {
 } from "./wholeDbReplicator.js"
 import { type DBAsync } from "@vlcn.io/xplat-api"
 import Peer, { type PeerJSOption, type DataConnection } from "peerjs"
+import { untrack } from "solid-js/web"
 import { stringify as uuidStringify } from "uuid"
+import { getUserId } from "../globalState.js"
+import { cwaClient } from "../trpcClient.js"
+import { type JWTVerifyResult, jwtVerify, importSPKI } from "jose"
+import { alg } from "cwa/src/peerSync.js"
 
 type Msg = PokeMsg | ChangesMsg | RequestChangesMsg
 /**
@@ -69,10 +74,19 @@ export class WholeDbRtc implements PokeProtocol {
     peerOption: PeerJSOption
   ) {
     this.site = new Peer(uuidStringify(siteId), peerOption)
-    this.site.on("connection", (c) => {
-      c.on("open", () => {
-        this._newConnection(c)
-      })
+    this.site.on("connection", async (c) => {
+      if (await validateToken(c.provider.options.token)) {
+        c.on("open", () => {
+          this._newConnection(c)
+        })
+      } else {
+        c.close()
+        console.warn(
+          `Incoming connection failed due to invalid token: ${
+            c.provider.options.token ?? "undefined"
+          }`
+        )
+      }
     })
   }
 
@@ -277,4 +291,18 @@ export default async function wholeDbRtc(
   const internal = new WholeDbRtc(siteId, db, peerOption)
   await internal._init()
   return new WholeDbRtcPublic(internal)
+}
+
+async function validateToken(token: string | undefined) {
+  if (token == null) return false
+  const publicKeyString = await cwaClient.getPeerSyncPublicKey.query()
+  const publicKey = await importSPKI(publicKeyString, alg)
+  let jwt: JWTVerifyResult | null = null
+  try {
+    jwt = await jwtVerify(token, publicKey)
+  } catch {}
+  if (jwt?.payload.sub == null) {
+    return false
+  }
+  return jwt.payload.sub === untrack(getUserId)
 }
