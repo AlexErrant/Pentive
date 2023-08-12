@@ -44,3 +44,4 @@ export type DeckId = Brand<string, "deckId">
 export type RemoteMediaNum = Brand<number, "remoteMediaNum">
 
 export type PeerJsId = Brand<string, "peerJsId"> // in uuid format
+export type PeerDisplayName = Brand<string, "peerDisplayName">

@@ -1076,8 +1076,9 @@ export function dbIdToBase64Url(dbId: DbId): Base64Url {
 }
 
 // use with .$call(log)
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function log<T extends Compilable>(qb: T): T {
-  console.log("Compiled SQL: ", qb.compile())
+export function log<T extends Compilable>(qb: T): T {
+  console.log("Query : ", qb.compile().query)
+  console.log("SQL   : ", qb.compile().sql)
+  console.log("Params: ", qb.compile().parameters)
   return qb
 }

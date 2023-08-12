@@ -1,4 +1,4 @@
-import { type PeerJsId } from "shared"
+import { peerDisplayNameValidator, peerIdValidator } from "shared"
 import { z } from "zod"
 import { authedProcedure, publicProcedure } from "./trpc"
 import { getUserPeer, setUserPeer } from "shared-edge"
@@ -9,9 +9,14 @@ export const userRouter = {
     async ({ ctx }) => await getUserPeer(ctx.user)
   ),
   setPeer: authedProcedure
-    .input(z.string().uuid())
+    .input(
+      z.object({
+        peerId: peerIdValidator,
+        displayName: peerDisplayNameValidator,
+      })
+    )
     .mutation(async ({ input, ctx }) => {
-      await setUserPeer(ctx.user, input as PeerJsId)
+      await setUserPeer(ctx.user, input.peerId, input.displayName)
     }),
   getPeerSyncToken: authedProcedure.query(
     async ({ ctx }) => await getPeerToken(ctx.user, ctx.env.peerSyncPrivateKey)

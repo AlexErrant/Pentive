@@ -8,7 +8,12 @@ import {
 import { getCrRtc } from "../sqlite/crsqlite"
 import { stringify as uuidStringify } from "uuid"
 import { cwaClient, isTrpcClientError } from "../trpcClient"
-import { peerValidator } from "shared"
+import {
+  type PeerJsId,
+  peerValidator,
+  peerDisplayNameValidator,
+  peerIdValidator,
+} from "shared"
 
 export default function Peers() {
   const [pending, setPending] = createSignal<string[]>([])
@@ -22,7 +27,7 @@ export default function Peers() {
         setPending(pending)
         setEstablished(established)
       })
-      return uuidStringify(rtc.siteId)
+      return peerIdValidator.parse(uuidStringify(rtc.siteId))
     } catch (error) {
       if (isTrpcClientError(error) && error.data?.httpStatus === 401) {
         return null
@@ -42,18 +47,28 @@ export default function Peers() {
 }
 
 const RenderPeerControls: VoidComponent<{
-  siteId: string
+  siteId: PeerJsId
   pending: string[]
   established: string[]
 }> = (props) => {
+  const [name, setName] = createSignal("")
   return (
     <>
       {peers()}
+      <input
+        class="w-75px p-1 bg-white text-sm rounded-lg"
+        type="text"
+        onInput={(e) => setName(e.currentTarget.value)}
+      />
       <button
         type="button"
         class="border rounded-lg px-2 border-gray-900"
         onClick={async () => {
-          await cwaClient.setPeer.mutate(props.siteId)
+          const displayName = peerDisplayNameValidator.parse(name())
+          await cwaClient.setPeer.mutate({
+            peerId: props.siteId,
+            displayName,
+          })
         }}
       >
         Add {props.siteId} as peer
