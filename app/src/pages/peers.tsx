@@ -1,8 +1,15 @@
-import { For, Show, createResource, createSignal } from "solid-js"
+import {
+  For,
+  Show,
+  type VoidComponent,
+  createResource,
+  createSignal,
+} from "solid-js"
 import { getCrRtc } from "../sqlite/crsqlite"
 import { stringify as uuidStringify } from "uuid"
 import { cwaClient, isTrpcClientError } from "../trpcClient"
 import { peerValidator } from "shared"
+import { getUserId } from "../globalState"
 
 export default function Peers() {
   const [pending, setPending] = createSignal<string[]>([])
@@ -25,27 +32,44 @@ export default function Peers() {
     }
   })
   return (
-    <div class="peers">
-      <Show when={siteId()}>
-        {peers()}
-        <button
-          type="button"
-          class="border rounded-lg px-2 border-gray-900"
-          onClick={async () => {
-            await cwaClient.setPeer.mutate(siteId()!)
-          }}
-        >
-          Add {siteId()!} as peer
-        </button>
-        <button
-          type="button"
-          onClick={async () => {
-            await navigator.clipboard.writeText(siteId()!)
-          }}
-        >
-          PeerID: {siteId()}
-        </button>
-      </Show>
+    <Show
+      when={getUserId() != null && siteId()}
+      fallback={"You're not logged in."}
+    >
+      <RenderPeerControls
+        siteId={siteId()!}
+        pending={pending()}
+        established={established()}
+      />
+    </Show>
+  )
+}
+
+const RenderPeerControls: VoidComponent<{
+  siteId: string
+  pending: string[]
+  established: string[]
+}> = (props) => {
+  return (
+    <>
+      {peers()}
+      <button
+        type="button"
+        class="border rounded-lg px-2 border-gray-900"
+        onClick={async () => {
+          await cwaClient.setPeer.mutate(props.siteId)
+        }}
+      >
+        Add {props.siteId} as peer
+      </button>
+      <button
+        type="button"
+        onClick={async () => {
+          await navigator.clipboard.writeText(props.siteId)
+        }}
+      >
+        PeerID: {props.siteId}
+      </button>
       <form
         onSubmit={async (e) => {
           e.preventDefault()
@@ -63,16 +87,16 @@ export default function Peers() {
         />
       </form>
       <ul>
-        <For each={pending()}>
+        <For each={props.pending}>
           {(p) => <li style={{ color: "orange" }}>{p}</li>}
         </For>
       </ul>
       <ul class="established">
-        <For each={established()}>
+        <For each={props.established}>
           {(p) => <li style={{ color: "green" }}>{p}</li>}
         </For>
       </ul>
-    </div>
+    </>
   )
 }
 
