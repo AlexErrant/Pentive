@@ -1,4 +1,4 @@
-import { type JSX } from "solid-js"
+import { Show, type JSX } from "solid-js"
 import { db } from "../db"
 import Peers from "./peers"
 import {
@@ -8,6 +8,7 @@ import {
   csrfHeaderName,
 } from "shared"
 import { cwaClient } from "../trpcClient"
+import { getUserId } from "../globalState"
 
 async function postMedia(
   type: "note" | "template",
@@ -93,36 +94,41 @@ async function uploadTemplates(): Promise<void> {
 
 export default function Sync(): JSX.Element {
   return (
-    <section class="bg-gray-100 text-gray-700 p-8">
-      <div class="mt-4">
-        <button
-          class="border rounded-lg px-2 border-gray-900"
-          onClick={async () => {
-            await uploadTemplates()
-          }}
-        >
-          upload Templates
-        </button>
-        <button
-          class="border rounded-lg px-2 border-gray-900"
-          onClick={async () => {
-            await uploadNotes()
-          }}
-        >
-          upload Notes
-        </button>
-        <button
-          class="border rounded-lg px-2 border-gray-900"
-          onClick={async () => {
-            await db.sync()
-          }}
-        >
-          sync
-        </button>
-      </div>
-      <div class="mt-4">
-        <Peers />
-      </div>
-    </section>
+    <Show
+      when={getUserId()}
+      fallback={"You can only upload/download/sync when you're logged in."}
+    >
+      <section class="bg-gray-100 text-gray-700 p-8">
+        <div class="mt-4">
+          <button
+            class="border rounded-lg px-2 border-gray-900"
+            onClick={async () => {
+              await uploadTemplates()
+            }}
+          >
+            upload Templates
+          </button>
+          <button
+            class="border rounded-lg px-2 border-gray-900"
+            onClick={async () => {
+              await uploadNotes()
+            }}
+          >
+            upload Notes
+          </button>
+          <button
+            class="border rounded-lg px-2 border-gray-900"
+            onClick={async () => {
+              await db.sync()
+            }}
+          >
+            sync
+          </button>
+        </div>
+        <div class="mt-4">
+          <Peers />
+        </div>
+      </section>
+    </Show>
   )
 }

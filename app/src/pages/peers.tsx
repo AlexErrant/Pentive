@@ -9,7 +9,6 @@ import { getCrRtc } from "../sqlite/crsqlite"
 import { stringify as uuidStringify } from "uuid"
 import { cwaClient, isTrpcClientError } from "../trpcClient"
 import { peerValidator } from "shared"
-import { getUserId } from "../globalState"
 
 export default function Peers() {
   const [pending, setPending] = createSignal<string[]>([])
@@ -32,10 +31,7 @@ export default function Peers() {
     }
   })
   return (
-    <Show
-      when={getUserId() != null && siteId()}
-      fallback={"You're not logged in."}
-    >
+    <Show when={siteId()} fallback={"Loading..."}>
       <RenderPeerControls
         siteId={siteId()!}
         pending={pending()}
