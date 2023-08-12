@@ -8,7 +8,6 @@ import { Kysely } from "kysely"
 import crsqliteUrl from "@vlcn.io/crsqlite-wasm/crsqlite.wasm?url"
 import wdbRtc from "./wholeDbRtc"
 import { wholeDbReplicator } from "shared-dom"
-import { cwaClient } from "../trpcClient"
 
 let myDatabase: Promise<crDB> | null = null
 let myCrRtc: Awaited<ReturnType<typeof wdbRtc>> | null = null
@@ -35,15 +34,11 @@ async function createDb() {
 }
 
 async function createCrRtc() {
-  const [db, token] = await Promise.all([
-    getDb(),
-    cwaClient.getPeerSyncToken.query(),
-  ])
+  const db = await getDb()
   return await wdbRtc(db, {
     secure: true,
     host: import.meta.env.VITE_PEER_HOST,
     port: parseInt(import.meta.env.VITE_PEER_PORT),
-    token,
   })
 }
 

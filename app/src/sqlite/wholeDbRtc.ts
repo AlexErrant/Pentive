@@ -39,6 +39,7 @@ interface RequestChangesMsg {
 
 export class WholeDbRtc implements PokeProtocol {
   private readonly site: Peer
+  private readonly token: string
   private readonly establishedConnections = new Map<
     SiteIDWire,
     DataConnection
@@ -71,11 +72,15 @@ export class WholeDbRtc implements PokeProtocol {
   constructor(
     public readonly siteId: SiteIDLocal,
     private readonly db: DBAsync,
-    peerOption: PeerJSOption
+    peerOption: PeerJSOption,
+    token: string
   ) {
     this.site = new Peer(uuidStringify(siteId), peerOption)
+    this.token = token
     this.site.on("connection", async (c) => {
-      if (await validateToken(c.provider.options.token)) {
+      const token = (c.metadata as Record<string, unknown> | null | undefined)
+        ?.token
+      if (await validateToken(token)) {
         c.on("open", () => {
           this._newConnection(c)
         })
@@ -83,7 +88,8 @@ export class WholeDbRtc implements PokeProtocol {
         c.close()
         console.warn(
           `Incoming connection failed due to invalid token: ${
-            c.provider.options.token ?? "undefined"
+            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions, @typescript-eslint/no-base-to-string
+            token ?? "undefined"
           }`
         )
       }
@@ -109,7 +115,7 @@ export class WholeDbRtc implements PokeProtocol {
       c?.close()
     }
 
-    const conn = this.site.connect(other)
+    const conn = this.site.connect(other, { metadata: { token: this.token } })
     this.pendingConnections.set(other, conn)
     this._connectionsChanged()
     conn.on("open", () => {
@@ -287,14 +293,17 @@ export default async function wholeDbRtc(
   db: DBAsync,
   peerOption: PeerJSOption
 ): Promise<WholeDbRtcPublic> {
-  const siteId = (await db.execA<[Uint8Array]>("SELECT crsql_siteid();"))[0][0]
-  const internal = new WholeDbRtc(siteId, db, peerOption)
+  const [siteId, token] = await Promise.all([
+    db.execA<[Uint8Array]>("SELECT crsql_siteid();").then((x) => x[0][0]),
+    cwaClient.getPeerSyncToken.query(),
+  ])
+  const internal = new WholeDbRtc(siteId, db, peerOption, token)
   await internal._init()
   return new WholeDbRtcPublic(internal)
 }
 
-async function validateToken(token: string | undefined) {
-  if (token == null) return false
+async function validateToken(token: unknown) {
+  if (typeof token !== "string") return false
   const r = await validateTokenWithKey(
     import.meta.env.VITE_PEER_SYNC_PUBLIC_KEY,
     token
