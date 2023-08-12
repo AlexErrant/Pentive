@@ -30,7 +30,7 @@ export const navLinks: NavLinkData[] = [
     href: "/plugins",
   },
   {
-    child: Upload(),
+    child: Upload,
     href: "/sync",
   },
   {

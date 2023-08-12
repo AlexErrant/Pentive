@@ -19,7 +19,7 @@ const Nav: VoidComponent<{ navLinks: NavLinkData[] }> = (props) => {
                 activeClass="font-bold"
                 end={ends.has(href)}
               >
-                {child}
+                {typeof child === "function" ? child() : child}
               </NavLink>
             </li>
           )}

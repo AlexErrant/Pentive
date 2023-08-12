@@ -11,7 +11,7 @@ export const Nav: VoidComponent<{ navLinks: NavLinkData[] }> = (props) => {
           {({ href, child }) => (
             <li class="py-2 px-4">
               <a href={href} class="no-underline hover:underline">
-                {child}
+                {typeof child === "function" ? child() : child}
               </a>
             </li>
           )}
