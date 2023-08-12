@@ -1,4 +1,8 @@
-import { createTRPCProxyClient, httpBatchLink } from "@trpc/client"
+import {
+  TRPCClientError,
+  createTRPCProxyClient,
+  httpBatchLink,
+} from "@trpc/client"
 import type { AppRouter as CwaAppRouter } from "cwa/src/router"
 import type { AppRouter as AugcAppRouter } from "api-ugc/src/router"
 import { csrfHeaderName } from "shared"
@@ -34,3 +38,10 @@ export const augcClient = createTRPCProxyClient<AugcAppRouter>({
   ],
   transformer: superjson,
 })
+
+// https://trpc.io/docs/client/vanilla/infer-types#infer-trpcclienterror-types
+export function isTrpcClientError(
+  cause: unknown
+): cause is TRPCClientError<AugcAppRouter | CwaAppRouter> {
+  return cause instanceof TRPCClientError
+}
