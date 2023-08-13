@@ -10,10 +10,11 @@ import { stringify as uuidStringify } from "uuid"
 import { cwaClient, isTrpcClientError } from "../trpcClient"
 import {
   type PeerJsId,
-  peerValidator,
   peerDisplayNameValidator,
   peerIdValidator,
+  type PeerDisplayName,
 } from "shared"
+import PeersTable from "../components/peersTable"
 
 export default function Peers() {
   const [pending, setPending] = createSignal<string[]>([])
@@ -46,15 +47,39 @@ export default function Peers() {
   )
 }
 
+export interface Peer {
+  id: PeerJsId
+  name: PeerDisplayName
+}
+
 const RenderPeerControls: VoidComponent<{
   siteId: PeerJsId
   pending: string[]
   established: string[]
 }> = (props) => {
+  const [peers, { mutate: setPeers }] = createResource(
+    // eslint-disable-next-line solid/reactivity
+    async () => {
+      const peers = await cwaClient.getPeer.query()
+      if (peers == null) {
+        return []
+      }
+      return Object.entries(peers).map(
+        ([peerId, peerName]) =>
+          ({
+            id: peerId as PeerJsId,
+            name: peerName,
+          } satisfies Peer)
+      )
+    },
+    {
+      initialValue: [],
+    }
+  )
   const [name, setName] = createSignal("")
   return (
     <>
-      {peers()}
+      <PeersTable peers={peers()} />
       <input
         class="w-75px p-1 bg-white text-sm rounded-lg"
         type="text"
@@ -108,25 +133,5 @@ const RenderPeerControls: VoidComponent<{
         </For>
       </ul>
     </>
-  )
-}
-
-function peers() {
-  // eslint-disable-next-line solid/reactivity
-  const [peers] = createResource(async () => await cwaClient.getPeer.query(), {
-    initialValue: null,
-  })
-  const peerIds = () => {
-    if (peers() != null) {
-      return Object.keys(peerValidator.parse(peers()))
-    }
-    return null
-  }
-  return (
-    <Show when={peerIds()}>
-      <ul>
-        <For each={peerIds()}>{(peerId) => <li>{peerId}</li>}</For>
-      </ul>
-    </Show>
   )
 }
