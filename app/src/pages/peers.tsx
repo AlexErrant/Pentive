@@ -50,7 +50,7 @@ export default function Peers() {
 export interface Peer {
   id: PeerJsId
   name: PeerDisplayName
-  status: "pending" | "connected" | "self"
+  status: "pending" | "connected" | "self" | "disconnected"
 }
 
 const RenderPeerControls: VoidComponent<{
@@ -70,7 +70,7 @@ const RenderPeerControls: VoidComponent<{
           ({
             id: peerId as PeerJsId,
             name: peerName,
-            status: props.siteId === peerId ? "self" : "pending",
+            status: props.siteId === peerId ? "self" : "disconnected",
           } satisfies Peer as Peer)
       )
     },
