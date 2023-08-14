@@ -14,6 +14,7 @@ import { type Template, type TemplateId } from "shared"
 import _ from "lodash"
 import "@github/relative-time-element"
 import { db } from "../db"
+import { agGridTheme } from "../globalState"
 
 LicenseManager.setLicenseKey(import.meta.env.VITE_AG_GRID_LICENSE)
 
@@ -52,7 +53,7 @@ const TemplatesTable: VoidComponent<{
   readonly onSelectionChanged: (templates: Template[]) => void
 }> = (props) => {
   return (
-    <div class="ag-theme-alpine h-full">
+    <div class={`${agGridTheme()} h-full`}>
       <AgGridSolid
         sideBar={{
           toolPanels: [

@@ -14,6 +14,7 @@ import {
 import { LicenseManager } from "ag-grid-enterprise"
 import { db } from "../db"
 import { assertNever } from "shared"
+import { agGridTheme } from "../globalState"
 
 LicenseManager.setLicenseKey(import.meta.env.VITE_AG_GRID_LICENSE)
 
@@ -76,7 +77,7 @@ const CardsTable: VoidComponent<{
           onInput={(e) => setGeneralSearch(e.currentTarget.value)}
         />
       </div>
-      <div class="ag-theme-alpine h-full">
+      <div class={`${agGridTheme()} h-full`}>
         <AgGridSolid
           sideBar={{
             toolPanels: [

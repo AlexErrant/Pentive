@@ -13,6 +13,7 @@ import "@github/relative-time-element"
 import { notEmpty, type PeerJsId } from "shared"
 import { type Peer } from "../pages/peers"
 import { getCrRtc } from "../sqlite/crsqlite"
+import { agGridTheme } from "../globalState"
 
 LicenseManager.setLicenseKey(import.meta.env.VITE_AG_GRID_LICENSE)
 
@@ -72,7 +73,7 @@ const PeersTable: VoidComponent<{
     )
   )
   return (
-    <div class="ag-theme-alpine">
+    <div class={agGridTheme()}>
       <AgGridSolid
         sideBar={{
           toolPanels: [
