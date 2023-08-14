@@ -1,11 +1,15 @@
-import { type VoidComponent } from "solid-js"
+import { createEffect, on, type VoidComponent } from "solid-js"
 import AgGridSolid, { type AgGridSolidRef } from "ag-grid-solid"
 import "ag-grid-community/styles/ag-grid.css"
 import "ag-grid-community/styles/ag-theme-alpine.css"
-import { type ColDef, type GetRowIdParams } from "ag-grid-community"
+import {
+  type GridApi,
+  type ColDef,
+  type GetRowIdParams,
+} from "ag-grid-community"
 import { LicenseManager } from "ag-grid-enterprise"
 import "@github/relative-time-element"
-import { type PeerJsId } from "shared"
+import { notEmpty, type PeerJsId } from "shared"
 import { type Peer } from "../pages/peers"
 
 LicenseManager.setLicenseKey(import.meta.env.VITE_AG_GRID_LICENSE)
@@ -21,13 +25,35 @@ const columnDefs: Array<ColDef<Peer>> = [
     headerName: "Name",
     valueGetter: (row) => row.data?.name,
   },
+  {
+    headerName: "Status",
+    valueGetter: (row) => row.data?.status,
+  },
 ]
 
 const getRowId = (params: GetRowIdParams<Peer>): PeerJsId => params.data.id
 
 const PeersTable: VoidComponent<{
   readonly peers: Peer[]
+  readonly updated: Peer[]
 }> = (props) => {
+  createEffect(
+    on(
+      () => props.updated,
+      () => {
+        const gridApi = gridRef?.api as GridApi<Peer> | undefined
+        gridApi?.applyTransaction({
+          update: props.updated
+            .map((c) => {
+              const node = gridApi?.getRowNode(c.id)
+              if (node == null) return null
+              return c
+            })
+            .filter(notEmpty),
+        })
+      }
+    )
+  )
   return (
     <div class="ag-theme-alpine">
       <AgGridSolid
@@ -53,7 +79,6 @@ const PeersTable: VoidComponent<{
         rowSelection="multiple"
         rowModelType="clientSide"
         rowData={props.peers}
-        cacheBlockSize={cacheBlockSize}
         domLayout="autoHeight"
       />
     </div>
@@ -61,5 +86,3 @@ const PeersTable: VoidComponent<{
 }
 
 export default PeersTable
-
-const cacheBlockSize = 100

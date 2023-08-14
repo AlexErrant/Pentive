@@ -50,6 +50,7 @@ export default function Peers() {
 export interface Peer {
   id: PeerJsId
   name: PeerDisplayName
+  status: "pending" | "connected" | "self"
 }
 
 const RenderPeerControls: VoidComponent<{
@@ -57,7 +58,7 @@ const RenderPeerControls: VoidComponent<{
   pending: string[]
   established: string[]
 }> = (props) => {
-  const [peers, { mutate: setPeers }] = createResource(
+  const [peers] = createResource(
     // eslint-disable-next-line solid/reactivity
     async () => {
       const peers = await cwaClient.getPeer.query()
@@ -69,17 +70,32 @@ const RenderPeerControls: VoidComponent<{
           ({
             id: peerId as PeerJsId,
             name: peerName,
-          } satisfies Peer)
+            status: props.siteId === peerId ? "self" : "pending",
+          } satisfies Peer as Peer)
       )
     },
     {
       initialValue: [],
     }
   )
+  const updated = () =>
+    peers().map((p) =>
+      props.established.includes(p.id)
+        ? {
+            ...p,
+            status: "connected" as const,
+          }
+        : props.pending.includes(p.id)
+        ? {
+            ...p,
+            status: "pending" as const,
+          }
+        : p
+    )
   const [name, setName] = createSignal("")
   return (
     <>
-      <PeersTable peers={peers()} />
+      <PeersTable peers={peers()} updated={updated()} />
       <input
         class="w-75px p-1 bg-white text-sm rounded-lg"
         type="text"
