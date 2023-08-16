@@ -182,17 +182,11 @@ export const templateCollectionMethods = {
     const db = await getKysely()
     const template = await db
       .selectFrom("template")
+      .leftJoin("remoteTemplate", "template.id", "remoteTemplate.localId")
       .selectAll()
       .where("id", "=", templateId)
-      .executeTakeFirst()
-    const remoteTemplates = await db
-      .selectFrom("remoteTemplate")
-      .selectAll()
-      .where("localId", "=", templateId)
       .execute()
-    return (
-      undefinedMap(template, (x) => entityToDomain(x, remoteTemplates)) ?? null
-    )
+    return undefinedMap(template, toTemplate) ?? null
   },
   getTemplateIdByRemoteId: async function (
     templateId: RemoteTemplateId,
@@ -482,6 +476,11 @@ function toTemplates(allTemplates: TemplateRow[]) {
     }, new Map<TemplateId, Template>())
     .values()
   return Array.from(r)
+}
+
+function toTemplate(allTemplates: TemplateRow[]) {
+  const r = toTemplates(allTemplates)
+  return r.length === 0 ? null : r[0]
 }
 
 function withLocalMediaIdByRemoteMediaId<
