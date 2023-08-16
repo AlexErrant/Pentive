@@ -74,7 +74,7 @@ export function entityToDomain(
                 remoteTemplateId: r.remoteId as RemoteTemplateId,
                 uploadDate: new Date(r.uploadDate),
               }
-        return [r.nook as NookId, value]
+        return [r.nook, value]
       })
     ),
   }

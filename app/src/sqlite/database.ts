@@ -76,7 +76,7 @@ export interface Template {
 
 export interface RemoteTemplate {
   localId: LDbId
-  nook: string
+  nook: NookId
   remoteId: LDbId | null
   uploadDate: number | null
 }
