@@ -231,22 +231,35 @@ export const templateCollectionMethods = {
   // lowTODO actually use the offset/limit
   getTemplatesInfinitely: async function (offset: number, limit: number) {
     const db = await getKysely()
-    const allTemplates = await db.selectFrom("template").selectAll().execute()
-    const remoteTemplates = await db
-      .selectFrom("remoteTemplate")
+    const allTemplates = await db
+      .selectFrom("template")
+      .leftJoin("remoteTemplate", "template.id", "remoteTemplate.localId")
       .selectAll()
       .execute()
-    const templates = allTemplates.map((alt) =>
-      entityToDomain(
-        alt,
-        remoteTemplates.filter((rt) => rt.localId === alt.id)
-      )
-    )
+    const templates = allTemplates
+      .reduce((map, row) => {
+        if (map.get(row.id) == null) {
+          map.set(row.id, entityToDomain(row, []))
+        }
+        if (row.nook != null) {
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          map.get(row.id)!.remotes[row.nook] =
+            row.uploadDate == null
+              ? null
+              : {
+                  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                  remoteTemplateId: row.remoteId!,
+                  uploadDate: new Date(row.uploadDate),
+                }
+        }
+        return map
+      }, new Map<TemplateId, Template>())
+      .values()
     const { count } = await db
       .selectFrom("template")
       .select(db.fn.count<number>("id").as("count"))
       .executeTakeFirstOrThrow()
-    return { templates, count }
+    return { templates: Array.from(templates), count }
   },
   getNewTemplatesToUpload: async function () {
     const db = await getKysely()

@@ -1,4 +1,4 @@
-import { type VoidComponent } from "solid-js"
+import { type VoidComponent, Show, For } from "solid-js"
 import AgGridSolid, { type AgGridSolidRef } from "ag-grid-solid"
 import "ag-grid-community/styles/ag-grid.css"
 import "ag-grid-community/styles/ag-theme-alpine.css"
@@ -10,7 +10,7 @@ import {
   type IGetRowsParams,
 } from "ag-grid-community"
 import { LicenseManager } from "ag-grid-enterprise"
-import { type Template, type TemplateId } from "shared"
+import { objEntries, type Template, type TemplateId } from "shared"
 import _ from "lodash"
 import "@github/relative-time-element"
 import { db } from "../db"
@@ -28,6 +28,36 @@ const columnDefs: Array<ColDef<Template>> = [
   {
     headerName: "Type",
     valueGetter: (row) => _.startCase(row?.data?.templateType.tag),
+  },
+  {
+    headerName: "Remotes",
+    cellRenderer: (props: ICellRendererParams<Template>) => (
+      <Show when={props.data?.remotes}>
+        <ul>
+          <For each={objEntries(props.data!.remotes)}>
+            {([nook, v]) => (
+              <li class="inline mr-2">
+                <Show when={v} fallback={nook}>
+                  <a
+                    class="underline text-blue-600 hover:text-blue-800 visited:text-purple-600"
+                    title={`Last uploaded at ${v!.uploadDate.toLocaleString()}`}
+                    href={
+                      import.meta.env.VITE_HUB_ORIGIN +
+                      `/n/` +
+                      nook +
+                      `/template/` +
+                      v!.remoteTemplateId
+                    }
+                  >
+                    /n/{nook}
+                  </a>
+                </Show>
+              </li>
+            )}
+          </For>
+        </ul>
+      </Show>
+    ),
   },
   {
     headerName: "Created",
