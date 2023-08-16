@@ -236,30 +236,12 @@ export const templateCollectionMethods = {
       .leftJoin("remoteTemplate", "template.id", "remoteTemplate.localId")
       .selectAll()
       .execute()
-    const templates = allTemplates
-      .reduce((map, row) => {
-        if (map.get(row.id) == null) {
-          map.set(row.id, entityToDomain(row, []))
-        }
-        if (row.nook != null) {
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          map.get(row.id)!.remotes[row.nook] =
-            row.uploadDate == null
-              ? null
-              : {
-                  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                  remoteTemplateId: row.remoteId!,
-                  uploadDate: new Date(row.uploadDate),
-                }
-        }
-        return map
-      }, new Map<TemplateId, Template>())
-      .values()
+    const templates = toTemplates(allTemplates)
     const { count } = await db
       .selectFrom("template")
       .select(db.fn.count<number>("id").as("count"))
       .executeTakeFirstOrThrow()
-    return { templates: Array.from(templates), count }
+    return { templates, count }
   },
   getNewTemplatesToUpload: async function () {
     const db = await getKysely()
@@ -474,6 +456,32 @@ export const templateCollectionMethods = {
         )} not found. (This is the worst error message ever - medTODO.)`
       )
   },
+}
+
+type Nullable<T> = { [K in keyof T]: T[K] | null }
+type TemplateRow = Nullable<RemoteTemplate> & TemplateEntity
+
+function toTemplates(allTemplates: TemplateRow[]) {
+  const r = allTemplates
+    .reduce((map, row) => {
+      if (map.get(row.id) == null) {
+        map.set(row.id, entityToDomain(row, []))
+      }
+      if (row.nook != null) {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        map.get(row.id)!.remotes[row.nook] =
+          row.uploadDate == null
+            ? null
+            : {
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                remoteTemplateId: row.remoteId!,
+                uploadDate: new Date(row.uploadDate),
+              }
+      }
+      return map
+    }, new Map<TemplateId, Template>())
+    .values()
+  return Array.from(r)
 }
 
 function withLocalMediaIdByRemoteMediaId<
