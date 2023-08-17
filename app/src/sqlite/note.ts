@@ -21,11 +21,12 @@ import { type InsertObject, type Kysely } from "kysely"
 import _ from "lodash"
 
 function noteToDocType(note: Note): InsertObject<DB, "note"> {
+  const now = new Date().getTime()
   const r: InsertObject<DB, "note"> = {
     id: note.id,
     templateId: note.templateId,
-    created: note.created.getTime(),
-    updated: note.updated.getTime(),
+    created: now,
+    updated: now,
     tags: stringifySet(note.tags),
     fieldValues: stringifyMap(note.fieldValues),
     ankiNoteId: note.ankiNoteId,
@@ -78,14 +79,14 @@ export const noteCollectionMethods = {
   upsertNote: async function (note: Note, db?: Kysely<DB>) {
     db ??= await getKysely()
     const values = noteToDocType(note)
-    const conflictValues = { ...values, id: undefined }
+    const conflictValues = { ...values, id: undefined, created: undefined }
     await db
       .insertInto("note")
       .values(values)
       .onConflict((db) => db.doUpdateSet(conflictValues))
       .execute()
   },
-  bulkUpsertNotes: async function (notes: Note[]) {
+  bulkInsertNotes: async function (notes: Note[]) {
     const db = await getKysely()
     const batches = _.chunk(notes.map(noteToDocType), 1000)
     for (let i = 0; i < batches.length; i++) {
@@ -386,10 +387,7 @@ export const noteCollectionMethods = {
   },
   updateNote: async function (note: Note) {
     const db = await getKysely()
-    const { id, ...rest } = noteToDocType({
-      ...note,
-      updated: new Date(),
-    })
+    const { id, created, ...rest } = noteToDocType(note)
     const r = await db
       .updateTable("note")
       .set(rest)

@@ -3,7 +3,7 @@ import { Show, createResource } from "solid-js"
 
 async function uploadCount() {
   const newTemplates = await db.getNewTemplatesToUpload()
-  const editedTemplates = await db.getNewTemplatesToUpload()
+  const editedTemplates = await db.getEditedTemplatesToUpload()
   const newNotes = await db.getNewNotesToUpload()
   const editedNotes = await db.getEditedNotesToUpload()
   return (

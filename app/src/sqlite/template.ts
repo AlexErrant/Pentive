@@ -33,12 +33,13 @@ import {
 import { updateLocalMediaIdByRemoteMediaIdAndGetNewDoc } from "./note"
 
 function templateToDocType(template: Template) {
+  const now = new Date().getTime()
   const insertTemplate: InsertObject<DB, "template"> = {
     id: template.id,
     name: template.name,
     css: template.css,
-    created: template.created.getTime(),
-    updated: template.updated.getTime(),
+    created: now,
+    updated: now,
     fields: JSON.stringify(template.fields),
     templateType: JSON.stringify(template.templateType),
   }
@@ -112,7 +113,11 @@ function domainToEditRemote(template: Template) {
 export const templateCollectionMethods = {
   upsertTemplate: async function (template: Template, trx?: Transaction<DB>) {
     const { insertTemplate, remoteTemplates } = templateToDocType(template)
-    const conflictValues = { ...insertTemplate, id: undefined }
+    const conflictValues = {
+      ...insertTemplate,
+      id: undefined,
+      created: undefined,
+    }
     async function insert(trx: Transaction<DB>) {
       await trx
         .insertInto("template")
@@ -166,7 +171,7 @@ export const templateCollectionMethods = {
       await insert(trx)
     }
   },
-  bulkUpsertTemplate: async function (templates: Template[]) {
+  bulkInsertTemplate: async function (templates: Template[]) {
     const entities = templates.map(templateToDocType)
     const insertTemplates = entities.map((x) => x.insertTemplate)
     const remoteTemplates = entities.flatMap((x) => x.remoteTemplates)

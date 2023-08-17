@@ -57,22 +57,13 @@ function deserializeState(s: number | null): State | undefined {
 }
 
 function cardToDocType(card: Card): InsertObject<DB, "card"> {
-  const {
-    id,
-    noteId,
-    created,
-    updated,
-    due,
-    ord,
-    deckIds,
-    cardSettingId,
-    state,
-  } = card
+  const { id, noteId, due, ord, deckIds, cardSettingId, state } = card
+  const now = new Date().getTime()
   return {
     id,
     noteId,
-    created: created.getTime(),
-    updated: updated.getTime(),
+    created: now,
+    updated: now,
     due: due.getTime(),
     ord,
     deckIds: stringifySet(deckIds),
@@ -125,8 +116,7 @@ type OnConflictUpdateCardSet = {
 
 export const cardCollectionMethods = {
   upsertCard: async function (card: Card) {
-    const db = await getKysely()
-    await db.insertInto("card").values(cardToDocType(card)).execute()
+    await this.bulkUpsertCards([card])
   },
   bulkUpsertCards: async function (cards: Card[], db?: Kysely<DB>) {
     db ??= await getKysely()

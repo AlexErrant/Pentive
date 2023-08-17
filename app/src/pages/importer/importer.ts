@@ -111,7 +111,7 @@ async function importAnkiDb(sqlite: Entry): Promise<void> {
       const row = cols.getAsObject()
       const col = checkCol(row)
       const templates = parseTemplates(col.models)
-      await db.bulkUpsertTemplate(templates)
+      await db.bulkInsertTemplate(templates)
       templates.forEach((t) => templatesMap.set(t.id, t))
       console.log(templates)
     }
@@ -123,7 +123,7 @@ async function importAnkiDb(sqlite: Entry): Promise<void> {
       notesMap.set(note.id, parseNote(note, templatesMap))
     }
     notes.free()
-    await db.bulkUpsertNotes(Array.from(notesMap.values()))
+    await db.bulkInsertNotes(Array.from(notesMap.values()))
     const cards = ankiDb.prepare("select * from cards") // lowTODO select exact columns
     while (cards.step()) {
       const row = cards.getAsObject()
