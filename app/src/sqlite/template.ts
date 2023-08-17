@@ -434,26 +434,24 @@ type Nullable<T> = { [K in keyof T]: T[K] | null }
 type TemplateRow = Nullable<RemoteTemplate> & TemplateEntity
 
 function toTemplates(allTemplates: TemplateRow[]) {
-  const r = allTemplates
-    .reduce((map, row) => {
-      if (map.get(row.id) == null) {
-        map.set(row.id, entityToDomain(row, []))
-      }
-      if (row.nook != null) {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        map.get(row.id)!.remotes[row.nook] =
-          row.uploadDate == null
-            ? null
-            : {
-                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                remoteTemplateId: row.remoteId!,
-                uploadDate: new Date(row.uploadDate),
-              }
-      }
-      return map
-    }, new Map<TemplateId, Template>())
-    .values()
-  return Array.from(r)
+  const map = new Map<TemplateId, Template>()
+  for (const row of allTemplates) {
+    if (map.get(row.id) == null) {
+      map.set(row.id, entityToDomain(row, []))
+    }
+    if (row.nook != null) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      map.get(row.id)!.remotes[row.nook] =
+        row.uploadDate == null
+          ? null
+          : {
+              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+              remoteTemplateId: row.remoteId!,
+              uploadDate: new Date(row.uploadDate),
+            }
+    }
+  }
+  return Array.from(map.values())
 }
 
 function toTemplate(allTemplates: TemplateRow[]) {
