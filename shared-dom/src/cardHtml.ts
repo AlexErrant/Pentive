@@ -421,7 +421,13 @@ export function toSampleNote(fieldValues: Map<string, string>): Note {
     tags: new Set(["SampleTag"]),
     fieldValues,
     remotes: new Map([
-      ["SampleNookId" as NookId, "SampleRemoteNoteId" as RemoteNoteId],
+      [
+        "SampleNookId" as NookId,
+        {
+          remoteNoteId: "SampleRemoteNoteId" as RemoteNoteId,
+          uploadDate: new Date(),
+        },
+      ],
     ]),
   }
 }

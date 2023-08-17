@@ -52,12 +52,12 @@ export const CardsRemote: VoidComponent<{
     () => props.noteCard,
     ({ note, template }) =>
       objEntries(template.remotes).map(([nookId, remoteTemplateId]) => {
-        const remoteNoteId = note.remotes.get(nookId) ?? null
+        const remote = note.remotes.get(nookId) ?? null
         const uploadable = note.remotes.has(nookId)
         return {
           nookId,
           remoteTemplateId,
-          remoteNoteId,
+          remote,
           uploadable,
         } as const
       }),
@@ -70,9 +70,11 @@ export const CardsRemote: VoidComponent<{
         {(x) => (
           <li class="py-2 px-4">
             {x.uploadable ? "✔" : ""}
-            <Show when={x.remoteNoteId != null} fallback={x.nookId}>
+            <Show when={x.remote != null} fallback={x.nookId}>
               <a
-                href={`${import.meta.env.VITE_HUB_ORIGIN}/n/${x.remoteNoteId!}`}
+                href={`${import.meta.env.VITE_HUB_ORIGIN}/n/${
+                  x.remote!.remoteNoteId
+                }`}
               >
                 {x.nookId}
               </a>

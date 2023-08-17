@@ -67,7 +67,15 @@ export function entityToDomain(note: NoteEntity, remotes: RemoteNote[]): Note {
     tags: parseSet(note.tags),
     fieldValues: parseMap(note.fieldValues),
     ankiNoteId: note.ankiNoteId ?? undefined,
-    remotes: new Map(remotes.map((r) => [r.nook, r.remoteId])),
+    remotes: new Map(
+      remotes.map((r) => [
+        r.nook,
+        r.remoteId == null
+          ? null
+          : // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            { remoteNoteId: r.remoteId, uploadDate: new Date(r.uploadDate!) },
+      ])
+    ),
   }
   if (r.ankiNoteId === undefined) {
     delete r.ankiNoteId
@@ -203,7 +211,7 @@ export const noteCollectionMethods = {
             if (note.remotes.size === 0)
               throwExp("Zero remotes - is something wrong with the SQL query?")
             const remotes = new Map(
-              Array.from(note.remotes).map(([nook, remoteNoteId]) => {
+              Array.from(note.remotes).map(([nook, remote]) => {
                 const rt =
                   remoteTemplates.find(
                     (rt) => rt.localId === note.templateId && nook === rt.nook
@@ -212,7 +220,7 @@ export const noteCollectionMethods = {
                     `No template found for id '${note.templateId}' with nook '${nook}'.`
                   )
                 return [
-                  remoteNoteId ??
+                  remote?.remoteNoteId ??
                     throwExp(
                       `remoteNoteId for ${JSON.stringify({
                         nook,

@@ -13,5 +13,5 @@ export interface Note {
   updated: Date
   tags: Set<string>
   fieldValues: Map<string, string>
-  remotes: Map<NookId, RemoteNoteId | null>
+  remotes: Map<NookId, { remoteNoteId: RemoteNoteId; uploadDate: Date } | null>
 }

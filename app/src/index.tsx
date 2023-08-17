@@ -91,7 +91,9 @@ export const appExpose = {
         updated: rn.updated,
         tags: new Set(rn.tags),
         fieldValues: rn.fieldValues,
-        remotes: new Map([[nook, rn.id]]),
+        remotes: new Map([
+          [nook, { remoteNoteId: rn.id, uploadDate: new Date() }],
+        ]),
       }
       await downloadImages(getNoteImages(n.fieldValues, new DOMParser()), trx)
       await db.upsertNote(n, trx)

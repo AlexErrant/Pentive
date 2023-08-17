@@ -17,8 +17,24 @@ export const note = recordWithOptionalFields<Note>(
     created: reasonableDates,
     updated: reasonableDates,
     remotes: fc
-      .dictionary(fc.string(), arbitraryUlid<RemoteNoteId>())
-      .map((x) => new Map(Object.entries(x) as Array<[NookId, RemoteNoteId]>)),
+      .dictionary(
+        fc.string(),
+        fc.oneof(
+          fc.constant(null),
+          fc.record<{ remoteNoteId: RemoteNoteId; uploadDate: Date }>({
+            remoteNoteId: arbitraryUlid<RemoteNoteId>(),
+            uploadDate: fc.date(),
+          })
+        )
+      )
+      .map(
+        (x) =>
+          new Map(
+            Object.entries(x) as Array<
+              [NookId, { remoteNoteId: RemoteNoteId; uploadDate: Date }]
+            >
+          )
+      ),
   },
   {
     ankiNoteId: fc.integer(),
