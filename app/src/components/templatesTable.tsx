@@ -15,6 +15,7 @@ import _ from "lodash"
 import "@github/relative-time-element"
 import { db } from "../db"
 import { agGridTheme } from "../globalState"
+import { Upload } from "shared-dom"
 
 LicenseManager.setLicenseKey(import.meta.env.VITE_AG_GRID_LICENSE)
 
@@ -37,21 +38,38 @@ const columnDefs: Array<ColDef<Template>> = [
           <For each={objEntries(props.data!.remotes)}>
             {([nook, v]) => (
               <li class="inline mr-2">
-                <Show when={v} fallback={nook}>
-                  <a
-                    class="underline text-blue-600 hover:text-blue-800 visited:text-purple-600"
-                    title={`Last uploaded at ${v!.uploadDate.toLocaleString()}`}
-                    href={
-                      import.meta.env.VITE_HUB_ORIGIN +
-                      `/n/` +
-                      nook +
-                      `/template/` +
-                      v!.remoteTemplateId
+                <span>
+                  <Show
+                    when={v}
+                    fallback={
+                      <>
+                        <Upload class="h-[1em] inline" />
+                        /n/{nook}
+                      </>
                     }
                   >
-                    /n/{nook}
-                  </a>
-                </Show>
+                    <Show
+                      when={
+                        v!.uploadDate.getTime() <= props.data!.updated.getTime()
+                      }
+                    >
+                      <Upload class="h-[1em] inline" />
+                    </Show>
+                    <a
+                      class="underline text-blue-600 hover:text-blue-800 visited:text-purple-600"
+                      title={`Last uploaded at ${v!.uploadDate.toLocaleString()}`}
+                      href={
+                        import.meta.env.VITE_HUB_ORIGIN +
+                        `/n/` +
+                        nook +
+                        `/template/` +
+                        v!.remoteTemplateId
+                      }
+                    >
+                      /n/{nook}
+                    </a>
+                  </Show>
+                </span>
               </li>
             )}
           </For>
