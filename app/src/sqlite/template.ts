@@ -199,33 +199,27 @@ export const templateCollectionMethods = {
   ) {
     db ??= await getKysely()
     const template = await db
-      .selectFrom("remoteTemplate")
-      .innerJoin("template", "remoteTemplate.localId", "template.id")
-      .selectAll("template")
-      .where("remoteId", "=", templateId)
-      .executeTakeFirst()
-    const remoteTemplates = await db
-      .selectFrom("remoteTemplate")
+      .selectFrom("template")
+      .leftJoin("remoteTemplate", "template.id", "remoteTemplate.localId")
+      .whereExists((qb) =>
+        qb
+          .selectFrom("remoteTemplate")
+          .select("remoteTemplate.localId")
+          .whereRef("template.id", "=", "remoteTemplate.localId")
+          .where("remoteTemplate.remoteId", "=", templateId)
+      )
       .selectAll()
-      .where("localId", "=", templateId)
       .execute()
-    return (
-      undefinedMap(template, (x) => entityToDomain(x, remoteTemplates)) ?? null
-    )
+    return undefinedMap(template, toTemplate) ?? null
   },
   getTemplates: async function () {
     const db = await getKysely()
-    const allTemplates = await db.selectFrom("template").selectAll().execute()
-    const remoteTemplates = await db
-      .selectFrom("remoteTemplate")
+    const allTemplates = await db
+      .selectFrom("template")
+      .leftJoin("remoteTemplate", "template.id", "remoteTemplate.localId")
       .selectAll()
       .execute()
-    return allTemplates.map((alt) =>
-      entityToDomain(
-        alt,
-        remoteTemplates.filter((rt) => rt.localId === alt.id)
-      )
-    )
+    return toTemplates(allTemplates)
   },
   // lowTODO actually use the offset/limit
   getTemplatesInfinitely: async function (offset: number, limit: number) {
@@ -245,25 +239,15 @@ export const templateCollectionMethods = {
   getNewTemplatesToUpload: async function () {
     const db = await getKysely()
     const dp = new DOMParser()
-    const remoteTemplates = await db
-      .selectFrom("remoteTemplate")
-      .selectAll()
-      .where("remoteId", "is", null)
-      .execute()
-    const localIds = [...new Set(remoteTemplates.map((t) => t.localId))]
     const templatesAndStuff = await db
       .selectFrom("template")
+      .leftJoin("remoteTemplate", "template.id", "remoteTemplate.localId")
       .selectAll()
-      .where("id", "in", localIds)
+      .where("remoteTemplate.remoteId", "is", null)
+      .where("remoteTemplate.nook", "is not", null)
       .execute()
       .then((n) =>
-        n
-          .map((lt) =>
-            entityToDomain(
-              lt,
-              remoteTemplates.filter((rt) => rt.localId === lt.id)
-            )
-          )
+        toTemplates(n)
           .map(domainToCreateRemote)
           .map((n) => withLocalMediaIdByRemoteMediaId(dp, n))
       )
@@ -272,27 +256,15 @@ export const templateCollectionMethods = {
   getEditedTemplatesToUpload: async function () {
     const db = await getKysely()
     const dp = new DOMParser()
-    const remoteTemplates = await db
-      .selectFrom("remoteTemplate")
-      .leftJoin("template", "remoteTemplate.localId", "template.id")
-      .selectAll("remoteTemplate")
-      .where("remoteId", "is not", null)
-      .whereRef("remoteTemplate.uploadDate", "<", "template.updated")
-      .execute()
-    const localIds = [...new Set(remoteTemplates.map((t) => t.localId))]
     const templatesAndStuff = await db
       .selectFrom("template")
+      .leftJoin("remoteTemplate", "template.id", "remoteTemplate.localId")
+      .where("remoteId", "is not", null)
+      .whereRef("remoteTemplate.uploadDate", "<", "template.updated")
       .selectAll()
-      .where("id", "in", localIds)
       .execute()
       .then((n) =>
-        n
-          .map((lt) =>
-            entityToDomain(
-              lt,
-              remoteTemplates.filter((rt) => rt.localId === lt.id)
-            )
-          )
+        toTemplates(n)
           .map(domainToEditRemote)
           .map((n) => withLocalMediaIdByRemoteMediaId(dp, n))
       )
@@ -364,7 +336,8 @@ export const templateCollectionMethods = {
         .executeTakeFirstOrThrow()
       const { remoteMediaIdByLocal } = withLocalMediaIdByRemoteMediaId(
         new DOMParser(),
-        domainToCreateRemote(entityToDomain(template, [remoteTemplate]))
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        domainToCreateRemote(toTemplate([{ ...template, ...remoteTemplate }])!)
       )
       const srcs = new Set(remoteMediaIdByLocal.keys())
       const mediaBinaries = await db
