@@ -1,6 +1,6 @@
 import { type VoidComponent, For, Show, createResource } from "solid-js"
 import { type Template, objEntries, type RemoteTemplateId } from "shared"
-import { diffChars } from "diff"
+import { diffChars, diffCss, diffWords } from "diff"
 import { cwaClient } from "../trpcClient"
 import Diff from "./diff"
 
@@ -39,7 +39,21 @@ const TemplateNookSync: VoidComponent<{
   )
   return (
     <Show when={remoteTemplate()}>
-      <Diff changes={diffChars(remoteTemplate()!.name, props.template.name)} />
+      <Diff
+        title="Name"
+        changes={diffChars(remoteTemplate()!.name, props.template.name)}
+      />
+      <Diff
+        title="Css"
+        changes={diffCss(remoteTemplate()!.css, props.template.css)}
+      />
+      <Diff
+        title="Fields"
+        changes={diffWords(
+          remoteTemplate()!.fields.join(", "),
+          props.template.fields.map((f) => f.name).join(", ")
+        )}
+      />
     </Show>
   )
 }
