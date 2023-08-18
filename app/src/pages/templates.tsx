@@ -14,6 +14,7 @@ import EditTemplate from "../components/editTemplate"
 import _ from "lodash"
 import { ulidAsBase64Url } from "../domain/utility"
 import { C } from ".."
+import TemplateSync from "../components/templateSync"
 
 export default function Templates(): JSX.Element {
   const templates = useRouteData<typeof TemplatesData>()
@@ -47,6 +48,20 @@ export default function Templates(): JSX.Element {
           () => (
             <Show when={selected.template != null}>
               <EditTemplate template={selected.template!} />
+            </Show>
+          ),
+          container.element
+        )
+      }
+    )
+    goldenLayout.registerComponentFactoryFunction(
+      "TemplateSync",
+      (container) => {
+        container.element.style.overflow = "auto"
+        render(
+          () => (
+            <Show when={selected.template != null}>
+              <TemplateSync template={selected.template!} />
             </Show>
           ),
           container.element
@@ -179,6 +194,10 @@ export default function Templates(): JSX.Element {
                 {
                   type: "component",
                   componentType: "TemplateDetail",
+                },
+                {
+                  type: "component",
+                  componentType: "TemplateSync",
                 },
                 {
                   type: "component",
