@@ -1,5 +1,12 @@
-import { createEffect, createSignal, on, type VoidComponent } from "solid-js"
-import { type NoteCard, type CardId } from "shared"
+import {
+  createEffect,
+  createSignal,
+  on,
+  type VoidComponent,
+  Show,
+  For,
+} from "solid-js"
+import { type NoteCard, type CardId, objEntries } from "shared"
 import "@github/relative-time-element"
 import AgGridSolid, { type AgGridSolidRef } from "ag-grid-solid"
 import "ag-grid-community/styles/ag-grid.css"
@@ -15,6 +22,7 @@ import { LicenseManager } from "ag-grid-enterprise"
 import { db } from "../db"
 import { assertNever } from "shared"
 import { agGridTheme } from "../globalState"
+import { Upload } from "shared-dom"
 
 LicenseManager.setLicenseKey(import.meta.env.VITE_AG_GRID_LICENSE)
 
@@ -47,6 +55,54 @@ const columnDefs: Array<ColDef<NoteCard>> = [
     cellRenderer: (
       props: ICellRendererParams<NoteCard, NoteCard["card"]["due"]>
     ) => <relative-time date={props.value} />,
+  },
+  {
+    headerName: "Remotes",
+    cellRenderer: (props: ICellRendererParams<NoteCard>) => (
+      <Show when={props.data?.note.remotes}>
+        <ul>
+          <For each={Array.from(props.data!.note.remotes)}>
+            {([nook, v]) => (
+              <li class="inline mr-2">
+                <span>
+                  <Show
+                    when={v}
+                    fallback={
+                      <>
+                        <Upload class="h-[1em] inline" />
+                        /n/{nook}
+                      </>
+                    }
+                  >
+                    <Show
+                      when={
+                        v!.uploadDate.getTime() <=
+                        props.data!.note.updated.getTime()
+                      }
+                    >
+                      <Upload class="h-[1em] inline" />
+                    </Show>
+                    <a
+                      class="underline text-blue-600 hover:text-blue-800 visited:text-purple-600"
+                      title={`Last uploaded at ${v!.uploadDate.toLocaleString()}`}
+                      href={
+                        import.meta.env.VITE_HUB_ORIGIN +
+                        `/n/` +
+                        nook +
+                        `/template/` +
+                        v!.remoteNoteId
+                      }
+                    >
+                      /n/{nook}
+                    </a>
+                  </Show>
+                </span>
+              </li>
+            )}
+          </For>
+        </ul>
+      </Show>
+    ),
   },
   {
     headerName: "Tags",
