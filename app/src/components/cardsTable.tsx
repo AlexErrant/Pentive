@@ -6,7 +6,7 @@ import {
   Show,
   For,
 } from "solid-js"
-import { type NoteCard, type CardId, objEntries } from "shared"
+import { type NoteCard, type CardId } from "shared"
 import "@github/relative-time-element"
 import AgGridSolid, { type AgGridSolidRef } from "ag-grid-solid"
 import "ag-grid-community/styles/ag-grid.css"
