@@ -59,6 +59,9 @@ async function buildHtml(i: RenderBodyInput) {
       const body = i.side === "front" ? frontBack[0] : frontBack[1]
       return { body }
     }
+    case "raw": {
+      return { body: i.html, css: i.css }
+    }
     default:
       return assertNever(i)
   }

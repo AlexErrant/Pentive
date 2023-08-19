@@ -28,6 +28,11 @@ export type RenderBodyInput =
       readonly note: Note
       readonly template: Template
     }
+  | {
+      readonly tag: "raw"
+      readonly html: string
+      readonly css: string
+    }
 
 async function getLocalMedia(id: MediaId): Promise<ArrayBuffer | null> {
   const media = await db.getMedia(id)

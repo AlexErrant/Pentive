@@ -18,6 +18,7 @@ import { diffChars, diffCss, diffJson, diffWords } from "diff"
 import { cwaClient } from "../trpcClient"
 import Diff from "./diff"
 import { zip } from "../domain/utility"
+import DiffHtml from "./diffHtml"
 
 const TemplateSync: VoidComponent<{ template: Template }> = (props) => {
   return (
@@ -100,6 +101,7 @@ const TemplateNookSync: VoidComponent<{
                 {([localTemplate, remoteTemplate]) => (
                   <li>
                     <ChildTemplateNookSync
+                      css={props.template.css}
                       local={localTemplate}
                       remote={remoteTemplate}
                     />
@@ -110,6 +112,7 @@ const TemplateNookSync: VoidComponent<{
           </Match>
           <Match when={props.template.templateType.tag === "cloze"}>
             <ChildTemplateNookSync
+              css={props.template.css}
               local={(props.template.templateType as Cloze).template}
               remote={(remoteTemplate()!.templateType as Cloze).template}
             />
@@ -121,16 +124,31 @@ const TemplateNookSync: VoidComponent<{
 }
 
 const ChildTemplateNookSync: VoidComponent<{
+  css: string
   local?: ChildTemplate
   remote?: ChildTemplate
 }> = (props) => {
   return (
     <Switch
       fallback={
-        <Diff
-          title="Name"
-          changes={diffChars(props.remote!.name, props.local!.name)}
-        />
+        <>
+          <Diff
+            title="Name"
+            changes={diffChars(props.remote!.name, props.local!.name)}
+          />
+          <DiffHtml
+            before={props.remote!.front}
+            after={props.local!.front}
+            css={props.css}
+            title="Front"
+          />
+          <DiffHtml
+            before={props.remote!.back}
+            after={props.local!.back}
+            css={props.css}
+            title="Back"
+          />
+        </>
       }
     >
       <Match when={props.local == null}>
