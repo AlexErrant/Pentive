@@ -463,6 +463,14 @@ function withLocalMediaIdByRemoteMediaId<
   T extends CreateRemoteTemplate | EditRemoteTemplate
 >(dp: DOMParser, template: T) {
   const serializer = new XMLSerializer()
+  const serialize = (doc: Document) => {
+    const s = serializer.serializeToString(doc)
+    return s.startsWith(
+      `<html xmlns="http://www.w3.org/1999/xhtml"><head></head><body>`
+    )
+      ? doc.body.innerHTML
+      : s
+  }
   if (template.templateType.tag === "standard") {
     const rawDoms = template.templateType.templates.flatMap((t) => [
       t.front,
@@ -472,9 +480,9 @@ function withLocalMediaIdByRemoteMediaId<
       updateLocalMediaIdByRemoteMediaIdAndGetNewDoc(dp, rawDoms)
     let i = 0
     for (const t of template.templateType.templates) {
-      t.front = serializer.serializeToString(docs[i])
+      t.front = serialize(docs[i])
       i++
-      t.back = serializer.serializeToString(docs[i])
+      t.back = serialize(docs[i])
       i++
     }
     return {
@@ -487,8 +495,8 @@ function withLocalMediaIdByRemoteMediaId<
         template.templateType.template.front,
         template.templateType.template.back,
       ])
-    template.templateType.template.front = serializer.serializeToString(docs[0])
-    template.templateType.template.back = serializer.serializeToString(docs[1])
+    template.templateType.template.front = serialize(docs[0])
+    template.templateType.template.back = serialize(docs[1])
     return {
       template,
       remoteMediaIdByLocal,
