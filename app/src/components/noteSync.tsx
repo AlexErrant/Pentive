@@ -10,6 +10,7 @@ import { type RemoteNoteId } from "shared"
 import { cwaClient } from "../trpcClient"
 import DiffHtml from "./diffHtml"
 import { type NoteCardView } from "../pages/cards"
+import ResizingIframe from "./resizingIframe"
 
 const NoteSync: VoidComponent<{ note: NoteCardView }> = (props) => (
   <ul>
@@ -73,11 +74,23 @@ const NoteNookSync: VoidComponent<{
               >
                 <Match when={local == null}>
                   <h2>Deleted</h2>
-                  <pre>{JSON.stringify(remote, null, 4)}</pre>
+                  <ResizingIframe
+                    i={{
+                      tag: "raw",
+                      html: remote!,
+                      css: props.note.template.css,
+                    }}
+                  />
                 </Match>
                 <Match when={remote == null}>
                   <h2>Added</h2>
-                  <pre>{JSON.stringify(local, null, 4)}</pre>
+                  <ResizingIframe
+                    i={{
+                      tag: "raw",
+                      html: local!,
+                      css: props.note.template.css,
+                    }}
+                  />
                 </Match>
               </Switch>
             </li>
