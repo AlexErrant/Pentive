@@ -18,6 +18,7 @@ import { render } from "solid-js/web"
 import "golden-layout/dist/css/goldenlayout-base.css"
 import "golden-layout/dist/css/themes/goldenlayout-light-theme.css"
 import AddNote from "../components/addNote"
+import NoteSync from "../components/noteSync"
 
 export interface NoteCardView {
   template: Template
@@ -105,6 +106,19 @@ export default function Cards(): JSX.Element {
                 noteCard={selected.noteCard!}
                 setNoteCard={setSelected}
               />
+            </div>
+          </Show>
+        ),
+        container.element
+      )
+    })
+    goldenLayout.registerComponentFactoryFunction("CardSync", (container) => {
+      container.element.style.overflow = "auto"
+      render(
+        () => (
+          <Show when={selected.noteCard != null}>
+            <div class="overflow-auto h-full">
+              <NoteSync note={selected.noteCard!} />
             </div>
           </Show>
         ),
@@ -202,6 +216,10 @@ export default function Cards(): JSX.Element {
                 {
                   type: "component",
                   componentType: "CardDetail",
+                },
+                {
+                  type: "component",
+                  componentType: "CardSync",
                 },
                 {
                   type: "component",

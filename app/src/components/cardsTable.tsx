@@ -89,7 +89,7 @@ const columnDefs: Array<ColDef<NoteCard>> = [
                         import.meta.env.VITE_HUB_ORIGIN +
                         `/n/` +
                         nook +
-                        `/template/` +
+                        `/note/` +
                         v!.remoteNoteId
                       }
                     >
