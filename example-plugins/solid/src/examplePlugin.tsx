@@ -21,7 +21,7 @@ const ExamplePlugin: VoidComponent<{
       </button>
       <output>Count: {props.count}</output>
       {/* If the above isn't reactive, make sure `app` is running via `pnpm serve`
-      (`external` doesn't work in dev https://github.com/vitejs/vite/issues/6582) */}
+      (`external` doesn't work in dev https://github.com/vitejs/vite/issues/6582 https://github.com/vitejs/vite/issues/2483) */}
       <button
         class="border rounded-lg px-2 mx-2 border-red-900"
         onClick={() => props.setCount(props.count + 0.1)}
