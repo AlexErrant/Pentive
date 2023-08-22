@@ -2,7 +2,7 @@ import type { JSX } from "solid-js"
 import { useRoutes } from "@solidjs/router"
 
 import { navLinks, routes } from "./routes"
-import { C } from "."
+import { C } from "./pluginManager"
 
 export default function App(): JSX.Element {
   const Route = useRoutes(routes)

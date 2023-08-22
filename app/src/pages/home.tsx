@@ -12,7 +12,7 @@ import { db } from "../db"
 import { importAnki } from "./importer/importer"
 import { augcClient } from "../trpcClient"
 import { getDb } from "../sqlite/crsqlite"
-import { C } from ".."
+import { C } from "../pluginManager"
 
 async function searchNotes(search: string): Promise<void> {
   const searchBatch = await augcClient.searchNotes.query(search)

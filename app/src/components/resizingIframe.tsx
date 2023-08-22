@@ -10,7 +10,7 @@ import {
 } from "shared"
 import { unwrap } from "solid-js/store"
 import { db } from "../db"
-import { C } from ".."
+import { C } from "../pluginManager"
 
 const targetOrigin = "*" // highTODO make more limiting. Also implement https://stackoverflow.com/q/8169582
 

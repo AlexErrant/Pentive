@@ -4,7 +4,6 @@ import { Router } from "@solidjs/router"
 import App from "./app"
 import { db } from "./db"
 import * as Comlink from "comlink"
-import { registerPluginServices } from "./pluginManager"
 import {
   type CardId,
   type ChildTemplate,
@@ -23,10 +22,7 @@ import { getKysely } from "./sqlite/crsqlite"
 import { type Transaction } from "kysely"
 import { type DB } from "./sqlite/database"
 import { noteOrds } from "shared-dom"
-
-const plugins = await db.getPlugins()
-
-export const C = await registerPluginServices(plugins)
+import { C } from "./pluginManager"
 
 render(
   () => (

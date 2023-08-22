@@ -13,7 +13,7 @@ import "golden-layout/dist/css/themes/goldenlayout-light-theme.css"
 import EditTemplate from "../components/editTemplate"
 import _ from "lodash"
 import { ulidAsBase64Url } from "../domain/utility"
-import { C } from ".."
+import { C } from "../pluginManager"
 import TemplateSync from "../components/templateSync"
 
 export default function Templates(): JSX.Element {

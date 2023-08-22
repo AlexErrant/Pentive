@@ -19,7 +19,7 @@ import {
 import { ulidAsBase64Url } from "../domain/utility"
 import { createStore } from "solid-js/store"
 import { type NoteCardView } from "../pages/cards"
-import { C } from ".."
+import { C } from "../pluginManager"
 import { CardsPreview } from "../components/cardsPreview"
 import { db } from "../db"
 

@@ -5,6 +5,7 @@ import {
   type Container,
   type PluginExports,
 } from "./services"
+import { db } from "./db"
 
 async function registerPluginService(
   c: Container,
@@ -39,3 +40,7 @@ export async function registerPluginServices(plugins: Plugin[]) {
     return await registerPluginService(await prior, plugin)
   }, Promise.resolve(seed))
 }
+
+const plugins = await db.getPlugins()
+
+export const C = await registerPluginServices(plugins)
