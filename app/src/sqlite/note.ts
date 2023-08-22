@@ -19,6 +19,7 @@ import { getKysely } from "./crsqlite"
 import { type DB, type Note as NoteEntity, type RemoteNote } from "./database"
 import { type InsertObject, type Kysely } from "kysely"
 import _ from "lodash"
+import { parseFields as parseTemplateFields } from "./template"
 
 function noteToDocType(note: Note): InsertObject<DB, "note"> {
   const now = new Date().getTime()
@@ -58,14 +59,25 @@ function domainToEditRemote(
   return r
 }
 
-export function entityToDomain(note: NoteEntity, remotes: RemoteNote[]): Note {
+export function entityToDomain(
+  note: NoteEntity & { templateFields: string },
+  remotes: RemoteNote[]
+): Note {
+  const noteFVs = parseMap<string, string>(note.fieldValues)
+  const tF = parseTemplateFields(note.templateFields).map((f) => f.name)
+  const fieldValues = new Map(tF.map((f) => [f, noteFVs.get(f) ?? ""]))
+  noteFVs.forEach((v, f) => {
+    if (!tF.includes(f)) {
+      fieldValues.set(f, v)
+    }
+  })
   const r: Note = {
     id: note.id as NoteId,
     created: new Date(note.created),
     updated: new Date(note.updated),
     templateId: note.templateId,
     tags: parseSet(note.tags),
-    fieldValues: parseMap(note.fieldValues),
+    fieldValues,
     ankiNoteId: note.ankiNoteId ?? undefined,
     remotes: new Map(
       remotes.map((r) => [
@@ -111,8 +123,10 @@ export const noteCollectionMethods = {
       .execute()
     const note = await db
       .selectFrom("note")
-      .selectAll()
-      .where("id", "=", noteId)
+      .selectAll("note")
+      .innerJoin("template", "note.templateId", "template.id")
+      .select("template.fields as templateFields")
+      .where("note.id", "=", noteId)
       .executeTakeFirst()
     return note == null ? null : entityToDomain(note, remoteNotes)
   },
@@ -125,8 +139,10 @@ export const noteCollectionMethods = {
       .execute()
     const notes = await db
       .selectFrom("note")
-      .selectAll()
-      .where("id", "in", noteIds)
+      .selectAll("note")
+      .innerJoin("template", "note.templateId", "template.id")
+      .select("template.fields as templateFields")
+      .where("note.id", "in", noteIds)
       .execute()
     return notes.map((ln) =>
       entityToDomain(
@@ -150,8 +166,10 @@ export const noteCollectionMethods = {
       .execute()
     const notesAndStuff = await db
       .selectFrom("note")
-      .selectAll()
-      .where("id", "in", localIds)
+      .selectAll("note")
+      .innerJoin("template", "note.templateId", "template.id")
+      .select("template.fields as templateFields")
+      .where("note.id", "in", localIds)
       .execute()
       .then((n) =>
         n
@@ -198,8 +216,10 @@ export const noteCollectionMethods = {
       .execute()
     const notesAndStuff = await db
       .selectFrom("note")
-      .selectAll()
-      .where("id", "in", localIds)
+      .selectAll("note")
+      .innerJoin("template", "note.templateId", "template.id")
+      .select("template.fields as templateFields")
+      .where("note.id", "in", localIds)
       .execute()
       .then((n) =>
         n
@@ -298,8 +318,10 @@ export const noteCollectionMethods = {
         .execute()
       const note = await db
         .selectFrom("note")
-        .selectAll()
-        .where("id", "=", noteId)
+        .selectAll("note")
+        .innerJoin("template", "note.templateId", "template.id")
+        .select("template.fields as templateFields")
+        .where("note.id", "=", noteId)
         .executeTakeFirstOrThrow()
       const { remoteMediaIdByLocal } = withLocalMediaIdByRemoteMediaId(
         new DOMParser(),

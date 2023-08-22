@@ -54,6 +54,8 @@ function templateToDocType(template: Template) {
   return { insertTemplate, remoteTemplates }
 }
 
+export const parseFields: (_: string) => Field[] = JSON.parse
+
 export function entityToDomain(
   template: TemplateEntity,
   remotes: RemoteTemplate[]
@@ -63,7 +65,7 @@ export function entityToDomain(
     name: template.name,
     created: new Date(template.created),
     updated: new Date(template.updated),
-    fields: JSON.parse(template.fields) as Field[],
+    fields: parseFields(template.fields),
     css: template.css,
     templateType: JSON.parse(template.templateType) as TemplateType,
     remotes: Object.fromEntries(

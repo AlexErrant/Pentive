@@ -238,6 +238,7 @@ export const cardCollectionMethods = {
             updated: tnc.note_updated,
             tags: tnc.note_tags,
             templateId: tnc.note_templateId,
+            templateFields: tnc.template_fields,
           },
           tncR
             .filter((x) => x.remoteNoteNook != null)
