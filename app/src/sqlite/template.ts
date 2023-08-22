@@ -338,7 +338,6 @@ export const templateCollectionMethods = {
         .executeTakeFirstOrThrow()
       const { remoteMediaIdByLocal } = withLocalMediaIdByRemoteMediaId(
         new DOMParser(),
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         domainToCreateRemote(toTemplate([{ ...template, ...remoteTemplate }])!)
       )
       const srcs = new Set(remoteMediaIdByLocal.keys())
@@ -442,12 +441,10 @@ function toTemplates(allTemplates: TemplateRow[]) {
       map.set(row.id, entityToDomain(row, []))
     }
     if (row.nook != null) {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       map.get(row.id)!.remotes[row.nook] =
         row.uploadDate == null
           ? null
           : {
-              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
               remoteTemplateId: row.remoteId!,
               uploadDate: new Date(row.uploadDate),
             }

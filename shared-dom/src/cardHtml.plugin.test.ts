@@ -52,7 +52,6 @@ function expectTemplate(
   expectedBack: string
 ): void {
   expect(template).not.toBeNull()
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const [front, back] = template!
   expectStrippedToBe(front, expectedFront)
   expectStrippedToBe(back, expectedBack)

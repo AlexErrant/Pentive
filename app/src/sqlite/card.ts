@@ -207,10 +207,8 @@ export const cardCollectionMethods = {
       ])
       .offset(offset)
       .limit(limit)
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       .$if(sort != null, (db) => db.orderBy(sort!.col, sort!.direction))
       .$if(search != null, (db) =>
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         db.where("note.fieldValues", "like", "%" + search!.generalSearch + "%")
       )
       .execute()
@@ -218,7 +216,6 @@ export const cardCollectionMethods = {
       .selectFrom("card")
       .innerJoin("note", "card.noteId", "note.id")
       .$if(search != null, (db) =>
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         db.where("note.fieldValues", "like", "%" + search!.generalSearch + "%")
       )
       .select(db.fn.count<number>("card.id").as("c"))
@@ -243,9 +240,7 @@ export const cardCollectionMethods = {
           tncR
             .filter((x) => x.remoteNoteNook != null)
             .map((x) => ({
-              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
               remoteId: x.remoteNoteId!,
-              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
               nook: x.remoteNoteNook!,
               uploadDate: x.remoteNoteUploadDate,
               localId: x.note_id,
@@ -265,9 +260,7 @@ export const cardCollectionMethods = {
           tncR
             .filter((x) => x.remoteTemplateNook != null)
             .map((x) => ({
-              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
               remoteId: x.remoteTemplateId!,
-              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
               nook: x.remoteTemplateNook!,
               uploadDate: x.remoteTemplateUploadDate,
               localId: x.template_id,

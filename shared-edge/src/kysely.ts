@@ -273,7 +273,6 @@ function listToTree<T extends Base64Url>(list: Array<Comment<T>>) {
   for (i = 0; i < list.length; i += 1) {
     node = list[i]
     if (node.parentId !== null) {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       list[map.get(node.parentId)!].comments.push(node)
     } else {
       roots.push(node)
@@ -393,14 +392,12 @@ export async function getTemplate(
     .selectFrom("template")
     .selectAll()
     .where("id", "=", fromBase64Url(id))
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     .$if(opts?.nook != null, (db) => db.where("nook", "=", opts!.nook!))
     .$if(opts?.userId != null, (a) =>
       a.select((b) =>
         b
           .selectFrom("templateSubscriber")
           .select(["til"])
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           .where("userId", "=", opts!.userId!)
           .whereRef("templateSubscriber.templateId", "=", "template.id")
           .as("til")
@@ -420,7 +417,6 @@ export async function getTemplates(nook: NookId, userId?: UserId) {
         b
           .selectFrom("templateSubscriber")
           .select(["til"])
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           .where("userId", "=", userId!)
           .whereRef("templateSubscriber.templateId", "=", "template.id")
           .as("til")

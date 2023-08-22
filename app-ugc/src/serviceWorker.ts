@@ -24,7 +24,6 @@ function getId(event: ExtendableMessageEvent): string {
 }
 
 function close(clientId: string): void {
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const messenger = messengers.get(clientId)!
   messenger[Comlink.releaseProxy]()
   messengers.delete(clientId)

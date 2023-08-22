@@ -84,8 +84,7 @@ export function entityToDomain(
         r.nook,
         r.remoteId == null
           ? null
-          : // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            { remoteNoteId: r.remoteId, uploadDate: new Date(r.uploadDate!) },
+          : { remoteNoteId: r.remoteId, uploadDate: new Date(r.uploadDate!) },
       ])
     ),
   }
