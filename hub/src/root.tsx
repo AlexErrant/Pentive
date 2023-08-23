@@ -15,7 +15,7 @@ import {
 } from "solid-start"
 import Nav from "./components/nav"
 import "./root.css"
-import type { appExpose } from "app/src/index"
+import type { appExpose } from "app/src/hubMessenger"
 import * as Comlink from "comlink"
 import { throwExp } from "shared"
 
@@ -92,7 +92,7 @@ export default function Root(): JSX.Element {
           sandbox="allow-scripts allow-same-origin" // Changing this has security ramifications! https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe#attr-sandbox
           // "When the embedded document has the same origin as the embedding page, it is strongly discouraged to use both allow-scripts and allow-same-origin"
           // Since this iframe hosts `app.pentive.com` and this page is hosted on `pentive.com`, resulting in different origins, we should be safe. https://web.dev/sandboxed-iframes/ https://stackoverflow.com/q/35208161
-          src={import.meta.env.VITE_APP_ORIGIN}
+          src={import.meta.env.VITE_APP_ORIGIN + "/hubmessenger.html"}
         />
         <ErrorBoundary>
           <Suspense fallback={<div class="news-list-nav">Loading...</div>}>

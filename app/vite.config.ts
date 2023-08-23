@@ -1,4 +1,5 @@
 import { defineConfig, type UserConfig } from "vite"
+import { resolve } from "path"
 import solidPlugin from "vite-plugin-solid"
 import checker from "vite-plugin-checker"
 import fs from "fs"
@@ -44,6 +45,11 @@ export default defineConfig(({ mode }: UserConfig) => {
       target: "esnext",
       rollupOptions: {
         external: ["solid-js", "solid-js/web"],
+        // https://vitejs.dev/guide/build.html#multi-page-app
+        input: {
+          main: resolve(__dirname, "index.html"),
+          hubmessenger: resolve(__dirname, "hubmessenger.html"),
+        },
       },
     },
     server: {
