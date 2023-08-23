@@ -12,6 +12,7 @@ import { type Plugin } from "shared-dom"
 import { db } from "../db"
 import "ag-grid-community/styles/ag-grid.css"
 import "ag-grid-community/styles/ag-theme-alpine.css"
+import { throwExp } from "shared"
 
 LicenseManager.setLicenseKey(import.meta.env.VITE_AG_GRID_LICENSE)
 
@@ -41,6 +42,23 @@ const columnDefs: Array<ColDef<Plugin>> = [
     cellRenderer: (props: ICellRendererParams<Plugin>) => {
       return <relative-time date={props.data?.updated} />
     },
+  },
+  {
+    headerName: "Delete",
+    cellRenderer: (props: ICellRendererParams<Plugin>) => (
+      <button
+        onClick={async () => {
+          if (props.data?.name != null) {
+            await db.deletePlugin(props.data.name)
+          } else {
+            console.error(props)
+            throwExp("props.data is null, how did this occur?")
+          }
+        }}
+      >
+        Delete
+      </button>
+    ),
   },
 ]
 

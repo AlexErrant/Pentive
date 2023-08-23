@@ -1,6 +1,7 @@
 import { type Plugin } from "shared-dom"
 import { getDb, getKysely } from "./crsqlite"
 import { type Plugin as PluginEntity } from "./database"
+import { type PluginName } from "shared"
 
 function entityToDomain(entity: PluginEntity): Plugin {
   return {
@@ -40,5 +41,9 @@ export const pluginCollectionMethods = {
     const db = await getKysely()
     const plugins = await db.selectFrom("plugin").selectAll().execute()
     return plugins.map(entityToDomain)
+  },
+  deletePlugin: async function (name: PluginName) {
+    const db = await getKysely()
+    await db.deleteFrom("plugin").where("name", "=", name).execute()
   },
 }
