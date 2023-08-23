@@ -1,100 +1,84 @@
-import { For, type VoidComponent, Suspense, createResource } from "solid-js"
+import { type VoidComponent, Suspense, createResource } from "solid-js"
+import AgGridSolid, { type AgGridSolidRef } from "ag-grid-solid"
 import {
-  type ColumnDef,
-  createSolidTable,
-  flexRender,
-  getCoreRowModel,
-} from "@tanstack/solid-table"
-import { type Plugin } from "shared-dom"
+  type ColDef,
+  type GetRowIdParams,
+  type ICellRendererParams,
+} from "ag-grid-community"
+import { LicenseManager } from "ag-grid-enterprise"
 import "@github/relative-time-element"
+import { agGridTheme } from "../globalState"
+import { type Plugin } from "shared-dom"
 import { db } from "../db"
+import "ag-grid-community/styles/ag-grid.css"
+import "ag-grid-community/styles/ag-theme-alpine.css"
 
-function id(id: keyof Plugin): keyof Plugin {
-  return id
-}
+LicenseManager.setLicenseKey(import.meta.env.VITE_AG_GRID_LICENSE)
 
-const columns: Array<ColumnDef<Plugin>> = [
+let gridRef: AgGridSolidRef
+
+const columnDefs: Array<ColDef<Plugin>> = [
   {
-    header: "Name",
-    accessorKey: id("name"),
+    headerName: "Name",
+    valueGetter: (row) => row.data?.name,
   },
   {
-    header: "Version",
-    accessorKey: id("version"),
+    headerName: "Version",
+    valueGetter: (row) => row.data?.version,
   },
   {
-    header: "Dependencies",
-    accessorKey: id("dependencies"),
+    headerName: "Dependencies",
+    valueGetter: (row) => row.data?.dependencies,
   },
   {
-    header: "Created",
-    accessorKey: id("created"),
-    cell: (info) => {
-      return <relative-time date={info.getValue<Date>()} />
+    headerName: "Created",
+    cellRenderer: (props: ICellRendererParams<Plugin>) => {
+      return <relative-time date={props.data?.created} />
     },
   },
   {
-    header: "Updated",
-    accessorKey: id("updated"),
-    cell: (info) => {
-      return <relative-time date={info.getValue<Date>()} />
+    headerName: "Updated",
+    cellRenderer: (props: ICellRendererParams<Plugin>) => {
+      return <relative-time date={props.data?.updated} />
     },
   },
 ]
+
+const getRowId = (params: GetRowIdParams<Plugin>) => params.data.name
 
 const PluginsTable: VoidComponent = () => {
   const [plugins] = createResource(db.getPlugins, {
     initialValue: [],
   })
-  const table = createSolidTable({
-    get data() {
-      return plugins()
-    },
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-  })
   return (
     <Suspense fallback={<span>Loading...</span>}>
-      <table>
-        <thead>
-          <For each={table.getHeaderGroups()}>
-            {(headerGroup) => (
-              <tr>
-                <For each={headerGroup.headers}>
-                  {(header) => (
-                    <th>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                    </th>
-                  )}
-                </For>
-              </tr>
-            )}
-          </For>
-        </thead>
-        <tbody>
-          <For each={table.getRowModel().rows}>
-            {(row) => (
-              <tr>
-                <For each={row.getVisibleCells()}>
-                  {(cell) => (
-                    <td>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </td>
-                  )}
-                </For>
-              </tr>
-            )}
-          </For>
-        </tbody>
-      </table>
+      <div class={agGridTheme()}>
+        <AgGridSolid
+          sideBar={{
+            toolPanels: [
+              {
+                id: "columns",
+                labelDefault: "Columns",
+                labelKey: "columns",
+                iconKey: "columns",
+                toolPanel: "agColumnsToolPanel",
+                toolPanelParams: {
+                  suppressRowGroups: true,
+                  suppressValues: true,
+                  suppressPivotMode: true,
+                },
+              },
+            ],
+          }}
+          columnDefs={columnDefs}
+          ref={gridRef}
+          getRowId={getRowId}
+          rowSelection="multiple"
+          rowModelType="clientSide"
+          rowData={plugins()}
+          domLayout="autoHeight"
+        />
+      </div>
     </Suspense>
   )
 }
