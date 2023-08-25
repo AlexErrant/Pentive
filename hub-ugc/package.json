@@ -42,7 +42,7 @@
     "vite-plugin-pwa": "^0.14.4",
     "vite-plugin-solid": "^2.7.0",
     "workbox-precaching": "^6.5.4",
-    "wrangler": "^2.16.0"
+    "wrangler": "^3.6.0"
   },
   "dependencies": {
     "comlink": "^4.4.1",
