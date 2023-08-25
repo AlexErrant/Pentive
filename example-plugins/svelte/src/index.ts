@@ -2,6 +2,8 @@ import type { Container, PluginExports } from "app/lib/src/services"
 import App from "./App.svelte"
 import { createEffect, type Setter, type VoidComponent } from "solid-js"
 import ExamplePlugin from "./ExamplePlugin.svelte"
+import { Router } from "@solidjs/router"
+import { createComponent } from "solid-js/web"
 
 function clozeTemplateRegex(c: Container): RegExp {
   return new RegExp(
@@ -33,15 +35,18 @@ const services = (c: Container): Partial<Container> => {
         return r
       }
     ),
-    nav: (p) => {
-      const div = document.createElement("div")
-      // eslint-disable-next-line no-new -- svelte API requires that we side effect
-      new App({
-        target: div,
-        props: { navLinks: p.navLinks },
-      })
-      return div
-    },
+    nav: (props) =>
+      createComponent(Router, {
+        get children() {
+          const div = document.createElement("div")
+          // eslint-disable-next-line no-new -- svelte API requires that we side effect
+          new App({
+            target: div,
+            props,
+          })
+          return div
+        },
+      }),
     examplePlugin,
   }
 }

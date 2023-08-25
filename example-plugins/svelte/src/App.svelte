@@ -1,23 +1,26 @@
 <script lang="ts">
   import type { NavLinkData } from "app/lib/src/components/contracts"
-  export let navLinks: NavLinkData[] = []
+  import NavItem from "./NavItem.svelte"
+  export let navLinks: NavLinkData[]
 </script>
 
 <nav>
   <ul>
-    {#each navLinks as { child, href }}
+    {#each navLinks as navLink}
       <li>
-        <a {href}>
-          {child} 
-        </a>
+        <NavItem navLink={navLink}/>
       </li>
     {/each}
   </ul>
 </nav>
 
 <style>
-  a {
+  :global a, :global a * {
     background: orange;
     color: white;
+  }
+  ul{
+    align-items: center;
+    display: flex;
   }
 </style>
