@@ -15,7 +15,7 @@ import {
   type ChildTemplate,
 } from "shared"
 import { diffChars, diffCss, diffJson, diffWords } from "diff"
-import { cwaClient } from "../trpcClient"
+import { augcClient } from "../trpcClient"
 import Diff from "./diff"
 import { zip } from "../domain/utility"
 import DiffHtml from "./diffHtml"
@@ -51,7 +51,7 @@ const TemplateNookSync: VoidComponent<{
 }> = (props) => {
   const [remoteTemplate] = createResource(
     () => props.remoteTemplate.remoteTemplateId,
-    async (id) => await cwaClient.getTemplate.query(id) // medTODO planetscale needs an id that associates all templates so we can lookup in 1 pass. Also would be useful to find "related" templates
+    async (id) => await augcClient.getTemplate.query(id) // medTODO planetscale needs an id that associates all templates so we can lookup in 1 pass. Also would be useful to find "related" templates
   )
   return (
     <Show when={remoteTemplate()}>

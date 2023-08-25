@@ -7,7 +7,7 @@ import {
   Match,
 } from "solid-js"
 import { type RemoteNoteId } from "shared"
-import { cwaClient } from "../trpcClient"
+import { augcClient } from "../trpcClient"
 import DiffHtml from "./diffHtml"
 import { type NoteCardView } from "../pages/cards"
 import ResizingIframe from "./resizingIframe"
@@ -38,7 +38,7 @@ const NoteNookSync: VoidComponent<{
 }> = (props) => {
   const [remoteNote] = createResource(
     () => props.remoteNote.remoteNoteId,
-    async (id) => await cwaClient.getNote.query(id) // medTODO planetscale needs an id that associates all notes so we can lookup in 1 pass. Also would be useful to find "related" notes
+    async (id) => await augcClient.getNote.query(id) // medTODO planetscale needs an id that associates all notes so we can lookup in 1 pass. Also would be useful to find "related" notes
   )
   return (
     <Show when={remoteNote()}>

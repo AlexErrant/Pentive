@@ -6,20 +6,18 @@ import {
   remoteNoteId,
 } from "shared"
 import { z } from "zod"
-import { authedProcedure, publicProcedure } from "./trpc"
+import { authedProcedure } from "./trpc"
 import {
   editNotes,
-  getNote,
   insertNoteChildComment,
   insertNoteComment,
   insertNotes,
   subscribeToNote,
 } from "shared-edge"
 
+// When writing a `procedure.query`, ensure it doesn't return HTML!
+// That code belongs in api-ugc
 export const noteRouter = {
-  getNote: publicProcedure
-    .input(remoteNoteId)
-    .query(async ({ input, ctx }) => await getNote(input, ctx.user ?? null)),
   createNote: authedProcedure
     .input(z.array(createRemoteNote).min(1))
     .mutation(async ({ input, ctx }) => {
