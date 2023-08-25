@@ -12,7 +12,7 @@ export default defineConfig({
     minify: false,
     target: "esnext",
     rollupOptions: {
-      external: ["solid-js", "solid-js/web"],
+      external: ["solid-js", "solid-js/web", "@solidjs/router"],
     },
     lib: {
       entry: "src/index.ts",

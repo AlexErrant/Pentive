@@ -515,6 +515,9 @@ importers:
         specifier: ^1.7.3
         version: 1.7.3
     devDependencies:
+      '@solidjs/router':
+        specifier: ^0.8.2
+        version: 0.8.2(solid-js@1.7.3)
       eslint:
         specifier: ^8.38.0
         version: 8.38.0
@@ -534,6 +537,9 @@ importers:
         specifier: workspace:*
         version: link:../../app
     devDependencies:
+      '@solidjs/router':
+        specifier: ^0.8.2
+        version: 0.8.2(solid-js@1.7.3)
       '@sveltejs/vite-plugin-svelte':
         specifier: ^2.0.3
         version: 2.0.3(svelte@3.55.1)(vite@4.1.4)
