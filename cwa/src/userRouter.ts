@@ -21,7 +21,7 @@ export const userRouter = {
   getPeerSyncToken: authedProcedure.query(
     async ({ ctx }) => await getPeerToken(ctx.user, ctx.env.peerSyncPrivateKey)
   ),
-  getUser: publicProcedure.query((x) => x.ctx.user),
+  whoAmI: publicProcedure.query((x) => x.ctx.user),
   getPeerSyncPublicKey: publicProcedure.query(
     ({ ctx }) => ctx.env.peerSyncPublicKey
   ),

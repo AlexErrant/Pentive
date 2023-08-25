@@ -8,7 +8,7 @@ import {
   csrfHeaderName,
 } from "shared"
 import { cwaClient } from "../trpcClient"
-import { getUserId } from "../globalState"
+import { whoAmI } from "../globalState"
 
 async function postMedia(
   type: "note" | "template",
@@ -95,7 +95,7 @@ async function uploadTemplates(): Promise<void> {
 export default function Sync(): JSX.Element {
   return (
     <Show
-      when={getUserId()}
+      when={whoAmI()}
       fallback={"You can only upload/download/sync when you're logged in."}
     >
       <section class="bg-gray-100 text-gray-700 p-8">

@@ -2,8 +2,8 @@ import { createResource, createSignal, untrack } from "solid-js"
 import { cwaClient } from "./trpcClient"
 
 // lowTODO have hub send app a message when a successful login occurs
-export const [getUserId] = createResource(
-  async () => await cwaClient.getUser.query()
+export const [whoAmI] = createResource(
+  async () => await cwaClient.whoAmI.query()
 )
 
 const currentTheme = () =>
