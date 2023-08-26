@@ -2,7 +2,7 @@ import { type Base64Url, remoteNoteId } from "shared"
 import { db, dbIdToBase64Url, fromBase64Url } from "shared-edge"
 import { z } from "zod"
 import { publicProcedure } from "./trpc"
-import { type DB, type Note } from "shared-edge/database"
+import { type DB, type Note } from "shared-edge/src/dbSchema"
 import { type Selection, sql } from "kysely"
 import { type From } from "kysely/dist/cjs/parser/table-parser"
 

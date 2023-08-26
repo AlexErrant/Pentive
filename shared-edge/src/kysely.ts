@@ -7,7 +7,7 @@ import {
   type Compilable,
 } from "kysely"
 import { PlanetScaleDialect } from "kysely-planetscale"
-import { type DB } from "../database.js"
+import { type DB } from "./dbSchema.js"
 import {
   type Base64,
   type Base64Url,
