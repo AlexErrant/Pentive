@@ -33,5 +33,5 @@
       "path": "../shared-edge"
     }
   ],
-  "include": ["src/**/*"]
+  "include": ["src/**/*", "*.ts"]
 }

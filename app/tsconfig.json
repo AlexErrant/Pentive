@@ -37,5 +37,5 @@
     }
   ],
   "exclude": ["lib", "dist"],
-  "include": ["src/**/*", "tests/**/*"]
+  "include": ["src/**/*", "tests/**/*", "tests-examples/**/*", "*.ts"]
 }

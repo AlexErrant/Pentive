@@ -26,5 +26,5 @@
       "path": "../shared-dom"
     }
   ],
-  "include": ["src/**/*"]
+  "include": ["src/**/*", "*.ts"]
 }
