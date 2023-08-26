@@ -5,31 +5,21 @@
     "noEmit": true,
     "target": "esnext",
     "module": "esnext",
-    "lib": [
-      "esnext"
-    ],
-    "types": [
-      "@cloudflare/workers-types"
-    ],
+    "lib": ["esnext"],
+    "types": ["@cloudflare/workers-types"],
     "moduleResolution": "node",
     "strict": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
     "baseUrl": "./",
     "paths": {
-      "@/*": [
-        "src/*"
-      ]
+      "@/*": ["src/*"]
     }
   },
-  "include": [
-    "src/**/*",
-    "bindings.d.ts",
-    "jest.config.ts"
-  ],
+  "include": ["src/**/*", "bindings.d.ts", "jest.config.ts"],
   "references": [
     {
-      "path": "../shared",
+      "path": "../shared"
     }
-  ],
+  ]
 }

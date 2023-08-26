@@ -12,16 +12,8 @@
     "skipLibCheck": true,
     "jsx": "preserve",
     "jsxImportSource": "solid-js",
-    "lib": [
-      "WebWorker",
-      "DOM",
-      "DOM.Iterable",
-      "ES2021.String"
-    ],
-    "types": [
-      "@cloudflare/workers-types",
-      "vite/client",
-    ]
+    "lib": ["WebWorker", "DOM", "DOM.Iterable", "ES2021.String", "ES2021"],
+    "types": ["@cloudflare/workers-types", "vite/client"]
   },
   "references": [
     {
@@ -29,6 +21,7 @@
     },
     {
       "path": "../shared"
-    },
+    }
   ],
+  "include": ["src/**/*"]
 }

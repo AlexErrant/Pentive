@@ -11,13 +11,10 @@
     "skipLibCheck": true,
     "jsx": "preserve",
     "jsxImportSource": "solid-js",
-    "types": [
-      "@cloudflare/workers-types",
-      "vite/client",
-    ],
+    "types": ["@cloudflare/workers-types", "vite/client"],
     "composite": true,
     "declaration": true,
-    "outDir": "dist",
+    "outDir": "dist"
   },
   "references": [
     {
@@ -37,10 +34,8 @@
     },
     {
       "path": "../shared-edge"
-    },
+    }
   ],
-  "exclude": [
-    "lib",
-    "dist"
-  ]
+  "exclude": ["lib", "dist"],
+  "include": ["src/**/*", "tests/**/*"]
 }

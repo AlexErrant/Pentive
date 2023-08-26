@@ -13,13 +13,12 @@
     "skipLibCheck": true,
     "jsx": "preserve",
     "jsxImportSource": "solid-js",
-    "types": [
-      "vite/client"
-    ]
+    "types": ["vite/client"]
   },
   "references": [
     {
       "path": "../../app/tsconfig.lib.json"
-    },
+    }
   ],
+  "include": ["src/**/*"]
 }

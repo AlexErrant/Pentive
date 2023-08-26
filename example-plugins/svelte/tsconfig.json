@@ -41,7 +41,7 @@
     // This fixes errors like:
     //     File 'shared-dom/src/cardHtml.ts' is not under 'rootDir' 'example-plugins/svelte'. 'rootDir' is expected to contain all source files.
     // ref: https://github.com/sveltejs/language-tools/issues/792
-    "rootDir": "../..",
+    "rootDir": "../.."
   },
   "include": [
     "src/**/*.d.ts",
@@ -57,5 +57,5 @@
     {
       "path": "../../app/tsconfig.lib.json"
     }
-  ],
+  ]
 }

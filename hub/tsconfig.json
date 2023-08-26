@@ -11,13 +11,9 @@
     "jsxImportSource": "solid-js",
     "jsx": "preserve",
     "strict": true,
-    "types": [
-      "vite/client"
-    ],
+    "types": ["vite/client"],
     "paths": {
-      "~/*": [
-        "./src/*"
-      ]
+      "~/*": ["./src/*"]
     }
   },
   "references": [
@@ -35,6 +31,7 @@
     },
     {
       "path": "../shared-edge"
-    },
-  ]
+    }
+  ],
+  "include": ["src/**/*"]
 }
