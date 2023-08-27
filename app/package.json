@@ -28,6 +28,7 @@
     "@babel/core": "^7.21.4",
     "@cloudflare/workers-types": "^4.20230404.0",
     "@playwright/test": "^1.25.0",
+    "@tailwindcss/forms": "^0.5.5",
     "@types/diff": "^5.0.3",
     "@types/html-to-text": "^9.0.1",
     "@types/iframe-resizer": "^3.5.9",
