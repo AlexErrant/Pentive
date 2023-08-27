@@ -8,6 +8,6 @@ export default {
   theme: {
     extend: {},
   },
-  plugins: [require("nightwind")],
+  plugins: [require("nightwind"), require("@tailwindcss/forms")],
   darkMode: "class",
 }
