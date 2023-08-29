@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/prefer-optional-chain */
 /* eslint-disable @typescript-eslint/naming-convention */
 import WDB, {
 	type Changeset,

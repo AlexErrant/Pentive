@@ -23,7 +23,6 @@ function relativeImgSrcQueriesCWA(body: string) {
 	const doc = new DOMParser().parseFromString(body, 'text/html')
 	for (const i of doc.images) {
 		const src = i.getAttribute('src')
-		// eslint-disable-next-line @typescript-eslint/prefer-optional-chain
 		if (src != null && src.startsWith(relativeChar)) {
 			i.setAttribute('src', import.meta.env.VITE_AUGC_URL + 'i' + src)
 		}
