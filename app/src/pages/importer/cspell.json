@@ -1,18 +1,15 @@
 {
-    "version": "0.2",
-    "language": "en",
-    "dictionaryDefinitions": [
-        {
-            "name": "importer",
-            "path": "./importer.txt"
-        },
-        {
-            "name": "dictionary",
-            "path": "../../../../.vscode/dictionary.txt"
-        }
-    ],
-    "dictionaries": [
-        "importer",
-        "dictionary"
-    ]
+  "version": "0.2",
+  "language": "en",
+  "dictionaryDefinitions": [
+    {
+      "name": "importer",
+      "path": "./importer.txt"
+    },
+    {
+      "name": "dictionary",
+      "path": "../../../../.vscode/dictionary.txt"
+    }
+  ],
+  "dictionaries": ["importer", "dictionary"]
 }
