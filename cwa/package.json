@@ -4,7 +4,7 @@
   "main": "src/index.ts",
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20230404.0",
-    "eslint": "^8.38.0",
+    "eslint": "^8.48.0",
     "typescript": "~5.0.4",
     "wrangler": "^3.6.0"
   },
