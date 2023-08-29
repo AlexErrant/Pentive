@@ -1,0 +1,17 @@
+app
+app-ugc
+hub
+hub-ugc
+lrpc
+shared
+shared-dom
+shared-edge
+cwa
+api-ugc
+peer
+workers-test
+example-plugins/solid
+example-plugins/svelte
+prosemirror-image-plugin
+
+pnpm-lock.yaml

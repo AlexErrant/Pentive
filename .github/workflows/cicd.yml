@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths-ignore:
-      - "**.md"
+      - '**.md'
 
 jobs:
   check_and_deploy:
@@ -23,7 +23,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           cache: pnpm
-          node-version-file: ".nvmrc"
+          node-version-file: '.nvmrc'
 
       - name: pnpm install
         run: pnpm install
