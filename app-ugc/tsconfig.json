@@ -1,27 +1,27 @@
 {
-  "extends": "../tsconfig.options.json",
-  "compilerOptions": {
-    "outDir": "dist",
-    "strict": true,
-    "target": "ES2021",
-    "module": "ESNext",
-    "moduleResolution": "node",
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "skipLibCheck": true,
-    "jsx": "preserve",
-    "jsxImportSource": "solid-js",
-    "lib": ["WebWorker", "DOM", "DOM.Iterable", "ES2021.String", "ES2021"],
-    "types": ["@cloudflare/workers-types", "vite/client"]
-  },
-  "references": [
-    {
-      "path": "../app/tsconfig.lib.json"
-    },
-    {
-      "path": "../shared"
-    }
-  ],
-  "include": ["src/**/*", "*.ts"]
+	"extends": "../tsconfig.options.json",
+	"compilerOptions": {
+		"outDir": "dist",
+		"strict": true,
+		"target": "ES2021",
+		"module": "ESNext",
+		"moduleResolution": "node",
+		"allowSyntheticDefaultImports": true,
+		"esModuleInterop": true,
+		"forceConsistentCasingInFileNames": true,
+		"skipLibCheck": true,
+		"jsx": "preserve",
+		"jsxImportSource": "solid-js",
+		"lib": ["WebWorker", "DOM", "DOM.Iterable", "ES2021.String", "ES2021"],
+		"types": ["@cloudflare/workers-types", "vite/client"]
+	},
+	"references": [
+		{
+			"path": "../app/tsconfig.lib.json"
+		},
+		{
+			"path": "../shared"
+		}
+	],
+	"include": ["src/**/*", "*.ts"]
 }

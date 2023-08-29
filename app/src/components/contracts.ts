@@ -1,6 +1,6 @@
-import { type JSX } from "solid-js"
+import { type JSX } from 'solid-js'
 
 export interface NavLinkData {
-  readonly child: JSX.Element | (() => JSX.Element)
-  readonly href: string
+	readonly child: JSX.Element | (() => JSX.Element)
+	readonly href: string
 }

@@ -1,46 +1,46 @@
-import { type Component, Show } from "solid-js"
-import { A } from "solid-start"
+import { type Component, Show } from 'solid-js'
+import { A } from 'solid-start'
 
-import type { IStory } from "../types"
+import type { IStory } from '../types'
 
 const Story: Component<{ story: IStory }> = (props) => {
-  return (
-    <li class="news-item">
-      <span class="score">{props.story.points}</span>
-      <span class="title">
-        <Show
-          when={props.story.url}
-          fallback={<A href={`/item/${props.story.id}`}>{props.story.title}</A>}
-        >
-          <A href={props.story.url} target="_blank" rel="noreferrer">
-            {props.story.title}
-          </A>
-          <span class="host"> ({props.story.domain})</span>
-        </Show>
-      </span>
-      <br />
-      <span class="meta">
-        <Show
-          when={props.story.type !== "job"}
-          fallback={
-            <A href={`/stories/${props.story.id}`}>{props.story.timeAgo}</A>
-          }
-        >
-          by <A href={`/users/${props.story.user}`}>{props.story.user}</A>{" "}
-          {props.story.timeAgo} |{" "}
-          <A href={`/stories/${props.story.id}`}>
-            {props.story.commentsCount !== 0
-              ? `${props.story.commentsCount} comments`
-              : "discuss"}
-          </A>
-        </Show>
-      </span>
-      <Show when={props.story.type !== "link"}>
-        {" "}
-        <span class="label">{props.story.type}</span>
-      </Show>
-    </li>
-  )
+	return (
+		<li class='news-item'>
+			<span class='score'>{props.story.points}</span>
+			<span class='title'>
+				<Show
+					when={props.story.url}
+					fallback={<A href={`/item/${props.story.id}`}>{props.story.title}</A>}
+				>
+					<A href={props.story.url} target='_blank' rel='noreferrer'>
+						{props.story.title}
+					</A>
+					<span class='host'> ({props.story.domain})</span>
+				</Show>
+			</span>
+			<br />
+			<span class='meta'>
+				<Show
+					when={props.story.type !== 'job'}
+					fallback={
+						<A href={`/stories/${props.story.id}`}>{props.story.timeAgo}</A>
+					}
+				>
+					by <A href={`/users/${props.story.user}`}>{props.story.user}</A>{' '}
+					{props.story.timeAgo} |{' '}
+					<A href={`/stories/${props.story.id}`}>
+						{props.story.commentsCount !== 0
+							? `${props.story.commentsCount} comments`
+							: 'discuss'}
+					</A>
+				</Show>
+			</span>
+			<Show when={props.story.type !== 'link'}>
+				{' '}
+				<span class='label'>{props.story.type}</span>
+			</Show>
+		</li>
+	)
 }
 
 export default Story

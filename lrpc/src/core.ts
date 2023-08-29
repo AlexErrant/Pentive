@@ -1,36 +1,36 @@
-import { jwtVerify } from "jose"
-import { hubSessionSecret } from "./config.js"
-import { parse } from "cookie"
-import { csrfHeaderName, hubSessionCookieName } from "shared"
-import { type IncomingHttpHeaders } from "http"
+import { jwtVerify } from 'jose'
+import { hubSessionSecret } from './config.js'
+import { parse } from 'cookie'
+import { csrfHeaderName, hubSessionCookieName } from 'shared'
+import { type IncomingHttpHeaders } from 'http'
 
 export async function getUser(
-  headers: IncomingHttpHeaders
+	headers: IncomingHttpHeaders,
 ): Promise<string | undefined> {
-  if (headers.cookie != null) {
-    const cookies = parse(headers.cookie)
-    const sessionCookie = cookies[hubSessionCookieName]
-    if (sessionCookie != null && csrfHeaderName in headers) {
-      try {
-        const session = await jwtVerify(sessionCookie, hubSessionSecret)
-        return session.payload.sub
-      } catch {}
-    }
-  }
-  return undefined
+	if (headers.cookie != null) {
+		const cookies = parse(headers.cookie)
+		const sessionCookie = cookies[hubSessionCookieName]
+		if (sessionCookie != null && csrfHeaderName in headers) {
+			try {
+				const session = await jwtVerify(sessionCookie, hubSessionSecret)
+				return session.payload.sub
+			} catch {}
+		}
+	}
+	return undefined
 }
 
 // https://stackoverflow.com/a/65666402
 export function throwExp(errorMessage: string): never {
-  throw new Error(errorMessage)
+	throw new Error(errorMessage)
 }
 
 export function optionMap<T, R>(
-  t: T | null | undefined,
-  f: (_: T) => R
+	t: T | null | undefined,
+	f: (_: T) => R,
 ): R | null | undefined {
-  if (t == null) {
-    return t as null | undefined
-  }
-  return f(t)
+	if (t == null) {
+		return t as null | undefined
+	}
+	return f(t)
 }

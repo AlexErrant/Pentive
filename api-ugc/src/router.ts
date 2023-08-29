@@ -1,10 +1,10 @@
-import { router } from "./trpc"
-import { noteRouter } from "./noteRouter"
-import { templateRouter } from "./templateRouter"
+import { router } from './trpc'
+import { noteRouter } from './noteRouter'
+import { templateRouter } from './templateRouter'
 
 export const appRouter = router({
-  ...noteRouter,
-  ...templateRouter,
+	...noteRouter,
+	...templateRouter,
 })
 
 export type AppRouter = typeof appRouter

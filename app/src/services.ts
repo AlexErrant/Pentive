@@ -1,17 +1,17 @@
-import { defaultRenderContainer } from "shared-dom"
-import Nav from "./components/nav"
-import ExamplePlugin from "./components/examplePlugin"
+import { defaultRenderContainer } from 'shared-dom'
+import Nav from './components/nav'
+import ExamplePlugin from './components/examplePlugin'
 
 export const domContainer = { nav: Nav, examplePlugin: ExamplePlugin }
 
 // the dependency injection container
 export const defaultContainer = {
-  ...defaultRenderContainer,
-  ...domContainer,
+	...defaultRenderContainer,
+	...domContainer,
 }
 
 export type Container = typeof defaultContainer
 
 export interface PluginExports {
-  services?: (c: Container) => Partial<Container>
+	services?: (c: Container) => Partial<Container>
 }

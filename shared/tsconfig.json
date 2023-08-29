@@ -1,18 +1,18 @@
 {
-  "extends": "../tsconfig.options.json",
-  "compilerOptions": {
-    "strict": true,
-    "target": "ES2021",
-    "module": "ESNext",
-    "moduleResolution": "node",
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "skipLibCheck": true,
-    "composite": true,
-    "declaration": true,
-    "outDir": "dist",
-    "lib": ["ES2022"]
-  },
-  "include": ["src/**/*"]
+	"extends": "../tsconfig.options.json",
+	"compilerOptions": {
+		"strict": true,
+		"target": "ES2021",
+		"module": "ESNext",
+		"moduleResolution": "node",
+		"allowSyntheticDefaultImports": true,
+		"esModuleInterop": true,
+		"forceConsistentCasingInFileNames": true,
+		"skipLibCheck": true,
+		"composite": true,
+		"declaration": true,
+		"outDir": "dist",
+		"lib": ["ES2022"]
+	},
+	"include": ["src/**/*"]
 }

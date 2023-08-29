@@ -1,25 +1,25 @@
 {
-  "name": "peer",
-  "version": "0.0.0",
-  "type": "module",
-  "dependencies": {
-    "express": "^4.18.2",
-    "peer": "^1.0.0"
-  },
-  "devDependencies": {
-    "@types/express": "^4.17.17",
-    "@types/node": "^18.7.21",
-    "eslint": "^8.48.0",
-    "nodemon": "^2.0.20",
-    "ts-node": "^10.9.1",
-    "typescript": "~5.0.4"
-  },
-  "scripts": {
-    "dev": "nodemon server.ts",
-    "tsc-build": "tsc --build",
-    "format:check": "prettier --ignore-path .gitignore --check .",
-    "format": "prettier --ignore-path .gitignore --write .",
-    "eslint": "eslint . --ignore-path .gitignore",
-    "eslint:fix": "eslint . --fix --ignore-path .gitignore"
-  }
+	"name": "peer",
+	"version": "0.0.0",
+	"type": "module",
+	"dependencies": {
+		"express": "^4.18.2",
+		"peer": "^1.0.0"
+	},
+	"devDependencies": {
+		"@types/express": "^4.17.17",
+		"@types/node": "^18.7.21",
+		"eslint": "^8.48.0",
+		"nodemon": "^2.0.20",
+		"ts-node": "^10.9.1",
+		"typescript": "~5.0.4"
+	},
+	"scripts": {
+		"dev": "nodemon server.ts",
+		"tsc-build": "tsc --build",
+		"format:check": "prettier --ignore-path .gitignore --check .",
+		"format": "prettier --ignore-path .gitignore --write .",
+		"eslint": "eslint . --ignore-path .gitignore",
+		"eslint:fix": "eslint . --fix --ignore-path .gitignore"
+	}
 }

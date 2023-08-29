@@ -1,35 +1,35 @@
 {
-  "name": "pentive-solid-plugin-example",
-  "version": "0.0.0",
-  "description": "",
-  "type": "module",
-  "files": [
-    "dist"
-  ],
-  "main": "./dist/index.js",
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "serve": "vite preview",
-    "tsc-build": "tsc --build",
-    "eslint": "eslint . --ignore-path .gitignore",
-    "eslint:fix": "eslint . --fix --ignore-path .gitignore",
-    "format:check": "prettier --ignore-path .gitignore --check .",
-    "format": "prettier --ignore-path .gitignore --write .",
-    "stylelint": "stylelint **/*.css",
-    "stylelintw": "stylelint **/*.css --fix",
-    "prepack": "pnpm build"
-  },
-  "license": "MIT",
-  "devDependencies": {
-    "@solidjs/router": "^0.8.2",
-    "eslint": "^8.48.0",
-    "typescript": "~5.0.4",
-    "vite": "^4.1.4",
-    "vite-plugin-solid": "^2.7.0"
-  },
-  "dependencies": {
-    "app": "workspace:*",
-    "solid-js": "^1.7.3"
-  }
+	"name": "pentive-solid-plugin-example",
+	"version": "0.0.0",
+	"description": "",
+	"type": "module",
+	"files": [
+		"dist"
+	],
+	"main": "./dist/index.js",
+	"scripts": {
+		"dev": "vite",
+		"build": "vite build",
+		"serve": "vite preview",
+		"tsc-build": "tsc --build",
+		"eslint": "eslint . --ignore-path .gitignore",
+		"eslint:fix": "eslint . --fix --ignore-path .gitignore",
+		"format:check": "prettier --ignore-path .gitignore --check .",
+		"format": "prettier --ignore-path .gitignore --write .",
+		"stylelint": "stylelint **/*.css",
+		"stylelintw": "stylelint **/*.css --fix",
+		"prepack": "pnpm build"
+	},
+	"license": "MIT",
+	"devDependencies": {
+		"@solidjs/router": "^0.8.2",
+		"eslint": "^8.48.0",
+		"typescript": "~5.0.4",
+		"vite": "^4.1.4",
+		"vite-plugin-solid": "^2.7.0"
+	},
+	"dependencies": {
+		"app": "workspace:*",
+		"solid-js": "^1.7.3"
+	}
 }

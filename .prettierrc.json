@@ -1,4 +1,6 @@
 {
   "semi": false,
-  "endOfLine": "auto"
+  "singleQuote": true,
+  "jsxSingleQuote": true,
+  "useTabs": true
 }

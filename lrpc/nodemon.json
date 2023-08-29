@@ -1,4 +1,4 @@
 {
-  "watch": ["./src", "../shared/src"],
-  "ext": "ts,js,json"
+	"watch": ["./src", "../shared/src"],
+	"ext": "ts,js,json"
 }

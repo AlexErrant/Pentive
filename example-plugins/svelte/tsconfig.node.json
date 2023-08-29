@@ -1,9 +1,9 @@
 {
-  "compilerOptions": {
-    "outDir": "dist",
-    "composite": true,
-    "module": "ESNext",
-    "moduleResolution": "Node"
-  },
-  "include": ["vite.config.ts"]
+	"compilerOptions": {
+		"outDir": "dist",
+		"composite": true,
+		"module": "ESNext",
+		"moduleResolution": "Node"
+	},
+	"include": ["vite.config.ts"]
 }

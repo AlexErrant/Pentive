@@ -1,25 +1,25 @@
 // todo - investigate a less trash build setup. https://www.reddit.com/r/solidjs/comments/gym0ed/bundling_a_web_components/
 
-import { For, type VoidComponent } from "solid-js"
-import { type NavLinkData } from "app/src/components/contracts"
-import { NavLink, Router } from "@solidjs/router"
+import { For, type VoidComponent } from 'solid-js'
+import { type NavLinkData } from 'app/src/components/contracts'
+import { NavLink, Router } from '@solidjs/router'
 
 export const Nav: VoidComponent<{ navLinks: NavLinkData[] }> = (props) => {
-  return (
-    <Router>
-      <nav class="bg-gray-200 text-gray-900 px-4">
-        <ul class="flex items-center">
-          <For each={props.navLinks}>
-            {({ href, child }) => (
-              <li class="py-2 px-4">
-                <NavLink href={href} class="no-underline hover:underline">
-                  {typeof child === "function" ? child() : child}
-                </NavLink>
-              </li>
-            )}
-          </For>
-        </ul>
-      </nav>
-    </Router>
-  )
+	return (
+		<Router>
+			<nav class='bg-gray-200 text-gray-900 px-4'>
+				<ul class='flex items-center'>
+					<For each={props.navLinks}>
+						{({ href, child }) => (
+							<li class='py-2 px-4'>
+								<NavLink href={href} class='no-underline hover:underline'>
+									{typeof child === 'function' ? child() : child}
+								</NavLink>
+							</li>
+						)}
+					</For>
+				</ul>
+			</nav>
+		</Router>
+	)
 }

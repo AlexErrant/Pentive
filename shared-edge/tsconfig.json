@@ -1,24 +1,24 @@
 {
-  "extends": "../tsconfig.options.json",
-  "compilerOptions": {
-    "strict": true,
-    "target": "ES2021",
-    "module": "ESNext",
-    "moduleResolution": "node",
-    "types": ["@cloudflare/workers-types"],
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "skipLibCheck": true,
-    "composite": true,
-    "declaration": true,
-    "outDir": "dist",
-    "lib": ["ES2022"]
-  },
-  "references": [
-    {
-      "path": "../shared"
-    }
-  ],
-  "include": ["src/**/*"]
+	"extends": "../tsconfig.options.json",
+	"compilerOptions": {
+		"strict": true,
+		"target": "ES2021",
+		"module": "ESNext",
+		"moduleResolution": "node",
+		"types": ["@cloudflare/workers-types"],
+		"allowSyntheticDefaultImports": true,
+		"esModuleInterop": true,
+		"forceConsistentCasingInFileNames": true,
+		"skipLibCheck": true,
+		"composite": true,
+		"declaration": true,
+		"outDir": "dist",
+		"lib": ["ES2022"]
+	},
+	"references": [
+		{
+			"path": "../shared"
+		}
+	],
+	"include": ["src/**/*"]
 }

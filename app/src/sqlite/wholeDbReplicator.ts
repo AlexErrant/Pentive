@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/naming-convention */
-import { type DBAsync } from "@vlcn.io/xplat-api"
-import { parse as uuidParse, stringify as uuidStringify } from "uuid"
+import { type DBAsync } from '@vlcn.io/xplat-api'
+import { parse as uuidParse, stringify as uuidStringify } from 'uuid'
 export type SiteIDWire = string
 export type SiteIDLocal = Uint8Array
 type CID = string
@@ -12,10 +12,10 @@ type Version = number | string
 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
 const isDebug = (globalThis as any).__vlcn_whole_db_dbg
 function log(...data: any[]) {
-  if (isDebug === true) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    console.log("whole-db: ", ...data)
-  }
+	if (isDebug === true) {
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+		console.log('whole-db: ', ...data)
+	}
 }
 
 /**
@@ -24,297 +24,297 @@ function log(...data: any[]) {
  * - retry on drop
  */
 export interface PokeProtocol {
-  /**
-   * Tell all connected sites that we have updates from this site
-   * ending at `pokerVersion`
-   */
-  poke: (poker: SiteIDWire, pokerVersion: bigint) => void
+	/**
+	 * Tell all connected sites that we have updates from this site
+	 * ending at `pokerVersion`
+	 */
+	poke: (poker: SiteIDWire, pokerVersion: bigint) => void
 
-  /**
-   * Push changes to the given site in response to their request for changes.
-   */
-  pushChanges: (to: SiteIDWire, changesets: readonly Changeset[]) => void
+	/**
+	 * Push changes to the given site in response to their request for changes.
+	 */
+	pushChanges: (to: SiteIDWire, changesets: readonly Changeset[]) => void
 
-  /**
-   * Request changes from a given site since a given version
-   * in response to a poke from that site.
-   */
-  requestChanges: (from: SiteIDWire, since: bigint) => void
+	/**
+	 * Request changes from a given site since a given version
+	 * in response to a poke from that site.
+	 */
+	requestChanges: (from: SiteIDWire, since: bigint) => void
 
-  /**
-   * Receive a poke from a given site.
-   * In response, we'll compute what changes we're missing from that site
-   * and request those changes.
-   */
-  onPoked: (
-    cb: (pokedBy: SiteIDWire, pokerVersion: bigint) => Promise<void>
-  ) => void
+	/**
+	 * Receive a poke from a given site.
+	 * In response, we'll compute what changes we're missing from that site
+	 * and request those changes.
+	 */
+	onPoked: (
+		cb: (pokedBy: SiteIDWire, pokerVersion: bigint) => Promise<void>,
+	) => void
 
-  /**
-   * When someone new connects we can just poke them to kick off
-   * initial sync. Simple.
-   */
-  onNewConnection: (cb: (siteID: SiteIDWire) => void) => void
+	/**
+	 * When someone new connects we can just poke them to kick off
+	 * initial sync. Simple.
+	 */
+	onNewConnection: (cb: (siteID: SiteIDWire) => void) => void
 
-  /**
-   * A peer has requested changes from us.
-   */
-  onChangesRequested: (
-    cb: (from: SiteIDWire, since: bigint) => Promise<void>
-  ) => void
+	/**
+	 * A peer has requested changes from us.
+	 */
+	onChangesRequested: (
+		cb: (from: SiteIDWire, since: bigint) => Promise<void>,
+	) => void
 
-  /**
-   * We have received changes from a peer.
-   */
-  onChangesReceived: (
-    cb: (
-      fromSiteId: SiteIDWire,
-      changesets: readonly Changeset[]
-    ) => Promise<void>
-  ) => void
+	/**
+	 * We have received changes from a peer.
+	 */
+	onChangesReceived: (
+		cb: (
+			fromSiteId: SiteIDWire,
+			changesets: readonly Changeset[],
+		) => Promise<void>,
+	) => void
 
-  dispose: () => void
+	dispose: () => void
 }
 
 export type Changeset = [
-  TableName,
-  QuoteConcatedPKs,
-  CID,
-  any, // val,
-  Version,
-  Version,
-  SiteIDWire // site_id
+	TableName,
+	QuoteConcatedPKs,
+	CID,
+	any, // val,
+	Version,
+	Version,
+	SiteIDWire, // site_id
 ]
 
 const api = {
-  async install(
-    siteId: SiteIDLocal,
-    db: DBAsync,
-    network: PokeProtocol
-  ): Promise<WholeDbReplicator> {
-    const ret = new WholeDbReplicator(siteId, db, network)
-    await ret._init()
-    return ret
-  },
+	async install(
+		siteId: SiteIDLocal,
+		db: DBAsync,
+		network: PokeProtocol,
+	): Promise<WholeDbReplicator> {
+		const ret = new WholeDbReplicator(siteId, db, network)
+		await ret._init()
+		return ret
+	},
 }
 
 // TODO: we need to handle initial sync.
 // Well, that should be easy. Just poke people on connect.
 export class WholeDbReplicator {
-  private crrs: string[] = []
-  private pendingNotification = false
-  private readonly siteId: SiteIDLocal
-  private readonly siteIdWire: SiteIDWire
+	private crrs: string[] = []
+	private pendingNotification = false
+	private readonly siteId: SiteIDLocal
+	private readonly siteIdWire: SiteIDWire
 
-  constructor(
-    siteId: SiteIDLocal,
-    private readonly db: DBAsync,
-    private readonly network: PokeProtocol
-  ) {
-    this.db = db
-    db.createFunction("crsql_wdbreplicator", () => {
-      this.crrChanged()
-    })
+	constructor(
+		siteId: SiteIDLocal,
+		private readonly db: DBAsync,
+		private readonly network: PokeProtocol,
+	) {
+		this.db = db
+		db.createFunction('crsql_wdbreplicator', () => {
+			this.crrChanged()
+		})
 
-    this.siteId = siteId
-    this.siteIdWire = uuidStringify(this.siteId)
+		this.siteId = siteId
+		this.siteIdWire = uuidStringify(this.siteId)
 
-    this.network.onPoked(this.poked)
-    this.network.onNewConnection(this.newConnection)
-    this.network.onChangesReceived(this.changesReceived)
-    this.network.onChangesRequested(this.changesRequested)
-  }
+		this.network.onPoked(this.poked)
+		this.network.onNewConnection(this.newConnection)
+		this.network.onChangesReceived(this.changesReceived)
+		this.network.onChangesRequested(this.changesRequested)
+	}
 
-  async _init() {
-    await this.installTriggers()
-    await this.createPeerTrackingTable()
-  }
+	async _init() {
+		await this.installTriggers()
+		await this.createPeerTrackingTable()
+	}
 
-  dispose() {
-    // remove trigger(s)
-    // function extension is fine to stay, it'll get removed on connection termination
-    this.crrs.forEach((crr) => {
-      ;["INSERT", "UPDATE", "DELETE"].forEach(async (verb) => {
-        await this.db.exec(
-          `DROP TRIGGER IF EXISTS "${crr}__crsql_wdbreplicator_${verb.toLowerCase()}";`
-        )
-      })
-    })
-  }
+	dispose() {
+		// remove trigger(s)
+		// function extension is fine to stay, it'll get removed on connection termination
+		this.crrs.forEach((crr) => {
+			;['INSERT', 'UPDATE', 'DELETE'].forEach(async (verb) => {
+				await this.db.exec(
+					`DROP TRIGGER IF EXISTS "${crr}__crsql_wdbreplicator_${verb.toLowerCase()}";`,
+				)
+			})
+		})
+	}
 
-  async schemaChanged(): Promise<void> {
-    await this.installTriggers()
-  }
+	async schemaChanged(): Promise<void> {
+		await this.installTriggers()
+	}
 
-  private async installTriggers() {
-    // find all crr tables
-    // TODO: ensure we are not notified
-    // if we're in the process of applying sync changes.
-    // TODO: we can also just track that internally.
-    // well we do want to pass on to sites that are not the site
-    // that just send the patch.
-    const crrs: string[][] = await this.db.execA(
-      "SELECT name FROM sqlite_master WHERE name LIKE '%__crsql_clock'"
-    )
+	private async installTriggers() {
+		// find all crr tables
+		// TODO: ensure we are not notified
+		// if we're in the process of applying sync changes.
+		// TODO: we can also just track that internally.
+		// well we do want to pass on to sites that are not the site
+		// that just send the patch.
+		const crrs: string[][] = await this.db.execA(
+			"SELECT name FROM sqlite_master WHERE name LIKE '%__crsql_clock'",
+		)
 
-    const baseTableNames = crrs.map(async (crr) => {
-      const fullTblName = crr[0]
-      const baseTblName = fullTblName.substring(
-        0,
-        fullTblName.lastIndexOf("__crsql_clock")
-      )
-      await Promise.all(
-        ["INSERT", "UPDATE", "DELETE"].map(async (verb) => {
-          await this.db.exec(
-            `CREATE TEMP TRIGGER IF NOT EXISTS "${baseTblName}__crsql_wdbreplicator_${verb.toLowerCase()}" AFTER ${verb} ON "${baseTblName}"
+		const baseTableNames = crrs.map(async (crr) => {
+			const fullTblName = crr[0]
+			const baseTblName = fullTblName.substring(
+				0,
+				fullTblName.lastIndexOf('__crsql_clock'),
+			)
+			await Promise.all(
+				['INSERT', 'UPDATE', 'DELETE'].map(async (verb) => {
+					await this.db.exec(
+						`CREATE TEMP TRIGGER IF NOT EXISTS "${baseTblName}__crsql_wdbreplicator_${verb.toLowerCase()}" AFTER ${verb} ON "${baseTblName}"
           BEGIN
             select crsql_wdbreplicator() WHERE crsql_internal_sync_bit() = 0;
           END;
-        `
-          )
-        })
-      )
+        `,
+					)
+				}),
+			)
 
-      return baseTblName
-    })
-    this.crrs = await Promise.all(baseTableNames)
-  }
+			return baseTblName
+		})
+		this.crrs = await Promise.all(baseTableNames)
+	}
 
-  private async createPeerTrackingTable() {
-    await this.db.exec(
-      "CREATE TABLE IF NOT EXISTS __crsql_wdbreplicator_peers (site_id BLOB primary key, version INTEGER) STRICT"
-    )
-  }
+	private async createPeerTrackingTable() {
+		await this.db.exec(
+			'CREATE TABLE IF NOT EXISTS __crsql_wdbreplicator_peers (site_id BLOB primary key, version INTEGER) STRICT',
+		)
+	}
 
-  private crrChanged() {
-    if (this.pendingNotification) {
-      return
-    }
+	private crrChanged() {
+		if (this.pendingNotification) {
+			return
+		}
 
-    this.pendingNotification = true
-    queueMicrotask(async () => {
-      const r = await this.db.execA<[number | bigint]>(
-        "SELECT crsql_dbversion()"
-      )
-      const dbv = r[0][0]
-      this.pendingNotification = false
-      // TODO: maybe wait for network before setting pending to false
-      log("poking across the network")
-      this.network.poke(this.siteIdWire, BigInt(dbv))
-    })
-  }
+		this.pendingNotification = true
+		queueMicrotask(async () => {
+			const r = await this.db.execA<[number | bigint]>(
+				'SELECT crsql_dbversion()',
+			)
+			const dbv = r[0][0]
+			this.pendingNotification = false
+			// TODO: maybe wait for network before setting pending to false
+			log('poking across the network')
+			this.network.poke(this.siteIdWire, BigInt(dbv))
+		})
+	}
 
-  private readonly poked = async (
-    pokedBy: SiteIDWire,
-    pokerVersion: bigint
-  ) => {
-    log("received a poke from ", pokedBy)
-    const rows = await this.db.execA(
-      "SELECT version FROM __crsql_wdbreplicator_peers WHERE site_id = ?",
-      [uuidParse(pokedBy)]
-    )
-    let ourVersionForPoker = 0n
-    if (rows != null && rows.length > 0) {
-      // ensure it is a bigint. sqlite will return number if in js int range and bigint if out of range.
-      // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions, @typescript-eslint/no-unsafe-argument
-      ourVersionForPoker = BigInt(rows[0][0] || 0)
-    }
+	private readonly poked = async (
+		pokedBy: SiteIDWire,
+		pokerVersion: bigint,
+	) => {
+		log('received a poke from ', pokedBy)
+		const rows = await this.db.execA(
+			'SELECT version FROM __crsql_wdbreplicator_peers WHERE site_id = ?',
+			[uuidParse(pokedBy)],
+		)
+		let ourVersionForPoker = 0n
+		if (rows != null && rows.length > 0) {
+			// ensure it is a bigint. sqlite will return number if in js int range and bigint if out of range.
+			// eslint-disable-next-line @typescript-eslint/strict-boolean-expressions, @typescript-eslint/no-unsafe-argument
+			ourVersionForPoker = BigInt(rows[0][0] || 0)
+		}
 
-    // the poker version can be less than our version for poker if a set of
-    // poke messages were queued up behind a sync.
-    if (pokerVersion <= ourVersionForPoker) {
-      return
-    }
+		// the poker version can be less than our version for poker if a set of
+		// poke messages were queued up behind a sync.
+		if (pokerVersion <= ourVersionForPoker) {
+			return
+		}
 
-    // ask the poker for changes since our version
-    log("requesting changes from ", pokedBy)
-    this.network.requestChanges(pokedBy, ourVersionForPoker)
-  }
+		// ask the poker for changes since our version
+		log('requesting changes from ', pokedBy)
+		this.network.requestChanges(pokedBy, ourVersionForPoker)
+	}
 
-  private readonly newConnection = async (siteId: SiteIDWire) => {
-    await this.db.exec(
-      "INSERT OR IGNORE INTO __crsql_wdbreplicator_peers VALUES (?, ?)",
-      [uuidParse(siteId), 0]
-    )
-    // treat it as a crr change so we can kick off sync
-    this.crrChanged()
-  }
+	private readonly newConnection = async (siteId: SiteIDWire) => {
+		await this.db.exec(
+			'INSERT OR IGNORE INTO __crsql_wdbreplicator_peers VALUES (?, ?)',
+			[uuidParse(siteId), 0],
+		)
+		// treat it as a crr change so we can kick off sync
+		this.crrChanged()
+	}
 
-  // if we fail to apply, re-request
-  // TODO: other retry mechanisms
-  // todo: need to know who received from. cs site id can be a forwarded site id
-  private readonly changesReceived = async (
-    fromSiteId: SiteIDWire,
-    changesets: readonly Changeset[]
-  ) => {
-    await this.db.tx(async (tx) => {
-      let maxVersion = 0n
-      log("inserting changesets in tx", changesets)
-      const stmt = await tx.prepare(
-        'INSERT INTO crsql_changes ("table", "pk", "cid", "val", "col_version", "db_version", "site_id") VALUES (?, ?, ?, ?, ?, ?, ?)'
-      )
-      // TODO: may want to chunk
-      try {
-        // TODO: should we discard the changes altogether if they're less than the tracking version
-        // we have for this peer?
-        // that'd preclude resetting tho.
-        for (const cs of changesets) {
-          const v = BigInt(cs[5])
-          maxVersion = v > maxVersion ? v : maxVersion
-          // cannot use same statement in parallel
-          await stmt.run(
-            tx,
-            cs[0],
-            cs[1],
-            cs[2],
-            cs[3],
-            BigInt(cs[4]),
-            v,
-            // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
-            cs[6] ? uuidParse(cs[6]) : 0
-          )
-        }
-      } catch (e) {
-        console.error(e)
-        throw e
-      } finally {
-        await stmt.finalize(tx)
-      }
+	// if we fail to apply, re-request
+	// TODO: other retry mechanisms
+	// todo: need to know who received from. cs site id can be a forwarded site id
+	private readonly changesReceived = async (
+		fromSiteId: SiteIDWire,
+		changesets: readonly Changeset[],
+	) => {
+		await this.db.tx(async (tx) => {
+			let maxVersion = 0n
+			log('inserting changesets in tx', changesets)
+			const stmt = await tx.prepare(
+				'INSERT INTO crsql_changes ("table", "pk", "cid", "val", "col_version", "db_version", "site_id") VALUES (?, ?, ?, ?, ?, ?, ?)',
+			)
+			// TODO: may want to chunk
+			try {
+				// TODO: should we discard the changes altogether if they're less than the tracking version
+				// we have for this peer?
+				// that'd preclude resetting tho.
+				for (const cs of changesets) {
+					const v = BigInt(cs[5])
+					maxVersion = v > maxVersion ? v : maxVersion
+					// cannot use same statement in parallel
+					await stmt.run(
+						tx,
+						cs[0],
+						cs[1],
+						cs[2],
+						cs[3],
+						BigInt(cs[4]),
+						v,
+						// eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+						cs[6] ? uuidParse(cs[6]) : 0,
+					)
+				}
+			} catch (e) {
+				console.error(e)
+				throw e
+			} finally {
+				await stmt.finalize(tx)
+			}
 
-      await tx.exec(
-        `INSERT OR REPLACE INTO __crsql_wdbreplicator_peers (site_id, version) VALUES (?, ?)`,
-        [uuidParse(fromSiteId), maxVersion]
-      )
-    })
-  }
+			await tx.exec(
+				`INSERT OR REPLACE INTO __crsql_wdbreplicator_peers (site_id, version) VALUES (?, ?)`,
+				[uuidParse(fromSiteId), maxVersion],
+			)
+		})
+	}
 
-  private readonly changesRequested = async (
-    from: SiteIDWire,
-    since: bigint
-  ) => {
-    const fromAsBlob = uuidParse(from)
-    // The casting is due to bigint support problems in various wasm builds of sqlite
-    const changes: Changeset[] = await this.db.execA<Changeset>(
-      `SELECT "table", "pk", "cid", "val", "col_version", "db_version", COALESCE("site_id", crsql_siteid()) FROM crsql_changes WHERE site_id IS NOT ? AND db_version > ?`,
-      [fromAsBlob, since]
-    )
+	private readonly changesRequested = async (
+		from: SiteIDWire,
+		since: bigint,
+	) => {
+		const fromAsBlob = uuidParse(from)
+		// The casting is due to bigint support problems in various wasm builds of sqlite
+		const changes: Changeset[] = await this.db.execA<Changeset>(
+			`SELECT "table", "pk", "cid", "val", "col_version", "db_version", COALESCE("site_id", crsql_siteid()) FROM crsql_changes WHERE site_id IS NOT ? AND db_version > ?`,
+			[fromAsBlob, since],
+		)
 
-    // TODO: temporary. better to `quote` out of db and `unquote` (to implement) into db
-    // TODO: further complicated by https://github.com/rhashimoto/wa-sqlite/issues/69
-    changes.forEach((c) => {
-      // nextTODO create a repro for this bug
-      if (typeof c[6] === "string") return
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      return (c[6] = uuidStringify(c[6] as any))
-    })
+		// TODO: temporary. better to `quote` out of db and `unquote` (to implement) into db
+		// TODO: further complicated by https://github.com/rhashimoto/wa-sqlite/issues/69
+		changes.forEach((c) => {
+			// nextTODO create a repro for this bug
+			if (typeof c[6] === 'string') return
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+			return (c[6] = uuidStringify(c[6] as any))
+		})
 
-    if (changes.length === 0) {
-      return
-    }
-    log("pushing changesets across the network", changes)
-    // console.log(changes);
-    this.network.pushChanges(from, changes)
-  }
+		if (changes.length === 0) {
+			return
+		}
+		log('pushing changesets across the network', changes)
+		// console.log(changes);
+		this.network.pushChanges(from, changes)
+	}
 }
 
 export default api

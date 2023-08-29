@@ -1,24 +1,24 @@
 {
-  "extends": "../../tsconfig.options.json",
-  "compilerOptions": {
-    "emitDeclarationOnly": false,
-    "noEmit": true,
-    "strict": true,
-    "target": "ES2022",
-    "module": "ESNext",
-    "moduleResolution": "node",
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "skipLibCheck": true,
-    "jsx": "preserve",
-    "jsxImportSource": "solid-js",
-    "types": ["vite/client"]
-  },
-  "references": [
-    {
-      "path": "../../app/tsconfig.lib.json"
-    }
-  ],
-  "include": ["src/**/*", "*.ts"]
+	"extends": "../../tsconfig.options.json",
+	"compilerOptions": {
+		"emitDeclarationOnly": false,
+		"noEmit": true,
+		"strict": true,
+		"target": "ES2022",
+		"module": "ESNext",
+		"moduleResolution": "node",
+		"allowSyntheticDefaultImports": true,
+		"esModuleInterop": true,
+		"forceConsistentCasingInFileNames": true,
+		"skipLibCheck": true,
+		"jsx": "preserve",
+		"jsxImportSource": "solid-js",
+		"types": ["vite/client"]
+	},
+	"references": [
+		{
+			"path": "../../app/tsconfig.lib.json"
+		}
+	],
+	"include": ["src/**/*", "*.ts"]
 }

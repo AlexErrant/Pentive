@@ -1,37 +1,37 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + Svelte + TS</title>
-  </head>
-  <body>
-    <script type="module" src="/src/App.svelte"></script>
-    <pentive-nav id="myNav"> </pentive-nav>
-    <script type="module" type="text/javascript" defer>
-      const myNav = document.querySelector("#myNav")
-      myNav.navLinks = [
-        {
-          child: "Home",
-          href: "/",
-        },
-        {
-          child: "About",
-          href: "/about",
-        },
-        {
-          child: "Templates",
-          href: "/templates",
-        },
-        {
-          child: "Plugins",
-          href: "/plugins",
-        },
-        {
-          child: "Error",
-          href: "/error",
-        },
-      ]
-    </script>
-  </body>
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Vite + Svelte + TS</title>
+	</head>
+	<body>
+		<script type="module" src="/src/App.svelte"></script>
+		<pentive-nav id="myNav"> </pentive-nav>
+		<script type="module" type="text/javascript" defer>
+			const myNav = document.querySelector('#myNav')
+			myNav.navLinks = [
+				{
+					child: 'Home',
+					href: '/',
+				},
+				{
+					child: 'About',
+					href: '/about',
+				},
+				{
+					child: 'Templates',
+					href: '/templates',
+				},
+				{
+					child: 'Plugins',
+					href: '/plugins',
+				},
+				{
+					child: 'Error',
+					href: '/error',
+				},
+			]
+		</script>
+	</body>
 </html>

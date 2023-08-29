@@ -1,8 +1,8 @@
 {
-  "recommendations": [
-    "svelte.svelte-vscode",
-    "dbaeumer.vscode-eslint",
-    "esbenp.prettier-vscode",
-    "streetsidesoftware.code-spell-checker"
-  ]
+	"recommendations": [
+		"svelte.svelte-vscode",
+		"dbaeumer.vscode-eslint",
+		"esbenp.prettier-vscode",
+		"streetsidesoftware.code-spell-checker"
+	]
 }

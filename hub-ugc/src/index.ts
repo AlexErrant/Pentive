@@ -1,6 +1,6 @@
-import { setBody } from "./setBody"
-import "./registerServiceWorker"
-import { hubMessenger } from "./hubMessenger"
+import { setBody } from './setBody'
+import './registerServiceWorker'
+import { hubMessenger } from './hubMessenger'
 
 const i = await hubMessenger.renderBodyInput
 setBody(i)
@@ -11,15 +11,15 @@ setBody(i)
 // but debugging it is annoying and slow, so this is the hacky fix
 // grep 52496928-5C27-4057-932E-E0C3876AB26E
 await Promise.all(
-  Array.from(document.images)
-    .filter((img) => !img.complete)
-    .map(
-      async (img) =>
-        await new Promise((resolve) => {
-          img.addEventListener("load", resolve)
-          img.addEventListener("error", resolve)
-        })
-    )
+	Array.from(document.images)
+		.filter((img) => !img.complete)
+		.map(
+			async (img) =>
+				await new Promise((resolve) => {
+					img.addEventListener('load', resolve)
+					img.addEventListener('error', resolve)
+				}),
+		),
 ).then(async () => {
-  await hubMessenger.resize()
+	await hubMessenger.resize()
 })

@@ -1,6 +1,6 @@
 export function buildResponse(text: string, status = 200): Response {
-  // Build a HTML response containing the text
-  const html = `
+	// Build a HTML response containing the text
+	const html = `
     <!DOCTYPE html>
     <html>
     <head>
@@ -29,12 +29,12 @@ export function buildResponse(text: string, status = 200): Response {
     </html>
   `
 
-  return new Response(html, {
-    status,
-    headers: {
-      // Content-Type must include text/html for live reload to work
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      "Content-Type": "text/html; charset=UTF-8",
-    },
-  })
+	return new Response(html, {
+		status,
+		headers: {
+			// Content-Type must include text/html for live reload to work
+			// eslint-disable-next-line @typescript-eslint/naming-convention
+			'Content-Type': 'text/html; charset=UTF-8',
+		},
+	})
 }

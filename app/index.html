@@ -1,57 +1,57 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#000000" />
-    <link rel="shortcut icon" type="image/ico" href="/src/assets/favicon.ico" />
-    <script>
-      window.global = window
-      ;(function () {
-        // https://github.com/jjranalli/nightwind/pull/57/files
-        function getInitialColorMode() {
-          const persistedColorPreference =
-            window.localStorage.getItem("nightwind-mode")
-          const hasPersistedPreference =
-            typeof persistedColorPreference === "string"
-          if (hasPersistedPreference) {
-            return persistedColorPreference
-          }
-          const mql = window.matchMedia("(prefers-color-scheme: dark)")
-          const hasMediaQueryPreference = typeof mql.matches === "boolean"
-          if (hasMediaQueryPreference) {
-            return mql.matches ? "dark" : "light"
-          }
-          return "light"
-        }
-        function setTheme() {
-          getInitialColorMode() == "light"
-            ? document.documentElement.classList.remove("dark")
-            : document.documentElement.classList.add("dark")
-        }
-        window
-          .matchMedia("(prefers-color-scheme: dark)")
-          .addEventListener("change", setTheme)
-        setTheme()
-      })()
-    </script>
-    <!-- highTODO these solid assets need hashing -->
-    <script type="importmap">
-      {
-        "imports": {
-          "solid-js": "/assets/solid.js",
-          "solid-js/web": "/assets/solidWeb.js",
-          "@solidjs/router": "/assets/solidRouter.js"
-        }
-      }
-    </script>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="theme-color" content="#000000" />
+		<link rel="shortcut icon" type="image/ico" href="/src/assets/favicon.ico" />
+		<script>
+			window.global = window
+			;(function () {
+				// https://github.com/jjranalli/nightwind/pull/57/files
+				function getInitialColorMode() {
+					const persistedColorPreference =
+						window.localStorage.getItem('nightwind-mode')
+					const hasPersistedPreference =
+						typeof persistedColorPreference === 'string'
+					if (hasPersistedPreference) {
+						return persistedColorPreference
+					}
+					const mql = window.matchMedia('(prefers-color-scheme: dark)')
+					const hasMediaQueryPreference = typeof mql.matches === 'boolean'
+					if (hasMediaQueryPreference) {
+						return mql.matches ? 'dark' : 'light'
+					}
+					return 'light'
+				}
+				function setTheme() {
+					getInitialColorMode() == 'light'
+						? document.documentElement.classList.remove('dark')
+						: document.documentElement.classList.add('dark')
+				}
+				window
+					.matchMedia('(prefers-color-scheme: dark)')
+					.addEventListener('change', setTheme)
+				setTheme()
+			})()
+		</script>
+		<!-- highTODO these solid assets need hashing -->
+		<script type="importmap">
+			{
+				"imports": {
+					"solid-js": "/assets/solid.js",
+					"solid-js/web": "/assets/solidWeb.js",
+					"@solidjs/router": "/assets/solidRouter.js"
+				}
+			}
+		</script>
 
-    <title>Pentive App</title>
-  </head>
-  <body class="bg-gray-100 text-gray-700">
-    <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div id="root" class="flex flex-col h-full"></div>
+		<title>Pentive App</title>
+	</head>
+	<body class="bg-gray-100 text-gray-700">
+		<noscript>You need to enable JavaScript to run this app.</noscript>
+		<div id="root" class="flex flex-col h-full"></div>
 
-    <script src="/src/index.tsx" type="module"></script>
-  </body>
+		<script src="/src/index.tsx" type="module"></script>
+	</body>
 </html>

@@ -1,61 +1,61 @@
 {
-  "extends": "../../tsconfig.options.json",
-  "compilerOptions": {
-    "emitDeclarationOnly": false,
-    "noEmit": true,
-    /**
+	"extends": "../../tsconfig.options.json",
+	"compilerOptions": {
+		"emitDeclarationOnly": false,
+		"noEmit": true,
+		/**
        TypeScript doesn't know about import usages in the template because it only sees the
        script of a Svelte file. Therefore preserve all value imports. Requires TS 4.5 or higher.
       */
-    "preserveValueImports": true,
-    /**
+		"preserveValueImports": true,
+		/**
        To have warnings/errors of the Svelte compiler at the correct position,
        enable source maps by default.
       */
-    "sourceMap": true,
-    "moduleResolution": "node",
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "strict": true,
-    "target": "ESNext",
-    "useDefineForClassFields": true,
-    "module": "ESNext",
-    "resolveJsonModule": true,
-    "baseUrl": ".",
-    /**
-     * Typecheck JS in `.svelte` and `.js` files by default.
-     * Disable checkJs if you'd like to use dynamic types in JS.
-     * Note that setting allowJs false does not prevent the use
-     * of JS in `.svelte` files.
-     */
-    "allowJs": true,
-    "checkJs": true,
-    "isolatedModules": true,
-    "skipLibCheck": true,
-    // next two lines were added because otherwise we get
-    //     example-plugins/svelte/src/index.ts:18:10 - error TS7031: Binding element 'initialValue' implicitly has an 'any' type.
-    // It's annoying that a Svelte plugin needs to handle JSX, but I'm out of give-a-damn juice. Chalk it up to monorepo bullshit.
-    "jsx": "preserve",
-    "jsxImportSource": "solid-js",
-    "ignoreDeprecations": "5.0", // https://github.com/sveltejs/kit/issues/8650
-    // This fixes errors like:
-    //     File 'shared-dom/src/cardHtml.ts' is not under 'rootDir' 'example-plugins/svelte'. 'rootDir' is expected to contain all source files.
-    // ref: https://github.com/sveltejs/language-tools/issues/792
-    "rootDir": "../.."
-  },
-  "include": [
-    "src/**/*.d.ts",
-    "src/**/*.ts",
-    "src/**/*.js",
-    "src/**/*.svelte",
-    "vite.config.ts"
-  ],
-  "references": [
-    {
-      "path": "./tsconfig.node.json"
-    },
-    {
-      "path": "../../app/tsconfig.lib.json"
-    }
-  ]
+		"sourceMap": true,
+		"moduleResolution": "node",
+		"esModuleInterop": true,
+		"forceConsistentCasingInFileNames": true,
+		"strict": true,
+		"target": "ESNext",
+		"useDefineForClassFields": true,
+		"module": "ESNext",
+		"resolveJsonModule": true,
+		"baseUrl": ".",
+		/**
+		 * Typecheck JS in `.svelte` and `.js` files by default.
+		 * Disable checkJs if you'd like to use dynamic types in JS.
+		 * Note that setting allowJs false does not prevent the use
+		 * of JS in `.svelte` files.
+		 */
+		"allowJs": true,
+		"checkJs": true,
+		"isolatedModules": true,
+		"skipLibCheck": true,
+		// next two lines were added because otherwise we get
+		//     example-plugins/svelte/src/index.ts:18:10 - error TS7031: Binding element 'initialValue' implicitly has an 'any' type.
+		// It's annoying that a Svelte plugin needs to handle JSX, but I'm out of give-a-damn juice. Chalk it up to monorepo bullshit.
+		"jsx": "preserve",
+		"jsxImportSource": "solid-js",
+		"ignoreDeprecations": "5.0", // https://github.com/sveltejs/kit/issues/8650
+		// This fixes errors like:
+		//     File 'shared-dom/src/cardHtml.ts' is not under 'rootDir' 'example-plugins/svelte'. 'rootDir' is expected to contain all source files.
+		// ref: https://github.com/sveltejs/language-tools/issues/792
+		"rootDir": "../.."
+	},
+	"include": [
+		"src/**/*.d.ts",
+		"src/**/*.ts",
+		"src/**/*.js",
+		"src/**/*.svelte",
+		"vite.config.ts"
+	],
+	"references": [
+		{
+			"path": "./tsconfig.node.json"
+		},
+		{
+			"path": "../../app/tsconfig.lib.json"
+		}
+	]
 }

@@ -1,37 +1,37 @@
 {
-  "extends": "../tsconfig.options.json",
-  "compilerOptions": {
-    "outDir": "dist",
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "target": "ESNext",
-    "module": "ESNext",
-    "moduleResolution": "node",
-    "jsxImportSource": "solid-js",
-    "jsx": "preserve",
-    "strict": true,
-    "types": ["vite/client"],
-    "paths": {
-      "~/*": ["./src/*"]
-    }
-  },
-  "references": [
-    {
-      "path": "../app/tsconfig.lib.json"
-    },
-    {
-      "path": "../cwa"
-    },
-    {
-      "path": "../shared"
-    },
-    {
-      "path": "../shared-dom"
-    },
-    {
-      "path": "../shared-edge"
-    }
-  ],
-  "include": ["src/**/*", "*.ts"]
+	"extends": "../tsconfig.options.json",
+	"compilerOptions": {
+		"outDir": "dist",
+		"allowSyntheticDefaultImports": true,
+		"esModuleInterop": true,
+		"skipLibCheck": true,
+		"target": "ESNext",
+		"module": "ESNext",
+		"moduleResolution": "node",
+		"jsxImportSource": "solid-js",
+		"jsx": "preserve",
+		"strict": true,
+		"types": ["vite/client"],
+		"paths": {
+			"~/*": ["./src/*"]
+		}
+	},
+	"references": [
+		{
+			"path": "../app/tsconfig.lib.json"
+		},
+		{
+			"path": "../cwa"
+		},
+		{
+			"path": "../shared"
+		},
+		{
+			"path": "../shared-dom"
+		},
+		{
+			"path": "../shared-edge"
+		}
+	],
+	"include": ["src/**/*", "*.ts"]
 }

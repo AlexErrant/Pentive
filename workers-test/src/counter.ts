@@ -1,29 +1,29 @@
-import { buildResponse } from "./response"
+import { buildResponse } from './response'
 
 export class Counter implements DurableObject {
-  // Store this.state for later access
-  constructor(private readonly _state: DurableObjectState) {}
+	// Store this.state for later access
+	constructor(private readonly _state: DurableObjectState) {}
 
-  async fetch(request: Request): Promise<Response> {
-    // Get the current count, defaulting to 0
-    let value = (await this._state.storage.get<number>("count")) ?? 0
+	async fetch(request: Request): Promise<Response> {
+		// Get the current count, defaulting to 0
+		let value = (await this._state.storage.get<number>('count')) ?? 0
 
-    const { pathname } = new URL(request.url)
-    let emoji = "➡️"
-    if (pathname === "/increment") {
-      // Increment, then store the new value
-      await this._state.storage.put("count", ++value)
-      emoji = "⬆️"
-    } else if (pathname === "/decrement") {
-      // Decrement, then store the new value
-      await this._state.storage.put("count", --value)
-      emoji = "⬇️"
-    } else if (pathname !== "/") {
-      // If no route matched, return 404 response
-      return buildResponse("😢 Not Found", 404)
-    }
+		const { pathname } = new URL(request.url)
+		let emoji = '➡️'
+		if (pathname === '/increment') {
+			// Increment, then store the new value
+			await this._state.storage.put('count', ++value)
+			emoji = '⬆️'
+		} else if (pathname === '/decrement') {
+			// Decrement, then store the new value
+			await this._state.storage.put('count', --value)
+			emoji = '⬇️'
+		} else if (pathname !== '/') {
+			// If no route matched, return 404 response
+			return buildResponse('😢 Not Found', 404)
+		}
 
-    // Return response containing new value, potentially after incrementing/decrementing
-    return buildResponse(`${emoji} ${value}`)
-  }
+		// Return response containing new value, potentially after incrementing/decrementing
+		return buildResponse(`${emoji} ${value}`)
+	}
 }

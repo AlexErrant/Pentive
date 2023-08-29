@@ -1,41 +1,41 @@
 {
-  "extends": "../tsconfig.options.json",
-  "compilerOptions": {
-    "strict": true,
-    "target": "ES2021",
-    "module": "ES2022",
-    "moduleResolution": "node",
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "skipLibCheck": true,
-    "jsx": "preserve",
-    "jsxImportSource": "solid-js",
-    "types": ["@cloudflare/workers-types", "vite/client"],
-    "composite": true,
-    "declaration": true,
-    "outDir": "dist"
-  },
-  "references": [
-    {
-      "path": "../api-ugc"
-    },
-    {
-      "path": "../cwa"
-    },
-    {
-      "path": "../lrpc"
-    },
-    {
-      "path": "../shared"
-    },
-    {
-      "path": "../shared-dom"
-    },
-    {
-      "path": "../shared-edge"
-    }
-  ],
-  "exclude": ["lib", "dist"],
-  "include": ["src/**/*", "tests/**/*", "tests-examples/**/*", "*.ts"]
+	"extends": "../tsconfig.options.json",
+	"compilerOptions": {
+		"strict": true,
+		"target": "ES2021",
+		"module": "ES2022",
+		"moduleResolution": "node",
+		"allowSyntheticDefaultImports": true,
+		"esModuleInterop": true,
+		"forceConsistentCasingInFileNames": true,
+		"skipLibCheck": true,
+		"jsx": "preserve",
+		"jsxImportSource": "solid-js",
+		"types": ["@cloudflare/workers-types", "vite/client"],
+		"composite": true,
+		"declaration": true,
+		"outDir": "dist"
+	},
+	"references": [
+		{
+			"path": "../api-ugc"
+		},
+		{
+			"path": "../cwa"
+		},
+		{
+			"path": "../lrpc"
+		},
+		{
+			"path": "../shared"
+		},
+		{
+			"path": "../shared-dom"
+		},
+		{
+			"path": "../shared-edge"
+		}
+	],
+	"exclude": ["lib", "dist"],
+	"include": ["src/**/*", "tests/**/*", "tests-examples/**/*", "*.ts"]
 }

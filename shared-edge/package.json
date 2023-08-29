@@ -1,44 +1,44 @@
 {
-  "name": "shared-edge",
-  "version": "0.0.0",
-  "private": "true",
-  "//comment": "Making `shared` an esmodule is necessary for lrpc. We need  'main' because 'app' empirically fails without it. I have no idea if this is a good idea or not, but I'm out of give-a-damn juice.",
-  "//comment2": "From https://nodejs.org/api/packages.html#main - 'When a package has an \"exports\" field, this will take precedence over the \"main\" field when importing the package by name.' ...raise eyebrows.",
-  "type": "module",
-  "main": "src/index.ts",
-  "exports": "./src/index.ts",
-  "scripts": {
-    "tsc-build": "tsc --build",
-    "eslint": "eslint . --ignore-path .gitignore",
-    "eslint:fix": "eslint . --fix --ignore-path .gitignore",
-    "format:check": "prettier --ignore-path .gitignore --check .",
-    "format": "prettier --ignore-path .gitignore --write .",
-    "test": "vitest"
-  },
-  "devDependencies": {
-    "@cloudflare/workers-types": "^4.20230404.0",
-    "@types/html-to-text": "^9.0.1",
-    "@typescript-eslint/eslint-plugin": "^6.5.0",
-    "@typescript-eslint/parser": "^6.5.0",
-    "eslint": "^8.48.0",
-    "eslint-config-prettier": "^9.0.0",
-    "eslint-config-standard-with-typescript": "^39.0.0",
-    "eslint-plugin-import": "^2.28.1",
-    "eslint-plugin-n": "^16.0.2",
-    "eslint-plugin-prettier": "^5.0.0",
-    "eslint-plugin-promise": "^6.1.1",
-    "kysely-codegen": "^0.9.0",
-    "mysql2": "^2.3.3",
-    "prettier": "^3.0.3",
-    "standard": "^17.0.0",
-    "typescript": "~5.0.4"
-  },
-  "dependencies": {
-    "@scure/base": "^1.1.1",
-    "html-to-text": "^9.0.5",
-    "kysely": "^0.23.5",
-    "kysely-planetscale": "^1.2.1",
-    "shared": "workspace:*",
-    "ulid-workers": "^2.1.0"
-  }
+	"name": "shared-edge",
+	"version": "0.0.0",
+	"private": "true",
+	"//comment": "Making `shared` an esmodule is necessary for lrpc. We need  'main' because 'app' empirically fails without it. I have no idea if this is a good idea or not, but I'm out of give-a-damn juice.",
+	"//comment2": "From https://nodejs.org/api/packages.html#main - 'When a package has an \"exports\" field, this will take precedence over the \"main\" field when importing the package by name.' ...raise eyebrows.",
+	"type": "module",
+	"main": "src/index.ts",
+	"exports": "./src/index.ts",
+	"scripts": {
+		"tsc-build": "tsc --build",
+		"eslint": "eslint . --ignore-path .gitignore",
+		"eslint:fix": "eslint . --fix --ignore-path .gitignore",
+		"format:check": "prettier --ignore-path .gitignore --check .",
+		"format": "prettier --ignore-path .gitignore --write .",
+		"test": "vitest"
+	},
+	"devDependencies": {
+		"@cloudflare/workers-types": "^4.20230404.0",
+		"@types/html-to-text": "^9.0.1",
+		"@typescript-eslint/eslint-plugin": "^6.5.0",
+		"@typescript-eslint/parser": "^6.5.0",
+		"eslint": "^8.48.0",
+		"eslint-config-prettier": "^9.0.0",
+		"eslint-config-standard-with-typescript": "^39.0.0",
+		"eslint-plugin-import": "^2.28.1",
+		"eslint-plugin-n": "^16.0.2",
+		"eslint-plugin-prettier": "^5.0.0",
+		"eslint-plugin-promise": "^6.1.1",
+		"kysely-codegen": "^0.9.0",
+		"mysql2": "^2.3.3",
+		"prettier": "^3.0.3",
+		"standard": "^17.0.0",
+		"typescript": "~5.0.4"
+	},
+	"dependencies": {
+		"@scure/base": "^1.1.1",
+		"html-to-text": "^9.0.5",
+		"kysely": "^0.23.5",
+		"kysely-planetscale": "^1.2.1",
+		"shared": "workspace:*",
+		"ulid-workers": "^2.1.0"
+	}
 }

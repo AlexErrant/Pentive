@@ -1,34 +1,34 @@
 {
-  "name": "cwa",
-  "version": "0.0.0",
-  "main": "src/index.ts",
-  "devDependencies": {
-    "@cloudflare/workers-types": "^4.20230404.0",
-    "eslint": "^8.48.0",
-    "typescript": "~5.0.4",
-    "wrangler": "^3.6.0"
-  },
-  "private": true,
-  "scripts": {
-    "start": "wrangler dev",
-    "dev": "wrangler dev",
-    "deploy": "wrangler publish",
-    "build": "wrangler publish ./src/index.ts --dry-run --outdir dist",
-    "tsc-build": "tsc --build",
-    "format:check": "prettier --ignore-path .gitignore --check .",
-    "format": "prettier --ignore-path .gitignore --write .",
-    "eslint": "eslint . --ignore-path .gitignore",
-    "eslint:fix": "eslint . --fix --ignore-path .gitignore"
-  },
-  "dependencies": {
-    "@planetscale/database": "^1.10.0",
-    "@trpc/server": "^10.18.0",
-    "hono": "^3.1.8",
-    "jose": "^4.14.4",
-    "kysely": "^0.23.5",
-    "shared": "workspace:*",
-    "shared-edge": "workspace:*",
-    "superjson": "^1.12.2",
-    "zod": "^3.21.4"
-  }
+	"name": "cwa",
+	"version": "0.0.0",
+	"main": "src/index.ts",
+	"devDependencies": {
+		"@cloudflare/workers-types": "^4.20230404.0",
+		"eslint": "^8.48.0",
+		"typescript": "~5.0.4",
+		"wrangler": "^3.6.0"
+	},
+	"private": true,
+	"scripts": {
+		"start": "wrangler dev",
+		"dev": "wrangler dev",
+		"deploy": "wrangler publish",
+		"build": "wrangler publish ./src/index.ts --dry-run --outdir dist",
+		"tsc-build": "tsc --build",
+		"format:check": "prettier --ignore-path .gitignore --check .",
+		"format": "prettier --ignore-path .gitignore --write .",
+		"eslint": "eslint . --ignore-path .gitignore",
+		"eslint:fix": "eslint . --fix --ignore-path .gitignore"
+	},
+	"dependencies": {
+		"@planetscale/database": "^1.10.0",
+		"@trpc/server": "^10.18.0",
+		"hono": "^3.1.8",
+		"jose": "^4.14.4",
+		"kysely": "^0.23.5",
+		"shared": "workspace:*",
+		"shared-edge": "workspace:*",
+		"superjson": "^1.12.2",
+		"zod": "^3.21.4"
+	}
 }

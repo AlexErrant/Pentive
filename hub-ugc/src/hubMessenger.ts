@@ -1,8 +1,8 @@
-import * as Comlink from "comlink"
-import type { HubExpose } from "hub/src/components/resizingIframe"
+import * as Comlink from 'comlink'
+import type { HubExpose } from 'hub/src/components/resizingIframe'
 
 export const hubMessenger = Comlink.wrap<HubExpose>(
-  Comlink.windowEndpoint(self.parent)
+	Comlink.windowEndpoint(self.parent),
 )
 
 // grep A08D0084-685D-4359-9949-3EAAEC5CC979
