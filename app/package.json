@@ -53,7 +53,7 @@
     "jsdom": "^20.0.0",
     "kysely-codegen": "^0.9.0",
     "postcss": "^8.4.14",
-    "prettier": "^2.8.8",
+    "prettier": "^3.0.3",
     "standard": "^17.0.0",
     "stylelint": "^14.9.1",
     "stylelint-config-prettier": "^9.0.5",
