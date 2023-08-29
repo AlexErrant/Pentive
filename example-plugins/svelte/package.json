@@ -15,8 +15,8 @@
     "tsc-build": "tsc --build",
     "eslint": "eslint . --ignore-path .gitignore",
     "eslint:fix": "eslint . --fix --ignore-path .gitignore",
-    "prettier": "prettier --check .",
-    "prettierw": "prettier --write .",
+    "format:check": "prettier --ignore-path .gitignore --check .",
+    "format": "prettier --ignore-path .gitignore --write .",
     "stylelint": "stylelint **/*.css",
     "stylelintw": "stylelint **/*.css --fix",
     "prepack": "pnpm build"

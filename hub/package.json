@@ -9,8 +9,8 @@
     "eslint": "eslint . --ignore-path .gitignore",
     "eslint:fix": "eslint . --fix --ignore-path .gitignore",
     "postinstall": "node add-ts-nocheck.cjs",
-    "prettier": "prettier --check .",
-    "prettierw": "prettier --write .",
+    "format:check": "prettier --ignore-path .gitignore --check .",
+    "format": "prettier --ignore-path .gitignore --write .",
     "stylelint": "stylelint **/*.css",
     "stylelintw": "stylelint **/*.css --fix"
   },

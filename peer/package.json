@@ -17,6 +17,8 @@
   "scripts": {
     "dev": "nodemon server.ts",
     "tsc-build": "tsc --build",
+    "format:check": "prettier --ignore-path .gitignore --check .",
+    "format": "prettier --ignore-path .gitignore --write .",
     "eslint": "eslint . --ignore-path .gitignore",
     "eslint:fix": "eslint . --fix --ignore-path .gitignore"
   }
