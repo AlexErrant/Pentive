@@ -35,6 +35,7 @@
 		"eslint-plugin-solid": "^0.13.0",
 		"html-to-text": "^9.0.5 || Hub doesn't use this, but `shared-edge` (actually `cwa`) does. Not including this causes an ESModule error in dev - I've no idea why.",
 		"prettier": "^3.0.3",
+		"prettier-plugin-tailwindcss": "^0.5.3",
 		"solid-start-cloudflare-workers": "^0.2.26",
 		"solid-start-node": "^0.2.26",
 		"stylelint": "^14.9.1",
