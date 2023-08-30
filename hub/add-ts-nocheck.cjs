@@ -4,32 +4,19 @@ https://github.com/solidjs/solid-start/issues/255
 */
 
 const fs = require('fs')
+const path = require('path')
+
+// https://stackoverflow.com/a/55566081
+const readdirSync = (p, a = []) => {
+	if (fs.statSync(p).isDirectory())
+		fs.readdirSync(p).map((f) => readdirSync(a[a.push(path.join(p, f)) - 1], a))
+	return a
+}
 
 const ADDED_STR = '// @ts-nocheck\n\n'
-const FILES = [
-	'node_modules/solid-start/data/createRouteAction.tsx',
-	'node_modules/solid-start/data/createRouteData.tsx',
-	'node_modules/solid-start/data/Form.tsx',
-	'node_modules/solid-start/entry-client/mount.tsx',
-	'node_modules/solid-start/entry-client/StartClient.tsx',
-	'node_modules/solid-start/entry-server/render.ts',
-	'node_modules/solid-start/entry-server/StartServer.tsx',
-	'node_modules/solid-start/error-boundary/ErrorBoundary.tsx',
-	'node_modules/solid-start/islands/index.tsx',
-	'node_modules/solid-start/islands/router.ts',
-	'node_modules/solid-start/root/InlineStyles.tsx',
-	'node_modules/solid-start/root/Links.tsx',
-	'node_modules/solid-start/root/Scripts.tsx',
-	'node_modules/solid-start/router.tsx',
-	'node_modules/solid-start/server/components/HttpHeader.tsx',
-	'node_modules/solid-start/server/components/HttpStatusCode.tsx',
-	'node_modules/solid-start/server/middleware.ts',
-	'node_modules/solid-start/server/responses.ts',
-	'node_modules/solid-start/server/server-functions/server.ts',
-	'node_modules/solid-start/types.ts',
-	'node_modules/solid-start/vite/plugin.d.ts',
-	'node_modules/solid-start/api/internalFetch.ts',
-]
+const FILES = readdirSync('node_modules/solid-start').filter(
+	(f) => f.endsWith('.ts') || f.endsWith('.tsx'),
+)
 
 Promise.allSettled(FILES.map(addTsNoCheck)).then((results) => {
 	let hasErrors = false
