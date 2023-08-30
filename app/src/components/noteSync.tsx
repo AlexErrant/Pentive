@@ -54,6 +54,7 @@ const NoteNookSync: VoidComponent<{
 								m.set(field, [value, undefined])
 							}
 							for (const [field, value] of remoteNote()!.fieldValues) {
+								// @ts-expect-error nextTODO
 								m.set(field, [m.get(field)?.at(0), value])
 							}
 							return m

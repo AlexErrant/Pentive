@@ -62,11 +62,11 @@ export async function sync(): Promise<void> {
 	const db = await getDb()
 	const siteIdRaw = (
 		await db.execA<[Uint8Array]>('SELECT crsql_siteid();')
-	)[0][0]
+	)[0]![0]
 	const siteId = uuidStringify(siteIdRaw)
 	const dbVersion = (
 		await db.execA<[number]>(`SELECT crsql_dbversion();`)
-	)[0][0]
+	)[0]![0]
 	const poke = await lrpc.poke.query({
 		pokedBy: siteId,
 		pokerVersion: BigInt(dbVersion),

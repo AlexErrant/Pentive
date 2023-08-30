@@ -88,7 +88,7 @@ export class TarReader {
 	_readFileType(header_offset: number) {
 		// offset: 156
 		const typeView = new Uint8Array(this.buffer!, header_offset + 156, 1)
-		const typeStr = String.fromCharCode(typeView[0])
+		const typeStr = String.fromCharCode(typeView[0]!)
 		if (typeStr === '0') {
 			return 'file'
 		} else if (typeStr === '5') {
@@ -103,7 +103,7 @@ export class TarReader {
 		const szView = new Uint8Array(this.buffer!, header_offset + 124, 12)
 		let szStr = ''
 		for (let i = 0; i < 11; i++) {
-			szStr += String.fromCharCode(szView[i])
+			szStr += String.fromCharCode(szView[i]!)
 		}
 		return parseInt(szStr, 8)
 	}

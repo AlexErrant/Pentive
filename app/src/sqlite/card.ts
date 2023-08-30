@@ -125,7 +125,7 @@ export const cardCollectionMethods = {
 			console.log('card batch', i)
 			await db
 				.insertInto('card')
-				.values(batches[i])
+				.values(batches[i]!)
 				.onConflict((db) =>
 					db.doUpdateSet({
 						updated: (x) => x.ref('excluded.updated'),
@@ -225,7 +225,7 @@ export const cardCollectionMethods = {
 			noteCards: Array.from(
 				groupByToMap(entities, (x) => x.card_id).values(),
 			).map((tncR) => {
-				const tnc = tncR[0]
+				const tnc = tncR[0]!
 				const note = noteEntityToDomain(
 					{
 						ankiNoteId: tnc.note_ankiNoteId,

@@ -268,12 +268,12 @@ function listToTree<T extends Base64Url>(list: Array<Comment<T>>) {
 	const roots = []
 	let i
 	for (i = 0; i < list.length; i += 1) {
-		map.set(list[i].id, i)
+		map.set(list[i]!.id, i)
 	}
 	for (i = 0; i < list.length; i += 1) {
-		node = list[i]
+		node = list[i]!
 		if (node.parentId !== null) {
-			list[map.get(node.parentId)!].comments.push(node)
+			list[map.get(node.parentId)!]!.comments.push(node)
 		} else {
 			roots.push(node)
 		}

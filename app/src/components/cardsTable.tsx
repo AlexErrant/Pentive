@@ -181,8 +181,8 @@ const dataSource = {
 		const sort =
 			p.sortModel.length === 1
 				? {
-						col: p.sortModel[0].colId as 'due',
-						direction: p.sortModel[0].sort,
+						col: p.sortModel[0]!.colId as 'due',
+						direction: p.sortModel[0]!.sort,
 				  }
 				: undefined
 		const generalSearchActual = generalSearch()

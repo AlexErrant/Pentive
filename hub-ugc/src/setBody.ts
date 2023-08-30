@@ -33,7 +33,7 @@ function relativeImgSrcQueriesCWA(body: string) {
 export function setBody(i: RenderBodyInput) {
 	const { body, css } = buildHtml(i)
 
-	document.getElementsByTagName('body')[0].innerHTML =
+	document.getElementsByTagName('body')[0]!.innerHTML =
 		relativeImgSrcQueriesCWA(body)
 	const resizeScript = document.createElement('script')
 	resizeScript.type = 'text/javascript'

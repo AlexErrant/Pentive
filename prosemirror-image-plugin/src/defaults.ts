@@ -96,7 +96,7 @@ export const defaultCreateDecorations = (state: EditorState) =>
 const defaultFindPlaceholder = (state: EditorState, id: object) => {
   const decos = imagePluginKey.getState(state);
   const found = decos?.find(undefined, undefined, (spec) => spec.id === id);
-  return found?.length ? found[0].from : undefined;
+  return found?.length ? found[0]!.from : undefined;
 };
 
 const defaultCreateState = () => ({

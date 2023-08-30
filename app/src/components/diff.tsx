@@ -11,8 +11,8 @@ const Diff: VoidComponent<{
 			<Show
 				when={
 					props.changes.length === 1 &&
-					props.changes[0].added !== true &&
-					props.changes[0].removed !== true
+					props.changes[0]!.added !== true &&
+					props.changes[0]!.removed !== true
 				}
 			>
 				{' '}

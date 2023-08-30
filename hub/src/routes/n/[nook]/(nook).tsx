@@ -37,7 +37,7 @@ const Threads: Component = () => {
 				<div class='flex'>
 					<div class='grow'>
 						<MainContent
-							nook={nook()}
+							nook={nook()!}
 							nookDetails={data()!.nookDetails!}
 							posts={data()!.posts}
 							notes={data()!.notes}
@@ -45,7 +45,7 @@ const Threads: Component = () => {
 					</div>
 					<aside class='basis-40'>
 						<Sidebar
-							nook={nook()}
+							nook={nook()!}
 							nookDetails={data()!.nookDetails!}
 							posts={data()!.posts}
 							notes={data()!.notes}

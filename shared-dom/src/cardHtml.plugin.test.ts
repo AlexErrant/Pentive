@@ -76,7 +76,7 @@ export default exports;`)
 	expect(templates.length).toBe(1)
 	const [template] = templates
 	expectTemplate(
-		template,
+		template!,
 		'This is a cloze deletion for [ ... ] .',
 		'This is a cloze deletion for [ Text ] .(Extra)',
 	)
@@ -111,7 +111,7 @@ export default exports;`)
 	expect(templates.length).toBe(1)
 	const [template] = templates
 	expectTemplate(
-		template,
+		template!,
 		'THIS IS A CLOZE DELETION FOR [ ... ] .',
 		'THIS IS A CLOZE DELETION FOR [ TEXT ] .(EXTRA)',
 	)

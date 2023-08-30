@@ -52,7 +52,7 @@ export const FieldsEditor: VoidComponent<{
 								...props.noteCard,
 								note: { ...props.noteCard.note, fieldValues },
 							})
-							await db.upsertNote(noteCards[0].note, trx)
+							await db.upsertNote(noteCards[0]!.note, trx)
 							await db.bulkUpsertCards(
 								noteCards.map((nc) => nc.card),
 								trx,

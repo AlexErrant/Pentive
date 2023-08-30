@@ -67,7 +67,7 @@ async function importAnkiMedia(ankiEntries: Entry[]): Promise<void> {
 	const entryChunks = _.chunk(ankiEntries, 1000)
 	for (let i = 0; i < entryChunks.length; i++) {
 		console.log(`media ${i}/${entryChunks.length}`)
-		await addMediaBatch(entryChunks[i], parsed)
+		await addMediaBatch(entryChunks[i]!, parsed)
 	}
 	console.log('Anki media import done!')
 }

@@ -16,7 +16,7 @@ export default (pluginSettings: ImagePluginSettings) =>
       return false;
     }
 
-    const item = items[0];
+    const item = items[0]!;
     const file = item.getAsFile();
     if (!file) {
       return false;

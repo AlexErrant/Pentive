@@ -22,7 +22,7 @@ self.addEventListener('message', async (event) => {
 export async function setBody(i: RenderBodyInput) {
 	const { body, css } = await buildHtml(i)
 
-	document.getElementsByTagName('body')[0].innerHTML = body
+	document.getElementsByTagName('body')[0]!.innerHTML = body
 	const resizeScript = document.createElement('script')
 	resizeScript.type = 'text/javascript'
 	resizeScript.text = contentWindowJs

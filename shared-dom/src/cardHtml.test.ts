@@ -600,7 +600,7 @@ test('renderTemplate works for 1 cloze', () => {
 	expect(templates.length).toBe(1)
 	const [template] = templates
 	expectTemplate(
-		template,
+		template!,
 		'This is a cloze deletion for [ ... ] .',
 		'This is a cloze deletion for [ Text ] .(Extra)',
 	)
@@ -629,12 +629,12 @@ test('renderTemplate works for 2 cloze deletions', () => {
 	expect(templates.length).toBe(2)
 	const [template1, template2] = templates
 	expectTemplate(
-		template1,
+		template1!,
 		'This is a cloze deletion for [ ... ] .',
 		'This is a cloze deletion for [ Text1 ] .(Extra)',
 	)
 	expectTemplate(
-		template2,
+		template2!,
 		'This is a cloze deletion for [ ... ] .',
 		'This is a cloze deletion for [ Text2 ] .(Extra)',
 	)
@@ -664,7 +664,7 @@ test('renderTemplate works for standard with 1 child template', () => {
 	const templates = defaultRenderContainer.renderTemplate(standard)
 	expect(templates.length).toBe(1)
 	const [template] = templates
-	expectTemplate(template, '(English)', '(English)-(Spanish)')
+	expectTemplate(template!, '(English)', '(English)-(Spanish)')
 })
 
 test('renderTemplate works for standard with 2 child templates', () => {
@@ -697,8 +697,8 @@ test('renderTemplate works for standard with 2 child templates', () => {
 	const templates = defaultRenderContainer.renderTemplate(standard)
 	expect(templates.length).toBe(2)
 	const [template1, template2] = templates
-	expectTemplate(template1, '(English)', '(English)-(Spanish)')
-	expectTemplate(template2, '(Spanish)', '(Spanish)-(English)')
+	expectTemplate(template1!, '(English)', '(English)-(Spanish)')
+	expectTemplate(template2!, '(Spanish)', '(Spanish)-(English)')
 })
 
 function toTestNote(

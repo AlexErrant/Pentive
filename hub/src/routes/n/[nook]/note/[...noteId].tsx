@@ -16,7 +16,6 @@ import { unwrap } from 'solid-js/store'
 export function routeData({ params }: RouteDataArgs) {
 	return {
 		nook: () => params.nook as NookId,
-		noteId: (): string => params.noteId,
 		data: createServerData$(
 			async (noteId, { request }) => {
 				return {

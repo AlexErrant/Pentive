@@ -9,7 +9,7 @@ import {
 import { requireCsrfSignature, requireSession, isInvalidCsrf } from '~/session'
 
 export function routeData({ params }: RouteDataArgs) {
-	const nook = (): string => params.nook
+	const nook = () => params.nook
 	return {
 		nook,
 		csrfSignature: createServerData$(

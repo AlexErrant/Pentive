@@ -12,10 +12,10 @@ export async function handleRequest(
 
 	// Forward the request to the named Durable Object...
 	const { COUNTER } = env
-	const id = COUNTER.idFromName(match.groups.name)
+	const id = COUNTER.idFromName(match.groups.name!)
 	const stub = COUNTER.get(id)
 	// ...removing the name prefix from URL
-	url.pathname = match.groups.action
+	url.pathname = match.groups.action!
 	return await stub.fetch(url.toString())
 }
 

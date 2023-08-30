@@ -110,7 +110,7 @@ export const noteCollectionMethods = {
 		const batches = _.chunk(notes.map(noteToDocType), 1000)
 		for (let i = 0; i < batches.length; i++) {
 			console.log('note batch', i)
-			await db.insertInto('note').values(batches[i]).execute()
+			await db.insertInto('note').values(batches[i]!).execute()
 		}
 	},
 	getNote: async function (noteId: NoteId) {
@@ -438,7 +438,7 @@ function withLocalMediaIdByRemoteMediaId<
 		)
 	let i = 0
 	for (const [field] of note.fieldValues) {
-		fieldValues.set(field, docs[i].body.innerHTML)
+		fieldValues.set(field, docs[i]!.body.innerHTML)
 		i++
 	}
 	return {

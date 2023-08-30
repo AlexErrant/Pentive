@@ -90,8 +90,8 @@ export default function Edit(): JSX.Element {
 			(i) => {
 				const { templateType: x } = template.t!
 				if (x.tag === 'standard') {
-					frontView()!.setState(createEditorState(x.templates[i!].front))
-					backView()!.setState(createEditorState(x.templates[i!].back))
+					frontView()!.setState(createEditorState(x.templates[i!]!.front))
+					backView()!.setState(createEditorState(x.templates[i!]!.back))
 				} else {
 					frontView()!.setState(createEditorState(x.template.front))
 					backView()!.setState(createEditorState(x.template.back))

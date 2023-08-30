@@ -293,7 +293,7 @@ export default async function wholeDbRtc(
 	peerOption: PeerJSOption,
 ): Promise<WholeDbRtcPublic> {
 	const [siteId, token] = await Promise.all([
-		db.execA<[Uint8Array]>('SELECT crsql_siteid();').then((x) => x[0][0]),
+		db.execA<[Uint8Array]>('SELECT crsql_siteid();').then((x) => x[0]![0]),
 		cwaClient.getPeerSyncToken.query(),
 	])
 	const internal = new WholeDbRtc(siteId, db, peerOption, token)

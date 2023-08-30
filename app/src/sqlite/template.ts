@@ -479,9 +479,9 @@ function withLocalMediaIdByRemoteMediaId<
 			updateLocalMediaIdByRemoteMediaIdAndGetNewDoc(dp, rawDoms)
 		let i = 0
 		for (const t of template.templateType.templates) {
-			t.front = serialize(docs[i])
+			t.front = serialize(docs[i]!)
 			i++
-			t.back = serialize(docs[i])
+			t.back = serialize(docs[i]!)
 			i++
 		}
 		return {
@@ -494,8 +494,8 @@ function withLocalMediaIdByRemoteMediaId<
 				template.templateType.template.front,
 				template.templateType.template.back,
 			])
-		template.templateType.template.front = serialize(docs[0])
-		template.templateType.template.back = serialize(docs[1])
+		template.templateType.template.front = serialize(docs[0]!)
+		template.templateType.template.back = serialize(docs[1]!)
 		return {
 			template,
 			remoteMediaIdByLocal,

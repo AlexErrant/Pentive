@@ -84,7 +84,7 @@ export function ThemeSelector() {
 					{({ selectedOptions }) => (
 						<Dynamic
 							component={
-								selectedOptions()[0].value === 'dark' ? MoonIcon : SunIcon
+								selectedOptions()[0]!.value === 'dark' ? MoonIcon : SunIcon
 							}
 							class='h-5 w-5'
 						/>

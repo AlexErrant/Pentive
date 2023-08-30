@@ -13,20 +13,20 @@ const TODO_ITEMS = [
 test.describe('New Todo', () => {
 	test('should allow me to add todo items', async ({ page }) => {
 		// Create 1st todo.
-		await page.locator('.new-todo').fill(TODO_ITEMS[0])
+		await page.locator('.new-todo').fill(TODO_ITEMS[0]!)
 		await page.locator('.new-todo').press('Enter')
 
 		// Make sure the list only has one todo item.
-		await expect(page.locator('.view label')).toHaveText([TODO_ITEMS[0]])
+		await expect(page.locator('.view label')).toHaveText([TODO_ITEMS[0]!])
 
 		// Create 2nd todo.
-		await page.locator('.new-todo').fill(TODO_ITEMS[1])
+		await page.locator('.new-todo').fill(TODO_ITEMS[1]!)
 		await page.locator('.new-todo').press('Enter')
 
 		// Make sure the list now has two todo items.
 		await expect(page.locator('.view label')).toHaveText([
-			TODO_ITEMS[0],
-			TODO_ITEMS[1],
+			TODO_ITEMS[0]!,
+			TODO_ITEMS[1]!,
 		])
 
 		await checkNumberOfTodosInLocalStorage(page, 2)
@@ -36,7 +36,7 @@ test.describe('New Todo', () => {
 		page,
 	}) => {
 		// Create one todo item.
-		await page.locator('.new-todo').fill(TODO_ITEMS[0])
+		await page.locator('.new-todo').fill(TODO_ITEMS[0]!)
 		await page.locator('.new-todo').press('Enter')
 
 		// Check that input is empty.
@@ -61,7 +61,7 @@ test.describe('New Todo', () => {
 	})
 
 	test('should show #main and #footer when items added', async ({ page }) => {
-		await page.locator('.new-todo').fill(TODO_ITEMS[0])
+		await page.locator('.new-todo').fill(TODO_ITEMS[0]!)
 		await page.locator('.new-todo').press('Enter')
 
 		await expect(page.locator('.main')).toBeVisible()
@@ -176,15 +176,15 @@ test.describe('Item', () => {
 		const todoItems = page.locator('.todo-list li')
 		const secondTodo = todoItems.nth(1)
 		await secondTodo.dblclick()
-		await expect(secondTodo.locator('.edit')).toHaveValue(TODO_ITEMS[1])
+		await expect(secondTodo.locator('.edit')).toHaveValue(TODO_ITEMS[1]!)
 		await secondTodo.locator('.edit').fill('buy some sausages')
 		await secondTodo.locator('.edit').press('Enter')
 
 		// Explicitly assert the new text value.
 		await expect(todoItems).toHaveText([
-			TODO_ITEMS[0],
+			TODO_ITEMS[0]!,
 			'buy some sausages',
-			TODO_ITEMS[2],
+			TODO_ITEMS[2]!,
 		])
 		await checkTodosInLocalStorage(page, 'buy some sausages')
 	})
@@ -211,9 +211,9 @@ test.describe('Editing', () => {
 		await todoItems.nth(1).locator('.edit').dispatchEvent('blur')
 
 		await expect(todoItems).toHaveText([
-			TODO_ITEMS[0],
+			TODO_ITEMS[0]!,
 			'buy some sausages',
-			TODO_ITEMS[2],
+			TODO_ITEMS[2]!,
 		])
 		await checkTodosInLocalStorage(page, 'buy some sausages')
 	})
@@ -225,9 +225,9 @@ test.describe('Editing', () => {
 		await todoItems.nth(1).locator('.edit').press('Enter')
 
 		await expect(todoItems).toHaveText([
-			TODO_ITEMS[0],
+			TODO_ITEMS[0]!,
 			'buy some sausages',
-			TODO_ITEMS[2],
+			TODO_ITEMS[2]!,
 		])
 		await checkTodosInLocalStorage(page, 'buy some sausages')
 	})
@@ -240,7 +240,7 @@ test.describe('Editing', () => {
 		await todoItems.nth(1).locator('.edit').fill('')
 		await todoItems.nth(1).locator('.edit').press('Enter')
 
-		await expect(todoItems).toHaveText([TODO_ITEMS[0], TODO_ITEMS[2]])
+		await expect(todoItems).toHaveText([TODO_ITEMS[0]!, TODO_ITEMS[2]!])
 	})
 
 	test('should cancel edits on escape', async ({ page }) => {
@@ -253,11 +253,11 @@ test.describe('Editing', () => {
 
 test.describe('Counter', () => {
 	test('should display the current number of todo items', async ({ page }) => {
-		await page.locator('.new-todo').fill(TODO_ITEMS[0])
+		await page.locator('.new-todo').fill(TODO_ITEMS[0]!)
 		await page.locator('.new-todo').press('Enter')
 		await expect(page.locator('.todo-count')).toContainText('1')
 
-		await page.locator('.new-todo').fill(TODO_ITEMS[1])
+		await page.locator('.new-todo').fill(TODO_ITEMS[1]!)
 		await page.locator('.new-todo').press('Enter')
 		await expect(page.locator('.todo-count')).toContainText('2')
 
@@ -280,7 +280,7 @@ test.describe('Clear completed button', () => {
 		await todoItems.nth(1).locator('.toggle').check()
 		await page.locator('.clear-completed').click()
 		await expect(todoItems).toHaveCount(2)
-		await expect(todoItems).toHaveText([TODO_ITEMS[0], TODO_ITEMS[2]])
+		await expect(todoItems).toHaveText([TODO_ITEMS[0]!, TODO_ITEMS[2]!])
 	})
 
 	test('should be hidden when there are no items that are completed', async ({
@@ -301,7 +301,7 @@ test.describe('Persistence', () => {
 
 		const todoItems = page.locator('.todo-list li')
 		await todoItems.nth(0).locator('.toggle').check()
-		await expect(todoItems).toHaveText([TODO_ITEMS[0], TODO_ITEMS[1]])
+		await expect(todoItems).toHaveText([TODO_ITEMS[0]!, TODO_ITEMS[1]!])
 		await expect(todoItems).toHaveClass(['completed', ''])
 
 		// Ensure there is 1 completed item.
@@ -309,7 +309,7 @@ test.describe('Persistence', () => {
 
 		// Now reload.
 		await page.reload()
-		await expect(todoItems).toHaveText([TODO_ITEMS[0], TODO_ITEMS[1]])
+		await expect(todoItems).toHaveText([TODO_ITEMS[0]!, TODO_ITEMS[1]!])
 		await expect(todoItems).toHaveClass(['completed', ''])
 	})
 })
@@ -320,7 +320,7 @@ test.describe('Routing', () => {
 		// make sure the app had a chance to save updated todos in storage
 		// before navigating to a new view, otherwise the items can get lost :(
 		// in some frameworks like Durandal
-		await checkTodosInLocalStorage(page, TODO_ITEMS[0])
+		await checkTodosInLocalStorage(page, TODO_ITEMS[0]!)
 	})
 
 	test('should allow me to display active items', async ({ page }) => {
@@ -329,8 +329,8 @@ test.describe('Routing', () => {
 		await page.locator('.filters >> text=Active').click()
 		await expect(page.locator('.todo-list li')).toHaveCount(2)
 		await expect(page.locator('.todo-list li')).toHaveText([
-			TODO_ITEMS[0],
-			TODO_ITEMS[2],
+			TODO_ITEMS[0]!,
+			TODO_ITEMS[2]!,
 		])
 	})
 

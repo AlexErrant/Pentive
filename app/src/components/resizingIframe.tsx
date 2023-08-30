@@ -63,8 +63,8 @@ const ResizingIframe: VoidComponent<{
 				props.i.template.templateType.template.front
 				props.i.template.templateType.template.back
 			} else {
-				props.i.template.templateType.templates[props.i.index].front
-				props.i.template.templateType.templates[props.i.index].back
+				props.i.template.templateType.templates[props.i.index]!.front
+				props.i.template.templateType.templates[props.i.index]!.back
 			}
 			/* eslint-enable @typescript-eslint/no-unused-expressions */
 		}

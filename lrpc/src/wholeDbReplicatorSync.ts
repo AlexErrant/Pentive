@@ -52,7 +52,7 @@ class WholeDbReplicatorSync {
 		if (rows != null && rows.length > 0) {
 			// ensure it is a bigint. sqlite will return number if in js int range and bigint if out of range.
 			// eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/strict-boolean-expressions
-			ourVersionForPoker = BigInt(rows[0][0] || 0)
+			ourVersionForPoker = BigInt(rows[0]![0] || 0)
 		}
 
 		// the poker version can be less than our version for poker if a set of

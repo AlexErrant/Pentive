@@ -3,6 +3,7 @@
 		"composite": true,
 		"declaration": true,
 		"declarationMap": true,
+		"noUncheckedIndexedAccess": true,
 		// "emitDeclarationOnly": true, // commenting out for now because I'm out of patience
 		"incremental": true,
 		"noEmitOnError": true,

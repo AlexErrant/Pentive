@@ -74,8 +74,8 @@ export default function Cards(): JSX.Element {
 				() => (
 					<CardsTable
 						onSelectionChanged={(ncs) => {
-							if (ncs.length > 0) {
-								const nc = ncs[0]
+							const nc = ncs[0]
+							if (nc != null) {
 								const selected: NoteCardView = {
 									...nc,
 									note: {

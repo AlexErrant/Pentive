@@ -162,7 +162,7 @@ export const FieldEditor: VoidComponent<{
 						strip(div.innerHTML) === ''
 							? ''
 							: div.childNodes.length === 1 &&
-							  div.childNodes[0].nodeName === 'P' &&
+							  div.childNodes[0]!.nodeName === 'P' &&
 							  (div.childNodes[0] as HTMLParagraphElement).attributes
 									.length === 0
 							? (div.childNodes[0] as HTMLParagraphElement).innerHTML

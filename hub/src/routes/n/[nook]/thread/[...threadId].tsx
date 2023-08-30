@@ -6,7 +6,7 @@ import { getPost } from 'shared-edge'
 
 export function routeData({ params }: RouteDataArgs) {
 	return {
-		threadId: (): string => params.threadId,
+		threadId: () => params.threadId,
 		thread: createServerData$(
 			async (threadId) => await getPost(threadId as Base64Url),
 			{ key: () => params.threadId },

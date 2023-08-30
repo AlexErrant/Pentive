@@ -54,7 +54,7 @@ function parseTemplateType(model: Model): TemplateType {
 				throwExp(
 					`Should be impossible! Cloze template have only 1 template, but got ${model.tmpls.length}`,
 				)
-			const tmpl = model.tmpls[0]
+			const tmpl = model.tmpls[0]!
 			return {
 				tag: 'cloze',
 				template: parseChildTemplate(tmpl),

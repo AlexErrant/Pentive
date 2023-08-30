@@ -39,7 +39,7 @@ export const appRouter = router({
 			try {
 				db.execMany(initSql)
 				const siteId = uuidStringify(
-					db.execA<[Uint8Array]>('SELECT crsql_siteid();')[0][0],
+					db.execA<[Uint8Array]>('SELECT crsql_siteid();')[0]![0],
 				)
 				const wdb = wholeDbReplicatorSync(db)
 				const version = wdb.onPoked(input.pokedBy, input.pokerVersion)

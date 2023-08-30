@@ -158,7 +158,7 @@ export class WholeDbReplicator {
 		)
 
 		const baseTableNames = crrs.map(async (crr) => {
-			const fullTblName = crr[0]
+			const fullTblName = crr[0]!
 			const baseTblName = fullTblName.substring(
 				0,
 				fullTblName.lastIndexOf('__crsql_clock'),
@@ -196,7 +196,7 @@ export class WholeDbReplicator {
 			const r = await this.db.execA<[number | bigint]>(
 				'SELECT crsql_dbversion()',
 			)
-			const dbv = r[0][0]
+			const dbv = r[0]![0]
 			this.pendingNotification = false
 			// TODO: maybe wait for network before setting pending to false
 			log('poking across the network')
@@ -217,7 +217,7 @@ export class WholeDbReplicator {
 		if (rows != null && rows.length > 0) {
 			// ensure it is a bigint. sqlite will return number if in js int range and bigint if out of range.
 			// eslint-disable-next-line @typescript-eslint/strict-boolean-expressions, @typescript-eslint/no-unsafe-argument
-			ourVersionForPoker = BigInt(rows[0][0] || 0)
+			ourVersionForPoker = BigInt(rows[0]![0] || 0)
 		}
 
 		// the poker version can be less than our version for poker if a set of
