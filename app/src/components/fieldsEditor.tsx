@@ -29,7 +29,7 @@ export const FieldsEditor: VoidComponent<{
 			</For>
 			<div>
 				<button
-					class='bg-green-600 hover:bg-green-700 text-white font-bold p-2 px-4 rounded'
+					class='text-white bg-green-600 rounded p-2 px-4 font-bold hover:bg-green-700'
 					onClick={async () => {
 						if (props.noteCard.cards.length === 0)
 							throwExp('There must be at least 1 card')

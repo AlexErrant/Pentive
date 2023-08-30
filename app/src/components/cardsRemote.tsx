@@ -68,7 +68,7 @@ export const CardsRemote: VoidComponent<{
 			Remote Nooks:
 			<For each={getRemotes()}>
 				{(x) => (
-					<li class='py-2 px-4'>
+					<li class='px-4 py-2'>
 						{x.uploadable ? '✔' : ''}
 						<Show when={x.remote != null} fallback={x.nookId}>
 							<a

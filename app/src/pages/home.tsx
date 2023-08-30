@@ -24,17 +24,17 @@ const MyPluginBaby: VoidComponent<{
 	setCount: Setter<number>
 }> = (props) => {
 	return (
-		<div class='border rounded-lg p-1 m-1 border-gray-900'>
+		<div class='border-gray-900 m-1 rounded-lg border p-1'>
 			<h1>App's Child Component</h1>
 			<button
-				class='border rounded-lg px-2 mx-2 border-gray-900'
+				class='border-gray-900 mx-2 rounded-lg border px-2'
 				onClick={() => props.setCount(props.count - 1)}
 			>
 				-
 			</button>
 			<output>Negative Count: {props.count * -1}</output>
 			<button
-				class='border rounded-lg px-2 mx-2 border-gray-900'
+				class='border-gray-900 mx-2 rounded-lg border px-2'
 				onClick={() => props.setCount(props.count + 1)}
 			>
 				+
@@ -54,13 +54,13 @@ export default function Home(): JSX.Element {
 	})
 
 	return (
-		<section class='bg-gray-100 text-gray-700 p-8'>
+		<section class='text-gray-700 bg-gray-100 p-8'>
 			<h1 class='text-2xl font-bold'>Home</h1>
 			<p class='mt-4'>This is the home page.</p>
 
 			<div class='flex items-center space-x-2'>
 				<button
-					class='border rounded-lg px-2 border-gray-900'
+					class='border-gray-900 rounded-lg border px-2'
 					onClick={() => setCount(count() - 1)}
 				>
 					-
@@ -69,7 +69,7 @@ export default function Home(): JSX.Element {
 				<output class='p-10px'>Count: {count()}</output>
 
 				<button
-					class='border rounded-lg px-2 border-gray-900'
+					class='border-gray-900 rounded-lg border px-2'
 					onClick={() => setCount(count() + 1)}
 				>
 					+
@@ -84,7 +84,7 @@ export default function Home(): JSX.Element {
 			</div>
 			<div class='mt-4'>
 				<button
-					class='border rounded-lg px-2 border-gray-900'
+					class='border-gray-900 rounded-lg border px-2'
 					onClick={async () => {
 						await searchNotes(search())
 					}}
@@ -98,7 +98,7 @@ export default function Home(): JSX.Element {
 					}}
 				>
 					<input
-						class='w-75px p-1 bg-white text-sm rounded-lg'
+						class='w-75px bg-white rounded-lg p-1 text-sm'
 						type='text'
 						onInput={(e) => setSearch(e.currentTarget.value)}
 					/>
@@ -128,7 +128,7 @@ export default function Home(): JSX.Element {
 					<label for='rawSql'>SQL</label>
 					<input
 						name='rawSql'
-						class='w-75px p-1 bg-white text-sm rounded-lg border'
+						class='w-75px bg-white rounded-lg border p-1 text-sm'
 						type='text'
 					/>
 				</form>

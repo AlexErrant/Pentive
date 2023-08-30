@@ -63,13 +63,13 @@ const columnDefs: Array<ColDef<NoteCard>> = [
 				<ul>
 					<For each={Array.from(props.data!.note.remotes)}>
 						{([nook, v]) => (
-							<li class='inline mr-2'>
+							<li class='mr-2 inline'>
 								<span>
 									<Show
 										when={v}
 										fallback={
 											<>
-												<Upload class='h-[1em] inline' />
+												<Upload class='inline h-[1em]' />
 												/n/{nook}
 											</>
 										}
@@ -80,10 +80,10 @@ const columnDefs: Array<ColDef<NoteCard>> = [
 												props.data!.note.updated.getTime()
 											}
 										>
-											<Upload class='h-[1em] inline' />
+											<Upload class='inline h-[1em]' />
 										</Show>
 										<a
-											class='underline text-blue-600 hover:text-blue-800 visited:text-purple-600'
+											class='text-blue-600 underline visited:text-purple-600 hover:text-blue-800'
 											title={`Last uploaded at ${v!.uploadDate.toLocaleString()}`}
 											href={
 												import.meta.env.VITE_HUB_ORIGIN +
@@ -124,7 +124,7 @@ const CardsTable: VoidComponent<{
 		}),
 	)
 	return (
-		<div class='flex flex-col h-full'>
+		<div class='flex h-full flex-col'>
 			<div class='m-0.5 p-0.5'>
 				<input
 					class='w-full border'

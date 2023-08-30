@@ -24,7 +24,7 @@ export function Upload() {
 			<Show when={count() > 0}>
 				<div
 					// https://stackoverflow.com/a/71440299
-					class='absolute border border-black bg-lime-300 flex justify-center items-center font-normal px-1'
+					class='border-black bg-lime-300 absolute flex items-center justify-center border px-1 font-normal'
 					style={{
 						bottom: '-1em',
 						right: '-1.3em',

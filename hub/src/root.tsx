@@ -79,7 +79,7 @@ export default function Root(): JSX.Element {
 `}
 				</script>
 			</Head>
-			<Body class='bg-white text-black'>
+			<Body class='text-black bg-white'>
 				<iframe
 					hidden
 					style={{

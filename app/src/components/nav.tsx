@@ -8,11 +8,11 @@ const ends = new Set(['/'])
 const Nav: VoidComponent<{ navLinks: NavLinkData[] }> = (props) => {
 	const location = useLocation()
 	return (
-		<nav class='bg-gray-200 text-gray-900 px-4'>
+		<nav class='text-gray-900 bg-gray-200 px-4'>
 			<ul class='flex items-center'>
 				<For each={props.navLinks}>
 					{({ href, child }) => (
-						<li class='py-2 px-4'>
+						<li class='px-4 py-2'>
 							<NavLink
 								href={href}
 								class='no-underline hover:underline'
@@ -39,10 +39,10 @@ const Nav: VoidComponent<{ navLinks: NavLinkData[] }> = (props) => {
 						</a>
 					</Show>
 				</span>
-				<li class='text-sm flex items-center space-x-1 ml-auto'>
+				<li class='ml-auto flex items-center space-x-1 text-sm'>
 					<span>URL:</span>
 					<input
-						class='w-75px p-1 bg-white text-sm rounded-lg'
+						class='w-75px bg-white rounded-lg p-1 text-sm'
 						type='text'
 						readOnly
 						value={location.pathname}

@@ -36,7 +36,7 @@ const columnDefs: Array<ColDef<Peer>> = [
 		cellRenderer: (props: ICellRendererParams<Peer>) => (
 			<Show when={props.data?.status === 'disconnected'}>
 				<button
-					class='border rounded-lg px-2 border-gray-900 bg-green-300 text-black leading-normal'
+					class='text-black bg-green-300 border-gray-900 rounded-lg border px-2 leading-normal'
 					onClick={async () => {
 						const rtc = await getCrRtc()
 						rtc.connectTo(props.data!.id)

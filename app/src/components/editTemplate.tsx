@@ -51,14 +51,14 @@ function remoteCell(
 	}>,
 ): JSX.Element {
 	return (
-		<fieldset class='border border-black p-2'>
+		<fieldset class='border-black border p-2'>
 			<legend>
 				<span class='p-2 px-2 font-bold'>Nooks</span>
 			</legend>
 			<ul>
 				<For each={objEntries(template.remotes)}>
 					{([nookId, remoteTemplate]) => (
-						<li class='py-2 px-4'>
+						<li class='px-4 py-2'>
 							<Show when={remoteTemplate != null} fallback={nookId}>
 								<a
 									href={`${import.meta.env.VITE_HUB_ORIGIN}/t/${
@@ -75,7 +75,7 @@ function remoteCell(
 			</ul>
 			<input
 				name='newNookId'
-				class='w-75px p-1 bg-white text-sm rounded-lg border'
+				class='w-75px bg-white rounded-lg border p-1 text-sm'
 				type='text'
 				onChange={(e) => {
 					setTemplate(
@@ -124,11 +124,11 @@ const EditTemplate: VoidComponent<{ template: Template }> = (props) => {
 					setTemplate('template', 'name', e.currentTarget.value)
 				}}
 			/>
-			<fieldset class='border border-black p-2'>
+			<fieldset class='border-black border p-2'>
 				<legend>
 					<span class='p-2 px-4 font-bold'>Fields</span>
 					<button
-						class='bg-green-600 hover:bg-green-700 text-white  py-1/2 px-2 m-2 rounded'
+						class='py-1/2 text-white bg-green-600  m-2 rounded px-2 hover:bg-green-700'
 						onClick={() => {
 							setTemplate('template', 'fields', [
 								...template.template.fields,
@@ -185,7 +185,7 @@ function childTemplates(
 	}>,
 ) {
 	return (
-		<fieldset class='border border-black p-2'>
+		<fieldset class='border-black border p-2'>
 			<legend>
 				<Show
 					when={template.template.templateType.tag === 'standard'}
@@ -193,7 +193,7 @@ function childTemplates(
 				>
 					<span class='p-2 px-4 font-bold'>Child Templates</span>
 					<button
-						class='bg-green-600 hover:bg-green-700 text-white  py-1/2 px-2 m-2 rounded'
+						class='py-1/2 text-white bg-green-600  m-2 rounded px-2 hover:bg-green-700'
 						onClick={() => {
 							;(setTemplate as SetStoreFunction<StandardTemplateStore>)(
 								'template',

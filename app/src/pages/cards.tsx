@@ -100,7 +100,7 @@ export default function Cards(): JSX.Element {
 			render(
 				() => (
 					<Show when={selected.noteCard != null}>
-						<div class='overflow-auto h-full'>
+						<div class='h-full overflow-auto'>
 							<CardsRemote noteCard={selected.noteCard!} />
 							<FieldsEditor
 								noteCard={selected.noteCard!}
@@ -117,7 +117,7 @@ export default function Cards(): JSX.Element {
 			render(
 				() => (
 					<Show when={selected.noteCard != null}>
-						<div class='overflow-auto h-full'>
+						<div class='h-full overflow-auto'>
 							<NoteSync note={selected.noteCard!} />
 						</div>
 					</Show>
@@ -133,7 +133,7 @@ export default function Cards(): JSX.Element {
 					() => (
 						<div>
 							<button
-								class='bg-green-600 hover:bg-green-700 text-white font-bold p-2 px-4 rounded m-2'
+								class='text-white bg-green-600 m-2 rounded p-2 px-4 font-bold hover:bg-green-700'
 								onClick={() => {
 									goldenLayout.addComponent('CardsTable')
 								}}
@@ -141,7 +141,7 @@ export default function Cards(): JSX.Element {
 								Add CardsTable
 							</button>
 							<button
-								class='bg-green-600 hover:bg-green-700 text-white font-bold p-2 px-4 rounded m-2'
+								class='text-white bg-green-600 m-2 rounded p-2 px-4 font-bold hover:bg-green-700'
 								onClick={() => {
 									goldenLayout.addComponent('CardDetail')
 								}}
@@ -149,7 +149,7 @@ export default function Cards(): JSX.Element {
 								Add CardDetail
 							</button>
 							<button
-								class='bg-green-600 hover:bg-green-700 text-white font-bold p-2 px-4 rounded m-2'
+								class='text-white bg-green-600 m-2 rounded p-2 px-4 font-bold hover:bg-green-700'
 								onClick={() => {
 									goldenLayout.addComponent('Preview Card')
 								}}

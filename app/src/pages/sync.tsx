@@ -98,10 +98,10 @@ export default function Sync(): JSX.Element {
 			when={whoAmI()}
 			fallback={"You can only upload/download/sync when you're logged in."}
 		>
-			<section class='bg-gray-100 text-gray-700 p-8'>
+			<section class='text-gray-700 bg-gray-100 p-8'>
 				<div class='mt-4'>
 					<button
-						class='border rounded-lg px-2 border-gray-900'
+						class='border-gray-900 rounded-lg border px-2'
 						onClick={async () => {
 							await uploadTemplates()
 						}}
@@ -109,7 +109,7 @@ export default function Sync(): JSX.Element {
 						upload Templates
 					</button>
 					<button
-						class='border rounded-lg px-2 border-gray-900'
+						class='border-gray-900 rounded-lg border px-2'
 						onClick={async () => {
 							await uploadNotes()
 						}}
@@ -117,7 +117,7 @@ export default function Sync(): JSX.Element {
 						upload Notes
 					</button>
 					<button
-						class='border rounded-lg px-2 border-gray-900'
+						class='border-gray-900 rounded-lg border px-2'
 						onClick={async () => {
 							await db.sync()
 						}}

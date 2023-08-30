@@ -68,7 +68,7 @@ const EditTemplateCss: VoidComponent<{
 		view?.destroy()
 	})
 	return (
-		<fieldset class='border border-black p-2'>
+		<fieldset class='border-black border p-2'>
 			<legend>
 				<span class='p-2 px-4 font-bold'>CSS</span>
 			</legend>

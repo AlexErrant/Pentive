@@ -65,7 +65,7 @@ const Sidebar: VoidComponent<{
 }> = (props) => {
 	return (
 		<>
-			<h1 class='font-bold text-lg'>/n/{props.nook}</h1>
+			<h1 class='text-lg font-bold'>/n/{props.nook}</h1>
 			<A href={`/n/${props.nook}/templates`}>Templates</A>
 			<div>Est. {props.nookDetails.created.toDateString()}</div>
 			<div>mods:{props.nookDetails.moderators}</div>

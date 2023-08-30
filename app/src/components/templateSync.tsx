@@ -70,7 +70,7 @@ const TemplateNookSync: VoidComponent<{
 					props.template.fields.map((f) => f.name).join(', '),
 				)}
 			/>
-			<div class='border border-black p-1 m-2'>
+			<div class='border-black m-2 border p-1'>
 				<h3>Child Templates</h3>
 				<Switch>
 					<Match

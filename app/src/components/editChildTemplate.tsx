@@ -67,7 +67,7 @@ const EditChildTemplate: VoidComponent<{
 		backView?.destroy()
 	})
 	return (
-		<fieldset class='border border-black p-2'>
+		<fieldset class='border-black border p-2'>
 			<legend>
 				<input
 					class='w-full border'

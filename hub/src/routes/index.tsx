@@ -28,8 +28,8 @@ export default function Home(): JSX.Element {
 	})
 
 	return (
-		<main class='w-full p-4 space-y-2'>
-			<h3 class='font-bold text-xl'>Message board</h3>
+		<main class='w-full space-y-2 p-4'>
+			<h3 class='text-xl font-bold'>Message board</h3>
 			<ResizingIframe
 				i={{
 					tag: 'template',

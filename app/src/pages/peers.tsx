@@ -97,13 +97,13 @@ const RenderPeerControls: VoidComponent<{
 		<>
 			<PeersTable peers={peers()} updated={updated()} />
 			<input
-				class='w-75px p-1 bg-white text-sm rounded-lg'
+				class='w-75px bg-white rounded-lg p-1 text-sm'
 				type='text'
 				onInput={(e) => setName(e.currentTarget.value)}
 			/>
 			<button
 				type='button'
-				class='border rounded-lg px-2 border-gray-900'
+				class='border-gray-900 rounded-lg border px-2'
 				onClick={async () => {
 					const displayName = peerDisplayNameValidator.parse(name())
 					await cwaClient.setPeer.mutate({
@@ -134,7 +134,7 @@ const RenderPeerControls: VoidComponent<{
 				<label for='remotePeerId'>Connect to</label>
 				<input
 					name='remotePeerId'
-					class='w-75px p-1 bg-white text-sm rounded-lg border'
+					class='w-75px bg-white rounded-lg border p-1 text-sm'
 					type='text'
 				/>
 			</form>

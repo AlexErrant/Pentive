@@ -37,13 +37,13 @@ const columnDefs: Array<ColDef<Template>> = [
 				<ul>
 					<For each={objEntries(props.data!.remotes)}>
 						{([nook, v]) => (
-							<li class='inline mr-2'>
+							<li class='mr-2 inline'>
 								<span>
 									<Show
 										when={v}
 										fallback={
 											<>
-												<Upload class='h-[1em] inline' />
+												<Upload class='inline h-[1em]' />
 												/n/{nook}
 											</>
 										}
@@ -53,10 +53,10 @@ const columnDefs: Array<ColDef<Template>> = [
 												v!.uploadDate.getTime() <= props.data!.updated.getTime()
 											}
 										>
-											<Upload class='h-[1em] inline' />
+											<Upload class='inline h-[1em]' />
 										</Show>
 										<a
-											class='underline text-blue-600 hover:text-blue-800 visited:text-purple-600'
+											class='text-blue-600 underline visited:text-purple-600 hover:text-blue-800'
 											title={`Last uploaded at ${v!.uploadDate.toLocaleString()}`}
 											href={
 												import.meta.env.VITE_HUB_ORIGIN +

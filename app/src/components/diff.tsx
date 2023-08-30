@@ -5,7 +5,7 @@ const Diff: VoidComponent<{
 	changes: Change[]
 	title: string
 }> = (props) => (
-	<div class='border border-black p-1 m-2'>
+	<div class='border-black m-2 border p-1'>
 		<h3>
 			{props.title}
 			<Show
