@@ -21,6 +21,7 @@ source ../PentiveSecrets/secrets.sh
 # echo $productionPlanetscaleDbUrl        | npx wrangler secret put planetscaleDbUrl        --name api-ugc
 # echo $productionAppOrigin               | npx wrangler secret put appOrigin               --name api-ugc
 # echo $productionHubOrigin               | npx wrangler secret put hubOrigin               --name api-ugc
+# echo $productionHubSessionSecret        | npx wrangler secret put hubSessionSecret        --name api-ugc
 # echo $productionHubSessionSecret        | npx wrangler secret put hubSessionSecret        --name hub
 # echo $productionAlphaKey                | npx wrangler secret put alphaKey                --name hub
 # echo $productionDiscordId               | npx wrangler secret put discordId               --name hub

@@ -19,4 +19,5 @@ export type Env = {
 	planetscaleDbUrl: string
 	appOrigin: string
 	hubOrigin: string
+	hubSessionSecret: string
 }
