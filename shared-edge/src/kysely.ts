@@ -261,6 +261,42 @@ export async function getNote(noteId: RemoteNoteId, userId: UserId | null) {
 	}
 }
 
+export async function searchNotes(input: string, userId: UserId | null) {
+	const r = await db
+		.selectFrom('note')
+		.innerJoin('template', 'template.id', 'note.templateId')
+		.select([
+			'note.id',
+			'note.fieldValues',
+			'note.created as noteCreated',
+			'note.updated as noteUpdated',
+			'note.tags',
+			'note.subscribersCount as subscribers',
+			'note.commentsCount as comments',
+			'template.id as templateId',
+			'template.name as templateName',
+			'template.created as templateCreated',
+			'template.updated as templateUpdated',
+			'template.nook as nook',
+			'template.css',
+			'template.fields',
+			'template.type',
+		])
+		.$if(userId != null, (a) =>
+			a.select((b) =>
+				b
+					.selectFrom('noteSubscriber')
+					.select(['til'])
+					.where('userId', '=', userId)
+					.whereRef('noteSubscriber.noteId', '=', 'note.id')
+					.as('til'),
+			),
+		)
+		.where(sql`MATCH(fts) AGAINST (${input} IN NATURAL LANGUAGE MODE)`)
+		.execute()
+	return r.map(noteToNookView)
+}
+
 // https://stackoverflow.com/a/18018037
 function listToTree<T extends Base64Url>(list: Array<Comment<T>>) {
 	const map = new Map<Base64Url, number>()
