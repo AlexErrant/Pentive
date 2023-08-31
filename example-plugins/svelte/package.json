@@ -23,7 +23,7 @@
 	},
 	"devDependencies": {
 		"@solidjs/router": "^0.8.2",
-		"@sveltejs/vite-plugin-svelte": "^2.0.3",
+		"@sveltejs/vite-plugin-svelte": "^2.4.5",
 		"@tsconfig/svelte": "^3.0.0",
 		"eslint": "^8.48.0",
 		"solid-js": "^1.7.3",
@@ -32,7 +32,7 @@
 		"svelte-preprocess": "^5.0.3",
 		"tslib": "^2.4.0",
 		"typescript": "~5.0.4",
-		"vite": "^4.1.4"
+		"vite": "^4.4.9"
 	},
 	"dependencies": {
 		"app": "workspace:*"
