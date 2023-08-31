@@ -45,8 +45,8 @@ async function addTsNoCheck(file) {
 }
 
 const ADDED_STR_TYPE =
-	'import type * as StartServerTypes from "./StartServer";\n\n'
-const FILES_TYPE = ['node_modules/solid-start/entry-server/render.ts']
+	'import type * as StartServerTypes from "../entry-server/StartServer";\n\n'
+const FILES_TYPE = ['node_modules/solid-start/server/render.ts']
 
 Promise.allSettled(FILES_TYPE.map(addTypeImport)).then((results) => {
 	let hasErrors = false
