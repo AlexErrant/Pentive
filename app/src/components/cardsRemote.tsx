@@ -22,8 +22,14 @@ function toggleNook(
 	setRemotes: Setter<
 		Array<{
 			readonly nookId: NookId
-			readonly remoteTemplateId: RemoteTemplateId | null
-			readonly remoteNoteId: RemoteNoteId | null
+			readonly remoteTemplateId: {
+				remoteTemplateId: RemoteTemplateId
+				uploadDate: Date
+			} | null
+			readonly remote: {
+				remoteNoteId: RemoteNoteId
+				uploadDate: Date
+			} | null
 			readonly uploadable: boolean
 		}>
 	>,
