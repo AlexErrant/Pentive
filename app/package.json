@@ -33,7 +33,7 @@
 		"@types/html-to-text": "^9.0.1",
 		"@types/iframe-resizer": "^3.5.9",
 		"@types/lodash": "^4.14.182",
-		"@types/node": "^18.7.21",
+		"@types/node": "18.16.0",
 		"@types/sql.js": "^1.4.4",
 		"@types/uuid": "^9.0.0",
 		"@typescript-eslint/eslint-plugin": "^6.5.0",
