@@ -7,6 +7,7 @@ import { type NookId, type Ord } from 'shared'
 import ResizingIframe from '~/components/resizingIframe'
 import { getUserId } from '~/session'
 import { remoteToNote, remoteToTemplate } from '~/lib/utility'
+import RelativeDate from '~/components/relativeDate'
 
 export function routeData({ params }: RouteDataArgs) {
 	return {
@@ -31,7 +32,7 @@ const Threads: Component = () => {
 	return (
 		<Show
 			when={data()?.nookDetails != null}
-			fallback={<a href={`/nooks/create`}>Create Nook</a>}
+			fallback={<a href={`/nooks/create?nook=${nook() ?? ''}`}>Create Nook</a>}
 		>
 			<Show when={data()}>
 				<div class='flex'>
@@ -67,7 +68,9 @@ const Sidebar: VoidComponent<{
 		<>
 			<h1 class='text-lg font-bold'>/n/{props.nook}</h1>
 			<A href={`/n/${props.nook}/templates`}>Templates</A>
-			<div>Est. {props.nookDetails.created.toDateString()}</div>
+			<div>
+				Est. <RelativeDate date={props.nookDetails.created} />
+			</div>
 			<div>mods:{props.nookDetails.moderators}</div>
 		</>
 	)

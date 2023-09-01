@@ -122,7 +122,7 @@ export default function Sync(): JSX.Element {
 							await db.sync()
 						}}
 					>
-						sync
+						p2p sync
 					</button>
 				</div>
 				<div class='mt-4'>

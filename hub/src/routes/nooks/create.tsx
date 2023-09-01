@@ -1,5 +1,5 @@
 import { Show, type JSX, For } from 'solid-js'
-import { FormError, useRouteData } from 'solid-start'
+import { FormError, useRouteData, useSearchParams } from 'solid-start'
 import { createNook } from 'shared-edge'
 import {
 	createServerAction$,
@@ -45,6 +45,7 @@ function validateNook(nook: unknown): string | undefined {
 
 export default function Submit(): JSX.Element {
 	const { csrfSignature } = useRouteData<typeof routeData>()
+	const [searchParams] = useSearchParams()
 
 	const [submitting, { Form }] = createServerAction$(
 		async (form: FormData, { request }) => {
@@ -88,7 +89,7 @@ export default function Submit(): JSX.Element {
 				description,
 				nook,
 			})
-			// highTODO return redirect to post
+			return redirect(`/n/${nook}`)
 		},
 	)
 	const error = (): FormError | undefined =>
@@ -107,7 +108,7 @@ export default function Submit(): JSX.Element {
 				/>
 				<div>
 					<label for='nook-input'>Nook Name</label>
-					<input id='nook-input' name='nook' />
+					<input value={searchParams.nook ?? ''} id='nook-input' name='nook' />
 				</div>
 				<div>
 					<label for='sidebar-input'>Sidebar</label>
