@@ -1,32 +1,15 @@
 import { type Context } from 'hono'
 import { jwtVerify, type JWTVerifyResult } from 'jose'
-import { type Brand, csrfHeaderName, hubSessionCookieName } from 'shared'
+import {
+	type Brand,
+	csrfHeaderName,
+	hubSessionCookieName,
+	type Result,
+	toError,
+	toOk,
+} from 'shared'
 import { getHubSessionSecret } from './env'
 import { type MediaTokenSecretBase64 } from './privateToken'
-
-export type Result<TOk, TError> =
-	| {
-			readonly tag: 'Ok'
-			readonly ok: TOk
-	  }
-	| {
-			readonly tag: 'Error'
-			readonly error: TError
-	  }
-
-export function toOk<T>(ok: T): { tag: 'Ok'; ok: T } {
-	return {
-		tag: 'Ok',
-		ok,
-	}
-}
-
-export function toError<T>(error: T): { tag: 'Error'; error: T } {
-	return {
-		tag: 'Error',
-		error,
-	}
-}
 
 // https://gist.github.com/72lions/4528834
 export function concat(a1: Uint8Array, a2: ArrayBuffer): Uint8Array {
