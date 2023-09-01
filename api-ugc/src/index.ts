@@ -10,7 +10,7 @@
 
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
-import { type Env, type ApiUgcContext } from './util'
+import { type Env, type ApiUgcContext, getUserId } from './util'
 import { hstsName, hstsValue, type Base64, parsePublicToken } from 'shared'
 import { setKysely, lookupMediaHash, binary16fromBase64URL } from 'shared-edge'
 import { appRouter } from './router'
@@ -37,12 +37,13 @@ app
 		})(c, next)
 	})
 	.use('/trpc/*', async (c) => {
+		const userId = await getUserId(c)
 		setKysely(c.env.planetscaleDbUrl)
 		return await fetchRequestHandler({
 			endpoint: '/trpc',
 			req: c.req.raw,
 			router: appRouter,
-			createContext,
+			createContext: () => createContext(userId, c.env),
 		})
 	})
 	.get('/', (c) => c.text('Hono!!'))

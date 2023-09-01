@@ -47,6 +47,7 @@ export type Env = {
 	peerSyncPrivateKey: string
 }
 
+// changes to this should be copied to CB799051-C477-4F6A-9251-AAF63C347F3A
 export async function getUserId(
 	c: CwaContext,
 ): Promise<Result<UserId, Response>> {
