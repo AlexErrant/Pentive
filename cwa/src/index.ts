@@ -10,7 +10,7 @@
 
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
-import { type Env, getUserId, type MediaHash, type CwaContext } from './util'
+import { type Env, type MediaHash, type CwaContext } from './util'
 import {
 	hstsName,
 	hstsValue,
@@ -29,6 +29,7 @@ import {
 	fromBase64,
 	userOwnsNoteAndHasMedia,
 	userOwnsTemplateAndHasMedia,
+	getUserId,
 } from 'shared-edge'
 import { connect } from '@planetscale/database'
 import { buildPrivateToken } from './privateToken'
