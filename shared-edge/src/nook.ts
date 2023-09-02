@@ -41,7 +41,6 @@ function serializeNookType(nookType: NookType) {
 	}
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function deserializeNookType(i: number): NookType {
 	switch (i) {
 		case 0:
@@ -53,6 +52,18 @@ function deserializeNookType(i: number): NookType {
 		default:
 			return throwExp(`Expected 0, 1, or 2, but got ${i}`)
 	}
+}
+
+export async function getNooks() {
+	const nooks = await db
+		.selectFrom('nook')
+		.select(['id', 'type', 'description'])
+		.where('nook.type', '<>', 2)
+		.execute()
+	return nooks.map((n) => ({
+		...n,
+		type: deserializeNookType(n.type),
+	}))
 }
 
 export async function createNook({
