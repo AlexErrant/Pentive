@@ -9,6 +9,7 @@ import { remoteToTemplate } from '~/lib/utility'
 import { unwrap } from 'solid-js/store'
 import { getUserId } from '~/session'
 import { cwaClient } from 'app/src/trpcClient'
+import RelativeDate from '~/components/relativeDate'
 
 export function routeData({ params }: RouteDataArgs) {
 	return {
@@ -48,9 +49,13 @@ const Threads: Component = () => {
 											Download
 										</button>
 										<div>
-											{template.til == null
-												? ''
-												: 'Last synced at' + template.til.toLocaleTimeString()}
+											{template.til == null ? (
+												''
+											) : (
+												<>
+													Last synced at <RelativeDate date={template.til} />
+												</>
+											)}
 										</div>
 										<a href={`/n/${nook()}/template/${template.id}`}>
 											Comments: {template.comments}

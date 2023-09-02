@@ -5,6 +5,7 @@ import Toggle from './toggle'
 import SubmitComment from './submitComment'
 import { cwaClient } from '~/routes/cwaClient'
 import { type Base64Url } from 'shared'
+import RelativeDate from './relativeDate'
 
 const Comment: Component<{
 	comment: CommentType<Base64Url>
@@ -17,7 +18,7 @@ const Comment: Component<{
 				<A href={`/users/${props.comment.authorId}`}>
 					{props.comment.authorId}
 				</A>{' '}
-				{props.comment.updated.toLocaleString()}
+				<RelativeDate date={props.comment.updated} />
 			</div>
 			<div class='text'>{props.comment.text}</div>
 			<button

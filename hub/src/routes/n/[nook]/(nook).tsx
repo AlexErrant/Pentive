@@ -101,9 +101,13 @@ const MainContent: VoidComponent<{
 					return (
 						<li>
 							<div>
-								{note.til == null
-									? ''
-									: 'Last synced at' + note.til.toLocaleTimeString()}
+								{note.til == null ? (
+									''
+								) : (
+									<>
+										Last synced at <RelativeDate date={note.til} />
+									</>
+								)}
 							</div>
 							<div>{note.subscribers} subscribers</div>
 							<div>
