@@ -9,8 +9,8 @@ export function routeData({ params }: RouteDataArgs) {
 	return {
 		nook: () => params.nook,
 		nookDetails: createServerData$(
-			async (nook) => await getNook(nook as NookId),
-			{ key: () => params.nook, initialValue: null },
+			async ([_, nook]) => await getNook(nook as NookId),
+			{ key: () => ['n', params.nook], initialValue: null },
 		),
 	}
 }

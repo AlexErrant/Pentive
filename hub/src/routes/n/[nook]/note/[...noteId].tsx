@@ -17,7 +17,7 @@ export function routeData({ params }: RouteDataArgs) {
 	return {
 		nook: () => params.nook as NookId,
 		data: createServerData$(
-			async (noteId, { request }) => {
+			async ([_, noteId], { request }) => {
 				return {
 					note: await getUserId(request).then(
 						async (userId) => await getNote(noteId as RemoteNoteId, userId),
@@ -25,7 +25,7 @@ export function routeData({ params }: RouteDataArgs) {
 					comments: await getNoteComments(noteId as RemoteNoteId),
 				}
 			},
-			{ key: () => params.noteId },
+			{ key: () => ['noteId', params.noteId] },
 		),
 	}
 }
