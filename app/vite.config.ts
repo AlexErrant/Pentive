@@ -55,7 +55,6 @@ export default defineConfig(({ mode }: UserConfig) => {
 		server: {
 			port: 3013,
 			strictPort: true,
-			hmr: false,
 			https: {
 				key,
 				cert,
