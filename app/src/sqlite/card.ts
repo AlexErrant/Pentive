@@ -164,6 +164,7 @@ export const cardCollectionMethods = {
 		search?: { literalSearch?: string; ftsSearch?: string },
 	) {
 		const db = await getKysely()
+		const start = performance.now()
 		const entities = await db
 			.selectFrom('card')
 			.innerJoin('note', 'card.noteId', 'note.id')
@@ -220,6 +221,8 @@ export const cardCollectionMethods = {
 				db.where('note.fieldValues', 'like', '%' + search!.literalSearch + '%'),
 			)
 			.execute()
+		const end = performance.now()
+		console.log(`Execution time: ${end - start} ms`, search)
 		const count = await db
 			.selectFrom('card')
 			.innerJoin('note', 'card.noteId', 'note.id')
