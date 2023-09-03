@@ -40,6 +40,12 @@ export interface Note {
 	fieldValues: string
 }
 
+export interface NoteFts {
+	id: LDbId
+	tags: string
+	fieldValues: string
+}
+
 export interface RemoteNote {
 	localId: LDbId
 	nook: NookId
@@ -85,6 +91,7 @@ export interface DB {
 	card: Card
 	media: Media
 	note: Note
+	noteFts: NoteFts
 	remoteNote: RemoteNote
 	plugin: Plugin
 	remoteMedia: RemoteMedia

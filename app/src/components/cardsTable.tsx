@@ -114,6 +114,7 @@ const getRowId = (params: GetRowIdParams<NoteCard>): CardId =>
 	params.data.card.id
 
 const [literalSearch, setLiteralSearch] = createSignal('')
+const [ftsSearch, setFtsSearch] = createSignal('')
 
 const CardsTable: VoidComponent<{
 	readonly onSelectionChanged: (noteCards: NoteCard[]) => void
@@ -123,14 +124,25 @@ const CardsTable: VoidComponent<{
 			gridRef?.api.setDatasource(dataSource)
 		}),
 	)
+	createEffect(
+		on(ftsSearch, () => {
+			gridRef?.api.setDatasource(dataSource)
+		}),
+	)
 	return (
 		<div class='flex h-full flex-col'>
 			<div class='m-0.5 p-0.5'>
 				<input
 					class='w-full border'
 					type='text'
-					placeholder='Search'
+					placeholder='Literal Search'
 					onInput={(e) => setLiteralSearch(e.currentTarget.value)}
+				/>
+				<input
+					class='w-full border'
+					type='text'
+					placeholder='FTS Search'
+					onInput={(e) => setFtsSearch(e.currentTarget.value)}
 				/>
 			</div>
 			<div class={`${agGridTheme()} h-full`}>
@@ -186,10 +198,12 @@ const dataSource = {
 				  }
 				: undefined
 		const literalSearchActual = literalSearch()
-		const search =
-			literalSearchActual === ''
-				? undefined
-				: { literalSearch: literalSearchActual }
+		const ftsSearchActual = ftsSearch()
+		const search = {
+			literalSearch:
+				literalSearchActual.trim() === '' ? undefined : literalSearchActual,
+			ftsSearch: ftsSearchActual.trim() === '' ? undefined : ftsSearchActual,
+		}
 		db.getCards(p.startRow, cacheBlockSize, sort, search) // medTODO could just cache the Template and mutate the NoteCard obj to add it
 			.then((x) => {
 				p.successCallback(x.noteCards, x.count)

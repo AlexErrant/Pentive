@@ -25,6 +25,21 @@ export const initSql = [
     tags TEXT,
     fieldValues TEXT
 ) STRICT;`,
+	`CREATE VIRTUAL TABLE IF NOT EXISTS noteFts USING fts5 (
+	    id,
+	    tags,
+	    fieldValues
+  );`,
+	`CREATE TRIGGER IF NOT EXISTS note_after_insert AFTER INSERT ON note BEGIN
+     INSERT INTO noteFts(id, tags, fieldValues) VALUES (new.id, new.tags, new.fieldValues);
+   END;`,
+	`CREATE TRIGGER IF NOT EXISTS note_after_delete AFTER DELETE ON note BEGIN
+     INSERT INTO noteFts(noteFts, id, tags, fieldValues) VALUES('delete', old.id, old.tags, old.fieldValues);
+   END;`,
+	`CREATE TRIGGER IF NOT EXISTS note_after_update AFTER UPDATE ON note BEGIN
+     INSERT INTO noteFts(noteFts, id, tags, fieldValues) VALUES('delete', old.id, old.tags, old.fieldValues);
+     INSERT INTO noteFts(id, tags, fieldValues) VALUES (new.id, new.tags, new.fieldValues);
+   END;`,
 	`CREATE TABLE IF NOT EXISTS remoteNote (
     localId TEXT, -- make BLOB upon SQLite v3.41 and the landing of UNHEX https://sqlite.org/forum/forumpost/30cca4e613d2fa2a grep F235B7FB-8CEA-4AE2-99CC-2790E607B1EB
     nook TEXT,

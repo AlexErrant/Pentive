@@ -19,6 +19,7 @@ import {
 	type Kysely,
 	type OnConflictTables,
 	type RawBuilder,
+	sql,
 } from 'kysely'
 import _ from 'lodash'
 import { entityToDomain as templateEntityToDomain } from './template'
@@ -160,7 +161,7 @@ export const cardCollectionMethods = {
 		offset: number,
 		limit: number,
 		sort?: { col: 'due'; direction: 'asc' | 'desc' },
-		search?: { literalSearch: string },
+		search?: { literalSearch?: string; ftsSearch?: string },
 	) {
 		const db = await getKysely()
 		const entities = await db
@@ -208,14 +209,27 @@ export const cardCollectionMethods = {
 			.offset(offset)
 			.limit(limit)
 			.$if(sort != null, (db) => db.orderBy(sort!.col, sort!.direction))
-			.$if(search != null, (db) =>
+			.$if(search?.ftsSearch != null, (db) =>
+				db
+					.innerJoin('noteFts', 'noteFts.id', 'note.id')
+					// must hardcode `noteFts` for now https://github.com/kysely-org/kysely/issues/546
+					.where(sql`noteFts`, 'match', search!.ftsSearch)
+					.orderBy(sql`rank`),
+			)
+			.$if(search?.literalSearch != null, (db) =>
 				db.where('note.fieldValues', 'like', '%' + search!.literalSearch + '%'),
 			)
 			.execute()
 		const count = await db
 			.selectFrom('card')
 			.innerJoin('note', 'card.noteId', 'note.id')
-			.$if(search != null, (db) =>
+			.$if(search?.ftsSearch != null, (db) =>
+				db
+					.innerJoin('noteFts', 'noteFts.id', 'note.id')
+					// must hardcode `noteFts` for now https://github.com/kysely-org/kysely/issues/546
+					.where(sql`noteFts`, 'match', search!.ftsSearch),
+			)
+			.$if(search?.literalSearch != null, (db) =>
 				db.where('note.fieldValues', 'like', '%' + search!.literalSearch + '%'),
 			)
 			.select(db.fn.count<number>('card.id').as('c'))
