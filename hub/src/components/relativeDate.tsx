@@ -5,7 +5,7 @@ const RelativeDate: Component<{ date: Date | string }> = (props) => {
 	const date = () =>
 		typeof props.date === 'string' ? new Date(props.date) : props.date
 
-	return <span>{date().toLocaleString()}</span>
+	return <time datetime={date().toISOString()}>{date().toLocaleString()}</time>
 }
 
 export default RelativeDate
