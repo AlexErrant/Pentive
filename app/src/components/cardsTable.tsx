@@ -113,13 +113,13 @@ const columnDefs: Array<ColDef<NoteCard>> = [
 const getRowId = (params: GetRowIdParams<NoteCard>): CardId =>
 	params.data.card.id
 
-const [generalSearch, setGeneralSearch] = createSignal('')
+const [literalSearch, setLiteralSearch] = createSignal('')
 
 const CardsTable: VoidComponent<{
 	readonly onSelectionChanged: (noteCards: NoteCard[]) => void
 }> = (props) => {
 	createEffect(
-		on(generalSearch, () => {
+		on(literalSearch, () => {
 			gridRef?.api.setDatasource(dataSource)
 		}),
 	)
@@ -130,7 +130,7 @@ const CardsTable: VoidComponent<{
 					class='w-full border'
 					type='text'
 					placeholder='Search'
-					onInput={(e) => setGeneralSearch(e.currentTarget.value)}
+					onInput={(e) => setLiteralSearch(e.currentTarget.value)}
 				/>
 			</div>
 			<div class={`${agGridTheme()} h-full`}>
@@ -185,11 +185,11 @@ const dataSource = {
 						direction: p.sortModel[0]!.sort,
 				  }
 				: undefined
-		const generalSearchActual = generalSearch()
+		const literalSearchActual = literalSearch()
 		const search =
-			generalSearchActual === ''
+			literalSearchActual === ''
 				? undefined
-				: { generalSearch: generalSearchActual }
+				: { literalSearch: literalSearchActual }
 		db.getCards(p.startRow, cacheBlockSize, sort, search) // medTODO could just cache the Template and mutate the NoteCard obj to add it
 			.then((x) => {
 				p.successCallback(x.noteCards, x.count)

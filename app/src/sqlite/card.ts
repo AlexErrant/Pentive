@@ -160,7 +160,7 @@ export const cardCollectionMethods = {
 		offset: number,
 		limit: number,
 		sort?: { col: 'due'; direction: 'asc' | 'desc' },
-		search?: { generalSearch: string },
+		search?: { literalSearch: string },
 	) {
 		const db = await getKysely()
 		const entities = await db
@@ -209,14 +209,14 @@ export const cardCollectionMethods = {
 			.limit(limit)
 			.$if(sort != null, (db) => db.orderBy(sort!.col, sort!.direction))
 			.$if(search != null, (db) =>
-				db.where('note.fieldValues', 'like', '%' + search!.generalSearch + '%'),
+				db.where('note.fieldValues', 'like', '%' + search!.literalSearch + '%'),
 			)
 			.execute()
 		const count = await db
 			.selectFrom('card')
 			.innerJoin('note', 'card.noteId', 'note.id')
 			.$if(search != null, (db) =>
-				db.where('note.fieldValues', 'like', '%' + search!.generalSearch + '%'),
+				db.where('note.fieldValues', 'like', '%' + search!.literalSearch + '%'),
 			)
 			.select(db.fn.count<number>('card.id').as('c'))
 			.executeTakeFirstOrThrow()
