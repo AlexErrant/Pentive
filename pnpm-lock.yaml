@@ -235,6 +235,9 @@ importers:
       solid-js:
         specifier: ^1.7.11
         version: 1.7.11
+      solid-toast:
+        specifier: ^0.5.0
+        version: 0.5.0(solid-js@1.7.11)
       sql.js:
         specifier: ^1.8.0
         version: 1.8.0
@@ -15035,6 +15038,14 @@ packages:
     transitivePeerDependencies:
       - '@nuxt/kit'
       - supports-color
+
+  /solid-toast@0.5.0(solid-js@1.7.11):
+    resolution: {integrity: sha512-t770JakjyS2P9b8Qa1zMLOD51KYKWXbTAyJePVUoYex5c5FH5S/HtUBUbZAWFcqRCKmAE8KhyIiCvDZA8bOnxQ==}
+    peerDependencies:
+      solid-js: ^1.5.4
+    dependencies:
+      solid-js: 1.7.11
+    dev: false
 
   /sorcery@0.11.0:
     resolution: {integrity: sha512-J69LQ22xrQB1cIFJhPfgtLuI6BpWRiWu1Y3vSsIwK/eAScqJxd/+CJlUuHQRdX2C9NGFamq+KqNywGgaThwfHw==}

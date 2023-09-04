@@ -127,6 +127,7 @@
 		"shared-dom": "workspace:*",
 		"shared-edge": "workspace:*",
 		"solid-js": "^1.7.11",
+		"solid-toast": "^0.5.0",
 		"sql.js": "^1.8.0",
 		"superjson": "^1.12.2",
 		"uuid": "^9.0.0",
