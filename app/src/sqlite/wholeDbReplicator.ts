@@ -276,10 +276,7 @@ export class WholeDbReplicator {
 					)
 				}
 			} catch (e) {
-				return toastFatal(
-					'Error occured while syncing, see console for details',
-					e,
-				)
+				return toastFatal('Error occured while syncing.', e)
 			} finally {
 				await stmt.finalize(tx)
 			}

@@ -195,7 +195,7 @@ export class WholeDbRtc implements PokeProtocol {
 		})
 		conn.on('error', (e) => {
 			// TODO: more reporting to the callers of us
-			toastError('Error while syncing, see console for details', e)
+			toastError('Error while syncing', e)
 			this.establishedConnections.delete(conn.peer)
 			this._connectionsChanged()
 		})
@@ -279,10 +279,7 @@ class WholeDbRtcPublic {
 			try {
 				l([...pending.keys()], [...established.keys()])
 			} catch (e) {
-				toastError(
-					'Error occured while connecting to peers, see console for details.',
-					e,
-				)
+				toastError('Error occured while connecting to peers', e)
 			}
 		}
 	}

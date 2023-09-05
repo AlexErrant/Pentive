@@ -75,10 +75,7 @@ const ResizingIframe: VoidComponent<{
 				targetOrigin,
 			)
 		} catch (error) {
-			toastError(
-				'Error communicating with iframe. See console for details.',
-				error,
-			)
+			toastError('Error communicating with iframe.', error)
 		}
 	})
 	return (

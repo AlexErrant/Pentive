@@ -164,7 +164,7 @@ async function downloadImages(
 				)
 			} else {
 				return toastFatal(
-					`Error occured while downloading ${imgSrc} - see console for details.`,
+					`Error occured while downloading ${imgSrc}.`,
 					`Fetching ${imgSrc} got a status code of ${response.status}`,
 					response,
 				)

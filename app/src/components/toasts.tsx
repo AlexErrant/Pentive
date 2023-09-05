@@ -4,13 +4,16 @@ import {
 	createEffect,
 	createSignal,
 	onCleanup,
+	Show,
 } from 'solid-js'
 import toast from 'solid-toast'
 
 export function toastError(userMsg: JSXElement, ...consoleMsg: unknown[]) {
+	let hasConsoleMsg = false
 	if (consoleMsg.length === 0) {
 		console.error(userMsg)
 	} else {
+		hasConsoleMsg = true
 		console.error(...consoleMsg)
 	}
 	toast.custom(
@@ -21,8 +24,25 @@ export function toastError(userMsg: JSXElement, ...consoleMsg: unknown[]) {
 					toast.dismiss(t.id)
 				}}
 			>
-				<h1 class='text-red-500 font-bold'>Error</h1>
-				{userMsg}
+				<h1 class='text-red-500 text-xl font-bold'>Error</h1>
+				<div class='text-lg'>{userMsg}</div>
+				<Show when={hasConsoleMsg}>
+					<div class='italic'>
+						The console has technical details.{' '}
+						<a
+							// https://stackoverflow.com/a/20327676
+							class='text-blue-600 relative z-[1] m-[-1em] inline-block p-[1em] underline visited:text-purple-600 hover:text-blue-800'
+							href='https://balsamiq.com/support/faqs/browserconsole'
+							target='_blank'
+							rel='noreferrer noopener'
+							onClick={(e) => {
+								e.stopPropagation()
+							}}
+						>
+							Here's how to open the console.
+						</a>
+					</div>
+				</Show>
 			</div>
 		),
 		{
