@@ -14,6 +14,7 @@ import { whoAmI } from '../globalState.js'
 import { cwaClient } from '../trpcClient.js'
 import { type JWTVerifyResult, jwtVerify, importSPKI } from 'jose'
 import { alg } from 'cwa/src/peerSync.js'
+import { toastError, toastInfo, toastWarn } from '../components/toasts.jsx'
 
 type Msg = PokeMsg | ChangesMsg | RequestChangesMsg
 /**
@@ -85,7 +86,7 @@ export class WholeDbRtc implements PokeProtocol {
 				})
 			} else {
 				c.close()
-				console.warn(
+				toastWarn(
 					`Incoming connection failed due to invalid token: ${
 						// eslint-disable-next-line @typescript-eslint/restrict-template-expressions, @typescript-eslint/no-base-to-string
 						token ?? 'undefined'
@@ -102,7 +103,7 @@ export class WholeDbRtc implements PokeProtocol {
 	async schemaChanged() {
 		const r = this.replicator
 		if (r == null) {
-			console.warn('replicator is null')
+			toastWarn('replicator is null')
 		} else {
 			await r.schemaChanged()
 		}
@@ -194,7 +195,7 @@ export class WholeDbRtc implements PokeProtocol {
 		})
 		conn.on('error', (e) => {
 			// TODO: more reporting to the callers of us
-			console.error(e)
+			toastError('Error while syncing, see console for details', e)
 			this.establishedConnections.delete(conn.peer)
 			this._connectionsChanged()
 		})
@@ -207,21 +208,21 @@ export class WholeDbRtc implements PokeProtocol {
 	private _dataReceived(from: SiteIDWire, data: Msg) {
 		switch (data.tag) {
 			case 'poke':
-				console.log(`Poking with v${data.version}...`)
+				toastInfo(`Poking with v${data.version}...`)
 				this._onPoked != null && this._onPoked(from, BigInt(data.version))
-				console.log(`Poked!`)
+				toastInfo(`Poked!`)
 				break
 			case 'apply-changes':
-				console.log(`Applying ${data.changes.length} changes...`)
+				toastInfo(`Applying ${data.changes.length} changes...`)
 				this._onChangesReceived != null &&
 					this._onChangesReceived(from, data.changes)
-				console.log('Applied changes!')
+				toastInfo('Applied changes!')
 				break
 			case 'request-changes':
-				console.log('Requesting changes since', data.since)
+				toastInfo('Requesting changes since ' + data.since)
 				this._onChangesRequested != null &&
 					this._onChangesRequested(from, BigInt(data.since))
-				console.log('Requested changes!')
+				toastInfo('Requested changes!')
 				break
 		}
 	}
@@ -278,7 +279,10 @@ class WholeDbRtcPublic {
 			try {
 				l([...pending.keys()], [...established.keys()])
 			} catch (e) {
-				console.error(e)
+				toastError(
+					'Error occured while connecting to peers, see console for details.',
+					e,
+				)
 			}
 		}
 	}

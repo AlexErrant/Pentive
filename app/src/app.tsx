@@ -3,6 +3,7 @@ import { useRoutes } from '@solidjs/router'
 
 import { navLinks, routes } from './routes'
 import { C } from './pluginManager'
+import { Toaster } from 'solid-toast'
 
 export default function App(): JSX.Element {
 	const Route = useRoutes(routes)
@@ -25,6 +26,7 @@ export default function App(): JSX.Element {
 			<main class='contents'>
 				<Route />
 			</main>
+			<Toaster />
 		</>
 	)
 }

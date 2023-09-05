@@ -1,5 +1,6 @@
 import { type Ord } from 'shared'
 import { z, type SafeParseReturnType } from 'zod'
+import { toastFatal } from '../../components/toasts'
 
 const tmpl = z.object({
 	name: z.string(),
@@ -155,8 +156,14 @@ function parse<Input, Output>(
 	if (result.success) {
 		return result.data
 	} else {
-		console.error('Error parsing: ', raw)
-		throw new Error(result.error.toString())
+		return toastFatal(
+			<>
+				<div>Error parsing the following:</div>
+				<pre>{JSON.stringify(raw, null, 4)}</pre>
+				<div>Error is: {result.error.toString()}</div>
+			</>,
+			result.error.toString(),
+		)
 	}
 }
 

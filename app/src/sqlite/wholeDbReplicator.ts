@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { type DBAsync } from '@vlcn.io/xplat-api'
 import { parse as uuidParse, stringify as uuidStringify } from 'uuid'
+import { toastFatal } from '../components/toasts'
 export type SiteIDWire = string
 export type SiteIDLocal = Uint8Array
 type CID = string
@@ -275,8 +276,10 @@ export class WholeDbReplicator {
 					)
 				}
 			} catch (e) {
-				console.error(e)
-				throw e
+				return toastFatal(
+					'Error occured while syncing, see console for details',
+					e,
+				)
 			} finally {
 				await stmt.finalize(tx)
 			}

@@ -11,6 +11,7 @@ import {
 import { unwrap } from 'solid-js/store'
 import { db } from '../db'
 import { C } from '../pluginManager'
+import { toastError } from './toasts'
 
 const targetOrigin = '*' // highTODO make more limiting. Also implement https://stackoverflow.com/q/8169582
 
@@ -74,7 +75,10 @@ const ResizingIframe: VoidComponent<{
 				targetOrigin,
 			)
 		} catch (error) {
-			console.error(error)
+			toastError(
+				'Error communicating with iframe. See console for details.',
+				error,
+			)
 		}
 	})
 	return (

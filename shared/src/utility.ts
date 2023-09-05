@@ -24,8 +24,11 @@ export function nullMap<T, R>(t: T | null, f: (_: T) => R): R | null {
 }
 
 // https://stackoverflow.com/a/65666402
-export function throwExp(errorMessage: string): never {
-	throw new Error(errorMessage)
+export function throwExp(error: unknown): never {
+	if (typeof error === 'string') {
+		throw new Error(error)
+	}
+	throw error
 }
 
 // https://stackoverflow.com/a/46700791/

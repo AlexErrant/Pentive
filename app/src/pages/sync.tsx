@@ -9,6 +9,7 @@ import {
 } from 'shared'
 import { cwaClient } from '../trpcClient'
 import { whoAmI } from '../globalState'
+import { toastError, toastInfo } from '../components/toasts'
 
 async function postMedia(
 	type: 'note' | 'template',
@@ -39,11 +40,10 @@ async function postMedia(
 	if (200 <= response.status && response.status <= 299) {
 		await db.updateUploadDate(ids)
 	} else {
-		console.error(
-			`'${response.status}' HTTP status while uploading ${mediaId}.`,
+		toastError(
+			`'${response.status}' HTTP status while uploading media with id ${mediaId}.`,
 		)
 	}
-	console.log(response)
 }
 
 async function uploadNotes(): Promise<void> {
@@ -64,7 +64,7 @@ async function uploadNotes(): Promise<void> {
 		await postMedia('note', mediaId, ids, data)
 	}
 	if (editedNotes.length === 0 && newNotes.length === 0 && media.size === 0) {
-		console.log('Nothing to upload!')
+		toastInfo('Nothing to upload!')
 	}
 }
 
@@ -88,7 +88,7 @@ async function uploadTemplates(): Promise<void> {
 		newTemplates.length === 0 &&
 		media.size === 0
 	) {
-		console.log('Nothing to upload!')
+		toastInfo('Nothing to upload!')
 	}
 }
 

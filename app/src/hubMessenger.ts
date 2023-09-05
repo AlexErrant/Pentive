@@ -19,6 +19,7 @@ import { type Transaction } from 'kysely'
 import { type DB } from './sqlite/database'
 import { noteOrds } from 'shared-dom'
 import { C } from './pluginManager'
+import { toastFatal } from './components/toasts'
 
 export const appExpose = {
 	addTemplate: async (rt: RemoteTemplate) => {
@@ -163,8 +164,11 @@ async function downloadImages(
 					trx,
 				)
 			} else {
-				console.error(response)
-				throwExp(`Fetching ${imgSrc} got a status code of ${response.status}`)
+				return toastFatal(
+					`Error occured while downloading ${imgSrc} - see console for details.`,
+					`Fetching ${imgSrc} got a status code of ${response.status}`,
+					response,
+				)
 			}
 		}),
 	)

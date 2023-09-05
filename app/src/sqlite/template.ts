@@ -31,6 +31,7 @@ import {
 	type RawBuilder,
 } from 'kysely'
 import { updateLocalMediaIdByRemoteMediaIdAndGetNewDoc } from './note'
+import { toastWarn } from '../components/toasts'
 
 function templateToDocType(template: Template) {
 	const now = new Date().getTime()
@@ -387,7 +388,7 @@ export const templateCollectionMethods = {
 				.returningAll()
 				.execute()
 			if (r1.length !== 1)
-				console.warn(
+				toastWarn(
 					`No remoteTemplate found for nook '${nook}' and templateId '${templateId}'`,
 				)
 			await db

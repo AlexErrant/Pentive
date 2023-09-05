@@ -20,6 +20,7 @@ import { type DB, type Note as NoteEntity, type RemoteNote } from './database'
 import { type InsertObject, type Kysely } from 'kysely'
 import _ from 'lodash'
 import { parseFields as parseTemplateFields } from './template'
+import { toastInfo, toastWarn } from '../components/toasts'
 
 function noteToDocType(note: Note): InsertObject<DB, 'note'> {
 	const now = new Date().getTime()
@@ -109,7 +110,7 @@ export const noteCollectionMethods = {
 		const db = await getKysely()
 		const batches = _.chunk(notes.map(noteToDocType), 1000)
 		for (let i = 0; i < batches.length; i++) {
-			console.log('note batch', i)
+			toastInfo('note batch ' + i)
 			await db.insertInto('note').values(batches[i]!).execute()
 		}
 	},
@@ -372,7 +373,7 @@ export const noteCollectionMethods = {
 				.returningAll()
 				.execute()
 			if (r1.length !== 1)
-				console.warn(
+				toastWarn(
 					`No remoteNote found for nook '${nook}' and noteId '${noteId}'`,
 				)
 			await db

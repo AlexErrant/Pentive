@@ -8,6 +8,7 @@ import { Kysely } from 'kysely'
 import crsqliteUrl from '@vlcn.io/crsqlite-wasm/crsqlite.wasm?url'
 import wdbRtc from './wholeDbRtc'
 import { wholeDbReplicator } from 'shared-dom'
+import { toastInfo } from '../components/toasts'
 
 let myDatabase: Promise<crDB> | null = null
 let myCrRtc: Awaited<ReturnType<typeof wdbRtc>> | null = null
@@ -80,6 +81,6 @@ export async function sync(): Promise<void> {
 			fromSiteId: siteId,
 		})
 	} else {
-		console.log('No changes to push!')
+		toastInfo('No changes to push!')
 	}
 }

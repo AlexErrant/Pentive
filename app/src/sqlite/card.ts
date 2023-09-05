@@ -24,6 +24,7 @@ import {
 import _ from 'lodash'
 import { entityToDomain as templateEntityToDomain } from './template'
 import { entityToDomain as noteEntityToDomain } from './note'
+import { toastInfo } from '../components/toasts'
 
 function serializeState(s: State): number {
 	switch (s) {
@@ -123,7 +124,7 @@ export const cardCollectionMethods = {
 		db ??= await getKysely()
 		const batches = _.chunk(cards.map(cardToDocType), 1000)
 		for (let i = 0; i < batches.length; i++) {
-			console.log('card batch', i)
+			toastInfo('card batch ' + i)
 			await db
 				.insertInto('card')
 				.values(batches[i]!)
@@ -164,7 +165,6 @@ export const cardCollectionMethods = {
 		search?: { literalSearch?: string; ftsSearch?: string },
 	) {
 		const db = await getKysely()
-		const start = performance.now()
 		const entities = await db
 			.selectFrom('card')
 			.innerJoin('note', 'card.noteId', 'note.id')
@@ -221,8 +221,6 @@ export const cardCollectionMethods = {
 				db.where('note.fieldValues', 'like', '%' + search!.literalSearch + '%'),
 			)
 			.execute()
-		const end = performance.now()
-		console.log(`Execution time: ${end - start} ms`, search)
 		const count = await db
 			.selectFrom('card')
 			.innerJoin('note', 'card.noteId', 'note.id')

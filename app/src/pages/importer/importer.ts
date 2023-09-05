@@ -30,6 +30,7 @@ import {
 import { db } from './../../db'
 import _ from 'lodash'
 import sqliteUrl from '../../assets/sql-wasm.wasm?url'
+import { toastInfo } from '../../components/toasts'
 
 export async function importAnki(
 	event: Event & {
@@ -66,10 +67,10 @@ async function importAnkiMedia(ankiEntries: Entry[]): Promise<void> {
 	const parsed = checkMedia(JSON.parse(mediaText))
 	const entryChunks = _.chunk(ankiEntries, 1000)
 	for (let i = 0; i < entryChunks.length; i++) {
-		console.log(`media ${i}/${entryChunks.length}`)
+		toastInfo(`Media ${i}/${entryChunks.length}`)
 		await addMediaBatch(entryChunks[i]!, parsed)
 	}
-	console.log('Anki media import done!')
+	toastInfo('Anki media import done!')
 }
 
 async function addMediaBatch(
@@ -113,7 +114,6 @@ async function importAnkiDb(sqlite: Entry): Promise<void> {
 			const templates = parseTemplates(col.models)
 			await db.bulkInsertTemplate(templates)
 			templates.forEach((t) => templatesMap.set(t.id, t))
-			console.log(templates)
 		}
 		cols.free()
 		const notes = ankiDb.prepare('select * from notes') // lowTODO select exact columns
@@ -135,7 +135,7 @@ async function importAnkiDb(sqlite: Entry): Promise<void> {
 	} finally {
 		ankiDb.close()
 	}
-	console.log('AnkiDB import done!')
+	toastInfo('AnkiDB import done!')
 }
 
 async function getAnkiDb(sqlite: Entry): Promise<Database> {

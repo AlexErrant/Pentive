@@ -3,6 +3,7 @@ import PluginsTable from '../components/pluginsTable'
 import { db } from '../db'
 import { throwExp } from 'shared'
 import { parsePluginNpmPackage } from 'shared-dom'
+import { toastInfo } from '../components/toasts'
 
 export default function Plugins(): JSX.Element {
 	return (
@@ -35,5 +36,5 @@ async function importPlugin(
 		created: new Date(),
 		updated: new Date(),
 	})
-	console.log('Plugin upserted!')
+	toastInfo('Plugin upserted!')
 }
