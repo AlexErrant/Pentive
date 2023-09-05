@@ -33,12 +33,16 @@ export function toastError(userMsg: JSXElement, ...consoleMsg: unknown[]) {
 }
 
 export function toastFatal(
-	userMsg: JSXElement,
-	throwMsg: unknown,
+	userMsg: string | { jsx: JSXElement; throwMsg: string },
 	...consoleMsg: unknown[]
 ) {
-	toastError(userMsg, ...consoleMsg)
-	return throwExp(throwMsg)
+	if (typeof userMsg === 'string') {
+		toastError(userMsg, ...consoleMsg)
+		return throwExp(userMsg)
+	} else {
+		toastError(userMsg.jsx, ...consoleMsg)
+		return throwExp(userMsg.throwMsg)
+	}
 }
 
 export function toastWarn(userMsg: JSXElement, ...consoleMsg: unknown[]) {

@@ -156,14 +156,16 @@ function parse<Input, Output>(
 	if (result.success) {
 		return result.data
 	} else {
-		return toastFatal(
-			<>
-				<div>Error parsing the following:</div>
-				<pre>{JSON.stringify(raw, null, 4)}</pre>
-				<div>Error is: {result.error.toString()}</div>
-			</>,
-			result.error.toString(),
-		)
+		return toastFatal({
+			jsx: (
+				<>
+					<div>Error parsing the following:</div>
+					<pre>{JSON.stringify(raw, null, 4)}</pre>
+					<div>Error is: {result.error.toString()}</div>
+				</>
+			),
+			throwMsg: result.error.toString(),
+		})
 	}
 }
 
