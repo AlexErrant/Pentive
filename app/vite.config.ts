@@ -43,6 +43,7 @@ export default defineConfig(({ mode }: UserConfig) => {
 		},
 		build: {
 			target: 'esnext',
+			sourcemap: true,
 			rollupOptions: {
 				external: ['solid-js', 'solid-js/web', '@solidjs/router'],
 				// https://vitejs.dev/guide/build.html#multi-page-app

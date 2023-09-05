@@ -23,8 +23,9 @@ const betterServiceWorkerDevExperience: BuildOptions = {
 }
 
 export default defineConfig(({ mode }) => {
-	const baseBuild = {
+	const baseBuild: BuildOptions = {
 		target: 'ES2022',
+		sourcemap: true,
 	}
 	const build: BuildOptions =
 		mode === 'production'
