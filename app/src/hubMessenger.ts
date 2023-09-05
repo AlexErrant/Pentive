@@ -7,7 +7,6 @@ import {
 	type NookId,
 	type RemoteNote,
 	type RemoteTemplate,
-	throwExp,
 	relativeChar,
 	type Template,
 	type Note,
@@ -66,7 +65,7 @@ export const appExpose = {
 		await k.transaction().execute(async (trx) => {
 			const template =
 				(await db.getTemplateIdByRemoteId(rn.templateId, trx)) ??
-				throwExp(`You don't have the remote template ${rn.templateId}`)
+				toastFatal(`You don't have the remote template ${rn.templateId}`)
 			const n: Note = {
 				id: rn.id,
 				templateId: template.id,

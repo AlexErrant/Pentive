@@ -7,7 +7,6 @@ import {
 	parseSet,
 	stringifyMap,
 	stringifySet,
-	throwExp,
 	type NoteId,
 	type MediaId,
 	type RemoteMediaNum,
@@ -20,7 +19,12 @@ import { type DB, type Note as NoteEntity, type RemoteNote } from './database'
 import { type InsertObject, type Kysely } from 'kysely'
 import _ from 'lodash'
 import { parseFields as parseTemplateFields } from './template'
-import { toastInfo, toastWarn } from '../components/toasts'
+import {
+	toastFatal,
+	toastImpossible,
+	toastInfo,
+	toastWarn,
+} from '../components/toasts'
 
 function noteToDocType(note: Note): InsertObject<DB, 'note'> {
 	const now = new Date().getTime()
@@ -179,18 +183,20 @@ export const noteCollectionMethods = {
 							remoteNotes.filter((rn) => rn.localId === noteEntity.id),
 						)
 						if (note.remotes.size === 0)
-							throwExp('Zero remotes - is something wrong with the SQL query?')
+							toastImpossible(
+								'Zero remotes - is something wrong with the SQL query?',
+							)
 						const remoteIds = Array.from(note.remotes).map(([nook]) => {
 							const rt =
 								remoteTemplates.find(
 									(rt) => rt.localId === note.templateId && nook === rt.nook,
 								) ??
-								throwExp(
+								toastImpossible(
 									`No template found for id '${note.templateId}' with nook '${nook}'.`,
 								)
 							return (
 								(rt.remoteId as RemoteTemplateId) ??
-								throwExp(`Template ${rt.localId} has no remoteId.`)
+								toastImpossible(`Template ${rt.localId} has no remoteId.`)
 							)
 						})
 						return domainToCreateRemote(note, remoteIds)
@@ -229,26 +235,28 @@ export const noteCollectionMethods = {
 							remoteNotes.filter((rn) => rn.localId === noteEntity.id),
 						)
 						if (note.remotes.size === 0)
-							throwExp('Zero remotes - is something wrong with the SQL query?')
+							toastImpossible(
+								'Zero remotes - is something wrong with the SQL query?',
+							)
 						const remotes = new Map(
 							Array.from(note.remotes).map(([nook, remote]) => {
 								const rt =
 									remoteTemplates.find(
 										(rt) => rt.localId === note.templateId && nook === rt.nook,
 									) ??
-									throwExp(
+									toastImpossible(
 										`No template found for id '${note.templateId}' with nook '${nook}'.`,
 									)
 								return [
 									remote?.remoteNoteId ??
-										throwExp(
+										toastImpossible(
 											`remoteNoteId for ${JSON.stringify({
 												nook,
 												noteEntityId: noteEntity.id,
 											})} is null.`,
 										),
 									rt.remoteId ??
-										throwExp(
+										toastImpossible(
 											`remoteId for ${JSON.stringify({
 												nook,
 												noteEntityId: noteEntity.id,
@@ -292,12 +300,12 @@ export const noteCollectionMethods = {
 		for (const m of mediaBinaries) {
 			const remoteId =
 				m.remoteId ??
-				throwExp(
+				toastImpossible(
 					`Note media '${m.localMediaId}' is missing a remoteId, is something wrong with the SQL query?`,
 				)
 			const value =
 				media.get(m.localMediaId) ??
-				throwExp(`mediaBinaries is missing '${m.localMediaId}'... how?`)
+				toastImpossible(`mediaBinaries is missing '${m.localMediaId}'... how?`)
 			value.ids.push([m.localEntityId, remoteId, m.i])
 		}
 		return media
@@ -336,7 +344,7 @@ export const noteCollectionMethods = {
 				.where('id', 'in', Array.from(srcs))
 				.execute()
 			if (mediaBinaries.length !== srcs.size)
-				throwExp("You're missing a media.") // medTODO better error message
+				toastFatal("You're missing a media.") // medTODO better error message
 			await db
 				.deleteFrom('remoteMedia')
 				.where('localEntityId', '=', noteId)
@@ -395,7 +403,7 @@ export const noteCollectionMethods = {
 				.returningAll()
 				.execute()
 			if (r.length !== 1)
-				throwExp(
+				toastFatal(
 					`No remoteNote found for nook '${nook}' and noteId '${noteId}'`,
 				)
 		}
@@ -409,7 +417,7 @@ export const noteCollectionMethods = {
 			.returningAll()
 			.execute()
 		if (r.length !== remoteNoteIds.length)
-			throwExp(
+			toastFatal(
 				`Some remoteNotes in ${JSON.stringify(
 					remoteNoteIds,
 				)} not found. (This is the worst error message ever - medTODO.)`,
@@ -424,7 +432,7 @@ export const noteCollectionMethods = {
 			.where('id', '=', id)
 			.returningAll()
 			.execute()
-		if (r.length !== 1) throwExp(`No note found for id '${note.id}'.`)
+		if (r.length !== 1) toastFatal(`No note found for id '${note.id}'.`)
 	},
 }
 
@@ -473,7 +481,7 @@ export function updateLocalMediaIdByRemoteMediaIdAndGetNewDoc(
 			if (src != null) {
 				const i =
 					remoteMediaIdByLocal.get(src) ??
-					throwExp(
+					toastImpossible(
 						`${src} not found in ${JSON.stringify(
 							Array.from(remoteMediaIdByLocal),
 						)}`,

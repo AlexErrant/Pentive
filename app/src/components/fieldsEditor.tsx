@@ -4,10 +4,11 @@ import { toNoteCards, type NoteCardView } from '../pages/cards'
 import { type SetStoreFunction } from 'solid-js/store'
 import { db } from '../db'
 import { getKysely } from '../sqlite/crsqlite'
-import { type MediaId, throwExp } from 'shared'
+import { type MediaId } from 'shared'
 import { type Transaction } from 'kysely'
 import { type DB } from '../sqlite/database'
 import { ulidAsBase64Url } from '../domain/utility'
+import { toastFatal } from './toasts'
 
 export const FieldsEditor: VoidComponent<{
 	readonly noteCard: NoteCardView
@@ -32,7 +33,7 @@ export const FieldsEditor: VoidComponent<{
 					class='text-white bg-green-600 rounded p-2 px-4 font-bold hover:bg-green-700'
 					onClick={async () => {
 						if (props.noteCard.cards.length === 0)
-							throwExp('There must be at least 1 card')
+							toastFatal('There must be at least 1 card')
 						const kysely = await getKysely()
 						const dp = new DOMParser()
 						// eslint-disable-next-line solid/reactivity -- the fn isn't reactive

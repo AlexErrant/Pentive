@@ -35,7 +35,22 @@ export function toastError(userMsg: JSXElement, ...consoleMsg: unknown[]) {
 export function toastFatal(
 	userMsg: string | { jsx: JSXElement; throwMsg: string },
 	...consoleMsg: unknown[]
-) {
+): never {
+	if (typeof userMsg === 'string') {
+		toastError(userMsg, ...consoleMsg)
+		return throwExp(userMsg)
+	} else {
+		toastError(userMsg.jsx, ...consoleMsg)
+		return throwExp(userMsg.throwMsg)
+	}
+}
+
+// fatal may be a user error, while impossible is a "programmer screwed up" error
+// medTODO customize the UI
+export function toastImpossible(
+	userMsg: string | { jsx: JSXElement; throwMsg: string },
+	...consoleMsg: unknown[]
+): never {
 	if (typeof userMsg === 'string') {
 		toastError(userMsg, ...consoleMsg)
 		return throwExp(userMsg)

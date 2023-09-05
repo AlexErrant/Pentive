@@ -1,10 +1,6 @@
-import {
-	type Base64Url,
-	type LDbId,
-	throwExp,
-	type RemoteMediaNum,
-} from 'shared'
+import { type Base64Url, type LDbId, type RemoteMediaNum } from 'shared'
 import { getKysely } from './crsqlite'
+import { toastFatal } from '../components/toasts'
 
 export const remoteMediaCollectionMethods = {
 	updateUploadDate: async function (
@@ -20,7 +16,7 @@ export const remoteMediaCollectionMethods = {
 				.returningAll()
 				.execute()
 			if (r.length !== 1)
-				throwExp(
+				toastFatal(
 					`No remoteMedia found for localEntityId '${localEntityId}' with i ${i}.`,
 				)
 		}

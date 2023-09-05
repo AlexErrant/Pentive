@@ -4,7 +4,6 @@ import {
 	type NoteId,
 	assertNever,
 	stringifySet,
-	throwExp,
 	undefinedMap,
 	type Card,
 	type State,
@@ -24,7 +23,7 @@ import {
 import _ from 'lodash'
 import { entityToDomain as templateEntityToDomain } from './template'
 import { entityToDomain as noteEntityToDomain } from './note'
-import { toastInfo } from '../components/toasts'
+import { toastImpossible, toastInfo } from '../components/toasts'
 
 function serializeState(s: State): number {
 	switch (s) {
@@ -54,7 +53,7 @@ function deserializeState(s: number | null): State | undefined {
 		case 3:
 			return 'suspended'
 		default:
-			return throwExp(`Expected null, 0, 1, 2, or 3, but got ${s}`)
+			return toastImpossible(`Expected null, 0, 1, 2, or 3, but got ${s}`)
 	}
 }
 

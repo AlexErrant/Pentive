@@ -6,13 +6,14 @@ import {
 	type JSX,
 	type Setter,
 } from 'solid-js'
-import { throwExp, type MediaId } from 'shared'
+import { type MediaId } from 'shared'
 import type HomeData from './home.data'
 import { db } from '../db'
 import { importAnki } from './importer/importer'
 import { augcClient } from '../trpcClient'
 import { getDb } from '../sqlite/crsqlite'
 import { C } from '../pluginManager'
+import { toastImpossible } from '../components/toasts'
 
 async function searchNotes(search: string): Promise<void> {
 	const searchBatch = await augcClient.searchNotes.query(search)
@@ -174,7 +175,7 @@ async function uploadMedia(
 	const file =
 		// My mental static analysis says to use `currentTarget`, but it seems to randomly be null, hence `target`. I'm confused but whatever.
 		event.target.files?.item(0) ??
-		throwExp('Impossible - there should be a file selected')
+		toastImpossible('There should be a file selected')
 	await db.bulkInsertMedia([
 		{
 			id: file.name as MediaId,

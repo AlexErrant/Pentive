@@ -2,13 +2,7 @@ import { type JSX, Show, createResource, createEffect, onMount } from 'solid-js'
 import { GoldenLayout, LayoutConfig } from 'golden-layout'
 import { createStore } from 'solid-js/store'
 import CardsTable from '../components/cardsTable'
-import {
-	type Override,
-	type NoteCard,
-	type Template,
-	type Card,
-	throwExp,
-} from 'shared'
+import { type Override, type NoteCard, type Template, type Card } from 'shared'
 import { CardsRemote } from '../components/cardsRemote'
 import { FieldsEditor } from '../components/fieldsEditor'
 import { CardsPreview } from '../components/cardsPreview'
@@ -16,6 +10,7 @@ import { db } from '../db'
 import { render } from 'solid-js/web'
 import AddNote from '../components/addNote'
 import NoteSync from '../components/noteSync'
+import { toastImpossible } from '../components/toasts'
 
 export interface NoteCardView {
 	template: Template
@@ -45,7 +40,8 @@ export function toMainNoteCards(noteCardView: NoteCardView): NoteCard {
 			...noteCardView.note,
 			fieldValues: new Map(noteCardView.note.fieldValues),
 		},
-		card: noteCardView.mainCard ?? throwExp('YA DONE GOOFED'),
+		card:
+			noteCardView.mainCard ?? toastImpossible('No main card.', noteCardView),
 	}
 }
 

@@ -5,7 +5,6 @@ import {
 	type TemplateId,
 	type ChildTemplate,
 	type TemplateType,
-	throwExp,
 	type CardSettingId,
 	type DeckId,
 	type Field,
@@ -22,6 +21,7 @@ import {
 	type Tmpl,
 } from './typeChecker'
 import _ from 'lodash'
+import { toastFatal, toastImpossible } from '../../components/toasts'
 
 function parseField(fld: Fld): Field {
 	return {
@@ -51,8 +51,8 @@ function parseTemplateType(model: Model): TemplateType {
 			}
 		case 1: {
 			if (model.tmpls.length !== 1)
-				throwExp(
-					`Should be impossible! Cloze template have only 1 template, but got ${model.tmpls.length}`,
+				toastImpossible(
+					`Cloze template have only 1 template, but got ${model.tmpls.length}`,
 				)
 			const tmpl = model.tmpls[0]!
 			return {
@@ -61,8 +61,8 @@ function parseTemplateType(model: Model): TemplateType {
 			}
 		}
 		default:
-			throwExp(
-				`Should be impossible! Only 0 or 1 are possible model types, but got ${model.type}`,
+			toastImpossible(
+				`Only 0 or 1 are possible model types, but got ${model.type}`,
 			)
 	}
 }
@@ -89,11 +89,11 @@ export function parseNote(
 ): PNote {
 	const templateId = note.mid.toString() as TemplateId // medTODO
 	const template = templates.get(templateId)
-	if (template == null) throwExp(`Template ${templateId} not found`)
+	if (template == null) toastFatal(`Template ${templateId} not found`)
 	const fields = template.fields.map((f) => f.name)
 	const values = note.flds.split('\x1f')
 	if (fields.length !== values.length)
-		throwExp(
+		toastFatal(
 			`The length of fields (${fields.length}) and values (${values.length}) for noteId=${note.id} don't match.`,
 		)
 	return {
@@ -119,9 +119,9 @@ export function parseCard(
 	templates: Map<TemplateId, Template>,
 ): PCard {
 	const note = notes.get(card.nid)
-	if (note == null) throwExp(`Note ${card.nid} not found`)
+	if (note == null) toastFatal(`Note ${card.nid} not found`)
 	const template = templates.get(note.templateId)
-	if (template == null) throwExp(`Template ${note.templateId} not found`)
+	if (template == null) toastFatal(`Template ${note.templateId} not found`)
 	return {
 		id: card.id.toString() as CardId, // medTODO
 		noteId: card.nid.toString() as NoteId, // medTODO

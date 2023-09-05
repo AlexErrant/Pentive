@@ -6,7 +6,6 @@ import {
 	type NookId,
 	type TemplateType,
 	notEmpty,
-	throwExp,
 	undefinedMap,
 	type TemplateId,
 	type MediaId,
@@ -31,7 +30,7 @@ import {
 	type RawBuilder,
 } from 'kysely'
 import { updateLocalMediaIdByRemoteMediaIdAndGetNewDoc } from './note'
-import { toastWarn } from '../components/toasts'
+import { toastFatal, toastImpossible, toastWarn } from '../components/toasts'
 
 function templateToDocType(template: Template) {
 	const now = new Date().getTime()
@@ -102,7 +101,7 @@ function domainToEditRemote(template: Template) {
 		.map(([, v]) => v?.remoteTemplateId)
 		.filter(notEmpty)
 	if (remoteIds.length === 0)
-		throwExp(`Zero remoteIds - is something wrong with the SQL query?`)
+		toastImpossible(`Zero remoteIds - is something wrong with the SQL query?`)
 	const r: EditRemoteTemplate = {
 		name: template.name,
 		css: template.css,
@@ -305,12 +304,12 @@ export const templateCollectionMethods = {
 		for (const m of mediaBinaries) {
 			const remoteId =
 				m.remoteId ??
-				throwExp(
+				toastImpossible(
 					`Template media '${m.localMediaId}' is missing a remoteId, is something wrong with the SQL query?`,
 				)
 			const value =
 				media.get(m.localMediaId) ??
-				throwExp(`mediaBinaries is missing '${m.localMediaId}'... how?`)
+				toastImpossible(`mediaBinaries is missing '${m.localMediaId}'... how?`)
 			value.ids.push([m.localEntityId, remoteId, m.i])
 		}
 		return media
@@ -348,7 +347,7 @@ export const templateCollectionMethods = {
 				.where('id', 'in', Array.from(srcs))
 				.execute()
 			if (mediaBinaries.length !== srcs.size)
-				throwExp("You're missing a media.") // medTODO better error message
+				toastFatal("You're missing a media.") // medTODO better error message
 			await db
 				.deleteFrom('remoteMedia')
 				.where('localEntityId', '=', templateId)
@@ -410,7 +409,7 @@ export const templateCollectionMethods = {
 				.returningAll()
 				.execute()
 			if (r.length !== 1)
-				throwExp(
+				toastFatal(
 					`No remoteTemplate found for nook '${nook}' and templateId '${templateId}'`,
 				)
 		}
@@ -424,7 +423,7 @@ export const templateCollectionMethods = {
 			.returningAll()
 			.execute()
 		if (r.length !== remoteTemplateIds.length)
-			throwExp(
+			toastFatal(
 				`Some remoteTemplates in ${JSON.stringify(
 					remoteTemplateIds,
 				)} not found. (This is the worst error message ever - medTODO.)`,

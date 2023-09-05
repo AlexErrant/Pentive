@@ -16,7 +16,7 @@ import {
 	Uint8ArrayWriter,
 	ZipReader,
 } from '@zip.js/zip.js'
-import { notEmpty, throwExp } from 'shared'
+import { notEmpty } from 'shared'
 import initSqlJs, { type Database } from 'sql.js'
 import { checkCard, checkCol, checkMedia, checkNote } from './typeChecker'
 import { parseNote, parseCard, parseTemplates } from './parser'
@@ -30,7 +30,7 @@ import {
 import { db } from './../../db'
 import _ from 'lodash'
 import sqliteUrl from '../../assets/sql-wasm.wasm?url'
-import { toastInfo } from '../../components/toasts'
+import { toastFatal, toastImpossible, toastInfo } from '../../components/toasts'
 
 export async function importAnki(
 	event: Event & {
@@ -41,15 +41,15 @@ export async function importAnki(
 	const ankiExport =
 		// My mental static analysis says to use `currentTarget`, but it seems to randomly be null, hence `target`. I'm confused but whatever.
 		(event.target as HTMLInputElement).files?.item(0) ??
-		throwExp('Impossible - there should be a file selected')
+		toastImpossible('There should be a file selected')
 	const ankiEntries = await new ZipReader(
 		new BlobReader(ankiExport),
 	).getEntries()
 	const sqlite =
 		ankiEntries.find((e) => e.filename === 'collection.anki21') ??
 		ankiEntries.find((e) => e.filename === 'collection.anki2') ??
-		throwExp(
-			'`collection.anki21` or `collection.anki2` not found. Ensure that `Support older Anki versions` in the `Export` window is checked.',
+		toastFatal(
+			'`collection.anki21` or `collection.anki2` not found. When exporting from Anki, ensure that `Support older Anki versions` in the `Export` window is checked.',
 		)
 	await importAnkiDb(sqlite)
 	await importAnkiMedia(ankiEntries) // running in parallel causes ERR_OUT_OF_MEMORY
@@ -58,10 +58,12 @@ export async function importAnki(
 async function importAnkiMedia(ankiEntries: Entry[]): Promise<void> {
 	const media =
 		ankiEntries.find((e) => e.filename === 'media') ??
-		throwExp('`media` not found.')
+		toastImpossible(
+			`'media' not found in the provided file. Did Anki change their export format?`,
+		)
 	const mediaText =
 		(await media.getData?.(new TextWriter())) ??
-		throwExp(
+		toastImpossible(
 			"Impossible since we're using `getEntries` https://github.com/gildas-lormeau/zip.js/issues/371",
 		)
 	const parsed = checkMedia(JSON.parse(mediaText))
@@ -81,7 +83,7 @@ async function addMediaBatch(
 		entries.map(async (entry) => {
 			const array =
 				(await entry.getData?.(new Uint8ArrayWriter())) ??
-				throwExp(
+				toastImpossible(
 					"Impossible since we're using `getEntries` https://github.com/gildas-lormeau/zip.js/issues/371",
 				)
 			const name = nameByI[entry.filename]
@@ -151,7 +153,7 @@ async function getAnkiDb(sqlite: Entry): Promise<Database> {
 async function getSqliteBuffer(sqlite: Entry): Promise<Buffer> {
 	const blob =
 		(await sqlite.getData?.(new BlobWriter())) ??
-		throwExp(
+		toastImpossible(
 			"Impossible since we're using `getEntries` https://github.com/gildas-lormeau/zip.js/issues/371",
 		)
 	const arrayBuffer = await blob.arrayBuffer()
