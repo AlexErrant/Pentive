@@ -8,7 +8,10 @@ import {
 } from 'solid-js'
 import toast from 'solid-toast'
 
-export function toastError(userMsg: JSXElement, ...consoleMsg: unknown[]) {
+export function toastError(
+	userMsg: JSXElement | { jsx: JSXElement; impossible: true },
+	...consoleMsg: unknown[]
+) {
 	let hasConsoleMsg = false
 	if (consoleMsg.length === 0) {
 		console.error(userMsg)
@@ -24,8 +27,38 @@ export function toastError(userMsg: JSXElement, ...consoleMsg: unknown[]) {
 					toast.dismiss(t.id)
 				}}
 			>
-				<h1 class='text-red-500 text-xl font-bold'>Error</h1>
-				<div class='text-lg'>{userMsg}</div>
+				<Show
+					when={
+						typeof userMsg === 'object' &&
+						userMsg != null &&
+						'jsx' in userMsg &&
+						userMsg.impossible &&
+						userMsg.jsx
+					}
+					fallback={<h1 class='text-red-500 text-xl font-bold'>Error</h1>}
+				>
+					<h1 class='text-red-500 text-xl font-bold'>Impossible Error</h1>
+					<div class='italic'>
+						This error should never occur!{' '}
+						<a
+							// https://stackoverflow.com/a/20327676
+							class='text-blue-600 relative z-[1] m-[-1em] inline-block p-[1em] underline visited:text-purple-600 hover:text-blue-800'
+							href='https://github.com/AlexErrant/Pentive/issues/new'
+							target='_blank'
+							rel='noreferrer noopener'
+							onClick={(e) => {
+								e.stopPropagation()
+							}}
+						>
+							Please report this to the devs!
+						</a>
+					</div>
+				</Show>
+				<div class='py-5 text-lg'>
+					{typeof userMsg === 'object' && userMsg != null && 'jsx' in userMsg
+						? userMsg.jsx
+						: userMsg}
+				</div>
 				<Show when={hasConsoleMsg}>
 					<div class='italic'>
 						The console has technical details.{' '}
@@ -66,16 +99,15 @@ export function toastFatal(
 }
 
 // fatal may be a user error, while impossible is a "programmer screwed up" error
-// medTODO customize the UI
 export function toastImpossible(
 	userMsg: string | { jsx: JSXElement; throwMsg: string },
 	...consoleMsg: unknown[]
 ): never {
 	if (typeof userMsg === 'string') {
-		toastError(userMsg, ...consoleMsg)
+		toastError({ jsx: userMsg, impossible: true }, ...consoleMsg)
 		return throwExp(userMsg)
 	} else {
-		toastError(userMsg.jsx, ...consoleMsg)
+		toastError({ jsx: userMsg.jsx, impossible: true }, ...consoleMsg)
 		return throwExp(userMsg.throwMsg)
 	}
 }
