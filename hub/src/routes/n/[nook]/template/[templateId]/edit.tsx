@@ -183,6 +183,7 @@ const basicSetup = [
 	drawSelection(),
 	dropCursor(),
 	EditorState.allowMultipleSelections.of(true),
+	EditorView.lineWrapping,
 	indentOnInput(),
 	syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
 	bracketMatching(),
