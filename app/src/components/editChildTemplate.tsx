@@ -61,6 +61,12 @@ const EditChildTemplate: VoidComponent<{
 			},
 			state: createEditorState(props.childTemplate.back),
 		})
+		new ResizeObserver(() => {
+			frontView.requestMeasure()
+		}).observe(frontRef!)
+		new ResizeObserver(() => {
+			backView.requestMeasure()
+		}).observe(backRef!)
 	})
 	onCleanup(() => {
 		frontView?.destroy()
@@ -78,24 +84,32 @@ const EditChildTemplate: VoidComponent<{
 					}}
 				/>
 			</legend>
-			<div ref={frontRef} />
-			<ResizingIframe
-				i={{
-					tag: 'template',
-					side: 'front',
-					template: props.template,
-					index: props.i,
-				}}
-			/>
-			<div ref={backRef} />
-			<ResizingIframe
-				i={{
-					tag: 'template',
-					side: 'back',
-					template: props.template,
-					index: props.i,
-				}}
-			/>
+			<div class='h-fit'>
+				<div class='flex h-fit'>
+					<div class='h-[500px] flex-1 resize-y overflow-auto' ref={frontRef} />
+					<ResizingIframe
+						class='flex-1'
+						i={{
+							tag: 'template',
+							side: 'front',
+							template: props.template,
+							index: props.i,
+						}}
+					/>
+				</div>
+				<div class='flex h-fit'>
+					<div class='h-[500px] flex-1 resize-y overflow-auto' ref={backRef} />
+					<ResizingIframe
+						class='flex-1'
+						i={{
+							tag: 'template',
+							side: 'back',
+							template: props.template,
+							index: props.i,
+						}}
+					/>
+				</div>
+			</div>
 		</fieldset>
 	)
 }
