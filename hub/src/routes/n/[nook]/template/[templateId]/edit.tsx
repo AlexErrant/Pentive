@@ -49,6 +49,14 @@ import { cwaClient } from '~/routes/cwaClient'
 import { remoteToTemplate } from '~/lib/utility'
 import { getUserId } from '~/session'
 
+/*
+
+      THIS FILE IS NOT WORTH UPDATING. SOMEDAY IT WILL BE REPLACED WITH WHATEVER'S USED IN APP
+
+      highTODO
+
+*/
+
 interface TemplateStore {
 	t: RemoteTemplate | undefined
 }

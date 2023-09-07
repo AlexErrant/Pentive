@@ -38,6 +38,8 @@ import {
 } from 'solid-js'
 import { type Template } from 'shared'
 import { type SetStoreFunction } from 'solid-js/store'
+import { oneDark } from '@codemirror/theme-one-dark'
+import { theme } from '../globalState'
 
 const EditTemplateCss: VoidComponent<{
 	template: Template
@@ -53,16 +55,21 @@ const EditTemplateCss: VoidComponent<{
 			dispatch: (tr) => {
 				dispatch(tr, view, props.setTemplate)
 			},
-			state: createEditorState(props.template.css),
+			state: createEditorState(props.template.css, theme()),
 		})
 	})
 	createEffect(
 		on(
 			() => props.template.id,
 			() => {
-				view.setState(createEditorState(props.template.css))
+				view.setState(createEditorState(props.template.css, theme()))
 			},
 		),
+	)
+	createEffect(
+		on(theme, (t) => {
+			view.setState(createEditorState(props.template.css, t))
+		}),
 	)
 	onCleanup(() => {
 		view?.destroy()
@@ -125,9 +132,10 @@ function dispatch(
 	}
 }
 
-function createEditorState(doc: string) {
+function createEditorState(doc: string, theme: 'light' | 'dark') {
+	const maybeDark = theme === 'dark' ? [oneDark] : []
 	return EditorState.create({
 		doc,
-		extensions: [[...basicSetup], css()],
+		extensions: [[...basicSetup], css(), ...maybeDark],
 	})
 }

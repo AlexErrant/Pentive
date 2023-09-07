@@ -29,10 +29,18 @@ import {
 } from '@codemirror/autocomplete'
 import { lintKeymap } from '@codemirror/lint'
 import { html } from '@codemirror/lang-html'
-import { onCleanup, onMount, type VoidComponent } from 'solid-js'
+import {
+	createEffect,
+	on,
+	onCleanup,
+	onMount,
+	type VoidComponent,
+} from 'solid-js'
 import { type Template, type ChildTemplate } from 'shared'
 import ResizingIframe from './resizingIframe'
 import { C } from '../pluginManager'
+import { oneDark } from '@codemirror/theme-one-dark'
+import { theme } from '../globalState'
 
 const EditChildTemplate: VoidComponent<{
 	template: Template
@@ -48,19 +56,20 @@ const EditChildTemplate: VoidComponent<{
 	let frontView: EditorView
 	let backView: EditorView
 	onMount(() => {
+		const t = theme()
 		frontView = new EditorView({
 			parent: frontRef,
 			dispatch: (tr) => {
 				dispatch('front', tr, frontView, props.setTemplate)
 			},
-			state: createEditorState(props.childTemplate.front),
+			state: createEditorState(props.childTemplate.front, t),
 		})
 		backView = new EditorView({
 			parent: backRef,
 			dispatch: (tr) => {
 				dispatch('back', tr, backView, props.setTemplate)
 			},
-			state: createEditorState(props.childTemplate.back),
+			state: createEditorState(props.childTemplate.back, t),
 		})
 		new ResizeObserver(() => {
 			frontView.requestMeasure()
@@ -69,6 +78,12 @@ const EditChildTemplate: VoidComponent<{
 			backView.requestMeasure()
 		}).observe(backRef!)
 	})
+	createEffect(
+		on(theme, (t) => {
+			frontView.setState(createEditorState(props.childTemplate.front, t))
+			backView.setState(createEditorState(props.childTemplate.back, t))
+		}),
+	)
 	onCleanup(() => {
 		frontView?.destroy()
 		backView?.destroy()
@@ -189,9 +204,10 @@ function dispatch(
 	}
 }
 
-function createEditorState(doc: string) {
+function createEditorState(doc: string, theme: 'light' | 'dark') {
+	const maybeDark = theme === 'dark' ? [oneDark] : []
 	return EditorState.create({
 		doc,
-		extensions: [[...basicSetup], html()],
+		extensions: [[...basicSetup], html(), ...maybeDark],
 	})
 }
