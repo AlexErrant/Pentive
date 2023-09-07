@@ -23,6 +23,7 @@ import { db } from '../db'
 import { assertNever } from 'shared'
 import { agGridTheme } from '../globalState'
 import { Upload } from 'shared-dom'
+import { C } from '../pluginManager'
 
 LicenseManager.setLicenseKey(import.meta.env.VITE_AG_GRID_LICENSE)
 
@@ -44,6 +45,22 @@ const columnDefs: Array<ColDef<NoteCard>> = [
 					default:
 						return assertNever(x.data.template.templateType)
 				}
+			}
+		},
+	},
+	{
+		headerName: 'Short Front',
+		valueGetter: (x) => {
+			if (x.data != null) {
+				return C.body(x.data.card, x.data.note, x.data.template, true)?.at(0)
+			}
+		},
+	},
+	{
+		headerName: 'Short Back',
+		valueGetter: (x) => {
+			if (x.data != null) {
+				return C.body(x.data.card, x.data.note, x.data.template, true)?.at(1)
 			}
 		},
 	},
