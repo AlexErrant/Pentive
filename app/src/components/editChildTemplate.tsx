@@ -32,6 +32,7 @@ import { html } from '@codemirror/lang-html'
 import { onCleanup, onMount, type VoidComponent } from 'solid-js'
 import { type Template, type ChildTemplate } from 'shared'
 import ResizingIframe from './resizingIframe'
+import { C } from '../pluginManager'
 
 const EditChildTemplate: VoidComponent<{
 	template: Template
@@ -108,6 +109,30 @@ const EditChildTemplate: VoidComponent<{
 							index: props.i,
 						}}
 					/>
+				</div>
+			</div>
+			<div class='flex h-fit'>
+				<textarea
+					class='bg-white flex-1'
+					value={props.childTemplate.shortFront}
+					onInput={(e) => {
+						props.setTemplate('shortFront', e.currentTarget.value)
+					}}
+				/>
+				<div class='flex-1'>
+					{C.renderTemplate(props.template, true)[props.i]![0]}
+				</div>
+			</div>
+			<div class='flex h-fit'>
+				<textarea
+					class='bg-white flex-1'
+					value={props.childTemplate.shortBack}
+					onInput={(e) => {
+						props.setTemplate('shortBack', e.currentTarget.value)
+					}}
+				/>
+				<div class='flex-1'>
+					{C.renderTemplate(props.template, true)[props.i]![1]}
 				</div>
 			</div>
 		</fieldset>

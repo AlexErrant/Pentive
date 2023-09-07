@@ -58,11 +58,28 @@ export function body(
 	card: Card,
 	note: Note,
 	template: Template,
+	short: boolean = false,
 ): readonly [string, string] | null {
+	const shortify = (frontBack: readonly [string, string] | null) => {
+		if (frontBack == null) return null
+		if (short)
+			return [this.strip(frontBack[0]), this.strip(frontBack[1])] as const
+		return frontBack
+	}
 	if (template.templateType.tag === 'standard') {
-		return handleStandard.call(this, card, note, template as StandardTemplate)
+		return shortify(
+			handleStandard.call(
+				this,
+				card,
+				note,
+				template as StandardTemplate,
+				short,
+			),
+		)
 	} else if (template.templateType.tag === 'cloze') {
-		return handleCloze.call(this, card, note, template as ClozeTemplate)
+		return shortify(
+			handleCloze.call(this, card, note, template as ClozeTemplate, short),
+		)
 	} else {
 		assertNever(template.templateType)
 	}
@@ -109,10 +126,15 @@ function handleStandard(
 	card: Card,
 	note: Note,
 	template: StandardTemplate,
+	short: boolean,
 ) {
-	const { front, back } =
+	let { front, back, shortFront, shortBack } =
 		template.templateType.templates.find((t) => t.id === card.ord) ??
 		throwExp(`Ord ${card.ord} not found`)
+	if (short) {
+		front = shortFront ?? front
+		back = shortBack ?? back
+	}
 	function replaceFields(
 		this: RenderContainer,
 		isFront: boolean,
@@ -165,8 +187,13 @@ function handleCloze(
 	card: Card,
 	note: Note,
 	template: ClozeTemplate,
+	short: boolean,
 ) {
-	const { front, back } = template.templateType.template
+	let { front, back, shortFront, shortBack } = template.templateType.template
+	if (short) {
+		front = shortFront ?? front
+		back = shortBack ?? back
+	}
 	function replaceFields(
 		this: RenderContainer,
 		isFront: boolean,
@@ -451,12 +478,13 @@ const getStandardFieldAndValue = (field: Field) =>
 export function renderTemplate(
 	this: RenderContainer,
 	template: Template,
+	short: boolean = false,
 ): ReadonlyArray<readonly [string, string] | null> {
 	const fieldsAndValues = new Map(template.fields.map(getStandardFieldAndValue)) // medTODO consider adding escape characters so you can do e.g. {{Front}}. Apparently Anki doesn't have escape characters - now would be a good time to introduce this feature.
 	if (template.templateType.tag === 'standard') {
 		const note = toSampleNote(fieldsAndValues)
 		return template.templateType.templates.map(({ id }) =>
-			this.body(toSampleCard(id), note, template),
+			this.body(toSampleCard(id), note, template, short),
 		)
 	} else if (template.templateType.tag === 'cloze') {
 		const getFieldsAndValues = (
@@ -479,6 +507,7 @@ export function renderTemplate(
 					toSampleCard(i as Ord),
 					toSampleNote(new Map(getFieldsAndValues(clozeField, i))),
 					template,
+					short,
 				),
 			)
 	}
