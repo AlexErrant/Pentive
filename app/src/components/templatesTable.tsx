@@ -119,6 +119,7 @@ const TemplatesTable: VoidComponent<{
 						},
 					],
 				}}
+				defaultColDef={{ resizable: true }}
 				columnDefs={columnDefs}
 				ref={gridRef}
 				getRowId={getRowId}
@@ -129,6 +130,9 @@ const TemplatesTable: VoidComponent<{
 				onSelectionChanged={(event) => {
 					const ncs = event.api.getSelectedRows() as Template[]
 					props.onSelectionChanged(ncs)
+				}}
+				onFirstDataRendered={(params) => {
+					params.api.sizeColumnsToFit()
 				}}
 			/>
 		</div>

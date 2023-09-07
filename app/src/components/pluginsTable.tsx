@@ -91,12 +91,16 @@ const PluginsTable: VoidComponent = () => {
 							},
 						],
 					}}
+					defaultColDef={{ resizable: true }}
 					columnDefs={columnDefs}
 					ref={gridRef}
 					getRowId={getRowId}
 					rowSelection='multiple'
 					rowModelType='clientSide'
 					rowData={plugins()}
+					onFirstDataRendered={(params) => {
+						params.api.sizeColumnsToFit()
+					}}
 					domLayout='autoHeight'
 				/>
 			</div>

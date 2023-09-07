@@ -165,6 +165,7 @@ const CardsTable: VoidComponent<{
 					}}
 					columnDefs={columnDefs}
 					ref={gridRef}
+					defaultColDef={{ resizable: true }}
 					getRowId={getRowId}
 					rowSelection='multiple'
 					rowModelType='infinite'
@@ -173,6 +174,9 @@ const CardsTable: VoidComponent<{
 					onSelectionChanged={(event) => {
 						const ncs = event.api.getSelectedRows() as NoteCard[]
 						props.onSelectionChanged(ncs)
+					}}
+					onFirstDataRendered={(params) => {
+						params.api.sizeColumnsToFit()
 					}}
 				/>
 			</div>

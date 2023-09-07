@@ -91,6 +91,7 @@ const PeersTable: VoidComponent<{
 						},
 					],
 				}}
+				defaultColDef={{ resizable: true }}
 				columnDefs={columnDefs}
 				ref={gridRef}
 				getRowId={getRowId}
@@ -98,6 +99,9 @@ const PeersTable: VoidComponent<{
 				rowModelType='clientSide'
 				rowData={props.peers}
 				domLayout='autoHeight'
+				onFirstDataRendered={(params) => {
+					params.api.sizeColumnsToFit()
+				}}
 			/>
 		</div>
 	)
