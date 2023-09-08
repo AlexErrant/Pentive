@@ -67,8 +67,6 @@ self.addEventListener('message', (event) => {
 	}
 })
 
-const localMediaPrefix = self.registration.scope + 'localMedia/'
-
 async function sleep(ms: number): Promise<void> {
 	await new Promise((resolve) => setTimeout(resolve, ms))
 }
@@ -127,9 +125,9 @@ async function getMessenger(
 }
 
 self.addEventListener('fetch', (fetch) => {
-	if (fetch.request.url.startsWith(localMediaPrefix)) {
+	if (fetch.request.url.startsWith(self.location.origin + '/')) {
 		const mediaId = decodeURI(
-			fetch.request.url.substring(localMediaPrefix.length),
+			fetch.request.url.substring(self.location.origin.length + 1),
 		) as MediaId
 		fetch.respondWith(getLocalMedia(mediaId, fetch.clientId))
 	}

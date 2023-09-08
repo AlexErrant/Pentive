@@ -3,6 +3,7 @@ import { appMessenger } from './appMessenger'
 import { type RenderBodyInput } from 'app/src/components/resizingIframe'
 import { assertNever } from 'shared'
 import { resizeIframe } from './registerServiceWorker'
+import diff from 'micromorph'
 
 self.addEventListener('message', async (event) => {
 	const data = event.data as unknown
@@ -19,10 +20,12 @@ self.addEventListener('message', async (event) => {
 	}
 })
 
+const domParser = new DOMParser()
+
 export async function setBody(i: RenderBodyInput) {
 	const { body, css } = await buildHtml(i)
 
-	document.getElementsByTagName('body')[0]!.innerHTML = body
+	await diff(document, domParser.parseFromString(body, 'text/html'))
 	const resizeScript = document.createElement('script')
 	resizeScript.type = 'text/javascript'
 	resizeScript.text = contentWindowJs
