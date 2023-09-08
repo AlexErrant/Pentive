@@ -106,6 +106,9 @@ importers:
       '@kobalte/tailwindcss':
         specifier: ^0.6.5
         version: 0.6.5(tailwindcss@3.3.3)
+      '@solid-primitives/scheduled':
+        specifier: ^1.4.1
+        version: 1.4.1(solid-js@1.7.11)
       '@solidjs/router':
         specifier: ^0.8.3
         version: 0.8.3(solid-js@1.7.11)
@@ -5678,6 +5681,14 @@ packages:
       solid-js: ^1.6.12
     dependencies:
       '@solid-primitives/utils': 6.2.0(solid-js@1.7.11)
+      solid-js: 1.7.11
+    dev: false
+
+  /@solid-primitives/scheduled@1.4.1(solid-js@1.7.11):
+    resolution: {integrity: sha512-OLcNXwYpX7HUOEqNPcmR31dkyI1E2imkMDBRlqsGT0ZhJV1L2g0TEREpo4nm/kUhh8LVQzkfnxS+GONx9kh90A==}
+    peerDependencies:
+      solid-js: ^1.6.12
+    dependencies:
       solid-js: 1.7.11
     dev: false
 
@@ -12521,6 +12532,10 @@ packages:
 
   /micromorph@0.3.1:
     resolution: {integrity: sha512-dbX4sz405e/QQtbHFMJj0SaVP+xuBBpSpR44AQYTjsrPek8oKyeRXkbtYN1XyFVdV7WjHp5DZMwxJOJiBfH1Jw==}
+
+  /micromorph@0.4.5:
+    resolution: {integrity: sha512-Erasr0xiDvDeEhh7B/k7RFTwwfaAX10D7BMorNpokkwDh6XsRLYWDPaWF1m5JQeMSkGdqlEtQ8s68NcdDWuGgw==}
+    dev: false
 
   /mime-db@1.52.0:
     resolution: {integrity: sha512-sPU4uV7dYlvtWJxwwxHD0PuihVNiE7TyAbQ5SWxDCB9mUYvOgroQOwYQQOKPJ8CIbE+1ETVlOoK1UC2nU3gYvg==}

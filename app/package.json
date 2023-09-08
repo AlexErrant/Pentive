@@ -84,6 +84,7 @@
 		"@github/relative-time-element": "^4.3.0",
 		"@kobalte/core": "^0.9.8",
 		"@kobalte/tailwindcss": "^0.6.5",
+		"@solid-primitives/scheduled": "^1.4.1",
 		"@solidjs/router": "^0.8.3",
 		"@tanstack/solid-table": "^8.9.3",
 		"@thisbeyond/solid-select": "^0.14.0",
