@@ -5,6 +5,7 @@ import {
 	type RawBuilder,
 	type InsertObject,
 	type Compilable,
+	type ExpressionWrapper,
 } from 'kysely'
 import { PlanetScaleDialect } from 'kysely-planetscale'
 import { type DB } from './dbSchema.js'
@@ -115,7 +116,7 @@ function noteToNookView(x: {
 	fields: string
 	subscribers: number
 	comments: number
-	til?: Date
+	til?: Date | null
 }) {
 	const noteId = dbIdToBase64Url(x.id) as RemoteNoteId
 	const templateId = dbIdToBase64Url(x.templateId) as RemoteTemplateId
@@ -474,7 +475,7 @@ function templateEntityToDomain(t: {
 	ankiId: number | null
 	subscribersCount: number
 	commentsCount: number
-	til?: Date | undefined
+	til?: Date | null
 }) {
 	const r = {
 		id: dbIdToBase64Url(t.id) as RemoteTemplateId,
@@ -1076,8 +1077,10 @@ export async function editTemplates(
 }
 
 // nix upon resolution of https://github.com/koskimas/kysely/issues/251
-function values<T>(x: RawBuilder<T>) {
-	return sql<T>`values(${x})`
+function values<Table extends keyof DB, Value>(
+	x: ExpressionWrapper<DB, Table, Value>,
+) {
+	return sql<Value>`values(${x})`
 }
 
 function unhex(id: Hex): RawBuilder<DbId> {

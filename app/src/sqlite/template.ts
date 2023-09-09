@@ -27,7 +27,6 @@ import {
 	type Kysely,
 	type Transaction,
 	type OnConflictTables,
-	type RawBuilder,
 } from 'kysely'
 import { updateLocalMediaIdByRemoteMediaIdAndGetNewDoc } from './note'
 import { toastFatal, toastImpossible, toastWarn } from '../components/toasts'
@@ -203,12 +202,13 @@ export const templateCollectionMethods = {
 		const template = await db
 			.selectFrom('template')
 			.leftJoin('remoteTemplate', 'template.id', 'remoteTemplate.localId')
-			.whereExists((qb) =>
-				qb
-					.selectFrom('remoteTemplate')
-					.select('remoteTemplate.localId')
-					.whereRef('template.id', '=', 'remoteTemplate.localId')
-					.where('remoteTemplate.remoteId', '=', templateId),
+			.where(({ selectFrom, exists }) =>
+				exists(
+					selectFrom('remoteTemplate')
+						.select('remoteTemplate.localId')
+						.whereRef('template.id', '=', 'remoteTemplate.localId')
+						.where('remoteTemplate.remoteId', '=', templateId),
+				),
 			)
 			.selectAll()
 			.execute()
@@ -286,8 +286,12 @@ export const templateCollectionMethods = {
 				'remoteMedia.i',
 				'remoteTemplate.remoteId',
 			])
-			.where('remoteMedia.uploadDate', 'is', null)
-			.orWhereRef('media.updated', '>', 'remoteMedia.uploadDate')
+			.where(({ eb, or, ref }) =>
+				or([
+					eb('remoteMedia.uploadDate', 'is', null),
+					eb('media.updated', '>', ref('remoteMedia.uploadDate')),
+				]),
+			)
 			.execute()
 		const media = new Map<
 			MediaId,
@@ -510,5 +514,5 @@ type OnConflictUpdateRemoteTemplateSet = {
 			OnConflictDatabase<DB, 'remoteTemplate'>,
 			OnConflictTables<'remoteTemplate'>
 		>,
-	) => RawBuilder<RemoteTemplate[K]>
+	) => unknown
 }

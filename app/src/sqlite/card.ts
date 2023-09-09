@@ -17,7 +17,6 @@ import {
 	type InsertObject,
 	type Kysely,
 	type OnConflictTables,
-	type RawBuilder,
 	sql,
 } from 'kysely'
 import _ from 'lodash'
@@ -112,7 +111,7 @@ type OnConflictUpdateCardSet = {
 			OnConflictDatabase<DB, 'card'>,
 			OnConflictTables<'card'>
 		>,
-	) => RawBuilder<CardEntity[K]>
+	) => unknown
 }
 
 export const cardCollectionMethods = {

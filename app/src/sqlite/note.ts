@@ -285,8 +285,12 @@ export const noteCollectionMethods = {
 				'remoteMedia.i',
 				'remoteNote.remoteId',
 			])
-			.where('remoteMedia.uploadDate', 'is', null)
-			.orWhereRef('media.updated', '>', 'remoteMedia.uploadDate')
+			.where(({ eb, ref, or }) =>
+				or([
+					eb('remoteMedia.uploadDate', 'is', null),
+					eb('media.updated', '>', ref('remoteMedia.uploadDate')),
+				]),
+			)
 			.execute()
 		const media = new Map<
 			MediaId,
