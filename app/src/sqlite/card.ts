@@ -163,7 +163,7 @@ export const cardCollectionMethods = {
 		search?: { literalSearch?: string; ftsSearch?: string },
 	) {
 		const db = await getKysely()
-		const entities = await db
+		const entities = db
 			.selectFrom('card')
 			.innerJoin('note', 'card.noteId', 'note.id')
 			.innerJoin('template', 'template.id', 'note.templateId')
@@ -219,7 +219,7 @@ export const cardCollectionMethods = {
 				db.where('note.fieldValues', 'like', '%' + search!.literalSearch + '%'),
 			)
 			.execute()
-		const count = await db
+		const count = db
 			.selectFrom('card')
 			.innerJoin('note', 'card.noteId', 'note.id')
 			.$if(search?.ftsSearch != null, (db) =>
@@ -234,9 +234,9 @@ export const cardCollectionMethods = {
 			.select(db.fn.count<number>('card.id').as('c'))
 			.executeTakeFirstOrThrow()
 		return {
-			count: count.c,
+			count: (await count).c,
 			noteCards: Array.from(
-				groupByToMap(entities, (x) => x.card_id).values(),
+				groupByToMap(await entities, (x) => x.card_id).values(),
 			).map((tncR) => {
 				const tnc = tncR[0]!
 				const note = noteEntityToDomain(
