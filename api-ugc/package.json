@@ -24,7 +24,7 @@
 		"@trpc/server": "^10.18.0",
 		"hono": "^3.1.8",
 		"jose": "^4.14.4",
-		"kysely": "^0.23.5",
+		"kysely": "^0.26.3",
 		"shared": "workspace:*",
 		"shared-edge": "workspace:*",
 		"superjson": "^1.12.2",
