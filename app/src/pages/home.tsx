@@ -14,6 +14,7 @@ import { augcClient } from '../trpcClient'
 import { getDb } from '../sqlite/crsqlite'
 import { C } from '../pluginManager'
 import { toastImpossible } from '../components/toasts'
+import EditSql from '../components/editSql'
 
 async function searchNotes(search: string): Promise<void> {
 	const searchBatch = await augcClient.searchNotes.query(search)
@@ -131,6 +132,13 @@ export default function Home(): JSX.Element {
 						name='rawSql'
 						class='w-75px bg-white rounded-lg border p-1 text-sm'
 						type='text'
+					/>
+					<EditSql
+						sql={''}
+						// eslint-disable-next-line solid/reactivity -- it's reactive for up to 1 await
+						run={async (x) => {
+							await q(x)()
+						}}
 					/>
 				</form>
 				<button class='px-2' onClick={q('select * from template')}>
