@@ -225,8 +225,11 @@ const dataSource = {
 				literalSearchActual.trim() === '' ? undefined : literalSearchActual,
 			ftsSearch: ftsSearchActual.trim() === '' ? undefined : ftsSearchActual,
 		}
+		const start = performance.now()
 		db.getCards(p.startRow, cacheBlockSize, sort, search) // medTODO could just cache the Template and mutate the NoteCard obj to add it
 			.then((x) => {
+				const end = performance.now()
+				console.log(`Execution time: ${end - start} ms`, search)
 				p.successCallback(x.noteCards, x.count)
 			})
 			.catch(() => {

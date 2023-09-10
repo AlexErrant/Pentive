@@ -162,7 +162,11 @@ export default function Home(): JSX.Element {
 function q(rawSql: string) {
 	return async () => {
 		console.log(rawSql)
-		console.table(await (await getDb()).execO(rawSql))
+		const start = performance.now()
+		const r = await (await getDb()).execO(rawSql)
+		const end = performance.now()
+		console.table(r)
+		console.log(`Execution time: ${end - start} ms`)
 	}
 }
 
