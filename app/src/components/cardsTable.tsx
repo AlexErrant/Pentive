@@ -68,10 +68,19 @@ const columnDefs: Array<ColDef<NoteCard>> = [
 	{
 		headerName: 'Due',
 		valueGetter: (x) => x.data?.card.due,
-		colId: 'due',
+		colId: 'card.due',
 		sortable: true,
 		cellRenderer: (
 			props: ICellRendererParams<NoteCard, NoteCard['card']['due']>,
+		) => <relative-time date={props.value} />,
+	},
+	{
+		headerName: 'Created',
+		valueGetter: (x) => x.data?.card.created,
+		colId: 'card.created',
+		sortable: true,
+		cellRenderer: (
+			props: ICellRendererParams<NoteCard, NoteCard['card']['created']>,
 		) => <relative-time date={props.value} />,
 	},
 	{
@@ -189,6 +198,7 @@ const CardsTable: VoidComponent<{
 					rowModelType='infinite'
 					onGridReady={onGridReady}
 					cacheBlockSize={cacheBlockSize}
+					suppressMultiSort={true}
 					onSelectionChanged={(event) => {
 						const ncs = event.api.getSelectedRows() as NoteCard[]
 						props.onSelectionChanged(ncs)
@@ -215,7 +225,7 @@ const dataSource = {
 		const sort =
 			p.sortModel.length === 1
 				? {
-						col: p.sortModel[0]!.colId as 'due',
+						col: p.sortModel[0]!.colId as 'card.due' | 'card.created',
 						direction: p.sortModel[0]!.sort,
 				  }
 				: undefined

@@ -81,6 +81,8 @@ export const initSql = [
     script BLOB
 ) STRICT;`,
 	`CREATE INDEX IF NOT EXISTS card_noteId_idx on card(noteId);`,
+	`CREATE INDEX IF NOT EXISTS card_created_idx on card(created);`,
+	`CREATE INDEX IF NOT EXISTS card_due_idx on card(due);`,
 	`SELECT crsql_as_crr('template');`,
 	`SELECT crsql_as_crr('remoteTemplate');`,
 	`SELECT crsql_as_crr('note');`,

@@ -159,7 +159,7 @@ export const cardCollectionMethods = {
 	getCards: async function (
 		offset: number,
 		limit: number,
-		sort?: { col: 'due'; direction: 'asc' | 'desc' },
+		sort?: { col: 'card.due' | 'card.created'; direction: 'asc' | 'desc' },
 		search?: { literalSearch?: string; ftsSearch?: string },
 	) {
 		const db = await getKysely()
@@ -205,8 +205,6 @@ export const cardCollectionMethods = {
 				'remoteNote.remoteId as remoteNoteId',
 				'remoteNote.uploadDate as remoteNoteUploadDate',
 			])
-			.offset(offset)
-			.limit(limit)
 			.$if(sort != null, (db) => db.orderBy(sort!.col, sort!.direction))
 			.$if(search?.ftsSearch != null, (db) =>
 				db
@@ -218,6 +216,8 @@ export const cardCollectionMethods = {
 			.$if(search?.literalSearch != null, (db) =>
 				db.where('note.fieldValues', 'like', '%' + search!.literalSearch + '%'),
 			)
+			.offset(offset)
+			.limit(limit)
 			.execute()
 		const count = db
 			.selectFrom('card')
