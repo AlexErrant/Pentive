@@ -119,27 +119,12 @@ export default function Home(): JSX.Element {
 				</label>
 			</div>
 			<div class='mt-4'>
-				<form
-					onSubmit={async (e) => {
-						e.preventDefault()
-						const formData = new FormData(e.target as HTMLFormElement)
-						const rawSql = formData.get('rawSql') as string
-						await q(rawSql)()
+				<EditSql
+					// eslint-disable-next-line solid/reactivity -- it's reactive for up to 1 await
+					run={async (x) => {
+						await q(x)()
 					}}
-				>
-					<label for='rawSql'>SQL</label>
-					<input
-						name='rawSql'
-						class='w-75px bg-white rounded-lg border p-1 text-sm'
-						type='text'
-					/>
-					<EditSql
-						// eslint-disable-next-line solid/reactivity -- it's reactive for up to 1 await
-						run={async (x) => {
-							await q(x)()
-						}}
-					/>
-				</form>
+				/>
 				<button class='px-2' onClick={q('select * from template')}>
 					template
 				</button>
