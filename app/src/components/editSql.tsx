@@ -40,7 +40,6 @@ import { oneDark } from '@codemirror/theme-one-dark'
 import { theme } from '../globalState'
 
 const EditSql: VoidComponent<{
-	sql: string
 	run: (sql: string) => Promise<void>
 }> = (props) => {
 	let ref: HTMLDivElement | undefined
@@ -48,12 +47,16 @@ const EditSql: VoidComponent<{
 	onMount(() => {
 		view = new EditorView({
 			parent: ref,
-			state: createEditorState(props.sql, theme(), props.run),
+			state: createEditorState(
+				localStorage.getItem('sql') ?? '',
+				theme(),
+				props.run,
+			),
 		})
 	})
 	createEffect(
 		on(theme, (t) => {
-			view.setState(createEditorState(props.sql, t, props.run))
+			view.setState(createEditorState(view.state.doc.toString(), t, props.run))
 		}),
 	)
 	onCleanup(() => {
@@ -115,7 +118,9 @@ function createEditorState(
 				{
 					key: 'Ctrl-Enter',
 					run: (x) => {
-						run(x.state.doc.toString()).catch(console.error)
+						const sql = x.state.doc.toString()
+						run(sql).catch(console.error)
+						localStorage.setItem('sql', sql)
 						return true
 					},
 				},

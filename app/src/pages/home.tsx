@@ -134,7 +134,6 @@ export default function Home(): JSX.Element {
 						type='text'
 					/>
 					<EditSql
-						sql={''}
 						// eslint-disable-next-line solid/reactivity -- it's reactive for up to 1 await
 						run={async (x) => {
 							await q(x)()
