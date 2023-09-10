@@ -12,7 +12,7 @@ import { unwrap } from 'solid-js/store'
 import { db } from '../db'
 import { C } from '../pluginManager'
 import { toastError } from './toasts'
-import { debounce } from '@solid-primitives/scheduled'
+import { debounce, leadingAndTrailing } from '@solid-primitives/scheduled'
 
 const targetOrigin = '*' // highTODO make more limiting. Also implement https://stackoverflow.com/q/8169582
 
@@ -57,17 +57,21 @@ const ResizingIframe: VoidComponent<{
 	onCleanup(() => {
 		iframeReference?.iFrameResizer?.close()
 	})
-	// eslint-disable-next-line solid/reactivity
-	const debouncePostMessage = debounce(() => {
-		try {
-			iframeReference?.contentWindow?.postMessage(
-				{ type: 'pleaseRerender', i: unwrap(props.i) },
-				targetOrigin,
-			)
-		} catch (error) {
-			toastError('Error communicating with iframe.', error)
-		}
-	}, 200)
+	const debouncePostMessage = leadingAndTrailing(
+		debounce,
+		// eslint-disable-next-line solid/reactivity
+		() => {
+			try {
+				iframeReference?.contentWindow?.postMessage(
+					{ type: 'pleaseRerender', i: unwrap(props.i) },
+					targetOrigin,
+				)
+			} catch (error) {
+				toastError('Error communicating with iframe.', error)
+			}
+		},
+		200,
+	)
 	createEffect(() => {
 		if (props.i.tag === 'template') {
 			// "touch" certain fields so they're reactive
