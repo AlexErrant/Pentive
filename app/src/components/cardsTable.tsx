@@ -145,8 +145,8 @@ const debouncedSetDatasource = leadingAndTrailing(
 const CardsTable: VoidComponent<{
 	readonly onSelectionChanged: (noteCards: NoteCard[]) => void
 }> = (props) => {
-	createEffect(on(literalSearch, debouncedSetDatasource))
-	createEffect(on(ftsSearch, debouncedSetDatasource))
+	createEffect(on(literalSearch, debouncedSetDatasource, { defer: true }))
+	createEffect(on(ftsSearch, debouncedSetDatasource, { defer: true }))
 	return (
 		<div class='flex h-full flex-col'>
 			<div class='m-0.5 p-0.5'>
