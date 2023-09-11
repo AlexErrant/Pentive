@@ -24,7 +24,6 @@ import { assertNever } from 'shared'
 import { agGridTheme } from '../globalState'
 import { Upload } from 'shared-dom'
 import { C } from '../pluginManager'
-import { debounce, leadingAndTrailing } from '@solid-primitives/scheduled'
 
 LicenseManager.setLicenseKey(import.meta.env.VITE_AG_GRID_LICENSE)
 
@@ -143,19 +142,15 @@ const getRowId = (params: GetRowIdParams<NoteCard>): CardId =>
 const [literalSearch, setLiteralSearch] = createSignal('')
 const [ftsSearch, setFtsSearch] = createSignal('')
 
-const debouncedSetDatasource = leadingAndTrailing(
-	debounce,
-	() => {
-		gridRef?.api.setDatasource(dataSource)
-	},
-	200,
-)
+function setDatasource() {
+	gridRef?.api.setDatasource(dataSource)
+}
 
 const CardsTable: VoidComponent<{
 	readonly onSelectionChanged: (noteCards: NoteCard[]) => void
 }> = (props) => {
-	createEffect(on(literalSearch, debouncedSetDatasource, { defer: true }))
-	createEffect(on(ftsSearch, debouncedSetDatasource, { defer: true }))
+	createEffect(on(literalSearch, setDatasource, { defer: true }))
+	createEffect(on(ftsSearch, setDatasource, { defer: true }))
 	return (
 		<div class='flex h-full flex-col'>
 			<div class='m-0.5 p-0.5'>
@@ -163,13 +158,17 @@ const CardsTable: VoidComponent<{
 					class='w-full border'
 					type='text'
 					placeholder='Literal Search'
-					onInput={(e) => setLiteralSearch(e.currentTarget.value)}
+					onKeyUp={(e) => {
+						if (e.key === 'Enter') setLiteralSearch(e.currentTarget.value)
+					}}
 				/>
 				<input
 					class='w-full border'
 					type='text'
 					placeholder='FTS Search'
-					onInput={(e) => setFtsSearch(e.currentTarget.value)}
+					onKeyUp={(e) => {
+						if (e.key === 'Enter') setFtsSearch(e.currentTarget.value)
+					}}
 				/>
 			</div>
 			<div class={`${agGridTheme()} h-full`}>
