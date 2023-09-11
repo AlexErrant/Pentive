@@ -87,7 +87,13 @@ export interface RemoteTemplate {
 	uploadDate: number | null
 }
 
+export interface SqliteTempMaster {
+	name: string
+}
+
 export interface DB {
+	// eslint-disable-next-line prettier/prettier, @typescript-eslint/naming-convention
+  sqlite_temp_master: SqliteTempMaster
 	card: Card
 	media: Media
 	note: Note

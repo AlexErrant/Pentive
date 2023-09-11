@@ -9,7 +9,7 @@ import {
 	type State,
 	type NoteCard,
 } from 'shared'
-import { getKysely } from './crsqlite'
+import { getDb, getKysely } from './crsqlite'
 import { type DB, type Card as CardEntity } from './database'
 import {
 	type ExpressionBuilder,
@@ -114,6 +114,15 @@ type OnConflictUpdateCardSet = {
 	) => unknown
 }
 
+// https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/digest#converting_a_digest_to_a_hex_string
+async function digestMessage(message: string) {
+	const msgUint8 = new TextEncoder().encode(message) // encode as (utf-8) Uint8Array
+	const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8) // hash the message
+	const hashArray = Array.from(new Uint8Array(hashBuffer)) // convert buffer to byte array
+	const hashHex = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('') // convert bytes to hex string
+	return hashHex
+}
+
 export const cardCollectionMethods = {
 	upsertCard: async function (card: Card) {
 		await this.bulkUpsertCards([card])
@@ -162,10 +171,49 @@ export const cardCollectionMethods = {
 		sort?: { col: 'card.due' | 'card.created'; direction: 'asc' | 'desc' },
 		search?: { literalSearch?: string; ftsSearch?: string },
 	) {
-		const db = await getKysely()
-		const entities = db
+		const searchCache = ('getCardsCache_' +
+			(await digestMessage(JSON.stringify(search)))) as 'searchCache'
+		const db = (await getKysely()).withTables<{
+			[searchCache]: {
+				rowid: number
+				id: string
+			}
+		}>()
+		const baseQuery = db
 			.selectFrom('card')
 			.innerJoin('note', 'card.noteId', 'note.id')
+			.$if(sort != null, (db) => db.orderBy(sort!.col, sort!.direction))
+			.$if(search?.ftsSearch != null, (db) =>
+				db
+					.innerJoin('noteFts', 'noteFts.id', 'note.id')
+					// must hardcode `noteFts` for now https://github.com/kysely-org/kysely/issues/546
+					.where(sql`noteFts`, 'match', search!.ftsSearch)
+					.orderBy(sql`rank`),
+			)
+			.$if(search?.literalSearch != null, (db) =>
+				db.where('note.fieldValues', 'like', '%' + search!.literalSearch + '%'),
+			)
+		const cacheExists = await db
+			.selectFrom('sqlite_temp_master')
+			.where('name', '=', searchCache)
+			.select(db.fn.count<number>('name').as('c'))
+			.executeTakeFirstOrThrow()
+			.then((x) => x.c === 1)
+		if (!cacheExists) {
+			const db = getDb()
+			const { sql, parameters } = baseQuery
+				.clearSelect()
+				.select('card.id as id')
+				.compile()
+			await (
+				await db
+			).exec(
+				`CREATE TEMP TABLE ${searchCache} AS ` + sql,
+				parameters as SQLiteCompatibleType[],
+			)
+		}
+		const entities = baseQuery
+			.innerJoin(searchCache, 'card.id', `${searchCache}.id`)
 			.innerJoin('template', 'template.id', 'note.templateId')
 			.leftJoin('remoteNote', 'note.id', 'remoteNote.localId')
 			.leftJoin('remoteTemplate', 'template.id', 'remoteTemplate.localId')
@@ -205,33 +253,12 @@ export const cardCollectionMethods = {
 				'remoteNote.remoteId as remoteNoteId',
 				'remoteNote.uploadDate as remoteNoteUploadDate',
 			])
-			.$if(sort != null, (db) => db.orderBy(sort!.col, sort!.direction))
-			.$if(search?.ftsSearch != null, (db) =>
-				db
-					.innerJoin('noteFts', 'noteFts.id', 'note.id')
-					// must hardcode `noteFts` for now https://github.com/kysely-org/kysely/issues/546
-					.where(sql`noteFts`, 'match', search!.ftsSearch)
-					.orderBy(sql`rank`),
-			)
-			.$if(search?.literalSearch != null, (db) =>
-				db.where('note.fieldValues', 'like', '%' + search!.literalSearch + '%'),
-			)
-			.offset(offset)
+			.where(`${searchCache}.rowid`, '>=', offset)
 			.limit(limit)
 			.execute()
 		const count = db
-			.selectFrom('card')
-			.innerJoin('note', 'card.noteId', 'note.id')
-			.$if(search?.ftsSearch != null, (db) =>
-				db
-					.innerJoin('noteFts', 'noteFts.id', 'note.id')
-					// must hardcode `noteFts` for now https://github.com/kysely-org/kysely/issues/546
-					.where(sql`noteFts`, 'match', search!.ftsSearch),
-			)
-			.$if(search?.literalSearch != null, (db) =>
-				db.where('note.fieldValues', 'like', '%' + search!.literalSearch + '%'),
-			)
-			.select(db.fn.count<number>('card.id').as('c'))
+			.selectFrom(searchCache)
+			.select(db.fn.max(`${searchCache}.rowid`).as('c'))
 			.executeTakeFirstOrThrow()
 		return {
 			count: (await count).c,
