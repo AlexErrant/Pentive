@@ -18,6 +18,7 @@ import {
 	type Kysely,
 	type OnConflictTables,
 	sql,
+	type SelectQueryBuilder,
 } from 'kysely'
 import _ from 'lodash'
 import { entityToDomain as templateEntityToDomain } from './template'
@@ -123,16 +124,60 @@ async function digestMessage(message: string) {
 	return hashHex
 }
 
+// This exists to lie to Typescript, saying that all caches are called `searchCache`.
+// There are multiple caches with different names, but idk how to get that working with Kysely.
+const searchCacheConst = 'searchCache' as const
+type SearchCache = typeof searchCacheConst
+
+// We cache the query's `card.id`s in a temp table. We use the temp table's rowids as a hack to get cursor pagination.
+async function buildCache(
+	db: Kysely<
+		DB & {
+			searchCache: {
+				rowid: number
+				id: string
+			}
+		}
+	>,
+	baseQuery: SelectQueryBuilder<DB, 'card' | 'note', Partial<unknown>>,
+	search?: {
+		literalSearch?: string
+		ftsSearch?: string
+	},
+) {
+	const cacheName = ('getCardsCache_' +
+		// lowTODO find a better way to name the cache table
+		(await digestMessage(JSON.stringify(search)))) as SearchCache
+	const cacheExists = await db
+		.selectFrom('sqlite_temp_master')
+		.where('name', '=', cacheName)
+		.select(db.fn.count<number>('name').as('c'))
+		.executeTakeFirstOrThrow()
+		.then((x) => x.c === 1)
+	if (!cacheExists) {
+		const db = getDb()
+		const { sql, parameters } = baseQuery
+			.clearSelect()
+			.select('card.id as id')
+			.compile()
+		await (
+			await db
+		).exec(
+			`CREATE TEMP TABLE ${cacheName} AS ` + sql,
+			parameters as SQLiteCompatibleType[],
+		)
+	}
+	return cacheName
+}
+
 async function getCards(
 	offset: number,
 	limit: number,
 	sort?: { col: 'card.due' | 'card.created'; direction: 'asc' | 'desc' },
 	search?: { literalSearch?: string; ftsSearch?: string },
-) {
-	const searchCache = ('getCardsCache_' +
-		(await digestMessage(JSON.stringify(search)))) as 'searchCache'
+): Promise<{ count: number; noteCards: NoteCard[] }> {
 	const db = (await getKysely()).withTables<{
-		[searchCache]: {
+		[searchCacheConst]: {
 			rowid: number
 			id: string
 		}
@@ -151,27 +196,18 @@ async function getCards(
 		.$if(search?.literalSearch != null, (db) =>
 			db.where('note.fieldValues', 'like', '%' + search!.literalSearch + '%'),
 		)
-	const cacheExists = await db
-		.selectFrom('sqlite_temp_master')
-		.where('name', '=', searchCache)
-		.select(db.fn.count<number>('name').as('c'))
-		.executeTakeFirstOrThrow()
-		.then((x) => x.c === 1)
-	if (!cacheExists) {
-		const db = getDb()
-		const { sql, parameters } = baseQuery
-			.clearSelect()
-			.select('card.id as id')
-			.compile()
-		await (
-			await db
-		).exec(
-			`CREATE TEMP TABLE ${searchCache} AS ` + sql,
-			parameters as SQLiteCompatibleType[],
-		)
-	}
+	const searchCache =
+		// If user has scrolled, build the cache. (Don't lazily build the cache in an async thread when
+		// when offset=0 and returning the results, since the user may be in the middle of typing a query.
+		// lowTODO could eagerly build a cache after no keyboard input after, say, 5 seconds...
+		// or if the user hits `enter`... hm...)
+		offset > 1 ? await buildCache(db, baseQuery, search) : null
 	const entities = baseQuery
-		.innerJoin(searchCache, 'card.id', `${searchCache}.id`)
+		.$if(searchCache != null, (qb) =>
+			qb
+				.innerJoin(searchCache!, 'card.id', `${searchCache!}.id`)
+				.where(`${searchCache!}.rowid`, '>=', offset),
+		)
 		.innerJoin('template', 'template.id', 'note.templateId')
 		.leftJoin('remoteNote', 'note.id', 'remoteNote.localId')
 		.leftJoin('remoteTemplate', 'template.id', 'remoteTemplate.localId')
@@ -211,13 +247,17 @@ async function getCards(
 			'remoteNote.remoteId as remoteNoteId',
 			'remoteNote.uploadDate as remoteNoteUploadDate',
 		])
-		.where(`${searchCache}.rowid`, '>=', offset)
 		.limit(limit)
 		.execute()
-	const count = db
-		.selectFrom(searchCache)
-		.select(db.fn.max(`${searchCache}.rowid`).as('c'))
-		.executeTakeFirstOrThrow()
+	const count =
+		searchCache != null
+			? db
+					.selectFrom(searchCache)
+					.select(db.fn.max(`${searchCache}.rowid`).as('c'))
+					.executeTakeFirstOrThrow()
+			: baseQuery
+					.select(db.fn.countAll<number>().as('c'))
+					.executeTakeFirstOrThrow()
 	return {
 		count: (await count).c,
 		noteCards: Array.from(
