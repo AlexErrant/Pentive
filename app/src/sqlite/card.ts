@@ -123,6 +123,164 @@ async function digestMessage(message: string) {
 	return hashHex
 }
 
+async function getCards(
+	offset: number,
+	limit: number,
+	sort?: { col: 'card.due' | 'card.created'; direction: 'asc' | 'desc' },
+	search?: { literalSearch?: string; ftsSearch?: string },
+) {
+	const searchCache = ('getCardsCache_' +
+		(await digestMessage(JSON.stringify(search)))) as 'searchCache'
+	const db = (await getKysely()).withTables<{
+		[searchCache]: {
+			rowid: number
+			id: string
+		}
+	}>()
+	const baseQuery = db
+		.selectFrom('card')
+		.innerJoin('note', 'card.noteId', 'note.id')
+		.$if(sort != null, (db) => db.orderBy(sort!.col, sort!.direction))
+		.$if(search?.ftsSearch != null, (db) =>
+			db
+				.innerJoin('noteFts', 'noteFts.id', 'note.id')
+				// must hardcode `noteFts` for now https://github.com/kysely-org/kysely/issues/546
+				.where(sql`noteFts`, 'match', search!.ftsSearch)
+				.orderBy(sql`rank`),
+		)
+		.$if(search?.literalSearch != null, (db) =>
+			db.where('note.fieldValues', 'like', '%' + search!.literalSearch + '%'),
+		)
+	const cacheExists = await db
+		.selectFrom('sqlite_temp_master')
+		.where('name', '=', searchCache)
+		.select(db.fn.count<number>('name').as('c'))
+		.executeTakeFirstOrThrow()
+		.then((x) => x.c === 1)
+	if (!cacheExists) {
+		const db = getDb()
+		const { sql, parameters } = baseQuery
+			.clearSelect()
+			.select('card.id as id')
+			.compile()
+		await (
+			await db
+		).exec(
+			`CREATE TEMP TABLE ${searchCache} AS ` + sql,
+			parameters as SQLiteCompatibleType[],
+		)
+	}
+	const entities = baseQuery
+		.innerJoin(searchCache, 'card.id', `${searchCache}.id`)
+		.innerJoin('template', 'template.id', 'note.templateId')
+		.leftJoin('remoteNote', 'note.id', 'remoteNote.localId')
+		.leftJoin('remoteTemplate', 'template.id', 'remoteTemplate.localId')
+		.select([
+			'card.cardSettingId as card_cardSettingId',
+			'card.created as card_created',
+			'card.deckIds as card_deckIds',
+			'card.due as card_due',
+			'card.id as card_id',
+			'card.updated as card_updated',
+			'card.noteId as card_noteId',
+			'card.ord as card_ord',
+			'card.state as card_state',
+
+			'note.ankiNoteId as note_ankiNoteId',
+			'note.created as note_created',
+			'note.fieldValues as note_fieldValues',
+			'note.id as note_id',
+			'note.updated as note_updated',
+			'note.tags as note_tags',
+			'note.templateId as note_templateId',
+
+			'template.ankiId as template_ankiId',
+			'template.created as template_created',
+			'template.css as template_css',
+			'template.fields as template_fields',
+			'template.id as template_id',
+			'template.updated as template_updated',
+			'template.name as template_name',
+			'template.templateType as template_templateType',
+
+			'remoteTemplate.nook as remoteTemplateNook',
+			'remoteTemplate.remoteId as remoteTemplateId',
+			'remoteTemplate.uploadDate as remoteTemplateUploadDate',
+
+			'remoteNote.nook as remoteNoteNook',
+			'remoteNote.remoteId as remoteNoteId',
+			'remoteNote.uploadDate as remoteNoteUploadDate',
+		])
+		.where(`${searchCache}.rowid`, '>=', offset)
+		.limit(limit)
+		.execute()
+	const count = db
+		.selectFrom(searchCache)
+		.select(db.fn.max(`${searchCache}.rowid`).as('c'))
+		.executeTakeFirstOrThrow()
+	return {
+		count: (await count).c,
+		noteCards: Array.from(
+			groupByToMap(await entities, (x) => x.card_id).values(),
+		).map((tncR) => {
+			const tnc = tncR[0]!
+			const note = noteEntityToDomain(
+				{
+					ankiNoteId: tnc.note_ankiNoteId,
+					created: tnc.note_created,
+					fieldValues: tnc.note_fieldValues,
+					id: tnc.note_id,
+					updated: tnc.note_updated,
+					tags: tnc.note_tags,
+					templateId: tnc.note_templateId,
+					templateFields: tnc.template_fields,
+				},
+				tncR
+					.filter((x) => x.remoteNoteNook != null)
+					.map((x) => ({
+						remoteId: x.remoteNoteId!,
+						nook: x.remoteNoteNook!,
+						uploadDate: x.remoteNoteUploadDate,
+						localId: x.note_id,
+					})),
+			)
+			const template = templateEntityToDomain(
+				{
+					ankiId: tnc.template_ankiId,
+					created: tnc.template_created,
+					css: tnc.template_css,
+					fields: tnc.template_fields,
+					id: tnc.template_id,
+					updated: tnc.template_updated,
+					name: tnc.template_name,
+					templateType: tnc.template_templateType,
+				},
+				tncR
+					.filter((x) => x.remoteTemplateNook != null)
+					.map((x) => ({
+						remoteId: x.remoteTemplateId!,
+						nook: x.remoteTemplateNook!,
+						uploadDate: x.remoteTemplateUploadDate,
+						localId: x.template_id,
+					})),
+			)
+			const card = entityToDomain({
+				cardSettingId: tnc.card_cardSettingId,
+				created: tnc.card_created,
+				deckIds: tnc.card_deckIds,
+				due: tnc.card_due,
+				id: tnc.card_id,
+				updated: tnc.card_updated,
+				noteId: tnc.card_noteId,
+				ord: tnc.card_ord,
+				state: tnc.card_state,
+			})
+			const r: NoteCard = { note, template, card }
+			return r
+		}),
+	}
+}
+
 export const cardCollectionMethods = {
 	upsertCard: async function (card: Card) {
 		await this.bulkUpsertCards([card])
@@ -165,161 +323,5 @@ export const cardCollectionMethods = {
 			.execute()
 		return cards.map(entityToDomain)
 	},
-	getCards: async function (
-		offset: number,
-		limit: number,
-		sort?: { col: 'card.due' | 'card.created'; direction: 'asc' | 'desc' },
-		search?: { literalSearch?: string; ftsSearch?: string },
-	) {
-		const searchCache = ('getCardsCache_' +
-			(await digestMessage(JSON.stringify(search)))) as 'searchCache'
-		const db = (await getKysely()).withTables<{
-			[searchCache]: {
-				rowid: number
-				id: string
-			}
-		}>()
-		const baseQuery = db
-			.selectFrom('card')
-			.innerJoin('note', 'card.noteId', 'note.id')
-			.$if(sort != null, (db) => db.orderBy(sort!.col, sort!.direction))
-			.$if(search?.ftsSearch != null, (db) =>
-				db
-					.innerJoin('noteFts', 'noteFts.id', 'note.id')
-					// must hardcode `noteFts` for now https://github.com/kysely-org/kysely/issues/546
-					.where(sql`noteFts`, 'match', search!.ftsSearch)
-					.orderBy(sql`rank`),
-			)
-			.$if(search?.literalSearch != null, (db) =>
-				db.where('note.fieldValues', 'like', '%' + search!.literalSearch + '%'),
-			)
-		const cacheExists = await db
-			.selectFrom('sqlite_temp_master')
-			.where('name', '=', searchCache)
-			.select(db.fn.count<number>('name').as('c'))
-			.executeTakeFirstOrThrow()
-			.then((x) => x.c === 1)
-		if (!cacheExists) {
-			const db = getDb()
-			const { sql, parameters } = baseQuery
-				.clearSelect()
-				.select('card.id as id')
-				.compile()
-			await (
-				await db
-			).exec(
-				`CREATE TEMP TABLE ${searchCache} AS ` + sql,
-				parameters as SQLiteCompatibleType[],
-			)
-		}
-		const entities = baseQuery
-			.innerJoin(searchCache, 'card.id', `${searchCache}.id`)
-			.innerJoin('template', 'template.id', 'note.templateId')
-			.leftJoin('remoteNote', 'note.id', 'remoteNote.localId')
-			.leftJoin('remoteTemplate', 'template.id', 'remoteTemplate.localId')
-			.select([
-				'card.cardSettingId as card_cardSettingId',
-				'card.created as card_created',
-				'card.deckIds as card_deckIds',
-				'card.due as card_due',
-				'card.id as card_id',
-				'card.updated as card_updated',
-				'card.noteId as card_noteId',
-				'card.ord as card_ord',
-				'card.state as card_state',
-
-				'note.ankiNoteId as note_ankiNoteId',
-				'note.created as note_created',
-				'note.fieldValues as note_fieldValues',
-				'note.id as note_id',
-				'note.updated as note_updated',
-				'note.tags as note_tags',
-				'note.templateId as note_templateId',
-
-				'template.ankiId as template_ankiId',
-				'template.created as template_created',
-				'template.css as template_css',
-				'template.fields as template_fields',
-				'template.id as template_id',
-				'template.updated as template_updated',
-				'template.name as template_name',
-				'template.templateType as template_templateType',
-
-				'remoteTemplate.nook as remoteTemplateNook',
-				'remoteTemplate.remoteId as remoteTemplateId',
-				'remoteTemplate.uploadDate as remoteTemplateUploadDate',
-
-				'remoteNote.nook as remoteNoteNook',
-				'remoteNote.remoteId as remoteNoteId',
-				'remoteNote.uploadDate as remoteNoteUploadDate',
-			])
-			.where(`${searchCache}.rowid`, '>=', offset)
-			.limit(limit)
-			.execute()
-		const count = db
-			.selectFrom(searchCache)
-			.select(db.fn.max(`${searchCache}.rowid`).as('c'))
-			.executeTakeFirstOrThrow()
-		return {
-			count: (await count).c,
-			noteCards: Array.from(
-				groupByToMap(await entities, (x) => x.card_id).values(),
-			).map((tncR) => {
-				const tnc = tncR[0]!
-				const note = noteEntityToDomain(
-					{
-						ankiNoteId: tnc.note_ankiNoteId,
-						created: tnc.note_created,
-						fieldValues: tnc.note_fieldValues,
-						id: tnc.note_id,
-						updated: tnc.note_updated,
-						tags: tnc.note_tags,
-						templateId: tnc.note_templateId,
-						templateFields: tnc.template_fields,
-					},
-					tncR
-						.filter((x) => x.remoteNoteNook != null)
-						.map((x) => ({
-							remoteId: x.remoteNoteId!,
-							nook: x.remoteNoteNook!,
-							uploadDate: x.remoteNoteUploadDate,
-							localId: x.note_id,
-						})),
-				)
-				const template = templateEntityToDomain(
-					{
-						ankiId: tnc.template_ankiId,
-						created: tnc.template_created,
-						css: tnc.template_css,
-						fields: tnc.template_fields,
-						id: tnc.template_id,
-						updated: tnc.template_updated,
-						name: tnc.template_name,
-						templateType: tnc.template_templateType,
-					},
-					tncR
-						.filter((x) => x.remoteTemplateNook != null)
-						.map((x) => ({
-							remoteId: x.remoteTemplateId!,
-							nook: x.remoteTemplateNook!,
-							uploadDate: x.remoteTemplateUploadDate,
-							localId: x.template_id,
-						})),
-				)
-				const card = entityToDomain({
-					cardSettingId: tnc.card_cardSettingId,
-					created: tnc.card_created,
-					deckIds: tnc.card_deckIds,
-					due: tnc.card_due,
-					id: tnc.card_id,
-					updated: tnc.card_updated,
-					noteId: tnc.card_noteId,
-					ord: tnc.card_ord,
-					state: tnc.card_state,
-				})
-				const r: NoteCard = { note, template, card }
-				return r
-			}),
-		}
-	},
+	getCards,
 }
