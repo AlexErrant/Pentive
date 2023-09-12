@@ -23,7 +23,7 @@ import {
 import _ from 'lodash'
 import { entityToDomain as templateEntityToDomain } from './template'
 import { entityToDomain as noteEntityToDomain } from './note'
-import { toastImpossible, toastInfo } from '../components/toasts'
+import { toastImpossible, toastInfo, toastWarn } from '../components/toasts'
 
 function serializeState(s: State): number {
 	switch (s) {
@@ -186,22 +186,21 @@ async function getCards(
 		.selectFrom('card')
 		.innerJoin('note', 'card.noteId', 'note.id')
 		.$if(sort != null, (db) => db.orderBy(sort!.col, sort!.direction))
-		.$if(search?.ftsSearch != null, (db) =>
+		// don't `where` when scrolling - redundant since joining on the cache already filters
+		.$if(offset === 0 && search?.ftsSearch != null, (db) =>
 			db
 				.innerJoin('noteFts', 'noteFts.id', 'note.id')
 				// must hardcode `noteFts` for now https://github.com/kysely-org/kysely/issues/546
 				.where(sql`noteFts`, 'match', search!.ftsSearch)
 				.orderBy(sql`rank`),
 		)
-		.$if(search?.literalSearch != null, (db) =>
+		// don't `where` when scrolling - redundant since joining on the cache already filters
+		.$if(offset === 0 && search?.literalSearch != null, (db) =>
 			db.where('note.fieldValues', 'like', '%' + search!.literalSearch + '%'),
 		)
 	const searchCache =
-		// If user has scrolled, build the cache. (Don't lazily build the cache in an async thread when
-		// when offset=0 and returning the results, since the user may be in the middle of typing a query.
-		// lowTODO could eagerly build a cache after no keyboard input after, say, 5 seconds...
-		// or if the user hits `enter`... hm...)
-		offset > 1 ? await buildCache(db, baseQuery, search) : null
+		// If user has scrolled, build/use the cache.
+		offset === 0 ? null : await buildCache(db, baseQuery, search)
 	const entities = baseQuery
 		.$if(searchCache != null, (qb) =>
 			qb
@@ -258,7 +257,7 @@ async function getCards(
 			: baseQuery
 					.select(db.fn.countAll<number>().as('c'))
 					.executeTakeFirstOrThrow()
-	return {
+	const r = {
 		count: (await count).c,
 		noteCards: Array.from(
 			groupByToMap(await entities, (x) => x.card_id).values(),
@@ -319,6 +318,23 @@ async function getCards(
 			return r
 		}),
 	}
+	if (searchCache == null) {
+		// asynchronously build the cache
+		const start = performance.now()
+		buildCache(db, baseQuery, search)
+			.then((name) => {
+				const end = performance.now()
+				console.info(
+					`Cache ${name} for ${JSON.stringify(search)} built in ${
+						end - start
+					} ms`,
+				)
+			})
+			.catch((e) => {
+				toastWarn('Error building cache', e)
+			})
+	}
+	return r
 }
 
 export const cardCollectionMethods = {
