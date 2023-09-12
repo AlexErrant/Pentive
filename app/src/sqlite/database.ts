@@ -40,10 +40,14 @@ export interface Note {
 	fieldValues: string
 }
 
-export interface NoteFts {
+export interface NoteFtsFv {
+	id: LDbId
+	fieldValues: string
+}
+
+export interface NoteFtsTag {
 	id: LDbId
 	tags: string
-	fieldValues: string
 }
 
 export interface RemoteNote {
@@ -92,12 +96,13 @@ export interface SqliteTempMaster {
 }
 
 export interface DB {
-	// eslint-disable-next-line prettier/prettier, @typescript-eslint/naming-convention
-  sqlite_temp_master: SqliteTempMaster
+	// eslint-disable-next-line @typescript-eslint/naming-convention
+	sqlite_temp_master: SqliteTempMaster
 	card: Card
 	media: Media
 	note: Note
-	noteFts: NoteFts
+	noteFtsFv: NoteFtsFv
+	noteFtsTag: NoteFtsTag
 	remoteNote: RemoteNote
 	plugin: Plugin
 	remoteMedia: RemoteMedia

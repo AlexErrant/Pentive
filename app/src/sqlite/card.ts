@@ -189,9 +189,8 @@ async function getCards(
 		// don't `where` when scrolling - redundant since joining on the cache already filters
 		.$if(offset === 0 && search?.ftsSearch != null, (db) =>
 			db
-				.innerJoin('noteFts', 'noteFts.id', 'note.id')
-				// must hardcode `noteFts` for now https://github.com/kysely-org/kysely/issues/546
-				.where(sql`noteFts`, 'match', search!.ftsSearch)
+				.innerJoin('noteFtsFv', 'noteFtsFv.id', 'note.id')
+				.where('noteFtsFv.fieldValues', 'match', search!.ftsSearch!)
 				.orderBy(sql`rank`),
 		)
 		// don't `where` when scrolling - redundant since joining on the cache already filters
