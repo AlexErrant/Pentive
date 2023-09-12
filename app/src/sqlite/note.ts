@@ -4,9 +4,7 @@ import {
 	type NookId,
 	type RemoteNoteId,
 	parseMap,
-	parseSet,
 	stringifyMap,
-	stringifySet,
 	type NoteId,
 	type MediaId,
 	type RemoteMediaNum,
@@ -26,6 +24,22 @@ import {
 	toastWarn,
 } from '../components/toasts'
 
+const unitSeparator = String.fromCharCode(31) // if this changes, also change noteFtsTag's separator 89CDE7EA-EF1B-4054-B381-597EE549CAB4
+
+// highTODO property test
+function stringifyTags(tags: Set<string>) {
+	for (const tag of tags) {
+		if (tag.includes(unitSeparator))
+			toastFatal('Tags cannot contain the unit separator.')
+	}
+	return Array.from(tags.values()).join(unitSeparator)
+}
+
+function parseTags(rawTags: string) {
+	const parsed = rawTags.split(unitSeparator)
+	return new Set(parsed)
+}
+
 function noteToDocType(note: Note): InsertObject<DB, 'note'> {
 	const now = new Date().getTime()
 	const r: InsertObject<DB, 'note'> = {
@@ -33,7 +47,7 @@ function noteToDocType(note: Note): InsertObject<DB, 'note'> {
 		templateId: note.templateId,
 		created: now,
 		updated: now,
-		tags: stringifySet(note.tags),
+		tags: stringifyTags(note.tags),
 		fieldValues: stringifyMap(note.fieldValues),
 		ankiNoteId: note.ankiNoteId,
 	}
@@ -81,7 +95,7 @@ export function entityToDomain(
 		created: new Date(note.created),
 		updated: new Date(note.updated),
 		templateId: note.templateId,
-		tags: parseSet(note.tags),
+		tags: parseTags(note.tags),
 		fieldValues,
 		ankiNoteId: note.ankiNoteId ?? undefined,
 		remotes: new Map(
