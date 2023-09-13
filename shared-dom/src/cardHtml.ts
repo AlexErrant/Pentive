@@ -43,7 +43,7 @@ function clozeTemplateFor(this: RenderContainer, fieldName: string): RegExp {
 }
 
 // https://stackoverflow.com/a/6969486
-function escapeRegExp(string: string): string {
+export function escapeRegExp(string: string): string {
 	return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') // $& means the whole matched string
 }
 

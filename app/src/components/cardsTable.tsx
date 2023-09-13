@@ -22,8 +22,10 @@ import { LicenseManager } from 'ag-grid-enterprise'
 import { db } from '../db'
 import { assertNever } from 'shared'
 import { agGridTheme } from '../globalState'
-import { Upload } from 'shared-dom'
+import { Upload, escapeRegExp } from 'shared-dom'
 import { C } from '../pluginManager'
+import { strip } from '../domain/utility'
+import { toastImpossible } from './toasts'
 
 LicenseManager.setLicenseKey(import.meta.env.VITE_AG_GRID_LICENSE)
 
@@ -229,11 +231,19 @@ const dataSource = {
 				  }
 				: undefined
 		const literalSearchActual = literalSearch()
-		const ftsSearchActual = ftsSearch()
+		const ftsSearchActual = ftsSearch().trim()
 		const search = {
 			literalSearch:
 				literalSearchActual.trim() === '' ? undefined : literalSearchActual,
-			ftsSearch: ftsSearchActual.trim() === '' ? undefined : ftsSearchActual,
+			ftsSearch: ftsSearchActual === '' ? undefined : ftsSearchActual,
+		}
+		const regex = () => {
+			const firstWord = ftsSearch().trim().split(' ')[0]! // lowTODO handle multiple words
+			const escapedFirstWord = escapeRegExp(firstWord)
+			return new RegExp(
+				`(?<left>.{0,20})\\b(?<searchWord>${escapedFirstWord})(?<right>.{0,20})`,
+				'si',
+			)
 		}
 		const start = performance.now()
 		db.getCards(p.startRow, cacheBlockSize, sort, search) // medTODO could just cache the Template and mutate the NoteCard obj to add it
@@ -241,9 +251,61 @@ const dataSource = {
 				const end = performance.now()
 				console.log(`GetCards ${end - start} ms`, search)
 				p.successCallback(x.noteCards, x.count)
+				if (
+					ftsSearchActual !== '' &&
+					gridRef.api.getColumnDef('Search') == null
+				) {
+					gridRef.api.setColumnDefs([
+						{
+							headerName: 'Search',
+							colId: 'Search',
+							cellRenderer: (props: ICellRendererParams<NoteCard>) => {
+								const [match, setMatch] = createSignal<RegExpExecArray>()
+								createEffect(() => {
+									for (const v of props.data?.note.fieldValues.values() ?? []) {
+										const r = minifyAndExec(strip(v), regex())
+										if (r != null) {
+											setMatch(r)
+											return
+										}
+									}
+									for (const v of props.data?.note.fieldValues.values() ?? []) {
+										const r = minifyAndExec(v, regex())
+										if (r != null) {
+											setMatch(r)
+											return
+										}
+									}
+								})
+								return (
+									<Show when={match()}>
+										<span>{match()?.groups?.left ?? ''}</span>
+										<span class='bg-yellow-300'>
+											{/* use the match's casing - not the search's (firstWord) */}
+											{match()?.groups?.searchWord ??
+												toastImpossible('searchWord is missing')}
+										</span>
+										<span>{match()?.groups?.right ?? ''}</span>
+									</Show>
+								)
+							},
+						} satisfies ColDef<NoteCard>,
+						...columnDefs,
+					])
+				} else if (
+					ftsSearchActual === '' &&
+					gridRef.api.getColumnDef('Search') != null
+				) {
+					gridRef.api.setColumnDefs(columnDefs)
+				}
 			})
 			.catch(() => {
 				p.failCallback()
 			})
 	},
+}
+
+function minifyAndExec(value: string, regex: RegExp) {
+	const minified = value.replace(/\s+/g, ' ')
+	return regex.exec(minified)
 }
