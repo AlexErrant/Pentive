@@ -91,6 +91,13 @@ export interface RemoteTemplate {
 	uploadDate: number | null
 }
 
+export interface NoteFtsTagVocab {
+	term: string
+	doc: number
+	col: string
+	offset: number
+}
+
 export interface SqliteTempMaster {
 	name: string
 }
@@ -98,6 +105,7 @@ export interface SqliteTempMaster {
 export interface DB {
 	// eslint-disable-next-line @typescript-eslint/naming-convention
 	sqlite_temp_master: SqliteTempMaster
+	noteFtsTagVocab: NoteFtsTagVocab
 	card: Card
 	media: Media
 	note: Note

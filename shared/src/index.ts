@@ -35,6 +35,7 @@ export const initSql = [
       -- All characters that are not the unit separator are tokenchars 89CDE7EA-EF1B-4054-B381-597EE549CAB4
       tokenize = "unicode61 categories 'L* M* N* P* S* Z* C*' separators '\x1F'"
   );`,
+	`CREATE VIRTUAL TABLE IF NOT EXISTS noteFtsTagVocab USING fts5vocab(noteFtsTag, instance);`,
 	`CREATE TRIGGER IF NOT EXISTS note_after_insert AFTER INSERT ON note BEGIN
      INSERT INTO noteFtsFv (id, fieldValues) VALUES (new.id, new.fieldValues);
      INSERT INTO noteFtsTag(id, tags       ) VALUES (new.id, new.tags       );

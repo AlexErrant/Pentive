@@ -23,8 +23,7 @@ import {
 	toastInfo,
 	toastWarn,
 } from '../components/toasts'
-
-const unitSeparator = String.fromCharCode(31) // if this changes, also change noteFtsTag's separator 89CDE7EA-EF1B-4054-B381-597EE549CAB4
+import { unitSeparator } from './tag'
 
 // highTODO property test
 function stringifyTags(tags: Set<string>) {

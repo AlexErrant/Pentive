@@ -6,6 +6,7 @@ import { pluginCollectionMethods } from './sqlite/plugin'
 // import { dexieMethods } from "./dexie/dexie"
 import { sync } from './sqlite/crsqlite'
 import { remoteMediaCollectionMethods } from './sqlite/remoteMedia'
+import { tagCollectionMethods } from './sqlite/tag'
 
 export const db = {
 	...remoteMediaCollectionMethods,
@@ -15,5 +16,6 @@ export const db = {
 	...noteCollectionMethods,
 	// ...dexieMethods,
 	...mediaCollectionMethods,
+	...tagCollectionMethods,
 	sync,
 }
