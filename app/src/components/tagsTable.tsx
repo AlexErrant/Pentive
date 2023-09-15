@@ -21,7 +21,9 @@ const columnDefs: Array<ColDef<TagNode>> = []
 
 const getRowId = (params: GetRowIdParams<TagNode>) => params.data.id
 
-const TagsTable: VoidComponent = () => {
+const TagsTable: VoidComponent<{
+	tagsChanged: (tags: string[]) => void
+}> = (props) => {
 	const [tags] = createResource(async () => {
 		const tags = await db.getTags()
 		return tags.map(
@@ -55,6 +57,10 @@ const TagsTable: VoidComponent = () => {
 				rowModelType='clientSide'
 				domLayout='autoHeight'
 				groupDefaultExpanded={1}
+				onSelectionChanged={(event) => {
+					const tags = event.api.getSelectedRows() as TagNode[]
+					props.tagsChanged(tags.map((t) => t.id))
+				}}
 				onFirstDataRendered={(params) => {
 					params.api.sizeColumnsToFit()
 				}}

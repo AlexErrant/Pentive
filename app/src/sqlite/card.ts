@@ -174,7 +174,7 @@ async function getCards(
 	offset: number,
 	limit: number,
 	sort?: { col: 'card.due' | 'card.created'; direction: 'asc' | 'desc' },
-	search?: { literalSearch?: string; ftsSearch?: string },
+	search?: { literalSearch?: string; ftsSearch?: string; tagSearch?: string[] },
 ): Promise<{ count: number; noteCards: NoteCard[] }> {
 	const db = (await getKysely()).withTables<{
 		[searchCacheConst]: {
@@ -196,6 +196,20 @@ async function getCards(
 		// don't `where` when scrolling - redundant since joining on the cache already filters
 		.$if(offset === 0 && search?.literalSearch != null, (db) =>
 			db.where('note.fieldValues', 'like', '%' + search!.literalSearch + '%'),
+		)
+		.$if(
+			// don't `where` when scrolling - redundant since joining on the cache already filters
+			offset === 0 && search?.tagSearch != null,
+			(db) =>
+				db
+					.innerJoin('noteFtsTag', 'noteFtsTag.id', 'note.id')
+					.where(
+						'noteFtsTag.tags',
+						'match',
+						search!
+							.tagSearch!.map((x) => `"${x.replaceAll('"', '\\"')}"`)
+							.join(' OR '),
+					),
 		)
 	const searchCache =
 		// If user has scrolled, build/use the cache.
