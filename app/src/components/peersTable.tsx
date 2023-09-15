@@ -76,6 +76,7 @@ const PeersTable: VoidComponent<{
 		<div class={agGridTheme()}>
 			<AgGridSolid
 				sideBar={{
+					position: 'left',
 					toolPanels: [
 						{
 							id: 'columns',
@@ -99,6 +100,9 @@ const PeersTable: VoidComponent<{
 				rowModelType='clientSide'
 				rowData={props.peers}
 				domLayout='autoHeight'
+				onGridSizeChanged={() => {
+					gridRef?.api.sizeColumnsToFit()
+				}}
 				onFirstDataRendered={(params) => {
 					params.api.sizeColumnsToFit()
 				}}

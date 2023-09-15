@@ -180,6 +180,7 @@ const CardsTable: VoidComponent<{
 			<div class={`${agGridTheme()} h-full`}>
 				<AgGridSolid
 					sideBar={{
+						position: 'left',
 						toolPanels: [
 							{
 								id: 'tags',
@@ -208,6 +209,9 @@ const CardsTable: VoidComponent<{
 					getRowId={getRowId}
 					rowSelection='multiple'
 					rowModelType='infinite'
+					onGridSizeChanged={() => {
+						gridRef?.api.sizeColumnsToFit()
+					}}
 					onGridReady={onGridReady}
 					cacheBlockSize={cacheBlockSize}
 					suppressMultiSort={true}

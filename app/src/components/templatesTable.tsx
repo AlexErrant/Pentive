@@ -104,6 +104,7 @@ const TemplatesTable: VoidComponent<{
 		<div class={`${agGridTheme()} h-full`}>
 			<AgGridSolid
 				sideBar={{
+					position: 'left',
 					toolPanels: [
 						{
 							id: 'columns',
@@ -127,6 +128,9 @@ const TemplatesTable: VoidComponent<{
 				rowModelType='infinite'
 				onGridReady={onGridReady}
 				cacheBlockSize={cacheBlockSize}
+				onGridSizeChanged={() => {
+					gridRef?.api.sizeColumnsToFit()
+				}}
 				onSelectionChanged={(event) => {
 					const ncs = event.api.getSelectedRows() as Template[]
 					props.onSelectionChanged(ncs)

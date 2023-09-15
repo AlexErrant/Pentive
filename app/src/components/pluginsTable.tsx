@@ -76,6 +76,7 @@ const PluginsTable: VoidComponent = () => {
 			<div class={agGridTheme()}>
 				<AgGridSolid
 					sideBar={{
+						position: 'left',
 						toolPanels: [
 							{
 								id: 'columns',
@@ -98,6 +99,9 @@ const PluginsTable: VoidComponent = () => {
 					rowSelection='multiple'
 					rowModelType='clientSide'
 					rowData={plugins()}
+					onGridSizeChanged={() => {
+						gridRef?.api.sizeColumnsToFit()
+					}}
 					onFirstDataRendered={(params) => {
 						params.api.sizeColumnsToFit()
 					}}

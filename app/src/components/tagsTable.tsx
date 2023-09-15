@@ -57,6 +57,9 @@ const TagsTable: VoidComponent<{
 				rowModelType='clientSide'
 				domLayout='autoHeight'
 				groupDefaultExpanded={1}
+				onGridSizeChanged={() => {
+					gridRef?.api.sizeColumnsToFit()
+				}}
 				onSelectionChanged={(event) => {
 					const tags = event.api.getSelectedRows() as TagNode[]
 					props.tagsChanged(tags.map((t) => t.id))
