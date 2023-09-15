@@ -106,7 +106,7 @@ export function parseNote(
 		tags: new Set(
 			note.tags
 				.split(' ')
-				.map((t) => t.trim())
+				.map((t) => t.trim().replaceAll('::', '/').replaceAll('_', ' '))
 				.filter((t) => t !== ''),
 		),
 		remotes: new Map(),
