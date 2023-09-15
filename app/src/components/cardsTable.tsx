@@ -26,6 +26,8 @@ import { Upload, escapeRegExp } from 'shared-dom'
 import { C } from '../pluginManager'
 import { strip } from '../domain/utility'
 import { toastImpossible } from './toasts'
+import TagsTable from './tagsTable'
+import './cardsTable.css'
 
 LicenseManager.setLicenseKey(import.meta.env.VITE_AG_GRID_LICENSE)
 
@@ -148,6 +150,10 @@ function setDatasource() {
 	gridRef?.api.setDatasource(dataSource)
 }
 
+const TagsPanel = () => {
+	return <TagsTable />
+}
+
 const CardsTable: VoidComponent<{
 	readonly onSelectionChanged: (noteCards: NoteCard[]) => void
 }> = (props) => {
@@ -188,6 +194,13 @@ const CardsTable: VoidComponent<{
 									suppressValues: true,
 									suppressPivotMode: true,
 								},
+							},
+							{
+								id: 'tags',
+								labelDefault: 'Tags',
+								labelKey: 'tags',
+								iconKey: 'filter',
+								toolPanel: TagsPanel,
 							},
 						],
 					}}

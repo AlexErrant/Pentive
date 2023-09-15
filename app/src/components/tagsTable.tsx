@@ -33,7 +33,7 @@ const TagsTable: VoidComponent = () => {
 		)
 	})
 	return (
-		<div class={agGridTheme()}>
+		<div class={agGridTheme() + ' h-full'}>
 			<AgGridSolid
 				autoGroupColumnDef={{
 					headerName: 'Tags',
