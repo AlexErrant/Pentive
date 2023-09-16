@@ -161,6 +161,14 @@ export default function Cards(): JSX.Element {
 							>
 								Add Preview Card
 							</button>
+							<button
+								class='text-white bg-green-600 m-2 rounded p-2 px-4 font-bold hover:bg-green-700'
+								onClick={() => {
+									localStorage.removeItem('cardPageLayoutConfig')
+								}}
+							>
+								Reset Layout
+							</button>
 						</div>
 					),
 					container.element,

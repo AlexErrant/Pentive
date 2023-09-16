@@ -110,6 +110,14 @@ export default function Templates(): JSX.Element {
 							>
 								Add Preview Template
 							</button>
+							<button
+								class='text-white bg-green-600 m-2 rounded p-2 px-4 font-bold hover:bg-green-700'
+								onClick={() => {
+									localStorage.removeItem('templatePageLayoutConfig')
+								}}
+							>
+								Reset Layout
+							</button>
 						</div>
 					),
 					container.element,
