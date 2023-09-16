@@ -1,5 +1,6 @@
 import { Select } from '@thisbeyond/solid-select'
 import '@thisbeyond/solid-select/style.css'
+import './solidSelect.css'
 import {
 	Show,
 	Suspense,
@@ -88,6 +89,7 @@ export default function AddNote() {
 		<>
 			<Suspense fallback={<span>Loading...</span>}>
 				<Select
+					class='bg-white'
 					initialValue={templateNames().at(0)}
 					options={templateNames()}
 					onChange={(value: string) =>

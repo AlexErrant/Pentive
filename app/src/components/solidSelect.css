@@ -1,0 +1,22 @@
+/* 
+https://github.com/thisbeyond/solid-select/blob/main/windi.config.ts
+https://www.npmjs.com/package/@thisbeyond/solid-select/v/0.14.0?activeTab=code
+  navigate to /@thisbeyond/solid-select/dist/esm/style.css
+https://github.com/MutinyWallet/mutiny-web/blob/master/src/styles/solid-select.css
+*/
+
+.solid-select-input[data-multiple='true'] {
+	@apply border-black min-w-[200px] rounded border;
+}
+
+.solid-select-option {
+	@apply hover:bg-gray-200 data-[focused=true]:bg-gray-100;
+}
+
+.solid-select-multi-value {
+	@apply bg-gray-100;
+}
+
+.solid-select-list {
+	z-index: 20;
+}

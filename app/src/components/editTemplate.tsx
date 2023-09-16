@@ -17,6 +17,7 @@ import { ulidAsBase64Url } from '../domain/utility'
 import { db } from '../db'
 
 import '@thisbeyond/solid-select/style.css'
+import './solidSelect.css'
 import EditTemplateCss from './editTemplateCss'
 
 interface ClozeTemplateStore {
@@ -102,6 +103,7 @@ const EditTemplate: VoidComponent<{ template: Template }> = (props) => {
 	return (
 		<>
 			<Select
+				class='bg-white'
 				initialValue={props.template.templateType.tag}
 				options={['standard', 'cloze']}
 				onChange={(value: string) => {
