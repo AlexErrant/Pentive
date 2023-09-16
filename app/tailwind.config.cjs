@@ -7,6 +7,11 @@ module.exports = {
 	theme: {
 		extend: {},
 	},
-	plugins: [require('nightwind'), require('@tailwindcss/forms')],
+	plugins: [
+		require('nightwind'),
+		require('@tailwindcss/forms')({
+			strategy: 'class',
+		}),
+	],
 	darkMode: 'class',
 }

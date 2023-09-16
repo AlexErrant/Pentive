@@ -92,7 +92,7 @@ const EditChildTemplate: VoidComponent<{
 		<fieldset class='border-black border p-2'>
 			<legend>
 				<input
-					class='w-full border'
+					class='form-input w-full border'
 					type='text'
 					value={props.childTemplate.name}
 					onInput={(e) => {
@@ -134,7 +134,7 @@ const EditChildTemplate: VoidComponent<{
 			</div>
 			<div class='flex h-fit'>
 				<textarea
-					class='bg-white flex-1'
+					class='bg-white form-textarea flex-1'
 					value={props.childTemplate.shortFront}
 					onInput={(e) => {
 						props.setTemplate('shortFront', e.currentTarget.value)
@@ -146,7 +146,7 @@ const EditChildTemplate: VoidComponent<{
 			</div>
 			<div class='flex h-fit'>
 				<textarea
-					class='bg-white flex-1'
+					class='bg-white form-textarea flex-1'
 					value={props.childTemplate.shortBack}
 					onInput={(e) => {
 						props.setTemplate('shortBack', e.currentTarget.value)

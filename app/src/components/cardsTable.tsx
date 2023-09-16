@@ -161,7 +161,7 @@ const CardsTable: VoidComponent<{
 		<div class='flex h-full flex-col'>
 			<div class='m-0.5 p-0.5'>
 				<input
-					class='w-full border'
+					class='form-input w-full border'
 					type='text'
 					placeholder='Literal Search'
 					onKeyUp={(e) => {
@@ -169,7 +169,7 @@ const CardsTable: VoidComponent<{
 					}}
 				/>
 				<input
-					class='w-full border'
+					class='form-input w-full border'
 					type='text'
 					placeholder='FTS Search'
 					onKeyUp={(e) => {

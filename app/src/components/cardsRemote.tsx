@@ -37,6 +37,7 @@ function toggleNook(
 	return (
 		<input
 			type='checkbox'
+			class='form-checkbox'
 			checked={uploadable}
 			onChange={async () => {
 				uploadable = !uploadable

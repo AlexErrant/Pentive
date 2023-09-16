@@ -42,7 +42,7 @@ const Nav: VoidComponent<{ navLinks: NavLinkData[] }> = (props) => {
 				<li class='ml-auto flex items-center space-x-1 text-sm'>
 					<span>URL:</span>
 					<input
-						class='w-75px bg-white rounded-lg p-1 text-sm'
+						class='w-75px bg-white form-input rounded-lg p-1 text-sm'
 						type='text'
 						readOnly
 						value={location.pathname}
