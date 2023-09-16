@@ -11,6 +11,7 @@ import { render } from 'solid-js/web'
 import AddNote from '../components/addNote'
 import NoteSync from '../components/noteSync'
 import { toastImpossible } from '../components/toasts'
+import NoteTags from '../components/noteTags'
 
 export interface NoteCardView {
 	template: Template
@@ -118,6 +119,17 @@ export default function Cards(): JSX.Element {
 				container.element,
 			)
 		})
+		goldenLayout.registerComponentFactoryFunction('NoteTags', (container) => {
+			container.element.style.overflow = 'auto'
+			render(
+				() => (
+					<Show when={selected.noteCard}>
+						{(n) => <NoteTags noteCard={n()} />}
+					</Show>
+				),
+				container.element,
+			)
+		})
 		goldenLayout.registerComponentFactoryFunction(
 			'Layout Manager',
 			(container) => {
@@ -209,6 +221,10 @@ export default function Cards(): JSX.Element {
 								{
 									type: 'component',
 									componentType: 'CardDetail',
+								},
+								{
+									type: 'component',
+									componentType: 'NoteTags',
 								},
 								{
 									type: 'component',
