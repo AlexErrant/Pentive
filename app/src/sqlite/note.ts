@@ -23,21 +23,7 @@ import {
 	toastInfo,
 	toastWarn,
 } from '../components/toasts'
-import { unitSeparator } from './tag'
-
-// highTODO property test
-function stringifyTags(tags: Set<string>) {
-	for (const tag of tags) {
-		if (tag.includes(unitSeparator))
-			toastFatal('Tags cannot contain the unit separator.')
-	}
-	return Array.from(tags.values()).join(unitSeparator)
-}
-
-function parseTags(rawTags: string) {
-	const parsed = rawTags.split(unitSeparator)
-	return new Set(parsed)
-}
+import { parseTags, stringifyTags } from './tag'
 
 function noteToDocType(note: Note): InsertObject<DB, 'note'> {
 	const now = new Date().getTime()
