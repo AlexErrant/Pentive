@@ -26,6 +26,7 @@ import {
 } from 'prosemirror-image-plugin'
 import 'prosemirror-image-plugin/src/styles/common.css'
 import 'prosemirror-image-plugin/src/styles/withResize.css'
+import FieldHtmlEditor from './fieldHtmlEditor'
 // import "prosemirror-image-plugin/src/styles/sideResize.css"
 
 // cf. https://gitlab.com/emergence-engineering/prosemirror-image-plugin/-/blob/master/src/updateImageNode.ts
@@ -130,6 +131,18 @@ const domSerializer = DOMSerializer.fromSchema(mySchemaSerializer)
 const domParser = new DOMParser()
 const proseMirrorDOMParser = ProseMirrorDOMParser.fromSchema(mySchema)
 
+async function createState(value: string) {
+	const doc = domParser.parseFromString(value, 'text/html')
+	await Promise.all(Array.from(doc.images).map(updateImgSrc))
+	return EditorState.create({
+		doc: proseMirrorDOMParser.parse(doc),
+		plugins: [
+			...exampleSetup({ schema: mySchema }),
+			imagePlugin(imageSettings),
+		],
+	})
+}
+
 export const FieldEditor: VoidComponent<{
 	readonly field: string
 	readonly value: string
@@ -139,18 +152,10 @@ export const FieldEditor: VoidComponent<{
 	}>
 }> = (props) => {
 	let editor: HTMLDivElement | undefined
+	let editorView: EditorView
 	onMount(async () => {
-		const doc = domParser.parseFromString(props.value, 'text/html')
-		await Promise.all(Array.from(doc.images).map(updateImgSrc))
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars -- not sure wtf to do with editorView
-		const editorView = new EditorView(editor!, {
-			state: EditorState.create({
-				doc: proseMirrorDOMParser.parse(doc),
-				plugins: [
-					...exampleSetup({ schema: mySchema }),
-					imagePlugin(imageSettings),
-				],
-			}),
+		editorView = new EditorView(editor!, {
+			state: await createState(props.value),
 			dispatchTransaction(this: EditorView, tr) {
 				this.updateState(this.state.apply(tr))
 				if (tr.docChanged) {
@@ -184,6 +189,14 @@ export const FieldEditor: VoidComponent<{
 			<div>{props.field}</div>
 			<div>
 				<div ref={editor} />
+				<FieldHtmlEditor
+					value={props.value}
+					// eslint-disable-next-line solid/reactivity -- doesn't need to be reactive
+					setValue={async (v) => {
+						editorView.updateState(await createState(v))
+						props.setNoteCard('noteCard', 'note', 'fieldValues', props.i, 1, v)
+					}}
+				/>
 			</div>
 		</>
 	)
