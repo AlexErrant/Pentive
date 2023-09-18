@@ -10,7 +10,7 @@ import {
 	type NoteCard,
 } from 'shared'
 import { getDb, getKysely } from './crsqlite'
-import { type DB, type Card as CardEntity } from './database'
+import { type DB, type Card as CardEntity, type Note } from './database'
 import {
 	type ExpressionBuilder,
 	type OnConflictDatabase,
@@ -181,6 +181,8 @@ async function getCards(
 			rowid: number
 			id: string
 		}
+		// I'm not adding rowid to the official type definition of Notes because it adds noise to Insert/Update/Conflict resolution types
+		note: Note & { rowid: number }
 	}>()
 	const baseQuery = db
 		.selectFrom('card')
@@ -189,7 +191,7 @@ async function getCards(
 		// don't `where` when scrolling - redundant since joining on the cache already filters
 		.$if(offset === 0 && search?.ftsSearch != null, (db) =>
 			db
-				.innerJoin('noteFtsFv', 'noteFtsFv.id', 'note.id')
+				.innerJoin('noteFtsFv', 'noteFtsFv.rowid', 'note.rowid')
 				.where('noteFtsFv.fieldValues', 'match', search!.ftsSearch!)
 				.orderBy(sql`rank`),
 		)
@@ -202,7 +204,7 @@ async function getCards(
 			offset === 0 && search?.tagSearch != null,
 			(db) =>
 				db
-					.innerJoin('noteFtsTag', 'noteFtsTag.id', 'note.id')
+					.innerJoin('noteFtsTag', 'noteFtsTag.rowid', 'note.rowid')
 					.where(
 						'noteFtsTag.tags',
 						'match',

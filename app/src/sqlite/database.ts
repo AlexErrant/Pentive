@@ -41,12 +41,12 @@ export interface Note {
 }
 
 export interface NoteFtsFv {
-	id: LDbId
+	rowid: number
 	fieldValues: string
 }
 
 export interface NoteFtsTag {
-	id: LDbId
+	rowid: number
 	tags: string
 }
 

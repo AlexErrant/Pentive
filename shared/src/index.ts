@@ -26,29 +26,31 @@ export const initSql = [
     fieldValues TEXT
 ) STRICT;`,
 	`CREATE VIRTUAL TABLE IF NOT EXISTS noteFtsFv USING fts5 (
-	    id,
-	    fieldValues
+	    fieldValues,
+      content=note,
+      content_rowid=rowid
   );`,
 	`CREATE VIRTUAL TABLE IF NOT EXISTS noteFtsTag USING fts5 (
-	    id,
 	    tags,
+      content=note,
+      content_rowid=rowid,
       -- All characters that are not the unit separator are tokenchars 89CDE7EA-EF1B-4054-B381-597EE549CAB4
       tokenize = "unicode61 categories 'L* M* N* P* S* Z* C*' separators '\x1F'"
   );`,
 	`CREATE VIRTUAL TABLE IF NOT EXISTS noteFtsTagVocab USING fts5vocab(noteFtsTag, instance);`,
 	`CREATE TRIGGER IF NOT EXISTS note_after_insert AFTER INSERT ON note BEGIN
-     INSERT INTO noteFtsFv (id, fieldValues) VALUES (new.id, new.fieldValues);
-     INSERT INTO noteFtsTag(id, tags       ) VALUES (new.id, new.tags       );
+     INSERT INTO noteFtsFv (rowid, fieldValues) VALUES (new.rowid, new.fieldValues);
+     INSERT INTO noteFtsTag(rowid, tags       ) VALUES (new.rowid, new.tags       );
    END;`,
 	`CREATE TRIGGER IF NOT EXISTS note_after_delete AFTER DELETE ON note BEGIN
-     INSERT INTO noteFtsFv (noteFtsFv , id, fieldValues) VALUES('delete', old.id, old.fieldValues);
-     INSERT INTO noteFtsTag(noteFtsTag, id, tags       ) VALUES('delete', old.id, old.tags       );
+     INSERT INTO noteFtsFv (noteFtsFv , rowid, fieldValues) VALUES('delete', old.rowid, old.fieldValues);
+     INSERT INTO noteFtsTag(noteFtsTag, rowid, tags       ) VALUES('delete', old.rowid, old.tags       );
    END;`,
 	`CREATE TRIGGER IF NOT EXISTS note_after_update AFTER UPDATE ON note BEGIN
-     INSERT INTO noteFtsFv (noteFtsFv , id, fieldValues) VALUES('delete', old.id, old.fieldValues);
-     INSERT INTO noteFtsTag(noteFtsTag, id, tags       ) VALUES('delete', old.id, old.tags       );
-     INSERT INTO noteFtsFv (id, fieldValues) VALUES (new.id, new.fieldValues);
-     INSERT INTO noteFtsTag(id, tags       ) VALUES (new.id, new.tags       );
+     INSERT INTO noteFtsFv (noteFtsFv , rowid, fieldValues) VALUES('delete', old.rowid, old.fieldValues);
+     INSERT INTO noteFtsTag(noteFtsTag, rowid, tags       ) VALUES('delete', old.rowid, old.tags       );
+     INSERT INTO noteFtsFv (rowid, fieldValues) VALUES (new.rowid, new.fieldValues);
+     INSERT INTO noteFtsTag(rowid, tags       ) VALUES (new.rowid, new.tags       );
    END;`,
 	`CREATE TABLE IF NOT EXISTS remoteNote (
     localId TEXT, -- make BLOB upon SQLite v3.41 and the landing of UNHEX https://sqlite.org/forum/forumpost/30cca4e613d2fa2a grep F235B7FB-8CEA-4AE2-99CC-2790E607B1EB
