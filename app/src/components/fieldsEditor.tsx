@@ -10,6 +10,8 @@ import { type DB } from '../sqlite/database'
 import { ulidAsBase64Url } from '../domain/utility'
 import { toastFatal } from './toasts'
 import FieldHtmlEditor from './fieldHtmlEditor'
+import { ToggleButton } from '@kobalte/core'
+import { Code, Quote } from 'shared-dom'
 
 export const FieldsEditor: VoidComponent<{
 	readonly noteCard: NoteCardView
@@ -103,12 +105,16 @@ const FieldValue: VoidComponent<{
 	const [isDev, setDev] = createSignal(false)
 	return (
 		<>
-			<div
-				onClick={() => {
-					setDev((x) => !x)
-				}}
-			>
+			<div class='flex justify-between'>
 				{props.fieldValue[0]}
+				<ToggleButton.Root
+					class='h-5 w-5 rounded-md focus-visible:outline-offset-1'
+					aria-label='code and wysiswg toggle'
+					pressed={isDev()}
+					onChange={setDev}
+				>
+					{isDev() ? <Quote /> : <Code />}
+				</ToggleButton.Root>
 			</div>
 			<Show
 				when={isDev()}
