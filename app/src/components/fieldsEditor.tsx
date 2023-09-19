@@ -11,7 +11,7 @@ import { ulidAsBase64Url } from '../domain/utility'
 import { toastFatal } from './toasts'
 import FieldHtmlEditor from './fieldHtmlEditor'
 import { ToggleButton } from '@kobalte/core'
-import { Code, Quote } from 'shared-dom'
+import { ChevronDown, Code, Quote } from 'shared-dom'
 
 export const FieldsEditor: VoidComponent<{
 	readonly noteCard: NoteCardView
@@ -103,37 +103,62 @@ const FieldValue: VoidComponent<{
 	i: number
 }> = (props) => {
 	const [isDev, setDev] = createSignal(false)
+	const [isOpen, setOpen] = createSignal(true)
 	return (
 		<>
-			<div class='flex justify-between'>
-				{props.fieldValue[0]}
+			<div class='flex items-center justify-between'>
 				<ToggleButton.Root
-					class='h-5 w-5 rounded-md focus-visible:outline-offset-1'
-					aria-label='code and wysiswg toggle'
-					pressed={isDev()}
-					onChange={setDev}
+					class='focus-visible:outline-offset-1'
+					aria-label='Field Value editor toggle'
+					pressed={isOpen()}
+					onChange={setOpen}
 				>
-					{isDev() ? <Quote /> : <Code />}
+					<div class='flex items-center gap-2'>
+						<ChevronDown
+							class='h-3 w-3'
+							classList={{ '-rotate-90': isOpen() }}
+						/>
+						{props.fieldValue[0]}
+					</div>
 				</ToggleButton.Root>
+				<Show when={isOpen()}>
+					<ToggleButton.Root
+						class='h-5 w-5 rounded-md focus-visible:outline-offset-1'
+						aria-label='code and wysiswg toggle'
+						pressed={isDev()}
+						onChange={setDev}
+					>
+						{isDev() ? <Quote /> : <Code />}
+					</ToggleButton.Root>
+				</Show>
 			</div>
-			<Show
-				when={isDev()}
-				fallback={
-					<FieldEditor
-						field={props.fieldValue[0]}
+			<Show when={isOpen()}>
+				<Show
+					when={isDev()}
+					fallback={
+						<FieldEditor
+							field={props.fieldValue[0]}
+							value={props.fieldValue[1]}
+							setNoteCard={props.setNoteCard}
+							i={props.i}
+						/>
+					}
+				>
+					<FieldHtmlEditor
 						value={props.fieldValue[1]}
-						setNoteCard={props.setNoteCard}
-						i={props.i}
+						css={props.css}
+						setValue={(v) => {
+							props.setNoteCard(
+								'noteCard',
+								'note',
+								'fieldValues',
+								props.i,
+								1,
+								v,
+							)
+						}}
 					/>
-				}
-			>
-				<FieldHtmlEditor
-					value={props.fieldValue[1]}
-					css={props.css}
-					setValue={(v) => {
-						props.setNoteCard('noteCard', 'note', 'fieldValues', props.i, 1, v)
-					}}
-				/>
+				</Show>
 			</Show>
 		</>
 	)
