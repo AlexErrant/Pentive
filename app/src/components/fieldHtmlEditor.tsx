@@ -38,10 +38,12 @@ import {
 } from 'solid-js'
 import { oneDark } from '@codemirror/theme-one-dark'
 import { theme } from '../globalState'
+import ResizingIframe from './resizingIframe'
 
 const FieldHtmlEditor: VoidComponent<{
 	value: string
 	setValue: (value: string) => void
+	css: string
 }> = (props) => {
 	let frontRef: HTMLDivElement | undefined
 	let frontView: EditorView
@@ -67,10 +69,13 @@ const FieldHtmlEditor: VoidComponent<{
 		frontView?.destroy()
 	})
 	return (
-		<div
-			class='flex-1 resize-y overflow-auto focus-within:border-black focus-within:border'
-			ref={frontRef}
-		/>
+		<>
+			<ResizingIframe i={{ tag: 'raw', css: props.css, html: props.value }} />
+			<div
+				class='flex-1 resize-y overflow-auto focus-within:border-black focus-within:border'
+				ref={frontRef}
+			/>
+		</>
 	)
 }
 

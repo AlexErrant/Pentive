@@ -1,4 +1,4 @@
-import { For, type VoidComponent } from 'solid-js'
+import { For, createSignal, type VoidComponent, Show } from 'solid-js'
 import { FieldEditor } from './fieldEditor'
 import { toNoteCards, type NoteCardView } from '../pages/cards'
 import { type SetStoreFunction } from 'solid-js/store'
@@ -9,6 +9,7 @@ import { type Transaction } from 'kysely'
 import { type DB } from '../sqlite/database'
 import { ulidAsBase64Url } from '../domain/utility'
 import { toastFatal } from './toasts'
+import FieldHtmlEditor from './fieldHtmlEditor'
 
 export const FieldsEditor: VoidComponent<{
 	readonly noteCard: NoteCardView
@@ -19,11 +20,11 @@ export const FieldsEditor: VoidComponent<{
 	return (
 		<>
 			<For each={props.noteCard.note.fieldValues}>
-				{([field, value], i) => (
-					<FieldEditor
-						field={field}
-						value={value}
+				{(fv, i) => (
+					<FieldValue
+						css={props.noteCard.template.css}
 						setNoteCard={props.setNoteCard}
+						fieldValue={fv}
 						i={i()}
 					/>
 				)}
@@ -89,4 +90,45 @@ async function mutate(img: HTMLImageElement, trx: Transaction<DB>) {
 	} else {
 		// do nothing, is a regular URL
 	}
+}
+
+const FieldValue: VoidComponent<{
+	fieldValue: readonly [string, string]
+	css: string
+	setNoteCard: SetStoreFunction<{
+		noteCard?: NoteCardView
+	}>
+	i: number
+}> = (props) => {
+	const [isDev, setDev] = createSignal(false)
+	return (
+		<>
+			<div
+				onClick={() => {
+					setDev((x) => !x)
+				}}
+			>
+				{props.fieldValue[0]}
+			</div>
+			<Show
+				when={isDev()}
+				fallback={
+					<FieldEditor
+						field={props.fieldValue[0]}
+						value={props.fieldValue[1]}
+						setNoteCard={props.setNoteCard}
+						i={props.i}
+					/>
+				}
+			>
+				<FieldHtmlEditor
+					value={props.fieldValue[1]}
+					css={props.css}
+					setValue={(v) => {
+						props.setNoteCard('noteCard', 'note', 'fieldValues', props.i, 1, v)
+					}}
+				/>
+			</Show>
+		</>
+	)
 }
