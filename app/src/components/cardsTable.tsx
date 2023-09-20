@@ -26,7 +26,7 @@ import { Upload, escapeRegExp } from 'shared-dom'
 import { C } from '../pluginManager'
 import { strip } from '../domain/utility'
 import { toastImpossible } from './toasts'
-import TagsTable from './tagsTable'
+import FiltersTable from './filtersTable'
 import './cardsTable.css'
 
 LicenseManager.setLicenseKey(import.meta.env.VITE_AG_GRID_LICENSE)
@@ -183,11 +183,11 @@ const CardsTable: VoidComponent<{
 						position: 'left',
 						toolPanels: [
 							{
-								id: 'tags',
-								labelDefault: 'Tags',
-								labelKey: 'tags',
+								id: 'filters',
+								labelDefault: 'Filters',
+								labelKey: 'filters',
 								iconKey: 'filter',
-								toolPanel: () => <TagsTable tagsChanged={setTagSearch} />,
+								toolPanel: () => <FiltersTable tagsChanged={setTagSearch} />,
 							},
 							{
 								id: 'columns',

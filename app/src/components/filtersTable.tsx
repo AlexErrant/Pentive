@@ -21,7 +21,7 @@ const columnDefs: Array<ColDef<TagNode>> = []
 
 const getRowId = (params: GetRowIdParams<TagNode>) => params.data.id
 
-const TagsTable: VoidComponent<{
+const FiltersTable: VoidComponent<{
 	tagsChanged: (tags: string[]) => void
 }> = (props) => {
 	const [tags] = createResource(async () => {
@@ -30,7 +30,7 @@ const TagsTable: VoidComponent<{
 			(t) =>
 				({
 					id: t,
-					dataPath: t.split('/'),
+					dataPath: ['Tags', ...t.split('/')],
 				}) satisfies TagNode,
 		)
 	})
@@ -74,4 +74,4 @@ const TagsTable: VoidComponent<{
 	)
 }
 
-export default TagsTable
+export default FiltersTable
