@@ -12,33 +12,35 @@ LicenseManager.setLicenseKey(import.meta.env.VITE_AG_GRID_LICENSE)
 
 let gridRef: AgGridSolidRef
 
-interface TagNode {
+interface FilterNode {
 	id: string
 	dataPath: string[]
 }
 
-const columnDefs: Array<ColDef<TagNode>> = []
+const columnDefs: Array<ColDef<FilterNode>> = []
 
-const getRowId = (params: GetRowIdParams<TagNode>) => params.data.id
+const getRowId = (params: GetRowIdParams<FilterNode>) => params.data.id
+
+const TagsNodeName = 'Tags'
 
 const FiltersTable: VoidComponent<{
 	tagsChanged: (tags: string[]) => void
 }> = (props) => {
-	const [tags] = createResource(async () => {
+	const [nodes] = createResource(async () => {
 		const tags = await db.getTags()
 		return tags.map(
 			(t) =>
 				({
 					id: t,
-					dataPath: ['Tags', ...t.split('/')],
-				}) satisfies TagNode,
+					dataPath: [TagsNodeName, ...t.split('/')],
+				}) satisfies FilterNode,
 		)
 	})
 	return (
 		<div class={agGridTheme() + ' h-full'}>
 			<AgGridSolid
 				autoGroupColumnDef={{
-					headerName: 'Tags',
+					headerName: 'Filters',
 					floatingFilter: true,
 					filter: 'agTextColumnFilter',
 					sortable: true,
@@ -53,21 +55,24 @@ const FiltersTable: VoidComponent<{
 				ref={gridRef}
 				getRowId={getRowId}
 				rowSelection='multiple'
-				rowData={tags()}
+				rowData={nodes()}
 				rowModelType='clientSide'
 				domLayout='autoHeight'
-				groupDefaultExpanded={1}
+				groupDefaultExpanded={2}
 				onGridSizeChanged={() => {
 					gridRef?.api.sizeColumnsToFit()
 				}}
 				onSelectionChanged={(event) => {
-					const tags = event.api.getSelectedRows() as TagNode[]
-					props.tagsChanged(tags.map((t) => t.id))
+					const nodes = event.api.getSelectedRows() as FilterNode[]
+					const tags = nodes
+						.filter((n) => n.dataPath[0] === TagsNodeName)
+						.map((t) => t.id)
+					props.tagsChanged(tags)
 				}}
 				onFirstDataRendered={(params) => {
 					params.api.sizeColumnsToFit()
 				}}
-				getDataPath={(data: TagNode) => data.dataPath}
+				getDataPath={(data: FilterNode) => data.dataPath}
 				treeData={true}
 			/>
 		</div>
