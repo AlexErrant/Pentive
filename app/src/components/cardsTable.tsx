@@ -6,7 +6,7 @@ import {
 	Show,
 	For,
 } from 'solid-js'
-import { type NoteCard, type CardId } from 'shared'
+import { type NoteCard, type CardId, type TemplateId } from 'shared'
 import '@github/relative-time-element'
 import AgGridSolid, { type AgGridSolidRef } from 'ag-grid-solid'
 import 'ag-grid-community/styles/ag-grid.css'
@@ -146,6 +146,7 @@ const getRowId = (params: GetRowIdParams<NoteCard>): CardId =>
 const [literalSearch, setLiteralSearch] = createSignal('')
 const [ftsSearch, setFtsSearch] = createSignal('')
 const [tagSearch, setTagSearch] = createSignal<string[]>([])
+const [templateSearch, setTemplateSearch] = createSignal<TemplateId[]>([])
 
 function setDatasource() {
 	gridRef?.api.setDatasource(dataSource)
@@ -157,6 +158,7 @@ const CardsTable: VoidComponent<{
 	createEffect(on(literalSearch, setDatasource, { defer: true }))
 	createEffect(on(ftsSearch, setDatasource, { defer: true }))
 	createEffect(on(tagSearch, setDatasource, { defer: true }))
+	createEffect(on(templateSearch, setDatasource, { defer: true }))
 	return (
 		<div class='flex h-full flex-col'>
 			<div class='m-0.5 p-0.5'>
@@ -187,7 +189,12 @@ const CardsTable: VoidComponent<{
 								labelDefault: 'Filters',
 								labelKey: 'filters',
 								iconKey: 'filter',
-								toolPanel: () => <FiltersTable tagsChanged={setTagSearch} />,
+								toolPanel: () => (
+									<FiltersTable
+										tagsChanged={setTagSearch}
+										templatesChanged={setTemplateSearch}
+									/>
+								),
 							},
 							{
 								id: 'columns',
@@ -248,11 +255,14 @@ const dataSource = {
 		const literalSearchActual = literalSearch()
 		const ftsSearchActual = ftsSearch().trim()
 		const tagSearchActual = tagSearch()
+		const templateSearchActual = templateSearch()
 		const search = {
 			literalSearch:
 				literalSearchActual.trim() === '' ? undefined : literalSearchActual,
 			ftsSearch: ftsSearchActual === '' ? undefined : ftsSearchActual,
 			tagSearch: tagSearchActual.length === 0 ? undefined : tagSearchActual,
+			templateSearch:
+				templateSearchActual.length === 0 ? undefined : templateSearchActual,
 		}
 		const regex = () => {
 			const firstWord = ftsSearch().trim().split(' ')[0]! // lowTODO handle multiple words

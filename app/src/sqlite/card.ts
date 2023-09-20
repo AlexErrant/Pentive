@@ -8,6 +8,7 @@ import {
 	type Card,
 	type State,
 	type NoteCard,
+	type TemplateId,
 } from 'shared'
 import { getDb, getKysely } from './crsqlite'
 import { type DB, type Card as CardEntity, type Note } from './database'
@@ -174,7 +175,12 @@ async function getCards(
 	offset: number,
 	limit: number,
 	sort?: { col: 'card.due' | 'card.created'; direction: 'asc' | 'desc' },
-	search?: { literalSearch?: string; ftsSearch?: string; tagSearch?: string[] },
+	search?: {
+		literalSearch?: string
+		ftsSearch?: string
+		tagSearch?: string[]
+		templateSearch?: TemplateId[]
+	},
 ): Promise<{ count: number; noteCards: NoteCard[] }> {
 	const db = (await getKysely()).withTables<{
 		[searchCacheConst]: {
@@ -198,6 +204,10 @@ async function getCards(
 		// don't `where` when scrolling - redundant since joining on the cache already filters
 		.$if(offset === 0 && search?.literalSearch != null, (db) =>
 			db.where('note.fieldValues', 'like', '%' + search!.literalSearch + '%'),
+		)
+		// don't `where` when scrolling - redundant since joining on the cache already filters
+		.$if(offset === 0 && search?.templateSearch != null, (db) =>
+			db.where('note.templateId', 'in', search!.templateSearch!),
 		)
 		.$if(
 			// don't `where` when scrolling - redundant since joining on the cache already filters

@@ -2,39 +2,51 @@ import { createResource, type VoidComponent } from 'solid-js'
 import AgGridSolid, { type AgGridSolidRef } from 'ag-grid-solid'
 import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-alpine.css'
-import { type ColDef, type GetRowIdParams } from 'ag-grid-community'
+import { type ColDef } from 'ag-grid-community'
 import { LicenseManager } from 'ag-grid-enterprise'
 import '@github/relative-time-element'
 import { agGridTheme } from '../globalState'
 import { db } from '../db'
+import { type TemplateId } from 'shared'
 
 LicenseManager.setLicenseKey(import.meta.env.VITE_AG_GRID_LICENSE)
 
 let gridRef: AgGridSolidRef
 
 interface FilterNode {
-	id: string
+	searchId: string
 	dataPath: string[]
 }
 
 const columnDefs: Array<ColDef<FilterNode>> = []
 
-const getRowId = (params: GetRowIdParams<FilterNode>) => params.data.id
-
 const TagsNodeName = 'Tags'
+const TemplatesNodeName = 'Templates'
 
 const FiltersTable: VoidComponent<{
 	tagsChanged: (tags: string[]) => void
+	templatesChanged: (templates: TemplateId[]) => void
 }> = (props) => {
 	const [nodes] = createResource(async () => {
-		const tags = await db.getTags()
-		return tags.map(
-			(t) =>
-				({
-					id: t,
-					dataPath: [TagsNodeName, ...t.split('/')],
-				}) satisfies FilterNode,
+		const tags = db.getTags().then((tags) =>
+			tags.map(
+				(t) =>
+					({
+						searchId: t,
+						dataPath: [TagsNodeName, ...t.split('/')],
+					}) satisfies FilterNode,
+			),
 		)
+		const templates = db.getTemplates().then((templates) =>
+			templates.map(
+				(t) =>
+					({
+						searchId: t.id,
+						dataPath: [TemplatesNodeName, t.name],
+					}) satisfies FilterNode,
+			),
+		)
+		return [...(await tags), ...(await templates)]
 	})
 	return (
 		<div class={agGridTheme() + ' h-full'}>
@@ -53,7 +65,6 @@ const FiltersTable: VoidComponent<{
 				groupSelectsChildren={true}
 				columnDefs={columnDefs}
 				ref={gridRef}
-				getRowId={getRowId}
 				rowSelection='multiple'
 				rowData={nodes()}
 				rowModelType='clientSide'
@@ -66,8 +77,12 @@ const FiltersTable: VoidComponent<{
 					const nodes = event.api.getSelectedRows() as FilterNode[]
 					const tags = nodes
 						.filter((n) => n.dataPath[0] === TagsNodeName)
-						.map((t) => t.id)
+						.map((t) => t.searchId)
+					const templates = nodes
+						.filter((n) => n.dataPath[0] === TemplatesNodeName)
+						.map((t) => t.searchId as TemplateId)
 					props.tagsChanged(tags)
+					props.templatesChanged(templates)
 				}}
 				onFirstDataRendered={(params) => {
 					params.api.sizeColumnsToFit()
