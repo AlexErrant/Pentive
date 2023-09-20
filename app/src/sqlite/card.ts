@@ -213,15 +213,14 @@ async function getCards(
 			// don't `where` when scrolling - redundant since joining on the cache already filters
 			offset === 0 && search?.tagSearch != null,
 			(db) =>
-				db
-					.innerJoin('noteFtsTag', 'noteFtsTag.rowid', 'note.rowid')
-					.where(
-						'noteFtsTag.tags',
-						'match',
-						search!
-							.tagSearch!.map((x) => `"${x.replaceAll('"', '\\"')}"`)
-							.join(' OR '),
-					),
+				db.innerJoin('noteFtsTag', 'noteFtsTag.rowid', 'note.rowid').where(
+					'noteFtsTag.tags',
+					'match',
+					search!
+						// https://stackoverflow.com/a/46918640 https://blog.haroldadmin.com/posts/escape-fts-queries
+						.tagSearch!.map((x) => `"${x.replaceAll('"', '""')}"`)
+						.join(' OR '),
+				),
 		)
 	const searchCache =
 		// If user has scrolled, build/use the cache.
