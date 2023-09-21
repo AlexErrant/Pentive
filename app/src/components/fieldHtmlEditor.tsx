@@ -39,6 +39,8 @@ import {
 import { oneDark } from '@codemirror/theme-one-dark'
 import { theme } from '../globalState'
 import ResizingIframe from './resizingIframe'
+import { format } from 'prettier'
+import * as prettierPluginHtml from 'prettier/plugins/html'
 
 const FieldHtmlEditor: VoidComponent<{
 	value: string
@@ -47,18 +49,27 @@ const FieldHtmlEditor: VoidComponent<{
 }> = (props) => {
 	let frontRef: HTMLDivElement | undefined
 	let frontView: EditorView
-	onMount(() => {
-		const t = theme()
+	onMount(async () => {
 		frontView = new EditorView({
 			parent: frontRef,
 			dispatch: (tr) => {
 				dispatch(tr, frontView, props.setValue)
 			},
-			state: createEditorState(props.value, t),
 		})
 		new ResizeObserver(() => {
 			frontView.requestMeasure()
 		}).observe(frontRef!)
+		frontView.setState(
+			createEditorState(
+				// https://prettier.io/blog/2018/11/07/1.15.0#whitespace-sensitive-formatting https://prettier.io/docs/en/options.html#html-whitespace-sensitivity
+				await format(props.value, {
+					parser: 'html',
+					plugins: [prettierPluginHtml],
+					useTabs: true,
+				}),
+				theme(),
+			),
+		)
 	})
 	createEffect(
 		on(theme, (t) => {
