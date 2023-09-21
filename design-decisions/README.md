@@ -2,6 +2,12 @@ This directory is similar to an [Architectural Decision Record](https://adr.gith
 
 The primary author of Pentive, Alex, is _not_ a good architect, designer, or web dev. Please open an issue if you see areas for improvement!
 
+The multitude of services is partly due to separating endpoints that serve insecure user generated content from trusted Pentive content.
+
+> [There are a few events in recent history that may have contributed to the current state of things. First, a whole army of developers writing JavaScript for the browser started self-identifying as “full-stack”, diving into server development and asynchronous code.](https://renegadeotter.com/2023/09/10/death-by-a-thousand-microservices.html)
+
+😭 Trust me, I never thought I'd willingly write TypeScript/JavaScript (same thing).
+
 # Service/Directory Overview
 
 ## app
