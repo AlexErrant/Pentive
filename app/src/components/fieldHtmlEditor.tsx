@@ -47,19 +47,19 @@ const FieldHtmlEditor: VoidComponent<{
 	setValue: (value: string) => void
 	css: string
 }> = (props) => {
-	let frontRef: HTMLDivElement | undefined
-	let frontView: EditorView
+	let ref: HTMLDivElement | undefined
+	let view: EditorView
 	onMount(async () => {
-		frontView = new EditorView({
-			parent: frontRef,
+		view = new EditorView({
+			parent: ref,
 			dispatch: (tr) => {
-				dispatch(tr, frontView, props.setValue)
+				dispatch(tr, view, props.setValue)
 			},
 		})
 		new ResizeObserver(() => {
-			frontView.requestMeasure()
-		}).observe(frontRef!)
-		frontView.setState(
+			view.requestMeasure()
+		}).observe(ref!)
+		view.setState(
 			createEditorState(
 				// https://prettier.io/blog/2018/11/07/1.15.0#whitespace-sensitive-formatting https://prettier.io/docs/en/options.html#html-whitespace-sensitivity
 				await format(props.value, {
@@ -73,18 +73,18 @@ const FieldHtmlEditor: VoidComponent<{
 	})
 	createEffect(
 		on(theme, (t) => {
-			frontView.setState(createEditorState(props.value, t))
+			view.setState(createEditorState(props.value, t))
 		}),
 	)
 	onCleanup(() => {
-		frontView?.destroy()
+		view?.destroy()
 	})
 	return (
 		<>
 			<ResizingIframe i={{ tag: 'raw', css: props.css, html: props.value }} />
 			<div
 				class='flex-1 resize-y overflow-auto focus-within:border-black focus-within:border'
-				ref={frontRef}
+				ref={ref}
 			/>
 		</>
 	)
