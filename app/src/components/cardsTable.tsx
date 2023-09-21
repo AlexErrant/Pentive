@@ -183,6 +183,7 @@ const CardsTable: VoidComponent<{
 				<AgGridSolid
 					sideBar={{
 						position: 'left',
+						defaultToolPanel: 'filters',
 						toolPanels: [
 							{
 								id: 'filters',
@@ -285,6 +286,7 @@ const dataSource = {
 					gridRef.api.setColumnDefs([
 						{
 							headerName: 'Search',
+							pinned: 'left',
 							colId: 'Search',
 							cellRenderer: (props: ICellRendererParams<NoteCard>) => {
 								const [match, setMatch] = createSignal<RegExpExecArray>()
@@ -307,11 +309,11 @@ const dataSource = {
 								return (
 									<Show when={match()}>
 										<span>{match()?.groups?.left ?? ''}</span>
-										<span class='bg-yellow-300'>
+										<mark>
 											{/* use the match's casing - not the search's (firstWord) */}
 											{match()?.groups?.searchWord ??
 												toastImpossible('searchWord is missing')}
-										</span>
+										</mark>
 										<span>{match()?.groups?.right ?? ''}</span>
 									</Show>
 								)

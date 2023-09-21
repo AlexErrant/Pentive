@@ -1,3 +1,9 @@
 .ag-tool-panel-wrapper > .ag-solid-container {
 	width: 100%;
 }
+.ag-theme-alpine {
+	--ag-grid-size: 4px;
+}
+.ag-theme-alpine-dark {
+	--ag-grid-size: 4px;
+}
