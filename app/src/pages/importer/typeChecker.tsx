@@ -233,3 +233,20 @@ export function checkCard(raw: initSqlJs.ParamsObject): Card {
 export function checkMedia(raw: unknown): Record<string, string> {
 	return z.record(z.string(), z.string()).parse(raw)
 }
+
+const revlog = z.object({
+	id: z.number(),
+	cid: z.number(),
+	ease: z.number(),
+	ivl: z.number(),
+	lastIvl: z.number(),
+	factor: z.number(),
+	time: z.number(),
+	type: z.number(),
+})
+
+export type Revlog = z.infer<typeof revlog>
+
+export function checkRevlog(raw: initSqlJs.ParamsObject) {
+	return revlog.parse(raw)
+}

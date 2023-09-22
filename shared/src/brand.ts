@@ -45,3 +45,5 @@ export type RemoteMediaNum = Brand<number, 'remoteMediaNum'>
 
 export type PeerJsId = Brand<string, 'peerJsId'> // in uuid format
 export type PeerDisplayName = Brand<string, 'peerDisplayName'>
+
+export type ReviewId = Brand<string, 'reviewId' & 'base64url'>

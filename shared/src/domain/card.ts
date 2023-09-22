@@ -17,18 +17,6 @@ export const states = [
 export type State = 'normal' | 'scheduler buried' | 'user buried' | 'suspended'
 export type Score = 'again' | 'hard' | 'good' | 'easy'
 
-export interface Review {
-	score: Score
-	created: Date
-	ease: number // factor
-	time: number // milliseconds from seeing front to score
-
-	// the following three are mutually exclusive
-	newStep?: number // index - see card settings
-	lapsed?: number // index - see card settings
-	interval?: number // in seconds
-}
-
 export interface Card {
 	id: CardId
 	ord: Ord

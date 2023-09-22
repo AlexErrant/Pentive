@@ -7,6 +7,7 @@ import { pluginCollectionMethods } from './sqlite/plugin'
 import { sync } from './sqlite/crsqlite'
 import { remoteMediaCollectionMethods } from './sqlite/remoteMedia'
 import { tagCollectionMethods } from './sqlite/tag'
+import { reviewCollectionMethods } from './sqlite/review'
 
 export const db = {
 	...remoteMediaCollectionMethods,
@@ -17,5 +18,6 @@ export const db = {
 	// ...dexieMethods,
 	...mediaCollectionMethods,
 	...tagCollectionMethods,
+	...reviewCollectionMethods,
 	sync,
 }

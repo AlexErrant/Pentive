@@ -18,11 +18,18 @@ import {
 } from '@zip.js/zip.js'
 import { notEmpty } from 'shared'
 import initSqlJs, { type Database } from 'sql.js'
-import { checkCard, checkCol, checkMedia, checkNote } from './typeChecker'
-import { parseNote, parseCard, parseTemplates } from './parser'
+import {
+	checkCard,
+	checkCol,
+	checkMedia,
+	checkNote,
+	checkRevlog,
+} from './typeChecker'
+import { parseNote, parseCard, parseTemplates, parseRevlog } from './parser'
 import {
 	type Card as PCard,
 	type Note as PNote,
+	type Review,
 	type Template,
 	type MediaId,
 	type TemplateId,
@@ -134,6 +141,15 @@ async function importAnkiDb(sqlite: Entry): Promise<void> {
 		}
 		cards.free()
 		await db.bulkUpsertCards(cardsList)
+		const revlogs = ankiDb.prepare('select * from revlog') // lowTODO select exact columns
+		const reviewList: Review[] = []
+		while (revlogs.step()) {
+			const row = revlogs.getAsObject()
+			const revlog = checkRevlog(row)
+			reviewList.push(parseRevlog(revlog))
+		}
+		await db.bulkUploadReview(reviewList)
+		revlogs.free()
 	} finally {
 		ankiDb.close()
 	}

@@ -1,8 +1,6 @@
 import fc from 'fast-check'
 import {
 	type Card,
-	type Review,
-	type Score,
 	states,
 	type CardId,
 	type Ord,
@@ -12,20 +10,6 @@ import {
 } from 'shared'
 
 import { reasonableDates, recordWithOptionalFields } from './arbitrary'
-
-export const review = recordWithOptionalFields<Review>(
-	{
-		score: fc.string().map((x) => x as Score), // this will generate "invalid" Scores, but I intend on this being extensible via plugins anyway, so might as well test every string
-		created: reasonableDates,
-		ease: fc.integer(),
-		time: fc.integer(),
-	},
-	{
-		newStep: fc.integer(),
-		lapsed: fc.integer(),
-		interval: fc.integer(),
-	},
-)
 
 export const card = recordWithOptionalFields<Card>(
 	{

@@ -11,6 +11,8 @@ import {
 	type Template,
 	type Card as PCard,
 	type Note as PNote,
+	type Review,
+	type ReviewId,
 } from 'shared'
 import {
 	type Card as ACard,
@@ -19,6 +21,7 @@ import {
 	type Models,
 	type Note as ANote,
 	type Tmpl,
+	type Revlog,
 } from './typeChecker'
 import _ from 'lodash'
 import { toastFatal, toastImpossible } from '../../components/toasts'
@@ -131,5 +134,13 @@ export function parseCard(
 		due: new Date(card.due), // highTODO
 		cardSettingId: card.did.toString() as CardSettingId, // medTODO
 		ord: card.ord,
+	}
+}
+
+export function parseRevlog({ id, cid, ...revlog }: Revlog): Review {
+	return {
+		...revlog,
+		cardId: cid.toString() as CardId, // highTODO
+		id: id.toString() as ReviewId, // highTODO
 	}
 }
