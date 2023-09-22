@@ -41,14 +41,15 @@ import { theme } from '../globalState'
 import ResizingIframe from './resizingIframe'
 import { format } from 'prettier'
 import * as prettierPluginHtml from 'prettier/plugins/html'
+import { toastError } from './toasts'
 
+let view: EditorView
 const FieldHtmlEditor: VoidComponent<{
 	value: string
 	setValue: (value: string) => void
 	css: string
 }> = (props) => {
 	let ref: HTMLDivElement | undefined
-	let view: EditorView
 	onMount(async () => {
 		view = new EditorView({
 			parent: ref,
@@ -62,11 +63,7 @@ const FieldHtmlEditor: VoidComponent<{
 		view.setState(
 			createEditorState(
 				// https://prettier.io/blog/2018/11/07/1.15.0#whitespace-sensitive-formatting https://prettier.io/docs/en/options.html#html-whitespace-sensitivity
-				await format(props.value, {
-					parser: 'html',
-					plugins: [prettierPluginHtml],
-					useTabs: true,
-				}),
+				await format(props.value, htmlFormatOpts),
 				theme(),
 			),
 		)
@@ -140,6 +137,31 @@ function createEditorState(doc: string, theme: 'light' | 'dark') {
 	const maybeDark = theme === 'dark' ? [oneDark] : []
 	return EditorState.create({
 		doc,
-		extensions: [[...basicSetup], html(), ...maybeDark],
+		extensions: [
+			keymap.of([
+				{
+					key: 'Shift-Alt-f',
+					run: (x) => {
+						format(x.state.doc.toString(), htmlFormatOpts)
+							.then((v) => {
+								view.setState(createEditorState(v, theme))
+							})
+							.catch((e) => {
+								toastError('Error while formatting.', e)
+							})
+						return true
+					},
+				},
+			]),
+			[...basicSetup],
+			html(),
+			...maybeDark,
+		],
 	})
+}
+
+const htmlFormatOpts = {
+	parser: 'html',
+	plugins: [prettierPluginHtml],
+	useTabs: true,
 }
