@@ -97,6 +97,10 @@ export const initSql = [
     cardId TEXT,
     details TEXT
 ) STRICT;`,
+	`CREATE TABLE IF NOT EXISTS cardSetting (
+    id TEXT PRIMARY KEY, -- make BLOB upon SQLite v3.41 and the landing of UNHEX https://sqlite.org/forum/forumpost/30cca4e613d2fa2a grep F235B7FB-8CEA-4AE2-99CC-2790E607B1EB
+    details TEXT
+) STRICT;`,
 	`CREATE INDEX IF NOT EXISTS card_noteId_idx on card(noteId);`,
 	`CREATE INDEX IF NOT EXISTS card_created_idx on card(created);`,
 	`CREATE INDEX IF NOT EXISTS note_templateId_idx on note(templateId);`,
@@ -128,5 +132,6 @@ export * from './domain/template.js'
 export * from './domain/media.js'
 export * from './domain/user.js'
 export * from './domain/review.js'
+export * from './domain/cardSetting.js'
 export * from './result.js'
 export * from '@scure/base'

@@ -108,6 +108,11 @@ export interface Review {
 	details: string
 }
 
+export interface CardSetting {
+	id: LDbId
+	details: string
+}
+
 export interface DB {
 	// eslint-disable-next-line @typescript-eslint/naming-convention
 	sqlite_temp_master: SqliteTempMaster
@@ -123,4 +128,5 @@ export interface DB {
 	template: Template
 	remoteTemplate: RemoteTemplate
 	review: Review
+	cardSetting: CardSetting
 }

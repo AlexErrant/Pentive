@@ -8,6 +8,7 @@ import { sync } from './sqlite/crsqlite'
 import { remoteMediaCollectionMethods } from './sqlite/remoteMedia'
 import { tagCollectionMethods } from './sqlite/tag'
 import { reviewCollectionMethods } from './sqlite/review'
+import { cardSettingsCollectionMethods } from './sqlite/cardSettings'
 
 export const db = {
 	...remoteMediaCollectionMethods,
@@ -19,5 +20,6 @@ export const db = {
 	...mediaCollectionMethods,
 	...tagCollectionMethods,
 	...reviewCollectionMethods,
+	...cardSettingsCollectionMethods,
 	sync,
 }

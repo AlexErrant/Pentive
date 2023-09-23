@@ -25,7 +25,13 @@ import {
 	checkNote,
 	checkRevlog,
 } from './typeChecker'
-import { parseNote, parseCard, parseTemplates, parseRevlog } from './parser'
+import {
+	parseNote,
+	parseCard,
+	parseTemplates,
+	parseRevlog,
+	parseCardSetting,
+} from './parser'
 import {
 	type Card as PCard,
 	type Note as PNote,
@@ -123,6 +129,8 @@ async function importAnkiDb(sqlite: Entry): Promise<void> {
 			const templates = parseTemplates(col.models)
 			await db.bulkInsertTemplate(templates)
 			templates.forEach((t) => templatesMap.set(t.id, t))
+			const cardSettings = parseCardSetting(col.dconf)
+			await db.bulkUploadCardSettings(cardSettings)
 		}
 		cols.free()
 		const notes = ankiDb.prepare('select * from notes') // lowTODO select exact columns

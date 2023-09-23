@@ -22,6 +22,7 @@ import {
 	type Note as ANote,
 	type Tmpl,
 	type Revlog,
+	type Dconf,
 } from './typeChecker'
 import _ from 'lodash'
 import { toastFatal, toastImpossible } from '../../components/toasts'
@@ -143,4 +144,11 @@ export function parseRevlog({ id, cid, ...revlog }: Revlog): Review {
 		cardId: cid.toString() as CardId, // highTODO
 		id: id.toString() as ReviewId, // highTODO
 	}
+}
+
+export function parseCardSetting(dconf: Dconf) {
+	return Array.from(Object.entries(dconf)).map(([id, rest]) => ({
+		...rest,
+		id: id as CardSettingId,
+	}))
 }
