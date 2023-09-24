@@ -35,7 +35,6 @@ import {
 	onCleanup,
 	onMount,
 	type VoidComponent,
-	Show,
 } from 'solid-js'
 import { type Template, type ChildTemplate } from 'shared'
 import ResizingIframe from './resizingIframe'
@@ -143,12 +142,7 @@ const EditChildTemplate: VoidComponent<{
 					}}
 				/>
 				<div class='flex-1'>
-					<Show
-						when={short()}
-						fallback='There is a problem with your template.'
-					>
-						{(s) => s()[0]}
-					</Show>
+					{short()?.at(0) ?? 'There is a problem with your template.'}
 				</div>
 			</div>
 			<div class='flex h-fit'>
@@ -160,12 +154,7 @@ const EditChildTemplate: VoidComponent<{
 					}}
 				/>
 				<div class='flex-1'>
-					<Show
-						when={short()}
-						fallback='There is a problem with your template.'
-					>
-						{(s) => s()[1]}
-					</Show>
+					{short()?.at(1) ?? 'There is a problem with your template.'}
 				</div>
 			</div>
 		</fieldset>
