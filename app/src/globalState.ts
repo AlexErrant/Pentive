@@ -1,4 +1,4 @@
-import { createEffect, createResource, createSignal, untrack } from 'solid-js'
+import { createResource, createSignal, untrack } from 'solid-js'
 import { cwaClient } from './trpcClient'
 
 // lowTODO have hub send app a message when a successful login occurs
@@ -24,11 +24,3 @@ new MutationObserver((_: MutationRecord[]) => {
 
 export const agGridTheme = () =>
 	theme() === 'light' ? 'ag-theme-alpine' : 'ag-theme-alpine-dark'
-
-// eslint-disable-next-line import/first -- let's just group all the golden-layout css here
-import 'golden-layout/dist/css/goldenlayout-base.css'
-createEffect(() => {
-	if (theme() === 'light') {
-		import('golden-layout/dist/css/themes/goldenlayout-light-theme.css')
-	} else import('golden-layout/dist/css/themes/goldenlayout-dark-theme.css')
-})
