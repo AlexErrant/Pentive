@@ -35,6 +35,7 @@ import {
 	onCleanup,
 	onMount,
 	type VoidComponent,
+	Show,
 } from 'solid-js'
 import { type Template, type ChildTemplate } from 'shared'
 import ResizingIframe from './resizingIframe'
@@ -88,6 +89,7 @@ const EditChildTemplate: VoidComponent<{
 		frontView?.destroy()
 		backView?.destroy()
 	})
+	const short = () => C.renderTemplate(props.template, true)[props.i]
 	return (
 		<fieldset class='border-black border p-2'>
 			<legend>
@@ -135,25 +137,35 @@ const EditChildTemplate: VoidComponent<{
 			<div class='flex h-fit'>
 				<textarea
 					class='bg-white form-textarea flex-1'
-					value={props.childTemplate.shortFront}
+					value={props.childTemplate.shortFront ?? ''}
 					onInput={(e) => {
 						props.setTemplate('shortFront', e.currentTarget.value)
 					}}
 				/>
 				<div class='flex-1'>
-					{C.renderTemplate(props.template, true)[props.i]![0]}
+					<Show
+						when={short()}
+						fallback='There is a problem with your template.'
+					>
+						{(s) => s()[0]}
+					</Show>
 				</div>
 			</div>
 			<div class='flex h-fit'>
 				<textarea
 					class='bg-white form-textarea flex-1'
-					value={props.childTemplate.shortBack}
+					value={props.childTemplate.shortBack ?? ''}
 					onInput={(e) => {
 						props.setTemplate('shortBack', e.currentTarget.value)
 					}}
 				/>
 				<div class='flex-1'>
-					{C.renderTemplate(props.template, true)[props.i]![1]}
+					<Show
+						when={short()}
+						fallback='There is a problem with your template.'
+					>
+						{(s) => s()[1]}
+					</Show>
 				</div>
 			</div>
 		</fieldset>

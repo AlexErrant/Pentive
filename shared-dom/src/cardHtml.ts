@@ -25,7 +25,16 @@ export type StandardTemplate = Omit<Template, 'templateType'> & {
 export type ClozeTemplate = Omit<Template, 'templateType'> & {
 	templateType: Cloze
 }
-const convert = compile({})
+
+const convert = compile({
+	selectors: [
+		{
+			selector: 'hr',
+			options: { length: 3 },
+		},
+	],
+})
+
 export const strip = convert
 
 // These have hidden state - don't use `match` or `exec`!
@@ -132,8 +141,8 @@ function handleStandard(
 		template.templateType.templates.find((t) => t.id === card.ord) ??
 		throwExp(`Ord ${card.ord} not found`)
 	if (short) {
-		front = shortFront ?? front
-		back = shortBack ?? back
+		front = shortFront == null || shortFront.trim() === '' ? front : shortFront
+		back = shortBack == null || shortBack.trim() === '' ? back : shortBack
 	}
 	function replaceFields(
 		this: RenderContainer,
@@ -191,8 +200,8 @@ function handleCloze(
 ) {
 	let { front, back, shortFront, shortBack } = template.templateType.template
 	if (short) {
-		front = shortFront ?? front
-		back = shortBack ?? back
+		front = shortFront == null || shortFront.trim() === '' ? front : shortFront
+		back = shortBack == null || shortBack.trim() === '' ? back : shortBack
 	}
 	function replaceFields(
 		this: RenderContainer,
