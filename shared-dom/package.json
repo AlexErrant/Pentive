@@ -17,7 +17,6 @@
 		"test:run": "vitest run"
 	},
 	"devDependencies": {
-		"@types/html-to-text": "^9.0.1",
 		"@types/uuid": "^9.0.0",
 		"@typescript-eslint/eslint-plugin": "^6.5.0",
 		"@typescript-eslint/parser": "^6.5.0",
@@ -38,7 +37,6 @@
 	"dependencies": {
 		"@kobalte/core": "^0.9.8",
 		"@kobalte/tailwindcss": "^0.6.5",
-		"html-to-text": "^9.0.5",
 		"immer": "^9.0.15",
 		"nightwind": "^1.1.13",
 		"shared": "workspace:*",

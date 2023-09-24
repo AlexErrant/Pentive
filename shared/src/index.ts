@@ -122,6 +122,7 @@ export const relativeChar = '/'
 
 export * from './brand.js'
 export * from './schema.js'
+export * from './htmlToText.js'
 export * from './utility.js'
 export * from './headers.js'
 export * from './publicToken.js'

@@ -397,7 +397,7 @@ test('CardHtml renders multiple cloze templates properly 1', () => {
 		0,
 		'cloze',
 		'Columbus first crossed the Atlantic in [ ... ]',
-		`Columbus first crossed the Atlantic in [ 1492 ]Some extra info`,
+		`Columbus first crossed the Atlantic in [ 1492 ] Some extra info`,
 	)
 })
 
@@ -413,7 +413,7 @@ test('CardHtml renders multiple cloze templates properly 2', () => {
 		1,
 		'cloze',
 		'In [ ... ] , Columbus sailed the ocean blue.',
-		'In [ 1492 ] , Columbus sailed the ocean blue.Some extra info',
+		'In [ 1492 ] , Columbus sailed the ocean blue. Some extra info',
 	)
 })
 
@@ -429,7 +429,7 @@ test('CardHtml renders multiple cloze templates properly 3', () => {
 		2,
 		'cloze',
 		'In 1492, Columbus sailed the ocean [ ... ] .',
-		'In 1492, Columbus sailed the ocean [ blue ] .Some extra info',
+		'In 1492, Columbus sailed the ocean [ blue ] . Some extra info',
 	)
 })
 
@@ -458,7 +458,7 @@ test('CardHtml renders multiple cloze templates properly 4', () => {
 		0,
 		'cloze',
 		'[ ... ] first crossed the Atlantic in [ ... ]',
-		'[ Columbus ] first crossed the Atlantic in [ 1492 ]Some extra info',
+		'[ Columbus ] first crossed the Atlantic in [ 1492 ] Some extra info',
 	)
 })
 
@@ -486,7 +486,7 @@ test('CardHtml renders {{cloze:FieldName}} properly with hint', () => {
 		0,
 		'cloze',
 		'Canberra was founded in [ year ] .',
-		'Canberra was founded in [ 1913 ] .Some extra stuff.',
+		'Canberra was founded in [ 1913 ] . Some extra stuff.',
 	)
 })
 
@@ -505,7 +505,7 @@ test('CardHtml renders multiple cloze templates properly 1 with hint', () => {
 		0,
 		'cloze',
 		'Columbus first crossed the Atlantic in [ year ]',
-		'Columbus first crossed the Atlantic in [ 1492 ]Some extra info',
+		'Columbus first crossed the Atlantic in [ 1492 ] Some extra info',
 	)
 })
 
@@ -524,7 +524,7 @@ test('CardHtml renders multiple cloze templates properly 2 with hint', () => {
 		1,
 		'cloze',
 		'In [ year ] , Columbus sailed the ocean blue.',
-		'In [ 1492 ] , Columbus sailed the ocean blue.Some extra info',
+		'In [ 1492 ] , Columbus sailed the ocean blue. Some extra info',
 	)
 })
 
@@ -543,7 +543,7 @@ test('CardHtml renders multiple cloze templates properly 3 with hint', () => {
 		2,
 		'cloze',
 		'In 1492, Columbus sailed the ocean [ color ] .',
-		'In 1492, Columbus sailed the ocean [ blue ] .Some extra info',
+		'In 1492, Columbus sailed the ocean [ blue ] . Some extra info',
 	)
 })
 
@@ -562,7 +562,7 @@ test('CardHtml renders multiple cloze templates properly 4 with hint', () => {
 		0,
 		'cloze',
 		'[ person ] first crossed the Atlantic in [ year ]',
-		'[ Columbus ] first crossed the Atlantic in [ 1492 ]Some extra info',
+		'[ Columbus ] first crossed the Atlantic in [ 1492 ] Some extra info',
 	)
 })
 

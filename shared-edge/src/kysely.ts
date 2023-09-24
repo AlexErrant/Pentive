@@ -30,14 +30,12 @@ import {
 	type TemplateType,
 	imgPlaceholder,
 	relativeChar,
+	toFts,
 } from 'shared'
 import { binary16fromBase64URL, ulidAsHex, ulidAsRaw } from './convertBinary.js'
 import { nullMap, parseMap, stringifyMap, throwExp, undefinedMap } from 'shared'
 import { base16, base64url } from '@scure/base'
-import { compile } from 'html-to-text'
 export type * from 'kysely'
-
-const convert = compile({})
 
 // @ts-expect-error db calls should throw null error if not setup
 export let db: Kysely<DB> = null as Kysely<DB>
@@ -907,7 +905,7 @@ function toNoteCreate(
 		updated,
 		fieldValues: serializeFieldValues(n.fieldValues),
 		fts: Array.from(n.fieldValues)
-			.map(([, v]) => convert(v))
+			.map(([, v]) => toFts(v))
 			.concat(n.tags)
 			.join(' '),
 		tags: serializeTags(n.tags),

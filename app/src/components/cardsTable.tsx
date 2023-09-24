@@ -6,7 +6,7 @@ import {
 	Show,
 	For,
 } from 'solid-js'
-import { type NoteCard, type CardId, type TemplateId } from 'shared'
+import { type NoteCard, type CardId, type TemplateId, toOneLine } from 'shared'
 import '@github/relative-time-element'
 import AgGridSolid, { type AgGridSolidRef } from 'ag-grid-solid'
 import 'ag-grid-community/styles/ag-grid.css'
@@ -24,7 +24,6 @@ import { assertNever } from 'shared'
 import { agGridTheme } from '../globalState'
 import { Upload, escapeRegExp } from 'shared-dom'
 import { C } from '../pluginManager'
-import { strip } from '../domain/utility'
 import { toastImpossible } from './toasts'
 import FiltersTable from './filtersTable'
 import './cardsTable.css'
@@ -292,7 +291,7 @@ const dataSource = {
 								const [match, setMatch] = createSignal<RegExpExecArray>()
 								createEffect(() => {
 									for (const v of props.data?.note.fieldValues.values() ?? []) {
-										const r = minifyAndExec(strip(v), regex())
+										const r = minifyAndExec(toOneLine(v), regex())
 										if (r != null) {
 											setMatch(r)
 											return

@@ -13,12 +13,11 @@ import { exampleSetup } from 'prosemirror-example-setup'
 import 'prosemirror-view/style/prosemirror.css'
 import 'prosemirror-menu/style/menu.css'
 import 'prosemirror-example-setup/style/style.css'
-import { type MediaId } from 'shared'
+import { toOneLine, type MediaId } from 'shared'
 import { db } from '../db'
 import { blobToBase64 } from 'shared-dom'
 import { type NoteCardView } from '../pages/cards'
 import { type SetStoreFunction } from 'solid-js/store'
-import { strip } from '../domain/utility'
 import { type ImagePluginSettings } from 'prosemirror-image-plugin'
 import {
 	defaultSettings as imageSettings,
@@ -159,7 +158,7 @@ export const FieldEditor: VoidComponent<{
 						domSerializer.serializeFragment(this.state.doc.content),
 					) // https://stackoverflow.com/a/51461773
 					const value =
-						strip(div.innerHTML) === ''
+						toOneLine(div.innerHTML) === ''
 							? ''
 							: div.childNodes.length === 1 &&
 							  div.childNodes[0]!.nodeName === 'P' &&

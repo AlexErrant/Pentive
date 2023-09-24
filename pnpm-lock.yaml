@@ -172,9 +172,6 @@ importers:
       golden-layout:
         specifier: ^2.6.0
         version: 2.6.0
-      html-to-text:
-        specifier: ^9.0.5
-        version: 9.0.5
       id128:
         specifier: ^1.6.6
         version: 1.6.6
@@ -278,9 +275,6 @@ importers:
       '@types/diff':
         specifier: ^5.0.3
         version: 5.0.3
-      '@types/html-to-text':
-        specifier: ^9.0.1
-        version: 9.0.1
       '@types/iframe-resizer':
         specifier: ^3.5.9
         version: 3.5.9
@@ -1073,6 +1067,9 @@ importers:
       '@scure/base':
         specifier: ^1.1.1
         version: 1.1.1
+      html-to-text:
+        specifier: ^9.0.5
+        version: 9.0.5
       lodash:
         specifier: 4.17.21
         version: 4.17.21
@@ -1083,6 +1080,9 @@ importers:
         specifier: ^3.21.4
         version: 3.21.4
     devDependencies:
+      '@types/html-to-text':
+        specifier: ^9.0.2
+        version: 9.0.2
       '@types/lodash':
         specifier: 4.14.182
         version: 4.14.182
@@ -1134,9 +1134,6 @@ importers:
       '@kobalte/tailwindcss':
         specifier: ^0.6.5
         version: 0.6.5(tailwindcss@3.3.3)
-      html-to-text:
-        specifier: ^9.0.5
-        version: 9.0.5
       immer:
         specifier: ^9.0.15
         version: 9.0.15
@@ -1156,9 +1153,6 @@ importers:
         specifier: ^3.21.4
         version: 3.21.4
     devDependencies:
-      '@types/html-to-text':
-        specifier: ^9.0.1
-        version: 9.0.1
       '@types/uuid':
         specifier: ^9.0.0
         version: 9.0.0
@@ -1216,9 +1210,6 @@ importers:
       hono:
         specifier: ^3.1.8
         version: 3.1.8
-      html-to-text:
-        specifier: ^9.0.5
-        version: 9.0.5
       jose:
         specifier: ^4.14.4
         version: 4.14.4
@@ -1238,9 +1229,6 @@ importers:
       '@cloudflare/workers-types':
         specifier: ^4.20230404.0
         version: 4.20230404.0
-      '@types/html-to-text':
-        specifier: ^9.0.1
-        version: 9.0.1
       '@typescript-eslint/eslint-plugin':
         specifier: ^6.5.0
         version: 6.5.0(@typescript-eslint/parser@6.5.0)(eslint@8.48.0)(typescript@5.0.4)
@@ -6054,8 +6042,8 @@ packages:
       '@types/node': 18.16.0
     dev: true
 
-  /@types/html-to-text@9.0.1:
-    resolution: {integrity: sha512-sHu702QGb0SP2F0Zt+CxdCmGZIZ0gEaaCjqOh/V4iba1wTxPVntEPOM/vHm5bel08TILhB3+OxUTkDJWnr/zHQ==}
+  /@types/html-to-text@9.0.2:
+    resolution: {integrity: sha512-cO9qsPwfIJ2GKFJ4AgpgmmFoUr0IulsN1clwOiPdChpsY/LVmbpGenUGrvZiYsSXSg/dWsj4NTzWZeIlv3D22w==}
     dev: true
 
   /@types/http-cache-semantics@4.0.1:

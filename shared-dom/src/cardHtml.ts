@@ -1,22 +1,24 @@
 import type { RenderContainer } from './renderContainer.js'
-import type {
-	NoteId,
-	TemplateId,
-	Ord,
-	NookId,
-	RemoteNoteId,
-	CardId,
-	DeckId,
-	CardSettingId,
-	Cloze,
-	Standard,
-	Field,
-	Template,
-	Card,
-	Note,
+import {
+	type NoteId,
+	type TemplateId,
+	type Ord,
+	type NookId,
+	type RemoteNoteId,
+	type CardId,
+	type DeckId,
+	type CardSettingId,
+	type Cloze,
+	type Standard,
+	type Field,
+	type Template,
+	type Card,
+	type Note,
+	assertNever,
+	notEmpty,
+	throwExp,
+	toOneLine,
 } from 'shared'
-import { assertNever, notEmpty, throwExp } from 'shared'
-import { compile } from 'html-to-text'
 
 export type StandardTemplate = Omit<Template, 'templateType'> & {
 	templateType: Standard
@@ -26,16 +28,7 @@ export type ClozeTemplate = Omit<Template, 'templateType'> & {
 	templateType: Cloze
 }
 
-const convert = compile({
-	selectors: [
-		{
-			selector: 'hr',
-			options: { length: 3 },
-		},
-	],
-})
-
-export const strip = convert
+export const strip = toOneLine
 
 // These have hidden state - don't use `match` or `exec`!
 // https://www.tsmean.com/articles/regex/javascript-regex-match-vs-exec-vs-matchall/
