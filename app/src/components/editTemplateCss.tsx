@@ -79,7 +79,7 @@ const EditTemplateCss: VoidComponent<{
 			<legend>
 				<span class='p-2 px-4 font-bold'>CSS</span>
 			</legend>
-			<div class='h-[500px] resize-y overflow-auto' ref={ref} />
+			<div class='max-h-[500px] resize-y overflow-auto' ref={ref} />
 		</fieldset>
 	)
 }

@@ -104,7 +104,7 @@ const EditChildTemplate: VoidComponent<{
 			<div class='h-fit'>
 				<div class='flex h-fit'>
 					<div
-						class='h-[500px] flex-1 resize-y overflow-auto focus-within:border-black focus-within:border'
+						class='max-h-[500px] flex-1 resize-y overflow-auto focus-within:border-black focus-within:border'
 						ref={frontRef}
 					/>
 					<ResizingIframe
@@ -119,7 +119,7 @@ const EditChildTemplate: VoidComponent<{
 				</div>
 				<div class='flex h-fit'>
 					<div
-						class='h-[500px] flex-1 resize-y overflow-auto focus-within:border-black focus-within:border'
+						class='max-h-[500px] flex-1 resize-y overflow-auto focus-within:border-black focus-within:border'
 						ref={backRef}
 					/>
 					<ResizingIframe
