@@ -63,6 +63,7 @@ export function stringifyTags(tags: Set<string>) {
 }
 
 export function parseTags(rawTags: string) {
+	if (rawTags === '') return new Set<string>()
 	const parsed = rawTags.split(unitSeparator)
 	return new Set(parsed)
 }
