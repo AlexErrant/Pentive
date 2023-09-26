@@ -100,6 +100,7 @@
 		"api-ugc": "workspace:*",
 		"babel-preset-solid": "^1.7.7",
 		"buffer": "^6.0.3",
+		"codemirror-json-schema": "^0.4.4",
 		"comlink": "^4.4.1",
 		"cwa": "workspace:*",
 		"dexie": "^3.2.2",
