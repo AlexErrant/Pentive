@@ -10,6 +10,7 @@ import {
 	crosshairCursor,
 	lineNumbers,
 	highlightActiveLineGutter,
+	hoverTooltip,
 } from '@codemirror/view'
 import {
 	defaultHighlightStyle,
@@ -27,8 +28,8 @@ import {
 	closeBrackets,
 	closeBracketsKeymap,
 } from '@codemirror/autocomplete'
-import { lintKeymap } from '@codemirror/lint'
-import { json } from '@codemirror/lang-json'
+import { lintKeymap, linter, lintGutter } from '@codemirror/lint'
+import { json, jsonLanguage, jsonParseLinter } from '@codemirror/lang-json'
 import {
 	createEffect,
 	on,
@@ -39,6 +40,11 @@ import {
 import { type CardSetting } from 'shared'
 import { oneDark } from '@codemirror/theme-one-dark'
 import { theme } from '../globalState'
+import {
+	jsonSchemaLinter,
+	jsonSchemaHover,
+	jsonCompletion,
+} from 'codemirror-json-schema'
 
 const EditCardSetting: VoidComponent<{
 	cardSetting: CardSetting
@@ -116,6 +122,19 @@ const basicSetup = [
 	]),
 ]
 
+const schema = {
+	type: 'object' as const,
+	properties: {
+		id: {
+			type: 'string',
+		},
+		name: {
+			type: 'string',
+		},
+	} as const,
+	required: ['id', 'name'],
+}
+
 function dispatch(
 	tr: Transaction,
 	editorView: EditorView,
@@ -133,6 +152,21 @@ function createEditorState(doc: string, theme: 'light' | 'dark') {
 	const maybeDark = theme === 'dark' ? [oneDark] : []
 	return EditorState.create({
 		doc,
-		extensions: [[...basicSetup], json(), ...maybeDark],
+		extensions: [
+			[...basicSetup],
+			json(),
+			...maybeDark,
+			lintGutter(),
+			linter(jsonParseLinter(), {
+				delay: 300,
+			}),
+			linter(jsonSchemaLinter(schema), {
+				delay: 300,
+			}),
+			jsonLanguage.data.of({
+				autocomplete: jsonCompletion(schema),
+			}),
+			hoverTooltip(jsonSchemaHover(schema)),
+		],
 	})
 }
