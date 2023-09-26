@@ -1,4 +1,4 @@
-import { EditorState, type Transaction } from '@codemirror/state'
+import { EditorState } from '@codemirror/state'
 import {
 	EditorView,
 	keymap,
@@ -45,6 +45,8 @@ import {
 	jsonSchemaHover,
 	jsonCompletion,
 } from 'codemirror-json-schema'
+import Ajv from 'ajv'
+import { toastError } from './toasts'
 
 const EditCardSetting: VoidComponent<{
 	cardSetting: CardSetting
@@ -57,9 +59,6 @@ const EditCardSetting: VoidComponent<{
 	onMount(() => {
 		view = new EditorView({
 			parent: ref,
-			dispatch: (tr) => {
-				dispatch(tr, view, props.setCardSetting)
-			},
 			state: createEditorState(stringifiedCardSetting(), theme()),
 		})
 	})
@@ -80,12 +79,39 @@ const EditCardSetting: VoidComponent<{
 		view?.destroy()
 	})
 	return (
-		<fieldset class='border-black border p-2'>
-			<legend>
-				<span class='p-2 px-4 font-bold'>JSON</span>
-			</legend>
-			<div class='h-full resize-y overflow-auto' ref={ref} />
-		</fieldset>
+		<>
+			<fieldset class='border-black border p-2'>
+				<legend>
+					<span class='p-2 px-4 font-bold'>JSON</span>
+				</legend>
+				<div class='h-full resize-y overflow-auto' ref={ref} />
+			</fieldset>
+			<button
+				type='button'
+				class='text-white bg-green-600 rounded p-2 px-4 font-bold hover:bg-green-700'
+				onClick={() => {
+					let cardSetting: CardSetting
+					try {
+						cardSetting = JSON.parse(view.state.doc.toString()) as CardSetting
+					} catch (error) {
+						toastError('Invalid JSON.')
+						return
+					}
+					if (validate(cardSetting)) {
+						props.setCardSetting(cardSetting)
+					} else {
+						toastError(
+							<>
+								<div>Error in JSON</div>
+								<pre>{JSON.stringify(validate.errors, null, 4)}</pre>
+							</>,
+						)
+					}
+				}}
+			>
+				Save
+			</button>
+		</>
 	)
 }
 
@@ -135,18 +161,7 @@ const schema = {
 	required: ['id', 'name'],
 }
 
-function dispatch(
-	tr: Transaction,
-	editorView: EditorView,
-	setCardSetting: (_: CardSetting) => void,
-) {
-	if (editorView == null) return
-	editorView.update([tr])
-	if (tr.docChanged) {
-		const newCode = tr.newDoc.sliceString(0, tr.newDoc.length)
-		setCardSetting(JSON.parse(newCode) as CardSetting)
-	}
-}
+const validate = new Ajv({ allErrors: true }).compile(schema)
 
 function createEditorState(doc: string, theme: 'light' | 'dark') {
 	const maybeDark = theme === 'dark' ? [oneDark] : []
