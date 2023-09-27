@@ -83,11 +83,7 @@ export default function Settings(): JSX.Element {
 					() => (
 						<EditCardSetting
 							setCardSetting={(s: CardSetting) => {
-								setSettings(
-									'cardSettings',
-									(x) => x.id === selected.setting!.id,
-									s,
-								)
+								setSettings('cardSettings', [...settings.cardSettings, s])
 							}}
 							cardSetting={getDefaultCardSetting(
 								ulidAsBase64Url() as CardSettingId,

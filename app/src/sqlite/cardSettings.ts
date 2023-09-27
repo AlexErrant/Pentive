@@ -4,7 +4,12 @@ import {
 	type DB,
 	type CardSetting as CardSettingEntity,
 } from '../sqlite/database'
-import { type Kysely } from 'kysely'
+import {
+	type ExpressionBuilder,
+	type OnConflictDatabase,
+	type OnConflictTables,
+	type Kysely,
+} from 'kysely'
 import _ from 'lodash'
 import { toastInfo } from '../components/toasts'
 
@@ -24,7 +29,15 @@ export const cardSettingsCollectionMethods = {
 		const batches = _.chunk(entities, 1000)
 		for (let i = 0; i < batches.length; i++) {
 			toastInfo('cardSetting batch ' + (i + 1) + '/' + batches.length)
-			await db.insertInto('cardSetting').values(batches[i]!).execute()
+			await db
+				.insertInto('cardSetting')
+				.values(batches[i]!)
+				.onConflict((db) =>
+					db.doUpdateSet({
+						details: (x) => x.ref('excluded.details'),
+					} satisfies OnConflictUpdateCardSettingSet),
+				)
+				.execute()
 		}
 	},
 	getCardSettings: async function () {
@@ -51,4 +64,14 @@ export function stringifyDetails(details: Record<string, unknown>) {
 
 export function parseDetails(rawDetails: string) {
 	return JSON.parse(rawDetails) as Record<string, unknown>
+}
+
+// the point of this type is to cause an error if something is added to CardSettingEntity
+type OnConflictUpdateCardSettingSet = {
+	[K in keyof CardSettingEntity as Exclude<K, 'id'>]: (
+		x: ExpressionBuilder<
+			OnConflictDatabase<DB, 'cardSetting'>,
+			OnConflictTables<'cardSetting'>
+		>,
+	) => unknown
 }

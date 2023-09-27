@@ -47,6 +47,7 @@ import {
 } from 'codemirror-json-schema'
 import Ajv from 'ajv'
 import { toastError } from './toasts'
+import { db } from '../db'
 
 const EditCardSetting: VoidComponent<{
 	cardSetting: CardSetting
@@ -89,7 +90,7 @@ const EditCardSetting: VoidComponent<{
 			<button
 				type='button'
 				class='text-white bg-green-600 rounded p-2 px-4 font-bold hover:bg-green-700'
-				onClick={() => {
+				onClick={async () => {
 					let cardSetting: CardSetting
 					try {
 						cardSetting = JSON.parse(view.state.doc.toString()) as CardSetting
@@ -99,6 +100,7 @@ const EditCardSetting: VoidComponent<{
 					}
 					if (validate(cardSetting)) {
 						props.setCardSetting(cardSetting)
+						await db.bulkUploadCardSettings([cardSetting])
 					} else {
 						toastError(
 							<>
