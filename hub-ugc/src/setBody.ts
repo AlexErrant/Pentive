@@ -41,7 +41,7 @@ export function setBody(i: RenderBodyInput) {
 	document.head.appendChild(resizeScript)
 	if (css != null) {
 		const style = document.createElement('style')
-		style.innerText = css
+		style.textContent = css
 		document.head.appendChild(style)
 	}
 }
