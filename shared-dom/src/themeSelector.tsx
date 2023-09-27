@@ -47,9 +47,11 @@ export function ThemeSelector() {
 		if (colorMode() === 'system') {
 			window.localStorage.removeItem('nightwind-mode')
 			nightwind.addNightModeSelector() // yes the name is confusing; it adds/removes "dark" based on the system setting; see source code
+			document.documentElement.style.setProperty('color-scheme', 'light dark')
 		} else {
 			window.localStorage.setItem('nightwind-mode', colorMode())
 			nightwind.enable(colorMode() === 'dark')
+			document.documentElement.style.setProperty('color-scheme', colorMode())
 		}
 	})
 	return (

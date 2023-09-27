@@ -12,7 +12,6 @@ export default function App(): JSX.Element {
 			import('golden-layout/dist/css/themes/goldenlayout-light-theme.css')
 		} else {
 			import('golden-layout/dist/css/themes/goldenlayout-dark-theme.css')
-			import('./index.dark.css')
 		}
 	})
 
