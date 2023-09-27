@@ -5,6 +5,10 @@ https://www.npmjs.com/package/@thisbeyond/solid-select/v/0.14.0?activeTab=code
 https://github.com/MutinyWallet/mutiny-web/blob/master/src/styles/solid-select.css
 */
 
+.solid-select-input {
+	@apply dark:bg-transparent;
+}
+
 .solid-select-input[data-multiple='true'] {
 	@apply border-black min-w-[200px] rounded border;
 }

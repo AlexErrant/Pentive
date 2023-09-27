@@ -100,7 +100,7 @@ export default function Home(): JSX.Element {
 					}}
 				>
 					<input
-						class='w-75px bg-white form-input rounded-lg p-1 text-sm'
+						class='w-75px form-input rounded-lg p-1 text-sm'
 						type='text'
 						onInput={(e) => setSearch(e.currentTarget.value)}
 					/>

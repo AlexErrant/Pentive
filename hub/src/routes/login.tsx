@@ -25,7 +25,7 @@ export default function Login(): JSX.Element {
 				<div>
 					<span>Alpha Key:</span>
 					<input
-						class='w-75px bg-white rounded-lg p-1 text-sm'
+						class='w-75px rounded-lg p-1 text-sm'
 						type='text'
 						onInput={(e) => setAlphaKey(e.currentTarget.value)}
 					/>

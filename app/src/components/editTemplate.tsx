@@ -76,7 +76,7 @@ function remoteCell(
 			</ul>
 			<input
 				name='newNookId'
-				class='w-75px bg-white form-input rounded-lg border p-1 text-sm'
+				class='w-75px form-input rounded-lg border p-1 text-sm'
 				type='text'
 				onChange={(e) => {
 					setTemplate(

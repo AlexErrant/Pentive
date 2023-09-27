@@ -135,7 +135,7 @@ const EditChildTemplate: VoidComponent<{
 			</div>
 			<div class='flex h-fit'>
 				<textarea
-					class='bg-white form-textarea flex-1'
+					class='form-textarea flex-1'
 					value={props.childTemplate.shortFront ?? ''}
 					onInput={(e) => {
 						props.setTemplate('shortFront', e.currentTarget.value)
@@ -147,7 +147,7 @@ const EditChildTemplate: VoidComponent<{
 			</div>
 			<div class='flex h-fit'>
 				<textarea
-					class='bg-white form-textarea flex-1'
+					class='form-textarea flex-1'
 					value={props.childTemplate.shortBack ?? ''}
 					onInput={(e) => {
 						props.setTemplate('shortBack', e.currentTarget.value)

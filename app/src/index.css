@@ -8,6 +8,7 @@ body {
 	margin: 0;
 }
 
-input {
+input,
+textarea {
 	@apply bg-white;
 }

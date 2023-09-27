@@ -97,7 +97,7 @@ const RenderPeerControls: VoidComponent<{
 		<>
 			<PeersTable peers={peers()} updated={updated()} />
 			<input
-				class='w-75px bg-white form-input rounded-lg p-1 text-sm'
+				class='w-75px form-input rounded-lg p-1 text-sm'
 				type='text'
 				onInput={(e) => setName(e.currentTarget.value)}
 			/>
@@ -134,7 +134,7 @@ const RenderPeerControls: VoidComponent<{
 				<label for='remotePeerId'>Connect to</label>
 				<input
 					name='remotePeerId'
-					class='w-75px bg-white form-input rounded-lg border p-1 text-sm'
+					class='w-75px form-input rounded-lg border p-1 text-sm'
 					type='text'
 				/>
 			</form>
