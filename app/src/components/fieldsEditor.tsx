@@ -116,7 +116,7 @@ const FieldValue: VoidComponent<{
 					<div class='flex items-center gap-2'>
 						<ChevronDown
 							class='h-3 w-3'
-							classList={{ '-rotate-90': isOpen() }}
+							classList={{ '-rotate-90': !isOpen() }}
 						/>
 						{props.fieldValue[0]}
 					</div>
