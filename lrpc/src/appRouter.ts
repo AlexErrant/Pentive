@@ -1,3 +1,6 @@
+/* eslint-disable */
+// @ts-nocheck medTODO needs rearchitecturing. Do we need AWS?
+
 import { z } from 'zod'
 import { authedProcedure, publicProcedure, router } from './trpc.js'
 import aio from '@vlcn.io/crsqlite-allinone'

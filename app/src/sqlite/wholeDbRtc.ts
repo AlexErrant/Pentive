@@ -129,7 +129,19 @@ export class WholeDbRtc implements PokeProtocol {
 			version: pokerVersion.toString(),
 		}
 		this.establishedConnections.forEach((conn) => {
-			conn.send(msg)
+			const p = conn.send(msg)
+			if (p instanceof Object) {
+				p.catch((error: unknown) => {
+					toastError('Error while sending Poke.', {
+						peer: conn.peer,
+						connectionId: conn.connectionId,
+						conn: JSON.stringify(conn),
+						poker,
+						msg,
+						error,
+					})
+				})
+			}
 		})
 	}
 
@@ -140,7 +152,12 @@ export class WholeDbRtc implements PokeProtocol {
 		}
 		const conn = this.establishedConnections.get(to)
 		if (conn != null) {
-			conn.send(msg)
+			const p = conn.send(msg)
+			if (p instanceof Object) {
+				p.catch((error: unknown) => {
+					toastError('Error while pushing changes.', { to, msg, error })
+				})
+			}
 		}
 	}
 
@@ -151,7 +168,12 @@ export class WholeDbRtc implements PokeProtocol {
 		}
 		const conn = this.establishedConnections.get(from)
 		if (conn != null) {
-			conn.send(msg)
+			const p = conn.send(msg)
+			if (p instanceof Object) {
+				p.catch((error: unknown) => {
+					toastError('Error while requesting changes.', { from, msg, error })
+				})
+			}
 		}
 	}
 

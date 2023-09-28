@@ -130,16 +130,19 @@ async function digestMessage(message: string) {
 const searchCacheConst = 'searchCache' as const
 type SearchCache = typeof searchCacheConst
 
+// eslint-disable-next-line @typescript-eslint/consistent-type-definitions -- interface deesn't work with `withTables`
+type WithCache = {
+	[searchCacheConst]: {
+		rowid: number
+		id: string
+	}
+	// I'm not adding rowid to the official type definition of Notes because it adds noise to Insert/Update/Conflict resolution types
+	note: Note & { rowid: number }
+}
+
 // We cache the query's `card.id`s in a temp table. We use the temp table's rowids as a hack to get cursor pagination.
 async function buildCache(
-	db: Kysely<
-		DB & {
-			searchCache: {
-				rowid: number
-				id: string
-			}
-		}
-	>,
+	db: Kysely<DB & WithCache>,
 	baseQuery: SelectQueryBuilder<DB, 'card' | 'note', Partial<unknown>>,
 	search?: {
 		literalSearch?: string
@@ -182,14 +185,7 @@ async function getCards(
 		templateSearch?: TemplateId[]
 	},
 ): Promise<{ count: number; noteCards: NoteCard[] }> {
-	const db = (await getKysely()).withTables<{
-		[searchCacheConst]: {
-			rowid: number
-			id: string
-		}
-		// I'm not adding rowid to the official type definition of Notes because it adds noise to Insert/Update/Conflict resolution types
-		note: Note & { rowid: number }
-	}>()
+	const db = (await getKysely()).withTables<WithCache>()
 	const baseQuery = db
 		.selectFrom('card')
 		.innerJoin('note', 'card.noteId', 'note.id')
