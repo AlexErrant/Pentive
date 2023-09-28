@@ -23,8 +23,8 @@
 	"license": "MIT",
 	"devDependencies": {
 		"@solidjs/router": "^0.8.3",
-		"eslint": "^8.48.0",
-		"typescript": "~5.0.4",
+		"eslint": "^8.50.0",
+		"typescript": "~5.2.2",
 		"vite": "^4.4.9",
 		"vite-plugin-solid": "^2.7.0"
 	},

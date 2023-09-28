@@ -7,10 +7,10 @@
 	},
 	"packageManager": "pnpm@8.5.1",
 	"devDependencies": {
-		"concurrently": "^7.6.0",
+		"concurrently": "^8.2.1",
 		"kill-port": "^2.0.1",
-		"typescript": "~5.0.4",
-		"wrangler": "^3.6.0"
+		"typescript": "~5.2.2",
+		"wrangler": "^3.10.0"
 	},
 	"scripts": {
 		"kill": "kill-port 3012 3013 3014 3015 3016 3017 3018 3019",

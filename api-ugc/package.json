@@ -2,10 +2,10 @@
 	"name": "api-ugc",
 	"version": "0.0.0",
 	"devDependencies": {
-		"@cloudflare/workers-types": "^4.20230404.0",
-		"eslint": "^8.48.0",
-		"typescript": "~5.0.4",
-		"wrangler": "^3.6.0"
+		"@cloudflare/workers-types": "^4.20230922.0",
+		"eslint": "^8.50.0",
+		"typescript": "~5.2.2",
+		"wrangler": "^3.10.0"
 	},
 	"private": true,
 	"scripts": {
@@ -20,14 +20,14 @@
 		"eslint:fix": "eslint . --fix --ignore-path .gitignore"
 	},
 	"dependencies": {
-		"@planetscale/database": "^1.10.0",
-		"@trpc/server": "^10.18.0",
-		"hono": "^3.1.8",
-		"jose": "^4.14.4",
+		"@planetscale/database": "^1.11.0",
+		"@trpc/server": "^10.38.5",
+		"hono": "^3.7.2",
+		"jose": "^4.14.6",
 		"kysely": "^0.26.3",
 		"shared": "workspace:*",
 		"shared-edge": "workspace:*",
-		"superjson": "^1.12.2",
-		"zod": "^3.21.4"
+		"superjson": "^1.13.3",
+		"zod": "^3.22.2"
 	}
 }
