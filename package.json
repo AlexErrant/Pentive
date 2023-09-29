@@ -34,6 +34,13 @@
 	"pnpm": {
 		"patchedDependencies": {
 			"nightwind@1.1.13": "patches/nightwind@1.1.13.patch"
+		},
+		"overrides": {
+			"got@<11.8.5": ">=11.8.5",
+			"json-schema@<0.4.0": ">=0.4.0",
+			"xml2js@<0.5.0": ">=0.5.0",
+			"semver@>=7.0.0 <7.5.2": ">=7.5.2",
+			"get-func-name@<2.0.1": ">=2.0.1"
 		}
 	}
 }
