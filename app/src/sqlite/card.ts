@@ -1,5 +1,4 @@
 import {
-	type DeckId,
 	type CardId,
 	type NoteId,
 	assertNever,
@@ -59,7 +58,7 @@ function deserializeState(s: number | null): State | undefined {
 }
 
 function cardToDocType(card: Card): InsertObject<DB, 'card'> {
-	const { id, noteId, due, ord, deckIds, cardSettingId, state } = card
+	const { id, noteId, due, ord, tags, cardSettingId, state } = card
 	const now = new Date().getTime()
 	return {
 		id,
@@ -68,7 +67,7 @@ function cardToDocType(card: Card): InsertObject<DB, 'card'> {
 		updated: now,
 		due: due.getTime(),
 		ord,
-		deckIds: stringifySet(deckIds),
+		tags: stringifySet(tags),
 		cardSettingId: cardSettingId ?? null,
 		state: undefinedMap(state, serializeState) ?? null,
 	}
@@ -82,7 +81,7 @@ function entityToDomain(card: CardEntity): Card {
 		updated: new Date(card.updated),
 		due: new Date(card.due),
 		ord: card.ord,
-		deckIds: new Set(JSON.parse(card.deckIds) as DeckId[]),
+		tags: new Set(JSON.parse(card.tags) as string[]),
 		state: deserializeState(card.state),
 		cardSettingId: card.cardSettingId ?? undefined,
 	}
@@ -233,7 +232,7 @@ async function getCards(
 		.select([
 			'card.cardSettingId as card_cardSettingId',
 			'card.created as card_created',
-			'card.deckIds as card_deckIds',
+			'card.tags as card_tags',
 			'card.due as card_due',
 			'card.id as card_id',
 			'card.updated as card_updated',
@@ -326,7 +325,7 @@ async function getCards(
 			const card = entityToDomain({
 				cardSettingId: tnc.card_cardSettingId,
 				created: tnc.card_created,
-				deckIds: tnc.card_deckIds,
+				tags: tnc.card_tags,
 				due: tnc.card_due,
 				id: tnc.card_id,
 				updated: tnc.card_updated,
@@ -373,7 +372,7 @@ export const cardCollectionMethods = {
 					db.doUpdateSet({
 						updated: (x) => x.ref('excluded.updated'),
 						due: (x) => x.ref('excluded.due'),
-						deckIds: (x) => x.ref('excluded.deckIds'),
+						tags: (x) => x.ref('excluded.tags'),
 						cardSettingId: (x) => x.ref('excluded.cardSettingId'),
 						state: (x) => x.ref('excluded.state'),
 					} satisfies OnConflictUpdateCardSet),

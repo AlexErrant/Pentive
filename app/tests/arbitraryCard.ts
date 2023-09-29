@@ -6,7 +6,6 @@ import {
 	type Ord,
 	type NoteId,
 	type CardSettingId,
-	type DeckId,
 } from 'shared'
 
 import { reasonableDates, recordWithOptionalFields } from './arbitrary'
@@ -15,7 +14,7 @@ export const card = recordWithOptionalFields<Card>(
 	{
 		id: fc.uuidV(4).map((x) => x as CardId),
 		noteId: fc.uuidV(4).map((x) => x as NoteId),
-		deckIds: fc.array(fc.uuidV(4)).map((x) => new Set(x) as Set<DeckId>),
+		tags: fc.array(fc.uuidV(4)).map((x) => new Set(x)),
 		created: reasonableDates,
 		updated: reasonableDates,
 		due: reasonableDates,

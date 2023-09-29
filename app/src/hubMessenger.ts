@@ -87,7 +87,7 @@ export const appExpose = {
 					id: ulidAsBase64Url() as CardId,
 					ord: i,
 					noteId: n.id,
-					deckIds: new Set(),
+					tags: new Set(),
 					created: now,
 					updated: now,
 					due: now,

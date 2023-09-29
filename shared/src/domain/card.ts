@@ -3,7 +3,6 @@ import {
 	type NoteId,
 	type Ord,
 	type CardSettingId,
-	type DeckId,
 } from '../brand.js'
 import { type Note } from './note'
 import { type Template } from './template'
@@ -21,7 +20,7 @@ export interface Card {
 	id: CardId
 	ord: Ord
 	noteId: NoteId
-	deckIds: Set<DeckId>
+	tags: Set<string>
 	created: Date
 	updated: Date
 	cardSettingId?: CardSettingId

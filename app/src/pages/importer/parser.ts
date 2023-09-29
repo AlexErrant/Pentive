@@ -6,7 +6,6 @@ import {
 	type ChildTemplate,
 	type TemplateType,
 	type CardSettingId,
-	type DeckId,
 	type Field,
 	type Template,
 	type Card as PCard,
@@ -129,7 +128,7 @@ export function parseCard(
 	return {
 		id: card.id.toString() as CardId, // medTODO
 		noteId: card.nid.toString() as NoteId, // medTODO
-		deckIds: new Set([card.did.toString() as DeckId]), // medTODO
+		tags: new Set([card.did.toString()]), // medTODO
 		created: new Date(card.id),
 		updated: new Date(card.mod),
 		due: new Date(card.due), // highTODO

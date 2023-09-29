@@ -14,7 +14,7 @@ export interface Card {
 	id: LDbId
 	ord: Ord
 	noteId: LDbId
-	deckIds: string
+	tags: string
 	created: number
 	updated: number
 	cardSettingId: LDbId | null
