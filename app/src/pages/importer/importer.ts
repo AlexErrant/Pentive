@@ -119,6 +119,7 @@ async function importAnkiDb(sqlite: Entry): Promise<void> {
 	const ankiDb = await getAnkiDb(sqlite)
 	const templatesMap = new Map<TemplateId, Template>()
 	const notesMap = new Map<number, PNote>()
+	let decks: Map<number, string> | undefined
 	const cardsList: PCard[] = []
 	try {
 		// highTODO wrap in a transaction
@@ -126,6 +127,9 @@ async function importAnkiDb(sqlite: Entry): Promise<void> {
 		while (cols.step()) {
 			const row = cols.getAsObject()
 			const col = checkCol(row)
+			decks = new Map(
+				Object.values(col.decks).map((d) => [d.id, d.name] as const),
+			)
 			const templates = parseTemplates(col.models)
 			await db.bulkInsertTemplate(templates)
 			templates.forEach((t) => templatesMap.set(t.id, t))
@@ -145,7 +149,7 @@ async function importAnkiDb(sqlite: Entry): Promise<void> {
 		while (cards.step()) {
 			const row = cards.getAsObject()
 			const card = checkCard(row)
-			cardsList.push(parseCard(card, notesMap, templatesMap))
+			cardsList.push(parseCard(card, notesMap, templatesMap, decks!))
 		}
 		cards.free()
 		await db.bulkUpsertCards(cardsList)

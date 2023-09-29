@@ -86,6 +86,9 @@ export function parseTemplates(models: Models): Template[] {
 	})
 }
 
+const normalize = (s: string) =>
+	s.trim().replaceAll('::', '/').replaceAll('_', ' ')
+
 export function parseNote(
 	note: ANote,
 	templates: Map<TemplateId, Template>,
@@ -109,7 +112,7 @@ export function parseNote(
 		tags: new Set(
 			note.tags
 				.split(' ')
-				.map((t) => t.trim().replaceAll('::', '/').replaceAll('_', ' '))
+				.map(normalize)
 				.filter((t) => t !== ''),
 		),
 		remotes: new Map(),
@@ -120,15 +123,17 @@ export function parseCard(
 	card: ACard,
 	notes: Map<number, PNote>,
 	templates: Map<TemplateId, Template>,
+	decks: Map<number, string>,
 ): PCard {
 	const note = notes.get(card.nid)
 	if (note == null) toastFatal(`Note ${card.nid} not found`)
 	const template = templates.get(note.templateId)
 	if (template == null) toastFatal(`Template ${note.templateId} not found`)
+	const deck = decks.get(card.did) ?? toastFatal(`Deck ${card.did} not found`)
 	return {
 		id: card.id.toString() as CardId, // medTODO
 		noteId: card.nid.toString() as NoteId, // medTODO
-		tags: new Set([card.did.toString()]), // medTODO
+		tags: new Set(['Deck/' + normalize(deck)]),
 		created: new Date(card.id),
 		updated: new Date(card.mod),
 		due: new Date(card.due), // highTODO
