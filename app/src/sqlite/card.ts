@@ -2,7 +2,6 @@ import {
 	type CardId,
 	type NoteId,
 	assertNever,
-	stringifySet,
 	undefinedMap,
 	type Card,
 	type State,
@@ -24,6 +23,7 @@ import _ from 'lodash'
 import { entityToDomain as templateEntityToDomain } from './template'
 import { entityToDomain as noteEntityToDomain } from './note'
 import { toastImpossible, toastInfo, toastWarn } from '../components/toasts'
+import { parseTags, stringifyTags } from './tag'
 
 function serializeState(s: State): number {
 	switch (s) {
@@ -67,7 +67,7 @@ function cardToDocType(card: Card): InsertObject<DB, 'card'> {
 		updated: now,
 		due: due.getTime(),
 		ord,
-		tags: stringifySet(tags),
+		tags: stringifyTags(tags),
 		cardSettingId: cardSettingId ?? null,
 		state: undefinedMap(state, serializeState) ?? null,
 	}
@@ -81,7 +81,7 @@ function entityToDomain(card: CardEntity): Card {
 		updated: new Date(card.updated),
 		due: new Date(card.due),
 		ord: card.ord,
-		tags: new Set(JSON.parse(card.tags) as string[]),
+		tags: parseTags(card.tags),
 		state: deserializeState(card.state),
 		cardSettingId: card.cardSettingId ?? undefined,
 	}

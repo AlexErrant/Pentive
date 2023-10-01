@@ -70,6 +70,24 @@ export const initSql = [
     due INTEGER,
     state INTEGER
 ) STRICT;`,
+	`CREATE VIRTUAL TABLE IF NOT EXISTS cardFtsTag USING fts5 (
+	    tags,
+      content=card,
+      content_rowid=rowid,
+      -- All characters that are not the unit separator are tokenchars 89CDE7EA-EF1B-4054-B381-597EE549CAB4
+      tokenize = "unicode61 categories 'L* M* N* P* S* Z* C*' separators '\x1F'"
+  );`,
+	`CREATE VIRTUAL TABLE IF NOT EXISTS cardFtsTagVocab USING fts5vocab(cardFtsTag, instance);`,
+	`CREATE TRIGGER IF NOT EXISTS card_after_insert AFTER INSERT ON card BEGIN
+     INSERT INTO cardFtsTag(rowid, tags       ) VALUES (new.rowid, new.tags       );
+   END;`,
+	`CREATE TRIGGER IF NOT EXISTS card_after_delete AFTER DELETE ON card BEGIN
+     INSERT INTO cardFtsTag(cardFtsTag, rowid, tags       ) VALUES('delete', old.rowid, old.tags       );
+   END;`,
+	`CREATE TRIGGER IF NOT EXISTS card_after_update AFTER UPDATE ON card BEGIN
+     INSERT INTO cardFtsTag(cardFtsTag, rowid, tags       ) VALUES('delete', old.rowid, old.tags       );
+     INSERT INTO cardFtsTag(rowid, tags       ) VALUES (new.rowid, new.tags       );
+   END;`,
 	`CREATE TABLE IF NOT EXISTS media (
     id TEXT PRIMARY KEY, -- should stay TEXT!
     created INTEGER,

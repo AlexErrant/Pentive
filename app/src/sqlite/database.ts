@@ -50,6 +50,11 @@ export interface NoteFtsTag {
 	tags: string
 }
 
+export interface CardFtsTag {
+	rowid: number
+	tags: string
+}
+
 export interface RemoteNote {
 	localId: LDbId
 	nook: NookId
@@ -98,6 +103,13 @@ export interface NoteFtsTagVocab {
 	offset: number
 }
 
+export interface CardFtsTagVocab {
+	term: string
+	doc: number
+	col: string
+	offset: number
+}
+
 export interface SqliteTempMaster {
 	name: string
 }
@@ -117,11 +129,13 @@ export interface DB {
 	// eslint-disable-next-line @typescript-eslint/naming-convention
 	sqlite_temp_master: SqliteTempMaster
 	noteFtsTagVocab: NoteFtsTagVocab
+	cardFtsTagVocab: CardFtsTagVocab
 	card: Card
 	media: Media
 	note: Note
 	noteFtsFv: NoteFtsFv
 	noteFtsTag: NoteFtsTag
+	cardFtsTag: CardFtsTag
 	remoteNote: RemoteNote
 	plugin: Plugin
 	remoteMedia: RemoteMedia
