@@ -137,6 +137,7 @@ type WithCache = {
 	}
 	// I'm not adding rowid to the official type definition of Notes because it adds noise to Insert/Update/Conflict resolution types
 	note: Note & { rowid: number }
+	card: CardEntity & { rowid: number }
 }
 
 // We cache the query's `card.id`s in a temp table. We use the temp table's rowids as a hack to get cursor pagination.
@@ -208,14 +209,44 @@ async function getCards(
 			// don't `where` when scrolling - redundant since joining on the cache already filters
 			offset === 0 && search?.tagSearch != null,
 			(db) =>
-				db.innerJoin('noteFtsTag', 'noteFtsTag.rowid', 'note.rowid').where(
-					'noteFtsTag.tags',
-					'match',
-					search!
-						// https://stackoverflow.com/a/46918640 https://blog.haroldadmin.com/posts/escape-fts-queries
-						.tagSearch!.map((x) => `"${x.replaceAll('"', '""')}"`)
-						.join(' OR '),
-				),
+				db
+					.innerJoin('noteFtsTag', 'noteFtsTag.rowid', 'note.rowid')
+					.innerJoin('cardFtsTag', 'cardFtsTag.rowid', 'card.rowid')
+					.where((qb) =>
+						// `or`ing `match` across multiple tables is annoying https://sqlite.org/forum/forumpost?udc=1&name=1a2f2ffdd80cf795
+						qb.or([
+							qb(
+								'noteFtsTag.rowid',
+								'in',
+								qb
+									.selectFrom('noteFtsTag')
+									.select('rowid')
+									.where(
+										'noteFtsTag.tags',
+										'match',
+										search!
+											// https://stackoverflow.com/a/46918640 https://blog.haroldadmin.com/posts/escape-fts-queries
+											.tagSearch!.map((x) => `"${x.replaceAll('"', '""')}"`)
+											.join(' OR '),
+									),
+							),
+							qb(
+								'cardFtsTag.rowid',
+								'in',
+								qb
+									.selectFrom('cardFtsTag')
+									.select('rowid')
+									.where(
+										'cardFtsTag.tags',
+										'match',
+										search!
+											// https://stackoverflow.com/a/46918640 https://blog.haroldadmin.com/posts/escape-fts-queries
+											.tagSearch!.map((x) => `"${x.replaceAll('"', '""')}"`)
+											.join(' OR '),
+									),
+							),
+						]),
+					),
 		)
 	const searchCache =
 		// If user has scrolled, build/use the cache.
