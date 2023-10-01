@@ -24,6 +24,7 @@ import {
 	checkMedia,
 	checkNote,
 	checkRevlog,
+	type Decks,
 } from './typeChecker'
 import {
 	parseNote,
@@ -119,7 +120,7 @@ async function importAnkiDb(sqlite: Entry): Promise<void> {
 	const ankiDb = await getAnkiDb(sqlite)
 	const templatesMap = new Map<TemplateId, Template>()
 	const notesMap = new Map<number, PNote>()
-	let decks: Map<number, string> | undefined
+	let decks: Decks | undefined
 	const cardsList: PCard[] = []
 	try {
 		// highTODO wrap in a transaction
@@ -127,9 +128,7 @@ async function importAnkiDb(sqlite: Entry): Promise<void> {
 		while (cols.step()) {
 			const row = cols.getAsObject()
 			const col = checkCol(row)
-			decks = new Map(
-				Object.values(col.decks).map((d) => [d.id, d.name] as const),
-			)
+			decks = col.decks
 			const templates = parseTemplates(col.models)
 			await db.bulkInsertTemplate(templates)
 			templates.forEach((t) => templatesMap.set(t.id, t))

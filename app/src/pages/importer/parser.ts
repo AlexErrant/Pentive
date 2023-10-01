@@ -22,6 +22,7 @@ import {
 	type Tmpl,
 	type Revlog,
 	type Dconf,
+	type Decks,
 } from './typeChecker'
 import _ from 'lodash'
 import { toastFatal, toastImpossible } from '../../components/toasts'
@@ -123,21 +124,21 @@ export function parseCard(
 	card: ACard,
 	notes: Map<number, PNote>,
 	templates: Map<TemplateId, Template>,
-	decks: Map<number, string>,
+	decks: Decks,
 ): PCard {
 	const note = notes.get(card.nid)
 	if (note == null) toastFatal(`Note ${card.nid} not found`)
 	const template = templates.get(note.templateId)
 	if (template == null) toastFatal(`Template ${note.templateId} not found`)
-	const deck = decks.get(card.did) ?? toastFatal(`Deck ${card.did} not found`)
+	const deck = decks[card.did] ?? toastFatal(`Deck ${card.did} not found`)
 	return {
 		id: card.id.toString() as CardId, // medTODO
 		noteId: card.nid.toString() as NoteId, // medTODO
-		tags: new Set(['Deck/' + normalize(deck)]),
+		tags: new Set(['Deck/' + normalize(deck.name)]),
 		created: new Date(card.id),
 		updated: new Date(card.mod),
 		due: new Date(card.due), // highTODO
-		cardSettingId: card.did.toString() as CardSettingId, // medTODO
+		cardSettingId: deck.conf.toString() as CardSettingId,
 		ord: card.ord,
 	}
 }

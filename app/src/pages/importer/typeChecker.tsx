@@ -139,7 +139,7 @@ export type Models = z.infer<typeof models>
 export type Model = z.infer<typeof model>
 export type Fld = z.infer<typeof fld>
 export type Tmpl = z.infer<typeof tmpl>
-type Decks = z.infer<typeof decks>
+export type Decks = z.infer<typeof decks>
 
 type MergedCol = Omit<Col, 'conf' | 'decks' | 'models' | 'dconf'> & {
 	conf: Conf
