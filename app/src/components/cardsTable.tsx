@@ -27,6 +27,7 @@ import { C } from '../pluginManager'
 import { toastImpossible } from './toasts'
 import FiltersTable from './filtersTable'
 import './cardsTable.css'
+import { type SearchParams } from '../sqlite/card'
 
 LicenseManager.setLicenseKey(import.meta.env.VITE_AG_GRID_LICENSE)
 
@@ -263,7 +264,7 @@ const dataSource = {
 			tagSearch: tagSearchActual.length === 0 ? undefined : tagSearchActual,
 			templateSearch:
 				templateSearchActual.length === 0 ? undefined : templateSearchActual,
-		}
+		} satisfies SearchParams
 		const regex = () => {
 			const firstWord = ftsSearch().trim().split(' ')[0]! // lowTODO handle multiple words
 			const escapedFirstWord = escapeRegExp(firstWord)

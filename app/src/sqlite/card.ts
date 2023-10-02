@@ -173,17 +173,18 @@ async function buildCache(
 	}
 	return cacheName
 }
+export interface SearchParams {
+	literalSearch?: string
+	ftsSearch?: string
+	tagSearch?: string[]
+	templateSearch?: TemplateId[]
+}
 
 async function getCards(
 	offset: number,
 	limit: number,
 	sort?: { col: 'card.due' | 'card.created'; direction: 'asc' | 'desc' },
-	search?: {
-		literalSearch?: string
-		ftsSearch?: string
-		tagSearch?: string[]
-		templateSearch?: TemplateId[]
-	},
+	search?: SearchParams,
 ): Promise<{ count: number; noteCards: NoteCard[] }> {
 	const db = (await getKysely()).withTables<WithCache>()
 	const baseQuery = db
