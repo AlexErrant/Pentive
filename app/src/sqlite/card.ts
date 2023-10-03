@@ -196,7 +196,7 @@ async function getCards(
 			db
 				.innerJoin('noteFtsFv', 'noteFtsFv.rowid', 'note.rowid')
 				.where('noteFtsFv.fieldValues', 'match', search!.ftsSearch!)
-				.orderBy(sql`rank`),
+				.orderBy(sql`noteFtsFv.rank`),
 		)
 		// don't `where` when scrolling - redundant since joining on the cache already filters
 		.$if(offset === 0 && search?.literalSearch != null, (db) =>
