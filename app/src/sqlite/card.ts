@@ -24,6 +24,7 @@ import { entityToDomain as templateEntityToDomain } from './template'
 import { entityToDomain as noteEntityToDomain } from './note'
 import { toastImpossible, toastInfo, toastWarn } from '../components/toasts'
 import { parseTags, stringifyTags } from './tag'
+import { md5 } from '../domain/utility'
 
 function serializeState(s: State): number {
 	switch (s) {
@@ -115,15 +116,6 @@ type OnConflictUpdateCardSet = {
 	) => unknown
 }
 
-// https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/digest#converting_a_digest_to_a_hex_string
-async function digestMessage(message: string) {
-	const msgUint8 = new TextEncoder().encode(message) // encode as (utf-8) Uint8Array
-	const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8) // hash the message
-	const hashArray = Array.from(new Uint8Array(hashBuffer)) // convert buffer to byte array
-	const hashHex = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('') // convert bytes to hex string
-	return hashHex
-}
-
 // This exists to lie to Typescript, saying that all caches are called `searchCache`.
 // There are multiple caches with different names, but idk how to get that working with Kysely.
 const searchCacheConst = 'searchCache' as const
@@ -149,9 +141,12 @@ async function buildCache(
 	baseQuery: SelectQueryBuilder<DB, 'card' | 'note', Partial<unknown>>,
 	search?: SearchParams,
 ) {
+	// const start = performance.now()
 	const cacheName = ('getCardsCache_' +
-		// lowTODO find a better way to name the cache table
-		(await digestMessage(JSON.stringify(search)))) as SearchCache
+		// lowTODO find a better way to name the cache table. Don't use crypto.subtle.digest - it's ~200ms which is absurd
+		md5(JSON.stringify(search))) as SearchCache
+	// const end = performance.now()
+	// console.info(`hash built in ${end - start} ms`)
 	const cacheExists = await db
 		.selectFrom('sqlite_temp_master')
 		.where('name', '=', cacheName)
