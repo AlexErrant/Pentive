@@ -141,13 +141,13 @@ type WithCache = {
 }
 
 // We cache the query's `card.id`s in a temp table. We use the temp table's rowids as a hack to get cursor pagination.
+// We use `PRAGMA temp_store=MEMORY;` despite a lack of perf improvement because... well, there *should* be better perf.
+// Doing 10 runs of alternating `FILE`/`MEMORY` showed no significant advantage to `MEMORY` (techncially a 2ms average improvement, which is just noise.)
+// Grep 2790D3E0-F98B-4A95-8910-AC3E87F4F2D3
 async function buildCache(
 	db: Kysely<DB & WithCache>,
 	baseQuery: SelectQueryBuilder<DB, 'card' | 'note', Partial<unknown>>,
-	search?: {
-		literalSearch?: string
-		ftsSearch?: string
-	},
+	search?: SearchParams,
 ) {
 	const cacheName = ('getCardsCache_' +
 		// lowTODO find a better way to name the cache table
@@ -164,11 +164,22 @@ async function buildCache(
 			.clearSelect()
 			.select('card.id as id')
 			.compile()
+		// console.log(
+		// 	'PRAGMA temp_store',
+		// 	(await sql`PRAGMA temp_store;`.execute(db)).rows[0],
+		// )
+		const start = performance.now()
 		await (
 			await db
 		).exec(
 			`CREATE TEMP TABLE ${cacheName} AS ` + sql,
 			parameters as SQLiteCompatibleType[],
+		)
+		const end = performance.now()
+		console.info(
+			`Cache ${cacheName} for ${JSON.stringify(search)} built in ${
+				end - start
+			} ms`,
 		)
 	}
 	return cacheName
@@ -371,19 +382,9 @@ async function getCards(
 	}
 	if (searchCache == null) {
 		// asynchronously build the cache
-		const start = performance.now()
-		buildCache(db, baseQuery, search)
-			.then((name) => {
-				const end = performance.now()
-				console.info(
-					`Cache ${name} for ${JSON.stringify(search)} built in ${
-						end - start
-					} ms`,
-				)
-			})
-			.catch((e) => {
-				toastWarn('Error building cache', e)
-			})
+		buildCache(db, baseQuery, search).catch((e) => {
+			toastWarn('Error building cache', e)
+		})
 	}
 	return r
 }
