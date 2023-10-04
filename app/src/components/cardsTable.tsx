@@ -155,10 +155,11 @@ function setDatasource() {
 const CardsTable: VoidComponent<{
 	readonly onSelectionChanged: (noteCards: NoteCard[]) => void
 }> = (props) => {
-	createEffect(on(literalSearch, setDatasource, { defer: true }))
-	createEffect(on(ftsSearch, setDatasource, { defer: true }))
-	createEffect(on(tagSearch, setDatasource, { defer: true }))
-	createEffect(on(templateSearch, setDatasource, { defer: true }))
+	createEffect(
+		on([literalSearch, ftsSearch, tagSearch, templateSearch], setDatasource, {
+			defer: true,
+		}),
+	)
 	return (
 		<div class='flex h-full flex-col'>
 			<div class='m-0.5 p-0.5'>

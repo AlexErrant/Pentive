@@ -1,4 +1,4 @@
-import { createResource, type VoidComponent } from 'solid-js'
+import { batch, createResource, type VoidComponent } from 'solid-js'
 import AgGridSolid, { type AgGridSolidRef } from 'ag-grid-solid'
 import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-alpine.css'
@@ -81,8 +81,10 @@ const FiltersTable: VoidComponent<{
 					const templates = nodes
 						.filter((n) => n.dataPath[0] === TemplatesNodeName)
 						.map((t) => t.searchId as TemplateId)
-					props.tagsChanged(tags)
-					props.templatesChanged(templates)
+					batch(() => {
+						props.tagsChanged(tags)
+						props.templatesChanged(templates)
+					})
 				}}
 				onFirstDataRendered={(params) => {
 					params.api.sizeColumnsToFit()
