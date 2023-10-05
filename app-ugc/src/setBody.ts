@@ -1,22 +1,24 @@
 import contentWindowJs from 'iframe-resizer/js/iframeResizer.contentWindow.js?raw' // https://vitejs.dev/guide/assets.html#importing-asset-as-string https://github.com/davidjbradshaw/iframe-resizer/issues/513
-import { appMessenger } from './appMessenger'
-import { type RenderBodyInput } from 'app/src/components/resizingIframe'
+import { appMessenger, setAppMessengerPort } from './appMessenger'
+import {
+	type ComlinkInit,
+	type RenderBodyInput,
+} from 'app/src/components/resizingIframe'
 import { assertNever } from 'shared'
 import { resizeIframe } from './registerServiceWorker'
 import diff from 'micromorph'
 
 self.addEventListener('message', async (event) => {
 	const data = event.data as unknown
-	if (
-		typeof data === 'object' &&
-		data != null &&
-		'type' in data &&
-		data.type === 'pleaseRerender'
-	) {
-		// @ts-expect-error i exists; grep pleaseRerender
-		const i = data.i as RenderBodyInput
-		await setBody(i)
-		await resizeIframe()
+	if (typeof data === 'object' && data != null && 'type' in data) {
+		if (data.type === 'pleaseRerender') {
+			// @ts-expect-error i exists; grep pleaseRerender
+			const i = data.i as RenderBodyInput
+			await setBody(i)
+			await resizeIframe()
+		} else if (data?.type === 'ComlinkInit') {
+			setAppMessengerPort((data as ComlinkInit).port)
+		}
 	}
 })
 

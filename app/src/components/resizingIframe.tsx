@@ -102,6 +102,15 @@ const ResizingIframe: VoidComponent<{
 						iframeReference?.iFrameResizer?.resize()
 					},
 				}
+				const { port1, port2 } = new MessageChannel()
+				const comlinkInit: ComlinkInit = {
+					type: 'ComlinkInit',
+					port: port1,
+				}
+				Comlink.expose(appExpose, port2)
+				e.currentTarget.contentWindow!.postMessage(comlinkInit, targetOrigin, [
+					port1,
+				])
 				Comlink.expose(
 					appExpose,
 					Comlink.windowEndpoint(
@@ -131,3 +140,8 @@ const ResizingIframe: VoidComponent<{
 }
 
 export default ResizingIframe
+
+export interface ComlinkInit {
+	type: 'ComlinkInit'
+	port: MessagePort
+}
