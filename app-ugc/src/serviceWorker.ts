@@ -84,9 +84,11 @@ async function getLocalMedia(
 		? new Response(media, { status: 404 })
 		: new Response(media, {
 				headers: {
+					/* eslint-disable @typescript-eslint/naming-convention */
 					// "image" seems like a valid content-type https://stackoverflow.com/a/28390633
-					// eslint-disable-next-line @typescript-eslint/naming-convention
 					'content-type': mediaId.endsWith('.svg') ? 'image/svg+xml' : 'image',
+					'cache-control': 'max-age=604800, immutable', // 7 days
+					/* eslint-enable @typescript-eslint/naming-convention */
 				},
 		  })
 }
