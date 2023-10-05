@@ -24,7 +24,7 @@ import { assertNever } from 'shared'
 import { agGridTheme } from '../globalState'
 import { Upload, escapeRegExp } from 'shared-dom'
 import { C } from '../pluginManager'
-import { toastImpossible } from './toasts'
+import { toastError, toastImpossible } from './toasts'
 import FiltersTable from './filtersTable'
 import './cardsTable.css'
 import { type SearchParams } from '../sqlite/card'
@@ -280,6 +280,11 @@ const dataSource = {
 				const end = performance.now()
 				console.log(`GetCards ${end - start} ms`, search)
 				p.successCallback(x.noteCards, x.count)
+				if (x.count === 0) {
+					gridRef.api.showNoRowsOverlay()
+				} else {
+					gridRef.api.hideOverlay()
+				}
 				if (
 					ftsSearchActual !== '' &&
 					gridRef.api.getColumnDef('Search') == null
@@ -329,7 +334,8 @@ const dataSource = {
 					gridRef.api.setColumnDefs(columnDefs)
 				}
 			})
-			.catch(() => {
+			.catch((e) => {
+				toastError('Error getting cards.', e)
 				p.failCallback()
 			})
 	},
