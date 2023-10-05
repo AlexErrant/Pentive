@@ -13,7 +13,8 @@ cleanupOutdatedCaches()
 
 precacheAndRoute(self.__WB_MANIFEST)
 
-const messengers = new Map<string, Comlink.Remote<Exposed>>()
+type Messenger = Comlink.Remote<Exposed>
+const messengers = new Map<string, Messenger>()
 
 function getId(event: ExtendableMessageEvent): string {
 	if (event.source instanceof Client) {
@@ -71,7 +72,7 @@ async function sleep(ms: number): Promise<void> {
 	await new Promise((resolve) => setTimeout(resolve, ms))
 }
 
-async function getLocalMedia(
+async function getLocalMediaResponse(
 	mediaId: MediaId,
 	clientId: string,
 ): Promise<Response> {
@@ -79,7 +80,7 @@ async function getLocalMedia(
 	if (messenger == null) {
 		return new Response(null, { status: 404 }) // lowTODO could return an image saying the messenger is null
 	}
-	const media = await messenger.getLocalMedia(mediaId)
+	const media = await getLocalMedia(messenger, mediaId)
 	return media == null
 		? new Response(media, { status: 404 })
 		: new Response(media, {
@@ -93,9 +94,7 @@ async function getLocalMedia(
 		  })
 }
 
-async function getMessenger(
-	clientId: string,
-): Promise<Comlink.Remote<Exposed> | undefined> {
+async function getMessenger(clientId: string) {
 	let i = 0
 	let m = messengers.get(clientId)
 	while (m == null) {
@@ -131,7 +130,7 @@ self.addEventListener('fetch', (fetch) => {
 		const mediaId = decodeURI(
 			fetch.request.url.substring(self.location.origin.length + 1),
 		) as MediaId
-		fetch.respondWith(getLocalMedia(mediaId, fetch.clientId))
+		fetch.respondWith(getLocalMediaResponse(mediaId, fetch.clientId))
 	}
 })
 
@@ -140,4 +139,31 @@ self.addEventListener('fetch', (fetch) => {
 // with `pnpm build` which I've no idea how to fix
 function throwExp(errorMessage: string): never {
 	throw new Error(errorMessage)
+}
+
+// From https://developer.mozilla.org/en-US/docs/Web/JavaScript/Memory_management#weakrefs_and_finalizationregistry in particular
+// https://github.com/mdn/content/blob/50a5ce565b2fa0b988b3f5ff90ea4b24b13e4b9d/files/en-us/web/javascript/memory_management/index.md?plain=1#L270-L293
+// A Map from string URLs to WeakRefs of results
+const cache = new Map<MediaId, WeakRef<ArrayBuffer>>()
+// Every time after a value is garbage collected, the callback is
+// called with the key in the cache as argument, allowing us to remove
+// the cache entry
+const registry = new FinalizationRegistry((key: MediaId) => {
+	// Note: it's important to test that the WeakRef is indeed empty.
+	// Otherwise, the callback may be called after a new object has been
+	// added with this key, and that new, alive object gets deleted
+	if (cache.get(key)?.deref() == null) {
+		cache.delete(key)
+	}
+})
+async function getLocalMedia(messenger: Messenger, key: MediaId) {
+	if (cache.has(key)) {
+		console.info('WeakRef cache hit on ' + key)
+		return cache.get(key)!.deref()!
+	}
+	const value = await messenger.getLocalMedia(key)
+	if (value == null) return null
+	cache.set(key, new WeakRef(value))
+	registry.register(value, key)
+	return value
 }
