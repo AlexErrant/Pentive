@@ -136,6 +136,14 @@ type WithCache = {
 // We use `PRAGMA temp_store=MEMORY;` despite a lack of perf improvement because... well, there *should* be better perf.
 // Doing 10 runs of alternating `FILE`/`MEMORY` showed no significant advantage to `MEMORY` (techncially a 2ms average improvement, which is just noise.)
 // Grep 2790D3E0-F98B-4A95-8910-AC3E87F4F2D3
+//
+// medTODO Consider building the cache upon first OFFSET != 0, instead of after the initial load.
+// medTODO Consider building the cache incrementally so its write doesn't block reads.
+//
+// Rejected ideas for improving limit+offset perf:
+// 1. Loading all relevant ids like Anki. This makes initial load for large numbers of cards unacceptably slow on the web.
+// 2. Deferred joins. https://planetscale.com/learn/courses/mysql-for-developers/examples/deferred-joins https://aaronfrancis.com/2022/efficient-pagination-using-deferred-joins
+//    They're ~2x faster than a normal limit+offset if including a FTS search criteria, but that's still not fast enough. Maybe FTS doesn't count as a covering index.
 async function buildCache(
 	db: Kysely<DB & WithCache>,
 	baseQuery: SelectQueryBuilder<DB, 'card' | 'note', Partial<unknown>>,
@@ -376,7 +384,7 @@ async function getCards(
 		}),
 	}
 	if (searchCache == null) {
-		// asynchronously build the cache
+		// asynchronously/nonblockingly build the cache
 		buildCache(db, baseQuery, search).catch((e) => {
 			toastWarn('Error building cache', e)
 		})
