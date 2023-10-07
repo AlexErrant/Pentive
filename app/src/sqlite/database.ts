@@ -45,6 +45,11 @@ export interface NoteFtsFv {
 	fieldValues: string
 }
 
+export interface NoteFtsMedia {
+	rowid: number
+	media: string
+}
+
 export interface NoteFtsTag {
 	rowid: number
 	tags: string
@@ -103,6 +108,13 @@ export interface NoteFtsTagVocab {
 	offset: number
 }
 
+export interface NoteFtsMediaVocab {
+	term: string
+	doc: number
+	col: string
+	offset: number
+}
+
 export interface CardFtsTagVocab {
 	term: string
 	doc: number
@@ -129,11 +141,13 @@ export interface DB {
 	// eslint-disable-next-line @typescript-eslint/naming-convention
 	sqlite_temp_master: SqliteTempMaster
 	noteFtsTagVocab: NoteFtsTagVocab
+	noteFtsMediaVocab: NoteFtsMediaVocab
 	cardFtsTagVocab: CardFtsTagVocab
 	card: Card
 	media: Media
 	note: Note
 	noteFtsFv: NoteFtsFv
+	noteFtsMedia: NoteFtsMedia
 	noteFtsTag: NoteFtsTag
 	cardFtsTag: CardFtsTag
 	remoteNote: RemoteNote

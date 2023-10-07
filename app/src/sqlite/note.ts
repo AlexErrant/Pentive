@@ -23,7 +23,7 @@ import {
 	toastInfo,
 	toastWarn,
 } from '../components/toasts'
-import { parseTags, stringifyTags } from './tag'
+import { parseTags, stringifyTags, unitSeparator } from './tag'
 
 function noteToDocType(note: Note): InsertObject<DB, 'note'> {
 	const now = new Date().getTime()
@@ -61,6 +61,17 @@ function domainToEditRemote(
 		tags: Array.from(note.tags),
 	}
 	return r
+}
+
+const dp = new DOMParser()
+
+export function getMediaIds(fvs: string) {
+	const values = parseMap<string, string>(fvs).values()
+	return Array.from(values)
+		.flatMap((v) => dp.parseFromString(v, 'text/html'))
+		.flatMap((d) => Array.from(d.images))
+		.map((i) => i.getAttribute('src'))
+		.join(unitSeparator)
 }
 
 export function entityToDomain(

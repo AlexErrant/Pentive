@@ -9,6 +9,7 @@ import crsqliteUrl from '@vlcn.io/crsqlite-wasm/crsqlite.wasm?url'
 import wdbRtc from './wholeDbRtc'
 import { wholeDbReplicator } from 'shared-dom'
 import { toastInfo } from '../components/toasts'
+import { getMediaIds } from './note'
 
 let myDatabase: Promise<crDB> | null = null
 let myCrRtc: Awaited<ReturnType<typeof wdbRtc>> | null = null
@@ -31,6 +32,7 @@ async function createDb() {
 	const sqlite = await sqliteWasm(() => crsqliteUrl)
 	const db = await sqlite.open('username.db')
 	await db.execMany(initSql)
+	db.createFunction('getMediaIds', getMediaIds)
 	return db
 }
 
