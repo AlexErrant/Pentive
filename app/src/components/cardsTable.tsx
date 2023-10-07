@@ -281,24 +281,22 @@ const dataSource = {
 				const end = performance.now()
 				console.log(`GetCards ${end - start} ms`, search)
 				const countish = x.noteCards.length
-				p.successCallback(x.noteCards)
+				const countishWrong = countish === cacheBlockSize
+				p.successCallback(x.noteCards, countishWrong ? undefined : countish)
 				if (countish === 0) {
 					gridRef.api.showNoRowsOverlay()
 				} else {
 					gridRef.api.hideOverlay()
 				}
 				setColumnDefs(ftsSearchActual, regex())
-				if (
-					gridRef.api.isLastRowIndexKnown() !== true &&
-					countish >= cacheBlockSize
-				) {
+				if (countishWrong && gridRef.api.isLastRowIndexKnown() !== true) {
 					const start = performance.now()
 					const count = await db.getCardsCount(x.searchCache, x.baseQuery)
 					const end = performance.now()
 					console.log(`Count took ${end - start} ms`, search)
 					p.successCallback(x.noteCards, count.c)
 				}
-				if (x.searchCache == null) {
+				if (countishWrong && x.searchCache == null) {
 					// asynchronously/nonblockingly build the cache
 					db.buildCache(x.baseQuery, search).catch((e) => {
 						toastWarn('Error building cache', e)
