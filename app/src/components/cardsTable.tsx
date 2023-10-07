@@ -276,6 +276,7 @@ const dataSource = {
 		}
 		const start = performance.now()
 		db.getCards(p.startRow, cacheBlockSize, sort, search) // medTODO could just cache the Template and mutate the NoteCard obj to add it
+			// eslint-disable-next-line solid/reactivity -- none of this is reacitve
 			.then(async (x) => {
 				const end = performance.now()
 				console.log(`GetCards ${end - start} ms`, search)
@@ -286,54 +287,7 @@ const dataSource = {
 				} else {
 					gridRef.api.hideOverlay()
 				}
-				if (
-					ftsSearchActual !== '' &&
-					gridRef.api.getColumnDef('Search') == null
-				) {
-					gridRef.api.setColumnDefs([
-						{
-							headerName: 'Search',
-							pinned: 'left',
-							colId: 'Search',
-							cellRenderer: (props: ICellRendererParams<NoteCard>) => {
-								const [match, setMatch] = createSignal<RegExpExecArray>()
-								createEffect(() => {
-									for (const v of props.data?.note.fieldValues.values() ?? []) {
-										const r = minifyAndExec(toOneLine(v), regex())
-										if (r != null) {
-											setMatch(r)
-											return
-										}
-									}
-									for (const v of props.data?.note.fieldValues.values() ?? []) {
-										const r = minifyAndExec(v, regex())
-										if (r != null) {
-											setMatch(r)
-											return
-										}
-									}
-								})
-								return (
-									<Show when={match()}>
-										<span>{match()?.groups?.left ?? ''}</span>
-										<mark>
-											{/* use the match's casing - not the search's (firstWord) */}
-											{match()?.groups?.searchWord ??
-												toastImpossible('searchWord is missing')}
-										</mark>
-										<span>{match()?.groups?.right ?? ''}</span>
-									</Show>
-								)
-							},
-						} satisfies ColDef<NoteCard>,
-						...columnDefs,
-					])
-				} else if (
-					ftsSearchActual === '' &&
-					gridRef.api.getColumnDef('Search') != null
-				) {
-					gridRef.api.setColumnDefs(columnDefs)
-				}
+				setColumnDefs(ftsSearchActual, regex())
 				if (
 					gridRef.api.isLastRowIndexKnown() !== true &&
 					countish >= cacheBlockSize
@@ -361,4 +315,52 @@ const dataSource = {
 function minifyAndExec(value: string, regex: RegExp) {
 	const minified = value.replace(/\s+/g, ' ')
 	return regex.exec(minified)
+}
+
+function setColumnDefs(ftsSearchActual: string, regex: RegExp) {
+	if (ftsSearchActual !== '' && gridRef.api.getColumnDef('Search') == null) {
+		gridRef.api.setColumnDefs([
+			{
+				headerName: 'Search',
+				pinned: 'left',
+				colId: 'Search',
+				cellRenderer: (props: ICellRendererParams<NoteCard>) => {
+					const [match, setMatch] = createSignal<RegExpExecArray>()
+					createEffect(() => {
+						for (const v of props.data?.note.fieldValues.values() ?? []) {
+							const r = minifyAndExec(toOneLine(v), regex)
+							if (r != null) {
+								setMatch(r)
+								return
+							}
+						}
+						for (const v of props.data?.note.fieldValues.values() ?? []) {
+							const r = minifyAndExec(v, regex)
+							if (r != null) {
+								setMatch(r)
+								return
+							}
+						}
+					})
+					return (
+						<Show when={match()}>
+							<span>{match()?.groups?.left ?? ''}</span>
+							<mark>
+								{/* use the match's casing - not the search's (firstWord) */}
+								{match()?.groups?.searchWord ??
+									toastImpossible('searchWord is missing')}
+							</mark>
+							<span>{match()?.groups?.right ?? ''}</span>
+						</Show>
+					)
+				},
+			} satisfies ColDef<NoteCard>,
+			...columnDefs,
+		])
+	} else if (
+		ftsSearchActual === '' &&
+		gridRef.api.getColumnDef('Search') != null
+	) {
+		gridRef.api.setColumnDefs(columnDefs)
+	}
 }
