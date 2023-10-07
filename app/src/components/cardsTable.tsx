@@ -24,7 +24,7 @@ import { assertNever } from 'shared'
 import { agGridTheme } from '../globalState'
 import { Upload, escapeRegExp } from 'shared-dom'
 import { C } from '../pluginManager'
-import { toastError, toastImpossible } from './toasts'
+import { toastError, toastImpossible, toastWarn } from './toasts'
 import FiltersTable from './filtersTable'
 import './cardsTable.css'
 import { type SearchParams } from '../sqlite/card'
@@ -276,11 +276,12 @@ const dataSource = {
 		}
 		const start = performance.now()
 		db.getCards(p.startRow, cacheBlockSize, sort, search) // medTODO could just cache the Template and mutate the NoteCard obj to add it
-			.then((x) => {
+			.then(async (x) => {
 				const end = performance.now()
 				console.log(`GetCards ${end - start} ms`, search)
-				p.successCallback(x.noteCards, x.count)
-				if (x.count === 0) {
+				const countish = x.noteCards.length
+				p.successCallback(x.noteCards)
+				if (countish === 0) {
 					gridRef.api.showNoRowsOverlay()
 				} else {
 					gridRef.api.hideOverlay()
@@ -332,6 +333,22 @@ const dataSource = {
 					gridRef.api.getColumnDef('Search') != null
 				) {
 					gridRef.api.setColumnDefs(columnDefs)
+				}
+				if (
+					gridRef.api.isLastRowIndexKnown() !== true &&
+					countish >= cacheBlockSize
+				) {
+					const start = performance.now()
+					const count = await db.getCardsCount(x.searchCache, x.baseQuery)
+					const end = performance.now()
+					console.log(`Count took ${end - start} ms`, search)
+					p.successCallback(x.noteCards, count.c)
+				}
+				if (x.searchCache == null) {
+					// asynchronously/nonblockingly build the cache
+					db.buildCache(x.baseQuery, search).catch((e) => {
+						toastWarn('Error building cache', e)
+					})
 				}
 			})
 			.catch((e) => {

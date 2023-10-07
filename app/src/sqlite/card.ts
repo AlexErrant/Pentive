@@ -22,7 +22,7 @@ import {
 import _ from 'lodash'
 import { entityToDomain as templateEntityToDomain } from './template'
 import { entityToDomain as noteEntityToDomain } from './note'
-import { toastImpossible, toastInfo, toastWarn } from '../components/toasts'
+import { toastImpossible, toastInfo } from '../components/toasts'
 import { parseTags, stringifyTags } from './tag'
 import { md5 } from '../domain/utility'
 
@@ -145,10 +145,10 @@ type WithCache = {
 // 2. Deferred joins. https://planetscale.com/learn/courses/mysql-for-developers/examples/deferred-joins https://aaronfrancis.com/2022/efficient-pagination-using-deferred-joins
 //    They're ~2x faster than a normal limit+offset if including a FTS search criteria, but that's still not fast enough. Maybe FTS doesn't count as a covering index.
 async function buildCache(
-	db: Kysely<DB & WithCache>,
 	baseQuery: SelectQueryBuilder<DB, 'card' | 'note', Partial<unknown>>,
 	search?: SearchParams,
 ) {
+	const db = await getKysely()
 	// const start = performance.now()
 	const cacheName = ('getCardsCache_' +
 		// lowTODO find a better way to name the cache table. Don't use crypto.subtle.digest - it's ~200ms which is absurd
@@ -175,7 +175,7 @@ async function buildCache(
 		await (
 			await db
 		).exec(
-			`CREATE TEMP TABLE ${cacheName} AS ` + sql,
+			`CREATE TEMP TABLE IF NOT EXISTS ${cacheName} AS ` + sql,
 			parameters as SQLiteCompatibleType[],
 		)
 		const end = performance.now()
@@ -187,6 +187,7 @@ async function buildCache(
 	}
 	return cacheName
 }
+
 export interface SearchParams {
 	literalSearch?: string
 	ftsSearch?: string
@@ -194,12 +195,33 @@ export interface SearchParams {
 	templateSearch?: TemplateId[]
 }
 
+async function getCardsCount(
+	searchCache: SearchCache | null,
+	baseQuery: SelectQueryBuilder<
+		DB & WithCache,
+		'card' | 'note',
+		Partial<unknown>
+	>,
+) {
+	const db = (await getKysely()).withTables<WithCache>()
+	const count =
+		searchCache != null
+			? db
+					.selectFrom(searchCache)
+					.select(db.fn.max(`${searchCache}.rowid`).as('c'))
+					.executeTakeFirstOrThrow()
+			: baseQuery
+					.select(db.fn.countAll<number>().as('c'))
+					.executeTakeFirstOrThrow()
+	return await count
+}
+
 async function getCards(
 	offset: number,
 	limit: number,
 	sort?: { col: 'card.due' | 'card.created'; direction: 'asc' | 'desc' },
 	search?: SearchParams,
-): Promise<{ count: number; noteCards: NoteCard[] }> {
+) {
 	const db = (await getKysely()).withTables<WithCache>()
 	const baseQuery = db
 		.selectFrom('card')
@@ -265,7 +287,7 @@ async function getCards(
 		)
 	const searchCache =
 		// If user has scrolled, build/use the cache.
-		offset === 0 ? null : await buildCache(db, baseQuery, search)
+		offset === 0 ? null : await buildCache(baseQuery, search)
 	const entities = baseQuery
 		.$if(searchCache != null, (qb) =>
 			qb
@@ -313,17 +335,9 @@ async function getCards(
 		])
 		.limit(limit)
 		.execute()
-	const count =
-		searchCache != null
-			? db
-					.selectFrom(searchCache)
-					.select(db.fn.max(`${searchCache}.rowid`).as('c'))
-					.executeTakeFirstOrThrow()
-			: baseQuery
-					.select(db.fn.countAll<number>().as('c'))
-					.executeTakeFirstOrThrow()
 	const r = {
-		count: (await count).c,
+		searchCache,
+		baseQuery,
 		noteCards: Array.from(
 			groupByToMap(await entities, (x) => x.card_id).values(),
 		).map((tncR) => {
@@ -383,12 +397,6 @@ async function getCards(
 			return r
 		}),
 	}
-	if (searchCache == null) {
-		// asynchronously/nonblockingly build the cache
-		buildCache(db, baseQuery, search).catch((e) => {
-			toastWarn('Error building cache', e)
-		})
-	}
 	return r
 }
 
@@ -435,4 +443,6 @@ export const cardCollectionMethods = {
 		return cards.map(entityToDomain)
 	},
 	getCards,
+	getCardsCount,
+	buildCache,
 }
