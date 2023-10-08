@@ -6,6 +6,7 @@ import {
 	type PluginExports,
 } from './services'
 import { db } from './db'
+import { createResource } from 'solid-js'
 
 async function registerPluginService(
 	c: Container,
@@ -41,6 +42,14 @@ export async function registerPluginServices(plugins: Plugin[]) {
 	}, Promise.resolve(seed))
 }
 
-const plugins = await db.getPlugins()
+export async function aC() {
+	// const start = performance.now()
+	const plugins = await db.getPlugins()
+	const r = await registerPluginServices(plugins)
+	// const end = performance.now()
+	// console.log(`plugins took ${end - start} ms`) // takes ~200ms with an empty container - mostly due to initializing the database
+	return r
+}
 
-export const C = await registerPluginServices(plugins)
+// medTODO consider using a 'custom reconciling store' to make plugin loading fine-grained https://docs.solidjs.com/references/api-reference/basic-reactivity/createResource
+export const C = createResource(aC, { initialValue: defaultContainer })[0]

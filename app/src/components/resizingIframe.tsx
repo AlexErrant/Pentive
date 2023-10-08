@@ -10,7 +10,7 @@ import {
 } from 'shared'
 import { unwrap } from 'solid-js/store'
 import { db } from '../db'
-import { C } from '../pluginManager'
+import { aC } from '../pluginManager'
 import { toastError } from './toasts'
 import { debounce, leadingAndTrailing } from '@solid-primitives/scheduled'
 
@@ -42,8 +42,8 @@ async function getLocalMedia(id: MediaId): Promise<ArrayBuffer | null> {
 }
 
 export interface AppExpose {
-	renderTemplate: typeof C.renderTemplate
-	html: typeof C.html
+	renderTemplate: Awaited<ReturnType<typeof aC>>['renderTemplate']
+	html: Awaited<ReturnType<typeof aC>>['html']
 	getLocalMedia: typeof getLocalMedia
 	renderBodyInput: RenderBodyInput
 	resize: () => void
@@ -92,10 +92,11 @@ const ResizingIframe: VoidComponent<{
 		<iframe
 			class={props.class ?? 'w-full'}
 			ref={(x) => (iframeReference = x as IFrameComponent)}
-			onLoad={(e) => {
+			onLoad={async () => {
+				const c = await aC()
 				const appExpose: AppExpose = {
-					renderTemplate: (x) => C.renderTemplate(x), // do not eta-reduce. `C`'s `this` binding apparently doesn't work across Comlink
-					html: (x, y, z) => C.html(x, y, z), // do not eta-reduce. `C`'s `this` binding apparently doesn't work across Comlink
+					renderTemplate: (x) => c.renderTemplate(x), // do not eta-reduce. `c`'s `this` binding apparently doesn't work across Comlink
+					html: (x, y, z) => c.html(x, y, z), // do not eta-reduce. `c`'s `this` binding apparently doesn't work across Comlink
 					getLocalMedia,
 					renderBodyInput: unwrap(props.i),
 					resize: () => {
@@ -108,13 +109,13 @@ const ResizingIframe: VoidComponent<{
 					port: port1,
 				}
 				Comlink.expose(appExpose, port2)
-				e.currentTarget.contentWindow!.postMessage(comlinkInit, targetOrigin, [
+				iframeReference!.contentWindow!.postMessage(comlinkInit, targetOrigin, [
 					port1,
 				])
 				Comlink.expose(
 					appExpose,
 					Comlink.windowEndpoint(
-						e.currentTarget.contentWindow!,
+						iframeReference!.contentWindow!,
 						self,
 						targetOrigin,
 					),
@@ -128,7 +129,7 @@ const ResizingIframe: VoidComponent<{
 						checkOrigin: [import.meta.env.VITE_APP_UGC_ORIGIN],
 						heightCalculationMethod: 'max',
 					},
-					e.currentTarget,
+					iframeReference!,
 				)
 			}}
 			sandbox='allow-scripts allow-same-origin' // Changing this has security ramifications! https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe#attr-sandbox

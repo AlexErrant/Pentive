@@ -78,11 +78,7 @@ export default function Home(): JSX.Element {
 				</button>
 			</div>
 			<div class='flex items-center space-x-2'>
-				<C.examplePlugin
-					count={count()}
-					setCount={setCount}
-					child={MyPluginBaby}
-				/>
+				{C().examplePlugin({ count: count(), setCount, child: MyPluginBaby })}
 			</div>
 			<div class='mt-4'>
 				<button

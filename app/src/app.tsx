@@ -30,7 +30,7 @@ export default function App(): JSX.Element {
 				}}
 				src={import.meta.env.VITE_APP_UGC_ORIGIN}
 			/>
-			<C.nav navLinks={navLinks} />
+			{C().nav({ navLinks })}
 
 			<main class='contents'>
 				<Route />

@@ -88,7 +88,7 @@ const EditChildTemplate: VoidComponent<{
 		frontView?.destroy()
 		backView?.destroy()
 	})
-	const short = () => C.renderTemplate(props.template, true)[props.i]
+	const short = () => C().renderTemplate(props.template, true)[props.i]
 	return (
 		<fieldset class='border-black border p-2'>
 			<legend>
