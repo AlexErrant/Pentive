@@ -20,6 +20,10 @@ export default defineConfig(({ mode }: UserConfig) => {
 			// if we ever move off this plugin https://github.com/vitejs/vite/issues/2248
 			VitePWA({
 				strategies: 'injectManifest',
+				injectManifest: {
+					globPatterns: ['**/*.{js,css,html,ico,wasm}'],
+					maximumFileSizeToCacheInBytes: 999999999999999,
+				},
 				injectRegister: null,
 				srcDir: 'src',
 				filename: 'serviceWorker.ts',
