@@ -17,14 +17,15 @@ export default defineConfig(({ mode }: UserConfig) => {
 	return {
 		plugins: [
 			solidPlugin(),
+			// if we ever move off this plugin https://github.com/vitejs/vite/issues/2248
 			VitePWA({
-				strategies: 'generateSW',
-				workbox: {
-					globPatterns: ['**/*.{js,css,html,ico,wasm}'],
-					maximumFileSizeToCacheInBytes: 999999999999999,
-				},
+				strategies: 'injectManifest',
+				injectRegister: null,
 				srcDir: 'src',
-				filename: 'serviceWorker.js',
+				filename: 'serviceWorker.ts',
+				devOptions: {
+					enabled: mode === 'development',
+				},
 			}),
 			checker({
 				overlay: {
@@ -42,7 +43,7 @@ export default defineConfig(({ mode }: UserConfig) => {
 			},
 		},
 		build: {
-			target: 'esnext',
+			target: 'ES2022',
 			sourcemap: true,
 			rollupOptions: {
 				external: ['solid-js', 'solid-js/web', '@solidjs/router'],

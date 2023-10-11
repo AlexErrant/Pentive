@@ -15,7 +15,6 @@ import 'prosemirror-menu/style/menu.css'
 import 'prosemirror-example-setup/style/style.css'
 import { toOneLine, type MediaId } from 'shared'
 import { db } from '../db'
-import { blobToBase64 } from 'shared-dom'
 import { type NoteCardView } from '../pages/cards'
 import { type SetStoreFunction } from 'solid-js/store'
 import { type ImagePluginSettings } from 'prosemirror-image-plugin'
@@ -185,26 +184,28 @@ export const FieldEditor: VoidComponent<{
   Displaying the field's value verbatim doesn't display images in ProseMirror because the src won't resolve.
   Images are stored in the database, after all. There are a few solutions to this:
   
-  1. Prefix all <img> srcs with a well known value (e.g. `/media`) and use app's service worker to intercept all `/media` requests
-     Cons: Passing image through service worker is slow.
+  1. Prefix all <img> srcs with a well known value (`ugm/` - "user generated media") and use app's service worker to intercept all `ugm/` requests
   2. Put ProseMirror in an iframe and give it a dedicated service worker, similar to app-ugc
-     Cons: iframes are slow. Passing image through service worker, then iframe is doubly slow. Some complexity with iframe sizing and message passing through an iframe.
+     Cons: Complexity with iframe sizing.
   3. Rewrite all <img> srcs to use data URLs for display and convert back to the standard URL upon persistance
-     Cons: When ProseMirror sets an <img> src attribute in `serializeFragment`, it makes a network request, filling console with 404s
+     Cons: When ProseMirror sets an <img> src attribute in `serializeFragment`, it makes a network request, filling console with 404s.
+           Also can't use browser's cache, so we hit sqlite more.
 
-  I'm going with Option 3 for now due to speed of implementation and performance, but that might be something that I have to rewrite in the future.
+  I'm going with Option 1.
 */
 async function updateImgSrc(img: HTMLImageElement) {
 	const src = img.getAttribute('src')
-	if (src == null || src === '' || src.startsWith('http')) {
+	if (
+		src == null ||
+		src === '' ||
+		src.startsWith('http://') ||
+		src.startsWith('https://')
+	) {
 		// do nothing
 	} else {
 		const media = await db.getMedia(src as MediaId)
 		if (media == null) return
-		const type = src.endsWith('.svg') ? 'image/svg+xml' : 'image'
-		const blob = new Blob([media.data], { type })
-		const dataUrl = await blobToBase64(blob)
-		img.setAttribute('src', dataUrl)
+		img.setAttribute('src', 'ugm/' + src)
 		img.setAttribute('srcx', src)
 	}
 }
