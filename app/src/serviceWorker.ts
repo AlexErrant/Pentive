@@ -5,6 +5,9 @@ import type { MediaId } from 'shared'
 
 declare let self: ServiceWorkerGlobalScope
 
+// @ts-expect-error may want to toggle this on/off as needed
+self.__WB_DISABLE_DEV_LOGS = true
+
 cleanupOutdatedCaches()
 
 precacheAndRoute(self.__WB_MANIFEST)
