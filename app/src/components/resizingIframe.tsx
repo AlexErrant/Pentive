@@ -52,6 +52,7 @@ export interface AppExpose {
 const ResizingIframe: VoidComponent<{
 	readonly i: RenderBodyInput
 	class?: string
+	resize?: false
 }> = (props) => {
 	let iframeReference: IFrameComponent | undefined
 	onCleanup(() => {
@@ -94,14 +95,16 @@ const ResizingIframe: VoidComponent<{
 			ref={(x) => (iframeReference = x as IFrameComponent)}
 			onLoad={async () => {
 				const c = await aC()
+				const resize = () => {
+					if (props.resize === false) return
+					iframeReference?.iFrameResizer?.resize()
+				}
 				const appExpose: AppExpose = {
 					renderTemplate: (x) => c.renderTemplate(x), // do not eta-reduce. `c`'s `this` binding apparently doesn't work across Comlink
 					html: (x, y, z) => c.html(x, y, z), // do not eta-reduce. `c`'s `this` binding apparently doesn't work across Comlink
 					getLocalMedia,
 					renderBodyInput: unwrap(props.i),
-					resize: () => {
-						iframeReference?.iFrameResizer?.resize()
-					},
+					resize,
 				}
 				const { port1, port2 } = new MessageChannel()
 				const comlinkInit: ComlinkInit = {
@@ -120,21 +123,21 @@ const ResizingIframe: VoidComponent<{
 						targetOrigin,
 					),
 				)
-				iframeResizer(
-					{
-						// log: true,
+				if (props.resize == null) {
+					iframeResizer(
+						{
+							// log: true,
 
-						// If perf becomes an issue consider debouncing https://github.com/davidjbradshaw/iframe-resizer/issues/816
+							// If perf becomes an issue consider debouncing https://github.com/davidjbradshaw/iframe-resizer/issues/816
 
-						checkOrigin: [import.meta.env.VITE_APP_UGC_ORIGIN],
-					},
-					iframeReference!,
-				)
-				new IntersectionObserver( // Resize when the iframe becomes visible, e.g. after the "Add Template" tab is clicked when we're looking at another tab. The resizing script behaves poorly when the iframe isn't visible.
-					() => iframeReference?.iFrameResizer?.resize(),
-				).observe(iframeReference!)
+							checkOrigin: [import.meta.env.VITE_APP_UGC_ORIGIN],
+						},
+						iframeReference!,
+					)
+				}
+				new IntersectionObserver(resize).observe(iframeReference!) // Resize when the iframe becomes visible, e.g. after the "Add Template" tab is clicked when we're looking at another tab. The resizing script behaves poorly when the iframe isn't visible.
 				debouncePostMessage()
-				iframeReference!.iFrameResizer?.resize()
+				resize()
 			}}
 			sandbox='allow-scripts allow-same-origin' // Changing this has security ramifications! https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe#attr-sandbox
 			// "When the embedded document has the same origin as the embedding page, it is strongly discouraged to use both allow-scripts and allow-same-origin"
