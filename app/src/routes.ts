@@ -8,6 +8,7 @@ import TemplatesData from './pages/templates.data'
 import { type NavLinkData } from './components/contracts'
 import { Upload } from './components/upload'
 import SettingsData from './pages/settings.data'
+import StudyData from './pages/study.data'
 
 export const navLinks: NavLinkData[] = [
 	{
@@ -33,6 +34,10 @@ export const navLinks: NavLinkData[] = [
 	{
 		child: 'Settings',
 		href: '/settings',
+	},
+	{
+		child: 'Study',
+		href: '/study',
 	},
 	{
 		child: Upload,
@@ -72,6 +77,11 @@ export const routes: RouteDefinition[] = [
 		path: '/settings',
 		component: lazy(async () => await import('./pages/settings')),
 		data: SettingsData,
+	},
+	{
+		path: '/study',
+		component: lazy(async () => await import('./pages/study')),
+		data: StudyData,
 	},
 	{
 		path: '/sync',
