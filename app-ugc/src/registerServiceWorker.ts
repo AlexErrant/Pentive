@@ -46,9 +46,8 @@ if ('serviceWorker' in navigator) {
 		}
 	})
 } else {
-	alert(
-		"Your browser doesn't support Service Workers. Pentive won't work properly without them.",
-	)
+	// unnecessary due to 7A0559B7-44B3-4674-B71C-100DAA30D45C
+	// alert("Your browser doesn't support Service Workers. Pentive won't work properly without them.")
 }
 
 function firstServiceWorkerInstall(sw: ServiceWorker): void {
