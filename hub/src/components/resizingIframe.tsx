@@ -69,7 +69,6 @@ const ResizingIframe: VoidComponent<{
 						// If perf becomes an issue consider debouncing https://github.com/davidjbradshaw/iframe-resizer/issues/816
 
 						checkOrigin: [import.meta.env.VITE_HUB_UGC_ORIGIN],
-						heightCalculationMethod: 'max',
 					},
 					e.currentTarget,
 				)
