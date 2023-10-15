@@ -131,6 +131,9 @@ const ResizingIframe: VoidComponent<{
 					},
 					iframeReference!,
 				)
+				new IntersectionObserver( // Resize when the iframe becomes visible, e.g. after the "Add Template" tab is clicked when we're looking at another tab. The resizing script behaves poorly when the iframe isn't visible.
+					() => iframeReference?.iFrameResizer?.resize(),
+				).observe(iframeReference!)
 				debouncePostMessage()
 				iframeReference!.iFrameResizer?.resize()
 			}}
