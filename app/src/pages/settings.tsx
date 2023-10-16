@@ -1,5 +1,5 @@
 import { createStore } from 'solid-js/store'
-import { type JSX, Show, onMount, For } from 'solid-js'
+import { type JSX, Show, onMount, For, createEffect } from 'solid-js'
 import type SettingsData from './settings.data'
 import { useRouteData } from '@solidjs/router'
 import {
@@ -16,7 +16,10 @@ import { ulidAsBase64Url } from '../domain/utility'
 export default function Settings(): JSX.Element {
 	const initialSettings = useRouteData<typeof SettingsData>()
 	const [settings, setSettings] = createStore({
-		cardSettings: initialSettings.cardSettings(),
+		cardSettings: [] as CardSetting[],
+	})
+	createEffect(() => {
+		setSettings({ cardSettings: initialSettings.cardSettings() })
 	})
 	const [selected, setSelected] = createStore<{ setting?: CardSetting }>({})
 	let glRoot: HTMLDivElement
