@@ -9,7 +9,7 @@ export default function Study(): JSX.Element {
 	const [side, setSide] = createSignal<'front' | 'back'>('front')
 	const noteCard = () => studyData.cardStudy()?.noteCards.at(i())
 	return (
-		<>
+		<div class='flex h-full flex-col'>
 			<Suspense fallback={'Loading...'}>
 				<Show when={noteCard()} fallback={'No cards!'}>
 					<ResizingIframe
@@ -21,19 +21,11 @@ export default function Study(): JSX.Element {
 							template: noteCard()!.template,
 						}}
 						resize={false}
-						class='h-full overflow-y-scroll'
+						class='h-full flex-1 overflow-auto'
 					/>
 				</Show>
 			</Suspense>
-			<div
-				class='bg-gray-200 flex flex-row items-center justify-center'
-				style={{
-					position: 'fixed',
-					bottom: '0',
-					left: '0',
-					right: '0',
-				}}
-			>
+			<div class='bg-gray-200 flex flex-row items-center justify-center'>
 				<button
 					onClick={() => {
 						if (side() === 'front') {
@@ -49,6 +41,6 @@ export default function Study(): JSX.Element {
 					Next
 				</button>
 			</div>
-		</>
+		</div>
 	)
 }
