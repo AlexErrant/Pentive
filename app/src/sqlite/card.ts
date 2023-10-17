@@ -25,6 +25,7 @@ import { entityToDomain as noteEntityToDomain } from './note'
 import { toastImpossible, toastInfo } from '../components/toasts'
 import { parseTags, stringifyTags } from './tag'
 import { md5 } from '../domain/utility'
+import { C } from '~/pluginManager'
 
 function serializeState(s: State): number {
 	switch (s) {
@@ -60,7 +61,7 @@ function deserializeState(s: number | null): State | undefined {
 
 function cardToDocType(card: Card): InsertObject<DB, 'card'> {
 	const { id, noteId, due, ord, tags, cardSettingId, state } = card
-	const now = new Date().getTime()
+	const now = C.getDate().getTime()
 	return {
 		id,
 		noteId,

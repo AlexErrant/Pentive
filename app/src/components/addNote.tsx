@@ -25,7 +25,7 @@ import { CardsPreview } from '../components/cardsPreview'
 import { db } from '../db'
 
 function toView(template: Template): NoteCardView {
-	const now = new Date()
+	const now = C.getDate()
 	const note: NoteCardView['note'] = {
 		id: ulidAsBase64Url() as NoteId,
 		templateId: template.id,
@@ -67,7 +67,7 @@ export default function AddNote() {
 				const template = wip.noteCard?.template
 				if (note != null && template != null) {
 					const ords = C.noteOrds(toNote(note), template)
-					const now = new Date()
+					const now = C.getDate()
 					const cards = ords.map((ord) => {
 						return {
 							id: ulidAsBase64Url() as CardId,

@@ -45,6 +45,7 @@ import { db } from './../../db'
 import _ from 'lodash'
 import sqliteUrl from '../../assets/sql-wasm.wasm?url'
 import { toastFatal, toastImpossible, toastInfo } from '../../components/toasts'
+import { C } from '~/pluginManager'
 
 export async function importAnki(
 	event: Event & {
@@ -101,7 +102,7 @@ async function addMediaBatch(
 					"Impossible since we're using `getEntries` https://github.com/gildas-lormeau/zip.js/issues/371",
 				)
 			const name = nameByI[entry.filename]
-			const now = new Date()
+			const now = C.getDate()
 			return name == null // occurs for entries that aren't media, e.g. collection.anki2
 				? null
 				: {

@@ -3,6 +3,7 @@ import PluginsTable from '../components/pluginsTable'
 import { db } from '../db'
 import { parsePluginNpmPackage } from 'shared-dom'
 import { toastImpossible, toastInfo } from '../components/toasts'
+import { C } from '~/pluginManager'
 
 export default function Plugins(): JSX.Element {
 	return (
@@ -30,10 +31,11 @@ async function importPlugin(
 		event.target.files?.item(0) ??
 		toastImpossible('There should be a file selected')
 	const plugin = await parsePluginNpmPackage(pluginTgz)
+	const now = C.getDate()
 	await db.upsertPlugin({
 		...plugin,
-		created: new Date(),
-		updated: new Date(),
+		created: now,
+		updated: now,
 	})
 	toastInfo('Plugin upserted!')
 }

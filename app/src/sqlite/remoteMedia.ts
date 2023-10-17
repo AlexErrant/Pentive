@@ -1,6 +1,7 @@
 import { type Base64Url, type LDbId, type RemoteMediaNum } from 'shared'
 import { getKysely } from './crsqlite'
 import { toastFatal } from '../components/toasts'
+import { C } from '~/pluginManager'
 
 export const remoteMediaCollectionMethods = {
 	updateUploadDate: async function (
@@ -10,7 +11,7 @@ export const remoteMediaCollectionMethods = {
 		for (const [localEntityId, , i] of ids) {
 			const r = await db
 				.updateTable('remoteMedia')
-				.set({ uploadDate: new Date().getTime() })
+				.set({ uploadDate: C.getDate().getTime() })
 				.where('localEntityId', '=', localEntityId as LDbId)
 				.where('i', '=', i)
 				.returningAll()

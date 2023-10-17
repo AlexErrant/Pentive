@@ -15,7 +15,10 @@
 		"lib": ["WebWorker", "DOM", "ES2021.String", "ES2021"],
 		"composite": true,
 		"declaration": true,
-		"outDir": "dist"
+		"outDir": "dist",
+		"paths": {
+			"~/*": ["./src/*"]
+		}
 	},
 	"references": [
 		{

@@ -24,17 +24,18 @@ export const appExpose = {
 	addTemplate: async (rt: RemoteTemplate) => {
 		const serializer = new XMLSerializer()
 		const k = await getKysely()
+		const now = C.getDate()
 		await k.transaction().execute(async (trx) => {
 			const template: Template = {
 				id: rt.id,
 				name: rt.name,
 				css: rt.css,
-				created: new Date(),
-				updated: new Date(),
+				created: now,
+				updated: now,
 				templateType: rt.templateType,
 				fields: rt.fields.map((name) => ({ name })),
 				remotes: {
-					[rt.nook]: { remoteTemplateId: rt.id, uploadDate: new Date() },
+					[rt.nook]: { remoteTemplateId: rt.id, uploadDate: now },
 				},
 			}
 			const dp = new DOMParser()
@@ -62,6 +63,7 @@ export const appExpose = {
 	},
 	addNote: async (rn: RemoteNote, nook: NookId) => {
 		const k = await getKysely()
+		const now = C.getDate()
 		await k.transaction().execute(async (trx) => {
 			const template =
 				(await db.getTemplateIdByRemoteId(rn.templateId, trx)) ??
@@ -74,15 +76,12 @@ export const appExpose = {
 				updated: rn.updated,
 				tags: new Set(rn.tags),
 				fieldValues: rn.fieldValues,
-				remotes: new Map([
-					[nook, { remoteNoteId: rn.id, uploadDate: new Date() }],
-				]),
+				remotes: new Map([[nook, { remoteNoteId: rn.id, uploadDate: now }]]),
 			}
 			await downloadImages(getNoteImages(n.fieldValues, new DOMParser()), trx)
 			await db.upsertNote(n, trx)
 			const ords = noteOrds.bind(C)(n, template)
 			const cards = ords.map((i) => {
-				const now = new Date()
 				const card: Card = {
 					id: ulidAsBase64Url() as CardId,
 					ord: i,
@@ -152,7 +151,7 @@ async function downloadImages(
 		Array.from(imgSrcs).map(async ([id, imgSrc]) => {
 			const response = await fetch(imgSrc)
 			if (response.status === 200) {
-				const now = new Date()
+				const now = C.getDate()
 				await db.insertMediaTrx(
 					{
 						id,

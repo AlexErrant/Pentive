@@ -58,6 +58,12 @@ export default defineConfig(({ mode }: UserConfig) => {
 				},
 			},
 		},
+		resolve: {
+			alias: {
+				// eslint-disable-next-line @typescript-eslint/naming-convention
+				'~': resolve(__dirname, './src'),
+			},
+		},
 		server: {
 			port: 3013,
 			strictPort: true,

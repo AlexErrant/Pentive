@@ -12,6 +12,7 @@ import { toastFatal } from './toasts'
 import FieldHtmlEditor from './fieldHtmlEditor'
 import { ToggleButton } from '@kobalte/core'
 import { ChevronDown, Code, Quote } from 'shared-dom'
+import { C } from '~/pluginManager'
 
 export const FieldsEditor: VoidComponent<{
 	readonly noteCard: NoteCardView
@@ -76,7 +77,7 @@ async function mutate(img: HTMLImageElement, trx: Transaction<DB>) {
 	if (src == null || src === '') {
 		// do nothing
 	} else if (src.startsWith('data:')) {
-		const now = new Date()
+		const now = C.getDate()
 		const data = await (await fetch(src)).arrayBuffer()
 		const id = ulidAsBase64Url() as string as MediaId
 		await db.insertMediaTrx(

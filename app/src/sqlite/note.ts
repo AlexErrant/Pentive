@@ -24,9 +24,10 @@ import {
 	toastWarn,
 } from '../components/toasts'
 import { parseTags, stringifyTags, unitSeparator } from './tag'
+import { C } from '~/pluginManager'
 
 function noteToDocType(note: Note): InsertObject<DB, 'note'> {
-	const now = new Date().getTime()
+	const now = C.getDate().getTime()
 	const r: InsertObject<DB, 'note'> = {
 		id: note.id,
 		templateId: note.templateId,
@@ -411,7 +412,7 @@ export const noteCollectionMethods = {
 		for (const [[noteId, nook], remoteId] of remoteIdByLocal) {
 			const r = await db
 				.updateTable('remoteNote')
-				.set({ remoteId, uploadDate: new Date().getTime() })
+				.set({ remoteId, uploadDate: C.getDate().getTime() })
 				.where('nook', '=', nook)
 				.where('localId', '=', noteId)
 				.returningAll()
@@ -426,7 +427,7 @@ export const noteCollectionMethods = {
 		const db = await getKysely()
 		const r = await db
 			.updateTable('remoteNote')
-			.set({ uploadDate: new Date().getTime() })
+			.set({ uploadDate: C.getDate().getTime() })
 			.where('remoteId', 'in', remoteNoteIds)
 			.returningAll()
 			.execute()

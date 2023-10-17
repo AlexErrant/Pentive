@@ -30,9 +30,10 @@ import {
 } from 'kysely'
 import { updateLocalMediaIdByRemoteMediaIdAndGetNewDoc } from './note'
 import { toastFatal, toastImpossible, toastWarn } from '../components/toasts'
+import { C } from '~/pluginManager'
 
 function templateToDocType(template: Template) {
-	const now = new Date().getTime()
+	const now = C.getDate().getTime()
 	const insertTemplate: InsertObject<DB, 'template'> = {
 		id: template.id,
 		name: template.name,
@@ -404,10 +405,11 @@ export const templateCollectionMethods = {
 		remoteIdByLocal: Map<readonly [TemplateId, NookId], RemoteTemplateId>,
 	) {
 		const db = await getKysely()
+		const now = C.getDate().getTime()
 		for (const [[templateId, nook], remoteId] of remoteIdByLocal) {
 			const r = await db
 				.updateTable('remoteTemplate')
-				.set({ remoteId, uploadDate: new Date().getTime() })
+				.set({ remoteId, uploadDate: now })
 				.where('nook', '=', nook)
 				.where('localId', '=', templateId)
 				.returningAll()
@@ -422,7 +424,7 @@ export const templateCollectionMethods = {
 		const db = await getKysely()
 		const r = await db
 			.updateTable('remoteTemplate')
-			.set({ uploadDate: new Date().getTime() })
+			.set({ uploadDate: C.getDate().getTime() })
 			.where('remoteId', 'in', remoteTemplateIds)
 			.returningAll()
 			.execute()
