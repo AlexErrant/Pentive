@@ -93,8 +93,7 @@ const ResizingIframe: VoidComponent<{
 		<iframe
 			class={props.class ?? 'w-full'}
 			ref={(x) => (iframeReference = x as IFrameComponent)}
-			onLoad={async () => {
-				const c = await aC()
+			onLoad={() => {
 				const resize = () => {
 					if (props.resize === false) return
 					iframeReference?.iFrameResizer?.resize()
@@ -112,13 +111,13 @@ const ResizingIframe: VoidComponent<{
 					port: port1,
 				}
 				Comlink.expose(appExpose, port2)
-				e.currentTarget.contentWindow!.postMessage(comlinkInit, targetOrigin, [
+				iframeReference!.contentWindow!.postMessage(comlinkInit, targetOrigin, [
 					port1,
 				])
 				Comlink.expose(
 					appExpose,
 					Comlink.windowEndpoint(
-						e.currentTarget.contentWindow!,
+						iframeReference!.contentWindow!,
 						self,
 						targetOrigin,
 					),
