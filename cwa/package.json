@@ -12,8 +12,8 @@
 	"scripts": {
 		"start": "wrangler dev",
 		"dev": "wrangler dev",
-		"deploy": "wrangler publish",
-		"build": "wrangler publish ./src/index.ts --dry-run --outdir dist",
+		"deploy": "wrangler deploy",
+		"build": "wrangler deploy ./src/index.ts --dry-run --outdir dist",
 		"tsc-build": "tsc --build",
 		"format:check": "prettier --ignore-path .gitignore --check .",
 		"format": "prettier --ignore-path .gitignore --write .",

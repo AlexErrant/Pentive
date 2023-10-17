@@ -4,7 +4,7 @@
 		"dev": "solid-start dev",
 		"build": "solid-start build",
 		"start": "solid-start start",
-		"deploy": "wrangler publish",
+		"deploy": "wrangler deploy",
 		"tsc-build": "tsc --build",
 		"eslint": "eslint . --ignore-path .gitignore",
 		"eslint:fix": "eslint . --fix --ignore-path .gitignore",
