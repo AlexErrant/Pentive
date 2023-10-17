@@ -56,7 +56,7 @@ const columnDefs: Array<ColDef<NoteCard>> = [
 		headerName: 'Short Front',
 		valueGetter: (x) => {
 			if (x.data != null) {
-				return C().body(x.data.card, x.data.note, x.data.template, true)?.at(0)
+				return C.body(x.data.card, x.data.note, x.data.template, true)?.at(0)
 			}
 		},
 	},
@@ -64,7 +64,7 @@ const columnDefs: Array<ColDef<NoteCard>> = [
 		headerName: 'Short Back',
 		valueGetter: (x) => {
 			if (x.data != null) {
-				return C().body(x.data.card, x.data.note, x.data.template, true)?.at(1)
+				return C.body(x.data.card, x.data.note, x.data.template, true)?.at(1)
 			}
 		},
 	},

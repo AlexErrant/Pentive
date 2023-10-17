@@ -66,7 +66,7 @@ export default function AddNote() {
 				const note = wip.noteCard?.note
 				const template = wip.noteCard?.template
 				if (note != null && template != null) {
-					const ords = C().noteOrds(toNote(note), template)
+					const ords = C.noteOrds(toNote(note), template)
 					const now = new Date()
 					const cards = ords.map((ord) => {
 						return {

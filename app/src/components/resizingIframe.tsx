@@ -10,7 +10,7 @@ import {
 } from 'shared'
 import { unwrap } from 'solid-js/store'
 import { db } from '../db'
-import { aC } from '../pluginManager'
+import { C } from '../pluginManager'
 import { toastError } from './toasts'
 import { debounce, leadingAndTrailing } from '@solid-primitives/scheduled'
 
@@ -42,8 +42,8 @@ async function getLocalMedia(id: MediaId): Promise<ArrayBuffer | null> {
 }
 
 export interface AppExpose {
-	renderTemplate: Awaited<ReturnType<typeof aC>>['renderTemplate']
-	html: Awaited<ReturnType<typeof aC>>['html']
+	renderTemplate: typeof C.renderTemplate
+	html: typeof C.html
 	getLocalMedia: typeof getLocalMedia
 	renderBodyInput: RenderBodyInput
 	resize: () => void
@@ -100,8 +100,8 @@ const ResizingIframe: VoidComponent<{
 					iframeReference?.iFrameResizer?.resize()
 				}
 				const appExpose: AppExpose = {
-					renderTemplate: (x) => c.renderTemplate(x), // do not eta-reduce. `c`'s `this` binding apparently doesn't work across Comlink
-					html: (x, y, z) => c.html(x, y, z), // do not eta-reduce. `c`'s `this` binding apparently doesn't work across Comlink
+					renderTemplate: (x) => C.renderTemplate(x), // do not eta-reduce. `C`'s `this` binding apparently doesn't work across Comlink
+					html: (x, y, z) => C.html(x, y, z), // do not eta-reduce. `C`'s `this` binding apparently doesn't work across Comlink
 					getLocalMedia,
 					renderBodyInput: unwrap(props.i),
 					resize,
@@ -112,13 +112,13 @@ const ResizingIframe: VoidComponent<{
 					port: port1,
 				}
 				Comlink.expose(appExpose, port2)
-				iframeReference!.contentWindow!.postMessage(comlinkInit, targetOrigin, [
+				e.currentTarget.contentWindow!.postMessage(comlinkInit, targetOrigin, [
 					port1,
 				])
 				Comlink.expose(
 					appExpose,
 					Comlink.windowEndpoint(
-						iframeReference!.contentWindow!,
+						e.currentTarget.contentWindow!,
 						self,
 						targetOrigin,
 					),

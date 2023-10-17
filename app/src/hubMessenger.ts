@@ -17,7 +17,7 @@ import { getKysely } from './sqlite/crsqlite'
 import { type Transaction } from 'kysely'
 import { type DB } from './sqlite/database'
 import { noteOrds } from 'shared-dom'
-import { aC } from './pluginManager'
+import { C } from './pluginManager'
 import { toastFatal } from './components/toasts'
 
 export const appExpose = {
@@ -80,8 +80,7 @@ export const appExpose = {
 			}
 			await downloadImages(getNoteImages(n.fieldValues, new DOMParser()), trx)
 			await db.upsertNote(n, trx)
-			const c = await aC()
-			const ords = noteOrds.bind(c)(n, template)
+			const ords = noteOrds.bind(C)(n, template)
 			const cards = ords.map((i) => {
 				const now = new Date()
 				const card: Card = {

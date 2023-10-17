@@ -131,7 +131,7 @@ export default function Templates(): JSX.Element {
 				render(
 					() => (
 						<Show when={selected.template != null}>
-							<For each={C().templateIndexes(selected.template!)}>
+							<For each={C.templateIndexes(selected.template!)}>
 								{(index) => (
 									<>
 										<ResizingIframe
