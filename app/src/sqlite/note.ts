@@ -15,7 +15,6 @@ import { getKysely } from './crsqlite'
 import { type DB, type Note as NoteEntity, type RemoteNote } from './database'
 import { type InsertObject, type Kysely } from 'kysely'
 import _ from 'lodash'
-import { parseFields as parseTemplateFields } from './template'
 import {
 	toastFatal,
 	toastImpossible,
@@ -24,7 +23,10 @@ import {
 } from '../components/toasts'
 import { parseTags, stringifyTags } from './tag'
 import { C } from '../topLevelAwait'
-import { updateLocalMediaIdByRemoteMediaIdAndGetNewDoc } from './util'
+import {
+	parseTemplateFields,
+	updateLocalMediaIdByRemoteMediaIdAndGetNewDoc,
+} from './util'
 
 function noteToDocType(note: Note): InsertObject<DB, 'note'> {
 	const now = C.getDate().getTime()

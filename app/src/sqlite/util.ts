@@ -1,4 +1,17 @@
-import { type MediaId, type RemoteMediaNum, imgPlaceholder } from 'shared'
+import {
+	type RemoteMediaNum,
+	type RemoteTemplateId,
+	type TemplateType,
+	type TemplateId,
+	type MediaId,
+	type Template,
+	imgPlaceholder,
+	type Field,
+} from 'shared'
+import {
+	type RemoteTemplate,
+	type Template as TemplateEntity,
+} from './database'
 import { toastImpossible } from '../components/toasts'
 
 export const unitSeparator = '\x1f' // if this changes, also change noteFtsTag's separator 89CDE7EA-EF1B-4054-B381-597EE549CAB4
@@ -39,4 +52,34 @@ export function updateLocalMediaIdByRemoteMediaIdAndGetNewDoc(
 		docs,
 		remoteMediaIdByLocal,
 	}
+}
+
+export const parseTemplateFields: (_: string) => Field[] = JSON.parse
+
+export function templateEntityToDomain(
+	template: TemplateEntity,
+	remotes: RemoteTemplate[],
+) {
+	const r: Template = {
+		id: template.id as TemplateId,
+		name: template.name,
+		created: new Date(template.created),
+		updated: new Date(template.updated),
+		fields: parseTemplateFields(template.fields),
+		css: template.css,
+		templateType: JSON.parse(template.templateType) as TemplateType,
+		remotes: Object.fromEntries(
+			remotes.map((r) => {
+				const value =
+					r.remoteId == null || r.uploadDate == null
+						? null
+						: {
+								remoteTemplateId: r.remoteId as RemoteTemplateId,
+								uploadDate: new Date(r.uploadDate),
+						  }
+				return [r.nook, value]
+			}),
+		),
+	}
+	return r
 }

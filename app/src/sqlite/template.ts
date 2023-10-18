@@ -4,12 +4,10 @@ import {
 	type CreateRemoteTemplate,
 	type EditRemoteTemplate,
 	type NookId,
-	type TemplateType,
 	notEmpty,
 	undefinedMap,
 	type TemplateId,
 	type MediaId,
-	type Field,
 	type Template,
 	objKeys,
 	objEntries,
@@ -28,7 +26,10 @@ import {
 	type Transaction,
 	type OnConflictTables,
 } from 'kysely'
-import { updateLocalMediaIdByRemoteMediaIdAndGetNewDoc } from './util'
+import {
+	templateEntityToDomain,
+	updateLocalMediaIdByRemoteMediaIdAndGetNewDoc,
+} from './util'
 import { toastFatal, toastImpossible, toastWarn } from '../components/toasts'
 import { C } from '../topLevelAwait'
 
@@ -52,36 +53,6 @@ function templateToDocType(template: Template) {
 		}),
 	)
 	return { insertTemplate, remoteTemplates }
-}
-
-export const parseFields: (_: string) => Field[] = JSON.parse
-
-export function templateEntityToDomain(
-	template: TemplateEntity,
-	remotes: RemoteTemplate[],
-) {
-	const r: Template = {
-		id: template.id as TemplateId,
-		name: template.name,
-		created: new Date(template.created),
-		updated: new Date(template.updated),
-		fields: parseFields(template.fields),
-		css: template.css,
-		templateType: JSON.parse(template.templateType) as TemplateType,
-		remotes: Object.fromEntries(
-			remotes.map((r) => {
-				const value =
-					r.remoteId == null || r.uploadDate == null
-						? null
-						: {
-								remoteTemplateId: r.remoteId as RemoteTemplateId,
-								uploadDate: new Date(r.uploadDate),
-						  }
-				return [r.nook, value]
-			}),
-		),
-	}
-	return r
 }
 
 function domainToCreateRemote(t: Template) {
