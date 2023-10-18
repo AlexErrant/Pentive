@@ -1,8 +1,8 @@
 import { getKysely } from './crsqlite'
-import { toastFatal, toastImpossible } from '../components/toasts'
+import { toastImpossible } from '../components/toasts'
 import { type Card, type Note } from './database'
 import { type NoteId } from 'shared'
-import { unitSeparator } from './util'
+import { stringifyTagsArray, unitSeparator } from './util'
 
 export const tagCollectionMethods = {
 	// This insanity with `noteFtsTagVocab` is to get properly cased tags.
@@ -64,23 +64,4 @@ export const tagCollectionMethods = {
 			.where('id', '=', noteId)
 			.execute()
 	},
-}
-
-function stringifyTagsArray(tags: string[]) {
-	for (const tag of tags) {
-		if (tag.includes(unitSeparator))
-			toastFatal('Tags cannot contain the unit separator.')
-	}
-	return tags.join(unitSeparator)
-}
-
-// highTODO property test
-export function stringifyTags(tags: Set<string>) {
-	return stringifyTagsArray(Array.from(tags.values()))
-}
-
-export function parseTags(rawTags: string) {
-	if (rawTags === '') return new Set<string>()
-	const parsed = rawTags.split(unitSeparator)
-	return new Set(parsed)
 }

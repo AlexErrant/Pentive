@@ -3,7 +3,6 @@ import {
 	type EditRemoteNote,
 	type NookId,
 	type RemoteNoteId,
-	parseMap,
 	stringifyMap,
 	type NoteId,
 	type MediaId,
@@ -12,7 +11,7 @@ import {
 	type Note,
 } from 'shared'
 import { getKysely } from './crsqlite'
-import { type DB, type Note as NoteEntity, type RemoteNote } from './database'
+import { type DB } from './database'
 import { type InsertObject, type Kysely } from 'kysely'
 import _ from 'lodash'
 import {
@@ -21,10 +20,10 @@ import {
 	toastInfo,
 	toastWarn,
 } from '../components/toasts'
-import { parseTags, stringifyTags } from './tag'
 import { C } from '../topLevelAwait'
 import {
-	parseTemplateFields,
+	noteEntityToDomain,
+	stringifyTags,
 	updateLocalMediaIdByRemoteMediaIdAndGetNewDoc,
 } from './util'
 
@@ -62,41 +61,6 @@ function domainToEditRemote(
 		remoteIds,
 		fieldValues: note.fieldValues,
 		tags: Array.from(note.tags),
-	}
-	return r
-}
-
-export function noteEntityToDomain(
-	note: NoteEntity & { templateFields: string },
-	remotes: RemoteNote[],
-): Note {
-	const noteFVs = parseMap<string, string>(note.fieldValues)
-	const tF = parseTemplateFields(note.templateFields).map((f) => f.name)
-	const fieldValues = new Map(tF.map((f) => [f, noteFVs.get(f) ?? '']))
-	noteFVs.forEach((v, f) => {
-		if (!tF.includes(f)) {
-			fieldValues.set(f, v)
-		}
-	})
-	const r: Note = {
-		id: note.id as NoteId,
-		created: new Date(note.created),
-		updated: new Date(note.updated),
-		templateId: note.templateId,
-		tags: parseTags(note.tags),
-		fieldValues,
-		ankiNoteId: note.ankiNoteId ?? undefined,
-		remotes: new Map(
-			remotes.map((r) => [
-				r.nook,
-				r.remoteId == null
-					? null
-					: { remoteNoteId: r.remoteId, uploadDate: new Date(r.uploadDate!) },
-			]),
-		),
-	}
-	if (r.ankiNoteId === undefined) {
-		delete r.ankiNoteId
 	}
 	return r
 }

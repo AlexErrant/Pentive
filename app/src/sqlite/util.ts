@@ -1,20 +1,44 @@
 import {
+	parseMap,
+	type NoteId,
+	type MediaId,
 	type RemoteMediaNum,
 	type RemoteTemplateId,
+	type Note,
 	type TemplateType,
 	type TemplateId,
-	type MediaId,
 	type Template,
 	imgPlaceholder,
 	type Field,
 } from 'shared'
 import {
+	type Note as NoteEntity,
+	type RemoteNote,
 	type RemoteTemplate,
 	type Template as TemplateEntity,
 } from './database'
-import { toastImpossible } from '../components/toasts'
+import { toastFatal, toastImpossible } from '../components/toasts'
 
 export const unitSeparator = '\x1f' // if this changes, also change noteFtsTag's separator 89CDE7EA-EF1B-4054-B381-597EE549CAB4
+
+export function stringifyTagsArray(tags: string[]) {
+	for (const tag of tags) {
+		if (tag.includes(unitSeparator))
+			toastFatal('Tags cannot contain the unit separator.')
+	}
+	return tags.join(unitSeparator)
+}
+
+// highTODO property test
+export function stringifyTags(tags: Set<string>) {
+	return stringifyTagsArray(Array.from(tags.values()))
+}
+
+export function parseTags(rawTags: string) {
+	if (rawTags === '') return new Set<string>()
+	const parsed = rawTags.split(unitSeparator)
+	return new Set(parsed)
+}
 
 export function updateLocalMediaIdByRemoteMediaIdAndGetNewDoc(
 	dp: DOMParser,
@@ -80,6 +104,41 @@ export function templateEntityToDomain(
 				return [r.nook, value]
 			}),
 		),
+	}
+	return r
+}
+
+export function noteEntityToDomain(
+	note: NoteEntity & { templateFields: string },
+	remotes: RemoteNote[],
+): Note {
+	const noteFVs = parseMap<string, string>(note.fieldValues)
+	const tF = parseTemplateFields(note.templateFields).map((f) => f.name)
+	const fieldValues = new Map(tF.map((f) => [f, noteFVs.get(f) ?? '']))
+	noteFVs.forEach((v, f) => {
+		if (!tF.includes(f)) {
+			fieldValues.set(f, v)
+		}
+	})
+	const r: Note = {
+		id: note.id as NoteId,
+		created: new Date(note.created),
+		updated: new Date(note.updated),
+		templateId: note.templateId,
+		tags: parseTags(note.tags),
+		fieldValues,
+		ankiNoteId: note.ankiNoteId ?? undefined,
+		remotes: new Map(
+			remotes.map((r) => [
+				r.nook,
+				r.remoteId == null
+					? null
+					: { remoteNoteId: r.remoteId, uploadDate: new Date(r.uploadDate!) },
+			]),
+		),
+	}
+	if (r.ankiNoteId === undefined) {
+		delete r.ankiNoteId
 	}
 	return r
 }

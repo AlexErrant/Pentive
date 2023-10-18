@@ -20,12 +20,15 @@ import {
 	type SelectQueryBuilder,
 } from 'kysely'
 import _ from 'lodash'
-import { noteEntityToDomain } from './note'
 import { toastImpossible, toastInfo } from '../components/toasts'
-import { parseTags, stringifyTags } from './tag'
 import { md5 } from '../domain/utility'
 import { C } from '../topLevelAwait'
-import { templateEntityToDomain } from './util'
+import {
+	noteEntityToDomain,
+	parseTags,
+	stringifyTags,
+	templateEntityToDomain,
+} from './util'
 
 function serializeState(s: State): number {
 	switch (s) {
