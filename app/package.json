@@ -49,6 +49,7 @@
 		"eslint-plugin-solid": "^0.13.0",
 		"events": "^3.3.0",
 		"fast-check": "^3.13.1",
+		"get-tsconfig": "^4.7.2",
 		"jsdom": "^22.1.0",
 		"kysely-codegen": "^0.10.1",
 		"madge": "^6.1.0",
