@@ -10,10 +10,15 @@ import {
 } from 'ag-grid-community'
 import { LicenseManager } from 'ag-grid-enterprise'
 import '@github/relative-time-element'
-import { notEmpty, type PeerJsId } from 'shared'
-import { type Peer } from '../pages/peers'
+import { notEmpty, type PeerDisplayName, type PeerJsId } from 'shared'
 import { getCrRtc } from '../sqlite/crsqlite'
 import { agGridTheme } from '../globalState'
+
+export interface Peer {
+	id: PeerJsId
+	name: PeerDisplayName
+	status: 'pending' | 'connected' | 'self' | 'disconnected'
+}
 
 LicenseManager.setLicenseKey(import.meta.env.VITE_AG_GRID_LICENSE)
 

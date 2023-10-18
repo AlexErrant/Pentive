@@ -12,9 +12,8 @@ import {
 	type PeerJsId,
 	peerDisplayNameValidator,
 	peerIdValidator,
-	type PeerDisplayName,
 } from 'shared'
-import PeersTable from '../components/peersTable'
+import PeersTable, { type Peer } from '../components/peersTable'
 
 export default function Peers() {
 	const [pending, setPending] = createSignal<string[]>([])
@@ -45,12 +44,6 @@ export default function Peers() {
 			/>
 		</Show>
 	)
-}
-
-export interface Peer {
-	id: PeerJsId
-	name: PeerDisplayName
-	status: 'pending' | 'connected' | 'self' | 'disconnected'
 }
 
 const RenderPeerControls: VoidComponent<{
