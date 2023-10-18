@@ -2,7 +2,6 @@ import { type JSX, Show, createResource, createEffect, onMount } from 'solid-js'
 import { GoldenLayout, LayoutConfig } from 'golden-layout'
 import { createStore } from 'solid-js/store'
 import CardsTable from '../components/cardsTable'
-import { type Override, type NoteCard, type Template, type Card } from 'shared'
 import { CardsRemote } from '../components/cardsRemote'
 import { FieldsEditor } from '../components/fieldsEditor'
 import { CardsPreview } from '../components/cardsPreview'
@@ -10,41 +9,8 @@ import { db } from '../db'
 import { render } from 'solid-js/web'
 import AddNote from '../components/addNote'
 import NoteSync from '../components/noteSync'
-import { toastImpossible } from '../components/toasts'
 import NoteTags from '../components/noteTags'
-
-export interface NoteCardView {
-	template: Template
-	note: Override<
-		NoteCard['note'],
-		{ fieldValues: Array<readonly [string, string]> }
-	>
-	mainCard?: Card
-	cards: Card[]
-}
-
-export function toNoteCards(noteCardView: NoteCardView): NoteCard[] {
-	return noteCardView.cards.map((card) => ({
-		template: noteCardView.template,
-		note: {
-			...noteCardView.note,
-			fieldValues: new Map(noteCardView.note.fieldValues),
-		},
-		card,
-	}))
-}
-
-export function toMainNoteCards(noteCardView: NoteCardView): NoteCard {
-	return {
-		template: noteCardView.template,
-		note: {
-			...noteCardView.note,
-			fieldValues: new Map(noteCardView.note.fieldValues),
-		},
-		card:
-			noteCardView.mainCard ?? toastImpossible('No main card.', noteCardView),
-	}
-}
+import { type NoteCardView } from '~/uiLogic/cards'
 
 export default function Cards(): JSX.Element {
 	const [selected, setSelected] = createStore<{ noteCard?: NoteCardView }>({})

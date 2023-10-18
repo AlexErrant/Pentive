@@ -1,6 +1,5 @@
 import { For, createSignal, type VoidComponent, Show } from 'solid-js'
 import { FieldEditor } from './fieldEditor'
-import { toNoteCards, type NoteCardView } from '../pages/cards'
 import { type SetStoreFunction } from 'solid-js/store'
 import { db } from '../db'
 import { getKysely } from '../sqlite/crsqlite'
@@ -13,6 +12,7 @@ import FieldHtmlEditor from './fieldHtmlEditor'
 import { ToggleButton } from '@kobalte/core'
 import { ChevronDown, Code, Quote } from 'shared-dom'
 import { C } from '~/pluginManager'
+import { toNoteCards, type NoteCardView } from '~/uiLogic/cards'
 
 export const FieldsEditor: VoidComponent<{
 	readonly noteCard: NoteCardView

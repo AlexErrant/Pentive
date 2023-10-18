@@ -13,7 +13,7 @@ import {
 	type RemoteTemplateId,
 } from 'shared'
 import { db } from '../db'
-import { type NoteCardView } from '../pages/cards'
+import { type NoteCardView } from '~/uiLogic/cards'
 
 function toggleNook(
 	uploadable: boolean,

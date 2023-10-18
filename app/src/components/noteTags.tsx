@@ -1,9 +1,9 @@
 import { createResource, createSignal, type VoidComponent } from 'solid-js'
 import { db } from '../db'
 import { createOptions, Select } from '@thisbeyond/solid-select'
-import { type NoteCardView } from '../pages/cards'
 import '@thisbeyond/solid-select/style.css'
 import './solidSelect.css'
+import { type NoteCardView } from '~/uiLogic/cards'
 
 const NoteTags: VoidComponent<{
 	readonly noteCard: NoteCardView

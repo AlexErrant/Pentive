@@ -1,7 +1,20 @@
 import { For, Show, type VoidComponent } from 'solid-js'
 import ResizingIframe from './resizingIframe'
-import { toNoteCards, type NoteCardView, toMainNoteCards } from '../pages/cards'
 import { type NoteCard } from 'shared'
+import { toastImpossible } from '../components/toasts'
+import { toNoteCards, type NoteCardView } from '~/uiLogic/cards'
+
+function toMainNoteCards(noteCardView: NoteCardView): NoteCard {
+	return {
+		template: noteCardView.template,
+		note: {
+			...noteCardView.note,
+			fieldValues: new Map(noteCardView.note.fieldValues),
+		},
+		card:
+			noteCardView.mainCard ?? toastImpossible('No main card.', noteCardView),
+	}
+}
 
 export const CardsPreview: VoidComponent<{
 	readonly noteCard: NoteCardView

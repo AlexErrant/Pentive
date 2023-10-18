@@ -15,7 +15,6 @@ import 'prosemirror-menu/style/menu.css'
 import 'prosemirror-example-setup/style/style.css'
 import { toOneLine, type MediaId } from 'shared'
 import { db } from '../db'
-import { type NoteCardView } from '../pages/cards'
 import { type SetStoreFunction } from 'solid-js/store'
 import { type ImagePluginSettings } from 'prosemirror-image-plugin'
 import {
@@ -24,6 +23,7 @@ import {
 } from 'prosemirror-image-plugin'
 import 'prosemirror-image-plugin/src/styles/common.css'
 import 'prosemirror-image-plugin/src/styles/withResize.css'
+import { type NoteCardView } from '~/uiLogic/cards'
 // import "prosemirror-image-plugin/src/styles/sideResize.css"
 
 // cf. https://gitlab.com/emergence-engineering/prosemirror-image-plugin/-/blob/master/src/updateImageNode.ts
