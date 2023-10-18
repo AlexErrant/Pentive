@@ -30,7 +30,7 @@ import {
 } from 'kysely'
 import { updateLocalMediaIdByRemoteMediaIdAndGetNewDoc } from './util'
 import { toastFatal, toastImpossible, toastWarn } from '../components/toasts'
-import { C } from '../pluginManager'
+import { C } from '../topLevelAwait'
 
 function templateToDocType(template: Template) {
 	const now = C.getDate().getTime()

@@ -12,7 +12,7 @@ import { db } from '../db'
 import { importAnki } from './importer/importer'
 import { augcClient } from '../trpcClient'
 import { getDb } from '../sqlite/crsqlite'
-import { C } from '../pluginManager'
+import { C } from '../topLevelAwait'
 import { toastImpossible } from '../components/toasts'
 import EditSql from '../components/editSql'
 

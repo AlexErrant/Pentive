@@ -38,7 +38,7 @@ import {
 } from 'solid-js'
 import { type Template, type ChildTemplate } from 'shared'
 import ResizingIframe from './resizingIframe'
-import { C } from '../pluginManager'
+import { C } from '../topLevelAwait'
 import { oneDark } from '@codemirror/theme-one-dark'
 import { theme } from '../globalState'
 

@@ -11,7 +11,7 @@ import { toastFatal } from './toasts'
 import FieldHtmlEditor from './fieldHtmlEditor'
 import { ToggleButton } from '@kobalte/core'
 import { ChevronDown, Code, Quote } from 'shared-dom'
-import { C } from '../pluginManager'
+import { C } from '../topLevelAwait'
 import { toNoteCards, type NoteCardView } from '../uiLogic/cards'
 
 export const FieldsEditor: VoidComponent<{

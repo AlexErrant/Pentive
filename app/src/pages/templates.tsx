@@ -10,7 +10,7 @@ import { render } from 'solid-js/web'
 import EditTemplate from '../components/editTemplate'
 import _ from 'lodash'
 import { ulidAsBase64Url } from '../domain/utility'
-import { C } from '../pluginManager'
+import { C } from '../topLevelAwait'
 import TemplateSync from '../components/templateSync'
 
 export default function Templates(): JSX.Element {

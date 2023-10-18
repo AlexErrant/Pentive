@@ -17,7 +17,7 @@ import { getKysely } from './sqlite/crsqlite'
 import { type Transaction } from 'kysely'
 import { type DB } from './sqlite/database'
 import { noteOrds } from 'shared-dom'
-import { C } from './pluginManager'
+import { C } from './topLevelAwait'
 import { toastFatal } from './components/toasts'
 
 export const appExpose = {

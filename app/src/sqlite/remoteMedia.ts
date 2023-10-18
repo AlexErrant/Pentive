@@ -1,7 +1,7 @@
 import { type Base64Url, type LDbId, type RemoteMediaNum } from 'shared'
 import { getKysely } from './crsqlite'
 import { toastFatal } from '../components/toasts'
-import { C } from '../pluginManager'
+import { C } from '../topLevelAwait'
 
 export const remoteMediaCollectionMethods = {
 	updateUploadDate: async function (

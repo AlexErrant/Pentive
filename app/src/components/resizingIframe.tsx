@@ -10,7 +10,7 @@ import {
 } from 'shared'
 import { unwrap } from 'solid-js/store'
 import { db } from '../db'
-import { C } from '../pluginManager'
+import { C } from '../topLevelAwait'
 import { toastError } from './toasts'
 import { debounce, leadingAndTrailing } from '@solid-primitives/scheduled'
 

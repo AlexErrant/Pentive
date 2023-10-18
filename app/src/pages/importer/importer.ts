@@ -45,7 +45,7 @@ import { db } from './../../db'
 import _ from 'lodash'
 import sqliteUrl from '../../assets/sql-wasm.wasm?url'
 import { toastFatal, toastImpossible, toastInfo } from '../../components/toasts'
-import { C } from '../../pluginManager'
+import { C } from '../../topLevelAwait'
 
 export async function importAnki(
 	event: Event & {

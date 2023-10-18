@@ -25,7 +25,7 @@ import { entityToDomain as noteEntityToDomain } from './note'
 import { toastImpossible, toastInfo } from '../components/toasts'
 import { parseTags, stringifyTags } from './tag'
 import { md5 } from '../domain/utility'
-import { C } from '../pluginManager'
+import { C } from '../topLevelAwait'
 
 function serializeState(s: State): number {
 	switch (s) {

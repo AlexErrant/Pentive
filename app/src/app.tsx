@@ -1,7 +1,7 @@
 import { type JSX, createEffect } from 'solid-js'
 import { useRoutes } from '@solidjs/router'
 import { navLinks, routes } from './routes'
-import { C } from './pluginManager'
+import { C } from './topLevelAwait'
 import { Toaster } from 'solid-toast'
 import 'golden-layout/dist/css/goldenlayout-base.css'
 import { theme } from './globalState'
