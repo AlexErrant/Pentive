@@ -6,6 +6,10 @@ overrides:
   xml2js@<0.5.0: '>=0.5.0'
   semver@>=7.0.0 <7.5.2: '>=7.5.2'
   get-func-name@<2.0.1: '>=2.0.1'
+  zod@<=3.22.2: '>=3.22.3'
+  postcss@<8.4.31: '>=8.4.31'
+  undici@<5.26.2: '>=5.26.2'
+  '@babel/traverse@<7.23.2': '>=7.23.2'
 
 patchedDependencies:
   nightwind@1.1.13:
@@ -4204,6 +4208,10 @@ packages:
     resolution: {integrity: sha512-NCC3zz2+nvYd+Ckfh87rA47zfu2QsQpvc6k1yzTk+b9KzRj0wkGa8LSoGOXN6Zv4lRf/EIoZ80biDh9HOI+RNQ==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
 
+  /@fastify/busboy@2.0.0:
+    resolution: {integrity: sha512-JUFJad5lv7jxj926GPgymrWQxxjPYuJNiNjNMzqT+HiuP6Vl3dk5xzG+8sTX96np0ZAluvaMzPsjhHZ5rNuNQQ==}
+    engines: {node: '>=14'}
+
   /@floating-ui/core@1.5.0:
     resolution: {integrity: sha512-kK1h4m36DQ0UHGj5Ah4db7R0rHemTqqO0QLvUqi1/mUUp3LuAWbWxdxSIf/XsnH9VS6rRVPLJCncjRzUvyCLXg==}
     dependencies:
@@ -4929,7 +4937,7 @@ packages:
       '@miniflare/core': 2.14.1
       '@miniflare/shared': 2.14.1
       http-cache-semantics: 4.1.1
-      undici: 5.20.0
+      undici: 5.26.3
 
   /@miniflare/cli-parser@2.14.1:
     resolution: {integrity: sha512-MLvMuvxQPL/uw94Dg6CR3CM62uGoxxCkgF7aDtBYF9zb6YCfjOQn0q5d7zWxydpYAb5Dn1N1hZMnjAy7mlpNdQ==}
@@ -4950,7 +4958,7 @@ packages:
       dotenv: 10.0.0
       kleur: 4.1.5
       set-cookie-parser: 2.6.0
-      undici: 5.20.0
+      undici: 5.26.3
       urlpattern-polyfill: 4.0.3
 
   /@miniflare/d1@2.14.1:
@@ -4967,7 +4975,7 @@ packages:
       '@miniflare/core': 2.14.1
       '@miniflare/shared': 2.14.1
       '@miniflare/storage-memory': 2.14.1
-      undici: 5.20.0
+      undici: 5.26.3
 
   /@miniflare/html-rewriter@2.14.1:
     resolution: {integrity: sha512-vp4uZXuEKhtIaxoXa7jgDAPItlzjbfoUqYWp+fwDKv4J4mfQnzzs/5hwjbE7+Ihm/KNI0zNi8P0sSWjIRFl6ng==}
@@ -4976,7 +4984,7 @@ packages:
       '@miniflare/core': 2.14.1
       '@miniflare/shared': 2.14.1
       html-rewriter-wasm: 0.4.1
-      undici: 5.20.0
+      undici: 5.26.3
 
   /@miniflare/http-server@2.14.1:
     resolution: {integrity: sha512-ICT9KuecAF5+AHs9dTnk7DRxCPYLfI3QCtfHOcGQWFuOoe4MCtQk4joo0pxMaSgAJ4TiOOxz3KRWO0G2FwgiPQ==}
@@ -4987,7 +4995,7 @@ packages:
       '@miniflare/web-sockets': 2.14.1
       kleur: 4.1.5
       selfsigned: 2.1.1
-      undici: 5.20.0
+      undici: 5.26.3
       ws: 8.13.0
       youch: 2.2.2
     transitivePeerDependencies:
@@ -5012,7 +5020,7 @@ packages:
     dependencies:
       '@miniflare/core': 2.14.1
       '@miniflare/shared': 2.14.1
-      undici: 5.20.0
+      undici: 5.26.3
 
   /@miniflare/runner-vm@2.14.1:
     resolution: {integrity: sha512-UobsGM0ICVPDlJD54VPDSx0EXrIY3nJMXBy2zIFuuUOz4hQKXvMQ6jtAlJ8UNKer+XXI3Mb/9R/gfU8r6kxIMA==}
@@ -5092,7 +5100,7 @@ packages:
     dependencies:
       '@miniflare/core': 2.14.1
       '@miniflare/shared': 2.14.1
-      undici: 5.20.0
+      undici: 5.26.3
       ws: 8.14.2
     transitivePeerDependencies:
       - bufferutil
@@ -13177,7 +13185,7 @@ packages:
       kleur: 4.1.5
       semiver: 1.1.0
       source-map-support: 0.5.21
-      undici: 5.20.0
+      undici: 5.26.3
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
@@ -17190,17 +17198,17 @@ packages:
     resolution: {integrity: sha512-WxONCrssBM8TSPRqN5EmsjVrsv4A8X12J4ArBiiayv3DyyG3ZlIg6yysuuSYdZsVz3TKcTg2fd//Ujd4CHV1iA==}
     dev: true
 
-  /undici@5.20.0:
-    resolution: {integrity: sha512-J3j60dYzuo6Eevbawwp1sdg16k5Tf768bxYK4TUJRH7cBM4kFCbf3mOnM/0E3vQYXvpxITbbWmBafaDbxLDz3g==}
-    engines: {node: '>=12.18'}
-    dependencies:
-      busboy: 1.6.0
-
   /undici@5.25.2:
     resolution: {integrity: sha512-tch8RbCfn1UUH1PeVCXva4V8gDpGAud/w0WubD6sHC46vYQ3KDxL+xv1A2UxK0N6jrVedutuPHxe1XIoqerwMw==}
     engines: {node: '>=14.0'}
     dependencies:
       busboy: 1.6.0
+
+  /undici@5.26.3:
+    resolution: {integrity: sha512-H7n2zmKEWgOllKkIUkLvFmsJQj062lSm3uA4EYApG8gLuiOM0/go9bIoC3HVaSnfg4xunowDE2i9p8drkXuvDw==}
+    engines: {node: '>=14.0'}
+    dependencies:
+      '@fastify/busboy': 2.0.0
 
   /uni-global@1.0.0:
     resolution: {integrity: sha512-WWM3HP+siTxzIWPNUg7hZ4XO8clKi6NoCAJJWnuRL+BAqyFXF8gC03WNyTefGoUXYc47uYgXxpKLIEvo65PEHw==}
