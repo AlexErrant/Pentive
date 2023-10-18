@@ -1,5 +1,5 @@
 import sqliteWasm, { type DB as crDB } from '@vlcn.io/crsqlite-wasm'
-import { initSql } from 'shared'
+import { initSql, parseMap } from 'shared'
 import { lrpc } from '../lrpcClient'
 import { stringify as uuidStringify } from 'uuid'
 import { type DB } from './database'
@@ -9,7 +9,7 @@ import crsqliteUrl from '@vlcn.io/crsqlite-wasm/crsqlite.wasm?url'
 import wdbRtc from './wholeDbRtc'
 import { wholeDbReplicator } from 'shared-dom'
 import { toastInfo } from '../components/toasts'
-import { getMediaIds } from './note'
+import { unitSeparator } from './util'
 
 let myDatabase: Promise<crDB> | null = null
 let myCrRtc: Awaited<ReturnType<typeof wdbRtc>> | null = null
@@ -26,6 +26,17 @@ export async function getCrRtc() {
 		myCrRtc = await createCrRtc()
 	}
 	return myCrRtc
+}
+
+const dp = new DOMParser()
+
+export function getMediaIds(fvs: string) {
+	const values = parseMap<string, string>(fvs).values()
+	return Array.from(values)
+		.flatMap((v) => dp.parseFromString(v, 'text/html'))
+		.flatMap((d) => Array.from(d.images))
+		.map((i) => i.getAttribute('src'))
+		.join(unitSeparator)
 }
 
 async function createDb() {

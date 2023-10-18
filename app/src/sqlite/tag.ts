@@ -2,8 +2,7 @@ import { getKysely } from './crsqlite'
 import { toastFatal, toastImpossible } from '../components/toasts'
 import { type Card, type Note } from './database'
 import { type NoteId } from 'shared'
-
-export const unitSeparator = '\x1f' // if this changes, also change noteFtsTag's separator 89CDE7EA-EF1B-4054-B381-597EE549CAB4
+import { unitSeparator } from './util'
 
 export const tagCollectionMethods = {
 	// This insanity with `noteFtsTagVocab` is to get properly cased tags.
