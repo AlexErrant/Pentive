@@ -20,8 +20,8 @@ import {
 	type SelectQueryBuilder,
 } from 'kysely'
 import _ from 'lodash'
-import { entityToDomain as templateEntityToDomain } from './template'
-import { entityToDomain as noteEntityToDomain } from './note'
+import { templateEntityToDomain } from './template'
+import { noteEntityToDomain } from './note'
 import { toastImpossible, toastInfo } from '../components/toasts'
 import { parseTags, stringifyTags } from './tag'
 import { md5 } from '../domain/utility'
@@ -75,7 +75,7 @@ function cardToDocType(card: Card): InsertObject<DB, 'card'> {
 	}
 }
 
-function entityToDomain(card: CardEntity): Card {
+function cardEntityToDomain(card: CardEntity): Card {
 	const r = {
 		id: card.id as CardId,
 		noteId: card.noteId as NoteId,
@@ -383,7 +383,7 @@ async function getCards(
 						localId: x.template_id,
 					})),
 			)
-			const card = entityToDomain({
+			const card = cardEntityToDomain({
 				cardSettingId: tnc.card_cardSettingId,
 				created: tnc.card_created,
 				tags: tnc.card_tags,
@@ -432,7 +432,7 @@ export const cardCollectionMethods = {
 			.selectAll()
 			.where('id', '=', cardId)
 			.executeTakeFirst()
-		return card == null ? null : entityToDomain(card)
+		return card == null ? null : cardEntityToDomain(card)
 	},
 	getCardsByNote: async function (noteId: NoteId) {
 		const db = await getKysely()
@@ -441,7 +441,7 @@ export const cardCollectionMethods = {
 			.selectAll()
 			.where('noteId', '=', noteId)
 			.execute()
-		return cards.map(entityToDomain)
+		return cards.map(cardEntityToDomain)
 	},
 	getCards,
 	getCardsCount,

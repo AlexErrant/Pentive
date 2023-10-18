@@ -64,7 +64,7 @@ function domainToEditRemote(
 	return r
 }
 
-export function entityToDomain(
+export function noteEntityToDomain(
 	note: NoteEntity & { templateFields: string },
 	remotes: RemoteNote[],
 ): Note {
@@ -132,7 +132,7 @@ export const noteCollectionMethods = {
 			.select('template.fields as templateFields')
 			.where('note.id', '=', noteId)
 			.executeTakeFirst()
-		return note == null ? null : entityToDomain(note, remoteNotes)
+		return note == null ? null : noteEntityToDomain(note, remoteNotes)
 	},
 	getNotesByIds: async function (noteIds: NoteId[]) {
 		const db = await getKysely()
@@ -149,7 +149,7 @@ export const noteCollectionMethods = {
 			.where('note.id', 'in', noteIds)
 			.execute()
 		return notes.map((ln) =>
-			entityToDomain(
+			noteEntityToDomain(
 				ln,
 				remoteNotes.filter((rn) => rn.localId === ln.id),
 			),
@@ -178,7 +178,7 @@ export const noteCollectionMethods = {
 			.then((n) =>
 				n
 					.map((noteEntity) => {
-						const note = entityToDomain(
+						const note = noteEntityToDomain(
 							noteEntity,
 							remoteNotes.filter((rn) => rn.localId === noteEntity.id),
 						)
@@ -230,7 +230,7 @@ export const noteCollectionMethods = {
 			.then((n) =>
 				n
 					.map((noteEntity) => {
-						const note = entityToDomain(
+						const note = noteEntityToDomain(
 							noteEntity,
 							remoteNotes.filter((rn) => rn.localId === noteEntity.id),
 						)
@@ -337,7 +337,7 @@ export const noteCollectionMethods = {
 				.executeTakeFirstOrThrow()
 			const { remoteMediaIdByLocal } = withLocalMediaIdByRemoteMediaId(
 				new DOMParser(),
-				domainToCreateRemote(entityToDomain(note, [remoteNote]), [
+				domainToCreateRemote(noteEntityToDomain(note, [remoteNote]), [
 					/* this doesn't need any real values... I think */
 				]),
 			)

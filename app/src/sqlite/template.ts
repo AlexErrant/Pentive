@@ -56,7 +56,7 @@ function templateToDocType(template: Template) {
 
 export const parseFields: (_: string) => Field[] = JSON.parse
 
-export function entityToDomain(
+export function templateEntityToDomain(
 	template: TemplateEntity,
 	remotes: RemoteTemplate[],
 ) {
@@ -444,7 +444,7 @@ function toTemplates(allTemplates: TemplateRow[]) {
 	const map = new Map<TemplateId, Template>()
 	for (const row of allTemplates) {
 		if (map.get(row.id) == null) {
-			map.set(row.id, entityToDomain(row, []))
+			map.set(row.id, templateEntityToDomain(row, []))
 		}
 		if (row.nook != null) {
 			map.get(row.id)!.remotes[row.nook] =
