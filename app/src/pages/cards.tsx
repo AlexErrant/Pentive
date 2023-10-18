@@ -10,7 +10,7 @@ import { render } from 'solid-js/web'
 import AddNote from '../components/addNote'
 import NoteSync from '../components/noteSync'
 import NoteTags from '../components/noteTags'
-import { type NoteCardView } from '~/uiLogic/cards'
+import { type NoteCardView } from '../uiLogic/cards'
 
 export default function Cards(): JSX.Element {
 	const [selected, setSelected] = createStore<{ noteCard?: NoteCardView }>({})

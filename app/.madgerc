@@ -28,12 +28,7 @@
       "ES2021.String",
       "ES2021"
     ],
-    "outDir": "./dist",
-    "paths": {
-      "~/*": [
-        "./src/*"
-      ]
-    }
+    "outDir": "./dist"
   },
   "references": [
     {

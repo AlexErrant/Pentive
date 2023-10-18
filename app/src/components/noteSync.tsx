@@ -10,7 +10,7 @@ import { type RemoteNoteId } from 'shared'
 import { augcClient } from '../trpcClient'
 import DiffHtml from './diffHtml'
 import ResizingIframe from './resizingIframe'
-import { type NoteCardView } from '~/uiLogic/cards'
+import { type NoteCardView } from '../uiLogic/cards'
 
 const NoteSync: VoidComponent<{ note: NoteCardView }> = (props) => (
 	<ul>

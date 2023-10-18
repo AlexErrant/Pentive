@@ -23,7 +23,7 @@ import {
 } from 'prosemirror-image-plugin'
 import 'prosemirror-image-plugin/src/styles/common.css'
 import 'prosemirror-image-plugin/src/styles/withResize.css'
-import { type NoteCardView } from '~/uiLogic/cards'
+import { type NoteCardView } from '../uiLogic/cards'
 // import "prosemirror-image-plugin/src/styles/sideResize.css"
 
 // cf. https://gitlab.com/emergence-engineering/prosemirror-image-plugin/-/blob/master/src/updateImageNode.ts

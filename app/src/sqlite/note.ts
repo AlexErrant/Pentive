@@ -23,7 +23,7 @@ import {
 	toastWarn,
 } from '../components/toasts'
 import { parseTags, stringifyTags } from './tag'
-import { C } from '~/pluginManager'
+import { C } from '../pluginManager'
 import { updateLocalMediaIdByRemoteMediaIdAndGetNewDoc } from './util'
 
 function noteToDocType(note: Note): InsertObject<DB, 'note'> {

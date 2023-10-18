@@ -22,7 +22,7 @@ import { createStore } from 'solid-js/store'
 import { C } from '../pluginManager'
 import { CardsPreview } from '../components/cardsPreview'
 import { db } from '../db'
-import { type NoteCardView } from '~/uiLogic/cards'
+import { type NoteCardView } from '../uiLogic/cards'
 
 function toView(template: Template): NoteCardView {
 	const now = C.getDate()

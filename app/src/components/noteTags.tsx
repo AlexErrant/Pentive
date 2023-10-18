@@ -3,7 +3,7 @@ import { db } from '../db'
 import { createOptions, Select } from '@thisbeyond/solid-select'
 import '@thisbeyond/solid-select/style.css'
 import './solidSelect.css'
-import { type NoteCardView } from '~/uiLogic/cards'
+import { type NoteCardView } from '../uiLogic/cards'
 
 const NoteTags: VoidComponent<{
 	readonly noteCard: NoteCardView

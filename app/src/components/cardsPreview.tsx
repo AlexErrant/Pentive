@@ -2,7 +2,7 @@ import { For, Show, type VoidComponent } from 'solid-js'
 import ResizingIframe from './resizingIframe'
 import { type NoteCard } from 'shared'
 import { toastImpossible } from '../components/toasts'
-import { toNoteCards, type NoteCardView } from '~/uiLogic/cards'
+import { toNoteCards, type NoteCardView } from '../uiLogic/cards'
 
 function toMainNoteCards(noteCardView: NoteCardView): NoteCard {
 	return {
