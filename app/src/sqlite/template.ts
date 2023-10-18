@@ -28,7 +28,7 @@ import {
 	type Transaction,
 	type OnConflictTables,
 } from 'kysely'
-import { updateLocalMediaIdByRemoteMediaIdAndGetNewDoc } from './note'
+import { updateLocalMediaIdByRemoteMediaIdAndGetNewDoc } from './util'
 import { toastFatal, toastImpossible, toastWarn } from '../components/toasts'
 import { C } from '~/pluginManager'
 

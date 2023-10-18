@@ -10,7 +10,6 @@ import {
 	type RemoteMediaNum,
 	type RemoteTemplateId,
 	type Note,
-	imgPlaceholder,
 } from 'shared'
 import { getKysely } from './crsqlite'
 import { type DB, type Note as NoteEntity, type RemoteNote } from './database'
@@ -25,6 +24,7 @@ import {
 } from '../components/toasts'
 import { parseTags, stringifyTags } from './tag'
 import { C } from '~/pluginManager'
+import { updateLocalMediaIdByRemoteMediaIdAndGetNewDoc } from './util'
 
 function noteToDocType(note: Note): InsertObject<DB, 'note'> {
 	const now = C.getDate().getTime()
@@ -459,44 +459,6 @@ function withLocalMediaIdByRemoteMediaId<
 			...note,
 			fieldValues,
 		},
-		remoteMediaIdByLocal,
-	}
-}
-
-export function updateLocalMediaIdByRemoteMediaIdAndGetNewDoc(
-	dp: DOMParser,
-	rawDoms: string[],
-) {
-	const docs = rawDoms.map((rawDom) => dp.parseFromString(rawDom, 'text/html'))
-	const imgSrcs = new Set(
-		docs
-			.flatMap((pd) => Array.from(pd.images))
-			.map((i) => i.getAttribute('src'))
-			.filter((i) => i !== '' && i != null),
-	)
-	const remoteMediaIdByLocal = new Map(
-		Array.from(imgSrcs.values()).map(
-			(src, i) => [src as MediaId, i as RemoteMediaNum] as const,
-		),
-	)
-	for (const doc of docs) {
-		for (const image of doc.images) {
-			const src = image.getAttribute('src') as MediaId
-			if (src != null) {
-				const i =
-					remoteMediaIdByLocal.get(src) ??
-					toastImpossible(
-						`${src} not found in ${JSON.stringify(
-							Array.from(remoteMediaIdByLocal),
-						)}`,
-					)
-				const extension = src.substring(src.lastIndexOf('.'))
-				image.setAttribute('src', `${imgPlaceholder}${i}${extension}`)
-			}
-		}
-	}
-	return {
-		docs,
 		remoteMediaIdByLocal,
 	}
 }
