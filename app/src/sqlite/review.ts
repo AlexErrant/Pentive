@@ -1,13 +1,12 @@
 import { getKysely } from './crsqlite'
 import { type Review } from 'shared'
-import { type DB, type Review as ReviewEntity } from '../sqlite/database'
-import { type Kysely } from 'kysely'
+import { type Review as ReviewEntity } from '../sqlite/database'
 import _ from 'lodash'
 import { toastInfo } from '../components/toasts'
 
 export const reviewCollectionMethods = {
-	bulkUploadReview: async function (reviews: Review[], db?: Kysely<DB>) {
-		db ??= await getKysely()
+	bulkUploadReview: async function (reviews: Review[]) {
+		const db = await getKysely()
 		const entities = reviews.map(
 			({ id, cardId, ...r }) =>
 				({

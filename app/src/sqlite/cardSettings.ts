@@ -8,17 +8,13 @@ import {
 	type ExpressionBuilder,
 	type OnConflictDatabase,
 	type OnConflictTables,
-	type Kysely,
 } from 'kysely'
 import _ from 'lodash'
 import { toastInfo } from '../components/toasts'
 
 export const cardSettingsCollectionMethods = {
-	bulkUploadCardSettings: async function (
-		cardSetting: CardSetting[],
-		db?: Kysely<DB>,
-	) {
-		db ??= await getKysely()
+	bulkUploadCardSettings: async function (cardSetting: CardSetting[]) {
+		const db = await getKysely()
 		const entities = cardSetting.map(
 			({ id, ...r }) =>
 				({

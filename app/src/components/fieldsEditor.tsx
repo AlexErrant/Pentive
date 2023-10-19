@@ -2,10 +2,8 @@ import { For, createSignal, type VoidComponent, Show } from 'solid-js'
 import { FieldEditor } from './fieldEditor'
 import { type SetStoreFunction } from 'solid-js/store'
 import { db } from '../db'
-import { getKysely } from '../sqlite/crsqlite'
+import { tx } from '../sqlite/crsqlite'
 import { type MediaId } from 'shared'
-import { type Transaction } from 'kysely'
-import { type DB } from '../sqlite/database'
 import { ulidAsBase64Url } from '../domain/utility'
 import { toastFatal } from './toasts'
 import FieldHtmlEditor from './fieldHtmlEditor'
@@ -38,16 +36,15 @@ export const FieldsEditor: VoidComponent<{
 					onClick={async () => {
 						if (props.noteCard.cards.length === 0)
 							toastFatal('There must be at least 1 card')
-						const kysely = await getKysely()
 						const dp = new DOMParser()
 						// eslint-disable-next-line solid/reactivity -- the fn isn't reactive
-						await kysely.transaction().execute(async (trx) => {
+						await tx(async () => {
 							const fieldValues = await Promise.all(
 								props.noteCard.note.fieldValues.map(async ([f, v]) => {
 									const doc = dp.parseFromString(v, 'text/html')
 									await Promise.all(
 										Array.from(doc.images).map(async (i) => {
-											await mutate(i, trx)
+											await mutate(i)
 										}),
 									)
 									return [f, doc.body.innerHTML] as const
@@ -57,11 +54,8 @@ export const FieldsEditor: VoidComponent<{
 								...props.noteCard,
 								note: { ...props.noteCard.note, fieldValues },
 							})
-							await db.upsertNote(noteCards[0]!.note, trx)
-							await db.bulkUpsertCards(
-								noteCards.map((nc) => nc.card),
-								trx,
-							)
+							await db.upsertNote(noteCards[0]!.note)
+							await db.bulkUpsertCards(noteCards.map((nc) => nc.card))
 						})
 					}}
 				>
@@ -72,7 +66,7 @@ export const FieldsEditor: VoidComponent<{
 	)
 }
 
-async function mutate(img: HTMLImageElement, trx: Transaction<DB>) {
+async function mutate(img: HTMLImageElement) {
 	const src = img.getAttribute('src')
 	if (src == null || src === '') {
 		// do nothing
@@ -80,15 +74,12 @@ async function mutate(img: HTMLImageElement, trx: Transaction<DB>) {
 		const now = C.getDate()
 		const data = await (await fetch(src)).arrayBuffer()
 		const id = ulidAsBase64Url() as string as MediaId
-		await db.insertMediaTrx(
-			{
-				id,
-				created: now,
-				updated: now,
-				data,
-			},
-			trx,
-		)
+		await db.insertMedia({
+			id,
+			created: now,
+			updated: now,
+			data,
+		})
 		img.setAttribute('src', id)
 	} else {
 		// do nothing, is a regular URL

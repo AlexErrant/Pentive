@@ -13,9 +13,7 @@ import {
 	type Card,
 } from 'shared'
 import { ulidAsBase64Url } from './domain/utility'
-import { getKysely } from './sqlite/crsqlite'
-import { type Transaction } from 'kysely'
-import { type DB } from './sqlite/database'
+import { tx } from './sqlite/crsqlite'
 import { noteOrds } from 'shared-dom'
 import { C } from './topLevelAwait'
 import { toastFatal } from './components/toasts'
@@ -23,9 +21,8 @@ import { toastFatal } from './components/toasts'
 export const appExpose = {
 	addTemplate: async (rt: RemoteTemplate) => {
 		const serializer = new XMLSerializer()
-		const k = await getKysely()
 		const now = C.getDate()
-		await k.transaction().execute(async (trx) => {
+		await tx(async () => {
 			const template: Template = {
 				id: rt.id,
 				name: rt.name,
@@ -45,7 +42,7 @@ export const appExpose = {
 						const { imgSrcs, front, back } = getTemplateImages(t, dp)
 						t.front = serializer.serializeToString(front)
 						t.back = serializer.serializeToString(back)
-						return await downloadImages(imgSrcs, trx)
+						return await downloadImages(imgSrcs)
 					}),
 				)
 			} else {
@@ -53,20 +50,19 @@ export const appExpose = {
 					template.templateType.template,
 					dp,
 				)
-				await downloadImages(imgSrcs, trx)
+				await downloadImages(imgSrcs)
 				template.templateType.template.front =
 					serializer.serializeToString(front)
 				template.templateType.template.back = serializer.serializeToString(back)
 			}
-			await db.upsertTemplate(template, trx)
+			await db.upsertTemplate(template)
 		})
 	},
 	addNote: async (rn: RemoteNote, nook: NookId) => {
-		const k = await getKysely()
 		const now = C.getDate()
-		await k.transaction().execute(async (trx) => {
+		await tx(async () => {
 			const template =
-				(await db.getTemplateIdByRemoteId(rn.templateId, trx)) ??
+				(await db.getTemplateIdByRemoteId(rn.templateId)) ??
 				toastFatal(`You don't have the remote template ${rn.templateId}`)
 			const n: Note = {
 				id: rn.id,
@@ -78,8 +74,8 @@ export const appExpose = {
 				fieldValues: rn.fieldValues,
 				remotes: new Map([[nook, { remoteNoteId: rn.id, uploadDate: now }]]),
 			}
-			await downloadImages(getNoteImages(n.fieldValues, new DOMParser()), trx)
-			await db.upsertNote(n, trx)
+			await downloadImages(getNoteImages(n.fieldValues, new DOMParser()))
+			await db.upsertNote(n)
 			const ords = noteOrds.bind(C)(n, template)
 			const cards = ords.map((i) => {
 				const card: Card = {
@@ -93,7 +89,7 @@ export const appExpose = {
 				}
 				return card
 			})
-			await db.bulkUpsertCards(cards, trx)
+			await db.bulkUpsertCards(cards)
 		})
 	},
 }
@@ -143,24 +139,18 @@ function getTemplateImages(ct: ChildTemplate, dp: DOMParser) {
 }
 
 // VERYlowTODO could sent it over Comlink - though that'll be annoying because it's in hub-ugc
-async function downloadImages(
-	imgSrcs: Map<MediaId, string>,
-	trx: Transaction<DB>,
-) {
+async function downloadImages(imgSrcs: Map<MediaId, string>) {
 	return await Promise.all(
 		Array.from(imgSrcs).map(async ([id, imgSrc]) => {
 			const response = await fetch(imgSrc)
 			if (response.status === 200) {
 				const now = C.getDate()
-				await db.insertMediaTrx(
-					{
-						id,
-						created: now,
-						updated: now,
-						data: await response.arrayBuffer(),
-					},
-					trx,
-				)
+				await db.insertMedia({
+					id,
+					created: now,
+					updated: now,
+					data: await response.arrayBuffer(),
+				})
 			} else {
 				return toastFatal(
 					`Error occured while downloading ${imgSrc}.`,

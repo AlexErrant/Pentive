@@ -14,7 +14,6 @@ import {
 	type ExpressionBuilder,
 	type OnConflictDatabase,
 	type InsertObject,
-	type Kysely,
 	type OnConflictTables,
 	sql,
 	type SelectQueryBuilder,
@@ -408,8 +407,8 @@ export const cardCollectionMethods = {
 	upsertCard: async function (card: Card) {
 		await this.bulkUpsertCards([card])
 	},
-	bulkUpsertCards: async function (cards: Card[], db?: Kysely<DB>) {
-		db ??= await getKysely()
+	bulkUpsertCards: async function (cards: Card[]) {
+		const db = await getKysely()
 		const batches = _.chunk(cards.map(cardToDocType), 1000)
 		for (let i = 0; i < batches.length; i++) {
 			toastInfo('card batch ' + i)

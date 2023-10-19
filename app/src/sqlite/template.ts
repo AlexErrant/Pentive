@@ -12,7 +12,7 @@ import {
 	objKeys,
 	objEntries,
 } from 'shared'
-import { getKysely } from './crsqlite'
+import { getKysely, tx } from './crsqlite'
 import {
 	type DB,
 	type RemoteTemplate,
@@ -22,8 +22,6 @@ import {
 	type ExpressionBuilder,
 	type OnConflictDatabase,
 	type InsertObject,
-	type Kysely,
-	type Transaction,
 	type OnConflictTables,
 } from 'kysely'
 import {
@@ -84,72 +82,61 @@ function domainToEditRemote(template: Template) {
 }
 
 export const templateCollectionMethods = {
-	upsertTemplate: async function (template: Template, trx?: Transaction<DB>) {
+	upsertTemplate: async function (template: Template) {
 		const { insertTemplate, remoteTemplates } = templateToDocType(template)
 		const conflictValues = {
 			...insertTemplate,
 			id: undefined,
 			created: undefined,
 		}
-		async function insert(trx: Transaction<DB>) {
-			await trx
-				.insertInto('template')
-				.values(insertTemplate)
-				.onConflict((db) => db.doUpdateSet(conflictValues))
-				.execute()
-			const oldRts = await trx
-				.selectFrom('remoteTemplate')
-				.selectAll()
+		const db = await getKysely()
+		await db
+			.insertInto('template')
+			.values(insertTemplate)
+			.onConflict((db) => db.doUpdateSet(conflictValues))
+			.execute()
+		const oldRts = await db
+			.selectFrom('remoteTemplate')
+			.selectAll()
+			.where('localId', '=', template.id)
+			.execute()
+		// the following deleted/added/updated logic assumes ONE template
+		const newRts = remoteTemplates
+		const deleted = oldRts.filter((o) => !newRts.some((n) => n.nook === o.nook))
+		const added = newRts.filter((o) => !oldRts.some((n) => n.nook === o.nook))
+		const updated = newRts.filter((o) => oldRts.some((n) => n.nook === o.nook))
+		if (deleted.length !== 0) {
+			await db
+				.deleteFrom('remoteTemplate')
 				.where('localId', '=', template.id)
+				.where(
+					'nook',
+					'in',
+					deleted.map((t) => t.nook),
+				)
 				.execute()
-			// the following deleted/added/updated logic assumes ONE template
-			const newRts = remoteTemplates
-			const deleted = oldRts.filter(
-				(o) => !newRts.some((n) => n.nook === o.nook),
-			)
-			const added = newRts.filter((o) => !oldRts.some((n) => n.nook === o.nook))
-			const updated = newRts.filter((o) =>
-				oldRts.some((n) => n.nook === o.nook),
-			)
-			if (deleted.length !== 0) {
-				await trx
-					.deleteFrom('remoteTemplate')
-					.where('localId', '=', template.id)
-					.where(
-						'nook',
-						'in',
-						deleted.map((t) => t.nook),
-					)
-					.execute()
-			}
-			if (added.length !== 0) {
-				await trx.insertInto('remoteTemplate').values(added).execute()
-			}
-			if (updated.length !== 0) {
-				await trx
-					.insertInto('remoteTemplate')
-					.values(updated)
-					.onConflict((db) =>
-						db.doUpdateSet({
-							uploadDate: (x) => x.ref('excluded.uploadDate'),
-							remoteId: (x) => x.ref('excluded.remoteId'),
-						} satisfies OnConflictUpdateRemoteTemplateSet),
-					)
-					.execute()
-			}
 		}
-		if (trx == null) {
-			await (await getKysely()).transaction().execute(insert)
-		} else {
-			await insert(trx)
+		if (added.length !== 0) {
+			await db.insertInto('remoteTemplate').values(added).execute()
+		}
+		if (updated.length !== 0) {
+			await db
+				.insertInto('remoteTemplate')
+				.values(updated)
+				.onConflict((db) =>
+					db.doUpdateSet({
+						uploadDate: (x) => x.ref('excluded.uploadDate'),
+						remoteId: (x) => x.ref('excluded.remoteId'),
+					} satisfies OnConflictUpdateRemoteTemplateSet),
+				)
+				.execute()
 		}
 	},
 	bulkInsertTemplate: async function (templates: Template[]) {
 		const entities = templates.map(templateToDocType)
 		const insertTemplates = entities.map((x) => x.insertTemplate)
 		const remoteTemplates = entities.flatMap((x) => x.remoteTemplates)
-		const db = await getKysely()
-		await db.transaction().execute(async (tx) => {
+		await tx(async (tx) => {
 			if (insertTemplates.length !== 0)
 				await tx.insertInto('template').values(insertTemplates).execute()
 			if (remoteTemplates.length !== 0)
@@ -166,11 +153,8 @@ export const templateCollectionMethods = {
 			.execute()
 		return undefinedMap(template, toTemplate) ?? null
 	},
-	getTemplateIdByRemoteId: async function (
-		templateId: RemoteTemplateId,
-		db?: Kysely<DB>,
-	) {
-		db ??= await getKysely()
+	getTemplateIdByRemoteId: async function (templateId: RemoteTemplateId) {
+		const db = await getKysely()
 		const template = await db
 			.selectFrom('template')
 			.leftJoin('remoteTemplate', 'template.id', 'remoteTemplate.localId')
@@ -294,14 +278,13 @@ export const templateCollectionMethods = {
 		templateId: TemplateId,
 		nook: NookId,
 	) {
-		const db = await getKysely()
 		const remoteTemplate = {
 			localId: templateId,
 			nook,
 			remoteId: null,
 			uploadDate: null,
 		}
-		await db.transaction().execute(async (db) => {
+		await tx(async (db) => {
 			await db
 				.insertInto('remoteTemplate')
 				.values(remoteTemplate)
@@ -354,8 +337,7 @@ export const templateCollectionMethods = {
 		templateId: TemplateId,
 		nook: NookId,
 	) {
-		const db = await getKysely()
-		await db.transaction().execute(async (db) => {
+		await tx(async (db) => {
 			const r1 = await db
 				.deleteFrom('remoteTemplate')
 				.where('localId', '=', templateId)

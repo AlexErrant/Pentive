@@ -97,3 +97,18 @@ export async function sync(): Promise<void> {
 		toastInfo('No changes to push!')
 	}
 }
+
+export async function tx(cb: (k: Kysely<DB>) => Promise<void>) {
+	const db = await getDb()
+	const id = 'x' + crypto.randomUUID().replaceAll('-', '')
+	await db.exec('SAVEPOINT ' + id)
+	try {
+		const k = await getKysely()
+		await cb(k)
+	} catch (e) {
+		await db.exec('ROLLBACK TO ' + id)
+		await db.exec('RELEASE ' + id)
+		throw e
+	}
+	await db.exec('RELEASE ' + id)
+}

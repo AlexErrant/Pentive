@@ -10,9 +10,9 @@ import {
 	type RemoteTemplateId,
 	type Note,
 } from 'shared'
-import { getKysely } from './crsqlite'
 import { type DB } from './database'
-import { type InsertObject, type Kysely } from 'kysely'
+import { type InsertObject } from 'kysely'
+import { getKysely, tx } from './crsqlite'
 import _ from 'lodash'
 import {
 	toastFatal,
@@ -66,8 +66,8 @@ function domainToEditRemote(
 }
 
 export const noteCollectionMethods = {
-	upsertNote: async function (note: Note, db?: Kysely<DB>) {
-		db ??= await getKysely()
+	upsertNote: async function (note: Note) {
+		const db = await getKysely()
 		const values = noteToDocType(note)
 		const conflictValues = { ...values, id: undefined, created: undefined }
 		await db
@@ -287,8 +287,7 @@ export const noteCollectionMethods = {
 			remoteId: null,
 			uploadDate: null,
 		}
-		const db = await getKysely()
-		await db.transaction().execute(async (db) => {
+		await tx(async (db) => {
 			await db
 				.insertInto('remoteNote')
 				.values(remoteNote)
@@ -342,8 +341,7 @@ export const noteCollectionMethods = {
 		})
 	},
 	makeNoteNotUploadable: async function (noteId: NoteId, nook: NookId) {
-		const db = await getKysely()
-		await db.transaction().execute(async (db) => {
+		await tx(async (db) => {
 			const r1 = await db
 				.deleteFrom('remoteNote')
 				.where('localId', '=', noteId)

@@ -2,8 +2,7 @@ import { undefinedMap } from 'shared'
 import { type MediaId, type Media } from 'shared'
 import * as Comlink from 'comlink'
 import { getDb, getKysely } from './crsqlite'
-import { type DB, type Media as MediaEntity } from './database'
-import { type Transaction } from 'kysely'
+import { type Media as MediaEntity } from './database'
 
 function entityToDomain(entity: MediaEntity): Media {
 	return {
@@ -18,19 +17,6 @@ function entityToDomain(entity: MediaEntity): Media {
 type MediaSansHash = Omit<Media, 'hash'>
 
 export const mediaCollectionMethods = {
-	insertMediaTrx: async function (media: MediaSansHash, db: Transaction<DB>) {
-		const hash = await crypto.subtle.digest('SHA-256', media.data)
-		await db
-			.insertInto('media')
-			.values({
-				id: media.id,
-				created: media.created.getTime(),
-				updated: media.updated.getTime(),
-				data: new Uint8Array(media.data),
-				hash: new Uint8Array(hash),
-			})
-			.execute()
-	},
 	insertMedia: async function (media: MediaSansHash) {
 		const db = await getDb()
 		const created = media.created.getTime()
