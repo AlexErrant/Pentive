@@ -12,20 +12,12 @@ import { toastInfo } from '../components/toasts'
 import { unitSeparator } from './util'
 
 let myDatabase: Promise<crDB> | null = null
-let myCrRtc: Awaited<ReturnType<typeof wdbRtc>> | null = null
 
 async function rd() {
 	if (myDatabase == null) {
 		myDatabase = createDb()
 	}
 	return await myDatabase
-}
-
-export async function getCrRtc() {
-	if (myCrRtc == null) {
-		myCrRtc = await createCrRtc()
-	}
-	return myCrRtc
 }
 
 const dp = new DOMParser()
@@ -47,8 +39,7 @@ export async function createDb() {
 	return db
 }
 
-async function createCrRtc() {
-	const db = await rd()
+export async function createCrRtc(db: crDB) {
 	return await wdbRtc(db, {
 		secure: true,
 		host: import.meta.env.VITE_PEER_HOST,

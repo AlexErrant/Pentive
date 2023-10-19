@@ -11,7 +11,7 @@ import {
 import { LicenseManager } from 'ag-grid-enterprise'
 import '@github/relative-time-element'
 import { notEmpty, type PeerDisplayName, type PeerJsId } from 'shared'
-import { getCrRtc } from '../sqlite/crsqlite'
+import { crRtc } from '../topLevelAwait'
 import { agGridTheme } from '../globalState'
 
 export interface Peer {
@@ -42,9 +42,8 @@ const columnDefs: Array<ColDef<Peer>> = [
 			<Show when={props.data?.status === 'disconnected'}>
 				<button
 					class='text-black bg-green-300 border-gray-900 rounded-lg border px-2 leading-normal'
-					onClick={async () => {
-						const rtc = await getCrRtc()
-						rtc.connectTo(props.data!.id)
+					onClick={() => {
+						crRtc.connectTo(props.data!.id)
 					}}
 				>
 					Connect

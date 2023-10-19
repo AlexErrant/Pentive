@@ -5,7 +5,6 @@ import {
 	createResource,
 	createSignal,
 } from 'solid-js'
-import { getCrRtc } from '../sqlite/crsqlite'
 import { stringify as uuidStringify } from 'uuid'
 import { cwaClient, isTrpcClientError } from '../trpcClient'
 import {
@@ -14,20 +13,20 @@ import {
 	peerIdValidator,
 } from 'shared'
 import PeersTable, { type Peer } from '../components/peersTable'
+import { crRtc } from '../topLevelAwait'
 
 export default function Peers() {
 	const [pending, setPending] = createSignal<string[]>([])
 	const [established, setEstablished] = createSignal<string[]>([])
-	const [siteId] = createResource(async () => {
+	const [siteId] = createResource(() => {
 		try {
-			const rtc = await getCrRtc()
 			// highTODO this returns a cleanup function; use it
 			// eslint-disable-next-line @typescript-eslint/no-unused-vars
-			const cleanup = rtc.onConnectionsChanged((pending, established) => {
+			const cleanup = crRtc.onConnectionsChanged((pending, established) => {
 				setPending(pending)
 				setEstablished(established)
 			})
-			return peerIdValidator.parse(uuidStringify(rtc.siteId))
+			return peerIdValidator.parse(uuidStringify(crRtc.siteId))
 		} catch (error) {
 			if (isTrpcClientError(error) && error.data?.httpStatus === 401) {
 				return null
@@ -116,12 +115,11 @@ const RenderPeerControls: VoidComponent<{
 				PeerID: {props.siteId}
 			</button>
 			<form
-				onSubmit={async (e) => {
+				onSubmit={(e) => {
 					e.preventDefault()
 					const formData = new FormData(e.target as HTMLFormElement)
 					const remotePeerId = formData.get('remotePeerId') as string
-					const rtc = await getCrRtc()
-					rtc.connectTo(remotePeerId)
+					crRtc.connectTo(remotePeerId)
 				}}
 			>
 				<label for='remotePeerId'>Connect to</label>
