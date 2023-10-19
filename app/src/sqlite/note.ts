@@ -12,7 +12,6 @@ import {
 } from 'shared'
 import { type DB } from './database'
 import { type InsertObject } from 'kysely'
-import { tx } from './crsqlite'
 import _ from 'lodash'
 import {
 	toastFatal,
@@ -20,7 +19,7 @@ import {
 	toastInfo,
 	toastWarn,
 } from '../components/toasts'
-import { C, ky } from '../topLevelAwait'
+import { C, ky, tx } from '../topLevelAwait'
 import {
 	noteEntityToDomain,
 	stringifyTags,

@@ -47,16 +47,6 @@ export async function createCrRtc(db: crDB) {
 	})
 }
 
-let myKysely: Kysely<DB> | null = null
-
-async function ky() {
-	if (myKysely == null) {
-		const db = await rd()
-		myKysely = createKysely(db)
-	}
-	return myKysely
-}
-
 export function createKysely(db: crDB) {
 	return new Kysely<DB>({
 		dialect: new CRDialect({ database: db as CRDatabase }),
@@ -89,17 +79,17 @@ export async function sync(): Promise<void> {
 	}
 }
 
-export async function tx(cb: (k: Kysely<DB>) => Promise<void>) {
-	const db = await rd()
-	const id = 'x' + crypto.randomUUID().replaceAll('-', '')
-	await db.exec('SAVEPOINT ' + id)
-	try {
-		const k = await ky()
-		await cb(k)
-	} catch (e) {
-		await db.exec('ROLLBACK TO ' + id)
+export function createTx(k: Kysely<DB>, db: crDB) {
+	return async (cb: (k: Kysely<DB>) => Promise<void>) => {
+		const id = 'x' + crypto.randomUUID().replaceAll('-', '')
+		await db.exec('SAVEPOINT ' + id)
+		try {
+			await cb(k)
+		} catch (e) {
+			await db.exec('ROLLBACK TO ' + id)
+			await db.exec('RELEASE ' + id)
+			throw e
+		}
 		await db.exec('RELEASE ' + id)
-		throw e
 	}
-	await db.exec('RELEASE ' + id)
 }

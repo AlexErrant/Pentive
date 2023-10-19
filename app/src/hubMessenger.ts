@@ -13,9 +13,8 @@ import {
 	type Card,
 } from 'shared'
 import { ulidAsBase64Url } from './domain/utility'
-import { tx } from './sqlite/crsqlite'
 import { noteOrds } from 'shared-dom'
-import { C } from './topLevelAwait'
+import { C, tx } from './topLevelAwait'
 import { toastFatal } from './components/toasts'
 
 export const appExpose = {

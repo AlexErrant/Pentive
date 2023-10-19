@@ -12,7 +12,6 @@ import {
 	objKeys,
 	objEntries,
 } from 'shared'
-import { tx } from './crsqlite'
 import {
 	type DB,
 	type RemoteTemplate,
@@ -29,7 +28,7 @@ import {
 	updateLocalMediaIdByRemoteMediaIdAndGetNewDoc,
 } from './util'
 import { toastFatal, toastImpossible, toastWarn } from '../components/toasts'
-import { C, ky } from '../topLevelAwait'
+import { tx, C, ky } from '../topLevelAwait'
 
 function templateToDocType(template: Template) {
 	const now = C.getDate().getTime()
