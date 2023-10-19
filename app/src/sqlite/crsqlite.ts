@@ -14,7 +14,7 @@ import { unitSeparator } from './util'
 let myDatabase: Promise<crDB> | null = null
 let myCrRtc: Awaited<ReturnType<typeof wdbRtc>> | null = null
 
-export async function getDb() {
+async function rd() {
 	if (myDatabase == null) {
 		myDatabase = createDb()
 	}
@@ -39,7 +39,7 @@ export function getMediaIds(fvs: string) {
 		.join(unitSeparator)
 }
 
-async function createDb() {
+export async function createDb() {
 	const sqlite = await sqliteWasm(() => crsqliteUrl)
 	const db = await sqlite.open('username.db')
 	await db.execMany(initSql)
@@ -48,7 +48,7 @@ async function createDb() {
 }
 
 async function createCrRtc() {
-	const db = await getDb()
+	const db = await rd()
 	return await wdbRtc(db, {
 		secure: true,
 		host: import.meta.env.VITE_PEER_HOST,
@@ -66,14 +66,14 @@ export async function getKysely(): Promise<Kysely<DB>> {
 }
 
 async function createKysely(): Promise<Kysely<DB>> {
-	const db = await getDb()
+	const db = await rd()
 	return new Kysely<DB>({
 		dialect: new CRDialect({ database: db as CRDatabase }),
 	})
 }
 
 export async function sync(): Promise<void> {
-	const db = await getDb()
+	const db = await rd()
 	const siteIdRaw = (
 		await db.execA<[Uint8Array]>('SELECT crsql_siteid();')
 	)[0]![0]
@@ -99,7 +99,7 @@ export async function sync(): Promise<void> {
 }
 
 export async function tx(cb: (k: Kysely<DB>) => Promise<void>) {
-	const db = await getDb()
+	const db = await rd()
 	const id = 'x' + crypto.randomUUID().replaceAll('-', '')
 	await db.exec('SAVEPOINT ' + id)
 	try {

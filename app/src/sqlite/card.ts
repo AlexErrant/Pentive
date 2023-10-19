@@ -8,7 +8,7 @@ import {
 	type NoteCard,
 	type TemplateId,
 } from 'shared'
-import { getDb, getKysely } from './crsqlite'
+import { getKysely } from './crsqlite'
 import { type DB, type Card as CardEntity, type Note } from './database'
 import {
 	type ExpressionBuilder,
@@ -21,7 +21,7 @@ import {
 import _ from 'lodash'
 import { toastImpossible, toastInfo } from '../components/toasts'
 import { md5 } from '../domain/utility'
-import { C } from '../topLevelAwait'
+import { C, rd } from '../topLevelAwait'
 import {
 	noteEntityToDomain,
 	parseTags,
@@ -165,7 +165,6 @@ async function buildCache(
 		.executeTakeFirstOrThrow()
 		.then((x) => x.c === 1)
 	if (!cacheExists) {
-		const db = getDb()
 		const { sql, parameters } = baseQuery
 			.clearSelect()
 			.select('card.id as id')
@@ -175,9 +174,7 @@ async function buildCache(
 		// 	(await sql`PRAGMA temp_store;`.execute(db)).rows[0],
 		// )
 		const start = performance.now()
-		await (
-			await db
-		).exec(
+		await rd.exec(
 			`CREATE TEMP TABLE IF NOT EXISTS ${cacheName} AS ` + sql,
 			parameters as SQLiteCompatibleType[],
 		)

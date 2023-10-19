@@ -1,5 +1,6 @@
 import { type Plugin } from 'shared-dom'
-import { getDb, getKysely } from './crsqlite'
+import { rd } from '../topLevelAwait'
+import { getKysely } from './crsqlite'
 import { type Plugin as PluginEntity } from './database'
 import { type PluginName } from 'shared'
 
@@ -18,7 +19,7 @@ function entityToDomain(entity: PluginEntity): Plugin {
 
 export const pluginCollectionMethods = {
 	upsertPlugin: async function (plugin: Plugin) {
-		const db = await getDb()
+		const db = rd
 		await db.exec(
 			`INSERT INTO plugin (name,version,dependencies,created,updated,script)
                    VALUES (   ?,      ?,           ?,      ?,       ?,    ?)

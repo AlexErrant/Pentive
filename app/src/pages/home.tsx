@@ -11,8 +11,7 @@ import type HomeData from './home.data'
 import { db } from '../db'
 import { importAnki } from './importer/importer'
 import { augcClient } from '../trpcClient'
-import { getDb } from '../sqlite/crsqlite'
-import { C } from '../topLevelAwait'
+import { C, rd } from '../topLevelAwait'
 import { toastImpossible } from '../components/toasts'
 import EditSql from '../components/editSql'
 
@@ -155,7 +154,7 @@ function q(rawSql: string) {
 	return async () => {
 		console.log(rawSql)
 		const start = performance.now()
-		const r = await (await getDb()).execO(rawSql)
+		const r = await rd.execO(rawSql)
 		const end = performance.now()
 		console.table(r)
 		console.log(`Execution time: ${end - start} ms`)

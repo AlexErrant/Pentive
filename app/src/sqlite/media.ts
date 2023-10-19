@@ -1,7 +1,8 @@
 import { undefinedMap } from 'shared'
 import { type MediaId, type Media } from 'shared'
 import * as Comlink from 'comlink'
-import { getDb, getKysely } from './crsqlite'
+import { rd } from '../topLevelAwait'
+import { getKysely } from './crsqlite'
 import { type Media as MediaEntity } from './database'
 
 function entityToDomain(entity: MediaEntity): Media {
@@ -18,7 +19,7 @@ type MediaSansHash = Omit<Media, 'hash'>
 
 export const mediaCollectionMethods = {
 	insertMedia: async function (media: MediaSansHash) {
-		const db = await getDb()
+		const db = rd
 		const created = media.created.getTime()
 		const updated = media.updated.getTime()
 		const hash = await crypto.subtle.digest('SHA-256', media.data)
@@ -37,7 +38,7 @@ export const mediaCollectionMethods = {
 	async bulkInsertMedia(media: MediaSansHash[]) {
 		// wa-sqlite write perf is significantly worse than Dexie's.
 		// If moving to SQLite official doesn't improve perf, consider using Origin Private File System
-		const db = await getDb()
+		const db = rd
 		await db.tx(async (tx) => {
 			const insert = await tx.prepare(
 				`INSERT INTO media (id,created,updated,data,hash)
