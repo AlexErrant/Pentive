@@ -1,3 +1,11 @@
+import { type Plugin } from 'shared-dom'
+import {
+	type Plugin as PluginEntity,
+	type Note as NoteEntity,
+	type RemoteNote,
+	type RemoteTemplate,
+	type Template as TemplateEntity,
+} from './database'
 import {
 	parseMap,
 	type NoteId,
@@ -11,12 +19,6 @@ import {
 	imgPlaceholder,
 	type Field,
 } from 'shared'
-import {
-	type Note as NoteEntity,
-	type RemoteNote,
-	type RemoteTemplate,
-	type Template as TemplateEntity,
-} from './database'
 import { toastFatal, toastImpossible } from '../components/toasts'
 
 export const unitSeparator = '\x1f' // if this changes, also change noteFtsTag's separator 89CDE7EA-EF1B-4054-B381-597EE549CAB4
@@ -141,4 +143,17 @@ export function noteEntityToDomain(
 		delete r.ankiNoteId
 	}
 	return r
+}
+
+export function pluginEntityToDomain(entity: PluginEntity): Plugin {
+	return {
+		name: entity.name,
+		version: entity.version,
+		dependencies: entity.dependencies ?? undefined,
+		created: new Date(entity.created),
+		updated: new Date(entity.updated),
+		script: new Blob([entity.script], {
+			type: 'text/javascript',
+		}),
+	}
 }

@@ -1,4 +1,3 @@
-import { db } from './db'
 import { registerPluginServices } from './pluginManager'
 import {
 	createCrRtc,
@@ -6,12 +5,13 @@ import {
 	createKysely,
 	createTx,
 } from './sqlite/crsqlite'
+import { pluginEntityToDomain } from './sqlite/util'
 
 export const rd = await createDb()
 export const crRtc = await createCrRtc(rd)
 export const ky = createKysely(rd)
 export const tx = createTx(ky, rd)
 
-const plugins = await db.getPlugins()
+const plugins = await ky.selectFrom('plugin').selectAll().execute()
 
-export const C = await registerPluginServices(plugins)
+export const C = await registerPluginServices(plugins.map(pluginEntityToDomain))

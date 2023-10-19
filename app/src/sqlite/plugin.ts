@@ -1,20 +1,7 @@
 import { type Plugin } from 'shared-dom'
 import { rd, ky } from '../topLevelAwait'
-import { type Plugin as PluginEntity } from './database'
 import { type PluginName } from 'shared'
-
-function entityToDomain(entity: PluginEntity): Plugin {
-	return {
-		name: entity.name,
-		version: entity.version,
-		dependencies: entity.dependencies ?? undefined,
-		created: new Date(entity.created),
-		updated: new Date(entity.updated),
-		script: new Blob([entity.script], {
-			type: 'text/javascript',
-		}),
-	}
-}
+import { pluginEntityToDomain } from './util'
 
 export const pluginCollectionMethods = {
 	upsertPlugin: async function (plugin: Plugin) {
@@ -39,7 +26,7 @@ export const pluginCollectionMethods = {
 	},
 	getPlugins: async function (): Promise<Plugin[]> {
 		const plugins = await ky.selectFrom('plugin').selectAll().execute()
-		return plugins.map(entityToDomain)
+		return plugins.map(pluginEntityToDomain)
 	},
 	deletePlugin: async function (name: PluginName) {
 		await ky.deleteFrom('plugin').where('name', '=', name).execute()
