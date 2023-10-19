@@ -11,15 +11,6 @@ import { wholeDbReplicator } from 'shared-dom'
 import { toastInfo } from '../components/toasts'
 import { unitSeparator } from './util'
 
-let myDatabase: Promise<crDB> | null = null
-
-async function rd() {
-	if (myDatabase == null) {
-		myDatabase = createDb()
-	}
-	return await myDatabase
-}
-
 const dp = new DOMParser()
 
 export function getMediaIds(fvs: string) {
@@ -53,8 +44,7 @@ export function createKysely(db: crDB) {
 	})
 }
 
-export async function sync(): Promise<void> {
-	const db = await rd()
+export async function sync(db: crDB): Promise<void> {
 	const siteIdRaw = (
 		await db.execA<[Uint8Array]>('SELECT crsql_siteid();')
 	)[0]![0]

@@ -10,6 +10,7 @@ import {
 import { cwaClient } from '../trpcClient'
 import { whoAmI } from '../globalState'
 import { toastError, toastInfo } from '../components/toasts'
+import { rd } from '../topLevelAwait'
 
 async function postMedia(
 	type: 'note' | 'template',
@@ -119,7 +120,7 @@ export default function Sync(): JSX.Element {
 					<button
 						class='border-gray-900 rounded-lg border px-2'
 						onClick={async () => {
-							await db.sync()
+							await db.sync(rd)
 						}}
 					>
 						p2p sync
