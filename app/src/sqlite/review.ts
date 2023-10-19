@@ -1,12 +1,11 @@
-import { getKysely } from './crsqlite'
 import { type Review } from 'shared'
 import { type Review as ReviewEntity } from '../sqlite/database'
 import _ from 'lodash'
 import { toastInfo } from '../components/toasts'
+import { ky } from '../topLevelAwait'
 
 export const reviewCollectionMethods = {
 	bulkUploadReview: async function (reviews: Review[]) {
-		const db = await getKysely()
 		const entities = reviews.map(
 			({ id, cardId, ...r }) =>
 				({
@@ -18,7 +17,7 @@ export const reviewCollectionMethods = {
 		const batches = _.chunk(entities, 1000)
 		for (let i = 0; i < batches.length; i++) {
 			toastInfo('review batch ' + (i + 1) + '/' + batches.length)
-			await db.insertInto('review').values(batches[i]!).execute()
+			await ky.insertInto('review').values(batches[i]!).execute()
 		}
 	},
 }

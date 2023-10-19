@@ -1,8 +1,8 @@
-import { getKysely } from './crsqlite'
 import { toastImpossible } from '../components/toasts'
 import { type Card, type Note } from './database'
 import { type NoteId } from 'shared'
 import { stringifyTagsArray, unitSeparator } from './util'
+import { ky } from '../topLevelAwait'
 
 export const tagCollectionMethods = {
 	// This insanity with `noteFtsTagVocab` is to get properly cased tags.
@@ -12,8 +12,7 @@ export const tagCollectionMethods = {
 	//    You'll still need a FTS index on tags to make checking for the existence of a
 	//    tag easier (so you can then safely delete a tag)
 	getTags: async function () {
-		const db = await getKysely()
-		const noteTagsOffsets = db
+		const noteTagsOffsets = ky
 			// I'm not adding rowid to the official type definition of Notes because it adds noise to Insert/Update/Conflict resolution types
 			.withTables<{ note: Note & { rowid: number } }>()
 			.with('vocab', (db) =>
@@ -28,7 +27,7 @@ export const tagCollectionMethods = {
 			.innerJoin('vocab', 'vocab.doc', 'note.rowid')
 			.select(['offset', 'tags'])
 			.execute()
-		const cardTagsOffsets = db
+		const cardTagsOffsets = ky
 			// I'm not adding rowid to the official type definition of Cards because it adds noise to Insert/Update/Conflict resolution types
 			.withTables<{ card: Card & { rowid: number } }>()
 			.with('vocab', (db) =>
@@ -57,8 +56,7 @@ export const tagCollectionMethods = {
 			.sort()
 	},
 	saveTags: async function (noteId: NoteId, tags: string[]) {
-		const db = await getKysely()
-		await db
+		await ky
 			.updateTable('note')
 			.set({ tags: stringifyTagsArray(tags) })
 			.where('id', '=', noteId)

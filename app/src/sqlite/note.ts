@@ -12,7 +12,7 @@ import {
 } from 'shared'
 import { type DB } from './database'
 import { type InsertObject } from 'kysely'
-import { getKysely, tx } from './crsqlite'
+import { tx } from './crsqlite'
 import _ from 'lodash'
 import {
 	toastFatal,
@@ -20,7 +20,7 @@ import {
 	toastInfo,
 	toastWarn,
 } from '../components/toasts'
-import { C } from '../topLevelAwait'
+import { C, ky } from '../topLevelAwait'
 import {
 	noteEntityToDomain,
 	stringifyTags,
@@ -67,31 +67,28 @@ function domainToEditRemote(
 
 export const noteCollectionMethods = {
 	upsertNote: async function (note: Note) {
-		const db = await getKysely()
 		const values = noteToDocType(note)
 		const conflictValues = { ...values, id: undefined, created: undefined }
-		await db
+		await ky
 			.insertInto('note')
 			.values(values)
 			.onConflict((db) => db.doUpdateSet(conflictValues))
 			.execute()
 	},
 	bulkInsertNotes: async function (notes: Note[]) {
-		const db = await getKysely()
 		const batches = _.chunk(notes.map(noteToDocType), 1000)
 		for (let i = 0; i < batches.length; i++) {
 			toastInfo('note batch ' + i)
-			await db.insertInto('note').values(batches[i]!).execute()
+			await ky.insertInto('note').values(batches[i]!).execute()
 		}
 	},
 	getNote: async function (noteId: NoteId) {
-		const db = await getKysely()
-		const remoteNotes = await db
+		const remoteNotes = await ky
 			.selectFrom('remoteNote')
 			.selectAll()
 			.where('localId', '=', noteId)
 			.execute()
-		const note = await db
+		const note = await ky
 			.selectFrom('note')
 			.selectAll('note')
 			.innerJoin('template', 'note.templateId', 'template.id')
@@ -101,13 +98,12 @@ export const noteCollectionMethods = {
 		return note == null ? null : noteEntityToDomain(note, remoteNotes)
 	},
 	getNotesByIds: async function (noteIds: NoteId[]) {
-		const db = await getKysely()
-		const remoteNotes = await db
+		const remoteNotes = await ky
 			.selectFrom('remoteNote')
 			.selectAll()
 			.where('localId', 'in', noteIds)
 			.execute()
-		const notes = await db
+		const notes = await ky
 			.selectFrom('note')
 			.selectAll('note')
 			.innerJoin('template', 'note.templateId', 'template.id')
@@ -122,19 +118,18 @@ export const noteCollectionMethods = {
 		)
 	},
 	getNewNotesToUpload: async function () {
-		const db = await getKysely()
 		const dp = new DOMParser()
-		const remoteNotes = await db
+		const remoteNotes = await ky
 			.selectFrom('remoteNote')
 			.selectAll()
 			.where('remoteId', 'is', null)
 			.execute()
 		const localIds = [...new Set(remoteNotes.map((t) => t.localId))]
-		const remoteTemplates = await db
+		const remoteTemplates = await ky
 			.selectFrom('remoteTemplate')
 			.selectAll()
 			.execute()
-		const notesAndStuff = await db
+		const notesAndStuff = await ky
 			.selectFrom('note')
 			.selectAll('note')
 			.innerJoin('template', 'note.templateId', 'template.id')
@@ -172,9 +167,8 @@ export const noteCollectionMethods = {
 		return notesAndStuff.map((n) => n.note)
 	},
 	getEditedNotesToUpload: async function () {
-		const db = await getKysely()
 		const dp = new DOMParser()
-		const remoteNotes = await db
+		const remoteNotes = await ky
 			.selectFrom('remoteNote')
 			.leftJoin('note', 'remoteNote.localId', 'note.id')
 			.selectAll('remoteNote')
@@ -182,11 +176,11 @@ export const noteCollectionMethods = {
 			.whereRef('remoteNote.uploadDate', '<', 'note.updated')
 			.execute()
 		const localIds = [...new Set(remoteNotes.map((t) => t.localId))]
-		const remoteTemplates = await db
+		const remoteTemplates = await ky
 			.selectFrom('remoteTemplate')
 			.selectAll()
 			.execute()
-		const notesAndStuff = await db
+		const notesAndStuff = await ky
 			.selectFrom('note')
 			.selectAll('note')
 			.innerJoin('template', 'note.templateId', 'template.id')
@@ -238,8 +232,7 @@ export const noteCollectionMethods = {
 		return notesAndStuff.map((n) => n.note)
 	},
 	getNoteMediaToUpload: async function () {
-		const db = await getKysely()
-		const mediaBinaries = await db
+		const mediaBinaries = await ky
 			.selectFrom('remoteMedia')
 			.innerJoin('media', 'remoteMedia.localMediaId', 'media.id')
 			.innerJoin('note', 'remoteMedia.localEntityId', 'note.id')
@@ -361,9 +354,8 @@ export const noteCollectionMethods = {
 	updateNoteRemoteIds: async function (
 		remoteIdByLocal: Map<readonly [NoteId, NookId], RemoteNoteId>,
 	) {
-		const db = await getKysely()
 		for (const [[noteId, nook], remoteId] of remoteIdByLocal) {
-			const r = await db
+			const r = await ky
 				.updateTable('remoteNote')
 				.set({ remoteId, uploadDate: C.getDate().getTime() })
 				.where('nook', '=', nook)
@@ -377,8 +369,7 @@ export const noteCollectionMethods = {
 		}
 	},
 	markNoteAsPushed: async function (remoteNoteIds: RemoteNoteId[]) {
-		const db = await getKysely()
-		const r = await db
+		const r = await ky
 			.updateTable('remoteNote')
 			.set({ uploadDate: C.getDate().getTime() })
 			.where('remoteId', 'in', remoteNoteIds)
@@ -392,9 +383,8 @@ export const noteCollectionMethods = {
 			)
 	},
 	updateNote: async function (note: Note) {
-		const db = await getKysely()
 		const { id, created, ...rest } = noteToDocType(note)
-		const r = await db
+		const r = await ky
 			.updateTable('note')
 			.set(rest)
 			.where('id', '=', id)

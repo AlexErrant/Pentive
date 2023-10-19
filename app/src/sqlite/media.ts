@@ -1,8 +1,7 @@
 import { undefinedMap } from 'shared'
 import { type MediaId, type Media } from 'shared'
 import * as Comlink from 'comlink'
-import { rd } from '../topLevelAwait'
-import { getKysely } from './crsqlite'
+import { ky, rd } from '../topLevelAwait'
 import { type Media as MediaEntity } from './database'
 
 function entityToDomain(entity: MediaEntity): Media {
@@ -63,8 +62,7 @@ export const mediaCollectionMethods = {
 	async getMedia(id: MediaId) {
 		// This helps detect memory leaks - if you see this log 100x, something's very wrong.
 		console.debug('getMedia for ' + id)
-		const db = await getKysely()
-		const media = await db
+		const media = await ky
 			.selectFrom('media')
 			.selectAll()
 			.where('id', '=', id)

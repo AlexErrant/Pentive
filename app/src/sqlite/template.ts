@@ -12,7 +12,7 @@ import {
 	objKeys,
 	objEntries,
 } from 'shared'
-import { getKysely, tx } from './crsqlite'
+import { tx } from './crsqlite'
 import {
 	type DB,
 	type RemoteTemplate,
@@ -29,7 +29,7 @@ import {
 	updateLocalMediaIdByRemoteMediaIdAndGetNewDoc,
 } from './util'
 import { toastFatal, toastImpossible, toastWarn } from '../components/toasts'
-import { C } from '../topLevelAwait'
+import { C, ky } from '../topLevelAwait'
 
 function templateToDocType(template: Template) {
 	const now = C.getDate().getTime()
@@ -89,13 +89,12 @@ export const templateCollectionMethods = {
 			id: undefined,
 			created: undefined,
 		}
-		const db = await getKysely()
-		await db
+		await ky
 			.insertInto('template')
 			.values(insertTemplate)
 			.onConflict((db) => db.doUpdateSet(conflictValues))
 			.execute()
-		const oldRts = await db
+		const oldRts = await ky
 			.selectFrom('remoteTemplate')
 			.selectAll()
 			.where('localId', '=', template.id)
@@ -106,7 +105,7 @@ export const templateCollectionMethods = {
 		const added = newRts.filter((o) => !oldRts.some((n) => n.nook === o.nook))
 		const updated = newRts.filter((o) => oldRts.some((n) => n.nook === o.nook))
 		if (deleted.length !== 0) {
-			await db
+			await ky
 				.deleteFrom('remoteTemplate')
 				.where('localId', '=', template.id)
 				.where(
@@ -117,10 +116,10 @@ export const templateCollectionMethods = {
 				.execute()
 		}
 		if (added.length !== 0) {
-			await db.insertInto('remoteTemplate').values(added).execute()
+			await ky.insertInto('remoteTemplate').values(added).execute()
 		}
 		if (updated.length !== 0) {
-			await db
+			await ky
 				.insertInto('remoteTemplate')
 				.values(updated)
 				.onConflict((db) =>
@@ -144,8 +143,7 @@ export const templateCollectionMethods = {
 		})
 	},
 	getTemplate: async function (templateId: TemplateId) {
-		const db = await getKysely()
-		const template = await db
+		const template = await ky
 			.selectFrom('template')
 			.leftJoin('remoteTemplate', 'template.id', 'remoteTemplate.localId')
 			.selectAll()
@@ -154,8 +152,7 @@ export const templateCollectionMethods = {
 		return undefinedMap(template, toTemplate) ?? null
 	},
 	getTemplateIdByRemoteId: async function (templateId: RemoteTemplateId) {
-		const db = await getKysely()
-		const template = await db
+		const template = await ky
 			.selectFrom('template')
 			.leftJoin('remoteTemplate', 'template.id', 'remoteTemplate.localId')
 			.where(({ selectFrom, exists }) =>
@@ -171,8 +168,7 @@ export const templateCollectionMethods = {
 		return undefinedMap(template, toTemplate) ?? null
 	},
 	getTemplates: async function () {
-		const db = await getKysely()
-		const allTemplates = await db
+		const allTemplates = await ky
 			.selectFrom('template')
 			.leftJoin('remoteTemplate', 'template.id', 'remoteTemplate.localId')
 			.selectAll()
@@ -181,23 +177,21 @@ export const templateCollectionMethods = {
 	},
 	// lowTODO actually use the offset/limit
 	getTemplatesInfinitely: async function (offset: number, limit: number) {
-		const db = await getKysely()
-		const allTemplates = await db
+		const allTemplates = await ky
 			.selectFrom('template')
 			.leftJoin('remoteTemplate', 'template.id', 'remoteTemplate.localId')
 			.selectAll()
 			.execute()
 		const templates = toTemplates(allTemplates)
-		const { count } = await db
+		const { count } = await ky
 			.selectFrom('template')
-			.select(db.fn.count<number>('id').as('count'))
+			.select(ky.fn.count<number>('id').as('count'))
 			.executeTakeFirstOrThrow()
 		return { templates, count }
 	},
 	getNewTemplatesToUpload: async function () {
-		const db = await getKysely()
 		const dp = new DOMParser()
-		const templatesAndStuff = await db
+		const templatesAndStuff = await ky
 			.selectFrom('template')
 			.leftJoin('remoteTemplate', 'template.id', 'remoteTemplate.localId')
 			.selectAll()
@@ -212,9 +206,8 @@ export const templateCollectionMethods = {
 		return templatesAndStuff.map((n) => n.template)
 	},
 	getEditedTemplatesToUpload: async function () {
-		const db = await getKysely()
 		const dp = new DOMParser()
-		const templatesAndStuff = await db
+		const templatesAndStuff = await ky
 			.selectFrom('template')
 			.leftJoin('remoteTemplate', 'template.id', 'remoteTemplate.localId')
 			.where('remoteId', 'is not', null)
@@ -229,8 +222,7 @@ export const templateCollectionMethods = {
 		return templatesAndStuff.map((n) => n.template)
 	},
 	getTemplateMediaToUpload: async function () {
-		const db = await getKysely()
-		const mediaBinaries = await db
+		const mediaBinaries = await ky
 			.selectFrom('remoteMedia')
 			.innerJoin('media', 'remoteMedia.localMediaId', 'media.id')
 			.innerJoin('template', 'remoteMedia.localEntityId', 'template.id')
@@ -357,10 +349,9 @@ export const templateCollectionMethods = {
 	updateTemplateRemoteIds: async function (
 		remoteIdByLocal: Map<readonly [TemplateId, NookId], RemoteTemplateId>,
 	) {
-		const db = await getKysely()
 		const now = C.getDate().getTime()
 		for (const [[templateId, nook], remoteId] of remoteIdByLocal) {
-			const r = await db
+			const r = await ky
 				.updateTable('remoteTemplate')
 				.set({ remoteId, uploadDate: now })
 				.where('nook', '=', nook)
@@ -374,8 +365,7 @@ export const templateCollectionMethods = {
 		}
 	},
 	markTemplateAsPushed: async function (remoteTemplateIds: RemoteTemplateId[]) {
-		const db = await getKysely()
-		const r = await db
+		const r = await ky
 			.updateTable('remoteTemplate')
 			.set({ uploadDate: C.getDate().getTime() })
 			.where('remoteId', 'in', remoteTemplateIds)

@@ -1,4 +1,3 @@
-import { getKysely } from './crsqlite'
 import { type CardSettingId, type CardSetting } from 'shared'
 import {
 	type DB,
@@ -11,10 +10,10 @@ import {
 } from 'kysely'
 import _ from 'lodash'
 import { toastInfo } from '../components/toasts'
+import { ky } from '../topLevelAwait'
 
 export const cardSettingsCollectionMethods = {
 	bulkUploadCardSettings: async function (cardSetting: CardSetting[]) {
-		const db = await getKysely()
 		const entities = cardSetting.map(
 			({ id, ...r }) =>
 				({
@@ -25,7 +24,7 @@ export const cardSettingsCollectionMethods = {
 		const batches = _.chunk(entities, 1000)
 		for (let i = 0; i < batches.length; i++) {
 			toastInfo('cardSetting batch ' + (i + 1) + '/' + batches.length)
-			await db
+			await ky
 				.insertInto('cardSetting')
 				.values(batches[i]!)
 				.onConflict((db) =>
@@ -37,8 +36,7 @@ export const cardSettingsCollectionMethods = {
 		}
 	},
 	getCardSettings: async function () {
-		const db = await getKysely()
-		const cardSettings = await db
+		const cardSettings = await ky
 			.selectFrom('cardSetting')
 			.selectAll()
 			.execute()

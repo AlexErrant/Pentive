@@ -47,17 +47,17 @@ export async function createCrRtc(db: crDB) {
 	})
 }
 
-let myKysely: Promise<Kysely<DB>> | null = null
+let myKysely: Kysely<DB> | null = null
 
-export async function getKysely(): Promise<Kysely<DB>> {
+async function ky() {
 	if (myKysely == null) {
-		myKysely = createKysely()
+		const db = await rd()
+		myKysely = createKysely(db)
 	}
-	return await myKysely
+	return myKysely
 }
 
-async function createKysely(): Promise<Kysely<DB>> {
-	const db = await rd()
+export function createKysely(db: crDB) {
 	return new Kysely<DB>({
 		dialect: new CRDialect({ database: db as CRDatabase }),
 	})
@@ -94,7 +94,7 @@ export async function tx(cb: (k: Kysely<DB>) => Promise<void>) {
 	const id = 'x' + crypto.randomUUID().replaceAll('-', '')
 	await db.exec('SAVEPOINT ' + id)
 	try {
-		const k = await getKysely()
+		const k = await ky()
 		await cb(k)
 	} catch (e) {
 		await db.exec('ROLLBACK TO ' + id)

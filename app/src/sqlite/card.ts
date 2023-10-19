@@ -8,7 +8,7 @@ import {
 	type NoteCard,
 	type TemplateId,
 } from 'shared'
-import { getKysely } from './crsqlite'
+import { ky, C, rd } from '../topLevelAwait'
 import { type DB, type Card as CardEntity, type Note } from './database'
 import {
 	type ExpressionBuilder,
@@ -21,7 +21,6 @@ import {
 import _ from 'lodash'
 import { toastImpossible, toastInfo } from '../components/toasts'
 import { md5 } from '../domain/utility'
-import { C, rd } from '../topLevelAwait'
 import {
 	noteEntityToDomain,
 	parseTags,
@@ -151,17 +150,16 @@ async function buildCache(
 	baseQuery: SelectQueryBuilder<DB, 'card' | 'note', Partial<unknown>>,
 	search?: SearchParams,
 ) {
-	const db = await getKysely()
 	// const start = performance.now()
 	const cacheName = ('getCardsCache_' +
 		// lowTODO find a better way to name the cache table. Don't use crypto.subtle.digest - it's ~200ms which is absurd
 		md5(JSON.stringify(search))) as SearchCache
 	// const end = performance.now()
 	// console.info(`hash built in ${end - start} ms`)
-	const cacheExists = await db
+	const cacheExists = await ky
 		.selectFrom('sqlite_temp_master')
 		.where('name', '=', cacheName)
-		.select(db.fn.count<number>('name').as('c'))
+		.select(ky.fn.count<number>('name').as('c'))
 		.executeTakeFirstOrThrow()
 		.then((x) => x.c === 1)
 	if (!cacheExists) {
@@ -203,7 +201,7 @@ async function getCardsCount(
 		Partial<unknown>
 	>,
 ) {
-	const db = (await getKysely()).withTables<WithCache>()
+	const db = ky.withTables<WithCache>()
 	const count =
 		searchCache != null
 			? db
@@ -222,7 +220,7 @@ async function getCards(
 	sort?: { col: 'card.due' | 'card.created'; direction: 'asc' | 'desc' },
 	search?: SearchParams,
 ) {
-	const db = (await getKysely()).withTables<WithCache>()
+	const db = ky.withTables<WithCache>()
 	const baseQuery = db
 		.selectFrom('card')
 		.innerJoin('note', 'card.noteId', 'note.id')
@@ -405,11 +403,10 @@ export const cardCollectionMethods = {
 		await this.bulkUpsertCards([card])
 	},
 	bulkUpsertCards: async function (cards: Card[]) {
-		const db = await getKysely()
 		const batches = _.chunk(cards.map(cardToDocType), 1000)
 		for (let i = 0; i < batches.length; i++) {
 			toastInfo('card batch ' + i)
-			await db
+			await ky
 				.insertInto('card')
 				.values(batches[i]!)
 				.onConflict((db) =>
@@ -425,8 +422,7 @@ export const cardCollectionMethods = {
 		}
 	},
 	getCard: async function (cardId: CardId) {
-		const db = await getKysely()
-		const card = await db
+		const card = await ky
 			.selectFrom('card')
 			.selectAll()
 			.where('id', '=', cardId)
@@ -434,8 +430,7 @@ export const cardCollectionMethods = {
 		return card == null ? null : cardEntityToDomain(card)
 	},
 	getCardsByNote: async function (noteId: NoteId) {
-		const db = await getKysely()
-		const cards = await db
+		const cards = await ky
 			.selectFrom('card')
 			.selectAll()
 			.where('noteId', '=', noteId)
