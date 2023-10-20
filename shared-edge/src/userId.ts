@@ -1,6 +1,5 @@
 import { type JWTVerifyResult, jwtVerify } from 'jose'
 import {
-	type Result,
 	type UserId,
 	csrfHeaderName,
 	toError,
@@ -15,14 +14,16 @@ export async function getUserId<T extends { hubSessionSecret: string }>(
 		// eslint-disable-next-line @typescript-eslint/naming-convention
 		Bindings: T
 	}>,
-): Promise<Result<UserId, Response>> {
+) {
 	// https://github.com/honojs/hono/pull/884
 	if (c.req.header(csrfHeaderName) == null) {
-		return toError(c.text(`Missing '${csrfHeaderName}' header`, 401))
+		return toError(`Missing '${csrfHeaderName}' header`)
 	}
 	const hubSession = c.req.cookie(hubSessionCookieName)
 	if (hubSession == null) {
-		return toError(c.text(`Missing '${hubSessionCookieName}' cookie.`, 401))
+		return toError(
+			`Missing '${hubSessionCookieName}' cookie. (You're not logged into Hub.)`,
+		)
 	} else {
 		let verifyResult: JWTVerifyResult
 		try {
@@ -32,14 +33,11 @@ export async function getUserId<T extends { hubSessionSecret: string }>(
 			)
 		} catch {
 			return toError(
-				c.text(
-					`Failed to verify JWT in '${hubSessionCookieName}' cookie.`,
-					401,
-				),
+				`Failed to verify JWT in '${hubSessionCookieName}' cookie.`,
 			)
 		}
 		if (verifyResult.payload.sub == null) {
-			return toError(c.text("There's no sub claim, ya goof.", 401))
+			return toError("There's no sub claim, ya goof.")
 		} else {
 			return toOk(verifyResult.payload.sub as UserId)
 		}

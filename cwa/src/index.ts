@@ -70,7 +70,7 @@ app
 	.get('/', (c) => c.text('Hono!!'))
 	.post('/private', async (c) => {
 		const authResult = await getUserId(c)
-		if (authResult.tag === 'Error') return authResult.error
+		if (authResult.tag === 'Error') return c.text(authResult.error, 401)
 		const userId = authResult.ok
 		const buildToken = async (mediaHash: MediaHash): Promise<Base64Url> =>
 			await buildPrivateToken(c.env.mediaTokenSecret, mediaHash, userId)
@@ -168,7 +168,7 @@ async function postPublicMedia(
 	iByEntityIds: Record<Base64Url, number>,
 ) {
 	const authResult = await getUserId(c)
-	if (authResult.tag === 'Error') return authResult.error
+	if (authResult.tag === 'Error') return c.text(authResult.error, 401)
 	const userId = authResult.ok
 	setKysely(c.env.planetscaleDbUrl)
 	const persistDbAndBucket = async ({

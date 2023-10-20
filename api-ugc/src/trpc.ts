@@ -9,7 +9,7 @@ export interface Context {
 }
 
 export function createContext(
-	userId: Result<UserId, Response>,
+	userId: Result<UserId, string>,
 	env: Env,
 ): Context {
 	const user = userId.tag === 'Ok' ? userId.ok : undefined
