@@ -11,7 +11,7 @@ import {
 import { LicenseManager } from 'ag-grid-enterprise'
 import '@github/relative-time-element'
 import { notEmpty, type PeerDisplayName, type PeerJsId } from 'shared'
-import { crRtc } from '../topLevelAwait'
+import { wdbRtc } from '../topLevelAwait'
 import { agGridTheme } from '../globalState'
 
 export interface Peer {
@@ -43,7 +43,7 @@ const columnDefs: Array<ColDef<Peer>> = [
 				<button
 					class='text-black bg-green-300 border-gray-900 rounded-lg border px-2 leading-normal'
 					onClick={() => {
-						crRtc.connectTo(props.data!.id)
+						wdbRtc.connectTo(props.data!.id)
 					}}
 				>
 					Connect

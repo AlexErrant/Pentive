@@ -1,6 +1,6 @@
 import { registerPluginServices } from './pluginManager'
 import {
-	createCrRtc,
+	createWdbRtc,
 	createDb,
 	createKysely,
 	createTx,
@@ -8,7 +8,7 @@ import {
 import { pluginEntityToDomain } from './sqlite/util'
 
 export const rd = await createDb()
-export const crRtc = await createCrRtc(rd)
+export const wdbRtc = await createWdbRtc(rd)
 export const ky = createKysely(rd)
 export const tx = createTx(ky, rd)
 

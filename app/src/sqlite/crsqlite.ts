@@ -30,7 +30,7 @@ export async function createDb() {
 	return db
 }
 
-export async function createCrRtc(db: crDB) {
+export async function createWdbRtc(db: crDB) {
 	return await wdbRtc(db, {
 		secure: true,
 		host: import.meta.env.VITE_PEER_HOST,
