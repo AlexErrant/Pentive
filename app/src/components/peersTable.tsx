@@ -11,8 +11,8 @@ import {
 import { LicenseManager } from 'ag-grid-enterprise'
 import '@github/relative-time-element'
 import { notEmpty, type PeerDisplayName, type PeerJsId } from 'shared'
-import { wdbRtc } from '../topLevelAwait'
 import { agGridTheme } from '../globalState'
+import { type WholeDbRtcPublic } from '../sqlite/wholeDbRtc'
 
 export interface Peer {
 	id: PeerJsId
@@ -38,12 +38,12 @@ const columnDefs: Array<ColDef<Peer>> = [
 		valueGetter: (row) => row.data?.status,
 	},
 	{
-		cellRenderer: (props: ICellRendererParams<Peer>) => (
+		cellRenderer: (props: ICellRendererParams<Peer, unknown, Context>) => (
 			<Show when={props.data?.status === 'disconnected'}>
 				<button
 					class='text-black bg-green-300 border-gray-900 rounded-lg border px-2 leading-normal'
 					onClick={() => {
-						wdbRtc.connectTo(props.data!.id)
+						props.context.wdbRtc.connectTo(props.data!.id)
 					}}
 				>
 					Connect
@@ -55,9 +55,14 @@ const columnDefs: Array<ColDef<Peer>> = [
 
 const getRowId = (params: GetRowIdParams<Peer>): PeerJsId => params.data.id
 
+interface Context {
+	wdbRtc: WholeDbRtcPublic
+}
+
 const PeersTable: VoidComponent<{
 	readonly peers: Peer[]
 	readonly updated: Peer[]
+	readonly wdbRtc: WholeDbRtcPublic
 }> = (props) => {
 	createEffect(
 		on(
@@ -96,6 +101,7 @@ const PeersTable: VoidComponent<{
 						},
 					],
 				}}
+				context={{ wdbRtc: props.wdbRtc } satisfies Context}
 				defaultColDef={{ resizable: true }}
 				columnDefs={columnDefs}
 				ref={gridRef}

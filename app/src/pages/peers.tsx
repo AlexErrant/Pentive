@@ -13,20 +13,23 @@ import {
 	peerIdValidator,
 } from 'shared'
 import PeersTable, { type Peer } from '../components/peersTable'
-import { wdbRtc } from '../topLevelAwait'
+import { createWdbRtc } from '../sqlite/crsqlite'
+import { rd } from '../topLevelAwait'
+import { type WholeDbRtcPublic } from '../sqlite/wholeDbRtc'
 
 export default function Peers() {
 	const [pending, setPending] = createSignal<string[]>([])
 	const [established, setEstablished] = createSignal<string[]>([])
-	const [siteId] = createResource(() => {
+	const [wdbRtc] = createResource(async () => {
 		try {
+			const wdbRtc = await createWdbRtc(rd)
 			// highTODO this returns a cleanup function; use it
 			// eslint-disable-next-line @typescript-eslint/no-unused-vars
 			const cleanup = wdbRtc.onConnectionsChanged((pending, established) => {
 				setPending(pending)
 				setEstablished(established)
 			})
-			return peerIdValidator.parse(uuidStringify(wdbRtc.siteId))
+			return wdbRtc
 		} catch (error) {
 			if (isTrpcClientError(error) && error.data?.httpStatus === 401) {
 				return null
@@ -35,9 +38,9 @@ export default function Peers() {
 		}
 	})
 	return (
-		<Show when={siteId()} fallback={'Loading...'}>
+		<Show when={wdbRtc()} fallback={'Loading...'}>
 			<RenderPeerControls
-				siteId={siteId()!}
+				wdbRtc={wdbRtc()!}
 				pending={pending()}
 				established={established()}
 			/>
@@ -46,10 +49,11 @@ export default function Peers() {
 }
 
 const RenderPeerControls: VoidComponent<{
-	siteId: PeerJsId
+	wdbRtc: WholeDbRtcPublic
 	pending: string[]
 	established: string[]
 }> = (props) => {
+	const siteId = () => peerIdValidator.parse(uuidStringify(props.wdbRtc.siteId))
 	const [peers] = createResource(
 		// eslint-disable-next-line solid/reactivity
 		async () => {
@@ -62,7 +66,7 @@ const RenderPeerControls: VoidComponent<{
 					({
 						id: peerId as PeerJsId,
 						name: peerName,
-						status: props.siteId === peerId ? 'self' : 'disconnected',
+						status: siteId() === peerId ? 'self' : 'disconnected',
 					}) satisfies Peer as Peer,
 			)
 		},
@@ -87,7 +91,7 @@ const RenderPeerControls: VoidComponent<{
 	const [name, setName] = createSignal('')
 	return (
 		<>
-			<PeersTable peers={peers()} updated={updated()} />
+			<PeersTable peers={peers()} updated={updated()} wdbRtc={props.wdbRtc} />
 			<input
 				class='w-75px form-input rounded-lg p-1 text-sm'
 				type='text'
@@ -99,27 +103,27 @@ const RenderPeerControls: VoidComponent<{
 				onClick={async () => {
 					const displayName = peerDisplayNameValidator.parse(name())
 					await cwaClient.setPeer.mutate({
-						peerId: props.siteId,
+						peerId: siteId(),
 						displayName,
 					})
 				}}
 			>
-				Add {props.siteId} as peer
+				Add {siteId()} as peer
 			</button>
 			<button
 				type='button'
 				onClick={async () => {
-					await navigator.clipboard.writeText(props.siteId)
+					await navigator.clipboard.writeText(siteId())
 				}}
 			>
-				PeerID: {props.siteId}
+				PeerID: {siteId()}
 			</button>
 			<form
 				onSubmit={(e) => {
 					e.preventDefault()
 					const formData = new FormData(e.target as HTMLFormElement)
 					const remotePeerId = formData.get('remotePeerId') as string
-					wdbRtc.connectTo(remotePeerId)
+					props.wdbRtc.connectTo(remotePeerId)
 				}}
 			>
 				<label for='remotePeerId'>Connect to</label>

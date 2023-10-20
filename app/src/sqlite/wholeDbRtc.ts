@@ -258,7 +258,7 @@ export class WholeDbRtc implements PokeProtocol {
 	}
 }
 
-class WholeDbRtcPublic {
+export class WholeDbRtcPublic {
 	readonly _listeners = new Set<
 		(pending: SiteIDWire[], established: SiteIDWire[]) => void
 	>()
