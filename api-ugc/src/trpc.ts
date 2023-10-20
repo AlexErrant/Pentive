@@ -4,16 +4,8 @@ import { type Env } from './util'
 import { type Result, type UserId } from 'shared'
 
 export interface Context {
-	user: UserId | undefined
+	user: Result<UserId, string>
 	env: Env
-}
-
-export function createContext(
-	userId: Result<UserId, string>,
-	env: Env,
-): Context {
-	const user = userId.tag === 'Ok' ? userId.ok : undefined
-	return { user, env }
 }
 
 // We export only the functionality that we use so we can enforce which base procedures should be used
@@ -25,14 +17,15 @@ const t = initTRPC.context<Context>().create({
 export const router = t.router
 
 const isAuthed = t.middleware(async ({ next, ctx }) => {
-	if (ctx.user === undefined) {
+	if (ctx.user.tag === 'Error') {
 		throw new TRPCError({
 			code: 'UNAUTHORIZED',
+			message: ctx.user.error,
 		})
 	}
 	return await next({
 		ctx: {
-			user: ctx.user,
+			user: ctx.user.ok,
 		},
 	})
 })

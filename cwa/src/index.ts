@@ -35,7 +35,6 @@ import { connect } from '@planetscale/database'
 import { buildPrivateToken } from './privateToken'
 import { appRouter } from './router'
 import { fetchRequestHandler } from '@trpc/server/adapters/fetch'
-import { createContext } from './trpc'
 export type * from '@trpc/server'
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -58,13 +57,13 @@ app
 		})(c, next)
 	})
 	.use('/trpc/*', async (c) => {
-		const userId = await getUserId(c)
+		const user = await getUserId(c)
 		setKysely(c.env.planetscaleDbUrl)
 		return await fetchRequestHandler({
 			endpoint: '/trpc',
 			req: c.req.raw,
 			router: appRouter,
-			createContext: () => createContext(userId, c.env),
+			createContext: () => ({ user, env: c.env }),
 		})
 	})
 	.get('/', (c) => c.text('Hono!!'))
