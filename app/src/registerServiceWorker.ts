@@ -32,7 +32,8 @@ const expose = {
 export type Expose = typeof expose
 
 if ('serviceWorker' in navigator) {
-	window.addEventListener('DOMContentLoaded', async () => {
+	// delay registration so it doesn't interfere with initial page render https://web.dev/articles/service-workers-registration#:~:text=Improving%20the%20boilerplate
+	window.addEventListener('load', async () => {
 		const registration = await navigator.serviceWorker.register(
 			import.meta.env.MODE === 'production'
 				? '/serviceWorker.js'
