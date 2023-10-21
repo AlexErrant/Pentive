@@ -31,22 +31,28 @@ const expose = {
 
 export type Expose = typeof expose
 
+async function register() {
+	const registration = await navigator.serviceWorker.register(
+		import.meta.env.MODE === 'production'
+			? '/serviceWorker.js'
+			: '/dev-sw.js?dev-sw',
+		{ type: import.meta.env.MODE === 'production' ? 'classic' : 'module' },
+	)
+	if (registration.installing != null) {
+		firstServiceWorkerInstall(registration.installing)
+	} else {
+		const registration = await navigator.serviceWorker.ready
+		initComlink(registration.active)
+	}
+}
+
 if ('serviceWorker' in navigator) {
-	// delay registration so it doesn't interfere with initial page render https://web.dev/articles/service-workers-registration#:~:text=Improving%20the%20boilerplate
-	window.addEventListener('load', async () => {
-		const registration = await navigator.serviceWorker.register(
-			import.meta.env.MODE === 'production'
-				? '/serviceWorker.js'
-				: '/dev-sw.js?dev-sw',
-			{ type: import.meta.env.MODE === 'production' ? 'classic' : 'module' },
-		)
-		if (registration.installing != null) {
-			firstServiceWorkerInstall(registration.installing)
-		} else {
-			const registration = await navigator.serviceWorker.ready
-			initComlink(registration.active)
-		}
-	})
+	if (document.readyState === 'complete') {
+		await register()
+	} else {
+		// delay registration so it doesn't interfere with initial page render https://web.dev/articles/service-workers-registration#:~:text=Improving%20the%20boilerplate
+		window.addEventListener('load', register)
+	}
 } else {
 	// 7A0559B7-44B3-4674-B71C-100DAA30D45C
 	toastError(
