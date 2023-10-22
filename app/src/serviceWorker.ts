@@ -166,3 +166,7 @@ async function getLocalMedia(messenger: Messenger, key: MediaId) {
 	registry.register(value, key)
 	return value
 }
+
+self.addEventListener('activate', (event) => {
+	event.waitUntil(self.clients.claim())
+})
