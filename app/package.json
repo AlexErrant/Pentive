@@ -68,6 +68,7 @@
 		"vite-plugin-solid": "^2.7.0",
 		"vitest": "^0.34.5",
 		"workbox-precaching": "^7.0.0",
+		"workbox-routing": "^7.0.0",
 		"wrangler": "^3.10.0"
 	},
 	"dependencies": {

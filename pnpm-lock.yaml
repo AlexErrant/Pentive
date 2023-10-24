@@ -412,6 +412,9 @@ importers:
       workbox-precaching:
         specifier: ^7.0.0
         version: 7.0.0
+      workbox-routing:
+        specifier: ^7.0.0
+        version: 7.0.0
       wrangler:
         specifier: ^3.10.0
         version: 3.10.0
