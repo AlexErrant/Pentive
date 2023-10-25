@@ -1,7 +1,12 @@
-import { cleanupOutdatedCaches, precacheAndRoute } from 'workbox-precaching'
+import {
+	cleanupOutdatedCaches,
+	precacheAndRoute,
+	createHandlerBoundToURL,
+} from 'workbox-precaching'
 import * as Comlink from 'comlink'
 import type { Expose, PostMessageTypes } from './registerServiceWorker'
 import type { MediaId } from 'shared'
+import { NavigationRoute, registerRoute } from 'workbox-routing'
 
 declare let self: ServiceWorkerGlobalScope
 
@@ -11,6 +16,10 @@ self.__WB_DISABLE_DEV_LOGS = true
 cleanupOutdatedCaches()
 
 precacheAndRoute(self.__WB_MANIFEST)
+
+// https://developer.chrome.com/docs/workbox/modules/workbox-routing/#how-to-register-a-navigation-route
+// "If your site is a single page app, you can use a NavigationRoute to return a specific response for all navigation requests."
+registerRoute(new NavigationRoute(createHandlerBoundToURL('/index.html')))
 
 type Messenger = Comlink.Remote<Expose>
 const messengers = new Map<string, Messenger>()
