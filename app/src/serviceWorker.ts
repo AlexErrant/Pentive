@@ -19,7 +19,9 @@ precacheAndRoute(self.__WB_MANIFEST)
 
 // https://developer.chrome.com/docs/workbox/modules/workbox-routing/#how-to-register-a-navigation-route
 // "If your site is a single page app, you can use a NavigationRoute to return a specific response for all navigation requests."
-registerRoute(new NavigationRoute(createHandlerBoundToURL('/index.html')))
+if (import.meta.env.PROD) {
+	registerRoute(new NavigationRoute(createHandlerBoundToURL('/index.html')))
+}
 
 type Messenger = Comlink.Remote<Expose>
 const messengers = new Map<string, Messenger>()
