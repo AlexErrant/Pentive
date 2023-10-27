@@ -14,7 +14,18 @@ export default defineConfig(({ mode }: UserConfig) => {
 		key = fs.readFileSync(keyPath)
 		cert = fs.readFileSync(certPath)
 	}
+	// grep 3FBCE1B6-ABA3-4179-80B3-A965F8D087BC
+	// We're using the version number due to https://developer.chrome.com/docs/workbox/service-worker-deployment/#its-all-in-the-timing:~:text=Problems%20arise%20in%20situations%20when%20unversioned%20static%20assets%20are%20cached
+	const define = Object.fromEntries(
+		fs
+			.readdirSync('./public/assets/')
+			.map((file) => [
+				'import.meta.env.' + file.split('.').at(0)! + 'Path',
+				`"/assets/${file}"`,
+			]),
+	) as Record<string, string>
 	return {
+		define,
 		plugins: [
 			solidPlugin(),
 			// if we ever move off this plugin https://github.com/vitejs/vite/issues/2248
