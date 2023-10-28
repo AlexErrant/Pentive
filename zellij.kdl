@@ -1,0 +1,49 @@
+layout {
+    pane size=1 borderless=true {
+        plugin location="zellij:tab-bar"
+    }
+    pane split_direction="vertical" {
+        pane split_direction="horizontal" {
+            pane {
+              name "hub"
+              cwd "hub"
+              command "pnpm"
+              args "dev"
+            }
+            pane {
+              name "app"
+              cwd "app"
+              command "pnpm"
+              args "dev"
+              close_on_exit false
+            }
+            pane {
+              name "tsc"
+              command "npx"
+              args "tsc" "--build" "--watch"
+            }
+        }
+        pane split_direction="horizontal" {
+            pane {
+              name "ugc"
+              command "pnpm"
+              args "ugc"
+            }
+            pane {
+              name "peer"
+              cwd "peer"
+              command "pnpm"
+              args "dev"
+            }
+            pane {
+              name "cwa"
+              cwd "cwa"
+              command "pnpm"
+              args "dev"
+            }
+        }
+    }
+    pane size=2 borderless=true {
+        plugin location="zellij:status-bar"
+    }
+}
