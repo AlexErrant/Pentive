@@ -129,6 +129,8 @@ export interface SqliteTempMaster {
 export interface Review {
 	id: LDbId
 	cardId: LDbId
+	created: number
+	rating: number
 	details: string
 }
 

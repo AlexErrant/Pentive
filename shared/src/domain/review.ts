@@ -15,4 +15,6 @@ import { type CardId, type ReviewId } from '../brand.js'
 export type Review = {
 	id: ReviewId
 	cardId: CardId
+	created: Date
+	rating: number
 } & Record<string, unknown>

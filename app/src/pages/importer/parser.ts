@@ -143,11 +143,13 @@ export function parseCard(
 	}
 }
 
-export function parseRevlog({ id, cid, ...revlog }: Revlog): Review {
+export function parseRevlog({ id, cid, ease, ...revlog }: Revlog): Review {
 	return {
 		...revlog,
 		cardId: cid.toString() as CardId, // highTODO
 		id: id.toString() as ReviewId, // highTODO
+		created: new Date(id),
+		rating: ease,
 	}
 }
 

@@ -7,10 +7,12 @@ import { ky } from '../topLevelAwait'
 export const reviewCollectionMethods = {
 	bulkUploadReview: async function (reviews: Review[]) {
 		const entities = reviews.map(
-			({ id, cardId, ...r }) =>
+			({ id, cardId, created, rating, ...r }) =>
 				({
 					id,
 					cardId,
+					rating,
+					created: created.getTime(),
 					details: stringifyDetails(r),
 				}) satisfies ReviewEntity,
 		)
@@ -23,10 +25,10 @@ export const reviewCollectionMethods = {
 }
 
 // highTODO property test
-export function stringifyDetails(details: unknown) {
+function stringifyDetails(details: Record<string, unknown>) {
 	return JSON.stringify(details)
 }
 
-export function parseDetails<T>(rawDetails: string) {
-	return JSON.parse(rawDetails) as T
+function parseDetails(rawDetails: string) {
+	return JSON.parse(rawDetails) as Record<string, unknown>
 }
