@@ -22,6 +22,22 @@ export const reviewCollectionMethods = {
 			await ky.insertInto('review').values(batches[i]!).execute()
 		}
 	},
+	getReviews: async function () {
+		const reviews = await ky
+			.selectFrom('review')
+			.selectAll()
+			.orderBy('cardId')
+			.orderBy('created')
+			.execute()
+		return reviews.map(
+			({ details, created, ...r }) =>
+				({
+					...r,
+					created: new Date(created),
+					...parseDetails(details),
+				}) satisfies Review as Review,
+		)
+	},
 }
 
 // highTODO property test

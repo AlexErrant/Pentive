@@ -14,6 +14,7 @@ crsqlite
 datasource
 dexie
 Exif
+fsrs
 goldenlayout
 graphiql
 hono

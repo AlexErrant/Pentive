@@ -12,8 +12,9 @@ import { db } from '../db'
 import { importAnki } from './importer/importer'
 import { augcClient } from '../trpcClient'
 import { C, rd } from '../topLevelAwait'
-import { toastImpossible } from '../components/toasts'
+import { toastFatal, toastImpossible } from '../components/toasts'
 import EditSql from '../components/editSql'
+import { reviewsToFsrsItems } from '../domain/fsrs'
 
 async function searchNotes(search: string): Promise<void> {
 	const searchBatch = await augcClient.searchNotes.query(search)
@@ -110,6 +111,19 @@ export default function Home(): JSX.Element {
 					Import Anki apkg
 					<input type='file' onChange={importAnki} accept='.apkg' />
 				</label>
+			</div>
+			<div class='flex items-center space-x-2'>
+				<button
+					class='border-gray-900 rounded-lg border px-2'
+					onClick={async () => {
+						const reviews = await db.getReviews()
+						const items = reviewsToFsrsItems(reviews)
+						if (items == null) toastFatal('No reviews!')
+						console.log('items', items)
+					}}
+				>
+					Train
+				</button>
 			</div>
 			<div class='mt-4'>
 				<label>
