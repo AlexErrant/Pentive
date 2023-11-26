@@ -7,7 +7,6 @@
 // However, until I figure out how to read from an existing sqlite file in cr-sqlite, we need both.
 // See https://github.com/rhashimoto/wa-sqlite/discussions/72
 
-import { Buffer } from 'buffer'
 import {
 	BlobReader,
 	BlobWriter,
@@ -178,12 +177,12 @@ async function getAnkiDb(sqlite: Entry): Promise<Database> {
 	return new sql.Database(sqliteBuffer)
 }
 
-async function getSqliteBuffer(sqlite: Entry): Promise<Buffer> {
+async function getSqliteBuffer(sqlite: Entry): Promise<Uint8Array> {
 	const blob =
 		(await sqlite.getData?.(new BlobWriter())) ??
 		toastImpossible(
 			"Impossible since we're using `getEntries` https://github.com/gildas-lormeau/zip.js/issues/371",
 		)
 	const arrayBuffer = await blob.arrayBuffer()
-	return Buffer.from(new Uint8Array(arrayBuffer))
+	return new Uint8Array(arrayBuffer)
 }

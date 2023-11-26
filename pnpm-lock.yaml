@@ -174,9 +174,6 @@ importers:
       babel-preset-solid:
         specifier: ^1.7.12
         version: 1.7.12(@babel/core@7.23.0)
-      buffer:
-        specifier: ^6.0.3
-        version: 6.0.3
       codemirror-json-schema:
         specifier: ^0.4.4
         version: 0.4.4(@codemirror/language@6.9.1)(@codemirror/lint@6.4.2)(@codemirror/state@6.2.1)(@codemirror/view@6.20.2)(@lezer/common@1.1.0)
@@ -7784,13 +7781,6 @@ packages:
     dependencies:
       base64-js: 1.5.1
       ieee754: 1.2.1
-
-  /buffer@6.0.3:
-    resolution: {integrity: sha512-FTiCpNxtwiZZHEZbcbTIcZjERVICn9yq/pDFkTl95/AxzD1naBctN7YO68riM/gLSDY7sdrMby8hofADYuuqOA==}
-    dependencies:
-      base64-js: 1.5.1
-      ieee754: 1.2.1
-    dev: false
 
   /builtin-modules@3.3.0:
     resolution: {integrity: sha512-zhaCDicdLuWN5UbN5IMnFqNMhNfo919sH85y2/ea+5Yg9TsTkeZxpL+JLbp6cgYFS4sRLp3YV4S6yDuqVWHYOw==}
