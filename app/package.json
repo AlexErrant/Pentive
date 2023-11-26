@@ -22,7 +22,8 @@
 		"test:run": "vitest run",
 		"playwright": "playwright test",
 		"playwright:debug": "playwright test --debug",
-		"playwright:init": "playwright install"
+		"playwright:init": "playwright install",
+		"generate-query-parser": "lezer-generator src/query.grammar --typeScript -o src/queryParser.ts"
 	},
 	"devDependencies": {
 		"@babel/core": "^7.23.0",
