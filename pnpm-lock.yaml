@@ -391,6 +391,9 @@ importers:
       tailwindcss:
         specifier: ^3.3.3
         version: 3.3.3(ts-node@10.9.1)
+      test:
+        specifier: link:@lezer/generator/test
+        version: link:@lezer/generator/test
       ts-node:
         specifier: ^10.9.1
         version: 10.9.1(@types/node@18.16.0)(typescript@5.2.2)
