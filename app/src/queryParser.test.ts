@@ -42,3 +42,27 @@ test('queryParser can parse standard test string', () => {
 )`
 	testTree(tree, spec)
 })
+
+test('OR must be a standalone keyword', () => {
+	const tree = parser.parse(`a OR b ORc d`)
+	const spec = `Program(SimpleString,Or,SimpleString,SimpleString,SimpleString)`
+	testTree(tree, spec)
+})
+
+test('negation might be separated by space', () => {
+	const tree = parser.parse(`-a - b`)
+	const spec = `Program(Not,SimpleString,Not,SimpleString)`
+	testTree(tree, spec)
+})
+
+test('empty string is valid program', () => {
+	const tree = parser.parse(``)
+	const spec = `Program()`
+	testTree(tree, spec)
+})
+
+test("can't end with OR", () => {
+	const tree = parser.parse(`a OR`)
+	const spec = `Program(SimpleString,Or,⚠)`
+	testTree(tree, spec)
+})
