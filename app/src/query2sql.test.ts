@@ -8,6 +8,13 @@ test('SimpleString is fts', () => {
 	)
 })
 
+test.only('not a', () => {
+	const actual = convert('-a')
+	expect(actual).toEqual(
+		"(noteFtsFv.rowid NOT IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH 'a'))",
+	)
+})
+
 test.only('2 SimpleStrings are ANDed', () => {
 	const actual = convert('a b')
 	expect(actual).toEqual(

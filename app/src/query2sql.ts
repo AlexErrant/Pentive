@@ -33,7 +33,9 @@ function enter(input: string, node: SyntaxNodeRef, context: Context) {
 			context.sql += '\n' + spaces + separator + '\n'
 		}
 		const snippet = input.slice(node.from, node.to)
-		const query = `(noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH '${snippet}'))`
+		const query = `(noteFtsFv.rowid ${maybeNot(
+			node,
+		)}IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH '${snippet}'))`
 		context.sql += spaces + query
 	} else if (node.name === 'ParenthesizedExpression') {
 		context.sql += '(\n'
@@ -52,6 +54,11 @@ function leave(input: string, node: SyntaxNodeRef, context: Context) {
 	if (node.name !== 'Program') {
 		--context.indent
 	}
+}
+
+function maybeNot(node: SyntaxNodeRef): '' | 'NOT ' {
+	if (node.node.prevSibling?.name === 'Not') return 'NOT '
+	return ''
 }
 
 function andOrNothing(node: SyntaxNode): '' | 'AND' | 'OR' {
