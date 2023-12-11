@@ -8,14 +8,14 @@ test('SimpleString is fts', () => {
 	)
 })
 
-test.only('not a', () => {
+test('not a', () => {
 	const actual = convert('-a')
 	expect(actual).toEqual(
 		"(noteFtsFv.rowid NOT IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH 'a'))",
 	)
 })
 
-test.only('2 SimpleStrings are ANDed', () => {
+test('2 SimpleStrings are ANDed', () => {
 	const actual = convert('a b')
 	expect(actual).toEqual(
 		`(noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH 'a'))
@@ -24,7 +24,7 @@ AND
 	)
 })
 
-test.only('2 SimpleStrings can be ORed', () => {
+test('2 SimpleStrings can be ORed', () => {
 	const actual = convert('a OR b')
 	expect(actual).toEqual(
 		`(noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH 'a'))
@@ -33,7 +33,7 @@ OR
 	)
 })
 
-test.only('2 SimpleStrings can be grouped', () => {
+test('2 SimpleStrings can be grouped', () => {
 	const actual = convert('(a b)')
 	expect(actual).toEqual(
 		`(
