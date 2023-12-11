@@ -1,32 +1,49 @@
-import { type SyntaxNode } from '@lezer/common'
+import { type SyntaxNodeRef, type SyntaxNode } from '@lezer/common'
 import { parser } from './queryParser'
+
+class Context {
+	constructor() {
+		this.sql = ''
+		this.indent = 0
+	}
+
+	sql: string
+	indent: number
+}
 
 export function convert(input: string) {
 	const tree = parser.parse(input)
-	let r = ''
-	let indent = 0
+	const context = new Context()
 	tree.cursor().iterate(
 		(node) => {
-			if (node.name === 'SimpleString') {
-				const separator = andOrNothing(node.node)
-				if (separator !== '') {
-					r += '\n' + separator + '\n'
-				}
-				const snippet = input.slice(node.from, node.to)
-				const query = `(noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH '${snippet}'))`
-				r += '  '.repeat(indent) + query
-			}
-			if (node.name !== 'Program') {
-				++indent
-			}
+			enter(input, node, context)
 		},
-		(node): void => {
-			if (node.name !== 'Program') {
-				--indent
-			}
+		(node) => {
+			leave(input, node, context)
 		},
 	)
-	return r
+	return context.sql
+}
+
+function enter(input: string, node: SyntaxNodeRef, context: Context) {
+	if (node.name === 'SimpleString') {
+		const separator = andOrNothing(node.node)
+		if (separator !== '') {
+			context.sql += '\n' + separator + '\n'
+		}
+		const snippet = input.slice(node.from, node.to)
+		const query = `(noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH '${snippet}'))`
+		context.sql += '  '.repeat(context.indent) + query
+	}
+	if (node.name !== 'Program') {
+		++context.indent
+	}
+}
+
+function leave(input: string, node: SyntaxNodeRef, context: Context) {
+	if (node.name !== 'Program') {
+		--context.indent
+	}
 }
 
 function andOrNothing(node: SyntaxNode): '' | 'AND' | 'OR' {
