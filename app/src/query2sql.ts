@@ -28,19 +28,27 @@ export function convert(input: string) {
 function enter(input: string, node: SyntaxNodeRef, context: Context) {
 	if (node.name === 'SimpleString') {
 		const separator = andOrNothing(node.node)
+		const spaces = '  '.repeat(context.indent)
 		if (separator !== '') {
-			context.sql += '\n' + separator + '\n'
+			context.sql += '\n' + spaces + separator + '\n'
 		}
 		const snippet = input.slice(node.from, node.to)
 		const query = `(noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH '${snippet}'))`
-		context.sql += '  '.repeat(context.indent) + query
+		context.sql += spaces + query
+	} else if (node.name === 'ParenthesizedExpression') {
+		context.sql += '(\n'
 	}
+
 	if (node.name !== 'Program') {
 		++context.indent
 	}
 }
 
 function leave(input: string, node: SyntaxNodeRef, context: Context) {
+	if (node.name === 'ParenthesizedExpression') {
+		context.sql += '\n)'
+	}
+
 	if (node.name !== 'Program') {
 		--context.indent
 	}

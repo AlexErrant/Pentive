@@ -25,3 +25,14 @@ OR
 (noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH 'b'))`,
 	)
 })
+
+test.only('2 SimpleStrings can be grouped', () => {
+	const actual = convert('(a b)')
+	expect(actual).toEqual(
+		`(
+  (noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH 'a'))
+  AND
+  (noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH 'b'))
+)`,
+	)
+})
