@@ -26,9 +26,9 @@ export function convert(input: string) {
 }
 
 function enter(input: string, node: SyntaxNodeRef, context: Context) {
+	const spaces = '  '.repeat(context.indent)
 	if (node.name === 'SimpleString') {
 		const separator = andOrNothing(node.node)
-		const spaces = '  '.repeat(context.indent)
 		if (separator !== '') {
 			context.sql += '\n' + spaces + separator + '\n'
 		}
@@ -38,7 +38,7 @@ function enter(input: string, node: SyntaxNodeRef, context: Context) {
 		)}IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH '${snippet}'))`
 		context.sql += spaces + query
 	} else if (node.name === 'ParenthesizedExpression') {
-		context.sql += '(\n'
+		context.sql += spaces + '(\n'
 	}
 
 	if (node.name !== 'Program') {
@@ -47,24 +47,45 @@ function enter(input: string, node: SyntaxNodeRef, context: Context) {
 }
 
 function leave(input: string, node: SyntaxNodeRef, context: Context) {
-	if (node.name === 'ParenthesizedExpression') {
-		context.sql += '\n)'
-	}
-
 	if (node.name !== 'Program') {
 		--context.indent
+	}
+
+	if (node.name === 'ParenthesizedExpression') {
+		const spaces = '  '.repeat(context.indent)
+		context.sql += '\n' + spaces + ')'
 	}
 }
 
 function maybeNot(node: SyntaxNodeRef): '' | 'NOT ' {
-	if (node.node.prevSibling?.name === 'Not') return 'NOT '
+	if (node.node.prevSibling?.name === 'Not' || hasNegatedParens(node.node)) {
+		return 'NOT '
+	}
 	return ''
+}
+
+function hasNegatedParens(node: SyntaxNode) {
+	let n: SyntaxNode | null = node
+	let count = 0
+	while (n != null && n.name !== 'Program') {
+		if (
+			n.node.name === 'ParenthesizedExpression' &&
+			n.node.prevSibling?.name === 'Not'
+		) {
+			count++
+		}
+		n = n.node.parent
+	}
+	return !(count % 2 === 0)
 }
 
 function andOrNothing(node: SyntaxNode): '' | 'AND' | 'OR' {
 	let left = node.prevSibling
 	while (left != null) {
-		if (left.name === 'Or') return 'OR'
+		if (left.name === 'Or') {
+			if (hasNegatedParens(node)) return 'AND'
+			return 'OR'
+		}
 		if (
 			left.name === 'SimpleString' ||
 			left.name === 'QuotedString' ||
@@ -72,6 +93,7 @@ function andOrNothing(node: SyntaxNode): '' | 'AND' | 'OR' {
 			left.name === 'Tag' ||
 			left.name === 'Deck'
 		) {
+			if (hasNegatedParens(node)) return 'OR'
 			return 'AND'
 		}
 		if (left.name === 'Not') {

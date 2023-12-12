@@ -43,3 +43,38 @@ test('2 SimpleStrings can be grouped', () => {
 )`,
 	)
 })
+
+test('not distributes over AND', () => {
+	const actual = convert('-(a b)')
+	expect(actual).toEqual(
+		`(
+  (noteFtsFv.rowid NOT IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH 'a'))
+  OR
+  (noteFtsFv.rowid NOT IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH 'b'))
+)`,
+	)
+})
+
+test('not distributes over OR', () => {
+	const actual = convert('-(a OR b)')
+	expect(actual).toEqual(
+		`(
+  (noteFtsFv.rowid NOT IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH 'a'))
+  AND
+  (noteFtsFv.rowid NOT IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH 'b'))
+)`,
+	)
+})
+
+test('double negative grouping does nothing', () => {
+	const actual = convert('-(-(a OR b))')
+	expect(actual).toEqual(
+		`(
+  (
+    (noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH 'a'))
+    OR
+    (noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH 'b'))
+  )
+)`,
+	)
+})
