@@ -22,7 +22,7 @@ export function convert(input: string) {
 			leave(input, node, context)
 		},
 	)
-	return context.sql
+	return context.sql.trim()
 }
 
 function enter(input: string, node: SyntaxNodeRef, context: Context) {
@@ -30,15 +30,15 @@ function enter(input: string, node: SyntaxNodeRef, context: Context) {
 	if (node.name === 'SimpleString') {
 		const separator = andOrNothing(node.node)
 		if (separator !== '') {
-			context.sql += '\n' + spaces + separator + '\n'
+			context.sql += '\n' + spaces + separator
 		}
 		const snippet = input.slice(node.from, node.to)
 		const query = `(noteFtsFv.rowid ${maybeNot(
 			node,
 		)}IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH '${snippet}'))`
-		context.sql += spaces + query
+		context.sql += '\n' + spaces + query
 	} else if (node.name === 'ParenthesizedExpression') {
-		context.sql += spaces + '(\n'
+		context.sql += '\n' + spaces + '('
 	}
 
 	if (node.name !== 'Program') {
