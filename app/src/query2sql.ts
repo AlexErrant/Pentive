@@ -33,13 +33,14 @@ export function convert(input: string) {
 }
 
 function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
+	if (node.type.isError) return
 	if (node.name === 'SimpleString' || node.name === 'QuotedString') {
-		const separator = andOrNothing(node.node)
-		if (separator !== '') context.current.attach({ type: separator })
+		maybeAddSeparator(node.node, context)
 		const value = input.slice(node.from, node.to)
 		const negate = isNegated(node.node)
 		context.current.attach({ type: node.name, value, negate })
 	} else if (node.name === 'ParenthesizedExpression') {
+		maybeAddSeparator(node.node, context)
 		const negate = isNegated(node.node)
 		const group = new Group(context.current, negate)
 		context.current.attach(group)
@@ -89,9 +90,15 @@ function serialize(node: Node, context: Context) {
 	}
 }
 
+function maybeAddSeparator(node: SyntaxNode, context: Context) {
+	const separator = andOrNothing(node.node)
+	if (separator !== '') context.current.attach({ type: separator })
+}
+
 function andOrNothing(node: SyntaxNode): '' | 'AND' | 'OR' {
 	let left = node.prevSibling
 	while (left != null) {
+		if (left.type.isError) continue
 		if (left.name === 'Or') return 'OR'
 		if (
 			left.name === 'SimpleString' ||

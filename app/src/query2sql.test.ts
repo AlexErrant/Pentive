@@ -85,3 +85,22 @@ test('double negative grouping does nothing', () => {
 )`,
 	)
 })
+
+test('2 groups', () => {
+	const actual = convert('(a b) OR c (d OR e)')
+	expect(actual).toEqual(
+		`(
+  (noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH 'a'))
+  AND
+  (noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH 'b'))
+)
+OR
+(noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH 'c'))
+AND
+(
+  (noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH 'd'))
+  OR
+  (noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH 'e'))
+)`,
+	)
+})
