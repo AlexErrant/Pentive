@@ -1,14 +1,19 @@
 import { type SyntaxNodeRef, type SyntaxNode } from '@lezer/common'
 import { parser } from './queryParser'
+import { assertNever } from 'shared'
 
 class Context {
 	constructor() {
 		this.sql = ''
 		this.indent = 0
+		this.root = new Group(null, false)
+		this.current = this.root
 	}
 
 	sql: string
 	indent: number
+	root: Group
+	current: Group
 }
 
 export function convert(input: string) {
@@ -16,76 +21,78 @@ export function convert(input: string) {
 	const context = new Context()
 	tree.cursor().iterate(
 		(node) => {
-			enter(input, node, context)
+			astEnter(input, node, context)
 		},
 		(node) => {
-			leave(input, node, context)
+			astLeave(input, node, context)
 		},
 	)
+	distributeNegate(context.root, false)
+	serialize(context.root, context)
 	return context.sql.trim()
 }
 
-function enter(input: string, node: SyntaxNodeRef, context: Context) {
-	const spaces = '  '.repeat(context.indent)
+function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
 	if (node.name === 'SimpleString') {
 		const separator = andOrNothing(node.node)
-		if (separator !== '') {
-			context.sql += '\n' + spaces + separator
-		}
-		const snippet = input.slice(node.from, node.to)
-		const query = `(noteFtsFv.rowid ${maybeNot(
-			node,
-		)}IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH '${snippet}'))`
-		context.sql += '\n' + spaces + query
+		if (separator !== '') context.current.attach({ type: separator })
+		const value = input.slice(node.from, node.to)
+		const negate = isNegated(node.node)
+		context.current.attach({ type: 'SimpleString', value, negate })
 	} else if (node.name === 'ParenthesizedExpression') {
-		context.sql += '\n' + spaces + '('
-	}
-
-	if (node.name !== 'Program') {
-		++context.indent
+		const negate = isNegated(node.node)
+		const group = new Group(context.current, negate)
+		context.current.attach(group)
+		context.current = group
 	}
 }
 
-function leave(input: string, node: SyntaxNodeRef, context: Context) {
-	if (node.name !== 'Program') {
-		--context.indent
-	}
+function isNegated(node: SyntaxNode) {
+	return node.node.prevSibling?.name === 'Not'
+}
 
+function astLeave(_input: string, node: SyntaxNodeRef, context: Context) {
 	if (node.name === 'ParenthesizedExpression') {
-		const spaces = '  '.repeat(context.indent)
-		context.sql += '\n' + spaces + ')'
-	}
-}
-
-function maybeNot(node: SyntaxNodeRef): '' | 'NOT ' {
-	if (node.node.prevSibling?.name === 'Not' || hasNegatedParens(node.node)) {
-		return 'NOT '
-	}
-	return ''
-}
-
-function hasNegatedParens(node: SyntaxNode) {
-	let n: SyntaxNode | null = node
-	let count = 0
-	while (n != null && n.name !== 'Program') {
-		if (
-			n.node.name === 'ParenthesizedExpression' &&
-			n.node.prevSibling?.name === 'Not'
-		) {
-			count++
+		if (!context.current.isRoot) {
+			context.current = context.current.parent!
 		}
-		n = n.node.parent
 	}
-	return !(count % 2 === 0)
+}
+
+function serialize(node: Node, context: Context) {
+	const spaces = '  '.repeat(context.indent)
+	if (node.type === 'SimpleString') {
+		const query = `(noteFtsFv.rowid ${
+			node.negate ? 'NOT ' : ''
+		}IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH '${
+			node.value
+		}'))`
+		context.sql += '\n' + spaces + query
+	} else if (node.type === 'Group') {
+		if (!node.isRoot) {
+			context.sql += '\n' + spaces + '('
+			context.indent++
+		}
+		for (const child of node.children) {
+			serialize(child, context)
+		}
+		if (!node.isRoot) {
+			context.indent--
+			context.sql += '\n' + spaces + ')'
+		}
+	} else if (node.type === 'AND') {
+		context.sql += '\n' + spaces + 'AND'
+	} else if (node.type === 'OR') {
+		context.sql += '\n' + spaces + 'OR'
+	} else {
+		assertNever(node.type)
+	}
 }
 
 function andOrNothing(node: SyntaxNode): '' | 'AND' | 'OR' {
 	let left = node.prevSibling
 	while (left != null) {
-		if (left.name === 'Or') {
-			if (hasNegatedParens(node)) return 'AND'
-			return 'OR'
-		}
+		if (left.name === 'Or') return 'OR'
 		if (
 			left.name === 'SimpleString' ||
 			left.name === 'QuotedString' ||
@@ -93,7 +100,6 @@ function andOrNothing(node: SyntaxNode): '' | 'AND' | 'OR' {
 			left.name === 'Tag' ||
 			left.name === 'Deck'
 		) {
-			if (hasNegatedParens(node)) return 'OR'
 			return 'AND'
 		}
 		if (left.name === 'Not') {
@@ -103,4 +109,50 @@ function andOrNothing(node: SyntaxNode): '' | 'AND' | 'OR' {
 		throw Error('Unhandled node:' + left.node.name)
 	}
 	return ''
+}
+
+type Leaf =
+	| { type: 'OR' | 'AND' }
+	| {
+			type: 'SimpleString' | 'QuotedString'
+			value: string
+			negate: boolean
+	  }
+
+type Node = Group | Leaf
+
+class Group {
+	constructor(parent: Group | null, negate: boolean) {
+		this.parent = parent
+		this.isRoot = parent == null
+		this.children = []
+		this.negate = negate
+	}
+
+	type = 'Group' as const
+	parent: Group | null
+	isRoot: boolean
+	children: Node[]
+	negate: boolean
+
+	attach(child: Node) {
+		this.children.push(child)
+	}
+}
+
+function distributeNegate(node: Node, negate: boolean) {
+	if (node.type === 'Group') {
+		if (negate) node.negate = !node.negate
+		for (const child of node.children) {
+			distributeNegate(child, node.negate)
+		}
+	} else if (node.type === 'SimpleString' || node.type === 'QuotedString') {
+		if (negate) node.negate = !node.negate
+	} else if (node.type === 'AND') {
+		if (negate) node.type = 'OR'
+	} else if (node.type === 'OR') {
+		if (negate) node.type = 'AND'
+	} else {
+		assertNever(node.type)
+	}
 }
