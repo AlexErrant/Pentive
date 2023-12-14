@@ -33,12 +33,12 @@ export function convert(input: string) {
 }
 
 function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
-	if (node.name === 'SimpleString') {
+	if (node.name === 'SimpleString' || node.name === 'QuotedString') {
 		const separator = andOrNothing(node.node)
 		if (separator !== '') context.current.attach({ type: separator })
 		const value = input.slice(node.from, node.to)
 		const negate = isNegated(node.node)
-		context.current.attach({ type: 'SimpleString', value, negate })
+		context.current.attach({ type: node.name, value, negate })
 	} else if (node.name === 'ParenthesizedExpression') {
 		const negate = isNegated(node.node)
 		const group = new Group(context.current, negate)
@@ -61,7 +61,7 @@ function astLeave(_input: string, node: SyntaxNodeRef, context: Context) {
 
 function serialize(node: Node, context: Context) {
 	const spaces = '  '.repeat(context.indent)
-	if (node.type === 'SimpleString') {
+	if (node.type === 'SimpleString' || node.type === 'QuotedString') {
 		const query = `(noteFtsFv.rowid ${
 			node.negate ? 'NOT ' : ''
 		}IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH '${

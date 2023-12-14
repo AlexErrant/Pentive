@@ -15,6 +15,13 @@ test('not a', () => {
 	)
 })
 
+test('QuotedString is fts', () => {
+	const actual = convert('"a b"')
+	expect(actual).toEqual(
+		`(noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH '"a b"'))`,
+	)
+})
+
 test('2 SimpleStrings are ANDed', () => {
 	const actual = convert('a b')
 	expect(actual).toEqual(
