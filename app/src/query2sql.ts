@@ -126,9 +126,9 @@ type Leaf =
 			negate: boolean
 	  }
 
-type Node = Group | Leaf
+export type Node = Group | Leaf
 
-class Group {
+export class Group {
 	constructor(parent: Group | null, negate: boolean) {
 		this.parent = parent
 		this.isRoot = parent == null
@@ -144,6 +144,37 @@ class Group {
 
 	attach(child: Node) {
 		this.children.push(child)
+		if (child.type === 'Group') child.parent = this
+	}
+
+	attachMany(children: Node[]) {
+		this.children.push(...children)
+		for (const child of children) {
+			if (child.type === 'Group') child.parent = this
+		}
+	}
+
+	// In boolean algebra, the order of operations from highest to lowest priority is: NOT, AND, OR.
+	// We group ANDs to make negation propagation work.
+	groupAnds() {
+		let start: number | null = null
+		let length = 1 // initialize to 1 to include the (eventual) ending node
+		let cursor = 0
+		while (cursor < this.children.length) {
+			const andOrNull = this.children[cursor + 1]
+			if (start != null && (andOrNull == null || andOrNull.type === 'OR')) {
+				const newGroup = new Group(this, false)
+				const newChildren = this.children.splice(start, length, newGroup) // remove a sequence of ANDs and replace with their Group
+				newGroup.attachMany(newChildren)
+				start = null
+				length = 1
+				cursor = cursor + 1 - newChildren.length // add 1 for the new group, and remove children's length
+			} else if (andOrNull?.type === 'AND') {
+				if (start == null) start = cursor
+				length += 2
+			}
+			cursor += 2
+		}
 	}
 }
 
