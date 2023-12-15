@@ -173,3 +173,17 @@ describe('groupAnds', () => {
 		)
 	})
 })
+
+// https://stackoverflow.com/a/20552239
+test('!(p && !q || r) is (!p || q) && !r', () => {
+	const actual = convert('-(p -q OR r)')
+	expect(actual).toEqual(`(
+  (
+    (noteFtsFv.rowid NOT IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH 'p'))
+    OR
+    (noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH 'q'))
+  )
+  AND
+  (noteFtsFv.rowid NOT IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH 'r'))
+)`)
+})

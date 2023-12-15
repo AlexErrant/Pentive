@@ -181,6 +181,13 @@ export class Group {
 function distributeNegate(node: Node, negate: boolean) {
 	if (node.type === 'Group') {
 		if (negate) node.negate = !node.negate
+		if (
+			node.negate &&
+			node.children.some((c) => c.type === 'AND') &&
+			node.children.some((c) => c.type === 'OR')
+		) {
+			node.groupAnds()
+		}
 		for (const child of node.children) {
 			distributeNegate(child, node.negate)
 		}
