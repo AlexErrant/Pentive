@@ -6,6 +6,7 @@ export default defineConfig({
 			...configDefaults.exclude,
 			'tests-examples/*',
 			'tests/testdb.test.ts',
+			'lib',
 		],
 		environment: 'jsdom',
 	},
