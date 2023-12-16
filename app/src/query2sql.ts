@@ -36,7 +36,10 @@ function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
 	if (node.type.isError) return
 	if (node.name === 'SimpleString' || node.name === 'QuotedString') {
 		maybeAddSeparator(node.node, context)
-		const value = input.slice(node.from, node.to)
+		const value =
+			node.name === 'SimpleString'
+				? input.slice(node.from, node.to)
+				: input.slice(node.from + 1, node.to - 1) // don't include quotes
 		const negate = isNegated(node.node)
 		context.current.attach({ type: node.name, value, negate })
 	} else if (node.name === 'Group') {
@@ -66,7 +69,7 @@ function serialize(node: Node, context: Context) {
 		const query = `(noteFtsFv.rowid ${
 			node.negate ? 'NOT ' : ''
 		}IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH '${
-			node.value
+			node.type === 'SimpleString' ? node.value : '"' + node.value + '"'
 		}'))`
 		context.sql += '\n' + spaces + query
 	} else if (node.type === 'Group') {
