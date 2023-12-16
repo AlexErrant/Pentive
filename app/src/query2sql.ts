@@ -39,7 +39,7 @@ function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
 		const value = input.slice(node.from, node.to)
 		const negate = isNegated(node.node)
 		context.current.attach({ type: node.name, value, negate })
-	} else if (node.name === 'ParenthesizedExpression') {
+	} else if (node.name === 'Group') {
 		maybeAddSeparator(node.node, context)
 		const negate = isNegated(node.node)
 		const group = new Group(context.current, negate)
@@ -53,7 +53,7 @@ function isNegated(node: SyntaxNode) {
 }
 
 function astLeave(_input: string, node: SyntaxNodeRef, context: Context) {
-	if (node.name === 'ParenthesizedExpression') {
+	if (node.name === 'Group') {
 		if (!context.current.isRoot) {
 			context.current = context.current.parent!
 		}
@@ -103,7 +103,7 @@ function andOrNothing(node: SyntaxNode): '' | 'AND' | 'OR' {
 		if (
 			left.name === 'SimpleString' ||
 			left.name === 'QuotedString' ||
-			left.name === 'ParenthesizedExpression' ||
+			left.name === 'Group' ||
 			left.name === 'Tag' ||
 			left.name === 'Deck'
 		) {

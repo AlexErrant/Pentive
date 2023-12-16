@@ -4,11 +4,17 @@
 
 expression {
   !leftAssociate Not?
-  (SimpleString | QuotedString | ParenthesizedExpression | Tag | Deck)
+  (SimpleString | QuotedString | Group | Tag | Deck | Template)
   (Or? expression)*
 }
 
-ParenthesizedExpression { "(" expression ")" }
+Group { "(" expression ")" }
+
+Deck     { @specialize<SimpleString, "deck"    > ":" ( SimpleString | QuotedString ) }
+Tag      { @specialize<SimpleString, "tag"     > ":" ( SimpleString | QuotedString ) }
+Template { @specialize<SimpleString, "template"> ":" ( SimpleString | QuotedString ) }
+
+Or       { @specialize<SimpleString, "OR"      > }
 
 @tokens {
   QuotedString { '"' char* '"' }
@@ -24,7 +30,3 @@ ParenthesizedExpression { "(" expression ")" }
   Not { "-" }
   @precedence { Not, SimpleString }
 }
-
-Deck { @specialize<SimpleString, "deck"> ":" ( SimpleString | QuotedString ) }
-Tag  { @specialize<SimpleString, "tag">  ":" ( SimpleString | QuotedString ) }
-Or   { @specialize<SimpleString, "OR"> }

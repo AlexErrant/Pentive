@@ -8,7 +8,7 @@ test('queryParser can parse standard test string', () => {
 	)
 	const spec = `Program(
   Not,
-  ParenthesizedExpression(
+  Group(
     SimpleString
   ),
   SimpleString,
@@ -25,8 +25,8 @@ test('queryParser can parse standard test string', () => {
   SimpleString,
   SimpleString,
   SimpleString,
-  ParenthesizedExpression(
-    ParenthesizedExpression(
+  Group(
+    Group(
       SimpleString,
       QuotedString
     ),
