@@ -52,7 +52,11 @@ function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
 }
 
 function isNegated(node: SyntaxNode) {
-	return node.node.prevSibling?.name === 'Not'
+	let left = node.node.prevSibling
+	while (left?.type.isError === true) {
+		left = left.prevSibling
+	}
+	return left?.name === 'Not'
 }
 
 function astLeave(_input: string, node: SyntaxNodeRef, context: Context) {
@@ -101,7 +105,11 @@ function maybeAddSeparator(node: SyntaxNode, context: Context) {
 function andOrNothing(node: SyntaxNode): '' | 'AND' | 'OR' {
 	let left = node.prevSibling
 	while (left != null) {
-		if (left.type.isError) continue
+		if (left.type.isError || left.name === 'Not') {
+			left = left.prevSibling
+			continue
+		}
+
 		if (left.name === 'Or') return 'OR'
 		if (
 			left.name === 'SimpleString' ||
@@ -111,10 +119,6 @@ function andOrNothing(node: SyntaxNode): '' | 'AND' | 'OR' {
 			left.name === 'Deck'
 		) {
 			return 'AND'
-		}
-		if (left.name === 'Not') {
-			left = left.prevSibling
-			continue
 		}
 		throw Error('Unhandled node:' + left.node.name)
 	}

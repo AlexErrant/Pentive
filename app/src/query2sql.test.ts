@@ -8,11 +8,19 @@ test('SimpleString is fts', () => {
 	)
 })
 
-test('not a', () => {
-	const actual = convert('-a')
-	expect(actual).toEqual(
-		"(noteFtsFv.rowid NOT IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH 'a'))",
-	)
+describe('not a', () => {
+	const expected =
+		"(noteFtsFv.rowid NOT IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH 'a'))"
+
+	test('together', () => {
+		const actual = convert('-a')
+		expect(actual).toEqual(expected)
+	})
+
+	test('separated', () => {
+		const actual = convert('- a')
+		expect(actual).toEqual(expected)
+	})
 })
 
 test('QuotedString is fts', () => {
@@ -186,4 +194,29 @@ test('!(p && !q || r) is (!p || q) && !r', () => {
   AND
   (noteFtsFv.rowid NOT IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH 'r'))
 )`)
+})
+
+describe('skip error nodes', () => {
+	const expected = `(noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH 'foo'))`
+	const negatedExpected = `(noteFtsFv.rowid NOT IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH 'foo'))`
+
+	test('plain', () => {
+		const actual = convert('" foo')
+		expect(actual).toEqual(expected)
+	})
+
+	test('negated', () => {
+		const actual = convert('- " foo')
+		expect(actual).toEqual(negatedExpected)
+	})
+
+	test('double error', () => {
+		const actual = convert(`) " foo`)
+		expect(actual).toEqual(expected)
+	})
+
+	test('double error, negated', () => {
+		const actual = convert(`- ) " foo`)
+		expect(actual).toEqual(negatedExpected)
+	})
 })
