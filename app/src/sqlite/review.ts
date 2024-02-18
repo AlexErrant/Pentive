@@ -7,11 +7,12 @@ import { ky } from '../topLevelAwait'
 export const reviewCollectionMethods = {
 	bulkUploadReview: async function (reviews: Review[]) {
 		const entities = reviews.map(
-			({ id, cardId, created, rating, ...r }) =>
+			({ id, cardId, created, rating, kind, ...r }) =>
 				({
 					id,
 					cardId,
 					rating,
+					kind,
 					created: created.getTime(),
 					details: stringifyDetails(r),
 				}) satisfies ReviewEntity,

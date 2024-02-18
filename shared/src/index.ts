@@ -127,6 +127,7 @@ export const initSql = [
     cardId TEXT,
     created INTEGER,
     rating INTEGER,
+    kind INTEGER,
     details TEXT
 ) STRICT;`,
 	`CREATE TABLE IF NOT EXISTS cardSetting (

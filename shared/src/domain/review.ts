@@ -17,4 +17,5 @@ export type Review = {
 	cardId: CardId
 	created: Date
 	rating: number
+	kind: number
 } & Record<string, unknown>

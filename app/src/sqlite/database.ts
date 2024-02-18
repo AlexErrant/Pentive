@@ -131,6 +131,7 @@ export interface Review {
 	cardId: LDbId
 	created: number
 	rating: number
+	kind: number
 	details: string
 }
 
