@@ -80,7 +80,6 @@ const dconfSingle = z.object({
 	id: z.number(),
 	mod: z.number(),
 	name: z.string(),
-	usn: z.number(),
 	maxTaken: z.number(),
 	autoplay: z.boolean(),
 	timer: z.number(),
@@ -109,6 +108,8 @@ const dconfSingle = z.object({
 		mult: z.number(),
 	}),
 	// dyn: z.boolean(),
+	fsrsWeights: z.array(z.number()).optional(),
+	desiredRetention: z.number().optional(),
 })
 
 const dconf = z.record(z.string(), dconfSingle)
