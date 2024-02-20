@@ -1,4 +1,8 @@
-#!/bin/sh -e
+#!/bin/bash -e
+
+# TODO: automate https://www.shellcheck.net/
+set -euo pipefail # https://stackoverflow.com/a/2871034
+# set -x
 
 # https://github.com/pahen/madge/issues/271#issuecomment-1484764471
 

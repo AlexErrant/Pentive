@@ -1,3 +1,9 @@
+#!/bin/bash
+
+# TODO: automate https://www.shellcheck.net/
+set -euo pipefail # https://stackoverflow.com/a/2871034
+# set -x
+
 cp ../node_modules/.pnpm/node_modules/sql.js/dist/sql-wasm.wasm ./src/assets/sql-wasm.wasm
 rm -rf ./public/assets/
 mkdir -p ./public/assets/
