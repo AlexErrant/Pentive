@@ -1,4 +1,4 @@
-import { type Review } from 'shared'
+import { type CardId, type Review } from 'shared'
 import { type Review as ReviewEntity } from '../sqlite/database'
 import _ from 'lodash'
 import { toastInfo } from '../components/toasts'
@@ -38,6 +38,31 @@ export const reviewCollectionMethods = {
 					...parseDetails(details),
 				}) satisfies Review as Review,
 		)
+	},
+	getFsrsItemsForCard: async function (cardId: CardId) {
+		const reviews = await ky
+			.selectFrom('review')
+			.where('cardId', '=', cardId) // medTODO filter out manual reviews and other edge cases
+			.select(['rating', 'created', 'kind'])
+			.orderBy('cardId')
+			.orderBy('created')
+			.execute()
+		const cids = new BigInt64Array(reviews.length) // not given values since cids don't do anything in fsrs, as long as it's for 1 card
+		const eases = new Uint8Array(reviews.length)
+		const ids = new BigInt64Array(reviews.length)
+		const types = new Uint8Array(reviews.length)
+		for (let index = 0; index < reviews.length; index++) {
+			const review = reviews[index]!
+			eases[index] = review.rating
+			ids[index] = BigInt(review.created)
+			types[index] = review.kind
+		}
+		return {
+			eases,
+			ids,
+			cids,
+			types,
+		}
 	},
 }
 
