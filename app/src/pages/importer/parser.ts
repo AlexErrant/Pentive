@@ -23,9 +23,11 @@ import {
 	type Revlog,
 	type Dconf,
 	type Decks,
+	dconfSingle,
 } from './typeChecker'
 import _ from 'lodash'
 import { toastFatal, toastImpossible } from '../../components/toasts'
+import { z } from 'zod'
 
 function parseField(fld: Fld): Field {
 	return {
@@ -160,9 +162,15 @@ export function parseRevlog({
 	}
 }
 
-export function parseCardSetting(dconf: Dconf) {
+export function parseCardSetting(dconf: Dconf): CardSetting[] {
 	return Array.from(Object.entries(dconf)).map(([id, rest]) => ({
 		...rest,
 		id: id as CardSettingId,
 	}))
 }
+
+export const cardSetting = dconfSingle.merge(
+	z.object({ id: z.string() as unknown as z.Schema<CardSettingId> }),
+)
+
+export type CardSetting = z.infer<typeof cardSetting>

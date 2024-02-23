@@ -76,7 +76,7 @@ const deck = z.object({
 	extendRev: z.number(),
 })
 
-const dconfSingle = z.object({
+export const dconfSingle = z.object({
 	id: z.number(),
 	mod: z.number(),
 	name: z.string(),
