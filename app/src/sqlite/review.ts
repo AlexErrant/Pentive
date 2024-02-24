@@ -42,12 +42,12 @@ export const reviewCollectionMethods = {
 	getFsrsItemsForCard: async function (cardId: CardId) {
 		const reviews = await ky
 			.selectFrom('review')
-			.where('cardId', '=', cardId) // medTODO filter out manual reviews and other edge cases
+			.where('cardId', '=', cardId) // highTODO filter out manual reviews and other edge cases
 			.select(['rating', 'created', 'kind'])
 			.orderBy('cardId')
 			.orderBy('created')
 			.execute()
-		const cids = new BigInt64Array(reviews.length) // not given values since cids don't do anything in fsrs, as long as it's for 1 card
+		const cids = new BigInt64Array(reviews.length) // not given values since cids don't do anything in fsrs-browser, as long as it's for 1 card
 		const eases = new Uint8Array(reviews.length)
 		const ids = new BigInt64Array(reviews.length)
 		const types = new Uint8Array(reviews.length)
