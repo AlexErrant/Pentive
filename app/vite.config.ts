@@ -53,6 +53,7 @@ export default defineConfig(({ mode }: UserConfig) => {
 			}),
 		],
 		optimizeDeps: {
+			exclude: ['fsrs-browser'], // https://github.com/vitejs/vite/issues/8427
 			esbuildOptions: {
 				target: 'esnext',
 			},
