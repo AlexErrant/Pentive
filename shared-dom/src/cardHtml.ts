@@ -67,23 +67,7 @@ export function body(
 			return [this.strip(frontBack[0]), this.strip(frontBack[1])] as const
 		return frontBack
 	}
-	if (template.templateType.tag === 'standard') {
-		return shortify(
-			handleStandard.call(
-				this,
-				card,
-				note,
-				template as StandardTemplate,
-				short,
-			),
-		)
-	} else if (template.templateType.tag === 'cloze') {
-		return shortify(
-			handleCloze.call(this, card, note, template as ClozeTemplate, short),
-		)
-	} else {
-		assertNever(template.templateType)
-	}
+	return shortify(handle.call(this, card, note, template, short))
 }
 export interface ReplacerArgs {
 	initialValue: string
@@ -93,45 +77,31 @@ export interface ReplacerArgs {
 	template: Template
 }
 
-export type StandardReplacerArgs = Omit<ReplacerArgs, 'template'> & {
-	template: StandardTemplate
-}
+export type Replacers = Map<string, Replacer>
 
-export type ClozeReplacerArgs = Omit<ReplacerArgs, 'template'> & {
-	template: ClozeTemplate
-}
+export type Replacer = (this: RenderContainer, args: ReplacerArgs) => string
 
-export type Replacers = Map<
-	string,
-	(this: RenderContainer, args: ReplacerArgs) => string
->
-
-export type StandardReplacer = (
-	this: RenderContainer,
-	args: StandardReplacerArgs,
-) => string
-
-export const standardReplacers: Map<string, StandardReplacer> = new Map<
-	string,
-	StandardReplacer
->([
+export const replacers: Map<string, Replacer> = new Map<string, Replacer>([
 	['simpleFieldReplacer', simpleFieldReplacer],
 	['conditionalReplacer', conditionalReplacer],
 	['antiConditionalReplacer', antiConditionalReplacer],
-	['tagReplacer', tagReplacer],
 	['stripHtmlReplacer', stripHtmlReplacer],
+	['tagReplacer', tagReplacer],
+	['clozeReplacer', clozeReplacer],
 ])
 
-function handleStandard(
+function handle(
 	this: RenderContainer,
 	card: Card,
 	note: Note,
-	template: StandardTemplate,
+	template: Template,
 	short: boolean,
 ) {
 	let { front, back, shortFront, shortBack } =
-		template.templateType.templates.find((t) => t.id === card.ord) ??
-		throwExp(`Ord ${card.ord} not found`)
+		template.templateType.tag === 'standard'
+			? template.templateType.templates.find((t) => t.id === card.ord) ??
+			  throwExp(`Ord ${card.ord} not found`)
+			: template.templateType.template
 	if (short) {
 		front = shortFront == null || shortFront.trim() === '' ? front : shortFront
 		back = shortBack == null || shortBack.trim() === '' ? back : shortBack
@@ -149,7 +119,7 @@ function handleStandard(
 			note,
 			template,
 		}
-		for (const [, replacer] of this.standardReplacers) {
+		for (const [, replacer] of this.replacers) {
 			args.initialValue = r
 			r = replacer.bind(this)(args)
 		}
@@ -165,66 +135,6 @@ function handleStandard(
 		return [frontSide, backSide] as const
 	}
 }
-
-export type ClozeReplacer = (
-	this: RenderContainer,
-	args: ClozeReplacerArgs,
-) => string
-
-export const clozeReplacers: Map<string, ClozeReplacer> = new Map<
-	string,
-	ClozeReplacer
->([
-	['simpleFieldReplacer', simpleFieldReplacer],
-	['conditionalReplacer', conditionalReplacer],
-	['antiConditionalReplacer', antiConditionalReplacer],
-	['stripHtmlReplacer', stripHtmlReplacer],
-	['tagReplacer', tagReplacer],
-	['clozeReplacer', clozeReplacer],
-])
-
-function handleCloze(
-	this: RenderContainer,
-	card: Card,
-	note: Note,
-	template: ClozeTemplate,
-	short: boolean,
-) {
-	let { front, back, shortFront, shortBack } = template.templateType.template
-	if (short) {
-		front = shortFront == null || shortFront.trim() === '' ? front : shortFront
-		back = shortBack == null || shortBack.trim() === '' ? back : shortBack
-	}
-	function replaceFields(
-		this: RenderContainer,
-		isFront: boolean,
-		seed: string,
-	) {
-		let r = seed
-		const args = {
-			initialValue: seed,
-			isFront,
-			card,
-			note,
-			template,
-		}
-		for (const [, replacer] of this.clozeReplacers) {
-			args.initialValue = r
-			r = replacer.bind(this)(args)
-		}
-		return r
-	}
-	const frontSide = replaceFields.call(this, true, front)
-	if (frontSide === front) {
-		return null
-	} else {
-		const backSide = replaceFields
-			.call(this, false, back)
-			.replace('{{FrontSide}}', replaceFields.call(this, false, front))
-		return [frontSide, backSide] as const
-	}
-}
-
 function getClozeFields(
 	this: RenderContainer,
 	frontTemplate: string,
@@ -251,14 +161,10 @@ export function simpleFieldReplacer(
 }
 
 function tagReplacer(this: RenderContainer, args: ReplacerArgs) {
-	const replacersMap =
-		args.template.templateType.tag === 'standard'
-			? (this.standardReplacers as Replacers)
-			: (this.clozeReplacers as Replacers)
 	const replacers = [
-		replacersMap.get('simpleFieldReplacer'),
-		replacersMap.get('conditionalReplacer'),
-		replacersMap.get('antiConditionalReplacer'),
+		this.replacers.get('simpleFieldReplacer'),
+		this.replacers.get('conditionalReplacer'),
+		this.replacers.get('antiConditionalReplacer'),
 	].filter(notEmpty)
 	let r = args.initialValue
 	const args2 = {
@@ -320,71 +226,74 @@ function stripHtmlReplacer(
 
 function clozeReplacer(
 	this: RenderContainer,
-	{ initialValue, isFront, card, note, template }: ClozeReplacerArgs,
+	{ initialValue, isFront, card, note, template }: ReplacerArgs,
 ) {
 	let r = initialValue
-	note.fieldValues.forEach((value, fieldName) => {
-		const i = (card.ord.valueOf() + 1).toString()
-		const clozeFields = getClozeFields.call(
-			this,
-			template.templateType.template.front,
-		)
-		const indexMatch = Array.from(
-			value.matchAll(this.clozeRegex),
-			(x) =>
-				x.groups?.clozeIndex ??
-				throwExp('This error should never occur - is `clozeRegex` broken?'),
-		).includes(i)
-		if (!indexMatch && clozeFields.includes(fieldName)) {
-			value = ''
-		} else {
-			value = Array.from(value.matchAll(this.clozeRegex))
-				.filter(
-					(x) =>
-						(x.groups?.clozeIndex ??
+	if (template.templateType.tag === 'cloze') {
+		const front = template.templateType.template.front
+		note.fieldValues.forEach((value, fieldName) => {
+			const i = (card.ord.valueOf() + 1).toString()
+			const clozeFields = getClozeFields.call(this, front)
+			const indexMatch = Array.from(
+				value.matchAll(this.clozeRegex),
+				(x) =>
+					x.groups?.clozeIndex ??
+					throwExp('This error should never occur - is `clozeRegex` broken?'),
+			).includes(i)
+			if (!indexMatch && clozeFields.includes(fieldName)) {
+				value = ''
+			} else {
+				value = Array.from(value.matchAll(this.clozeRegex))
+					.filter(
+						(x) =>
+							(x.groups?.clozeIndex ??
+								throwExp(
+									'This error should never occur - is `clozeRegex` broken?',
+								)) !== i,
+					)
+					.map((x) => ({
+						completeMatch: x[0],
+						answer:
+							x.groups?.answer ??
 							throwExp(
 								'This error should never occur - is `clozeRegex` broken?',
-							)) !== i,
-				)
-				.map((x) => ({
-					completeMatch: x[0],
-					answer:
-						x.groups?.answer ??
-						throwExp('This error should never occur - is `clozeRegex` broken?'),
-				}))
-				.reduce(
-					(state, { completeMatch, answer }) =>
-						state.replace(completeMatch, answer),
-					value,
-				)
-		}
-		if (isFront) {
-			const regexMatches: ReadonlyArray<readonly [string | undefined, string]> =
-				Array.from(value.matchAll(this.clozeRegex), (x) => [
+							),
+					}))
+					.reduce(
+						(state, { completeMatch, answer }) =>
+							state.replace(completeMatch, answer),
+						value,
+					)
+			}
+			if (isFront) {
+				const regexMatches: ReadonlyArray<
+					readonly [string | undefined, string]
+				> = Array.from(value.matchAll(this.clozeRegex), (x) => [
 					x.groups?.hint,
 					x[0],
 				])
-			const bracketed = regexMatches.reduce((current, [hint, rawCloze]) => {
-				const brackets = `
+				const bracketed = regexMatches.reduce((current, [hint, rawCloze]) => {
+					const brackets = `
 <span class="cloze-brackets-front">[</span>
 <span class="cloze-filler-front">${hint ?? '...'}</span>
 <span class="cloze-brackets-front">]</span>
 `
-				return current.replace(rawCloze, brackets)
-			}, value)
-			r = r.replace(clozeTemplateFor.call(this, fieldName), bracketed)
-		} else {
-			const answer = value.replace(
-				this.clozeRegex,
-				`
+					return current.replace(rawCloze, brackets)
+				}, value)
+				r = r.replace(clozeTemplateFor.call(this, fieldName), bracketed)
+			} else {
+				const answer = value.replace(
+					this.clozeRegex,
+					`
 <span class="cloze-brackets-back">[</span>
 $<answer>
 <span class="cloze-brackets-back">]</span>
 `,
-			)
-			r = r.replace(clozeTemplateFor.call(this, fieldName), answer)
-		}
-	})
+				)
+				r = r.replace(clozeTemplateFor.call(this, fieldName), answer)
+			}
+		})
+	}
 	return r
 }
 

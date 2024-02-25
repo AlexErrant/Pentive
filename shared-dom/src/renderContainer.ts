@@ -5,15 +5,13 @@ import {
 	html,
 	renderTemplate,
 	strip,
-	standardReplacers,
-	clozeReplacers,
+	replacers,
 	noteOrds,
 	templateIndexes,
 } from './cardHtml.js'
 
 export const defaultRenderContainer = {
-	standardReplacers,
-	clozeReplacers,
+	replacers,
 	clozeRegex,
 	clozeTemplateRegex,
 	body,

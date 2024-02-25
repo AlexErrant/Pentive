@@ -12,17 +12,7 @@ function clozeTemplateRegex(c: Container): RegExp {
 const services = (c: Container): Partial<Container> => {
 	return {
 		clozeTemplateRegex: clozeTemplateRegex(c),
-		standardReplacers: new Map(c.standardReplacers).set(
-			'editFieldReplacer',
-			({ initialValue, isFront, card, note, template }) => {
-				let r = initialValue
-				note.fieldValues.forEach((value, fieldName) => {
-					r = r.replace(new RegExp(`{{(?:edit:)?${fieldName}}}`), value)
-				})
-				return r
-			},
-		),
-		clozeReplacers: new Map(c.clozeReplacers).set(
+		replacers: new Map(c.replacers).set(
 			'editFieldReplacer',
 			({ initialValue, isFront, card, note, template }) => {
 				let r = initialValue
