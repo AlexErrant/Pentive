@@ -1,13 +1,8 @@
-@top Document { (entity | DoctypeDecl)+ }
+@top Document { entity+ }
 
 entity {
   Text |
-  EntityReference |
-  CharacterReference |
-  Cdata |
   Element |
-  Comment |
-  ProcessingInst |
   MismatchedCloseTag |
   incompleteStartCloseTag
 }
@@ -18,11 +13,11 @@ Element {
 }
 
 OpenTag[closedBy="CloseTag MissingCloseTag",isolate] {
-  StartTag space* TagName space* (Attribute space*)* EndTag
+  StartTag space* TagName space* EndTag
 }
 
 SelfClosingTag[isolate] {
-  StartTag space* TagName space* (Attribute space*)* SelfCloseEndTag
+  StartTag space* TagName space* EndTag 
 }
 
 CloseTag[openedBy=OpenTag,isolate] {
@@ -33,71 +28,23 @@ MismatchedCloseTag[isolate] {
   mismatchedStartCloseTag space* TagName space* EndTag
 }
 
-Attribute {
-  AttributeName space* Is space* AttributeValue
-}
+@context elementContext from "./template.tokens.ts"
 
-AttributeValue[isolate] { "\"" (attributeContent | EntityReference | CharacterReference)* "\"" }
-
-Comment[isolate] { "<!--" commentContent* "-->" }
-
-ProcessingInst { "<?" piContent* "?>" }
-
-Cdata { cdataStart cdataContent* "]]>" }
-
-@context elementContext from "./tokens.js"
-
-@external tokens startTag from "./tokens.js" {
-  StartTag[closedBy="SelfCloseEndTag EndTag"]
+@external tokens startTag from "./template.tokens.ts" {
+  StartTag[closedBy="EndTag"]
   StartCloseTag
   MissingCloseTag
   mismatchedStartCloseTag[@name=StartCloseTag]
   incompleteStartCloseTag[@name=StartCloseTag]
 }
 
-@external tokens commentContent from "./tokens.js" { commentContent }
-@external tokens piContent from "./tokens.js" { piContent }
-@external tokens cdataContent from "./tokens.js" { cdataContent }
-
 @tokens {
   EndTag[openedBy="StartTag StartCloseTag"] { ">" }
-
-  SelfCloseEndTag[openedBy=StartTag] { "/>" }
-
-  nameStart {
-    ":" | @asciiLetter | "_" |
-    $[\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02FF\u0370-\u037D\u037F-\u1FFF\u200C-\u200D] |
-    $[\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD\u{10000}-\u{EFFFF}]
-  }
-
-  nameChar {
-    nameStart | "-" | "." | @digit | $[\u00B7\u0300-\u036F\u203F-\u2040]
-  }
-
-  identifier { nameStart nameChar* }
-
-  TagName { identifier }
-
-  AttributeName { identifier }
-
-  attributeContent { !["&]+ }
-
-  Is { "=" }
-
-   // See https://www.w3.org/TR/2006/REC-xml11-20060816/#sec-references
-   EntityReference { "&" identifier ";" }
-
-  CharacterReference { "&#" ("x" $[0-9a-fA-F]+ | $[0-9]+) ";" }
-
+  TagName { @asciiLetter+ }
   Text { ![<&]+ }
-
-  DoctypeDecl { "<!" ("doctype" | "DOCTYPE") ![>]* ">" }
-
-  cdataStart { "<![" ("cdata" | "CDATA") "[" }
-
   space { (" " | "\t" | "\r" | "\n")+ }
 }
 
-@external propSource xmlHighlighting from "./highlight"
+@external propSource xmlHighlighting from "./template.highlight.ts"
 
 @detectDelim

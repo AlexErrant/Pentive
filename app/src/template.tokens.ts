@@ -1,6 +1,15 @@
+/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
+/* eslint-disable @typescript-eslint/strict-boolean-expressions */
+/* eslint-disable eqeqeq */
+
 /* Hand-written tokenizer for XML tag matching. */
 
-import { ExternalTokenizer, ContextTracker } from '@lezer/lr'
+import {
+	ExternalTokenizer,
+	ContextTracker,
+	type InputStream,
+	type Stack,
+} from '@lezer/lr'
 import {
 	StartTag,
 	StartCloseTag,
@@ -9,12 +18,9 @@ import {
 	MissingCloseTag,
 	Element,
 	OpenTag,
-	commentContent as _commentContent,
-	piContent as _piContent,
-	cdataContent as _cdataContent,
-} from './parser.terms.js'
+} from './templateParser.terms'
 
-function nameChar(ch) {
+function nameChar(ch: number) {
 	return (
 		ch == 45 ||
 		ch == 46 ||
@@ -26,14 +32,14 @@ function nameChar(ch) {
 	)
 }
 
-function isSpace(ch) {
+function isSpace(ch: number) {
 	return ch == 9 || ch == 10 || ch == 13 || ch == 32
 }
 
-let cachedName = null
-let cachedInput = null
+let cachedName: null | string = null
+let cachedInput: null | InputStream = null
 let cachedPos = 0
-function tagNameAfter(input, offset) {
+function tagNameAfter(input: InputStream, offset: number) {
 	const pos = input.pos + offset
 	if (cachedInput == input && cachedPos == pos) return cachedName
 	while (isSpace(input.peek(offset))) offset++
@@ -49,18 +55,23 @@ function tagNameAfter(input, offset) {
 	return (cachedName = name || null)
 }
 
-function ElementContext(name, parent) {
-	this.name = name
-	this.parent = parent
-	this.hash = parent ? parent.hash : 0
-	for (let i = 0; i < name.length; i++)
-		this.hash +=
-			(this.hash << 4) + name.charCodeAt(i) + (name.charCodeAt(i) << 8)
+class ElementContext {
+	name: string
+	parent: ElementContext | null
+	hash: number
+	constructor(name: string, parent: ElementContext | null) {
+		this.name = name
+		this.parent = parent
+		this.hash = parent ? parent.hash : 0
+		for (let i = 0; i < name.length; i++)
+			this.hash +=
+				(this.hash << 4) + name.charCodeAt(i) + (name.charCodeAt(i) << 8)
+	}
 }
 
-export const elementContext = new ContextTracker({
+export const elementContext = new ContextTracker<null | ElementContext>({
 	start: null,
-	shift(context, term, stack, input) {
+	shift(context, term, _stack, input) {
 		return term == StartTag
 			? new ElementContext(tagNameAfter(input, 1) || '', context)
 			: context
@@ -81,9 +92,13 @@ export const elementContext = new ContextTracker({
 })
 
 export const startTag = new ExternalTokenizer(
-	(input, stack) => {
+	(input, stack0) => {
+		const stack = stack0 as Omit<Stack, 'context'> & {
+			context: ElementContext | null
+		}
 		if (input.next != 60 /* '<' */) return
 		input.advance()
+		// @ts-expect-error .advance changes the .next value but TS doesn't know that
 		if (input.next == 47 /* '/' */) {
 			input.advance()
 			const name = tagNameAfter(input, 0)
@@ -101,29 +116,10 @@ export const startTag = new ExternalTokenizer(
 					return
 				}
 			input.acceptToken(mismatchedStartCloseTag)
+			// @ts-expect-error .advance changes the .next value but TS doesn't know that
 		} else if (input.next != 33 /* '!' */ && input.next != 63 /* '?' */) {
 			input.acceptToken(StartTag)
 		}
 	},
 	{ contextual: true },
 )
-
-function scanTo(type, end) {
-	return new ExternalTokenizer((input) => {
-		let len = 0
-		const first = end.charCodeAt(0)
-		scan: for (; ; input.advance(), len++) {
-			if (input.next < 0) break
-			if (input.next == first) {
-				for (let i = 1; i < end.length; i++)
-					if (input.peek(i) != end.charCodeAt(i)) continue scan
-				break
-			}
-		}
-		if (len) input.acceptToken(type)
-	})
-}
-
-export const commentContent = scanTo(_commentContent, '-->')
-export const piContent = scanTo(_piContent, '?>')
-export const cdataContent = scanTo(_cdataContent, ']]>')
