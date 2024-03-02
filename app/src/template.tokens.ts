@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/strict-boolean-expressions */
 /* eslint-disable eqeqeq */
 
-/* Hand-written tokenizer for XML tag matching. */
+/* Mostly a copy/paste of https://github.com/lezer-parser/xml */
 
 import {
 	ExternalTokenizer,
@@ -20,20 +20,14 @@ import {
 	OpenTag,
 } from './templateParser.terms'
 
+// if you update this, also update 08643083-B4CC-42E8-ACFA-A713DF287B7F
 function nameChar(ch: number) {
 	return (
-		ch == 45 ||
-		ch == 46 ||
-		ch == 58 ||
-		(ch >= 65 && ch <= 90) ||
-		ch == 95 ||
-		(ch >= 97 && ch <= 122) ||
-		ch >= 161
+		ch == 32 || // space
+		(ch >= 48 && ch <= 57) || // 0-9
+		(ch >= 65 && ch <= 90) || // A-Z
+		(ch >= 97 && ch <= 122) // a-z
 	)
-}
-
-function isSpace(ch: number) {
-	return ch == 9 || ch == 10 || ch == 13 || ch == 32
 }
 
 let cachedName: null | string = null
@@ -42,7 +36,6 @@ let cachedPos = 0
 function tagNameAfter(input: InputStream, offset: number) {
 	const pos = input.pos + offset
 	if (cachedInput == input && cachedPos == pos) return cachedName
-	while (isSpace(input.peek(offset))) offset++
 	let name = ''
 	for (;;) {
 		const next = input.peek(offset)
@@ -73,7 +66,7 @@ export const elementContext = new ContextTracker<null | ElementContext>({
 	start: null,
 	shift(context, term, _stack, input) {
 		return term == StartTag
-			? new ElementContext(tagNameAfter(input, 1) || '', context)
+			? new ElementContext(tagNameAfter(input, 3) || '', context)
 			: context
 	},
 	reduce(context, term) {
@@ -82,7 +75,7 @@ export const elementContext = new ContextTracker<null | ElementContext>({
 	reuse(context, node, _stack, input) {
 		const type = node.type.id
 		return type == StartTag || type == OpenTag
-			? new ElementContext(tagNameAfter(input, 1) || '', context)
+			? new ElementContext(tagNameAfter(input, 3) || '', context)
 			: context
 	},
 	hash(context) {
@@ -96,7 +89,9 @@ export const startTag = new ExternalTokenizer(
 		const stack = stack0 as Omit<Stack, 'context'> & {
 			context: ElementContext | null
 		}
-		if (input.next != 60 /* '<' */) return
+		if (input.next != 123 /* '{' */) return
+		input.advance()
+		if (input.next != 123 /* '{' */) return
 		input.advance()
 		// @ts-expect-error .advance changes the .next value but TS doesn't know that
 		if (input.next == 47 /* '/' */) {

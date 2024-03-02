@@ -2,6 +2,7 @@
 
 entity {
   Text |
+  Brace |
   Element |
   MismatchedCloseTag |
   incompleteStartCloseTag
@@ -13,19 +14,19 @@ Element {
 }
 
 OpenTag[closedBy="CloseTag MissingCloseTag",isolate] {
-  StartTag space* TagName space* EndTag
+  StartTag (If | Unless) TagName EndTag
 }
 
 SelfClosingTag[isolate] {
-  StartTag space* TagName space* EndTag 
+  StartTag TagName EndTag
 }
 
 CloseTag[openedBy=OpenTag,isolate] {
-  StartCloseTag space* TagName space* EndTag
+  StartCloseTag TagName EndTag
 }
 
 MismatchedCloseTag[isolate] {
-  mismatchedStartCloseTag space* TagName space* EndTag
+  mismatchedStartCloseTag TagName EndTag
 }
 
 @context elementContext from "./template.tokens.ts"
@@ -39,10 +40,12 @@ MismatchedCloseTag[isolate] {
 }
 
 @tokens {
-  EndTag[openedBy="StartTag StartCloseTag"] { ">" }
-  TagName { @asciiLetter+ }
-  Text { ![<&]+ }
-  space { (" " | "\t" | "\r" | "\n")+ }
+  EndTag[openedBy="StartTag StartCloseTag"] { "}}" }
+  TagName { (@asciiLetter | @digit | " ")+ } // if you update this, also update 08643083-B4CC-42E8-ACFA-A713DF287B7F
+  If { "#" }
+  Unless { "^" }
+  Text { ![{]+ }
+  Brace[@name=Text] { "{" }
 }
 
 @external propSource xmlHighlighting from "./template.highlight.ts"
