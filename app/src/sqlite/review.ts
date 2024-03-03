@@ -39,6 +39,39 @@ export const reviewCollectionMethods = {
 				}) satisfies Review as Review,
 		)
 	},
+	getFsrsItems: async function () {
+		const reviews = await ky
+			.selectFrom('review')
+			// highTODO filter out manual reviews and other edge cases
+			.select(['rating', 'created', 'kind', 'cardId'])
+			.orderBy('cardId')
+			.orderBy('created')
+			.execute()
+		const cids = new BigInt64Array(reviews.length) // not given values since cids don't do anything in fsrs-browser, as long as it's for 1 card
+		const eases = new Uint8Array(reviews.length)
+		const ids = new BigInt64Array(reviews.length)
+		const types = new Uint8Array(reviews.length)
+		let currentCardId = '' as CardId
+		let cid = BigInt(0)
+		for (let index = 0; index < reviews.length; index++) {
+			const review = reviews[index]!
+			// fsrs only uses cids for grouping, but needs it to be an i64, so we convert it
+			if (currentCardId !== review.cardId) {
+				cid++
+				currentCardId = review.cardId
+			}
+			cids[index] = cid
+			eases[index] = review.rating
+			ids[index] = BigInt(review.created)
+			types[index] = review.kind
+		}
+		return {
+			eases,
+			ids,
+			cids,
+			types,
+		}
+	},
 	getFsrsItemsForCard: async function (cardId: CardId) {
 		const reviews = await ky
 			.selectFrom('review')
