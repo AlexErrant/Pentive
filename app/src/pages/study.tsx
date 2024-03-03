@@ -42,7 +42,10 @@ export default function Study(): JSX.Element {
 			const [stability, difficulty] =
 				fi.ids.length === 0
 					? [undefined, undefined]
-					: fsrs.memoryStateAnki(cids, eases, ids, types)
+					: fsrs.memoryStateAnki(cids, eases, ids, types) ?? [
+							undefined,
+							undefined,
+					  ]
 			const now = BigInt(new Date().getTime())
 			const mostRecent = ids.at(-1) ?? now
 			const daysElapsed = (now - mostRecent) / 86400000n + 1n // +1n because BigInt division truncates and we want to simulate Math.ceil
