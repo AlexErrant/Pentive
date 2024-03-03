@@ -10,8 +10,7 @@ test('templateParser can parse standard test string', () => {
   <hr></div><div class=extra>{{extra content}}
 {{/extra content}}
   <hr>
-</div>
-`,
+</div>`,
 	)
 	const spec = `Document(
 Text,
@@ -26,5 +25,24 @@ Element(
   CloseTag(StartCloseTag,TagName,EndTag)
 ),
 Text)`
+	testTree(tree, spec)
+})
+
+test('templateParser can parse cloze test string', () => {
+	const tree = parser.parse(`{{type:cloze:Text}}words{foo`)
+	const spec = `Document(
+Element(
+  SelfClosingTag(
+    StartTag,
+    Transformer(TagName,TransformerDelimiter),
+    Transformer(TagName,TransformerDelimiter),
+    TagName,
+    EndTag
+  )
+)
+Text,
+Text,
+Text
+)`
 	testTree(tree, spec)
 })

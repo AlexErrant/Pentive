@@ -135,6 +135,7 @@ function handle(
 		return [frontSide, backSide] as const
 	}
 }
+
 function getClozeFields(
 	this: RenderContainer,
 	frontTemplate: string,

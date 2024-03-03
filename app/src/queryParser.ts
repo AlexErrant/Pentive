@@ -15,6 +15,6 @@ export const parser = LRParser.deserialize({
   tokenData: "'o~RpOX#VX^$d^p#Vpq$dqr#Vrs%Xsx#Vxy&Vyz&[z}#V}!O&a!O![#V![!]'j!]#y#V#y#z$d#z$f#V$f$g$d$g#BY#V#BY#BZ$d#BZ$IS#V$IS$I_$d$I_$I|#V$I|$JO$d$JO$JT#V$JT$JU$d$JU$KV#V$KV$KW$d$KW&FU#V&FU&FV$d&FV;'S#V;'S;=`$^<%lO#V~#[`R~OX#V^p#Vqr#Vsx#Vz![#V!]#y#V#z$f#V$g#BY#V#BZ$IS#V$I_$I|#V$JO$JT#V$JU$KV#V$KW&FU#V&FV;'S#V;'S;=`$^<%lO#V~$aP;=`<%l#V~$iY^~X^$dpq$d#y#z$d$f$g$d#BY#BZ$d$IS$I_$d$I|$JO$d$JT$JU$d$KV$KW$d&FU&FV$d~%[VOr%Xrs%qs#O%X#O#P%v#P;'S%X;'S;=`&P<%lO%X~%vOS~~%yQrs%X#O#P%X~&SP;=`<%l%X~&[O`~~&aOa~~&h`Q~R~OX#V^p#Vqr#Vsx#Vz![#V!]#y#V#z$f#V$g#BY#V#BZ$IS#V$I_$I|#V$JO$JT#V$JU$KV#V$KW&FU#V&FV;'S#V;'S;=`$^<%lO#V~'oOc~",
   tokenizers: [0],
   topRules: {"Program":[0,1]},
-  specialized: [{term: 3, get: (value: any) => spec_SimpleString[value] || -1}],
+  specialized: [{term: 3, get: (value: keyof typeof spec_SimpleString) => spec_SimpleString[value] || -1}],
   tokenPrec: 297
 })
