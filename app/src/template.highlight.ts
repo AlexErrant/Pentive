@@ -1,16 +1,13 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import { styleTags, tags as t } from '@lezer/highlight'
 
 export const xmlHighlighting = styleTags({
 	Text: t.content,
-	'StartTag StartCloseTag EndTag SelfCloseEndTag': t.angleBracket,
+	'StartTag StartCloseTag EndTag SelfCloseEndTag': t.brace,
 	TagName: t.tagName,
 	'MismatchedCloseTag/Tagname': [t.tagName, t.invalid],
-	AttributeName: t.attributeName,
-	AttributeValue: t.attributeValue,
-	Is: t.definitionOperator,
-	'EntityReference CharacterReference': t.character,
-	Comment: t.blockComment,
-	ProcessingInst: t.processingInstruction,
-	DoctypeDecl: t.documentMeta,
-	Cdata: t.special(t.string),
+	Transformer: t.attributeName,
+	TransformerDelimiter: t.separator,
+	If: t.controlOperator,
+	Unless: t.controlOperator,
 })
