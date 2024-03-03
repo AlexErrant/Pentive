@@ -25,6 +25,20 @@ export default defineConfig(({ mode }: UserConfig) => {
 				`"/assets/${file}"`,
 			]),
 	) as Record<string, string>
+	const serverOptions = {
+		port: 3013,
+		strictPort: true,
+		https: {
+			key,
+			cert,
+		},
+		headers: {
+			// eslint-disable-next-line @typescript-eslint/naming-convention
+			'Cross-Origin-Opener-Policy': 'same-origin',
+			// eslint-disable-next-line @typescript-eslint/naming-convention
+			'Cross-Origin-Embedder-Policy': 'require-corp',
+		},
+	}
 	return {
 		define,
 		plugins: [
@@ -78,21 +92,7 @@ export default defineConfig(({ mode }: UserConfig) => {
 				'~': resolve(__dirname, './src'),
 			},
 		},
-		server: {
-			port: 3013,
-			strictPort: true,
-			https: {
-				key,
-				cert,
-			},
-		},
-		preview: {
-			port: 3013,
-			strictPort: true,
-			https: {
-				key,
-				cert,
-			},
-		},
+		server: serverOptions,
+		preview: serverOptions,
 	}
 })
