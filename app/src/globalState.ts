@@ -1,6 +1,7 @@
 import { createResource, createSignal, untrack } from 'solid-js'
 import { cwaClient } from './trpcClient'
 import { toastError, toastInfo } from './components/toasts'
+import { initThreadPool } from 'fsrs-browser'
 
 // lowTODO have hub send app a message when a successful login occurs
 export const [whoAmI] = createResource(async () => {
@@ -14,6 +15,14 @@ export const [whoAmI] = createResource(async () => {
 	})
 	return r?.tag === 'Ok' ? r.ok : undefined
 })
+
+let isInitted = false
+export async function initFsrsTrainThreadPool() {
+	if (!isInitted) {
+		await initThreadPool(navigator.hardwareConcurrency)
+		isInitted = true
+	}
+}
 
 const currentTheme = () =>
 	document.documentElement.className.includes('dark')

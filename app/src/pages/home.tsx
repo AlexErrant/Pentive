@@ -12,9 +12,10 @@ import { db } from '../db'
 import { importAnki } from './importer/importer'
 import { augcClient } from '../trpcClient'
 import { C, rd } from '../topLevelAwait'
-import { toastFatal, toastImpossible } from '../components/toasts'
+import { toastImpossible } from '../components/toasts'
 import EditSql from '../components/editSql'
-import { reviewsToFsrsItems } from '../domain/fsrs'
+import init, { Fsrs } from 'fsrs-browser'
+import { initFsrsTrainThreadPool } from '../globalState'
 
 async function searchNotes(search: string): Promise<void> {
 	const searchBatch = await augcClient.searchNotes.query(search)
@@ -116,10 +117,13 @@ export default function Home(): JSX.Element {
 				<button
 					class='border-gray-900 rounded-lg border px-2'
 					onClick={async () => {
-						const reviews = await db.getReviews()
-						const items = reviewsToFsrsItems(reviews)
-						if (items == null) toastFatal('No reviews!')
-						console.log('items', items)
+						const [{ cids, eases, ids, types }] = await Promise.all([
+							db.getFsrsItems(),
+							init().then(initFsrsTrainThreadPool),
+						])
+						const f = new Fsrs()
+						const parameters = f.computeParametersAnki(cids, eases, ids, types)
+						console.log('parameters', parameters)
 					}}
 				>
 					Train
