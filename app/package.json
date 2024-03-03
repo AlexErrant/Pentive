@@ -22,14 +22,11 @@
 		"test:run": "vitest run",
 		"playwright": "playwright test",
 		"playwright:debug": "playwright test --debug",
-		"playwright:init": "playwright install",
-		"generate-query-parser": "lezer-generator src/query.grammar --typeScript -o src/queryParser.ts",
-		"generate-template-parser": "lezer-generator src/template.grammar --typeScript -o src/templateParser.ts"
+		"playwright:init": "playwright install"
 	},
 	"devDependencies": {
 		"@babel/core": "^7.23.0",
 		"@cloudflare/workers-types": "^4.20230922.0",
-		"@lezer/generator": "^1.6.0",
 		"@playwright/test": "^1.38.1",
 		"@tailwindcss/forms": "^0.5.6",
 		"@types/diff": "^5.0.5",
@@ -63,7 +60,6 @@
 		"stylelint-config-prettier": "^9.0.5",
 		"stylelint-config-standard": "^34.0.0",
 		"tailwindcss": "^3.3.3",
-		"test": "link:@lezer/generator/test",
 		"ts-node": "^10.9.1",
 		"typescript": "~5.2.2",
 		"vite": "^4.4.9",
@@ -91,9 +87,6 @@
 		"@github/relative-time-element": "^4.3.0",
 		"@kobalte/core": "^0.11.0",
 		"@kobalte/tailwindcss": "^0.8.0",
-		"@lezer/common": "^1.2.1",
-		"@lezer/highlight": "^1.2.0",
-		"@lezer/lr": "^1.4.0",
 		"@solid-primitives/scheduled": "^1.4.1",
 		"@solidjs/router": "^0.8.3",
 		"@tanstack/solid-table": "^8.10.3",
