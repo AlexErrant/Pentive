@@ -61,42 +61,6 @@ export function body(
 	template: Template,
 	short: boolean = false,
 ): readonly [string, string] | null {
-	const shortify = (frontBack: readonly [string, string] | null) => {
-		if (frontBack == null) return null
-		if (short)
-			return [this.strip(frontBack[0]), this.strip(frontBack[1])] as const
-		return frontBack
-	}
-	return shortify(handle.call(this, card, note, template, short))
-}
-export interface ReplacerArgs {
-	initialValue: string
-	isFront: boolean
-	card: Card
-	note: Note
-	template: Template
-}
-
-export type Replacers = Map<string, Replacer>
-
-export type Replacer = (this: RenderContainer, args: ReplacerArgs) => string
-
-export const replacers: Map<string, Replacer> = new Map<string, Replacer>([
-	['simpleFieldReplacer', simpleFieldReplacer],
-	['conditionalReplacer', conditionalReplacer],
-	['antiConditionalReplacer', antiConditionalReplacer],
-	['stripHtmlReplacer', stripHtmlReplacer],
-	['tagReplacer', tagReplacer],
-	['clozeReplacer', clozeReplacer],
-])
-
-function handle(
-	this: RenderContainer,
-	card: Card,
-	note: Note,
-	template: Template,
-	short: boolean,
-) {
 	let { front, back, shortFront, shortBack } =
 		template.templateType.tag === 'standard'
 			? template.templateType.templates.find((t) => t.id === card.ord) ??
@@ -132,9 +96,30 @@ function handle(
 		const backSide = replaceFields
 			.call(this, false, back)
 			.replace('{{FrontSide}}', replaceFields.call(this, false, front))
+		if (short) return [this.strip(frontSide), this.strip(backSide)] as const
 		return [frontSide, backSide] as const
 	}
 }
+export interface ReplacerArgs {
+	initialValue: string
+	isFront: boolean
+	card: Card
+	note: Note
+	template: Template
+}
+
+export type Replacers = Map<string, Replacer>
+
+export type Replacer = (this: RenderContainer, args: ReplacerArgs) => string
+
+export const replacers: Map<string, Replacer> = new Map<string, Replacer>([
+	['simpleFieldReplacer', simpleFieldReplacer],
+	['conditionalReplacer', conditionalReplacer],
+	['antiConditionalReplacer', antiConditionalReplacer],
+	['stripHtmlReplacer', stripHtmlReplacer],
+	['tagReplacer', tagReplacer],
+	['clozeReplacer', clozeReplacer],
+])
 
 function getClozeFields(
 	this: RenderContainer,
