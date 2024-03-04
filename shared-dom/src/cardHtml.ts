@@ -1,3 +1,4 @@
+import { convert } from './language/template2html.js'
 import type { RenderContainer } from './renderContainer.js'
 import {
 	type NoteId,
@@ -48,12 +49,6 @@ export function escapeRegExp(string: string): string {
 	return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') // $& means the whole matched string
 }
 
-// https://stackoverflow.com/a/32800728
-function isNullOrWhitespace(input: string | undefined): boolean {
-	// eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
-	return !input?.trim()
-}
-
 export function body(
 	this: RenderContainer,
 	card: Card,
@@ -75,9 +70,9 @@ export function body(
 		isFront: boolean,
 		seed: string,
 	) {
-		let r = seed
+		let r = convert(seed, isFront, card, note, template)
 		const args = {
-			initialValue: seed,
+			initialValue: r,
 			isFront,
 			card,
 			note,
@@ -114,8 +109,6 @@ export type Replacer = (this: RenderContainer, args: ReplacerArgs) => string
 
 export const replacers: Map<string, Replacer> = new Map<string, Replacer>([
 	['simpleFieldReplacer', simpleFieldReplacer],
-	['conditionalReplacer', conditionalReplacer],
-	['antiConditionalReplacer', antiConditionalReplacer],
 	['stripHtmlReplacer', stripHtmlReplacer],
 	['tagReplacer', tagReplacer],
 	['clozeReplacer', clozeReplacer],
@@ -166,36 +159,6 @@ function tagReplacer(this: RenderContainer, args: ReplacerArgs) {
 		args2.initialValue = r
 		r = replacer.call(this, args2)
 	}
-	return r
-}
-
-function conditionalReplacer(
-	this: RenderContainer,
-	{ initialValue, isFront, card, note, template }: ReplacerArgs,
-) {
-	let r = initialValue
-	note.fieldValues.forEach((value, fieldName) => {
-		const fieldName2 = escapeRegExp(fieldName)
-		const regex = new RegExp(`{{#${fieldName2}}}(.*?){{/${fieldName2}}}`, 's')
-		r = isNullOrWhitespace(value)
-			? r.replace(regex, '')
-			: r.replace(regex, '$1')
-	})
-	return r
-}
-
-function antiConditionalReplacer(
-	this: RenderContainer,
-	{ initialValue, isFront, card, note, template }: ReplacerArgs,
-) {
-	let r = initialValue
-	note.fieldValues.forEach((value, fieldName) => {
-		const fieldName2 = escapeRegExp(fieldName)
-		const regex = new RegExp(`{{\\^${fieldName2}}}(.*?){{/${fieldName2}}}`, 's')
-		r = isNullOrWhitespace(value)
-			? r.replace(regex, '$1')
-			: r.replace(regex, '')
-	})
 	return r
 }
 

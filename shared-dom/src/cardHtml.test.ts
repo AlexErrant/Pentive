@@ -238,12 +238,10 @@ Category: {{Category}}<br/>
     {{Back}}`,
 		0,
 		'standard',
-		`
-Category: Nations and Capitals<br/>
+		`Category: Nations and Capitals<br/>
 
 What is the capital of Canada?`,
-		`
-Category: Nations and Capitals<br/>
+		`Category: Nations and Capitals<br/>
 
 What is the capital of Canada?
     <hr id=answer>
@@ -287,12 +285,10 @@ Category: {{Category}}No category was given<br/>
     {{Back}}`,
 		0,
 		'standard',
-		`
-Category: No category was given<br/>
+		`Category: No category was given<br/>
 
 What is the capital of Canada?`,
-		`
-Category: No category was given<br/>
+		`Category: No category was given<br/>
 
 What is the capital of Canada?
     <hr id=answer>
