@@ -5,16 +5,8 @@ import ExamplePlugin from './ExamplePlugin.svelte'
 import { Router } from '@solidjs/router'
 import { createComponent } from 'solid-js/web'
 
-function clozeTemplateRegex(c: Container): RegExp {
-	return new RegExp(
-		c.clozeTemplateRegex.source.replace('cloze:', '(?:edit:)?cloze:'),
-		c.clozeTemplateRegex.flags,
-	)
-}
-
 const services = (c: Container): Partial<Container> => {
 	return {
-		clozeTemplateRegex: clozeTemplateRegex(c),
 		transformers: new Map(c.transformers).set(
 			'edit',
 			({ initialValue, isFront, card, note, template }) => {

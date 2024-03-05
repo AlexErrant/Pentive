@@ -35,7 +35,6 @@ export const strip = toOneLine
 // https://www.tsmean.com/articles/regex/javascript-regex-match-vs-exec-vs-matchall/
 const clozeRegex =
 	/{{c(?<clozeIndex>\d+)::(?<answer>.*?)(?:::(?<hint>.*?))?}}/gi
-export const clozeTemplateRegex = /{{cloze:(?<fieldName>.+?)}}/gi
 
 export function body(
 	this: RenderContainer,

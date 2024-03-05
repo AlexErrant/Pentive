@@ -7,13 +7,6 @@ import {
 	type RenderPluginExports,
 } from './renderContainer'
 
-function clozeTemplateRegex(c: RenderContainer): RegExp {
-	return new RegExp(
-		c.clozeTemplateRegex.source.replace('cloze:', 'edit:cloze:'),
-		c.clozeTemplateRegex.flags,
-	)
-}
-
 function renderTemplate(
 	c: RenderContainer,
 ): typeof defaultRenderContainer.renderTemplate {
@@ -27,7 +20,6 @@ function renderTemplate(
 
 const services = (c: RenderContainer): Partial<RenderContainer> => {
 	return {
-		clozeTemplateRegex: clozeTemplateRegex(c),
 		renderTemplate: renderTemplate(c),
 	}
 }
