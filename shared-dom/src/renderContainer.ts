@@ -1,6 +1,5 @@
 import {
 	body,
-	clozeRegex,
 	clozeTemplateRegex,
 	html,
 	renderTemplate,
@@ -12,7 +11,6 @@ import {
 
 export const defaultRenderContainer = {
 	transformers,
-	clozeRegex,
 	clozeTemplateRegex,
 	body,
 	renderTemplate,

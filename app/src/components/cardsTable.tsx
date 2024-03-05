@@ -22,7 +22,7 @@ import { LicenseManager } from 'ag-grid-enterprise'
 import { db } from '../db'
 import { assertNever } from 'shared'
 import { agGridTheme } from '../globalState'
-import { Upload, escapeRegExp } from 'shared-dom'
+import { Upload } from 'shared-dom'
 import { C } from '../topLevelAwait'
 import { toastError, toastImpossible, toastWarn } from './toasts'
 import FiltersTable from './filtersTable'
@@ -243,6 +243,11 @@ const cacheBlockSize = 100
 
 const onGridReady = ({ api }: GridReadyEvent) => {
 	api.setDatasource(dataSource)
+}
+
+// https://stackoverflow.com/a/6969486
+function escapeRegExp(string: string): string {
+	return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') // $& means the whole matched string
 }
 
 const dataSource = {

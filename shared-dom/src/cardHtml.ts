@@ -32,14 +32,9 @@ export const strip = toOneLine
 
 // These have hidden state - don't use `match` or `exec`!
 // https://www.tsmean.com/articles/regex/javascript-regex-match-vs-exec-vs-matchall/
-export const clozeRegex =
+const clozeRegex =
 	/{{c(?<clozeIndex>\d+)::(?<answer>.*?)(?:::(?<hint>.*?))?}}/gi
 export const clozeTemplateRegex = /{{cloze:(?<fieldName>.+?)}}/gi
-
-// https://stackoverflow.com/a/6969486
-export function escapeRegExp(string: string): string {
-	return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') // $& means the whole matched string
-}
 
 export function body(
 	this: RenderContainer,
@@ -127,7 +122,7 @@ function clozeTransformer(
 	if (template.templateType.tag === 'cloze') {
 		const i = (card.ord.valueOf() + 1).toString()
 		const indexMatch = Array.from(
-			r.matchAll(this.clozeRegex),
+			r.matchAll(clozeRegex),
 			(x) =>
 				x.groups?.clozeIndex ??
 				throwExp('This error should never occur - is `clozeRegex` broken?'),
@@ -135,7 +130,7 @@ function clozeTransformer(
 		if (!indexMatch) {
 			r = ''
 		} else {
-			r = Array.from(r.matchAll(this.clozeRegex))
+			r = Array.from(r.matchAll(clozeRegex))
 				.filter(
 					(x) =>
 						(x.groups?.clozeIndex ??
@@ -157,7 +152,7 @@ function clozeTransformer(
 		}
 		if (isFront) {
 			const regexMatches: ReadonlyArray<readonly [string | undefined, string]> =
-				Array.from(r.matchAll(this.clozeRegex), (x) => [x.groups?.hint, x[0]])
+				Array.from(r.matchAll(clozeRegex), (x) => [x.groups?.hint, x[0]])
 			r = regexMatches.reduce((current, [hint, rawCloze]) => {
 				const brackets = `
 <span class="cloze-brackets-front">[</span>
@@ -168,7 +163,7 @@ function clozeTransformer(
 			}, r)
 		} else {
 			r = r.replace(
-				this.clozeRegex,
+				clozeRegex,
 				`
 <span class="cloze-brackets-back">[</span>
 $<answer>
@@ -330,7 +325,7 @@ export function noteOrds(
 		return distinctAndOrder(ords)
 	} else if (template.templateType.tag === 'cloze') {
 		const ords = Array.from(note.fieldValues.entries()).flatMap(([, value]) =>
-			Array.from(value.matchAll(this.clozeRegex)).map((x) => {
+			Array.from(value.matchAll(clozeRegex)).map((x) => {
 				const clozeIndex =
 					x.groups?.clozeIndex ??
 					throwExp('This error should never occur - is `clozeRegex` broken?')
