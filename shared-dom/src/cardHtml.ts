@@ -1,3 +1,4 @@
+import { getClozeFields } from './language/template2clozeFields.js'
 import { convert } from './language/template2html.js'
 import type { RenderContainer } from './renderContainer.js'
 import {
@@ -92,20 +93,6 @@ export const transformers: Map<string, Transformer> = new Map<
 	['text', textTransformer],
 	['cloze', clozeTransformer],
 ])
-
-function getClozeFields(
-	this: RenderContainer,
-	frontTemplate: string,
-): string[] {
-	return Array.from(
-		frontTemplate.matchAll(this.clozeTemplateRegex),
-		(x) =>
-			x.groups?.fieldName ??
-			throwExp(
-				'This error should never occur - is `clozeTemplateRegex` broken?',
-			),
-	)
-}
 
 function textTransformer(
 	this: RenderContainer,
