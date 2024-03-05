@@ -852,8 +852,8 @@ describe('standardTemplate tags', () => {
 					'standard',
 				),
 			) ?? throwExp('should never happen')
-		expect(front).toBe('What is the capital of Canada?Tags: ')
-		expect(back).toBe(`What is the capital of Canada?Tags: 
+		expect(front).toBe('What is the capital of Canada?Tags:')
+		expect(back).toBe(`What is the capital of Canada?Tags:
     <hr id=answer>
     Ottawa`)
 	})

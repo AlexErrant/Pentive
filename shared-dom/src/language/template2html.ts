@@ -9,6 +9,8 @@ import {
 	If,
 	SelfClosingTag,
 	Text,
+	TagName,
+	Transformer,
 } from './templateParser.terms'
 
 class Context {
@@ -46,6 +48,10 @@ function isEmpty(input: string | null | undefined) {
 	return input.trim() === ''
 }
 
+function htmlifyTags(tags: Set<string>) {
+	return Array.from(tags.keys()).join(', ')
+}
+
 function astEnter(
 	input: string,
 	node: SyntaxNodeRef,
@@ -59,7 +65,17 @@ function astEnter(
 	if (node.type.is(Text)) {
 		context.html += input.slice(node.from, node.to)
 	} else if (node.node.type.is(SelfClosingTag)) {
-		context.html += input.slice(node.from, node.to) // todoNEXT
+		const fieldNode = node.node.getChildren(TagName)[0]!
+		const field = input.slice(fieldNode.from, fieldNode.to)
+		const value =
+			note.fieldValues.get(field)?.trim() ??
+			new Map([['Tags', htmlifyTags(note.tags)]]).get(field)
+		const anyTransformers = node.node.getChildren(Transformer).length !== 0
+		if (value == null || anyTransformers) {
+			context.html += input.slice(node.from, node.to)
+		} else {
+			context.html += value
+		}
 	} else if (
 		node.type.is(StartTag) &&
 		node.node.parent?.type.is(OpenTag) === true
@@ -68,7 +84,7 @@ function astEnter(
 		const field = input.slice(tagNameNode.from, tagNameNode.to)
 		const value =
 			field === 'Tags'
-				? Array.from(note.tags.keys()).join(', ')
+				? htmlifyTags(note.tags).trim()
 				: note.fieldValues.get(field)?.trim()
 		if (node.node.nextSibling?.type.is(If) === true) {
 			if (isEmpty(value)) {

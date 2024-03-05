@@ -108,9 +108,7 @@ export type Replacers = Map<string, Replacer>
 export type Replacer = (this: RenderContainer, args: ReplacerArgs) => string
 
 export const replacers: Map<string, Replacer> = new Map<string, Replacer>([
-	['simpleFieldReplacer', simpleFieldReplacer],
 	['stripHtmlReplacer', stripHtmlReplacer],
-	['tagReplacer', tagReplacer],
 	['clozeReplacer', clozeReplacer],
 ])
 
@@ -126,40 +124,6 @@ function getClozeFields(
 				'This error should never occur - is `clozeTemplateRegex` broken?',
 			),
 	)
-}
-
-export function simpleFieldReplacer(
-	this: RenderContainer,
-	{ initialValue, isFront, card, note, template }: ReplacerArgs,
-) {
-	let r = initialValue
-	note.fieldValues.forEach((value, fieldName) => {
-		r = r.replace(`{{${fieldName}}}`, value)
-	})
-	return r
-}
-
-function tagReplacer(this: RenderContainer, args: ReplacerArgs) {
-	const replacers = [
-		this.replacers.get('simpleFieldReplacer'),
-		this.replacers.get('conditionalReplacer'),
-		this.replacers.get('antiConditionalReplacer'),
-	].filter(notEmpty)
-	let r = args.initialValue
-	const args2 = {
-		...args,
-		note: {
-			...args.note,
-			fieldValues: new Map([
-				['Tags', Array.from(args.note.tags.keys()).join(', ')],
-			]),
-		},
-	}
-	for (const replacer of replacers) {
-		args2.initialValue = r
-		r = replacer.call(this, args2)
-	}
-	return r
 }
 
 function stripHtmlReplacer(
