@@ -80,7 +80,7 @@ function astEnter(
 				.getChildren(Transformer)
 				.map((t) => input.slice(t.from, t.to - 1))
 			for (const transformerName of transformerNames) {
-				const transformer = this.replacers.get(transformerName)
+				const transformer = this.transformers.get(transformerName)
 				if (transformer == null) {
 					console.warn('No transformer found: ', transformerName)
 					continue

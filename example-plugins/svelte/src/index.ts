@@ -15,8 +15,8 @@ function clozeTemplateRegex(c: Container): RegExp {
 const services = (c: Container): Partial<Container> => {
 	return {
 		clozeTemplateRegex: clozeTemplateRegex(c),
-		replacers: new Map(c.replacers).set(
-			'editFieldReplacer',
+		transformers: new Map(c.transformers).set(
+			'edit',
 			({ initialValue, isFront, card, note, template }) => {
 				let r = initialValue
 				note.fieldValues.forEach((value, fieldName) => {

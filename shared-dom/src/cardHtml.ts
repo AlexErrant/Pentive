@@ -75,7 +75,7 @@ export function body(
 		return [frontSide, backSide] as const
 	}
 }
-export interface ReplacerArgs {
+export interface TransformerArgs {
 	initialValue: string
 	isFront: boolean
 	card: Card
@@ -83,13 +83,19 @@ export interface ReplacerArgs {
 	template: Template
 }
 
-export type Replacers = Map<string, Replacer>
+export type Transformers = Map<string, Transformer>
 
-export type Replacer = (this: RenderContainer, args: ReplacerArgs) => string
+export type Transformer = (
+	this: RenderContainer,
+	args: TransformerArgs,
+) => string
 
-export const replacers: Map<string, Replacer> = new Map<string, Replacer>([
-	['text', stripHtmlReplacer],
-	['cloze', clozeReplacer],
+export const transformers: Map<string, Transformer> = new Map<
+	string,
+	Transformer
+>([
+	['text', textTransformer],
+	['cloze', clozeTransformer],
 ])
 
 function getClozeFields(
@@ -106,16 +112,16 @@ function getClozeFields(
 	)
 }
 
-function stripHtmlReplacer(
+function textTransformer(
 	this: RenderContainer,
-	{ initialValue }: ReplacerArgs,
+	{ initialValue }: TransformerArgs,
 ) {
 	return this.strip(initialValue)
 }
 
-function clozeReplacer(
+function clozeTransformer(
 	this: RenderContainer,
-	{ initialValue, isFront, card, note, template }: ReplacerArgs,
+	{ initialValue, isFront, card, note, template }: TransformerArgs,
 ) {
 	let r = initialValue
 	if (template.templateType.tag === 'cloze') {
