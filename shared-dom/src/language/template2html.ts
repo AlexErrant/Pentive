@@ -12,6 +12,7 @@ import {
 	TagName,
 	Transformer,
 } from './templateParser.terms'
+import { type RenderContainer } from '../renderContainer'
 
 class Context {
 	constructor() {
@@ -24,6 +25,7 @@ class Context {
 }
 
 export function convert(
+	this: RenderContainer,
 	input: string,
 	isFront: boolean,
 	card: Card,
@@ -34,7 +36,7 @@ export function convert(
 	const context = new Context()
 	tree.cursor().iterate(
 		(node) => {
-			astEnter(input, node, context, isFront, card, note, template)
+			astEnter.bind(this)(input, node, context, isFront, card, note, template)
 		},
 		(node) => {
 			astLeave(input, node, context)
@@ -53,6 +55,7 @@ function htmlifyTags(tags: Set<string>) {
 }
 
 function astEnter(
+	this: RenderContainer,
 	input: string,
 	node: SyntaxNodeRef,
 	context: Context,
@@ -67,13 +70,29 @@ function astEnter(
 	} else if (node.node.type.is(SelfClosingTag)) {
 		const fieldNode = node.node.getChildren(TagName)[0]!
 		const field = input.slice(fieldNode.from, fieldNode.to)
-		const value =
+		let value =
 			note.fieldValues.get(field)?.trim() ??
 			new Map([['Tags', htmlifyTags(note.tags)]]).get(field)
-		const anyTransformers = node.node.getChildren(Transformer).length !== 0
-		if (value == null || anyTransformers) {
+		if (value == null) {
 			context.html += input.slice(node.from, node.to)
 		} else {
+			const transformerNames = node.node
+				.getChildren(Transformer)
+				.map((t) => input.slice(t.from, t.to - 1))
+			for (const transformerName of transformerNames) {
+				const transformer = this.replacers.get(transformerName)
+				if (transformer == null) {
+					console.warn('No transformer found: ', transformerName)
+					continue
+				}
+				value = transformer.bind(this)({
+					initialValue: value,
+					isFront,
+					card,
+					note,
+					template,
+				})
+			}
 			context.html += value
 		}
 	} else if (

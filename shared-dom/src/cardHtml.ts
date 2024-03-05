@@ -35,14 +35,6 @@ export const strip = toOneLine
 export const clozeRegex =
 	/{{c(?<clozeIndex>\d+)::(?<answer>.*?)(?:::(?<hint>.*?))?}}/gi
 export const clozeTemplateRegex = /{{cloze:(?<fieldName>.+?)}}/gi
-function clozeTemplateFor(this: RenderContainer, fieldName: string): RegExp {
-	const escapedFieldName = escapeRegExp(fieldName)
-	const r = this.clozeTemplateRegex.source.replace(
-		'(?<fieldName>.+?)',
-		escapedFieldName,
-	)
-	return new RegExp(r, this.clozeTemplateRegex.flags)
-}
 
 // https://stackoverflow.com/a/6969486
 export function escapeRegExp(string: string): string {
@@ -70,19 +62,7 @@ export function body(
 		isFront: boolean,
 		seed: string,
 	) {
-		let r = convert(seed, isFront, card, note, template)
-		const args = {
-			initialValue: r,
-			isFront,
-			card,
-			note,
-			template,
-		}
-		for (const [, replacer] of this.replacers) {
-			args.initialValue = r
-			r = replacer.bind(this)(args)
-		}
-		return r
+		return convert.bind(this)(seed, isFront, card, note, template)
 	}
 	const frontSide = replaceFields.call(this, true, front)
 	if (frontSide === front || frontSide === '') {
@@ -108,8 +88,8 @@ export type Replacers = Map<string, Replacer>
 export type Replacer = (this: RenderContainer, args: ReplacerArgs) => string
 
 export const replacers: Map<string, Replacer> = new Map<string, Replacer>([
-	['stripHtmlReplacer', stripHtmlReplacer],
-	['clozeReplacer', clozeReplacer],
+	['text', stripHtmlReplacer],
+	['cloze', clozeReplacer],
 ])
 
 function getClozeFields(
@@ -128,13 +108,9 @@ function getClozeFields(
 
 function stripHtmlReplacer(
 	this: RenderContainer,
-	{ initialValue, isFront, card, note, template }: ReplacerArgs,
+	{ initialValue }: ReplacerArgs,
 ) {
-	let r = initialValue
-	note.fieldValues.forEach((value, fieldName) => {
-		r = r.replace(`{{text:${fieldName}}}`, this.strip(value))
-	})
-	return r
+	return this.strip(initialValue)
 }
 
 function clozeReplacer(
@@ -143,69 +119,57 @@ function clozeReplacer(
 ) {
 	let r = initialValue
 	if (template.templateType.tag === 'cloze') {
-		const front = template.templateType.template.front
-		note.fieldValues.forEach((value, fieldName) => {
-			const i = (card.ord.valueOf() + 1).toString()
-			const clozeFields = getClozeFields.call(this, front)
-			const indexMatch = Array.from(
-				value.matchAll(this.clozeRegex),
-				(x) =>
-					x.groups?.clozeIndex ??
-					throwExp('This error should never occur - is `clozeRegex` broken?'),
-			).includes(i)
-			if (!indexMatch && clozeFields.includes(fieldName)) {
-				value = ''
-			} else {
-				value = Array.from(value.matchAll(this.clozeRegex))
-					.filter(
-						(x) =>
-							(x.groups?.clozeIndex ??
-								throwExp(
-									'This error should never occur - is `clozeRegex` broken?',
-								)) !== i,
-					)
-					.map((x) => ({
-						completeMatch: x[0],
-						answer:
-							x.groups?.answer ??
+		const i = (card.ord.valueOf() + 1).toString()
+		const indexMatch = Array.from(
+			r.matchAll(this.clozeRegex),
+			(x) =>
+				x.groups?.clozeIndex ??
+				throwExp('This error should never occur - is `clozeRegex` broken?'),
+		).includes(i)
+		if (!indexMatch) {
+			r = ''
+		} else {
+			r = Array.from(r.matchAll(this.clozeRegex))
+				.filter(
+					(x) =>
+						(x.groups?.clozeIndex ??
 							throwExp(
 								'This error should never occur - is `clozeRegex` broken?',
-							),
-					}))
-					.reduce(
-						(state, { completeMatch, answer }) =>
-							state.replace(completeMatch, answer),
-						value,
-					)
-			}
-			if (isFront) {
-				const regexMatches: ReadonlyArray<
-					readonly [string | undefined, string]
-				> = Array.from(value.matchAll(this.clozeRegex), (x) => [
-					x.groups?.hint,
-					x[0],
-				])
-				const bracketed = regexMatches.reduce((current, [hint, rawCloze]) => {
-					const brackets = `
+							)) !== i,
+				)
+				.map((x) => ({
+					completeMatch: x[0],
+					answer:
+						x.groups?.answer ??
+						throwExp('This error should never occur - is `clozeRegex` broken?'),
+				}))
+				.reduce(
+					(state, { completeMatch, answer }) =>
+						state.replace(completeMatch, answer),
+					r,
+				)
+		}
+		if (isFront) {
+			const regexMatches: ReadonlyArray<readonly [string | undefined, string]> =
+				Array.from(r.matchAll(this.clozeRegex), (x) => [x.groups?.hint, x[0]])
+			r = regexMatches.reduce((current, [hint, rawCloze]) => {
+				const brackets = `
 <span class="cloze-brackets-front">[</span>
 <span class="cloze-filler-front">${hint ?? '...'}</span>
 <span class="cloze-brackets-front">]</span>
 `
-					return current.replace(rawCloze, brackets)
-				}, value)
-				r = r.replace(clozeTemplateFor.call(this, fieldName), bracketed)
-			} else {
-				const answer = value.replace(
-					this.clozeRegex,
-					`
+				return current.replace(rawCloze, brackets)
+			}, r)
+		} else {
+			r = r.replace(
+				this.clozeRegex,
+				`
 <span class="cloze-brackets-back">[</span>
 $<answer>
 <span class="cloze-brackets-back">]</span>
 `,
-				)
-				r = r.replace(clozeTemplateFor.call(this, fieldName), answer)
-			}
-		})
+			)
+		}
 	}
 	return r
 }
