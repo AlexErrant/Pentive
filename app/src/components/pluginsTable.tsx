@@ -12,7 +12,7 @@ import { type Plugin } from 'shared-dom'
 import { db } from '../db'
 import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-alpine.css'
-import { toastError } from './toasts'
+import { C } from '../topLevelAwait'
 
 LicenseManager.setLicenseKey(import.meta.env.VITE_AG_GRID_LICENSE)
 
@@ -51,7 +51,7 @@ const columnDefs: Array<ColDef<Plugin>> = [
 					if (props.data?.name != null) {
 						await db.deletePlugin(props.data.name)
 					} else {
-						toastError(
+						C.toastError(
 							'props.data is null, how did this occur?',
 							'props.data is null, how did this occur?',
 							props,

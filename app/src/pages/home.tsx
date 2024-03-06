@@ -12,7 +12,6 @@ import { db } from '../db'
 import { importAnki } from './importer/importer'
 import { augcClient } from '../trpcClient'
 import { C, rd } from '../topLevelAwait'
-import { toastImpossible } from '../components/toasts'
 import EditSql from '../components/editSql'
 import init, { Fsrs } from 'fsrs-browser'
 import { initFsrsTrainThreadPool } from '../globalState'
@@ -188,7 +187,7 @@ async function uploadMedia(
 	const file =
 		// My mental static analysis says to use `currentTarget`, but it seems to randomly be null, hence `target`. I'm confused but whatever.
 		event.target.files?.item(0) ??
-		toastImpossible('There should be a file selected')
+		C.toastImpossible('There should be a file selected')
 	const now = C.getDate()
 	await db.bulkInsertMedia([
 		{

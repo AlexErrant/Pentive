@@ -9,8 +9,7 @@ import {
 	type OnConflictTables,
 } from 'kysely'
 import _ from 'lodash'
-import { toastInfo } from '../components/toasts'
-import { ky } from '../topLevelAwait'
+import { C, ky } from '../topLevelAwait'
 
 export const cardSettingsCollectionMethods = {
 	bulkUploadCardSettings: async function (cardSetting: CardSetting[]) {
@@ -23,7 +22,7 @@ export const cardSettingsCollectionMethods = {
 		)
 		const batches = _.chunk(entities, 1000)
 		for (let i = 0; i < batches.length; i++) {
-			toastInfo('cardSetting batch ' + (i + 1) + '/' + batches.length)
+			C.toastInfo('cardSetting batch ' + (i + 1) + '/' + batches.length)
 			await ky
 				.insertInto('cardSetting')
 				.values(batches[i]!)

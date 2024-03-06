@@ -2,7 +2,6 @@ import { type JSX } from 'solid-js'
 import PluginsTable from '../components/pluginsTable'
 import { db } from '../db'
 import { parsePluginNpmPackage } from 'shared-dom'
-import { toastImpossible, toastInfo } from '../components/toasts'
 import { C } from '../topLevelAwait'
 
 export default function Plugins(): JSX.Element {
@@ -29,7 +28,7 @@ async function importPlugin(
 	const pluginTgz =
 		// My mental static analysis says to use `currentTarget`, but it seems to randomly be null, hence `target`. I'm confused but whatever.
 		event.target.files?.item(0) ??
-		toastImpossible('There should be a file selected')
+		C.toastImpossible('There should be a file selected')
 	const plugin = await parsePluginNpmPackage(pluginTgz)
 	const now = C.getDate()
 	await db.upsertPlugin({
@@ -37,5 +36,5 @@ async function importPlugin(
 		created: now,
 		updated: now,
 	})
-	toastInfo('Plugin upserted!')
+	C.toastInfo('Plugin upserted!')
 }

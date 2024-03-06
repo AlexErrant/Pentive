@@ -15,7 +15,6 @@ import {
 import { ulidAsBase64Url } from './domain/utility'
 import { noteOrds } from 'shared-dom'
 import { C, tx } from './topLevelAwait'
-import { toastFatal } from './components/toasts'
 
 export const appExpose = {
 	addTemplate: async (rt: RemoteTemplate) => {
@@ -62,7 +61,7 @@ export const appExpose = {
 		await tx(async () => {
 			const template =
 				(await db.getTemplateIdByRemoteId(rn.templateId)) ??
-				toastFatal(`You don't have the remote template ${rn.templateId}`)
+				C.toastFatal(`You don't have the remote template ${rn.templateId}`)
 			const n: Note = {
 				id: rn.id,
 				templateId: template.id,
@@ -151,7 +150,7 @@ async function downloadImages(imgSrcs: Map<MediaId, string>) {
 					data: await response.arrayBuffer(),
 				})
 			} else {
-				return toastFatal(
+				return C.toastFatal(
 					`Error occured while downloading ${imgSrc}.`,
 					`Fetching ${imgSrc} got a status code of ${response.status}`,
 					response,

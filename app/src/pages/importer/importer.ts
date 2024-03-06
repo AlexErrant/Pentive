@@ -43,7 +43,6 @@ import {
 import { db } from './../../db'
 import _ from 'lodash'
 import sqliteUrl from '../../assets/sql-wasm.wasm?url'
-import { toastFatal, toastImpossible, toastInfo } from '../../components/toasts'
 import { C } from '../../topLevelAwait'
 
 export async function importAnki(
@@ -55,14 +54,14 @@ export async function importAnki(
 	const ankiExport =
 		// My mental static analysis says to use `currentTarget`, but it seems to randomly be null, hence `target`. I'm confused but whatever.
 		(event.target as HTMLInputElement).files?.item(0) ??
-		toastImpossible('There should be a file selected')
+		C.toastImpossible('There should be a file selected')
 	const ankiEntries = await new ZipReader(
 		new BlobReader(ankiExport),
 	).getEntries()
 	const sqlite =
 		ankiEntries.find((e) => e.filename === 'collection.anki21') ??
 		ankiEntries.find((e) => e.filename === 'collection.anki2') ??
-		toastFatal(
+		C.toastFatal(
 			'`collection.anki21` or `collection.anki2` not found. When exporting from Anki, ensure that `Support older Anki versions` in the `Export` window is checked.',
 		)
 	await importAnkiDb(sqlite)
@@ -72,21 +71,21 @@ export async function importAnki(
 async function importAnkiMedia(ankiEntries: Entry[]): Promise<void> {
 	const media =
 		ankiEntries.find((e) => e.filename === 'media') ??
-		toastImpossible(
+		C.toastImpossible(
 			`'media' not found in the provided file. Did Anki change their export format?`,
 		)
 	const mediaText =
 		(await media.getData?.(new TextWriter())) ??
-		toastImpossible(
+		C.toastImpossible(
 			"Impossible since we're using `getEntries` https://github.com/gildas-lormeau/zip.js/issues/371",
 		)
 	const parsed = checkMedia(JSON.parse(mediaText))
 	const entryChunks = _.chunk(ankiEntries, 1000)
 	for (let i = 0; i < entryChunks.length; i++) {
-		toastInfo(`Media ${i}/${entryChunks.length}`)
+		C.toastInfo(`Media ${i}/${entryChunks.length}`)
 		await addMediaBatch(entryChunks[i]!, parsed)
 	}
-	toastInfo('Anki media import done!')
+	C.toastInfo('Anki media import done!')
 }
 
 async function addMediaBatch(
@@ -97,7 +96,7 @@ async function addMediaBatch(
 		entries.map(async (entry) => {
 			const array =
 				(await entry.getData?.(new Uint8ArrayWriter())) ??
-				toastImpossible(
+				C.toastImpossible(
 					"Impossible since we're using `getEntries` https://github.com/gildas-lormeau/zip.js/issues/371",
 				)
 			const name = nameByI[entry.filename]
@@ -164,7 +163,7 @@ async function importAnkiDb(sqlite: Entry): Promise<void> {
 	} finally {
 		ankiDb.close()
 	}
-	toastInfo('AnkiDB import done!')
+	C.toastInfo('AnkiDB import done!')
 }
 
 async function getAnkiDb(sqlite: Entry): Promise<Database> {
@@ -180,7 +179,7 @@ async function getAnkiDb(sqlite: Entry): Promise<Database> {
 async function getSqliteBuffer(sqlite: Entry): Promise<Uint8Array> {
 	const blob =
 		(await sqlite.getData?.(new BlobWriter())) ??
-		toastImpossible(
+		C.toastImpossible(
 			"Impossible since we're using `getEntries` https://github.com/gildas-lormeau/zip.js/issues/371",
 		)
 	const arrayBuffer = await blob.arrayBuffer()

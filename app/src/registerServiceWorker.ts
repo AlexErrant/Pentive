@@ -1,7 +1,7 @@
 import { type MediaId } from 'shared'
 import * as Comlink from 'comlink' // https://github.com/GoogleChromeLabs/comlink/tree/main/docs/examples/05-serviceworker-example
 import { db } from './db'
-import { toastError } from './components/toasts'
+import { C } from './topLevelAwait'
 
 export interface ComlinkInit {
 	type: 'ComlinkInit'
@@ -51,7 +51,7 @@ if ('serviceWorker' in navigator) {
 	}
 } else {
 	// 7A0559B7-44B3-4674-B71C-100DAA30D45C
-	toastError(
+	C.toastError(
 		"Your browser doesn't support Service Workers. Pentive won't work properly without them.",
 	)
 }

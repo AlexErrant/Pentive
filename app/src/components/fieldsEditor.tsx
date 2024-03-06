@@ -4,7 +4,6 @@ import { type SetStoreFunction } from 'solid-js/store'
 import { db } from '../db'
 import { type MediaId } from 'shared'
 import { ulidAsBase64Url } from '../domain/utility'
-import { toastFatal } from './toasts'
 import FieldHtmlEditor from './fieldHtmlEditor'
 import { ToggleButton } from '@kobalte/core'
 import { ChevronDown, Code, Quote } from 'shared-dom'
@@ -34,7 +33,7 @@ export const FieldsEditor: VoidComponent<{
 					class='text-white bg-green-600 rounded p-2 px-4 font-bold hover:bg-green-700'
 					onClick={async () => {
 						if (props.noteCard.cards.length === 0)
-							toastFatal('There must be at least 1 card')
+							C.toastFatal('There must be at least 1 card')
 						const dp = new DOMParser()
 						// eslint-disable-next-line solid/reactivity -- the fn isn't reactive
 						await tx(async () => {

@@ -19,7 +19,6 @@ import {
 	type SelectQueryBuilder,
 } from 'kysely'
 import _ from 'lodash'
-import { toastImpossible, toastInfo } from '../components/toasts'
 import { md5 } from '../domain/utility'
 import {
 	noteEntityToDomain,
@@ -56,7 +55,7 @@ function deserializeState(s: number | null): State | undefined {
 		case 3:
 			return 'suspended'
 		default:
-			return toastImpossible(`Expected null, 0, 1, 2, or 3, but got ${s}`)
+			return C.toastImpossible(`Expected null, 0, 1, 2, or 3, but got ${s}`)
 	}
 }
 
@@ -405,7 +404,7 @@ export const cardCollectionMethods = {
 	bulkUpsertCards: async function (cards: Card[]) {
 		const batches = _.chunk(cards.map(cardToDocType), 1000)
 		for (let i = 0; i < batches.length; i++) {
-			toastInfo('card batch ' + i)
+			C.toastInfo('card batch ' + i)
 			await ky
 				.insertInto('card')
 				.values(batches[i]!)

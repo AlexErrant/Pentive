@@ -11,7 +11,6 @@ import {
 import { unwrap } from 'solid-js/store'
 import { db } from '../db'
 import { C } from '../topLevelAwait'
-import { toastError } from './toasts'
 import { debounce, leadingAndTrailing } from '@solid-primitives/scheduled'
 
 const targetOrigin = '*' // highTODO make more limiting. Also implement https://stackoverflow.com/q/8169582
@@ -68,7 +67,7 @@ const ResizingIframe: VoidComponent<{
 					targetOrigin,
 				)
 			} catch (error) {
-				toastError('Error communicating with iframe.', error)
+				C.toastError('Error communicating with iframe.', error)
 			}
 		},
 		200,

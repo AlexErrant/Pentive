@@ -46,8 +46,8 @@ import {
 	jsonCompletion,
 } from 'codemirror-json-schema'
 import Ajv from 'ajv'
-import { toastError } from './toasts'
 import { db } from '../db'
+import { C } from '../topLevelAwait'
 
 const EditCardSetting: VoidComponent<{
 	cardSetting: CardSetting
@@ -95,14 +95,14 @@ const EditCardSetting: VoidComponent<{
 					try {
 						cardSetting = JSON.parse(view.state.doc.toString()) as CardSetting
 					} catch (error) {
-						toastError('Invalid JSON.')
+						C.toastError('Invalid JSON.')
 						return
 					}
 					if (validate(cardSetting)) {
 						props.setCardSetting(cardSetting)
 						await db.bulkUploadCardSettings([cardSetting])
 					} else {
-						toastError(
+						C.toastError(
 							<>
 								<div>Error in JSON</div>
 								<pre>{JSON.stringify(validate.errors, null, 4)}</pre>

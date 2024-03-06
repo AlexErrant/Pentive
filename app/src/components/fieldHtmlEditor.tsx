@@ -41,7 +41,7 @@ import { theme } from '../globalState'
 import ResizingIframe from './resizingIframe'
 import { format } from 'prettier'
 import * as prettierPluginHtml from 'prettier/plugins/html'
-import { toastError } from './toasts'
+import { C } from '../topLevelAwait'
 
 let view: EditorView
 const FieldHtmlEditor: VoidComponent<{
@@ -147,7 +147,7 @@ function createEditorState(doc: string, theme: 'light' | 'dark') {
 								view.setState(createEditorState(v, theme))
 							})
 							.catch((e) => {
-								toastError('Error while formatting.', e)
+								C.toastError('Error while formatting.', e)
 							})
 						return true
 					},

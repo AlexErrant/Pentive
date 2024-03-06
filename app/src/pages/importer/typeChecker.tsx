@@ -1,6 +1,6 @@
 import { type Ord } from 'shared'
 import { z, type SafeParseReturnType } from 'zod'
-import { toastFatal } from '../../components/toasts'
+import { C } from '../../topLevelAwait'
 
 const tmpl = z.object({
 	name: z.string(),
@@ -157,7 +157,7 @@ function parse<Input, Output>(
 	if (result.success) {
 		return result.data
 	} else {
-		return toastFatal({
+		return C.toastFatal({
 			jsx: (
 				<>
 					<div>Error parsing the following:</div>

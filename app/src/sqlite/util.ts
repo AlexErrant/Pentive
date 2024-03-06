@@ -19,14 +19,14 @@ import {
 	imgPlaceholder,
 	type Field,
 } from 'shared'
-import { toastFatal, toastImpossible } from '../components/toasts'
+import { C } from '../topLevelAwait'
 
 export const unitSeparator = '\x1f' // if this changes, also change noteFtsTag's separator 89CDE7EA-EF1B-4054-B381-597EE549CAB4
 
 export function stringifyTagsArray(tags: string[]) {
 	for (const tag of tags) {
 		if (tag.includes(unitSeparator))
-			toastFatal('Tags cannot contain the unit separator.')
+			C.toastFatal('Tags cannot contain the unit separator.')
 	}
 	return tags.join(unitSeparator)
 }
@@ -64,7 +64,7 @@ export function updateLocalMediaIdByRemoteMediaIdAndGetNewDoc(
 			if (src != null) {
 				const i =
 					remoteMediaIdByLocal.get(src) ??
-					toastImpossible(
+					C.toastImpossible(
 						`${src} not found in ${JSON.stringify(
 							Array.from(remoteMediaIdByLocal),
 						)}`,

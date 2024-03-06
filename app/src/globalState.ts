@@ -1,15 +1,15 @@
 import { createResource, createSignal, untrack } from 'solid-js'
 import { cwaClient } from './trpcClient'
-import { toastError, toastInfo } from './components/toasts'
 import { initThreadPool } from 'fsrs-browser'
+import { C } from './topLevelAwait'
 
 // lowTODO have hub send app a message when a successful login occurs
 export const [whoAmI] = createResource(async () => {
 	const r = await cwaClient.whoAmI.query().catch((e) => {
 		if (window.navigator.onLine) {
-			toastError('Error occurred while verifying identity.', e)
+			C.toastError('Error occurred while verifying identity.', e)
 		} else {
-			toastInfo('Cannot validate identity while offline.')
+			C.toastInfo('Cannot validate identity while offline.')
 		}
 		return undefined
 	})

@@ -24,7 +24,6 @@ import { assertNever } from 'shared'
 import { agGridTheme } from '../globalState'
 import { Upload } from 'shared-dom'
 import { C } from '../topLevelAwait'
-import { toastError, toastImpossible, toastWarn } from './toasts'
 import FiltersTable from './filtersTable'
 import './cardsTable.css'
 import { type SearchParams } from '../sqlite/card'
@@ -304,12 +303,12 @@ const dataSource = {
 				if (countishWrong && x.searchCache == null) {
 					// asynchronously/nonblockingly build the cache
 					db.buildCache(x.baseQuery, search).catch((e) => {
-						toastWarn('Error building cache', e)
+						C.toastWarn('Error building cache', e)
 					})
 				}
 			})
 			.catch((e) => {
-				toastError('Error getting cards.', e)
+				C.toastError('Error getting cards.', e)
 				p.failCallback()
 			})
 	},
@@ -351,7 +350,7 @@ function setColumnDefs(ftsSearchActual: string, regex: RegExp) {
 							<mark>
 								{/* use the match's casing - not the search's (firstWord) */}
 								{match()?.groups?.searchWord ??
-									toastImpossible('searchWord is missing')}
+									C.toastImpossible('searchWord is missing')}
 							</mark>
 							<span>{match()?.groups?.right ?? ''}</span>
 						</Show>

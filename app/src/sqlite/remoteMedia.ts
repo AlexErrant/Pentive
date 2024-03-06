@@ -1,5 +1,4 @@
 import { type Base64Url, type LDbId, type RemoteMediaNum } from 'shared'
-import { toastFatal } from '../components/toasts'
 import { C, ky } from '../topLevelAwait'
 
 export const remoteMediaCollectionMethods = {
@@ -15,7 +14,7 @@ export const remoteMediaCollectionMethods = {
 				.returningAll()
 				.execute()
 			if (r.length !== 1)
-				toastFatal(
+				C.toastFatal(
 					`No remoteMedia found for localEntityId '${localEntityId}' with i ${i}.`,
 				)
 		}

@@ -1,8 +1,7 @@
-import { toastImpossible } from '../components/toasts'
 import { type Card, type Note } from './database'
 import { type NoteId } from 'shared'
 import { stringifyTagsArray, unitSeparator } from './util'
-import { ky } from '../topLevelAwait'
+import { C, ky } from '../topLevelAwait'
 
 export const tagCollectionMethods = {
 	// This insanity with `noteFtsTagVocab` is to get properly cased tags.
@@ -48,7 +47,7 @@ export const tagCollectionMethods = {
 				const tagsArray = tags.split(unitSeparator)
 				return (
 					tagsArray[offset] ??
-					toastImpossible(
+					C.toastImpossible(
 						`Offset ${offset} for ${tagsArray.join(',')} is out of bounds.`,
 					)
 				)

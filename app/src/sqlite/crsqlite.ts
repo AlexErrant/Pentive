@@ -8,8 +8,8 @@ import { Kysely } from 'kysely'
 import crsqliteUrl from '@vlcn.io/crsqlite-wasm/crsqlite.wasm?url'
 import wdbRtc from './wholeDbRtc'
 import { wholeDbReplicator } from 'shared-dom'
-import { toastInfo } from '../components/toasts'
 import { unitSeparator } from './util'
+import { C } from '../topLevelAwait'
 
 const dp = new DOMParser()
 
@@ -65,7 +65,7 @@ export async function sync(db: crDB): Promise<void> {
 			fromSiteId: siteId,
 		})
 	} else {
-		toastInfo('No changes to push!')
+		C.toastInfo('No changes to push!')
 	}
 }
 

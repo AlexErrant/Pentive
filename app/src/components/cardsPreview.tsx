@@ -1,8 +1,8 @@
 import { For, Show, type VoidComponent } from 'solid-js'
 import ResizingIframe from './resizingIframe'
 import { type NoteCard } from 'shared'
-import { toastImpossible } from '../components/toasts'
 import { toNoteCards, type NoteCardView } from '../uiLogic/cards'
+import { C } from '../topLevelAwait'
 
 function toMainNoteCards(noteCardView: NoteCardView): NoteCard {
 	return {
@@ -12,7 +12,7 @@ function toMainNoteCards(noteCardView: NoteCardView): NoteCard {
 			fieldValues: new Map(noteCardView.note.fieldValues),
 		},
 		card:
-			noteCardView.mainCard ?? toastImpossible('No main card.', noteCardView),
+			noteCardView.mainCard ?? C.toastImpossible('No main card.', noteCardView),
 	}
 }
 

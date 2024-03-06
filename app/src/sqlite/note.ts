@@ -13,12 +13,6 @@ import {
 import { type DB } from './database'
 import { type InsertObject } from 'kysely'
 import _ from 'lodash'
-import {
-	toastFatal,
-	toastImpossible,
-	toastInfo,
-	toastWarn,
-} from '../components/toasts'
 import { C, ky, tx } from '../topLevelAwait'
 import {
 	noteEntityToDomain,
@@ -77,7 +71,7 @@ export const noteCollectionMethods = {
 	bulkInsertNotes: async function (notes: Note[]) {
 		const batches = _.chunk(notes.map(noteToDocType), 1000)
 		for (let i = 0; i < batches.length; i++) {
-			toastInfo('note batch ' + i)
+			C.toastInfo('note batch ' + i)
 			await ky.insertInto('note').values(batches[i]!).execute()
 		}
 	},
@@ -143,7 +137,7 @@ export const noteCollectionMethods = {
 							remoteNotes.filter((rn) => rn.localId === noteEntity.id),
 						)
 						if (note.remotes.size === 0)
-							toastImpossible(
+							C.toastImpossible(
 								'Zero remotes - is something wrong with the SQL query?',
 							)
 						const remoteIds = Array.from(note.remotes).map(([nook]) => {
@@ -151,12 +145,12 @@ export const noteCollectionMethods = {
 								remoteTemplates.find(
 									(rt) => rt.localId === note.templateId && nook === rt.nook,
 								) ??
-								toastImpossible(
+								C.toastImpossible(
 									`No template found for id '${note.templateId}' with nook '${nook}'.`,
 								)
 							return (
 								(rt.remoteId as RemoteTemplateId) ??
-								toastImpossible(`Template ${rt.localId} has no remoteId.`)
+								C.toastImpossible(`Template ${rt.localId} has no remoteId.`)
 							)
 						})
 						return domainToCreateRemote(note, remoteIds)
@@ -194,7 +188,7 @@ export const noteCollectionMethods = {
 							remoteNotes.filter((rn) => rn.localId === noteEntity.id),
 						)
 						if (note.remotes.size === 0)
-							toastImpossible(
+							C.toastImpossible(
 								'Zero remotes - is something wrong with the SQL query?',
 							)
 						const remotes = new Map(
@@ -203,19 +197,19 @@ export const noteCollectionMethods = {
 									remoteTemplates.find(
 										(rt) => rt.localId === note.templateId && nook === rt.nook,
 									) ??
-									toastImpossible(
+									C.toastImpossible(
 										`No template found for id '${note.templateId}' with nook '${nook}'.`,
 									)
 								return [
 									remote?.remoteNoteId ??
-										toastImpossible(
+										C.toastImpossible(
 											`remoteNoteId for ${JSON.stringify({
 												nook,
 												noteEntityId: noteEntity.id,
 											})} is null.`,
 										),
 									rt.remoteId ??
-										toastImpossible(
+										C.toastImpossible(
 											`remoteId for ${JSON.stringify({
 												nook,
 												noteEntityId: noteEntity.id,
@@ -262,12 +256,14 @@ export const noteCollectionMethods = {
 		for (const m of mediaBinaries) {
 			const remoteId =
 				m.remoteId ??
-				toastImpossible(
+				C.toastImpossible(
 					`Note media '${m.localMediaId}' is missing a remoteId, is something wrong with the SQL query?`,
 				)
 			const value =
 				media.get(m.localMediaId) ??
-				toastImpossible(`mediaBinaries is missing '${m.localMediaId}'... how?`)
+				C.toastImpossible(
+					`mediaBinaries is missing '${m.localMediaId}'... how?`,
+				)
 			value.ids.push([m.localEntityId, remoteId, m.i])
 		}
 		return media
@@ -305,7 +301,7 @@ export const noteCollectionMethods = {
 				.where('id', 'in', Array.from(srcs))
 				.execute()
 			if (mediaBinaries.length !== srcs.size)
-				toastFatal("You're missing a media.") // medTODO better error message
+				C.toastFatal("You're missing a media.") // medTODO better error message
 			await db
 				.deleteFrom('remoteMedia')
 				.where('localEntityId', '=', noteId)
@@ -341,7 +337,7 @@ export const noteCollectionMethods = {
 				.returningAll()
 				.execute()
 			if (r1.length !== 1)
-				toastWarn(
+				C.toastWarn(
 					`No remoteNote found for nook '${nook}' and noteId '${noteId}'`,
 				)
 			await db
@@ -362,7 +358,7 @@ export const noteCollectionMethods = {
 				.returningAll()
 				.execute()
 			if (r.length !== 1)
-				toastFatal(
+				C.toastFatal(
 					`No remoteNote found for nook '${nook}' and noteId '${noteId}'`,
 				)
 		}
@@ -375,7 +371,7 @@ export const noteCollectionMethods = {
 			.returningAll()
 			.execute()
 		if (r.length !== remoteNoteIds.length)
-			toastFatal(
+			C.toastFatal(
 				`Some remoteNotes in ${JSON.stringify(
 					remoteNoteIds,
 				)} not found. (This is the worst error message ever - medTODO.)`,
@@ -389,7 +385,7 @@ export const noteCollectionMethods = {
 			.where('id', '=', id)
 			.returningAll()
 			.execute()
-		if (r.length !== 1) toastFatal(`No note found for id '${note.id}'.`)
+		if (r.length !== 1) C.toastFatal(`No note found for id '${note.id}'.`)
 	},
 }
 

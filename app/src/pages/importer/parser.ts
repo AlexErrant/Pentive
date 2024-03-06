@@ -26,8 +26,8 @@ import {
 	dconfSingle,
 } from './typeChecker'
 import _ from 'lodash'
-import { toastFatal, toastImpossible } from '../../components/toasts'
 import { z } from 'zod'
+import { C } from '../../topLevelAwait'
 
 function parseField(fld: Fld): Field {
 	return {
@@ -57,7 +57,7 @@ function parseTemplateType(model: Model): TemplateType {
 			}
 		case 1: {
 			if (model.tmpls.length !== 1)
-				toastImpossible(
+				C.toastImpossible(
 					`Cloze template have only 1 template, but got ${model.tmpls.length}`,
 				)
 			const tmpl = model.tmpls[0]!
@@ -67,7 +67,7 @@ function parseTemplateType(model: Model): TemplateType {
 			}
 		}
 		default:
-			toastImpossible(
+			return C.toastImpossible(
 				`Only 0 or 1 are possible model types, but got ${model.type}`,
 			)
 	}
@@ -98,11 +98,11 @@ export function parseNote(
 ): PNote {
 	const templateId = note.mid.toString() as TemplateId // medTODO
 	const template = templates.get(templateId)
-	if (template == null) toastFatal(`Template ${templateId} not found`)
+	if (template == null) return C.toastFatal(`Template ${templateId} not found`)
 	const fields = template.fields.map((f) => f.name)
 	const values = note.flds.split('\x1f')
 	if (fields.length !== values.length)
-		toastFatal(
+		C.toastFatal(
 			`The length of fields (${fields.length}) and values (${values.length}) for noteId=${note.id} don't match.`,
 		)
 	return {
@@ -129,10 +129,11 @@ export function parseCard(
 	decks: Decks,
 ): PCard {
 	const note = notes.get(card.nid)
-	if (note == null) toastFatal(`Note ${card.nid} not found`)
+	if (note == null) return C.toastFatal(`Note ${card.nid} not found`)
 	const template = templates.get(note.templateId)
-	if (template == null) toastFatal(`Template ${note.templateId} not found`)
-	const deck = decks[card.did] ?? toastFatal(`Deck ${card.did} not found`)
+	if (template == null)
+		return C.toastFatal(`Template ${note.templateId} not found`)
+	const deck = decks[card.did] ?? C.toastFatal(`Deck ${card.did} not found`)
 	return {
 		id: card.id.toString() as CardId, // medTODO
 		noteId: card.nid.toString() as NoteId, // medTODO

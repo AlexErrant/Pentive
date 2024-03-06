@@ -1,8 +1,7 @@
 import { type CardId, type Review } from 'shared'
 import { type Review as ReviewEntity } from '../sqlite/database'
 import _ from 'lodash'
-import { toastInfo } from '../components/toasts'
-import { ky } from '../topLevelAwait'
+import { C, ky } from '../topLevelAwait'
 
 export const reviewCollectionMethods = {
 	bulkUploadReview: async function (reviews: Review[]) {
@@ -19,7 +18,7 @@ export const reviewCollectionMethods = {
 		)
 		const batches = _.chunk(entities, 1000)
 		for (let i = 0; i < batches.length; i++) {
-			toastInfo('review batch ' + (i + 1) + '/' + batches.length)
+			C.toastInfo('review batch ' + (i + 1) + '/' + batches.length)
 			await ky.insertInto('review').values(batches[i]!).execute()
 		}
 	},

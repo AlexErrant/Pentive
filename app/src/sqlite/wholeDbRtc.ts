@@ -14,7 +14,7 @@ import { whoAmI } from '../globalState.js'
 import { cwaClient } from '../trpcClient.js'
 import { type JWTVerifyResult, jwtVerify, importSPKI } from 'jose'
 import { alg } from 'cwa/src/peerSync.js'
-import { toastError, toastInfo, toastWarn } from '../components/toasts.jsx'
+import { C } from '../topLevelAwait.js'
 
 type Msg = PokeMsg | ChangesMsg | RequestChangesMsg
 /**
@@ -86,7 +86,7 @@ export class WholeDbRtc implements PokeProtocol {
 				})
 			} else {
 				c.close()
-				toastWarn(
+				C.toastWarn(
 					`Incoming connection failed due to invalid token: ${
 						// eslint-disable-next-line @typescript-eslint/restrict-template-expressions, @typescript-eslint/no-base-to-string
 						token ?? 'undefined'
@@ -103,7 +103,7 @@ export class WholeDbRtc implements PokeProtocol {
 	async schemaChanged() {
 		const r = this.replicator
 		if (r == null) {
-			toastWarn('replicator is null')
+			C.toastWarn('replicator is null')
 		} else {
 			await r.schemaChanged()
 		}
@@ -132,7 +132,7 @@ export class WholeDbRtc implements PokeProtocol {
 			const p = conn.send(msg)
 			if (p instanceof Object) {
 				p.catch((error: unknown) => {
-					toastError('Error while sending Poke.', {
+					C.toastError('Error while sending Poke.', {
 						peer: conn.peer,
 						connectionId: conn.connectionId,
 						conn: JSON.stringify(conn),
@@ -155,7 +155,7 @@ export class WholeDbRtc implements PokeProtocol {
 			const p = conn.send(msg)
 			if (p instanceof Object) {
 				p.catch((error: unknown) => {
-					toastError('Error while pushing changes.', { to, msg, error })
+					C.toastError('Error while pushing changes.', { to, msg, error })
 				})
 			}
 		}
@@ -171,7 +171,7 @@ export class WholeDbRtc implements PokeProtocol {
 			const p = conn.send(msg)
 			if (p instanceof Object) {
 				p.catch((error: unknown) => {
-					toastError('Error while requesting changes.', { from, msg, error })
+					C.toastError('Error while requesting changes.', { from, msg, error })
 				})
 			}
 		}
@@ -217,7 +217,7 @@ export class WholeDbRtc implements PokeProtocol {
 		})
 		conn.on('error', (e) => {
 			// TODO: more reporting to the callers of us
-			toastError('Error while syncing', e)
+			C.toastError('Error while syncing', e)
 			this.establishedConnections.delete(conn.peer)
 			this._connectionsChanged()
 		})
@@ -230,21 +230,21 @@ export class WholeDbRtc implements PokeProtocol {
 	private _dataReceived(from: SiteIDWire, data: Msg) {
 		switch (data.tag) {
 			case 'poke':
-				toastInfo(`Poking with v${data.version}...`)
+				C.toastInfo(`Poking with v${data.version}...`)
 				this._onPoked != null && this._onPoked(from, BigInt(data.version))
-				toastInfo(`Poked!`)
+				C.toastInfo(`Poked!`)
 				break
 			case 'apply-changes':
-				toastInfo(`Applying ${data.changes.length} changes...`)
+				C.toastInfo(`Applying ${data.changes.length} changes...`)
 				this._onChangesReceived != null &&
 					this._onChangesReceived(from, data.changes)
-				toastInfo('Applied changes!')
+				C.toastInfo('Applied changes!')
 				break
 			case 'request-changes':
-				toastInfo('Requesting changes since ' + data.since)
+				C.toastInfo('Requesting changes since ' + data.since)
 				this._onChangesRequested != null &&
 					this._onChangesRequested(from, BigInt(data.since))
-				toastInfo('Requested changes!')
+				C.toastInfo('Requested changes!')
 				break
 		}
 	}
@@ -301,7 +301,7 @@ export class WholeDbRtcPublic {
 			try {
 				l([...pending.keys()], [...established.keys()])
 			} catch (e) {
-				toastError('Error occured while connecting to peers', e)
+				C.toastError('Error occured while connecting to peers', e)
 			}
 		}
 	}
