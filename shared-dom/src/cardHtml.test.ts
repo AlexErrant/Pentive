@@ -222,6 +222,26 @@ test("CardHtml generates proper basic card template, but with conditional Catego
 	)
 })
 
+test("CardHtml generates proper basic card template, but with conditional Category that's shown, and is nested inside itself", () => {
+	testBody(
+		[
+			['Back', 'Ottawa'],
+			['Front', 'What is the capital of Canada?'],
+			['Category', 'Nations and Capitals'],
+		],
+		'{{#Category}}{{#Category}}Category: {{Category}}<br/>{{/Category}}{{/Category}}{{Front}}',
+		`{{FrontSide}}
+    <hr id=answer>
+    {{Back}}`,
+		0,
+		'standard',
+		'Category: Nations and Capitals<br/>What is the capital of Canada?',
+		`Category: Nations and Capitals<br/>What is the capital of Canada?
+    <hr id=answer>
+    Ottawa`,
+	)
+})
+
 test("CardHtml generates proper basic card template, but with conditional Category that's shown, with newlines", () => {
 	testBody(
 		[
