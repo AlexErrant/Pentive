@@ -41,6 +41,22 @@ export default defineConfig(({ mode }) => {
 		key = fs.readFileSync(keyPath)
 		cert = fs.readFileSync(certPath)
 	}
+	const serverOptions = {
+		headers: {
+			// eslint-disable-next-line @typescript-eslint/naming-convention
+			'Cross-Origin-Opener-Policy': 'same-origin',
+			// eslint-disable-next-line @typescript-eslint/naming-convention
+			'Cross-Origin-Embedder-Policy': 'require-corp',
+			// eslint-disable-next-line @typescript-eslint/naming-convention
+			'Cross-Origin-Resource-Policy': 'cross-origin',
+		},
+		port: 3015,
+		strictPort: true,
+		https: {
+			key,
+			cert,
+		},
+	}
 	return {
 		plugins: [
 			// if we ever move off this plugin https://github.com/vitejs/vite/issues/2248
@@ -61,21 +77,7 @@ export default defineConfig(({ mode }) => {
 			}),
 		],
 		build,
-		server: {
-			port: 3015,
-			strictPort: true,
-			https: {
-				key,
-				cert,
-			},
-		},
-		preview: {
-			port: 3015,
-			strictPort: true,
-			https: {
-				key,
-				cert,
-			},
-		},
+		server: serverOptions,
+		preview: serverOptions,
 	}
 })
