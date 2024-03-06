@@ -7,11 +7,7 @@ const services = (c: Container): Partial<Container> => {
 		transformers: new Map(c.transformers).set(
 			'edit',
 			({ initialValue, isFront, card, note, template }) => {
-				let r = initialValue
-				note.fieldValues.forEach((value, fieldName) => {
-					r = r.replace(new RegExp(`{{(?:edit:)?${fieldName}}}`), value)
-				})
-				return r
+				return '[EDITABLE]' + initialValue + '[/EDITABLE]'
 			},
 		),
 		nav: Nav,
