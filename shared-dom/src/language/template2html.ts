@@ -1,4 +1,4 @@
-import { type SyntaxNodeRef } from '@lezer/common'
+import { type Tree, type SyntaxNodeRef } from '@lezer/common'
 import { parser } from './templateParser'
 import { type Card, type Note, type Template } from 'shared'
 
@@ -24,15 +24,31 @@ class Context {
 	hideTagName: string | null
 }
 
+export function validate(input: string) {
+	const tree = parser.parse(input)
+	let hasErrors = false
+	tree.cursor().iterate((node) => {
+		if (node.type.isError) {
+			const parent = node.node.parent
+			const from = parent?.from
+			const to = parent?.to == null ? undefined : parent.to + 1 // +1 to include what might be an unexpected character
+			console.error('Error near', input.slice(from, to))
+			hasErrors = true
+			return false
+		}
+	})
+	return hasErrors ? null : tree
+}
+
 export function convert(
 	this: RenderContainer,
 	input: string,
+	tree: Tree,
 	isFront: boolean,
 	card: Card,
 	note: Note,
 	template: Template,
 ) {
-	const tree = parser.parse(input)
 	const context = new Context()
 	tree.cursor().iterate(
 		(node) => {
@@ -64,7 +80,7 @@ function astEnter(
 	note: Note,
 	template: Template,
 ) {
-	if (node.type.isError || context.hideTagName != null) return
+	if (context.hideTagName != null) return
 	if (node.type.is(Text)) {
 		context.html += input.slice(node.from, node.to)
 	} else if (node.node.type.is(SelfClosingTag)) {

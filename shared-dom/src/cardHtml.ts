@@ -1,5 +1,5 @@
 import { getClozeFields } from './language/template2clozeFields.js'
-import { convert } from './language/template2html.js'
+import { convert, validate } from './language/template2html.js'
 import type { RenderContainer } from './renderContainer.js'
 import {
 	type NoteId,
@@ -52,24 +52,33 @@ export function body(
 		front = shortFront == null || shortFront.trim() === '' ? front : shortFront
 		back = shortBack == null || shortBack.trim() === '' ? back : shortBack
 	}
-	function replaceFields(
-		this: RenderContainer,
-		isFront: boolean,
-		seed: string,
-	) {
-		return convert.bind(this)(seed, isFront, card, note, template)
-	}
-	const frontSide = replaceFields.call(this, true, front)
+	const frontTree = validate(front)
+	if (frontTree == null) return null
+	const backTree = validate(back)
+	if (backTree == null) return null
+	const frontSide = convert.call(
+		this,
+		front,
+		frontTree,
+		true,
+		card,
+		note,
+		template,
+	)
 	if (frontSide === front || frontSide === '') {
 		return null
 	} else {
-		const backSide = replaceFields
-			.call(this, false, back)
-			.replace('{{FrontSide}}', replaceFields.call(this, false, front))
+		const backSide = convert
+			.call(this, back, backTree, false, card, note, template)
+			.replace(
+				'{{FrontSide}}',
+				convert.call(this, front, frontTree, false, card, note, template),
+			)
 		if (short) return [this.strip(frontSide), this.strip(backSide)] as const
 		return [frontSide, backSide] as const
 	}
 }
+
 export interface TransformerArgs {
 	initialValue: string
 	isFront: boolean
