@@ -4,4 +4,7 @@ export default defineConfig({
 	test: {
 		environment: 'jsdom',
 	},
+	resolve: {
+		conditions: ['development', 'browser'],
+	},
 })

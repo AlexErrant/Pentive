@@ -7,6 +7,13 @@ import {
 	noteOrds,
 	templateIndexes,
 } from './cardHtml.js'
+import {
+	toastError,
+	toastFatal,
+	toastImpossible,
+	toastInfo,
+	toastWarn,
+} from './toasts.jsx'
 
 export const defaultRenderContainer = {
 	transformers,
@@ -16,6 +23,11 @@ export const defaultRenderContainer = {
 	strip,
 	noteOrds,
 	templateIndexes,
+	toastError,
+	toastFatal,
+	toastImpossible,
+	toastInfo,
+	toastWarn,
 }
 
 export const noteOrdsRenderContainer = {
