@@ -1,6 +1,3 @@
-// This file generates the test plugin code in `cardHtml.plugin.test.ts`
-// You can re-generate via
-// npx tsc .\cardHtml.plugin.testinput.ts
 import {
 	type defaultRenderContainer,
 	type RenderContainer,
@@ -21,6 +18,10 @@ function renderTemplate(
 const services = (c: RenderContainer): Partial<RenderContainer> => {
 	return {
 		renderTemplate: renderTemplate(c),
+		transformers: new Map(c.transformers).set(
+			'edit',
+			({ initialValue }) => '[EDITABLE]' + initialValue + '[/EDITABLE]',
+		),
 	}
 }
 
