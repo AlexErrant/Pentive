@@ -35,7 +35,7 @@
 	"dependencies": {
 		"@scure/base": "^1.1.1",
 		"html-to-text": "^9.0.5",
-		"lodash": "4.17.21",
+		"lodash": "^4.17.21",
 		"uuid": "^9.0.1",
 		"zod": "^3.22.2"
 	}

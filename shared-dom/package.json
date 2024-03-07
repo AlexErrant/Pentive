@@ -20,6 +20,7 @@
 	},
 	"devDependencies": {
 		"@lezer/generator": "^1.6.0",
+		"@types/lodash": "^4.14.202",
 		"@types/uuid": "^9.0.4",
 		"@typescript-eslint/eslint-plugin": "^6.7.3",
 		"@typescript-eslint/parser": "^6.7.3",
@@ -45,6 +46,7 @@
 		"@lezer/highlight": "^1.2.0",
 		"@lezer/lr": "^1.4.0",
 		"immer": "^10.0.2",
+		"lodash": "^4.17.21",
 		"nightwind": "^1.1.13",
 		"shared": "workspace:*",
 		"solid-js": "^1.7.11",

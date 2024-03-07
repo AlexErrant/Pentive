@@ -1106,7 +1106,7 @@ importers:
         specifier: ^9.0.5
         version: 9.0.5
       lodash:
-        specifier: 4.17.21
+        specifier: ^4.17.21
         version: 4.17.21
       uuid:
         specifier: ^9.0.1
@@ -1181,6 +1181,9 @@ importers:
       immer:
         specifier: ^10.0.2
         version: 10.0.2
+      lodash:
+        specifier: ^4.17.21
+        version: 4.17.21
       nightwind:
         specifier: ^1.1.13
         version: 1.1.13(patch_hash=3i6ghclomd7vkkb2jwgexhbq3i)(tailwindcss@3.4.1)
@@ -1203,6 +1206,9 @@ importers:
       '@lezer/generator':
         specifier: ^1.6.0
         version: 1.6.0
+      '@types/lodash':
+        specifier: ^4.14.202
+        version: 4.14.202
       '@types/uuid':
         specifier: ^9.0.4
         version: 9.0.4
@@ -6614,7 +6620,7 @@ packages:
   /@serverless/event-mocks@1.1.1:
     resolution: {integrity: sha512-YAV5V/y+XIOfd+HEVeXfPWZb8C6QLruFk9tBivoX2roQLWVq145s4uxf8D0QioCueuRzkukHUS4JIj+KVoS34A==}
     dependencies:
-      '@types/lodash': 4.14.199
+      '@types/lodash': 4.14.202
       lodash: 4.17.21
     dev: true
 
@@ -7549,6 +7555,10 @@ packages:
 
   /@types/lodash@4.14.199:
     resolution: {integrity: sha512-Vrjz5N5Ia4SEzWWgIVwnHNEnb1UE1XMkvY5DGXrAeOGE9imk0hgTHh5GyDjLDJi9OTCn9oo9dXH1uToK1VRfrg==}
+    dev: true
+
+  /@types/lodash@4.14.202:
+    resolution: {integrity: sha512-OvlIYQK9tNneDlS0VN54LLd5uiPCBOp7gS5Z0f1mjoJYBrtStzgmJBxONW3U6OZqdtNzZPmn9BS/7WI7BFFcFQ==}
     dev: true
 
   /@types/mime@3.0.1:
@@ -9143,7 +9153,7 @@ packages:
     resolution: {integrity: sha512-OqeheDucGKifjQRx524URgV4z4NaKjocGhygTptDea+DLROre4ZEecA4KXDq+P7qlGCohYVNOh3qr+y5XH5Ftg==}
     dependencies:
       '@devexpress/error-stack-parser': 2.0.6
-      '@types/lodash': 4.14.199
+      '@types/lodash': 4.14.202
       callsite: 1.0.0
       chalk: 2.4.2
       highlight-es: 1.0.3
