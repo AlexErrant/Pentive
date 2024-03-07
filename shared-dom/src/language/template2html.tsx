@@ -24,15 +24,22 @@ class Context {
 	hideTagName: string | null
 }
 
-export function validate(input: string) {
+export function validate(this: RenderContainer, input: string) {
 	const tree = parser.parse(input)
 	let hasErrors = false
 	tree.cursor().iterate((node) => {
+		// eslint-disable-next-line solid/reactivity
 		if (node.type.isError) {
+			// eslint-disable-next-line solid/reactivity
 			const parent = node.node.parent
 			const from = parent?.from
 			const to = parent?.to == null ? undefined : parent.to + 1 // +1 to include what might be an unexpected character
-			console.error('Error near', input.slice(from, to))
+			this.toastError(
+				<>
+					There's a syntax error in the template near{' '}
+					<pre>{input.slice(from, to)}</pre>
+				</>,
+			)
 			hasErrors = true
 			return false
 		}
@@ -98,7 +105,7 @@ function astEnter(
 			for (const transformerName of transformerNames) {
 				const transformer = this.transformers.get(transformerName)
 				if (transformer == null) {
-					console.warn('No transformer found: ', transformerName)
+					this.toastWarn(`Transformer '${transformerName}' not found.`)
 					continue
 				}
 				value = transformer.bind(this)({

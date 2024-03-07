@@ -1,5 +1,5 @@
 import { getClozeFields } from './language/template2clozeFields.js'
-import { convert, validate } from './language/template2html.js'
+import { convert, validate } from './language/template2html.jsx'
 import type { RenderContainer } from './renderContainer.js'
 import {
 	type NoteId,
@@ -52,9 +52,9 @@ export function body(
 		front = shortFront == null || shortFront.trim() === '' ? front : shortFront
 		back = shortBack == null || shortBack.trim() === '' ? back : shortBack
 	}
-	const frontTree = validate(front)
+	const frontTree = validate.call(this, front)
 	if (frontTree == null) return null
-	const backTree = validate(back)
+	const backTree = validate.call(this, back)
 	if (backTree == null) return null
 	const frontSide = convert.call(
 		this,
