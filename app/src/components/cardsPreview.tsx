@@ -33,7 +33,6 @@ export const CardsPreview: VoidComponent<{
 	)
 }
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 function CardPreview(props: { noteCard: NoteCard }) {
 	return (
 		<>

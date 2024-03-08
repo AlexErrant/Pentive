@@ -154,6 +154,11 @@ module.exports = {
 						selector: 'typeLike',
 						format: ['PascalCase'],
 					},
+					{
+						selector: 'function',
+						format: ['camelCase', 'PascalCase'],
+						leadingUnderscore: 'allow',
+					},
 					// Exported function components should be PascalCase
 					{
 						selector: 'function',

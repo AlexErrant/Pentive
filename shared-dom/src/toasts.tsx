@@ -7,8 +7,55 @@ import {
 	Show,
 } from 'solid-js'
 import toast from 'solid-toast'
+import memoize from 'lodash/memoize'
+import throttle from 'lodash/throttle'
 
-export function toastError(
+// https://github.com/lodash/lodash/issues/2403#issuecomment-1706130395
+function memoizeThrottle<F extends (...args: Parameters<F>) => ReturnType<F>>(
+	func: F,
+	wait = 0,
+	options?: Parameters<typeof throttle<F>>[2],
+	resolver?: Parameters<
+		typeof memoize<(...args: Parameters<F>) => ReturnType<typeof throttle<F>>>
+	>[1],
+) {
+	const mem = memoize<
+		(...args: Parameters<F>) => ReturnType<typeof throttle<F>>
+	>(function () {
+		return throttle<F>(func, wait, options)
+	}, resolver)
+
+	return function (...args: Parameters<F>) {
+		return mem(...args)(...args)
+	}
+}
+
+export const toastError = memoizeThrottle(
+	_toastError,
+	2000,
+	{ trailing: false },
+	(userMsg) => {
+		const el =
+			typeof userMsg === 'object' && userMsg != null && 'jsx' in userMsg
+				? userMsg.jsx
+				: userMsg
+		return getCacheKey(el)
+	},
+)
+
+function getCacheKey(el: JSXElement): string {
+	if (el instanceof Node) {
+		return el.textContent ?? 'null'
+	} else if (typeof el === 'number' || typeof el === 'boolean' || el == null) {
+		return String(el)
+	} else if (typeof el === 'string') {
+		return el
+	} else {
+		return el.map(getCacheKey).join('|,;!') // just using random delimiters. Could dynamically build a delimiter with a while loop... but too lazy. lowTODO
+	}
+}
+
+function _toastError(
 	userMsg: JSXElement | { jsx: JSXElement; impossible: true },
 	...consoleMsg: unknown[]
 ) {
