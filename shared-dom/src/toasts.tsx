@@ -159,7 +159,14 @@ export function toastImpossible(
 	}
 }
 
-export function toastWarn(userMsg: JSXElement, ...consoleMsg: unknown[]) {
+export const toastWarn = memoizeThrottle(
+	_toastWarn,
+	2000,
+	{ trailing: false },
+	getCacheKey,
+)
+
+function _toastWarn(userMsg: JSXElement, ...consoleMsg: unknown[]) {
 	if (consoleMsg.length === 0) {
 		console.warn(userMsg)
 	} else {
