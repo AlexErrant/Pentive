@@ -102,10 +102,15 @@ function astEnter(
 			const transformerNames = node.node
 				.getChildren(Transformer)
 				.map((t) => input.slice(t.from, t.to - 1))
+				.filter((x) => x.length !== 0)
 			for (const transformerName of transformerNames) {
 				const transformer = this.transformers.get(transformerName)
 				if (transformer == null) {
-					this.toastWarn(`Transformer '${transformerName}' not found.`)
+					this.toastWarn(
+						<>
+							Transformer <pre>{transformerName}</pre> not found.
+						</>,
+					)
 					continue
 				}
 				value = transformer.bind(this)({
