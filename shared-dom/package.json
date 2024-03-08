@@ -37,6 +37,7 @@
 		"standard": "^17.1.0",
 		"test": "link:@lezer/generator/test",
 		"typescript": "~5.2.2",
+		"vite-plugin-solid": "^2.7.0",
 		"vitest": "^1.0.4"
 	},
 	"dependencies": {
