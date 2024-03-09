@@ -39,11 +39,11 @@ MismatchedCloseTag[isolate] {
   incompleteStartCloseTag[@name=StartCloseTag]
 }
 
-Transformer { TagName TransformerDelimiter }
+Transformer { TagName* TransformerDelimiter }
 
 @tokens {
   EndTag[openedBy="StartTag StartCloseTag"] { "}}" }
-  TagName { (@asciiLetter | @digit | " ")+ } // if you update this, also update 08643083-B4CC-42E8-ACFA-A713DF287B7F
+  TagName { ![}:#^] ![}:]* } // if you update this, also update 08643083-B4CC-42E8-ACFA-A713DF287B7F
   TransformerDelimiter { ":" }
   If { "#" }
   Unless { "^" }

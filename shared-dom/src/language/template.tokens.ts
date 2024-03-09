@@ -23,10 +23,23 @@ import {
 // if you update this, also update 08643083-B4CC-42E8-ACFA-A713DF287B7F
 function nameChar(ch: number) {
 	return (
-		ch == 32 || // space
-		(ch >= 48 && ch <= 57) || // 0-9
-		(ch >= 65 && ch <= 90) || // A-Z
-		(ch >= 97 && ch <= 122) // a-z
+		ch >= 0 && // .peek() may return -1 or NaN
+		ch != 35 && // #
+		ch != 58 && // :
+		ch != 94 && // ^
+		ch != 125 //   }
+	)
+}
+
+// if you update this, also update 08643083-B4CC-42E8-ACFA-A713DF287B7F
+// this fn's 2 callers don't call this with the same semantics, but whatever
+// 1. looks for the rest of the acceptable chars in a tag name
+// 2. looks for anything after the {{ token, which could include # and ^
+function nameChar2(ch: number) {
+	return (
+		ch >= 0 && // .peek() may return -1 or NaN
+		ch != 58 && // :
+		ch != 125 //   }
 	)
 }
 
@@ -37,11 +50,16 @@ function tagNameAfter(input: InputStream, offset: number) {
 	const pos = input.pos + offset
 	if (cachedInput == input && cachedPos == pos) return cachedName
 	let name = ''
-	for (;;) {
-		const next = input.peek(offset)
-		if (!nameChar(next)) break
-		name += String.fromCharCode(next)
+	const firstChar = input.peek(offset)
+	if (nameChar(firstChar)) {
+		name += String.fromCharCode(firstChar)
 		offset++
+		for (;;) {
+			const next = input.peek(offset)
+			if (!nameChar2(next)) break
+			name += String.fromCharCode(next)
+			offset++
+		}
 	}
 	cachedInput = input
 	cachedPos = pos
@@ -111,8 +129,7 @@ export const startTag = new ExternalTokenizer(
 					return
 				}
 			input.acceptToken(mismatchedStartCloseTag)
-			// @ts-expect-error .advance changes the .next value but TS doesn't know that
-		} else if (input.next != 33 /* '!' */ && input.next != 63 /* '?' */) {
+		} else if (nameChar2(input.next)) {
 			input.acceptToken(StartTag)
 		}
 	},

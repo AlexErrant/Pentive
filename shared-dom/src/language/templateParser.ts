@@ -6,11 +6,11 @@ import {startTag, elementContext} from "./template.tokens.ts"
 import {xmlHighlighting} from "./template.highlight.ts"
 export const parser = LRParser.deserialize({
   version: 14,
-  states: "$tOQOROOOcOSO'#ClOnORO'#CeOOOP'#Ce'#CeOxOSO'#CoOOOP'#Cs'#CsOOOP'#Cp'#CpQQOROOO}OSO,59RO!SOSO,59WOOOO'#Cq'#CqO![OSO,59WO!aOSO'#CkOOOP,59P,59PO!fORO,59PO!pOSO,59ZOOOP-E6n-E6nO!uOSO1G.mOOOO,59Y,59YOOOP1G.r1G.rO!zOSO1G.rOOOO-E6o-E6oO#SOSO,59VOOOP1G.k1G.kOOOP1G.u1G.uOOOP7+$X7+$XOOOP7+$^7+$^P!VOSO'#CnOOOP1G.q1G.q",
-  stateData: "#X~OPPOSSOTTOVTOWTO~O[WO]WO^XO~OQ[OR]O~PQO^_O~O^aO~OYcOabO~O^dO~O^fO~OQ[ORgO~PQOYhO~OYiO~OYjOabO~OYlO~O",
-  goto: "!mhPPPPPPPPPiPoPPPu{P!Ri!V!aP!gXTOQV^XQOQV^Q]QRg^XROQV^TYPZQVOQ^QT`V^QZPReZXUOQV^",
+  states: "%WOQOROOOcOSO'#ClOqORO'#CeOOOP'#Ce'#CeO{OSO'#CoOOOP'#Ct'#CtOOOP'#Cp'#CpQQOROOO!QOSO,59RO!VOSO,59WO!bOSO'#CnOOOO'#Cn'#CnOOOO'#Cq'#CqO!jOSO,59WO!rOSO'#CkOOOP,59P,59PO!wORO,59PO#ROSO,59ZOOOP-E6n-E6nO#WOSO1G.mOOOP1G.r1G.rOOOO'#Cr'#CrOOOO-E6p-E6pOOOO,59Y,59YO#]OSO1G.rOOOO-E6o-E6oO#hOSO,59VOOOP1G.k1G.kOOOP1G.u1G.uOOOP7+$X7+$XOOOP7+$^7+$^OOOP1G.q1G.q",
+  stateData: "#m~OPPOSSOTTOVTOWTO~O[WO]WO^XOaZO~OQ^OR_O~PQO^aO~O^cO~OYdO^fXafX~O^eOagO~O^hOaZO~O^jO~OQ^ORkO~PQOYlO~OYmO~OYnO^fXafX~OYoO~O",
+  goto: "!uiPPPPPPPPPjPpPPPv|P!Sj!W!b!hP!oXTOQV`XQOQV`Q_QRk`XROQV`T[P]QVOQ`QTbV`Q]PRi]SYP]RfYXUOQV`",
   nodeNames: "⚠ StartTag StartCloseTag MissingCloseTag StartCloseTag StartCloseTag Document Text Text Element EndTag OpenTag If Unless TagName CloseTag SelfClosingTag TransformerDelimiter Transformer MismatchedCloseTag",
-  maxTerm: 23,
+  maxTerm: 24,
   context: elementContext,
   nodeProps: [
     ["closedBy", 1,"EndTag",11,"CloseTag MissingCloseTag"],
@@ -19,8 +19,8 @@ export const parser = LRParser.deserialize({
   ],
   propSources: [xmlHighlighting],
   skippedNodes: [0],
-  repeatNodeCount: 2,
-  tokenData: "%{~RcOp!^pq!uqs!^st#ot!Q!^!Q![!u![!]$S!]!c!^!c!}!u!}#Q!^#Q#R$g#R#T!^#T#o!u#o#p$z#p#q!^#q#r%P#r;'S!^;'S;=`!o<%lO!^P!cSVPO#o!^#p;'S!^;'S;=`!o<%lO!^P!rP;=`<%l!^R!|Z^QVPOp!^pq!uq!Q!^!Q![!u![!c!^!c!}!u!}#T!^#T#o!u#p;'S!^;'S;=`!o<%lO!^R#vS[QVPO#o!^#p;'S!^;'S;=`!o<%lO!^R$ZSVPaQO#o!^#p;'S!^;'S;=`!o<%lO!^R$nSVP]QO#o!^#p;'S!^;'S;=`!o<%lO!^~%POW~R%UUVPO#o!^#p#q!^#q#r%h#r;'S!^;'S;=`!o<%lO!^R%oSYQVPO#o!^#p;'S!^;'S;=`!o<%lO!^",
+  repeatNodeCount: 3,
+  tokenData: "&fRR]Oszst#wt![z![!]$[!]#Qz#Q#R$o#R#oz#o#p%S#p#qz#q#r%j#r;'Sz;'S;=`#q<%lOzR!RX^QVPO![z![!]!n!]#oz#o#p#V#p#qz#q#r!n#r;'Sz;'S;=`#q<%lOzP!sSVPO#o!n#p;'S!n;'S;=`#P<%lO!nP#SP;=`<%l!nQ#[T^QO![#V!]#q#V#r;'S#V;'S;=`#k<%lO#VQ#nP;=`<%l#VR#tP;=`<%lzR$OS[QVPO#o!n#p;'S!n;'S;=`#P<%lO!nR$cSVPaQO#o!n#p;'S!n;'S;=`#P<%lO!nR$vSVP]QO#o!n#p;'S!n;'S;=`#P<%lO!nR%ZTWP^QO![#V!]#q#V#r;'S#V;'S;=`#k<%lO#VR%oUVPO#o!n#p#q!n#q#r&R#r;'S!n;'S;=`#P<%lO!nR&YSYQVPO#o!n#p;'S!n;'S;=`#P<%lO!n",
   tokenizers: [startTag, 0, 1],
   topRules: {"Document":[0,6]},
   tokenPrec: 0
