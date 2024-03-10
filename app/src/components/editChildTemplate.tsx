@@ -28,7 +28,6 @@ import {
 	closeBracketsKeymap,
 } from '@codemirror/autocomplete'
 import { lintKeymap } from '@codemirror/lint'
-import { html } from '@codemirror/lang-html'
 import {
 	createEffect,
 	on,
@@ -41,6 +40,7 @@ import ResizingIframe from './resizingIframe'
 import { C } from '../topLevelAwait'
 import { oneDark } from '@codemirror/theme-one-dark'
 import { theme } from '../globalState'
+import { htmlTemplateLanguage } from 'shared-dom'
 
 const EditChildTemplate: VoidComponent<{
 	template: Template
@@ -215,6 +215,6 @@ function createEditorState(doc: string, theme: 'light' | 'dark') {
 	const maybeDark = theme === 'dark' ? [oneDark] : []
 	return EditorState.create({
 		doc,
-		extensions: [[...basicSetup], html(), ...maybeDark],
+		extensions: [[...basicSetup], ...maybeDark, htmlTemplateLanguage],
 	})
 }
