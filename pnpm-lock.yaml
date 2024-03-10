@@ -1169,6 +1169,12 @@ importers:
       '@codemirror/language':
         specifier: ^6.9.1
         version: 6.9.1
+      '@codemirror/lint':
+        specifier: ^6.4.2
+        version: 6.4.2
+      '@codemirror/state':
+        specifier: ^6.2.1
+        version: 6.2.1
       '@kobalte/core':
         specifier: ^0.11.0
         version: 0.11.0(solid-js@1.7.12)

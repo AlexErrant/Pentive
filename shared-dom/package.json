@@ -43,6 +43,8 @@
 	"dependencies": {
 		"@codemirror/lang-html": "^6.4.6",
 		"@codemirror/language": "^6.9.1",
+		"@codemirror/lint": "^6.4.2",
+		"@codemirror/state": "^6.2.1",
 		"@kobalte/core": "^0.11.0",
 		"@kobalte/tailwindcss": "^0.8.0",
 		"@lezer/common": "^1.2.1",
