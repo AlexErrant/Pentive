@@ -40,7 +40,7 @@ import ResizingIframe from './resizingIframe'
 import { C } from '../topLevelAwait'
 import { oneDark } from '@codemirror/theme-one-dark'
 import { theme } from '../globalState'
-import { htmlTemplateLanguage } from 'shared-dom'
+import { htmlTemplateLanguage, templateLinter } from 'shared-dom'
 
 const EditChildTemplate: VoidComponent<{
 	template: Template
@@ -215,6 +215,11 @@ function createEditorState(doc: string, theme: 'light' | 'dark') {
 	const maybeDark = theme === 'dark' ? [oneDark] : []
 	return EditorState.create({
 		doc,
-		extensions: [[...basicSetup], ...maybeDark, htmlTemplateLanguage],
+		extensions: [
+			[...basicSetup],
+			...maybeDark,
+			htmlTemplateLanguage,
+			templateLinter(),
+		],
 	})
 }
