@@ -17,5 +17,5 @@ export type Review = {
 	cardId: CardId
 	created: Date
 	rating: number
-	kind: number
+	kind: number // 0=learn, 1=review, 2=relearn, 3=cram highTODO reconsider your life choices
 } & Record<string, unknown>

@@ -12,7 +12,9 @@ import ResizingIframe from '../components/resizingIframe'
 import { db } from '../db'
 import { cardSetting as cardSettingParser } from './importer/parser'
 import init, { Fsrs } from 'fsrs-browser'
-import { type CardSettingId } from 'shared'
+import { type ReviewId, type CardSettingId } from 'shared'
+import { ulidAsBase64Url } from '../domain/utility'
+import { C } from '../topLevelAwait'
 
 export default function Study(): JSX.Element {
 	const studyData = useRouteData<typeof StudyData>()
@@ -61,7 +63,14 @@ export default function Study(): JSX.Element {
 			)
 		}
 	}
-	function rate(score: number) {
+	async function rate(rating: number) {
+		await db.insertReview({
+			id: ulidAsBase64Url() as ReviewId,
+			cardId: cardId()!,
+			created: C.getDate(),
+			rating,
+			kind: 1, // highTODO
+		})
 		batch(() => {
 			setSide('front')
 			setI((i) => i + 1)
@@ -97,8 +106,8 @@ export default function Study(): JSX.Element {
 					<>
 						<button
 							class='border-red-500 mx-2 my-1 rounded-lg border-4 px-2 py-1'
-							onClick={() => {
-								rate(1)
+							onClick={async () => {
+								await rate(1)
 							}}
 						>
 							<div>Again</div>
@@ -106,8 +115,8 @@ export default function Study(): JSX.Element {
 						</button>
 						<button
 							class='border-amber-500 mx-2 my-1 rounded-lg border-4 px-2 py-1'
-							onClick={() => {
-								rate(2)
+							onClick={async () => {
+								await rate(2)
 							}}
 						>
 							<div>Hard</div>
@@ -115,8 +124,8 @@ export default function Study(): JSX.Element {
 						</button>
 						<button
 							class='border-green-500 mx-2 my-1 rounded-lg border-4 px-2 py-1'
-							onClick={() => {
-								rate(3)
+							onClick={async () => {
+								await rate(3)
 							}}
 						>
 							<div>Good</div>
@@ -124,8 +133,8 @@ export default function Study(): JSX.Element {
 						</button>
 						<button
 							class='border-sky-500 mx-2 my-1 rounded-lg border-4 px-2 py-1'
-							onClick={() => {
-								rate(4)
+							onClick={async () => {
+								await rate(4)
 							}}
 						>
 							<div>Easy</div>

@@ -3,19 +3,24 @@ import { type Review as ReviewEntity } from '../sqlite/database'
 import _ from 'lodash'
 import { C, ky } from '../topLevelAwait'
 
+function toEntity({ id, cardId, created, rating, kind, ...r }: Review) {
+	return {
+		id,
+		cardId,
+		rating,
+		kind,
+		created: created.getTime(),
+		details: stringifyDetails(r),
+	} satisfies ReviewEntity
+}
+
 export const reviewCollectionMethods = {
+	insertReview: async function (review: Review) {
+		const entity = toEntity(review)
+		await ky.insertInto('review').values(entity).execute()
+	},
 	bulkUploadReview: async function (reviews: Review[]) {
-		const entities = reviews.map(
-			({ id, cardId, created, rating, kind, ...r }) =>
-				({
-					id,
-					cardId,
-					rating,
-					kind,
-					created: created.getTime(),
-					details: stringifyDetails(r),
-				}) satisfies ReviewEntity,
-		)
+		const entities = reviews.map(toEntity)
 		const batches = _.chunk(entities, 1000)
 		for (let i = 0; i < batches.length; i++) {
 			C.toastInfo('review batch ' + (i + 1) + '/' + batches.length)
