@@ -11,6 +11,7 @@ import {
 	Text,
 	TagName,
 	Transformer,
+	Brace,
 } from './templateParser.terms'
 import { type RenderContainer } from '../renderContainer'
 
@@ -88,7 +89,7 @@ function astEnter(
 	template: Template,
 ) {
 	if (context.hideTagName != null) return
-	if (node.type.is(Text)) {
+	if (node.type.is(Text) || node.node.type.is(Brace)) {
 		context.html += input.slice(node.from, node.to)
 	} else if (node.node.type.is(SelfClosingTag)) {
 		const fieldNode = node.node.getChildren(TagName)[0]!
