@@ -7,6 +7,7 @@ import {
 import { assertNever } from 'shared'
 import { resizeIframe } from './registerServiceWorker'
 import diff from 'micromorph'
+import { getOk } from 'shared-dom'
 
 self.addEventListener('message', async (event) => {
 	const data = event.data as unknown
@@ -43,7 +44,9 @@ async function buildHtml(i: RenderBodyInput) {
 	switch (i.tag) {
 		case 'template': {
 			const template = i.template
-			const result = (await appMessenger.renderTemplate(template))[i.index]
+			const result = getOk(
+				(await appMessenger.renderTemplate(template))[i.index],
+			)
 			if (result == null) {
 				return {
 					body: `Error rendering Template #${i.index}".`,
@@ -57,7 +60,9 @@ async function buildHtml(i: RenderBodyInput) {
 			}
 		}
 		case 'card': {
-			const frontBack = await appMessenger.html(i.card, i.note, i.template)
+			const frontBack = getOk(
+				await appMessenger.html(i.card, i.note, i.template),
+			)
 			if (frontBack == null) {
 				return { body: 'Card is invalid!' }
 			}

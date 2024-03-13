@@ -14,20 +14,23 @@ import {
 	Brace,
 } from './templateParser.terms'
 import { type RenderContainer } from '../renderContainer'
+import { type JSX } from 'solid-js'
 
 class Context {
 	constructor() {
 		this.html = ''
 		this.hideTagName = null
+		this.warnings = []
 	}
 
 	html: string
 	hideTagName: string | null
+	warnings: JSX.Element[]
 }
 
 export function validate(this: RenderContainer, input: string) {
 	const tree = parser.parse(input)
-	let hasErrors = false
+	const errors: JSX.Element[] = []
 	tree.cursor().iterate((node) => {
 		// eslint-disable-next-line solid/reactivity
 		if (node.type.isError) {
@@ -35,17 +38,16 @@ export function validate(this: RenderContainer, input: string) {
 			const parent = node.node.parent
 			const from = parent?.from
 			const to = parent?.to == null ? undefined : parent.to + 1 // +1 to include what might be an unexpected character
-			this.toastError(
+			errors.push(
 				<>
 					There's a syntax error in the template near{' '}
 					<pre>{input.slice(from, to)}</pre>
 				</>,
 			)
-			hasErrors = true
 			return false
 		}
 	})
-	return hasErrors ? null : tree
+	return errors.length === 0 ? tree : errors
 }
 
 export function convert(
@@ -66,7 +68,7 @@ export function convert(
 			astLeave(input, node, context)
 		},
 	)
-	return context.html.trim()
+	return { html: context.html.trim(), warnings: context.warnings }
 }
 
 function isEmpty(input: string | null | undefined) {
@@ -107,7 +109,7 @@ function astEnter(
 			for (const transformerName of transformerNames) {
 				const transformer = this.transformers.get(transformerName)
 				if (transformer == null) {
-					this.toastWarn(
+					context.warnings.push(
 						<>
 							Transformer <pre>{transformerName}</pre> not found.
 						</>,

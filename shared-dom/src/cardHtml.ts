@@ -1,3 +1,4 @@
+import { type JSX } from 'solid-js'
 import { getClozeFields } from './language/template2clozeFields.js'
 import { convert, validate } from './language/template2html.jsx'
 import type { RenderContainer } from './renderContainer.js'
@@ -20,6 +21,7 @@ import {
 	throwExp,
 	toOneLine,
 } from 'shared'
+import { type Tree } from '@lezer/common'
 
 export type StandardTemplate = Omit<Template, 'templateType'> & {
 	templateType: Standard
@@ -36,13 +38,28 @@ export const strip = toOneLine
 const clozeRegex =
 	/{{c(?<clozeIndex>\d+)::(?<answer>.*?)(?:::(?<hint>.*?))?}}/gi
 
+export type HtmlResult =
+	| {
+			tag: 'Ok'
+			ok: readonly [string, string] | null
+			warnings: JSX.Element[]
+	  }
+	| {
+			tag: 'Error'
+			errors: JSX.Element[]
+	  }
+
+export function getOk(htmlResult: HtmlResult | null | undefined) {
+	return htmlResult?.tag === 'Ok' ? htmlResult.ok : null
+}
+
 export function body(
 	this: RenderContainer,
 	card: Card,
 	note: Note,
 	template: Template,
 	short: boolean = false,
-): readonly [string, string] | null {
+): HtmlResult {
 	let { front, back, shortFront, shortBack } =
 		template.templateType.tag === 'standard'
 			? template.templateType.templates.find((t) => t.id === card.ord) ??
@@ -53,29 +70,34 @@ export function body(
 		back = shortBack == null || shortBack.trim() === '' ? back : shortBack
 	}
 	const frontTree = validate.call(this, front)
-	if (frontTree == null) return null
+	if (Array.isArray(frontTree)) return { tag: 'Error', errors: frontTree }
 	const backTree = validate.call(this, back)
-	if (backTree == null) return null
-	const frontSide = convert.call(
-		this,
-		front,
-		frontTree,
-		true,
-		card,
-		note,
-		template,
-	)
+	if (Array.isArray(backTree)) return { tag: 'Error', errors: backTree }
+	const warnings: JSX.Element[] = []
+	function c(
+		this: RenderContainer,
+		input: string,
+		tree: Tree,
+		isFront: boolean,
+	) {
+		const r = convert.call(this, input, tree, isFront, card, note, template)
+		warnings.push(r.warnings)
+		return r.html
+	}
+	const frontSide = c.call(this, front, frontTree, true)
 	if (frontSide === front || frontSide === '') {
-		return null
+		return { tag: 'Ok', ok: null, warnings }
 	} else {
-		const backSide = convert
-			.call(this, back, backTree, false, card, note, template)
-			.replace(
-				'{{FrontSide}}',
-				convert.call(this, front, frontTree, false, card, note, template),
-			)
-		if (short) return [this.strip(frontSide), this.strip(backSide)] as const
-		return [frontSide, backSide] as const
+		const backSide = c
+			.call(this, back, backTree, false)
+			.replace('{{FrontSide}}', c.call(this, front, frontTree, false))
+		if (short)
+			return {
+				tag: 'Ok',
+				ok: [this.strip(frontSide), this.strip(backSide)],
+				warnings,
+			}
+		return { tag: 'Ok', ok: [frontSide, backSide], warnings }
 	}
 }
 
@@ -210,15 +232,16 @@ export function html(
 	card: Card,
 	note: Note,
 	template: Template,
-): readonly [string, string] | null {
+): HtmlResult {
 	const body2 = this.body(card, note, template)
-	if (body2 === null) {
-		return null
+	if (body2.tag === 'Error') {
+		return body2
 	} else {
-		return [
-			buildHtml(body2[0], template.css),
-			buildHtml(body2[1], template.css),
-		] as const
+		if (body2.ok === null) return body2
+		const f = buildHtml(body2.ok[0], template.css)
+		const b = buildHtml(body2.ok[1], template.css)
+		body2.ok = [f, b]
+		return body2
 	}
 }
 
@@ -262,7 +285,7 @@ export function renderTemplate(
 	this: RenderContainer,
 	template: Template,
 	short: boolean = false,
-): ReadonlyArray<readonly [string, string] | null> {
+): readonly HtmlResult[] {
 	const fieldsAndValues = new Map(template.fields.map(getStandardFieldAndValue)) // medTODO consider adding escape characters so you can do e.g. {{Front}}. Apparently Anki doesn't have escape characters - now would be a good time to introduce this feature.
 	if (template.templateType.tag === 'standard') {
 		const note = toSampleNote(fieldsAndValues)

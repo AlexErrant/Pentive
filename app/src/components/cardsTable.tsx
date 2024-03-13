@@ -22,7 +22,7 @@ import { LicenseManager } from 'ag-grid-enterprise'
 import { db } from '../db'
 import { assertNever } from 'shared'
 import { agGridTheme } from '../globalState'
-import { Upload } from 'shared-dom'
+import { Upload, getOk } from 'shared-dom'
 import { C } from '../topLevelAwait'
 import FiltersTable from './filtersTable'
 import './cardsTable.css'
@@ -55,7 +55,9 @@ const columnDefs: Array<ColDef<NoteCard>> = [
 		headerName: 'Short Front',
 		valueGetter: (x) => {
 			if (x.data != null) {
-				return C.body(x.data.card, x.data.note, x.data.template, true)?.at(0)
+				return getOk(
+					C.body(x.data.card, x.data.note, x.data.template, true),
+				)?.at(0)
 			}
 		},
 	},
@@ -63,7 +65,9 @@ const columnDefs: Array<ColDef<NoteCard>> = [
 		headerName: 'Short Back',
 		valueGetter: (x) => {
 			if (x.data != null) {
-				return C.body(x.data.card, x.data.note, x.data.template, true)?.at(1)
+				return getOk(
+					C.body(x.data.card, x.data.note, x.data.template, true),
+				)?.at(1)
 			}
 		},
 	},

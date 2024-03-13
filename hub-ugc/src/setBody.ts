@@ -1,7 +1,7 @@
 import contentWindowJs from 'iframe-resizer/js/iframeResizer.contentWindow.js?raw' // https://vitejs.dev/guide/assets.html#importing-asset-as-string https://github.com/davidjbradshaw/iframe-resizer/issues/513
 import { type RenderBodyInput } from 'hub/src/components/resizingIframe'
 import { assertNever, relativeChar } from 'shared'
-import { registerPluginServices } from 'shared-dom'
+import { getOk, registerPluginServices } from 'shared-dom'
 
 const C = await registerPluginServices([])
 
@@ -50,7 +50,7 @@ function buildHtml(i: RenderBodyInput): { body: string; css?: string } {
 	switch (i.tag) {
 		case 'template': {
 			const template = i.template
-			const result = C.renderTemplate(template)[i.index]
+			const result = getOk(C.renderTemplate(template)[i.index])
 			if (result == null) {
 				return {
 					body: `Error rendering Template #${i.index}".`,
@@ -64,7 +64,7 @@ function buildHtml(i: RenderBodyInput): { body: string; css?: string } {
 			}
 		}
 		case 'card': {
-			const frontBack = C.html(i.card, i.note, i.template)
+			const frontBack = getOk(C.html(i.card, i.note, i.template))
 			if (frontBack == null) {
 				return { body: 'Card is invalid!' }
 			}

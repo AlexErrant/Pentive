@@ -9,9 +9,17 @@ function renderTemplate(
 ): typeof defaultRenderContainer.renderTemplate {
 	return function (template) {
 		const original = c.renderTemplate.bind(this)(template)
-		return original.map((x) =>
-			x !== null ? ([x[0].toUpperCase(), x[1].toUpperCase()] as const) : null,
-		)
+		return original.map((r) => {
+			if (r.tag === 'Error') return r
+			return {
+				tag: 'Ok',
+				ok:
+					r.ok !== null
+						? ([r.ok[0].toUpperCase(), r.ok[1].toUpperCase()] as const)
+						: null,
+				warnings: r.warnings,
+			}
+		})
 	}
 }
 

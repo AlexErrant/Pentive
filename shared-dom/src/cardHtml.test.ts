@@ -1,8 +1,21 @@
 import { defaultRenderContainer } from './renderContainer'
 import { describe, expect, test } from 'vitest'
-import { type TemplateId, type Ord, type Template, type Note } from 'shared'
+import {
+	type TemplateId,
+	type Ord,
+	type Template,
+	type Note,
+	type Card,
+} from 'shared'
 import { throwExp } from 'shared'
-import { noteOrds, strip, toSampleCard, toSampleNote } from './cardHtml'
+import {
+	type HtmlResult,
+	noteOrds,
+	strip,
+	toSampleCard,
+	toSampleNote,
+	getOk as getOkSafe,
+} from './cardHtml'
 
 function buildTemplate(
 	fieldValues: Array<readonly [string, string]>,
@@ -45,6 +58,10 @@ function buildTemplate(
 	} satisfies Template
 }
 
+export function getOk(result: HtmlResult) {
+	return getOkSafe(result) ?? throwExp('ya goofed')
+}
+
 function testBody(
 	fieldValues: Array<readonly [string, string]>,
 	frontTemplate: string,
@@ -55,12 +72,12 @@ function testBody(
 	expectedBack: string,
 ): void {
 	const template = buildTemplate(fieldValues, frontTemplate, backTemplate, type)
-	const [front, back] =
-		defaultRenderContainer.body(
-			toSampleCard(ord as Ord),
-			toSampleNote(new Map(fieldValues)),
-			template,
-		) ?? throwExp('should never happen')
+	const r = defaultRenderContainer.body(
+		toSampleCard(ord as Ord),
+		toSampleNote(new Map(fieldValues)),
+		template,
+	)
+	const [front, back] = getOk(r)
 	expect(front).toBe(expectedFront)
 	expect(back).toBe(expectedBack)
 }
@@ -75,12 +92,13 @@ function testStrippedBody(
 	expectedBack: string,
 ): void {
 	const template = buildTemplate(fieldValues, frontTemplate, backTemplate, type)
-	const [front, back] =
+	const [front, back] = getOk(
 		defaultRenderContainer.body(
 			toSampleCard(ord as Ord),
 			toSampleNote(new Map(fieldValues)),
 			template,
-		) ?? throwExp('should never happen')
+		),
+	)
 	expectStrippedToBe(front, expectedFront)
 	expectStrippedToBe(back, expectedBack)
 }
@@ -103,7 +121,7 @@ function testBodyIsNull(
 		toSampleNote(new Map(fieldValues)),
 		template,
 	)
-	expect(result).toBeNull()
+	expect(getOkSafe(result)).toBeNull()
 }
 
 test('CardHtml generates proper basic card template', () => {
@@ -583,12 +601,12 @@ test('CardHtml renders multiple cloze templates properly 4 with hint', () => {
 })
 
 function expectTemplate(
-	template: readonly [string, string] | null,
+	template: HtmlResult,
 	expectedFront: string,
 	expectedBack: string,
 ): void {
 	expect(template).not.toBeNull()
-	const [front, back] = template!
+	const [front, back] = getOk(template)
 	expectStrippedToBe(front, expectedFront)
 	expectStrippedToBe(back, expectedBack)
 }
@@ -728,6 +746,15 @@ function toTestNote(
 	}
 }
 
+function toBody(
+	card: Card,
+	note: Note,
+	template: Template,
+	short: boolean = false,
+) {
+	return getOk(defaultRenderContainer.body(card, note, template, short))
+}
+
 describe('standardTemplate tags', () => {
 	const fieldValues = [
 		['Back', 'Ottawa'],
@@ -736,7 +763,7 @@ describe('standardTemplate tags', () => {
 
 	test('CardHtml generates proper basic card template with no tags', () => {
 		const [front, back] =
-			defaultRenderContainer.body(
+			toBody(
 				toSampleCard(0 as Ord),
 				toTestNote(new Map(fieldValues), { tags: new Set() }),
 				buildTemplate(
@@ -756,7 +783,7 @@ describe('standardTemplate tags', () => {
 
 	test('CardHtml generates proper basic card template with 1 tag', () => {
 		const [front, back] =
-			defaultRenderContainer.body(
+			toBody(
 				toSampleCard(0 as Ord),
 				toTestNote(new Map(fieldValues), { tags: new Set(['Geography']) }),
 				buildTemplate(
@@ -776,7 +803,7 @@ describe('standardTemplate tags', () => {
 
 	test('CardHtml generates proper basic card template with 2 tags', () => {
 		const [front, back] =
-			defaultRenderContainer.body(
+			toBody(
 				toSampleCard(0 as Ord),
 				toTestNote(new Map(fieldValues), {
 					tags: new Set(['Geography', 'Capital']),
@@ -798,7 +825,7 @@ describe('standardTemplate tags', () => {
 
 	test('CardHtml generates proper basic card template with no conditional tags', () => {
 		const [front, back] =
-			defaultRenderContainer.body(
+			toBody(
 				toSampleCard(0 as Ord),
 				toTestNote(new Map(fieldValues), { tags: new Set() }),
 				buildTemplate(
@@ -818,7 +845,7 @@ describe('standardTemplate tags', () => {
 
 	test('CardHtml generates proper basic card template with 1 conditional tag', () => {
 		const [front, back] =
-			defaultRenderContainer.body(
+			toBody(
 				toSampleCard(0 as Ord),
 				toTestNote(new Map(fieldValues), { tags: new Set(['Geography']) }),
 				buildTemplate(
@@ -838,7 +865,7 @@ describe('standardTemplate tags', () => {
 
 	test('CardHtml generates proper basic card template with 2 conditional tags', () => {
 		const [front, back] =
-			defaultRenderContainer.body(
+			toBody(
 				toSampleCard(0 as Ord),
 				toTestNote(new Map(fieldValues), {
 					tags: new Set(['Geography', 'Capital']),
@@ -860,7 +887,7 @@ describe('standardTemplate tags', () => {
 
 	test('CardHtml generates proper basic card template with no antiConditional tags', () => {
 		const [front, back] =
-			defaultRenderContainer.body(
+			toBody(
 				toSampleCard(0 as Ord),
 				toTestNote(new Map(fieldValues), { tags: new Set() }),
 				buildTemplate(
@@ -880,7 +907,7 @@ describe('standardTemplate tags', () => {
 
 	test('CardHtml generates proper basic card template with 1 antiConditional tag', () => {
 		const [front, back] =
-			defaultRenderContainer.body(
+			toBody(
 				toSampleCard(0 as Ord),
 				toTestNote(new Map(fieldValues), { tags: new Set(['Geography']) }),
 				buildTemplate(
@@ -900,7 +927,7 @@ describe('standardTemplate tags', () => {
 
 	test('CardHtml generates proper basic card template with 2 antiConditional tags', () => {
 		const [front, back] =
-			defaultRenderContainer.body(
+			toBody(
 				toSampleCard(0 as Ord),
 				toTestNote(new Map(fieldValues), {
 					tags: new Set(['Geography', 'Capital']),

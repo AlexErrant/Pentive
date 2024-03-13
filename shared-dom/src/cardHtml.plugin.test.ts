@@ -11,6 +11,7 @@ import {
 import { type Plugin } from './plugin.js'
 import { registerPluginServices } from './pluginManager.js'
 import { strip } from './cardHtml'
+import { getOk } from './cardHtml.test.js'
 
 function expectStrippedToBe(html: string, expected: string): void {
 	const newline = /[\r\n]/g
@@ -70,9 +71,9 @@ test('renderTemplate works with plugin that requires `edit` syntax', async () =>
 	const c = await registerPluginServices([plugin])
 	const templates = c.renderTemplate(clozeWithRequiredEdit)
 	expect(templates.length).toBe(1)
-	const [template] = templates
+	const template = getOk(templates[0]!)
 	expectTemplate(
-		template!,
+		template,
 		'[EDITABLE]This is a cloze deletion for [ ... ] .[/EDITABLE]',
 		'[EDITABLE]This is a cloze deletion for [ Text ] .[/EDITABLE](Extra)',
 	)
@@ -87,9 +88,9 @@ test('renderTemplate works with plugin that requires `.bind(this)` because it in
 	const c = await registerPluginServices([plugin])
 	const templates = c.renderTemplate(clozeWithRequiredEdit)
 	expect(templates.length).toBe(1)
-	const [template] = templates
+	const template = getOk(templates[0]!)
 	expectTemplate(
-		template!,
+		template,
 		'[EDITABLE]THIS IS A CLOZE DELETION FOR [ ... ] .[/EDITABLE]',
 		'[EDITABLE]THIS IS A CLOZE DELETION FOR [ TEXT ] .[/EDITABLE](EXTRA)',
 	)
@@ -104,9 +105,9 @@ test('[EDITABLE] is missing since no `bind(this)`', async () => {
 	const c = await registerPluginServices([plugin])
 	const templates = c.renderTemplate(clozeWithRequiredEdit)
 	expect(templates.length).toBe(1)
-	const [template] = templates
+	const template = getOk(templates[0]!)
 	expectTemplate(
-		template!,
+		template,
 		'THIS IS A CLOZE DELETION FOR [ ... ] .',
 		'THIS IS A CLOZE DELETION FOR [ TEXT ] .(EXTRA)',
 	)

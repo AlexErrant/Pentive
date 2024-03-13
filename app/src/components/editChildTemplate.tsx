@@ -40,7 +40,7 @@ import ResizingIframe from './resizingIframe'
 import { C } from '../topLevelAwait'
 import { oneDark } from '@codemirror/theme-one-dark'
 import { theme } from '../globalState'
-import { htmlTemplateLanguage, templateLinter } from 'shared-dom'
+import { getOk, htmlTemplateLanguage, templateLinter } from 'shared-dom'
 
 const EditChildTemplate: VoidComponent<{
 	template: Template
@@ -88,7 +88,7 @@ const EditChildTemplate: VoidComponent<{
 		frontView?.destroy()
 		backView?.destroy()
 	})
-	const short = () => C.renderTemplate(props.template, true)[props.i]
+	const short = () => getOk(C.renderTemplate(props.template, true)[props.i])
 	return (
 		<fieldset class='border-black border p-2'>
 			<legend>
