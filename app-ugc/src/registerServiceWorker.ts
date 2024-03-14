@@ -61,7 +61,7 @@ function initComlink(serviceWorker: ServiceWorker | null): void {
 	port2.onmessage = async (e) => {
 		const data = e.data as ComlinkReady | null // force a null check in case some other message occurs
 		if (data?.type === 'ComlinkReady') {
-			const i = await appMessenger.renderBodyInput
+			const i = await appMessenger.rawRenderBodyInput
 			await setBody(i)
 			await resizeIframe()
 		}

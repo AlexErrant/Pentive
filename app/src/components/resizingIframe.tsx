@@ -7,11 +7,13 @@ import {
 	type Note,
 	type Side,
 	type MediaId,
+	assertNever,
 } from 'shared'
 import { unwrap } from 'solid-js/store'
 import { db } from '../db'
 import { C } from '../topLevelAwait'
 import { debounce, leadingAndTrailing } from '@solid-primitives/scheduled'
+import { getOk } from 'shared-dom'
 
 const targetOrigin = '*' // highTODO make more limiting. Also implement https://stackoverflow.com/q/8169582
 
@@ -35,6 +37,11 @@ export type RenderBodyInput =
 			readonly css: string
 	  }
 
+export interface RawRenderBodyInput {
+	readonly body: string
+	readonly css?: string
+}
+
 async function getLocalMedia(id: MediaId): Promise<ArrayBuffer | null> {
 	const media = await db.getMedia(id)
 	return media?.data ?? null
@@ -44,7 +51,7 @@ export interface AppExpose {
 	renderTemplate: typeof C.renderTemplate
 	html: typeof C.html
 	getLocalMedia: typeof getLocalMedia
-	renderBodyInput: RenderBodyInput
+	rawRenderBodyInput: RawRenderBodyInput
 	resize: () => void
 }
 
@@ -63,7 +70,10 @@ const ResizingIframe: VoidComponent<{
 		() => {
 			try {
 				iframeReference?.contentWindow?.postMessage(
-					{ type: 'pleaseRerender', i: unwrap(props.i) },
+					{
+						type: 'pleaseRerender',
+						i: buildHtml(unwrap(props.i)) satisfies RawRenderBodyInput,
+					},
 					targetOrigin,
 				)
 			} catch (error) {
@@ -101,7 +111,7 @@ const ResizingIframe: VoidComponent<{
 					renderTemplate: (x) => C.renderTemplate(x), // do not eta-reduce. `C`'s `this` binding apparently doesn't work across Comlink
 					html: (x, y, z) => C.html(x, y, z), // do not eta-reduce. `C`'s `this` binding apparently doesn't work across Comlink
 					getLocalMedia,
-					renderBodyInput: unwrap(props.i),
+					rawRenderBodyInput: buildHtml(unwrap(props.i)),
 					resize,
 				}
 				const { port1, port2 } = new MessageChannel()
@@ -150,4 +160,37 @@ export default ResizingIframe
 export interface ComlinkInit {
 	type: 'ComlinkInit'
 	port: MessagePort
+}
+
+function buildHtml(i: RenderBodyInput): RawRenderBodyInput {
+	switch (i.tag) {
+		case 'template': {
+			const template = i.template
+			const result = getOk(C.renderTemplate(template)[i.index])
+			if (result == null) {
+				return {
+					body: `Error rendering Template #${i.index}".`,
+					css: template.css,
+				}
+			} else {
+				return {
+					body: i.side === 'front' ? result[0] : result[1],
+					css: template.css,
+				}
+			}
+		}
+		case 'card': {
+			const frontBack = getOk(C.html(i.card, i.note, i.template))
+			if (frontBack == null) {
+				return { body: 'Card is invalid!' }
+			}
+			const body = i.side === 'front' ? frontBack[0] : frontBack[1]
+			return { body }
+		}
+		case 'raw': {
+			return { body: i.html, css: i.css }
+		}
+		default:
+			return assertNever(i)
+	}
 }
