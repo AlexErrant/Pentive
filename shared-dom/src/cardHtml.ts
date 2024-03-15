@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import { getClozeFields } from './language/template2clozeFields.js'
 import {
 	type Error,
@@ -88,9 +89,10 @@ export function body(
 		warnings.push(...r.warnings)
 		return r.html
 	}
+	const getWarnings = () => _.uniqWith(warnings, (x, y) => _.isEqual(x, y))
 	const frontSide = c.call(this, front, frontTree, true)
 	if (frontSide === front || frontSide === '') {
-		return { tag: 'Ok', ok: null, warnings }
+		return { tag: 'Ok', ok: null, warnings: getWarnings() }
 	} else {
 		const backSide = c
 			.call(this, back, backTree, false)
@@ -99,9 +101,9 @@ export function body(
 			return {
 				tag: 'Ok',
 				ok: [this.strip(frontSide), this.strip(backSide)],
-				warnings,
+				warnings: getWarnings(),
 			}
-		return { tag: 'Ok', ok: [frontSide, backSide], warnings }
+		return { tag: 'Ok', ok: [frontSide, backSide], warnings: getWarnings() }
 	}
 }
 
