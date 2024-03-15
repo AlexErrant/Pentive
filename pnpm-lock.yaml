@@ -373,6 +373,9 @@ importers:
       postcss:
         specifier: ^8.4.30
         version: 8.4.30
+      prettier-plugin-sql-cst:
+        specifier: ^0.11.4
+        version: 0.11.4
       prettier-plugin-tailwindcss:
         specifier: ^0.5.4
         version: 0.5.4(prettier@3.0.3)
@@ -16788,6 +16791,13 @@ packages:
     dependencies:
       fast-diff: 1.3.0
 
+  /prettier-plugin-sql-cst@0.11.4:
+    resolution: {integrity: sha512-MumTTC5+vEpWDkgWhgUuLB3ZhDBa8xrG8JkIzL79+MMjaKYKbHh4Vpq2Pl2dxJTjgQL7razH0ETA/k3mZ1Adkw==}
+    dependencies:
+      prettier: 3.0.3
+      sql-parser-cst: 0.27.1
+    dev: true
+
   /prettier-plugin-tailwindcss@0.5.4(prettier@3.0.3):
     resolution: {integrity: sha512-QZzzB1bID6qPsKHTeA9qPo1APmmxfFrA5DD3LQ+vbTmAnY40eJI7t9Q1ocqel2EKMWNPLJqdTDWZj1hKYgqSgg==}
     engines: {node: '>=14.21.3'}
@@ -18522,6 +18532,10 @@ packages:
     resolution: {integrity: sha512-2PNlcs3j5JflQKcg4wpdqpZ+AjhQJ2OZEo34NXDtlB0tIPG84xaaXhpA8XFacFiwjKA4m49UOYG83y3hbMn/gQ==}
     dependencies:
       es5-ext: 0.10.62
+    dev: true
+
+  /sql-parser-cst@0.27.1:
+    resolution: {integrity: sha512-Tadqbv6MP6CARltKi9dzNEykw8rCUWilALS5gUnTCTYN7NA3KdcvrSoUNmL8uP/k+W8eY56tm3HP/XRy/Wq5Hg==}
     dev: true
 
   /sql.js@1.8.0:
