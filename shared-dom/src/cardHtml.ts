@@ -81,7 +81,7 @@ export function body(
 		isFront: boolean,
 	) {
 		const r = convert.call(this, input, tree, isFront, card, note, template)
-		warnings.push(r.warnings)
+		warnings.push(...r.warnings)
 		return r.html
 	}
 	const frontSide = c.call(this, front, frontTree, true)

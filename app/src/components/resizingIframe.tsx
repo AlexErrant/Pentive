@@ -1,5 +1,12 @@
 import { iframeResizer, type IFrameComponent } from 'iframe-resizer'
-import { createEffect, onCleanup, type VoidComponent } from 'solid-js'
+import {
+	createEffect,
+	onCleanup,
+	type VoidComponent,
+	type JSX,
+	Show,
+	For,
+} from 'solid-js'
 import * as Comlink from 'comlink'
 import {
 	type Template,
@@ -9,11 +16,11 @@ import {
 	type MediaId,
 	assertNever,
 } from 'shared'
-import { unwrap } from 'solid-js/store'
+import { type SetStoreFunction, createStore, unwrap } from 'solid-js/store'
 import { db } from '../db'
 import { C } from '../topLevelAwait'
 import { debounce, leadingAndTrailing } from '@solid-primitives/scheduled'
-import { getOk } from 'shared-dom'
+import { type HtmlResult } from 'shared-dom'
 
 const targetOrigin = '*' // highTODO make more limiting. Also implement https://stackoverflow.com/q/8169582
 
@@ -55,6 +62,11 @@ export interface AppExpose {
 	resize: () => void
 }
 
+interface Diagnostics {
+	errors: JSX.Element[]
+	warnings: JSX.Element[]
+}
+
 const ResizingIframe: VoidComponent<{
 	readonly i: RenderBodyInput
 	class?: string
@@ -64,6 +76,10 @@ const ResizingIframe: VoidComponent<{
 	onCleanup(() => {
 		iframeReference?.iFrameResizer?.close()
 	})
+	const [diagnostics, setDiagnostics] = createStore<Diagnostics>({
+		errors: [],
+		warnings: [],
+	})
 	const debouncePostMessage = leadingAndTrailing(
 		debounce,
 		// eslint-disable-next-line solid/reactivity
@@ -72,7 +88,10 @@ const ResizingIframe: VoidComponent<{
 				iframeReference?.contentWindow?.postMessage(
 					{
 						type: 'pleaseRerender',
-						i: buildHtml(unwrap(props.i)) satisfies RawRenderBodyInput,
+						i: buildHtml(
+							unwrap(props.i),
+							setDiagnostics,
+						) satisfies RawRenderBodyInput,
 					},
 					targetOrigin,
 				)
@@ -99,59 +118,65 @@ const ResizingIframe: VoidComponent<{
 		debouncePostMessage()
 	})
 	return (
-		<iframe
-			class={props.class ?? 'w-full'}
-			ref={(x) => (iframeReference = x as IFrameComponent)}
-			onLoad={() => {
-				const resize = () => {
-					if (props.resize === false) return
-					iframeReference?.iFrameResizer?.resize()
-				}
-				const appExpose: AppExpose = {
-					renderTemplate: (x) => C.renderTemplate(x), // do not eta-reduce. `C`'s `this` binding apparently doesn't work across Comlink
-					html: (x, y, z) => C.html(x, y, z), // do not eta-reduce. `C`'s `this` binding apparently doesn't work across Comlink
-					getLocalMedia,
-					rawRenderBodyInput: buildHtml(unwrap(props.i)),
-					resize,
-				}
-				const { port1, port2 } = new MessageChannel()
-				const comlinkInit: ComlinkInit = {
-					type: 'ComlinkInit',
-					port: port1,
-				}
-				Comlink.expose(appExpose, port2)
-				iframeReference!.contentWindow!.postMessage(comlinkInit, targetOrigin, [
-					port1,
-				])
-				Comlink.expose(
-					appExpose,
-					Comlink.windowEndpoint(
-						iframeReference!.contentWindow!,
-						self,
+		<div class='flex flex-col'>
+			<RenderDiagnostics heading='Error' diagnostics={diagnostics.errors} />
+			<RenderDiagnostics heading='Warning' diagnostics={diagnostics.warnings} />
+			<iframe
+				class={props.class ?? 'w-full'}
+				ref={(x) => (iframeReference = x as IFrameComponent)}
+				onLoad={() => {
+					const resize = () => {
+						if (props.resize === false) return
+						iframeReference?.iFrameResizer?.resize()
+					}
+					const appExpose: AppExpose = {
+						renderTemplate: (x) => C.renderTemplate(x), // do not eta-reduce. `C`'s `this` binding apparently doesn't work across Comlink
+						html: (x, y, z) => C.html(x, y, z), // do not eta-reduce. `C`'s `this` binding apparently doesn't work across Comlink
+						getLocalMedia,
+						rawRenderBodyInput: buildHtml(unwrap(props.i), setDiagnostics),
+						resize,
+					}
+					const { port1, port2 } = new MessageChannel()
+					const comlinkInit: ComlinkInit = {
+						type: 'ComlinkInit',
+						port: port1,
+					}
+					Comlink.expose(appExpose, port2)
+					iframeReference!.contentWindow!.postMessage(
+						comlinkInit,
 						targetOrigin,
-					),
-				)
-				if (props.resize == null) {
-					iframeResizer(
-						{
-							// log: true,
-
-							// If perf becomes an issue consider debouncing https://github.com/davidjbradshaw/iframe-resizer/issues/816
-
-							checkOrigin: [import.meta.env.VITE_APP_UGC_ORIGIN],
-						},
-						iframeReference!,
+						[port1],
 					)
-				}
-				new IntersectionObserver(resize).observe(iframeReference!) // Resize when the iframe becomes visible, e.g. after the "Add Template" tab is clicked when we're looking at another tab. The resizing script behaves poorly when the iframe isn't visible.
-				debouncePostMessage()
-				resize()
-			}}
-			sandbox='allow-scripts allow-same-origin' // Changing this has security ramifications! https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe#attr-sandbox
-			// "When the embedded document has the same origin as the embedding page, it is strongly discouraged to use both allow-scripts and allow-same-origin"
-			// Since this iframe is hosted on `app-user-generated-content` and this component is hosted on `app`, resulting in different origins, we should be safe. https://web.dev/sandboxed-iframes/ https://stackoverflow.com/q/35208161
-			src={import.meta.env.VITE_APP_UGC_ORIGIN}
-		/>
+					Comlink.expose(
+						appExpose,
+						Comlink.windowEndpoint(
+							iframeReference!.contentWindow!,
+							self,
+							targetOrigin,
+						),
+					)
+					if (props.resize == null) {
+						iframeResizer(
+							{
+								// log: true,
+
+								// If perf becomes an issue consider debouncing https://github.com/davidjbradshaw/iframe-resizer/issues/816
+
+								checkOrigin: [import.meta.env.VITE_APP_UGC_ORIGIN],
+							},
+							iframeReference!,
+						)
+					}
+					new IntersectionObserver(resize).observe(iframeReference!) // Resize when the iframe becomes visible, e.g. after the "Add Template" tab is clicked when we're looking at another tab. The resizing script behaves poorly when the iframe isn't visible.
+					debouncePostMessage()
+					resize()
+				}}
+				sandbox='allow-scripts allow-same-origin' // Changing this has security ramifications! https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe#attr-sandbox
+				// "When the embedded document has the same origin as the embedding page, it is strongly discouraged to use both allow-scripts and allow-same-origin"
+				// Since this iframe is hosted on `app-user-generated-content` and this component is hosted on `app`, resulting in different origins, we should be safe. https://web.dev/sandboxed-iframes/ https://stackoverflow.com/q/35208161
+				src={import.meta.env.VITE_APP_UGC_ORIGIN}
+			/>
+		</div>
 	)
 }
 
@@ -162,11 +187,27 @@ export interface ComlinkInit {
 	port: MessagePort
 }
 
-function buildHtml(i: RenderBodyInput): RawRenderBodyInput {
+function getOk(
+	htmlResult: HtmlResult | null | undefined,
+	setDiagnostics: SetStoreFunction<Diagnostics>,
+) {
+	if (htmlResult?.tag === 'Ok') {
+		setDiagnostics({ warnings: htmlResult.warnings, errors: [] })
+		return htmlResult.ok
+	} else if (htmlResult?.tag === 'Error') {
+		setDiagnostics({ errors: htmlResult?.errors, warnings: [] })
+	}
+	return null
+}
+
+function buildHtml(
+	i: RenderBodyInput,
+	setDiagnostics: SetStoreFunction<Diagnostics>,
+): RawRenderBodyInput {
 	switch (i.tag) {
 		case 'template': {
 			const template = i.template
-			const result = getOk(C.renderTemplate(template)[i.index])
+			const result = getOk(C.renderTemplate(template)[i.index], setDiagnostics)
 			if (result == null) {
 				return {
 					body: `Error rendering Template #${i.index}".`,
@@ -180,7 +221,10 @@ function buildHtml(i: RenderBodyInput): RawRenderBodyInput {
 			}
 		}
 		case 'card': {
-			const frontBack = getOk(C.html(i.card, i.note, i.template))
+			const frontBack = getOk(
+				C.html(i.card, i.note, i.template),
+				setDiagnostics,
+			)
 			if (frontBack == null) {
 				return { body: 'Card is invalid!' }
 			}
@@ -193,4 +237,19 @@ function buildHtml(i: RenderBodyInput): RawRenderBodyInput {
 		default:
 			return assertNever(i)
 	}
+}
+
+const RenderDiagnostics: VoidComponent<{
+	readonly diagnostics: JSX.Element[]
+	readonly heading: 'Error' | 'Warning'
+}> = (props) => {
+	return (
+		<Show when={props.diagnostics.length !== 0}>
+			{props.heading}
+			{props.diagnostics.length > 1 ? 's' : ''}:
+			<ul>
+				<For each={props.diagnostics}>{(d) => <li>{d}</li>}</For>
+			</ul>
+		</Show>
+	)
 }
