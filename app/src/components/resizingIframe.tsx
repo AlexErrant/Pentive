@@ -3,7 +3,6 @@ import {
 	createEffect,
 	onCleanup,
 	type VoidComponent,
-	type JSX,
 	Show,
 	For,
 } from 'solid-js'
@@ -20,7 +19,7 @@ import { type SetStoreFunction, createStore, unwrap } from 'solid-js/store'
 import { db } from '../db'
 import { C } from '../topLevelAwait'
 import { debounce, leadingAndTrailing } from '@solid-primitives/scheduled'
-import { type HtmlResult } from 'shared-dom'
+import { type Error, type Warning, type HtmlResult } from 'shared-dom'
 
 const targetOrigin = '*' // highTODO make more limiting. Also implement https://stackoverflow.com/q/8169582
 
@@ -63,8 +62,8 @@ export interface AppExpose {
 }
 
 interface Diagnostics {
-	errors: JSX.Element[]
-	warnings: JSX.Element[]
+	errors: Error[]
+	warnings: Warning[]
 }
 
 const ResizingIframe: VoidComponent<{
@@ -240,7 +239,7 @@ function buildHtml(
 }
 
 const RenderDiagnostics: VoidComponent<{
-	readonly diagnostics: JSX.Element[]
+	readonly diagnostics: Array<Warning | Error>
 	readonly heading: 'Error' | 'Warning'
 }> = (props) => {
 	return (
@@ -248,8 +247,35 @@ const RenderDiagnostics: VoidComponent<{
 			{props.heading}
 			{props.diagnostics.length > 1 ? 's' : ''}:
 			<ul>
-				<For each={props.diagnostics}>{(d) => <li>{d}</li>}</For>
+				<For each={props.diagnostics}>
+					{(d) => (
+						<li>
+							{d.tag === 'SyntaxError' && (
+								<>
+									There's a syntax error in the template near{' '}
+									<code>{d.errorParent}</code>.
+								</>
+							)}
+							{d.tag === 'Transformer404' && (
+								<>
+									Transformer <code>{d.transformer}</code> not found.
+								</>
+							)}
+						</li>
+					)}
+				</For>
 			</ul>
 		</Show>
 	)
+}
+
+// this exists to cause type errors if new tags are added.
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function throwaway(d: Warning | Error) {
+	if (d.tag === 'SyntaxError') {
+		return ''
+	} else if (d.tag === 'Transformer404') {
+		return ''
+	}
+	assertNever(d)
 }

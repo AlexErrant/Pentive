@@ -14,7 +14,18 @@ import {
 	Brace,
 } from './templateParser.terms'
 import { type RenderContainer } from '../renderContainer'
-import { type JSX } from 'solid-js'
+
+// make a DU if there's a second
+export interface Error {
+	tag: 'SyntaxError'
+	errorParent: string
+}
+
+// make a DU if there's a second
+export interface Warning {
+	tag: 'Transformer404'
+	transformer: string
+}
 
 class Context {
 	constructor() {
@@ -25,25 +36,21 @@ class Context {
 
 	html: string
 	hideTagName: string | null
-	warnings: JSX.Element[]
+	warnings: Warning[]
 }
 
 export function validate(this: RenderContainer, input: string) {
 	const tree = parser.parse(input)
-	const errors: JSX.Element[] = []
+	const errors: Error[] = []
 	tree.cursor().iterate((node) => {
-		// eslint-disable-next-line solid/reactivity
 		if (node.type.isError) {
-			// eslint-disable-next-line solid/reactivity
 			const parent = node.node.parent
 			const from = parent?.from
 			const to = parent?.to == null ? undefined : parent.to + 1 // +1 to include what might be an unexpected character
-			errors.push(
-				<>
-					There's a syntax error in the template near{' '}
-					<pre>{input.slice(from, to)}</pre>
-				</>,
-			)
+			errors.push({
+				tag: 'SyntaxError',
+				errorParent: input.slice(from, to),
+			})
 			return false
 		}
 	})
@@ -109,11 +116,10 @@ function astEnter(
 			for (const transformerName of transformerNames) {
 				const transformer = this.transformers.get(transformerName)
 				if (transformer == null) {
-					context.warnings.push(
-						<>
-							Transformer <pre>{transformerName}</pre> not found.
-						</>,
-					)
+					context.warnings.push({
+						tag: 'Transformer404',
+						transformer: transformerName,
+					})
 					continue
 				}
 				value = transformer.bind(this)({

@@ -1,6 +1,10 @@
-import { type JSX } from 'solid-js'
 import { getClozeFields } from './language/template2clozeFields.js'
-import { convert, validate } from './language/template2html.jsx'
+import {
+	type Error,
+	type Warning,
+	convert,
+	validate,
+} from './language/template2html.js'
 import type { RenderContainer } from './renderContainer.js'
 import {
 	type NoteId,
@@ -42,11 +46,11 @@ export type HtmlResult =
 	| {
 			tag: 'Ok'
 			ok: readonly [string, string] | null
-			warnings: JSX.Element[]
+			warnings: Warning[]
 	  }
 	| {
 			tag: 'Error'
-			errors: JSX.Element[]
+			errors: Error[]
 	  }
 
 export function getOk(htmlResult: HtmlResult | null | undefined) {
@@ -73,7 +77,7 @@ export function body(
 	if (Array.isArray(frontTree)) return { tag: 'Error', errors: frontTree }
 	const backTree = validate.call(this, back)
 	if (Array.isArray(backTree)) return { tag: 'Error', errors: backTree }
-	const warnings: JSX.Element[] = []
+	const warnings: Warning[] = []
 	function c(
 		this: RenderContainer,
 		input: string,
