@@ -51,6 +51,7 @@
 		"@lezer/highlight": "^1.2.0",
 		"@lezer/lr": "^1.4.0",
 		"immer": "^10.0.2",
+		"kysely": "^0.26.3",
 		"lodash": "^4.17.21",
 		"nightwind": "^1.1.13",
 		"shared": "workspace:*",
