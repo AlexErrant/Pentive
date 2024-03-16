@@ -1,17 +1,16 @@
 import { type SyntaxNodeRef, type SyntaxNode } from '@lezer/common'
 import { parser } from './queryParser'
 import { assertNever } from 'shared'
+import { sql, type RawBuilder, type SqlBool } from 'kysely'
 
 class Context {
 	constructor() {
-		this.sql = ''
-		this.indent = 0
+		this.sql = []
 		this.root = new Group(null, false)
 		this.current = this.root
 	}
 
-	sql: string
-	indent: number
+	sql: Array<string | number | RawBuilder<unknown>>
 	root: Group
 	current: Group
 }
@@ -29,7 +28,7 @@ export function convert(input: string) {
 	)
 	distributeNegate(context.root, false)
 	serialize(context.root, context)
-	return context.sql.trim()
+	return sql.join(context.sql, sql``) as RawBuilder<SqlBool>
 }
 
 function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
@@ -68,30 +67,27 @@ function astLeave(_input: string, node: SyntaxNodeRef, context: Context) {
 }
 
 function serialize(node: Node, context: Context) {
-	const spaces = '  '.repeat(context.indent)
 	if (node.type === 'SimpleString' || node.type === 'QuotedString') {
 		const query = `(noteFtsFv.rowid ${
 			node.negate ? 'NOT ' : ''
 		}IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH '${
 			node.type === 'SimpleString' ? node.value : '"' + node.value + '"'
 		}'))`
-		context.sql += '\n' + spaces + query
+		context.sql.push(sql.raw(query))
 	} else if (node.type === 'Group') {
 		if (!node.isRoot) {
-			context.sql += '\n' + spaces + '('
-			context.indent++
+			context.sql.push(sql.raw(' ( '))
 		}
 		for (const child of node.children) {
 			serialize(child, context)
 		}
 		if (!node.isRoot) {
-			context.indent--
-			context.sql += '\n' + spaces + ')'
+			context.sql.push(sql.raw(' ) '))
 		}
 	} else if (node.type === 'AND') {
-		context.sql += '\n' + spaces + 'AND'
+		context.sql.push(sql.raw(' AND '))
 	} else if (node.type === 'OR') {
-		context.sql += '\n' + spaces + 'OR'
+		context.sql.push(sql.raw(' OR '))
 	} else {
 		assertNever(node.type)
 	}

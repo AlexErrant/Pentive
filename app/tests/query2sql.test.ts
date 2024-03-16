@@ -1,9 +1,30 @@
 import { describe, expect, test } from 'vitest'
-import { type Node, Group, convert } from './query2sql'
+import { type Node, Group, convert as actualConvert } from 'shared-dom'
+import { Kysely } from 'kysely'
+import { CRDialect } from '../src/sqlite/dialect'
+import { format as actualFormat } from 'prettier'
+import * as plugin from 'prettier-plugin-sql-cst'
+import { type DB } from '../src/sqlite/database'
 
-test('SimpleString is fts', () => {
-	const actual = convert('a')
-	expect(actual).toEqual(
+async function format(sql: string) {
+	return await actualFormat('select * from x where ' + sql, {
+		parser: 'sqlite',
+		plugins: [plugin],
+	})
+}
+
+async function assertEqual(actual: string, expected: string) {
+	const ky = new Kysely<DB>({
+		// @ts-expect-error don't actually use CRDialect
+		dialect: new CRDialect(),
+	})
+	const actual2 = actualConvert(actual).compile(ky).sql
+	expect(await format(actual2)).toBe(await format(expected))
+}
+
+test('SimpleString is fts', async () => {
+	await assertEqual(
+		'a',
 		"(noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH 'a'))",
 	)
 })
@@ -12,45 +33,43 @@ describe('not a', () => {
 	const expected =
 		"(noteFtsFv.rowid NOT IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH 'a'))"
 
-	test('together', () => {
-		const actual = convert('-a')
-		expect(actual).toEqual(expected)
+	test('together', async () => {
+		await assertEqual('-a', expected)
 	})
 
-	test('separated', () => {
-		const actual = convert('- a')
-		expect(actual).toEqual(expected)
+	test('separated', async () => {
+		await assertEqual('- a', expected)
 	})
 })
 
-test('QuotedString is fts', () => {
-	const actual = convert('"a b"')
-	expect(actual).toEqual(
+test('QuotedString is fts', async () => {
+	await assertEqual(
+		'"a b"',
 		`(noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH '"a b"'))`,
 	)
 })
 
-test('2 SimpleStrings are ANDed', () => {
-	const actual = convert('a b')
-	expect(actual).toEqual(
+test('2 SimpleStrings are ANDed', async () => {
+	await assertEqual(
+		'a b',
 		`(noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH 'a'))
 AND
 (noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH 'b'))`,
 	)
 })
 
-test('2 SimpleStrings can be ORed', () => {
-	const actual = convert('a OR b')
-	expect(actual).toEqual(
+test('2 SimpleStrings can be ORed', async () => {
+	await assertEqual(
+		'a OR b',
 		`(noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH 'a'))
 OR
 (noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH 'b'))`,
 	)
 })
 
-test('2 SimpleStrings can be grouped', () => {
-	const actual = convert('(a b)')
-	expect(actual).toEqual(
+test('2 SimpleStrings can be grouped', async () => {
+	await assertEqual(
+		'(a b)',
 		`(
   (noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH 'a'))
   AND
@@ -59,9 +78,9 @@ test('2 SimpleStrings can be grouped', () => {
 	)
 })
 
-test('not distributes over AND', () => {
-	const actual = convert('-(a b)')
-	expect(actual).toEqual(
+test('not distributes over AND', async () => {
+	await assertEqual(
+		'-(a b)',
 		`(
   (noteFtsFv.rowid NOT IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH 'a'))
   OR
@@ -70,9 +89,9 @@ test('not distributes over AND', () => {
 	)
 })
 
-test('not distributes over OR', () => {
-	const actual = convert('-(a OR b)')
-	expect(actual).toEqual(
+test('not distributes over OR', async () => {
+	await assertEqual(
+		'-(a OR b)',
 		`(
   (noteFtsFv.rowid NOT IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH 'a'))
   AND
@@ -81,9 +100,9 @@ test('not distributes over OR', () => {
 	)
 })
 
-test('double negative grouping does nothing', () => {
-	const actual = convert('-(-(a OR b))')
-	expect(actual).toEqual(
+test('double negative grouping does nothing', async () => {
+	await assertEqual(
+		'-(-(a OR b))',
 		`(
   (
     (noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH 'a'))
@@ -94,9 +113,9 @@ test('double negative grouping does nothing', () => {
 	)
 })
 
-test('2 groups', () => {
-	const actual = convert('(a b) OR c (d OR e)')
-	expect(actual).toEqual(
+test('2 groups', async () => {
+	await assertEqual(
+		'(a b) OR c (d OR e)',
 		`(
   (noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH 'a'))
   AND
@@ -183,9 +202,10 @@ describe('groupAnds', () => {
 })
 
 // https://stackoverflow.com/a/20552239
-test('!(p && !q || r) is (!p || q) && !r', () => {
-	const actual = convert('-(p -q OR r)')
-	expect(actual).toEqual(`(
+test('!(p && !q || r) is (!p || q) && !r', async () => {
+	await assertEqual(
+		'-(p -q OR r)',
+		`(
   (
     (noteFtsFv.rowid NOT IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH 'p'))
     OR
@@ -193,30 +213,27 @@ test('!(p && !q || r) is (!p || q) && !r', () => {
   )
   AND
   (noteFtsFv.rowid NOT IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH 'r'))
-)`)
+)`,
+	)
 })
 
 describe('skip error nodes', () => {
 	const expected = `(noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH 'foo'))`
 	const negatedExpected = `(noteFtsFv.rowid NOT IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH 'foo'))`
 
-	test('plain', () => {
-		const actual = convert('" foo')
-		expect(actual).toEqual(expected)
+	test('plain', async () => {
+		await assertEqual('" foo', expected)
 	})
 
-	test('negated', () => {
-		const actual = convert('- " foo')
-		expect(actual).toEqual(negatedExpected)
+	test('negated', async () => {
+		await assertEqual('- " foo', negatedExpected)
 	})
 
-	test('double error', () => {
-		const actual = convert(`) " foo`)
-		expect(actual).toEqual(expected)
+	test('double error', async () => {
+		await assertEqual(`) " foo`, expected)
 	})
 
-	test('double error, negated', () => {
-		const actual = convert(`- ) " foo`)
-		expect(actual).toEqual(negatedExpected)
+	test('double error, negated', async () => {
+		await assertEqual(`- ) " foo`, negatedExpected)
 	})
 })
