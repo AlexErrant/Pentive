@@ -244,3 +244,71 @@ describe('skip error nodes', () => {
 		await assertEqual(`- ) " foo`, negatedExpected)
 	})
 })
+
+describe('template', () => {
+	test('1', async () => {
+		await assertEqual(
+			'template:foo',
+			`note.templateId IN (SELECT value FROM json_each('["foo"]'))`,
+		)
+	})
+
+	test('2', async () => {
+		await assertEqual(
+			'template:foo,bar',
+			`note.templateId IN (SELECT value FROM json_each('["foo","bar"]'))`,
+		)
+	})
+
+	test('can contain comma', async () => {
+		await assertEqual(
+			'template:"foo,bar"',
+			`note.templateId IN (SELECT value FROM json_each('["foo,bar"]'))`,
+		)
+	})
+
+	test('simple string ANDed with template', async () => {
+		await assertEqual(
+			'a template:t b',
+			`
+(noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH 'a'))
+AND
+note.templateId IN (SELECT value FROM json_each('["t"]'))
+AND
+(noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH 'b'))`,
+		)
+	})
+
+	test('quoted string ORed with template', async () => {
+		await assertEqual(
+			'"a b" OR template:t OR "c d"',
+			`
+(noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH '"a b"'))
+OR
+note.templateId IN (SELECT value FROM json_each('["t"]'))
+OR
+(noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH '"c d"'))`,
+		)
+	})
+
+	test('quoted', async () => {
+		await assertEqual(
+			'template:"foo bar",biz,"baz quz"',
+			`note.templateId IN (SELECT value FROM json_each('["foo bar","biz","baz quz"]'))`,
+		)
+	})
+
+	test('spaces', async () => {
+		await assertEqual(
+			' template : "foo bar" , biz      , "baz quz" ',
+			`note.templateId IN (SELECT value FROM json_each('["foo bar","biz","baz quz"]'))`,
+		)
+	})
+
+	test('neg', async () => {
+		await assertEqual(
+			'-template:foo,bar',
+			`note.templateId NOT IN (SELECT value FROM json_each('["foo","bar"]'))`,
+		)
+	})
+})

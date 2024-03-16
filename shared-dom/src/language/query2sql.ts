@@ -19,9 +19,7 @@ export function convert(input: string) {
 	const tree = parser.parse(input)
 	const context = new Context()
 	tree.cursor().iterate(
-		(node) => {
-			astEnter(input, node, context)
-		},
+		(node) => astEnter(input, node, context),
 		(node) => {
 			astLeave(input, node, context)
 		},
@@ -47,6 +45,21 @@ function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
 		const group = new Group(context.current, negate)
 		context.current.attach(group)
 		context.current = group
+	} else if (node.name === 'Template') {
+		maybeAddSeparator(node.node, context)
+		const values = []
+		let child = node.node.firstChild
+		while (child != null) {
+			const value =
+				child.name === 'SimpleString'
+					? input.slice(child.from, child.to)
+					: input.slice(child.from + 1, child.to - 1) // don't include quotes
+			values.push(value)
+			child = child.nextSibling
+		}
+		const negate = isNegated(node.node)
+		context.current.attach({ type: node.name, values, negate })
+		return false
 	}
 }
 
@@ -81,6 +94,13 @@ function serialize(node: Node, context: Context) {
 			context.sql.push('"' + node.value + '"')
 		}
 		context.sql.push(sql.raw(`))`))
+	} else if (node.type === 'Template') {
+		context.sql.push(sql.raw(` note.templateId `))
+		if (node.negate) context.sql.push(sql.raw(' NOT '))
+		// https://ricardoanderegg.com/posts/sqlite-list-array-parameter-query/
+		context.sql.push(sql.raw(` IN (SELECT value FROM json_each(`))
+		context.sql.push(JSON.stringify(node.values))
+		context.sql.push(sql.raw(`)) `))
 	} else if (node.type === 'Group') {
 		if (!node.isRoot) {
 			context.sql.push(sql.raw(' ( '))
@@ -119,7 +139,8 @@ function andOrNothing(node: SyntaxNode): '' | 'AND' | 'OR' {
 			left.name === 'QuotedString' ||
 			left.name === 'Group' ||
 			left.name === 'Tag' ||
-			left.name === 'Deck'
+			left.name === 'Deck' ||
+			left.name === 'Template'
 		) {
 			return 'AND'
 		}
@@ -133,6 +154,11 @@ type Leaf =
 	| {
 			type: 'SimpleString' | 'QuotedString'
 			value: string
+			negate: boolean
+	  }
+	| {
+			type: 'Template'
+			values: string[]
 			negate: boolean
 	  }
 
@@ -201,7 +227,11 @@ function distributeNegate(node: Node, negate: boolean) {
 		for (const child of node.children) {
 			distributeNegate(child, node.negate)
 		}
-	} else if (node.type === 'SimpleString' || node.type === 'QuotedString') {
+	} else if (
+		node.type === 'SimpleString' ||
+		node.type === 'QuotedString' ||
+		node.type === 'Template'
+	) {
 		if (negate) node.negate = !node.negate
 	} else if (node.type === 'AND') {
 		if (negate) node.type = 'OR'
