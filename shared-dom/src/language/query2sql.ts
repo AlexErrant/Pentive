@@ -68,12 +68,19 @@ function astLeave(_input: string, node: SyntaxNodeRef, context: Context) {
 
 function serialize(node: Node, context: Context) {
 	if (node.type === 'SimpleString' || node.type === 'QuotedString') {
-		const query = `(noteFtsFv.rowid ${
-			node.negate ? 'NOT ' : ''
-		}IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH '${
-			node.type === 'SimpleString' ? node.value : '"' + node.value + '"'
-		}'))`
-		context.sql.push(sql.raw(query))
+		context.sql.push(sql.raw(' (noteFtsFv.rowid '))
+		if (node.negate) context.sql.push(sql.raw(' NOT '))
+		context.sql.push(
+			sql.raw(
+				" IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH '",
+			),
+		)
+		if (node.type === 'SimpleString') {
+			context.sql.push(sql.raw(node.value))
+		} else {
+			context.sql.push(sql.raw('"' + node.value + '"'))
+		}
+		context.sql.push(sql.raw(`'))`))
 	} else if (node.type === 'Group') {
 		if (!node.isRoot) {
 			context.sql.push(sql.raw(' ( '))
