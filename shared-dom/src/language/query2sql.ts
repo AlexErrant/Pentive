@@ -36,7 +36,10 @@ function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
 		const value =
 			node.name === 'SimpleString'
 				? input.slice(node.from, node.to)
-				: input.slice(node.from + 1, node.to - 1) // don't include quotes
+				: input
+						.slice(node.from + 1, node.to - 1) // don't include quotes
+						.replaceAll('\\\\', '\\')
+						.replaceAll('\\"', '"')
 		const negate = isNegated(node.node)
 		context.current.attach({ type: node.name, value, negate })
 	} else if (node.name === 'Group') {
@@ -45,7 +48,7 @@ function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
 		const group = new Group(context.current, negate)
 		context.current.attach(group)
 		context.current = group
-	} else if (node.name === 'Template') {
+	} else if (node.name === 'Template' || node.name === 'Tag') {
 		maybeAddSeparator(node.node, context)
 		const values = []
 		let child = node.node.firstChild
@@ -53,7 +56,10 @@ function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
 			const value =
 				child.name === 'SimpleString'
 					? input.slice(child.from, child.to)
-					: input.slice(child.from + 1, child.to - 1) // don't include quotes
+					: input
+							.slice(child.from + 1, child.to - 1) // don't include quotes
+							.replaceAll('\\\\', '\\')
+							.replaceAll('\\"', '"')
 			values.push(value)
 			child = child.nextSibling
 		}
@@ -101,6 +107,12 @@ function serialize(node: Node, context: Context) {
 		context.sql.push(sql.raw(` IN (SELECT value FROM json_each(`))
 		context.sql.push(JSON.stringify(node.values))
 		context.sql.push(sql.raw(`)) `))
+	} else if (node.type === 'Tag') {
+		context.sql.push(sql.raw(' ( '))
+		buildTagSearch('card', node, context)
+		context.sql.push(sql.raw(node.negate ? ' AND ' : ' OR '))
+		buildTagSearch('note', node, context)
+		context.sql.push(sql.raw(' ) '))
 	} else if (node.type === 'Group') {
 		if (!node.isRoot) {
 			context.sql.push(sql.raw(' ( '))
@@ -118,6 +130,25 @@ function serialize(node: Node, context: Context) {
 	} else {
 		assertNever(node.type)
 	}
+}
+
+function buildTagSearch(
+	type: 'note' | 'card',
+	node: TagLeaf,
+	context: Context,
+) {
+	context.sql.push(sql.raw(` ${type}FtsTag.rowid `))
+	if (node.negate) context.sql.push(sql.raw(' NOT '))
+	context.sql.push(
+		sql.raw(
+			` IN (SELECT "rowid" FROM "${type}FtsTag" WHERE "${type}FtsTag"."tags" match `,
+		),
+	)
+	context.sql.push(
+		// https://stackoverflow.com/a/46918640 https://blog.haroldadmin.com/posts/escape-fts-queries
+		node.values.map((x) => `"${x.replaceAll('"', '""')}"`).join(' OR '),
+	)
+	context.sql.push(sql.raw(`) `))
 }
 
 function maybeAddSeparator(node: SyntaxNode, context: Context) {
@@ -149,6 +180,12 @@ function andOrNothing(node: SyntaxNode): '' | 'AND' | 'OR' {
 	return ''
 }
 
+interface TagLeaf {
+	type: 'Tag'
+	values: string[]
+	negate: boolean
+}
+
 type Leaf =
 	| { type: 'OR' | 'AND' }
 	| {
@@ -161,6 +198,7 @@ type Leaf =
 			values: string[]
 			negate: boolean
 	  }
+	| TagLeaf
 
 export type Node = Group | Leaf
 
@@ -230,7 +268,8 @@ function distributeNegate(node: Node, negate: boolean) {
 	} else if (
 		node.type === 'SimpleString' ||
 		node.type === 'QuotedString' ||
-		node.type === 'Template'
+		node.type === 'Template' ||
+		node.type === 'Tag'
 	) {
 		if (negate) node.negate = !node.negate
 	} else if (node.type === 'AND') {

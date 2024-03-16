@@ -312,3 +312,109 @@ OR
 		)
 	})
 })
+
+describe('tag', () => {
+	test('1', async () => {
+		await assertEqual(
+			'tag:foo',
+			`
+(
+cardFtsTag.rowid IN (SELECT "rowid" FROM "cardFtsTag" WHERE "cardFtsTag"."tags" MATCH '"foo"')
+OR
+noteFtsTag.rowid IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" MATCH '"foo"')
+)`,
+		)
+	})
+
+	test('2', async () => {
+		await assertEqual(
+			'tag:foo,bar',
+			`
+(
+cardFtsTag.rowid IN (SELECT "rowid" FROM "cardFtsTag" WHERE "cardFtsTag"."tags" MATCH '"foo" OR "bar"')
+OR
+noteFtsTag.rowid IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" MATCH '"foo" OR "bar"')
+)`,
+		)
+	})
+
+	test('can contain doublequote and backslash', async () => {
+		await assertEqual(
+			`tag:"a\\"b","c\\\\b"`,
+			`
+(
+cardFtsTag.rowid IN (SELECT "rowid" FROM "cardFtsTag" WHERE "cardFtsTag"."tags" MATCH '"a""b" OR "c\\b"')
+OR
+noteFtsTag.rowid IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" MATCH '"a""b" OR "c\\b"')
+)`,
+		)
+	})
+
+	test('simple string ANDed with tag', async () => {
+		await assertEqual(
+			'a tag:t b',
+			`
+(noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH 'a'))
+AND
+(
+  cardFtsTag.rowid IN (SELECT "rowid" FROM "cardFtsTag" WHERE "cardFtsTag"."tags" MATCH '"t"')
+  OR
+  noteFtsTag.rowid IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" MATCH '"t"')
+)
+AND
+(noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH 'b'))`,
+		)
+	})
+
+	test('quoted string ORed with tag', async () => {
+		await assertEqual(
+			'"a b" OR tag:t OR "c d"',
+			`
+(noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH '"a b"'))
+OR
+(
+  cardFtsTag.rowid IN (SELECT "rowid" FROM "cardFtsTag" WHERE "cardFtsTag"."tags" MATCH '"t"')
+  OR
+  noteFtsTag.rowid IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" MATCH '"t"')
+)
+OR
+(noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH '"c d"'))`,
+		)
+	})
+
+	test('quoted', async () => {
+		await assertEqual(
+			'tag:"foo bar",biz,"baz quz"',
+			`
+(
+cardFtsTag.rowid IN (SELECT "rowid" FROM "cardFtsTag" WHERE "cardFtsTag"."tags" MATCH '"foo bar" OR "biz" OR "baz quz"')
+OR
+noteFtsTag.rowid IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" MATCH '"foo bar" OR "biz" OR "baz quz"')
+)`,
+		)
+	})
+
+	test('spaces', async () => {
+		await assertEqual(
+			' tag : "foo bar" , biz      , "baz quz" ',
+			`
+(
+cardFtsTag.rowid IN (SELECT "rowid" FROM "cardFtsTag" WHERE "cardFtsTag"."tags" MATCH '"foo bar" OR "biz" OR "baz quz"')
+OR
+noteFtsTag.rowid IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" MATCH '"foo bar" OR "biz" OR "baz quz"')
+)`,
+		)
+	})
+
+	test('neg', async () => {
+		await assertEqual(
+			'-tag:foo,bar',
+			`
+(
+cardFtsTag.rowid NOT IN (SELECT "rowid" FROM "cardFtsTag" WHERE "cardFtsTag"."tags" MATCH '"foo" OR "bar"')
+AND
+noteFtsTag.rowid NOT IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" MATCH '"foo" OR "bar"')
+)`,
+		)
+	})
+})

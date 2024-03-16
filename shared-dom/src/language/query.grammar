@@ -21,7 +21,7 @@ Or       { @specialize<SimpleString, "OR"      > }
 
 @tokens {
   QuotedString { '"' char* '"' }
-  // a char is any non-doublequote or forward-slash followed by a doublequote or forward-slash
+  // a char is any non-doublequote or backslash followed by a doublequote or backslash
   char {
          !["\\] |
     "\\" $["\\]
