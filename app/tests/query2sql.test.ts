@@ -18,7 +18,14 @@ async function assertEqual(actual: string, expected: string) {
 		// @ts-expect-error don't actually use CRDialect
 		dialect: new CRDialect(),
 	})
-	const actual2 = actualConvert(actual).compile(ky).sql
+	const compile = actualConvert(actual).compile(ky)
+	let actual2 = compile.sql
+	const parameters = compile.parameters
+	let i = 0
+	while (actual2.includes('?')) {
+		actual2 = actual2.replace('?', "'" + (parameters[i]! as string) + "'")
+		i++
+	}
 	expect(await format(actual2)).toBe(await format(expected))
 }
 

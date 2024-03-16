@@ -10,7 +10,7 @@ class Context {
 		this.current = this.root
 	}
 
-	sql: Array<string | number | RawBuilder<unknown>>
+	sql: Array<string | RawBuilder<unknown>>
 	root: Group
 	current: Group
 }
@@ -72,15 +72,15 @@ function serialize(node: Node, context: Context) {
 		if (node.negate) context.sql.push(sql.raw(' NOT '))
 		context.sql.push(
 			sql.raw(
-				" IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH '",
+				' IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH ',
 			),
 		)
 		if (node.type === 'SimpleString') {
-			context.sql.push(sql.raw(node.value))
+			context.sql.push(node.value)
 		} else {
-			context.sql.push(sql.raw('"' + node.value + '"'))
+			context.sql.push('"' + node.value + '"')
 		}
-		context.sql.push(sql.raw(`'))`))
+		context.sql.push(sql.raw(`))`))
 	} else if (node.type === 'Group') {
 		if (!node.isRoot) {
 			context.sql.push(sql.raw(' ( '))
