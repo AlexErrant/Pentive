@@ -26,7 +26,7 @@
 		"eslint": "^8.50.0",
 		"typescript": "~5.2.2",
 		"vite": "^4.4.9",
-		"vite-plugin-solid": "^2.10.1"
+		"vite-plugin-solid": "^2.10.2"
 	},
 	"dependencies": {
 		"app": "workspace:*",
