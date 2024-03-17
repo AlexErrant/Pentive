@@ -18,7 +18,7 @@ async function assertEqual(actual: string, expected: string) {
 		// @ts-expect-error don't actually use CRDialect
 		dialect: new CRDialect(),
 	})
-	const compile = actualConvert(actual).compile(ky)
+	const compile = actualConvert(actual).sql.compile(ky)
 	let actual2 = compile.sql
 	const parameters = compile.parameters
 	let i = 0

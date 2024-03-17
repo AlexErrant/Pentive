@@ -8,11 +8,15 @@ class Context {
 		this.sql = []
 		this.root = new Group(null, false)
 		this.current = this.root
+		this.joinTags = false
+		this.joinFts = false
 	}
 
 	sql: Array<string | RawBuilder<unknown>>
 	root: Group
 	current: Group
+	joinTags: boolean
+	joinFts: boolean
 }
 
 export function convert(input: string) {
@@ -26,7 +30,11 @@ export function convert(input: string) {
 	)
 	distributeNegate(context.root, false)
 	serialize(context.root, context)
-	return sql.join(context.sql, sql``) as RawBuilder<SqlBool>
+	return {
+		sql: sql.join(context.sql, sql``) as RawBuilder<SqlBool>,
+		joinTags: context.joinTags,
+		joinFts: context.joinFts,
+	}
 }
 
 function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
@@ -87,6 +95,7 @@ function astLeave(_input: string, node: SyntaxNodeRef, context: Context) {
 
 function serialize(node: Node, context: Context) {
 	if (node.type === 'SimpleString' || node.type === 'QuotedString') {
+		context.joinFts = true
 		context.sql.push(sql.raw(' (noteFtsFv.rowid '))
 		if (node.negate) context.sql.push(sql.raw(' NOT '))
 		context.sql.push(
@@ -108,6 +117,7 @@ function serialize(node: Node, context: Context) {
 		context.sql.push(JSON.stringify(node.values))
 		context.sql.push(sql.raw(`)) `))
 	} else if (node.type === 'Tag') {
+		context.joinTags = true
 		context.sql.push(sql.raw(' ( '))
 		buildTagSearch('card', node, context)
 		context.sql.push(sql.raw(node.negate ? ' AND ' : ' OR '))
