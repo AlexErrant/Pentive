@@ -148,6 +148,7 @@ const getRowId = (params: GetRowIdParams<NoteCard>): CardId =>
 
 const [literalSearch, setLiteralSearch] = createSignal('')
 const [ftsSearch, setFtsSearch] = createSignal('')
+const [fancySearch, setFancySearch] = createSignal('')
 const [tagSearch, setTagSearch] = createSignal<string[]>([])
 const [templateSearch, setTemplateSearch] = createSignal<TemplateId[]>([])
 
@@ -159,9 +160,13 @@ const CardsTable: VoidComponent<{
 	readonly onSelectionChanged: (noteCards: NoteCard[]) => void
 }> = (props) => {
 	createEffect(
-		on([literalSearch, ftsSearch, tagSearch, templateSearch], setDatasource, {
-			defer: true,
-		}),
+		on(
+			[literalSearch, fancySearch, ftsSearch, tagSearch, templateSearch],
+			setDatasource,
+			{
+				defer: true,
+			},
+		),
 	)
 	return (
 		<div class='flex h-full flex-col'>
@@ -180,6 +185,14 @@ const CardsTable: VoidComponent<{
 					placeholder='FTS Search'
 					onKeyUp={(e) => {
 						if (e.key === 'Enter') setFtsSearch(e.currentTarget.value)
+					}}
+				/>
+				<input
+					class='form-input w-full border'
+					type='text'
+					placeholder='Fancy Search'
+					onKeyUp={(e) => {
+						if (e.key === 'Enter') setFancySearch(e.currentTarget.value)
 					}}
 				/>
 			</div>
@@ -264,12 +277,15 @@ const dataSource = {
 				: undefined
 		const literalSearchActual = literalSearch()
 		const ftsSearchActual = ftsSearch().trim()
+		const fancySearchActual = fancySearch().trim()
 		const tagSearchActual = tagSearch()
 		const templateSearchActual = templateSearch()
 		const search = {
 			literalSearch:
 				literalSearchActual.trim() === '' ? undefined : literalSearchActual,
 			ftsSearch: ftsSearchActual === '' ? undefined : ftsSearchActual,
+			fancySearch:
+				fancySearchActual.trim() === '' ? undefined : fancySearchActual,
 			tagSearch: tagSearchActual.length === 0 ? undefined : tagSearchActual,
 			templateSearch:
 				templateSearchActual.length === 0 ? undefined : templateSearchActual,

@@ -26,6 +26,7 @@ import {
 	stringifyTags,
 	templateEntityToDomain,
 } from './util'
+import { convert } from 'shared-dom'
 
 function serializeState(s: State): number {
 	switch (s) {
@@ -188,6 +189,7 @@ async function buildCache(
 export interface SearchParams {
 	literalSearch?: string
 	ftsSearch?: string
+	fancySearch?: string
 	tagSearch?: string[]
 	templateSearch?: TemplateId[]
 }
@@ -231,6 +233,22 @@ async function getCards(
 				.where('noteFtsFv.fieldValues', 'match', search!.ftsSearch!)
 				.orderBy(sql`noteFtsFv.rank`),
 		)
+		// don't `where` when scrolling - redundant since joining on the cache already filters
+		.$if(offset === 0 && search?.fancySearch != null, (db) => {
+			const x = convert(search!.fancySearch!)
+			return db
+				.$if(x.joinFts, (db) =>
+					db
+						.innerJoin('noteFtsFv', 'noteFtsFv.rowid', 'note.rowid')
+						.orderBy(sql`noteFtsFv.rank`),
+				)
+				.$if(x.joinTags, (db) =>
+					db
+						.innerJoin('noteFtsTag', 'noteFtsTag.rowid', 'note.rowid')
+						.innerJoin('cardFtsTag', 'cardFtsTag.rowid', 'card.rowid'),
+				)
+				.where(x.sql)
+		})
 		// don't `where` when scrolling - redundant since joining on the cache already filters
 		.$if(offset === 0 && search?.literalSearch != null, (db) =>
 			db.where('note.fieldValues', 'like', '%' + search!.literalSearch + '%'),
