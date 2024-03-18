@@ -32,7 +32,7 @@ import {
 } from 'solid-js'
 import { oneDark } from '@codemirror/theme-one-dark'
 import { theme } from '../globalState'
-import { queryParser } from 'shared-dom'
+import { queryHighlightStyle, queryParser } from 'shared-dom'
 
 let view: EditorView
 const QueryEditor: VoidComponent<{
@@ -112,6 +112,7 @@ function createEditorState(
 			]),
 			[...basicSetup],
 			queryLanguage,
+			syntaxHighlighting(queryHighlightStyle),
 			...maybeDark,
 		],
 	})

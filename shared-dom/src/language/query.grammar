@@ -33,3 +33,5 @@ Or       { @specialize<SimpleString, "OR"      > }
   Not { "-" }
   @precedence { Not, SimpleString }
 }
+
+@external propSource queryHighlighting from "./query.highlight.js"
