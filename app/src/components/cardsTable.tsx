@@ -27,6 +27,7 @@ import { C } from '../topLevelAwait'
 import FiltersTable from './filtersTable'
 import './cardsTable.css'
 import { type SearchParams } from '../sqlite/card'
+import QueryEditor from './queryEditor'
 
 LicenseManager.setLicenseKey(import.meta.env.VITE_AG_GRID_LICENSE)
 
@@ -187,6 +188,7 @@ const CardsTable: VoidComponent<{
 						if (e.key === 'Enter') setFtsSearch(e.currentTarget.value)
 					}}
 				/>
+				<QueryEditor value={fancySearch()} setValue={setFancySearch} />
 				<input
 					class='form-input w-full border'
 					type='text'
