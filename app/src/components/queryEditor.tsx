@@ -148,6 +148,10 @@ const baseTheme = EditorView.baseTheme({
 		color: 'darkorange',
 		fontWeight: 'bold',
 	},
+	'.query-active': {
+		color: 'red',
+		fontWeight: 'bold',
+	},
 })
 
 const blackBackground = EditorView.theme({
