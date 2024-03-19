@@ -1,5 +1,5 @@
 import { Tag, styleTags, tags as t } from '@lezer/highlight'
-import { HighlightStyle } from '@codemirror/language'
+import { HighlightStyle, type TagStyle } from '@codemirror/language'
 
 const childStringTag = Tag.define()
 
@@ -28,15 +28,32 @@ const notSearchTermStyle = {
 	fontWeight: 'bold',
 } as const
 
-export const queryHighlightStyle = HighlightStyle.define([
-	{ tag: t.operatorKeyword, ...notSearchTermStyle },
+function createSpecs(isLight: boolean) {
+	const overline = `overline ${isLight ? 'black' : 'white'}`
+	return [
+		{ tag: t.operatorKeyword, ...notSearchTermStyle },
+		{
+			tag: t.labelName,
+			textDecoration: overline,
+			...notSearchTermStyle,
+		},
+		{
+			tag: childStringTag,
+			textDecoration: overline,
+		},
+	] satisfies readonly TagStyle[]
+}
+
+export const queryDarkHighlightStyle = HighlightStyle.define(
+	createSpecs(false),
 	{
-		tag: t.labelName,
-		textDecoration: 'overline black',
-		...notSearchTermStyle,
+		themeType: 'dark',
 	},
+)
+
+export const queryLightHighlightStyle = HighlightStyle.define(
+	createSpecs(true),
 	{
-		tag: childStringTag,
-		textDecoration: 'overline black',
+		themeType: 'light',
 	},
-])
+)

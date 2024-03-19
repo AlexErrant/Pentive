@@ -10,4 +10,7 @@ export * from './language/templateLinter.js'
 export * from './language/query2sql.js'
 export { type Error, type Warning } from './language/template2html.js'
 export { parser as queryParser } from './language/queryParser.js'
-export { queryHighlightStyle } from './language/query.highlight.js'
+export {
+	queryDarkHighlightStyle,
+	queryLightHighlightStyle,
+} from './language/query.highlight.js'

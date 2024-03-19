@@ -32,7 +32,11 @@ import {
 } from 'solid-js'
 import { oneDark } from '@codemirror/theme-one-dark'
 import { theme } from '../globalState'
-import { queryHighlightStyle, queryParser } from 'shared-dom'
+import {
+	queryLightHighlightStyle,
+	queryDarkHighlightStyle,
+	queryParser,
+} from 'shared-dom'
 
 let view: EditorView
 const QueryEditor: VoidComponent<{
@@ -58,10 +62,7 @@ const QueryEditor: VoidComponent<{
 	})
 	return (
 		<>
-			<div
-				class='flex-1 resize-y overflow-auto focus-within:border-black focus-within:border'
-				ref={ref}
-			/>
+			<div class='flex-1 resize-y overflow-auto' ref={ref} />
 		</>
 	)
 }
@@ -97,7 +98,7 @@ function createEditorState(
 	theme: 'light' | 'dark',
 	setValue: (value: string) => void,
 ) {
-	const maybeDark = theme === 'dark' ? [oneDark] : []
+	const maybeDark = theme === 'dark' ? [blackBackground, oneDark] : []
 	return EditorState.create({
 		doc,
 		extensions: [
@@ -112,7 +113,9 @@ function createEditorState(
 			]),
 			[...basicSetup],
 			queryLanguage,
-			syntaxHighlighting(queryHighlightStyle),
+			syntaxHighlighting(queryLightHighlightStyle),
+			syntaxHighlighting(queryDarkHighlightStyle),
+			baseTheme,
 			...maybeDark,
 		],
 	})
@@ -120,4 +123,21 @@ function createEditorState(
 
 const queryLanguage = LRLanguage.define({
 	parser: queryParser,
+})
+
+const baseTheme = EditorView.baseTheme({
+	'&light': {
+		backgroundColor: 'white',
+	},
+	'& .cm-content': {
+		fontSize: '1rem',
+	},
+	// https://discuss.codemirror.net/t/changing-the-font-size-of-cm6/2935/11
+	'.cm-scroller': { fontFamily: 'inherit' },
+})
+
+const blackBackground = EditorView.theme({
+	'&': {
+		backgroundColor: 'black',
+	},
 })
