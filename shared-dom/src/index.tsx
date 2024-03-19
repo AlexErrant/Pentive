@@ -14,3 +14,4 @@ export {
 	queryDarkHighlightStyle,
 	queryLightHighlightStyle,
 } from './language/query.highlight.js'
+export * as queryTerms from './language/queryParser.terms.js'

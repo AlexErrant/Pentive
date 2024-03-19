@@ -37,6 +37,7 @@ import {
 	queryDarkHighlightStyle,
 	queryParser,
 } from 'shared-dom'
+import { queryDecorations } from './queryDecorations'
 
 let view: EditorView
 const QueryEditor: VoidComponent<{
@@ -115,6 +116,7 @@ function createEditorState(
 			queryLanguage,
 			syntaxHighlighting(queryLightHighlightStyle),
 			syntaxHighlighting(queryDarkHighlightStyle),
+			queryDecorations,
 			baseTheme,
 			...maybeDark,
 		],
@@ -134,6 +136,18 @@ const baseTheme = EditorView.baseTheme({
 	},
 	// https://discuss.codemirror.net/t/changing-the-font-size-of-cm6/2935/11
 	'.cm-scroller': { fontFamily: 'inherit' },
+	'.query-escape': {
+		color: 'darkorange',
+		fontWeight: 'bold',
+	},
+	'.query-paren': {
+		color: 'darkorange',
+		fontWeight: 'bold',
+	},
+	'.query-quote': {
+		color: 'darkorange',
+		fontWeight: 'bold',
+	},
 })
 
 const blackBackground = EditorView.theme({
