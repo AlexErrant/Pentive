@@ -6,8 +6,9 @@ export const
   Not = 2,
   SimpleString = 3,
   QuotedString = 4,
-  Group = 5,
-  Tag = 6,
-  Deck = 7,
-  Template = 8,
-  Or = 9
+  Wildcard = 5,
+  Group = 6,
+  Tag = 7,
+  Deck = 8,
+  Template = 9,
+  Or = 10
