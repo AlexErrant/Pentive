@@ -219,7 +219,7 @@ function createEditorState(doc: string, theme: 'light' | 'dark') {
 			[...basicSetup],
 			...maybeDark,
 			htmlTemplateLanguage,
-			templateLinter(),
+			templateLinter,
 		],
 	})
 }

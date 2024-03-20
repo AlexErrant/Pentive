@@ -36,6 +36,7 @@ import {
 	queryLightHighlightStyle,
 	queryDarkHighlightStyle,
 	queryParser,
+	queryLinter,
 } from 'shared-dom'
 import { queryDecorations } from './queryDecorations'
 
@@ -117,6 +118,7 @@ function createEditorState(
 			syntaxHighlighting(queryLightHighlightStyle),
 			syntaxHighlighting(queryDarkHighlightStyle),
 			queryDecorations,
+			queryLinter,
 			baseTheme,
 			...maybeDark,
 		],
