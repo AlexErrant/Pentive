@@ -17,7 +17,7 @@ function childStringKeys() {
 
 export const queryHighlighting = styleTags({
 	// eslint-disable-next-line @typescript-eslint/naming-convention
-	'Not Or': t.operatorKeyword,
+	'Not Or Wildcard': t.operatorKeyword,
 	[childStringKeys()]: childStringTag,
 	[prefixes.join(' ')]: t.labelName,
 })
