@@ -2,6 +2,7 @@ import { type SyntaxNodeRef, type SyntaxNode } from '@lezer/common'
 import { parser } from './queryParser'
 import { assertNever } from 'shared'
 import { sql, type RawBuilder, type SqlBool } from 'kysely'
+import { Wildcard } from './queryParser.terms'
 
 class Context {
 	constructor() {
@@ -49,7 +50,8 @@ function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
 						.replaceAll('\\\\', '\\')
 						.replaceAll('\\"', '"')
 		const negate = isNegated(node.node)
-		context.current.attach({ type: node.name, value, negate })
+		const wildcard = node.node.nextSibling?.type.is(Wildcard) === true
+		context.current.attach({ type: node.name, value, negate, wildcard })
 	} else if (node.name === 'Group') {
 		maybeAddSeparator(node.node, context)
 		const negate = isNegated(node.node)
@@ -103,8 +105,8 @@ function serialize(node: Node, context: Context) {
 				' IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH ',
 			),
 		)
-		if (node.type === 'SimpleString') {
-			context.sql.push(node.value)
+		if (node.wildcard) {
+			context.sql.push('"' + node.value + '" * ')
 		} else {
 			context.sql.push('"' + node.value + '"')
 		}
@@ -202,6 +204,7 @@ type Leaf =
 			type: 'SimpleString' | 'QuotedString'
 			value: string
 			negate: boolean
+			wildcard: boolean
 	  }
 	| {
 			type: 'Template'
