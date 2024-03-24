@@ -10,7 +10,10 @@ expression {
 
 Group { "(" expression ")" }
 
-string { (SimpleString | QuotedString) Wildcard? }
+string {
+  Regex |
+  ((SimpleString | QuotedString) Wildcard?)
+}
 strings { (string ",")* string }
 
 Deck     { @specialize<SimpleString, "deck"    > ":" strings }
@@ -22,13 +25,18 @@ Or       { @specialize<SimpleString, "OR"      > }
 @tokens {
   Wildcard { "*" }
   QuotedString { '"' char* '"' }
-  // a char is any non-doublequote or backslash followed by a doublequote or backslash
+
+  // https://github.com/lezer-parser/javascript/blob/392c6115647c9e55c147ac2d702f75be127a7b2d/src/javascript.grammar#L683
+  // Not exactly the same because we're more interested in correctness (than tokenization) https://github.com/lezer-parser/javascript/pull/31#issuecomment-2016585616
+  Regex[isolate] { "/" (![/\\\n[] | "\\" ![\n] | "[" (![\n\\\]] | "\\" ![\n])* "]")+ "/" $[dgimsuvy]* }
+
+  // a char is any non-doublequote or non-backslash... or a backslash followed by a doublequote or backslash
   char {
          !["\\] |
     "\\" $["\\]
   }
-  // a SimpleString is any series of characters that is not asterisk, comma, parentheses, colon, doublequote, or whitespace (as defined by the Unicode standard)
-  SimpleString { ( ![*,():"\u0009\u000A\u000B\u000C\u000D\u0020\u0085\u00A0\u1680\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200A\u2028\u2029\u202F\u205F\u3000] )+ }
+  // a SimpleString is any series of characters that is not backslash, forwardslash, asterisk, comma, parentheses, colon, doublequote, or whitespace (as defined by the Unicode standard)
+  SimpleString { ( ![\\/*,():"\u0009\u000A\u000B\u000C\u000D\u0020\u0085\u00A0\u1680\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200A\u2028\u2029\u202F\u205F\u3000] )+ }
   whitespace { @whitespace+ }
 
   Not { "-" }

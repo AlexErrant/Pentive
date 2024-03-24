@@ -4,11 +4,12 @@
 export const
   Program = 1,
   Not = 2,
-  SimpleString = 3,
-  QuotedString = 4,
-  Wildcard = 5,
-  Group = 6,
-  Tag = 7,
-  Deck = 8,
-  Template = 9,
-  Or = 10
+  Regex = 3,
+  SimpleString = 4,
+  QuotedString = 5,
+  Wildcard = 6,
+  Group = 7,
+  Tag = 8,
+  Deck = 9,
+  Template = 10,
+  Or = 11
