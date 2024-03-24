@@ -10,6 +10,7 @@ import wdbRtc from './wholeDbRtc'
 import { wholeDbReplicator } from 'shared-dom'
 import { unitSeparator } from './util'
 import { C } from '../topLevelAwait'
+import { SQLITE_DETERMINISTIC, SQLITE_UTF8 } from '@vlcn.io/wa-sqlite'
 
 const dp = new DOMParser()
 
@@ -27,6 +28,39 @@ export async function createDb() {
 	const db = await sqlite.open('username.db')
 	await db.execMany(initSql)
 	db.createFunction('getMediaIds', getMediaIds)
+	// lowTODO compile in sqlean's regex https://github.com/vlcn-io/js/issues/51#issuecomment-2016481277
+	// https://github.com/rhashimoto/wa-sqlite/blob/f1f8550ea9babe1867e5ec2c170aaaf0c649887e/demo/demo-worker.js#L63-L73
+	// db.api.create_function(
+	// 	db.db,
+	// 	'regexp',
+	// 	2,
+	// 	SQLITE_UTF8 | SQLITE_DETERMINISTIC,
+	// 	0,
+	// 	function (context, values) {
+	// 		const pattern = new RegExp(db.api.value_text(values[0]!))
+	// 		const s = db.api.value_text(values[1]!)
+	// 		db.api.result(context, pattern.test(s) ? 1 : 0)
+	// 	},
+	// 	undefined,
+	// 	undefined,
+	// )
+	db.api.create_function(
+		db.db,
+		'regexp_with_flags',
+		3,
+		SQLITE_UTF8 | SQLITE_DETERMINISTIC,
+		0,
+		function (context, values) {
+			const pattern = new RegExp(
+				db.api.value_text(values[0]!),
+				db.api.value_text(values[1]!),
+			)
+			const s = db.api.value_text(values[2]!)
+			db.api.result(context, pattern.test(s) ? 1 : 0)
+		},
+		undefined,
+		undefined,
+	)
 	return db
 }
 
