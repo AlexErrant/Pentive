@@ -69,6 +69,51 @@ test('QuotedString* is wildcarded', async () => {
 	)
 })
 
+describe('regex', () => {
+	test('plain', async () => {
+		await assertEqual('/foo/', `regexp_with_flags('foo', '', note.fieldValues)`)
+	})
+
+	test('with flag', async () => {
+		await assertEqual(
+			'/foo/i',
+			`regexp_with_flags('foo', 'i', note.fieldValues)`,
+		)
+	})
+
+	test('with flags', async () => {
+		await assertEqual(
+			'/foo/is',
+			`regexp_with_flags('foo', 'is', note.fieldValues)`,
+		)
+	})
+
+	test('flags are deduped', async () => {
+		await assertEqual(
+			'/foo/suuvvyys',
+			`regexp_with_flags('foo', 'suvy', note.fieldValues)`,
+		)
+	})
+
+	test('two are anded', async () => {
+		await assertEqual(
+			'/foo/ /bar/',
+			`
+regexp_with_flags('foo', '', note.fieldValues)
+AND
+regexp_with_flags('bar', '', note.fieldValues)
+`,
+		)
+	})
+
+	test('NOT works', async () => {
+		await assertEqual(
+			'-/foo/y',
+			`NOT regexp_with_flags('foo', 'y', note.fieldValues)`,
+		)
+	})
+})
+
 test('2 SimpleStrings are ANDed', async () => {
 	await assertEqual(
 		'a b',

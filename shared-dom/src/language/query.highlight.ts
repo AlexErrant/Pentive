@@ -18,6 +18,8 @@ function childStringKeys() {
 export const queryHighlighting = styleTags({
 	// eslint-disable-next-line @typescript-eslint/naming-convention
 	'Not Or Wildcard': t.operatorKeyword,
+	// eslint-disable-next-line @typescript-eslint/naming-convention
+	Regex: t.regexp,
 	[childStringKeys()]: childStringTag,
 	[prefixes.join(' ')]: t.labelName,
 })
@@ -32,6 +34,12 @@ function createSpecs(isLight: boolean) {
 	const overline = `overline ${isLight ? 'black' : 'white'}`
 	return [
 		{ tag: t.operatorKeyword, ...notSearchTermStyle },
+		{
+			tag: t.regexp,
+			...notSearchTermStyle,
+			fontFamily: 'monospace',
+			fontStyle: 'normal',
+		},
 		{
 			tag: t.labelName,
 			textDecoration: overline,

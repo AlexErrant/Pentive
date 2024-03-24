@@ -2,7 +2,7 @@ import { type SyntaxNodeRef, type SyntaxNode } from '@lezer/common'
 import { parser } from './queryParser'
 import { assertNever } from 'shared'
 import { sql, type RawBuilder, type SqlBool } from 'kysely'
-import { Wildcard } from './queryParser.terms'
+import { Regex, Wildcard } from './queryParser.terms'
 
 class Context {
 	constructor() {
@@ -38,6 +38,13 @@ export function convert(input: string) {
 	}
 }
 
+// https://stackoverflow.com/a/28798479
+function unique(str: string) {
+	return Array.from(str)
+		.filter((item, i, ar) => ar.indexOf(item) === i)
+		.join('')
+}
+
 function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
 	if (node.type.isError) return
 	if (node.name === 'SimpleString' || node.name === 'QuotedString') {
@@ -52,6 +59,16 @@ function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
 		const negate = isNegated(node.node)
 		const wildcard = node.node.nextSibling?.type.is(Wildcard) === true
 		context.current.attach({ type: node.name, value, negate, wildcard })
+	} else if (node.type.is(Regex)) {
+		maybeAddSeparator(node.node, context)
+		const tailDelimiterIndex = input.lastIndexOf('/', node.to)
+		context.current.attach({
+			type: 'Regex',
+			pattern: input.slice(node.from + 1, tailDelimiterIndex),
+			flags: unique(input.slice(tailDelimiterIndex + 1, node.to)),
+			negate: isNegated(node.node),
+		})
+		return false
 	} else if (node.name === 'Group') {
 		maybeAddSeparator(node.node, context)
 		const negate = isNegated(node.node)
@@ -111,6 +128,13 @@ function serialize(node: Node, context: Context) {
 			context.sql.push('"' + node.value + '"')
 		}
 		context.sql.push(sql.raw(`))`))
+	} else if (node.type === 'Regex') {
+		if (node.negate) context.sql.push(sql.raw(' NOT '))
+		context.sql.push(sql.raw(' regexp_with_flags('))
+		context.sql.push(node.pattern)
+		context.sql.push(sql.raw(','))
+		context.sql.push(node.flags)
+		context.sql.push(sql.raw(', note.fieldValues)'))
 	} else if (node.type === 'Template') {
 		context.sql.push(sql.raw(` note.templateId `))
 		if (node.negate) context.sql.push(sql.raw(' NOT '))
@@ -180,6 +204,7 @@ function andOrNothing(node: SyntaxNode): '' | 'AND' | 'OR' {
 		if (
 			left.name === 'SimpleString' ||
 			left.name === 'QuotedString' ||
+			left.name === 'Regex' ||
 			left.name === 'Group' ||
 			left.name === 'Tag' ||
 			left.name === 'Deck' ||
@@ -205,6 +230,12 @@ type Leaf =
 			value: string
 			negate: boolean
 			wildcard: boolean
+	  }
+	| {
+			type: 'Regex'
+			pattern: string
+			flags: string
+			negate: boolean
 	  }
 	| {
 			type: 'Template'
@@ -281,6 +312,7 @@ function distributeNegate(node: Node, negate: boolean) {
 	} else if (
 		node.type === 'SimpleString' ||
 		node.type === 'QuotedString' ||
+		node.type === 'Regex' ||
 		node.type === 'Template' ||
 		node.type === 'Tag'
 	) {
