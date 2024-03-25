@@ -44,6 +44,8 @@ import {
 	jsonSchemaLinter,
 	jsonSchemaHover,
 	jsonCompletion,
+	stateExtensions,
+	handleRefresh,
 } from 'codemirror-json-schema'
 import Ajv from 'ajv'
 import { db } from '../db'
@@ -177,13 +179,14 @@ function createEditorState(doc: string, theme: 'light' | 'dark') {
 			linter(jsonParseLinter(), {
 				delay: 300,
 			}),
-			linter(jsonSchemaLinter(schema), {
-				delay: 300,
+			linter(jsonSchemaLinter(), {
+				needsRefresh: handleRefresh,
 			}),
 			jsonLanguage.data.of({
-				autocomplete: jsonCompletion(schema),
+				autocomplete: jsonCompletion(),
 			}),
-			hoverTooltip(jsonSchemaHover(schema)),
+			hoverTooltip(jsonSchemaHover()),
+			stateExtensions(schema),
 		],
 	})
 }
