@@ -41,6 +41,7 @@ import { C } from '../topLevelAwait'
 import { oneDark } from '@codemirror/theme-one-dark'
 import { theme } from '../globalState'
 import { getOk, htmlTemplateLanguage, templateLinter } from 'shared-dom'
+import { html } from '@codemirror/lang-html'
 
 const EditChildTemplate: VoidComponent<{
 	template: Template
@@ -219,6 +220,7 @@ function createEditorState(doc: string, theme: 'light' | 'dark') {
 			[...basicSetup],
 			...maybeDark,
 			htmlTemplateLanguage,
+			html().support,
 			templateLinter,
 		],
 	})
