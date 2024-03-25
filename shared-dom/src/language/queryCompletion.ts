@@ -13,8 +13,9 @@ import {
 
 export const queryCompletion: (_: {
 	getTags: () => Promise<string[]>
+	getHistory: () => string[]
 }) => CompletionSource =
-	({ getTags }) =>
+	({ getTags, getHistory }) =>
 	async (context) => {
 		const nodeBefore = syntaxTree(context.state).resolveInner(context.pos, -1)
 		if (
@@ -26,17 +27,31 @@ export const queryCompletion: (_: {
 			const textBefore = context.state.sliceDoc(nodeBefore.from, context.pos)
 			const tagBefore = /\w*$/.exec(textBefore)
 			if (tagBefore == null && !context.explicit) return null
+			const from =
+				tagBefore != null ? nodeBefore.from + tagBefore.index : context.pos
+			const options: Completion[] = ['deck', 'tag', 'template'].map(
+				(option) =>
+					({
+						label: option,
+						type: 'general',
+						apply: option + ':',
+					}) satisfies Completion,
+			)
+			// only use historical autocomplete if we're replacing everything
+			if (from === 0) {
+				options.push(
+					...getHistory().map(
+						(label) =>
+							({
+								label,
+								type: 'history',
+							}) satisfies Completion,
+					),
+				)
+			}
 			return {
-				from:
-					tagBefore != null ? nodeBefore.from + tagBefore.index : context.pos,
-				options: ['deck', 'tag', 'template'].map(
-					(option) =>
-						({
-							label: option,
-							type: 'class', // adds circle icon https://github.com/codemirror/autocomplete/blob/5ad2ebc861f2f61cdc943fc087a5bfb756a7d0fa/src/theme.ts#L110
-							apply: option + ':',
-						}) satisfies Completion,
-				),
+				from,
+				options,
 				validFor: /^(\w*)?$/,
 			}
 		} else if (
@@ -54,7 +69,7 @@ export const queryCompletion: (_: {
 					const escaped = tag.replaceAll('\\', '\\\\').replaceAll('"', '\\"') // the order here is important
 					return {
 						label: tag,
-						type: 'class', // adds circle icon https://github.com/codemirror/autocomplete/blob/5ad2ebc861f2f61cdc943fc087a5bfb756a7d0fa/src/theme.ts#L110
+						type: 'tag',
 						apply: nodeBefore.type.is(QuotedString)
 							? escaped
 							: '"' + escaped + '"',

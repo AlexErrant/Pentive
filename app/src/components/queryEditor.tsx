@@ -111,7 +111,9 @@ function createEditorState(
 				{
 					key: 'Enter',
 					run: (x) => {
-						setValue(x.state.doc.toString())
+						const value = x.state.doc.toString()
+						setValue(value)
+						appendHistory(value)
 						return true
 					},
 				},
@@ -128,11 +130,22 @@ function createEditorState(
 	})
 }
 
+function getHistory() {
+	return JSON.parse(localStorage.getItem('queryHistory') ?? '[]') as string[]
+}
+
+function appendHistory(value: string) {
+	const history = getHistory()
+	history.push(value)
+	localStorage.setItem('queryHistory', JSON.stringify(history))
+}
+
 const queryLanguage = LRLanguage.define({
 	parser: queryParser,
 	languageData: {
 		autocomplete: queryCompletion({
 			getTags: db.getTags,
+			getHistory,
 		}) satisfies CompletionSource,
 	},
 })
@@ -161,6 +174,15 @@ const baseTheme = EditorView.baseTheme({
 	'.query-active': {
 		color: 'red',
 		fontWeight: 'bold',
+	},
+	'.cm-completionIcon-general': {
+		'&:after': { content: "'🗂\uFE0F'" },
+	},
+	'.cm-completionIcon-tag': {
+		'&:after': { content: "'🏷\uFE0F'" },
+	},
+	'.cm-completionIcon-history': {
+		'&:after': { content: "'🕑\uFE0F'" },
 	},
 })
 
