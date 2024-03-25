@@ -21,6 +21,7 @@ import {
 	completionKeymap,
 	closeBrackets,
 	closeBracketsKeymap,
+	type CompletionSource,
 } from '@codemirror/autocomplete'
 import { lintKeymap } from '@codemirror/lint'
 import {
@@ -40,6 +41,7 @@ import {
 	queryCompletion,
 } from 'shared-dom'
 import { queryDecorations } from './queryDecorations'
+import { db } from '../db'
 
 let view: EditorView
 const QueryEditor: VoidComponent<{
@@ -129,7 +131,9 @@ function createEditorState(
 const queryLanguage = LRLanguage.define({
 	parser: queryParser,
 	languageData: {
-		autocomplete: queryCompletion,
+		autocomplete: queryCompletion({
+			getTags: db.getTags,
+		}) satisfies CompletionSource,
 	},
 })
 
