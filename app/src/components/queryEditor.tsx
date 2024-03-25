@@ -37,6 +37,7 @@ import {
 	queryDarkHighlightStyle,
 	queryParser,
 	queryLinter,
+	queryCompletion,
 } from 'shared-dom'
 import { queryDecorations } from './queryDecorations'
 
@@ -127,6 +128,9 @@ function createEditorState(
 
 const queryLanguage = LRLanguage.define({
 	parser: queryParser,
+	languageData: {
+		autocomplete: queryCompletion,
+	},
 })
 
 const baseTheme = EditorView.baseTheme({
