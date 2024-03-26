@@ -11,8 +11,8 @@ import {
 	Tag,
 } from './queryParser.terms'
 
-function buildHistory(getHistory: () => string[]) {
-	return getHistory().map(
+function buildHistory(getHistory: () => Set<string>) {
+	return Array.from(getHistory()).map(
 		(label) =>
 			({
 				label,
@@ -23,7 +23,7 @@ function buildHistory(getHistory: () => string[]) {
 
 export const queryCompletion: (_: {
 	getTags: () => Promise<string[]>
-	getHistory: () => string[]
+	getHistory: () => Set<string>
 }) => CompletionSource =
 	({ getTags, getHistory }) =>
 	async (context) => {

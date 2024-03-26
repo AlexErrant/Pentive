@@ -142,13 +142,17 @@ function createEditorState(
 }
 
 function getHistory() {
-	return JSON.parse(localStorage.getItem('queryHistory') ?? '[]') as string[]
+	const array = JSON.parse(
+		localStorage.getItem('queryHistory') ?? '[]',
+	) as string[]
+	return new Set(array)
 }
 
 function appendHistory(value: string) {
 	const history = getHistory()
-	history.push(value)
-	localStorage.setItem('queryHistory', JSON.stringify(history))
+	history.delete(value) // used to reorder and put `value` at the bottom if it's already in the set
+	history.add(value)
+	localStorage.setItem('queryHistory', JSON.stringify([...history].slice(-100)))
 }
 
 const queryLanguage = LRLanguage.define({
