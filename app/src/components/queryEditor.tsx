@@ -22,6 +22,7 @@ import {
 	closeBrackets,
 	closeBracketsKeymap,
 	type CompletionSource,
+	startCompletion,
 } from '@codemirror/autocomplete'
 import { lintKeymap } from '@codemirror/lint'
 import {
@@ -115,6 +116,16 @@ function createEditorState(
 						setValue(value)
 						appendHistory(value)
 						return true
+					},
+				},
+				{
+					key: 'ArrowDown',
+					run: (x) => {
+						if (x.state.doc.length === 0) {
+							startCompletion(view)
+							return true
+						}
+						return false
 					},
 				},
 			]),

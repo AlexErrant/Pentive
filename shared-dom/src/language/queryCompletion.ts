@@ -11,12 +11,29 @@ import {
 	Tag,
 } from './queryParser.terms'
 
+function buildHistory(getHistory: () => string[]) {
+	return getHistory().map(
+		(label) =>
+			({
+				label,
+				type: 'history',
+			}) satisfies Completion,
+	)
+}
+
 export const queryCompletion: (_: {
 	getTags: () => Promise<string[]>
 	getHistory: () => string[]
 }) => CompletionSource =
 	({ getTags, getHistory }) =>
 	async (context) => {
+		if (context.explicit && context.pos === 0) {
+			return {
+				from: 0,
+				options: buildHistory(getHistory).reverse(),
+				filter: false,
+			}
+		}
 		const nodeBefore = syntaxTree(context.state).resolveInner(context.pos, -1)
 		if (
 			nodeBefore.type.is(Program) ||
@@ -39,15 +56,7 @@ export const queryCompletion: (_: {
 			)
 			// only use historical autocomplete if we're replacing everything
 			if (from === 0) {
-				options.push(
-					...getHistory().map(
-						(label) =>
-							({
-								label,
-								type: 'history',
-							}) satisfies Completion,
-					),
-				)
+				options.push(...buildHistory(getHistory))
 			}
 			return {
 				from,
