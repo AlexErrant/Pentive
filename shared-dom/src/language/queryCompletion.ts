@@ -11,6 +11,14 @@ import {
 	Tag,
 } from './queryParser.terms'
 
+// I don't think we should use Codemirror's autocomplete for showing history. Doing anything more
+// advanced, e.g. deleting an entry from history, is unsupported in `@codemirror/autocomplete`.
+// In particular, while we can detect a pressing of the `Delete` key, there's no `Command` like
+// `startCompletion` in `@codemirror/autocomplete` for removing a completion.
+// lowTODO investigate using `@thisbeyond/solid-select` instead. Or fork `@codemirror/autocomplete` >_<
+//
+// https://discuss.codemirror.net/t/how-to-add-new-auto-complete-values-to-existing-auto-completion-results-dynamically/6750/2
+// ^ this indicates that the completions can't be live updated
 function buildHistory(getHistory: () => Set<string>) {
 	return Array.from(getHistory()).map(
 		(label) =>
