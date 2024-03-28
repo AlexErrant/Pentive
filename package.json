@@ -33,7 +33,8 @@
 	},
 	"pnpm": {
 		"patchedDependencies": {
-			"nightwind@1.1.13": "patches/nightwind@1.1.13.patch"
+			"nightwind@1.1.13": "patches/nightwind@1.1.13.patch",
+			"@thisbeyond/solid-select@0.14.0": "patches/@thisbeyond__solid-select@0.14.0.patch"
 		},
 		"overrides": {
 			"got@<11.8.5": ">=11.8.5",

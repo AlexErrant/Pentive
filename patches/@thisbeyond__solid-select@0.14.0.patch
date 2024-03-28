@@ -1,0 +1,43 @@
+diff --git a/dist/source/create-options.jsx b/dist/source/create-options.jsx
+index 9ecaf9cd1d546794dd6dec8cca9dd2aca2db60f1..dc2fbf328430fea46ceefcaff5eab754780787c9 100644
+--- a/dist/source/create-options.jsx
++++ b/dist/source/create-options.jsx
+@@ -38,7 +38,7 @@ const createOptions = (values, userConfig) => {
+                     value,
+                     disabled: false,
+                 };
+-                createdOptions = [...createdOptions, option];
++                createdOptions = [option, ...createdOptions];
+             }
+         }
+         return createdOptions;
+diff --git a/dist/source/create-select.jsx b/dist/source/create-select.jsx
+index da8907d3b1b447bf06d7d2be1a78789198baebb2..94fcf186dc3149628433290e6c714f4af3c62c98 100644
+--- a/dist/source/create-select.jsx
++++ b/dist/source/create-select.jsx
+@@ -122,7 +122,11 @@ const createSelect = (props) => {
+                 break;
+             case "Enter":
+                 if (isOpen() && focusedOption()) {
+-                    pickOption(focusedOption());
++                    if (focusedOption().value === inputValue()) {
++                        pickOption(focusedOption());
++                        break;
++                    }
++                    setInputValue(focusedOption().value);
+                     break;
+                 }
+                 return;
+@@ -160,7 +164,11 @@ const createSelect = (props) => {
+                 break;
+             case "Tab":
+                 if (focusedOption() && isOpen()) {
+-                    pickOption(focusedOption());
++                    if (focusedOption().value === inputValue()) {
++                        pickOption(focusedOption());
++                        break;
++                    }
++                    setInputValue(focusedOption().value);
+                     break;
+                 }
+                 return;
