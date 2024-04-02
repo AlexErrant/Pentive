@@ -26,9 +26,9 @@ export const initSql = [
     fieldValues TEXT
 ) STRICT;`,
 	`CREATE VIRTUAL TABLE IF NOT EXISTS noteFtsFv USING fts5 (
-	    fieldValues,
-      content=note,
-      content_rowid=rowid
+	    noteId,
+	    field,
+	    value,
   );`,
 	`CREATE VIRTUAL TABLE IF NOT EXISTS noteFtsTag USING fts5 (
 	    tags,
@@ -47,20 +47,29 @@ export const initSql = [
 	`CREATE VIRTUAL TABLE IF NOT EXISTS noteFtsTagVocab USING fts5vocab(noteFtsTag, instance);`,
 	`CREATE VIRTUAL TABLE IF NOT EXISTS noteFtsMediaVocab USING fts5vocab(noteFtsMedia, instance);`,
 	`CREATE TRIGGER IF NOT EXISTS note_after_insert AFTER INSERT ON note BEGIN
-     INSERT INTO noteFtsFv   (rowid, fieldValues) VALUES (new.rowid, new.fieldValues);
-     INSERT INTO noteFtsTag  (rowid, tags       ) VALUES (new.rowid, new.tags       );
-     INSERT INTO noteFtsMedia(rowid, media      ) VALUES (new.rowid, getMediaIds(new.fieldValues));
+      INSERT INTO noteFtsFv (noteId, field, value)
+        SELECT 
+          new.id,
+          json_each.key,
+          json_each.value
+        FROM json_each(new.fieldValues);
+      INSERT INTO noteFtsTag  (rowid, tags       ) VALUES (new.rowid, new.tags       );
+      INSERT INTO noteFtsMedia(rowid, media      ) VALUES (new.rowid, getMediaIds(new.fieldValues));
    END;`,
 	`CREATE TRIGGER IF NOT EXISTS note_after_delete AFTER DELETE ON note BEGIN
-     INSERT INTO noteFtsFv (noteFtsFv , rowid, fieldValues) VALUES('delete', old.rowid, old.fieldValues);
+     DELETE FROM noteFtsFv WHERE noteId = old.id;
      INSERT INTO noteFtsTag(noteFtsTag, rowid, tags       ) VALUES('delete', old.rowid, old.tags       );
      INSERT INTO noteFtsMedia(noteFtsMedia, rowid, media  ) VALUES('delete', old.rowid, getMediaIds(old.fieldValues));
    END;`,
 	`CREATE TRIGGER IF NOT EXISTS note_after_update AFTER UPDATE ON note BEGIN
-     INSERT INTO noteFtsFv (noteFtsFv , rowid, fieldValues) VALUES('delete', old.rowid, old.fieldValues);
+      REPLACE INTO noteFtsFv (noteId, field, value)
+        SELECT 
+          new.id,
+          json_each.key,
+          json_each.value
+        FROM json_each(new.fieldValues);
      INSERT INTO noteFtsTag(noteFtsTag, rowid, tags       ) VALUES('delete', old.rowid, old.tags       );
      INSERT INTO noteFtsMedia(noteFtsMedia, rowid, media  ) VALUES('delete', old.rowid, getMediaIds(old.fieldValues));
-     INSERT INTO noteFtsFv (rowid, fieldValues) VALUES (new.rowid, new.fieldValues);
      INSERT INTO noteFtsTag(rowid, tags       ) VALUES (new.rowid, new.tags       );
      INSERT INTO noteFtsMedia(rowid, media    ) VALUES (new.rowid, getMediaIds(new.fieldValues));
    END;`,
