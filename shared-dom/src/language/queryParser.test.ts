@@ -1,6 +1,7 @@
-import { test } from 'vitest'
+import { expect, test } from 'vitest'
 import { parser } from './queryParser'
 import { testTree } from '@lezer/generator/dist/test'
+import { convert } from './query2sql'
 
 test('queryParser can parse standard test string', () => {
 	const tree = parser.parse(
@@ -41,6 +42,23 @@ test('queryParser can parse standard test string', () => {
   )
 )`
 	testTree(tree, spec)
+})
+
+test('strings are returned in BFS order', () => {
+	const query = `-(a) spider-man -a b -c -"(quote\\"d) str" OR "l o l" OR  a b c ((a "c") b) tag:what -deck:"x y"`
+	const { strings } = convert(query)
+	expect(strings).toEqual([
+		'spider-man',
+		'b',
+		'l o l',
+		'a',
+		'b',
+		'c',
+		'x y', // this should disappear when we add Deck to the converter
+		'b',
+		'a',
+		'c',
+	])
 })
 
 test('OR must be a standalone keyword', () => {

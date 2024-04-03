@@ -6,7 +6,6 @@ import {
 	type Card,
 	type State,
 	type NoteCard,
-	type TemplateId,
 } from 'shared'
 import { ky, C, rd } from '../topLevelAwait'
 import { type DB, type Card as CardEntity, type Note } from './database'
@@ -26,7 +25,7 @@ import {
 	stringifyTags,
 	templateEntityToDomain,
 } from './util'
-import { convert } from 'shared-dom'
+import { type convert } from 'shared-dom'
 
 function serializeState(s: State): number {
 	switch (s) {
@@ -148,12 +147,12 @@ type WithCache = {
 //    They're ~2x faster than a normal limit+offset if including a FTS search criteria, but that's still not fast enough. Maybe FTS doesn't count as a covering index.
 async function buildCache(
 	baseQuery: SelectQueryBuilder<DB, 'card' | 'note', Partial<unknown>>,
-	search?: SearchParams,
+	query: string,
 ) {
 	// const start = performance.now()
 	const cacheName = ('getCardsCache_' +
 		// lowTODO find a better way to name the cache table. Don't use crypto.subtle.digest - it's ~200ms which is absurd
-		md5(JSON.stringify(search))) as SearchCache
+		md5(query)) as SearchCache
 	// const end = performance.now()
 	// console.info(`hash built in ${end - start} ms`)
 	const cacheExists = await ky
@@ -177,21 +176,9 @@ async function buildCache(
 			parameters as SQLiteCompatibleType[],
 		)
 		const end = performance.now()
-		console.info(
-			`Cache ${cacheName} for ${JSON.stringify(search)} built in ${
-				end - start
-			} ms`,
-		)
+		console.info(`Cache ${cacheName} for ${query} built in ${end - start} ms`)
 	}
 	return cacheName
-}
-
-export interface SearchParams {
-	literalSearch?: string
-	ftsSearch?: string
-	fancySearch?: string
-	tagSearch?: string[]
-	templateSearch?: TemplateId[]
 }
 
 async function getCardsCount(
@@ -218,8 +205,9 @@ async function getCardsCount(
 async function getCards(
 	offset: number,
 	limit: number,
+	query: string,
+	conversionResult: ReturnType<typeof convert>,
 	sort?: { col: 'card.due' | 'card.created'; direction: 'asc' | 'desc' },
-	search?: SearchParams,
 ) {
 	const db = ky.withTables<WithCache>()
 	const baseQuery = db
@@ -227,82 +215,23 @@ async function getCards(
 		.innerJoin('note', 'card.noteId', 'note.id')
 		.$if(sort != null, (db) => db.orderBy(sort!.col, sort!.direction))
 		// don't `where` when scrolling - redundant since joining on the cache already filters
-		.$if(offset === 0 && search?.ftsSearch != null, (db) =>
-			db
-				.innerJoin('noteFtsFv', 'noteFtsFv.rowid', 'note.rowid')
-				.where('noteFtsFv.fieldValues', 'match', search!.ftsSearch!)
-				.orderBy(sql`noteFtsFv.rank`),
-		)
-		// don't `where` when scrolling - redundant since joining on the cache already filters
-		.$if(offset === 0 && search?.fancySearch != null, (db) => {
-			const x = convert(search!.fancySearch!)
+		.$if(offset === 0, (db) => {
 			return db
-				.$if(x.joinFts, (db) =>
+				.$if(conversionResult.joinFts, (db) =>
 					db
 						.innerJoin('noteFtsFv', 'noteFtsFv.rowid', 'note.rowid')
 						.orderBy(sql`noteFtsFv.rank`),
 				)
-				.$if(x.joinTags, (db) =>
+				.$if(conversionResult.joinTags, (db) =>
 					db
 						.innerJoin('noteFtsTag', 'noteFtsTag.rowid', 'note.rowid')
 						.innerJoin('cardFtsTag', 'cardFtsTag.rowid', 'card.rowid'),
 				)
-				.where(x.sql)
+				.where(conversionResult.sql)
 		})
-		// don't `where` when scrolling - redundant since joining on the cache already filters
-		.$if(offset === 0 && search?.literalSearch != null, (db) =>
-			db.where('note.fieldValues', 'like', '%' + search!.literalSearch + '%'),
-		)
-		// don't `where` when scrolling - redundant since joining on the cache already filters
-		.$if(offset === 0 && search?.templateSearch != null, (db) =>
-			db.where('note.templateId', 'in', search!.templateSearch!),
-		)
-		.$if(
-			// don't `where` when scrolling - redundant since joining on the cache already filters
-			offset === 0 && search?.tagSearch != null,
-			(db) =>
-				db
-					.innerJoin('noteFtsTag', 'noteFtsTag.rowid', 'note.rowid')
-					.innerJoin('cardFtsTag', 'cardFtsTag.rowid', 'card.rowid')
-					.where((qb) =>
-						// `or`ing `match` across multiple tables is annoying https://sqlite.org/forum/forumpost?udc=1&name=1a2f2ffdd80cf795
-						qb.or([
-							qb(
-								'noteFtsTag.rowid',
-								'in',
-								qb
-									.selectFrom('noteFtsTag')
-									.select('rowid')
-									.where(
-										'noteFtsTag.tags',
-										'match',
-										search!
-											// https://stackoverflow.com/a/46918640 https://blog.haroldadmin.com/posts/escape-fts-queries
-											.tagSearch!.map((x) => `"${x.replaceAll('"', '""')}"`)
-											.join(' OR '),
-									),
-							),
-							qb(
-								'cardFtsTag.rowid',
-								'in',
-								qb
-									.selectFrom('cardFtsTag')
-									.select('rowid')
-									.where(
-										'cardFtsTag.tags',
-										'match',
-										search!
-											// https://stackoverflow.com/a/46918640 https://blog.haroldadmin.com/posts/escape-fts-queries
-											.tagSearch!.map((x) => `"${x.replaceAll('"', '""')}"`)
-											.join(' OR '),
-									),
-							),
-						]),
-					),
-		)
 	const searchCache =
 		// If user has scrolled, build/use the cache.
-		offset === 0 ? null : await buildCache(baseQuery, search)
+		offset === 0 ? null : await buildCache(baseQuery, query)
 	const entities = baseQuery
 		.$if(searchCache != null, (qb) =>
 			qb

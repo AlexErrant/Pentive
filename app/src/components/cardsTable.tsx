@@ -6,7 +6,7 @@ import {
 	Show,
 	For,
 } from 'solid-js'
-import { type NoteCard, type CardId, type TemplateId, toOneLine } from 'shared'
+import { type NoteCard, type CardId, toOneLine } from 'shared'
 import '@github/relative-time-element'
 import AgGridSolid, { type AgGridSolidRef } from 'ag-grid-solid'
 import 'ag-grid-community/styles/ag-grid.css'
@@ -22,11 +22,10 @@ import { LicenseManager } from 'ag-grid-enterprise'
 import { db } from '../db'
 import { assertNever } from 'shared'
 import { agGridTheme } from '../globalState'
-import { Upload, getOk } from 'shared-dom'
+import { Upload, convert, getOk } from 'shared-dom'
 import { C } from '../topLevelAwait'
 import FiltersTable from './filtersTable'
 import './cardsTable.css'
-import { type SearchParams } from '../sqlite/card'
 import QueryEditor from './queryEditor'
 
 LicenseManager.setLicenseKey(import.meta.env.VITE_AG_GRID_LICENSE)
@@ -147,11 +146,7 @@ const columnDefs: Array<ColDef<NoteCard>> = [
 const getRowId = (params: GetRowIdParams<NoteCard>): CardId =>
 	params.data.card.id
 
-const [literalSearch, setLiteralSearch] = createSignal('')
-const [ftsSearch, setFtsSearch] = createSignal('')
-const [fancySearch, setFancySearch] = createSignal('')
-const [tagSearch, setTagSearch] = createSignal<string[]>([])
-const [templateSearch, setTemplateSearch] = createSignal<TemplateId[]>([])
+const [query, setQuery] = createSignal('')
 
 function setDatasource() {
 	gridRef?.api.setDatasource(dataSource)
@@ -161,42 +156,14 @@ const CardsTable: VoidComponent<{
 	readonly onSelectionChanged: (noteCards: NoteCard[]) => void
 }> = (props) => {
 	createEffect(
-		on(
-			[literalSearch, fancySearch, ftsSearch, tagSearch, templateSearch],
-			setDatasource,
-			{
-				defer: true,
-			},
-		),
+		on([query], setDatasource, {
+			defer: true,
+		}),
 	)
 	return (
 		<div class='flex h-full flex-col'>
 			<div class='m-0.5 p-0.5'>
-				<input
-					class='form-input w-full border'
-					type='text'
-					placeholder='Literal Search'
-					onKeyUp={(e) => {
-						if (e.key === 'Enter') setLiteralSearch(e.currentTarget.value)
-					}}
-				/>
-				<input
-					class='form-input w-full border'
-					type='text'
-					placeholder='FTS Search'
-					onKeyUp={(e) => {
-						if (e.key === 'Enter') setFtsSearch(e.currentTarget.value)
-					}}
-				/>
-				<QueryEditor value={fancySearch()} setValue={setFancySearch} />
-				<input
-					class='form-input w-full border'
-					type='text'
-					placeholder='Fancy Search'
-					onKeyUp={(e) => {
-						if (e.key === 'Enter') setFancySearch(e.currentTarget.value)
-					}}
-				/>
+				<QueryEditor value={query()} setValue={setQuery} />
 			</div>
 			<div class={`${agGridTheme()} h-full`}>
 				<AgGridSolid
@@ -211,8 +178,8 @@ const CardsTable: VoidComponent<{
 								iconKey: 'filter',
 								toolPanel: () => (
 									<FiltersTable
-										tagsChanged={setTagSearch}
-										templatesChanged={setTemplateSearch}
+										tagsChanged={() => {}}
+										templatesChanged={() => {}}
 									/>
 								),
 							},
@@ -277,23 +244,11 @@ const dataSource = {
 						direction: p.sortModel[0]!.sort,
 				  }
 				: undefined
-		const literalSearchActual = literalSearch()
-		const ftsSearchActual = ftsSearch().trim()
-		const fancySearchActual = fancySearch().trim()
-		const tagSearchActual = tagSearch()
-		const templateSearchActual = templateSearch()
-		const search = {
-			literalSearch:
-				literalSearchActual.trim() === '' ? undefined : literalSearchActual,
-			ftsSearch: ftsSearchActual === '' ? undefined : ftsSearchActual,
-			fancySearch:
-				fancySearchActual.trim() === '' ? undefined : fancySearchActual,
-			tagSearch: tagSearchActual.length === 0 ? undefined : tagSearchActual,
-			templateSearch:
-				templateSearchActual.length === 0 ? undefined : templateSearchActual,
-		} satisfies SearchParams
+		const cleanedQuery = query().trim()
+		const conversionResult = convert(cleanedQuery)
 		const regex = () => {
-			const firstWord = ftsSearch().trim().split(' ')[0]! // lowTODO handle multiple words
+			const firstWord = conversionResult.strings[0] // lowTODO handle multiple words
+			if (firstWord == null) return null
 			const escapedFirstWord = escapeRegExp(firstWord)
 			return new RegExp(
 				`(?<left>.{0,20})\\b(?<searchWord>${escapedFirstWord})(?<right>.{0,20})`,
@@ -301,11 +256,16 @@ const dataSource = {
 			)
 		}
 		const start = performance.now()
-		db.getCards(p.startRow, cacheBlockSize, sort, search) // medTODO could just cache the Template and mutate the NoteCard obj to add it
-			// eslint-disable-next-line solid/reactivity -- none of this is reacitve
+		db.getCards(
+			p.startRow,
+			cacheBlockSize,
+			cleanedQuery,
+			conversionResult,
+			sort,
+		) // medTODO could just cache the Template and mutate the NoteCard obj to add it
 			.then(async (x) => {
 				const end = performance.now()
-				console.log(`GetCards ${end - start} ms`, search)
+				console.log(`GetCards ${end - start} ms`, cleanedQuery)
 				const countish = x.noteCards.length
 				const countishWrong = countish === cacheBlockSize
 				p.successCallback(x.noteCards, countishWrong ? undefined : countish)
@@ -314,17 +274,17 @@ const dataSource = {
 				} else {
 					gridRef.api.hideOverlay()
 				}
-				setColumnDefs(ftsSearchActual, regex())
+				setColumnDefs(cleanedQuery, regex())
 				if (countishWrong && gridRef.api.isLastRowIndexKnown() !== true) {
 					const start = performance.now()
 					const count = await db.getCardsCount(x.searchCache, x.baseQuery)
 					const end = performance.now()
-					console.log(`Count took ${end - start} ms`, search)
+					console.log(`Count took ${end - start} ms`, cleanedQuery)
 					p.successCallback(x.noteCards, count.c)
 				}
 				if (countishWrong && x.searchCache == null) {
 					// asynchronously/nonblockingly build the cache
-					db.buildCache(x.baseQuery, search).catch((e) => {
+					db.buildCache(x.baseQuery, cleanedQuery).catch((e) => {
 						C.toastWarn('Error building cache', e)
 					})
 				}
@@ -336,12 +296,13 @@ const dataSource = {
 	},
 }
 
-function minifyAndExec(value: string, regex: RegExp) {
+function minifyAndExec(value: string, regex: RegExp | null) {
 	const minified = value.replace(/\s+/g, ' ')
+	if (regex == null) return null
 	return regex.exec(minified)
 }
 
-function setColumnDefs(ftsSearchActual: string, regex: RegExp) {
+function setColumnDefs(ftsSearchActual: string, regex: RegExp | null) {
 	if (ftsSearchActual !== '' && gridRef.api.getColumnDef('Search') == null) {
 		gridRef.api.setColumnDefs([
 			{

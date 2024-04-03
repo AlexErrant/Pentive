@@ -35,6 +35,7 @@ export function convert(input: string) {
 		sql: sql.join(context.sql, sql``) as RawBuilder<SqlBool>,
 		joinTags: context.joinTags,
 		joinFts: context.joinFts,
+		strings: findStrings(context.root),
 	}
 }
 
@@ -324,4 +325,20 @@ function distributeNegate(node: Node, negate: boolean) {
 	} else {
 		assertNever(node.type)
 	}
+}
+
+function findStrings(root: Node) {
+	const r: string[] = []
+	const queue = [root]
+	while (queue.length > 0) {
+		const i = queue.shift()!
+		if (i.type === 'Group') {
+			queue.push(...i.children)
+		} else if (i.type === 'SimpleString' || i.type === 'QuotedString') {
+			if (!i.negate) {
+				r.push(i.value)
+			}
+		}
+	}
+	return r
 }
