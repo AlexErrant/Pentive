@@ -215,8 +215,8 @@ async function getCards(
 		.innerJoin('note', 'card.noteId', 'note.id')
 		.$if(sort != null, (db) => db.orderBy(sort!.col, sort!.direction))
 		// don't `where` when scrolling - redundant since joining on the cache already filters
-		.$if(offset === 0, (db) => {
-			return db
+		.$if(offset === 0 && conversionResult.sql != null, (db) =>
+			db
 				.$if(conversionResult.joinFts, (db) =>
 					db
 						.innerJoin('noteFtsFv', 'noteFtsFv.rowid', 'note.rowid')
@@ -227,8 +227,8 @@ async function getCards(
 						.innerJoin('noteFtsTag', 'noteFtsTag.rowid', 'note.rowid')
 						.innerJoin('cardFtsTag', 'cardFtsTag.rowid', 'card.rowid'),
 				)
-				.where(conversionResult.sql)
-		})
+				.where(conversionResult.sql!),
+		)
 	const searchCache =
 		// If user has scrolled, build/use the cache.
 		offset === 0 ? null : await buildCache(baseQuery, query)

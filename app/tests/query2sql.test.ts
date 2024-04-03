@@ -18,7 +18,7 @@ async function assertEqual(actual: string, expected: string) {
 		// @ts-expect-error don't actually use CRDialect
 		dialect: new CRDialect(),
 	})
-	const compile = actualConvert(actual).sql.compile(ky)
+	const compile = actualConvert(actual).sql!.compile(ky)
 	let actual2 = compile.sql
 	const parameters = compile.parameters
 	let i = 0
@@ -28,6 +28,16 @@ async function assertEqual(actual: string, expected: string) {
 	}
 	expect(await format(actual2)).toBe(await format(expected))
 }
+
+test('empty string is null', () => {
+	const sql = actualConvert('').sql
+	expect(sql).toBeNull()
+})
+
+test('whitespace is null', () => {
+	const sql = actualConvert(' \t\r\n').sql
+	expect(sql).toBeNull()
+})
 
 test('SimpleString is fts', async () => {
 	await assertEqual(

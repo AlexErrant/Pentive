@@ -32,7 +32,10 @@ export function convert(input: string) {
 	distributeNegate(context.root, false)
 	serialize(context.root, context)
 	return {
-		sql: sql.join(context.sql, sql``) as RawBuilder<SqlBool>,
+		sql:
+			context.sql.length === 0
+				? null
+				: (sql.join(context.sql, sql``) as RawBuilder<SqlBool>),
 		joinTags: context.joinTags,
 		joinFts: context.joinFts,
 		strings: findStrings(context.root),
