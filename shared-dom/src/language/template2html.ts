@@ -16,13 +16,13 @@ import {
 import { type RenderContainer } from '../renderContainer'
 import _ from 'lodash'
 
-// make a DU if there's a second
+// make a DU if there's a second Error
 export interface Error {
 	tag: 'SyntaxError'
 	errorParent: string
 }
 
-// make a DU if there's a second
+// make a DU if there's a second Warning
 export interface Warning {
 	tag: 'Transformer404'
 	transformer: string
