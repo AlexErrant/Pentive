@@ -41,8 +41,9 @@ export interface Note {
 }
 
 export interface NoteFtsFv {
-	rowid: number
-	fieldValues: string
+	noteId: string
+	field: string
+	value: string
 }
 
 export interface NoteFtsMedia {

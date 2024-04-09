@@ -122,9 +122,7 @@ function serialize(node: Node, context: Context) {
 		context.sql.push(sql.raw(' (noteFtsFv.rowid '))
 		if (node.negate) context.sql.push(sql.raw(' NOT '))
 		context.sql.push(
-			sql.raw(
-				' IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH ',
-			),
+			sql.raw(' IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '),
 		)
 		if (node.wildcard) {
 			context.sql.push('"' + node.value + '" * ')
@@ -133,12 +131,13 @@ function serialize(node: Node, context: Context) {
 		}
 		context.sql.push(sql.raw(`))`))
 	} else if (node.type === 'Regex') {
+		context.joinFts = true
 		if (node.negate) context.sql.push(sql.raw(' NOT '))
 		context.sql.push(sql.raw(' regexp_with_flags('))
 		context.sql.push(node.pattern)
 		context.sql.push(sql.raw(','))
 		context.sql.push(node.flags)
-		context.sql.push(sql.raw(', note.fieldValues)'))
+		context.sql.push(sql.raw(', noteFtsFv.value)'))
 	} else if (node.type === 'Template') {
 		context.sql.push(sql.raw(` note.templateId `))
 		if (node.negate) context.sql.push(sql.raw(' NOT '))

@@ -42,19 +42,19 @@ test('whitespace is null', () => {
 test('SimpleString is fts', async () => {
 	await assertEqual(
 		'a',
-		`(noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH '"a"'))`,
+		`(noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"a"'))`,
 	)
 })
 
 test('SimpleString* is wildcarded', async () => {
 	await assertEqual(
 		'a*',
-		`(noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH '"a" * '))`,
+		`(noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"a" * '))`,
 	)
 })
 
 describe('not a', () => {
-	const expected = `(noteFtsFv.rowid NOT IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH '"a"'))`
+	const expected = `(noteFtsFv.rowid NOT IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"a"'))`
 
 	test('together', async () => {
 		await assertEqual('-a', expected)
@@ -68,40 +68,40 @@ describe('not a', () => {
 test('QuotedString is fts', async () => {
 	await assertEqual(
 		'"a b"',
-		`(noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH '"a b"'))`,
+		`(noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"a b"'))`,
 	)
 })
 
 test('QuotedString* is wildcarded', async () => {
 	await assertEqual(
 		'"a b"*',
-		`(noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH '"a b" * '))`,
+		`(noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"a b" * '))`,
 	)
 })
 
 describe('regex', () => {
 	test('plain', async () => {
-		await assertEqual('/foo/', `regexp_with_flags('foo', '', note.fieldValues)`)
+		await assertEqual('/foo/', `regexp_with_flags('foo', '', noteFtsFv.value)`)
 	})
 
 	test('with flag', async () => {
 		await assertEqual(
 			'/foo/i',
-			`regexp_with_flags('foo', 'i', note.fieldValues)`,
+			`regexp_with_flags('foo', 'i', noteFtsFv.value)`,
 		)
 	})
 
 	test('with flags', async () => {
 		await assertEqual(
 			'/foo/is',
-			`regexp_with_flags('foo', 'is', note.fieldValues)`,
+			`regexp_with_flags('foo', 'is', noteFtsFv.value)`,
 		)
 	})
 
 	test('flags are deduped', async () => {
 		await assertEqual(
 			'/foo/suuvvyys',
-			`regexp_with_flags('foo', 'suvy', note.fieldValues)`,
+			`regexp_with_flags('foo', 'suvy', noteFtsFv.value)`,
 		)
 	})
 
@@ -109,9 +109,9 @@ describe('regex', () => {
 		await assertEqual(
 			'/foo/ /bar/',
 			`
-regexp_with_flags('foo', '', note.fieldValues)
+regexp_with_flags('foo', '', noteFtsFv.value)
 AND
-regexp_with_flags('bar', '', note.fieldValues)
+regexp_with_flags('bar', '', noteFtsFv.value)
 `,
 		)
 	})
@@ -119,7 +119,7 @@ regexp_with_flags('bar', '', note.fieldValues)
 	test('NOT works', async () => {
 		await assertEqual(
 			'-/foo/y',
-			`NOT regexp_with_flags('foo', 'y', note.fieldValues)`,
+			`NOT regexp_with_flags('foo', 'y', noteFtsFv.value)`,
 		)
 	})
 })
@@ -127,18 +127,18 @@ regexp_with_flags('bar', '', note.fieldValues)
 test('2 SimpleStrings are ANDed', async () => {
 	await assertEqual(
 		'a b',
-		`(noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH '"a"'))
+		`(noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"a"'))
 AND
-(noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH '"b"'))`,
+(noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"b"'))`,
 	)
 })
 
 test('2 SimpleStrings can be ORed', async () => {
 	await assertEqual(
 		'a OR b',
-		`(noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH '"a"'))
+		`(noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"a"'))
 OR
-(noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH '"b"'))`,
+(noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"b"'))`,
 	)
 })
 
@@ -146,9 +146,9 @@ test('2 SimpleStrings can be grouped', async () => {
 	await assertEqual(
 		'(a b)',
 		`(
-  (noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH '"a"'))
+  (noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"a"'))
   AND
-  (noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH '"b"'))
+  (noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"b"'))
 )`,
 	)
 })
@@ -157,9 +157,9 @@ test('not distributes over AND', async () => {
 	await assertEqual(
 		'-(a b)',
 		`(
-  (noteFtsFv.rowid NOT IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH '"a"'))
+  (noteFtsFv.rowid NOT IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"a"'))
   OR
-  (noteFtsFv.rowid NOT IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH '"b"'))
+  (noteFtsFv.rowid NOT IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"b"'))
 )`,
 	)
 })
@@ -168,9 +168,9 @@ test('not distributes over OR', async () => {
 	await assertEqual(
 		'-(a OR b)',
 		`(
-  (noteFtsFv.rowid NOT IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH '"a"'))
+  (noteFtsFv.rowid NOT IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"a"'))
   AND
-  (noteFtsFv.rowid NOT IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH '"b"'))
+  (noteFtsFv.rowid NOT IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"b"'))
 )`,
 	)
 })
@@ -180,9 +180,9 @@ test('double negative grouping does nothing', async () => {
 		'-(-(a OR b))',
 		`(
   (
-    (noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH '"a"'))
+    (noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"a"'))
     OR
-    (noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH '"b"'))
+    (noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"b"'))
   )
 )`,
 	)
@@ -192,17 +192,17 @@ test('2 groups', async () => {
 	await assertEqual(
 		'(a b) OR c (d OR e)',
 		`(
-  (noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH '"a"'))
+  (noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"a"'))
   AND
-  (noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH '"b"'))
+  (noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"b"'))
 )
 OR
-(noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH '"c"'))
+(noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"c"'))
 AND
 (
-  (noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH '"d"'))
+  (noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"d"'))
   OR
-  (noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH '"e"'))
+  (noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"e"'))
 )`,
 	)
 })
@@ -287,19 +287,19 @@ test('!(p && !q || r) is (!p || q) && !r', async () => {
 		'-(p -q OR r)',
 		`(
   (
-    (noteFtsFv.rowid NOT IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH '"p"'))
+    (noteFtsFv.rowid NOT IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"p"'))
     OR
-    (noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH '"q"'))
+    (noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"q"'))
   )
   AND
-  (noteFtsFv.rowid NOT IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH '"r"'))
+  (noteFtsFv.rowid NOT IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"r"'))
 )`,
 	)
 })
 
 describe('skip error nodes', () => {
-	const expected = `(noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH '"foo"'))`
-	const negatedExpected = `(noteFtsFv.rowid NOT IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH '"foo"'))`
+	const expected = `(noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"foo"'))`
+	const negatedExpected = `(noteFtsFv.rowid NOT IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"foo"'))`
 
 	test('plain', async () => {
 		await assertEqual('" foo', expected)
@@ -344,11 +344,11 @@ describe('template', () => {
 		await assertEqual(
 			'a template:t b',
 			`
-(noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH '"a"'))
+(noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"a"'))
 AND
 note.templateId IN (SELECT value FROM json_each('["t"]'))
 AND
-(noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH '"b"'))`,
+(noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"b"'))`,
 		)
 	})
 
@@ -356,11 +356,11 @@ AND
 		await assertEqual(
 			'"a b" OR template:t OR "c d"',
 			`
-(noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH '"a b"'))
+(noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"a b"'))
 OR
 note.templateId IN (SELECT value FROM json_each('["t"]'))
 OR
-(noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH '"c d"'))`,
+(noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"c d"'))`,
 		)
 	})
 
@@ -427,7 +427,7 @@ noteFtsTag.rowid IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" 
 		await assertEqual(
 			'a tag:t b',
 			`
-(noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH '"a"'))
+(noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"a"'))
 AND
 (
   cardFtsTag.rowid IN (SELECT "rowid" FROM "cardFtsTag" WHERE "cardFtsTag"."tags" MATCH '"t"')
@@ -435,7 +435,7 @@ AND
   noteFtsTag.rowid IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" MATCH '"t"')
 )
 AND
-(noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH '"b"'))`,
+(noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"b"'))`,
 		)
 	})
 
@@ -443,7 +443,7 @@ AND
 		await assertEqual(
 			'"a b" OR tag:t OR "c d"',
 			`
-(noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH '"a b"'))
+(noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"a b"'))
 OR
 (
   cardFtsTag.rowid IN (SELECT "rowid" FROM "cardFtsTag" WHERE "cardFtsTag"."tags" MATCH '"t"')
@@ -451,7 +451,7 @@ OR
   noteFtsTag.rowid IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" MATCH '"t"')
 )
 OR
-(noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.fieldValues MATCH '"c d"'))`,
+(noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"c d"'))`,
 		)
 	})
 

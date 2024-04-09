@@ -219,7 +219,7 @@ async function getCards(
 			db
 				.$if(conversionResult.joinFts, (db) =>
 					db
-						.innerJoin('noteFtsFv', 'noteFtsFv.rowid', 'note.rowid')
+						.innerJoin('noteFtsFv', 'noteFtsFv.noteId', 'note.id')
 						.orderBy(sql`noteFtsFv.rank`),
 				)
 				.$if(conversionResult.joinTags, (db) =>
