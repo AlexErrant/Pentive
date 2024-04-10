@@ -56,10 +56,9 @@ function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
 		const value =
 			node.name === 'SimpleString'
 				? input.slice(node.from, node.to)
-				: input
-						.slice(node.from + 1, node.to - 1) // don't include quotes
-						.replaceAll('\\\\', '\\')
-						.replaceAll('\\"', '"')
+				: unescapeQuoted(
+						input.slice(node.from + 1, node.to - 1), // don't include quotes
+				  )
 		const negate = isNegated(node.node)
 		const wildcard = node.node.nextSibling?.type.is(Wildcard) === true
 		context.current.attach({ type: node.name, value, negate, wildcard })
@@ -87,10 +86,9 @@ function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
 			const value =
 				child.name === 'SimpleString'
 					? input.slice(child.from, child.to)
-					: input
-							.slice(child.from + 1, child.to - 1) // don't include quotes
-							.replaceAll('\\\\', '\\')
-							.replaceAll('\\"', '"')
+					: unescapeQuoted(
+							input.slice(child.from + 1, child.to - 1), // don't include quotes
+					  )
 			values.push(value)
 			child = child.nextSibling
 		}
@@ -343,4 +341,11 @@ function findStrings(root: Node) {
 		}
 	}
 	return r
+}
+
+export function escapedQuoted(str: string) {
+	return str.replaceAll('\\', '\\\\').replaceAll('"', '\\"') // the order here is important
+}
+export function unescapeQuoted(str: string) {
+	return str.replaceAll('\\\\', '\\').replaceAll('\\"', '"')
 }

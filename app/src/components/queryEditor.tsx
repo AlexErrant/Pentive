@@ -48,6 +48,9 @@ let view: EditorView
 const QueryEditor: VoidComponent<{
 	value: string
 	setValue: (value: string) => void
+	// This exists so exernal callers can set the value.
+	// We usually ignore changes to `value` to prevent unecessary `view.setState` calls
+	externalValue: string
 }> = (props) => {
 	let ref: HTMLDivElement | undefined
 	onMount(() => {
@@ -63,12 +66,20 @@ const QueryEditor: VoidComponent<{
 			view.setState(createEditorState(props.value, t, props.setValue))
 		}),
 	)
+	createEffect(
+		on(
+			() => props.externalValue,
+			(v) => {
+				view.setState(createEditorState(v, theme(), props.setValue))
+			},
+		),
+	)
 	onCleanup(() => {
 		view?.destroy()
 	})
 	return (
 		<>
-			<div class='flex-1 resize-y overflow-auto' ref={ref} />
+			<div class='max-h-40 flex-1 resize-y overflow-auto' ref={ref} />
 		</>
 	)
 }

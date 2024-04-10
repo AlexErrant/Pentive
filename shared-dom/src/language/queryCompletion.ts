@@ -10,6 +10,7 @@ import {
 	SimpleString,
 	Tag,
 } from './queryParser.terms'
+import { escapedQuoted } from './query2sql'
 
 // I don't think we should use Codemirror's autocomplete for showing history. Doing anything more
 // advanced, e.g. deleting an entry from history, is unsupported in `@codemirror/autocomplete`.
@@ -83,7 +84,7 @@ export const queryCompletion: (_: {
 				from:
 					tagBefore != null ? nodeBefore.from + tagBefore.index : context.pos,
 				options: tags.map((tag) => {
-					const escaped = tag.replaceAll('\\', '\\\\').replaceAll('"', '\\"') // the order here is important
+					const escaped = escapedQuoted(tag)
 					return {
 						label: tag,
 						type: 'tag',

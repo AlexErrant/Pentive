@@ -27,6 +27,7 @@ import { C } from '../topLevelAwait'
 import FiltersTable from './filtersTable'
 import './cardsTable.css'
 import QueryEditor from './queryEditor'
+import { alterQuery } from '../domain/alterQuery'
 
 LicenseManager.setLicenseKey(import.meta.env.VITE_AG_GRID_LICENSE)
 
@@ -147,6 +148,7 @@ const getRowId = (params: GetRowIdParams<NoteCard>): CardId =>
 	params.data.card.id
 
 const [query, setQuery] = createSignal('')
+const [externalQuery, setExternalQuery] = createSignal('')
 
 function setDatasource() {
 	gridRef?.api.setDatasource(dataSource)
@@ -163,7 +165,11 @@ const CardsTable: VoidComponent<{
 	return (
 		<div class='flex h-full flex-col'>
 			<div class='m-0.5 p-0.5'>
-				<QueryEditor value={query()} setValue={setQuery} />
+				<QueryEditor
+					value={query()}
+					setValue={setQuery}
+					externalValue={externalQuery()}
+				/>
 			</div>
 			<div class={`${agGridTheme()} h-full`}>
 				<AgGridSolid
@@ -178,7 +184,11 @@ const CardsTable: VoidComponent<{
 								iconKey: 'filter',
 								toolPanel: () => (
 									<FiltersTable
-										tagsChanged={() => {}}
+										tagsChanged={(tags) => {
+											const q = alterQuery(query(), { tags })
+											setQuery(q)
+											setExternalQuery(q)
+										}}
 										templatesChanged={() => {}}
 									/>
 								),
