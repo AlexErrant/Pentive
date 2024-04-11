@@ -79,7 +79,10 @@ const QueryEditor: VoidComponent<{
 	})
 	return (
 		<>
-			<div class='max-h-40 flex-1 resize-y overflow-auto' ref={ref} />
+			<div
+				class='query-editor max-h-40 flex-1 resize-y overflow-auto'
+				ref={ref}
+			/>
 		</>
 	)
 }
@@ -176,44 +179,47 @@ const queryLanguage = LRLanguage.define({
 	},
 })
 
+// why & https://codemirror.net/examples/styling
+const prefix = '.query-editor &'
+
 const baseTheme = EditorView.baseTheme({
-	'&light': {
+	[`${prefix}light`]: {
 		backgroundColor: 'white',
 	},
-	'& .cm-content': {
+	[`${prefix} .cm-content`]: {
 		fontSize: '1rem',
 	},
 	// https://discuss.codemirror.net/t/changing-the-font-size-of-cm6/2935/11
-	'.cm-scroller': { fontFamily: 'inherit' },
-	'.query-escape': {
+	[`${prefix} .cm-scroller`]: { fontFamily: 'inherit' },
+	[`${prefix} .query-escape`]: {
 		color: 'darkorange',
 		fontWeight: 'bold',
 	},
-	'.query-paren': {
+	[`${prefix} .query-paren`]: {
 		color: 'darkorange',
 		fontWeight: 'bold',
 	},
-	'.query-quote': {
+	[`${prefix} .query-quote`]: {
 		color: 'darkorange',
 		fontWeight: 'bold',
 	},
-	'.query-active': {
+	[`${prefix} .query-active`]: {
 		color: 'red',
 		fontWeight: 'bold',
 	},
-	'.cm-completionIcon-general': {
+	[`${prefix} .cm-completionIcon-general`]: {
 		'&:after': { content: "'🗂\uFE0F'" },
 	},
-	'.cm-completionIcon-tag': {
+	[`${prefix} .cm-completionIcon-tag`]: {
 		'&:after': { content: "'🏷\uFE0F'" },
 	},
-	'.cm-completionIcon-history': {
+	[`${prefix} .cm-completionIcon-history`]: {
 		'&:after': { content: "'🕑\uFE0F'" },
 	},
 })
 
 const blackBackground = EditorView.theme({
-	'&': {
+	[`${prefix}`]: {
 		backgroundColor: 'black',
 	},
 })
