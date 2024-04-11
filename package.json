@@ -3,9 +3,9 @@
 	"version": "0.0.0",
 	"engines": {
 		"node": "18.16.0",
-		"pnpm": "8.5.1"
+		"pnpm": "8.15.6"
 	},
-	"packageManager": "pnpm@8.5.1",
+	"packageManager": "pnpm@8.15.6",
 	"devDependencies": {
 		"concurrently": "^8.2.1",
 		"kill-port": "^2.0.1",
