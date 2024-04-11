@@ -100,7 +100,10 @@ const basicSetup = [
 	syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
 	bracketMatching(),
 	closeBrackets(),
-	autocompletion(),
+	autocompletion({
+		activateOnCompletion: ({ apply }) =>
+			typeof apply === 'string' && apply.slice(-1) === ':',
+	}),
 	highlightSelectionMatches(),
 	keymap.of([
 		...closeBracketsKeymap,
