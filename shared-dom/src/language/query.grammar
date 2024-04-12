@@ -4,23 +4,32 @@
 
 expression {
   !leftAssociate Not?
-  (string | Group | Tag | Deck | Template)
-  (Or? expression)*
+  (string | Group | LabeledGroup | Labeled)
+  ~x (Or? expression)*
 }
 
-Group { "(" expression ")" }
+stringExpression {
+  !leftAssociate Not?
+  string
+  ~x (Or? stringExpression)*
+}
+
+Group        { "(" expression ")" }
+LabeledGroup { "(" Not? labels stringExpression ")" }
 
 string {
   Regex |
   ((SimpleString | QuotedString) Wildcard?)
 }
-strings { (string ",")* string }
 
-Deck     { @specialize<SimpleString, "deck"    > ":" strings }
-Tag      { @specialize<SimpleString, "tag"     > ":" strings }
-Template { @specialize<SimpleString, "template"> ":" strings }
+Tag      { @specialize<SimpleString, "tag">      ":" }
+Deck     { @specialize<SimpleString, "deck">     ":" }
+Template { @specialize<SimpleString, "template"> ":" }
 
-Or       { @specialize<SimpleString, "OR"      > }
+Or       { @specialize<SimpleString, "OR"> | ","}
+
+Labeled[@name=LabeledGroup] { labels Not? string }
+labels                      { Deck | Tag | Template }
 
 @tokens {
   Wildcard { "*" }

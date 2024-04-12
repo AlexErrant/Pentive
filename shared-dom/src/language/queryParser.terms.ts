@@ -9,7 +9,9 @@ export const
   QuotedString = 5,
   Wildcard = 6,
   Group = 7,
-  Tag = 8,
+  LabeledGroup = 8,
   Deck = 9,
-  Template = 10,
-  Or = 11
+  Tag = 10,
+  Template = 11,
+  Or = 12,
+  Labeled = 13
