@@ -5,7 +5,7 @@ import { convert } from './query2sql'
 
 test('queryParser can parse standard test string', () => {
 	const tree = parser.parse(
-		`-(a) spider-man -a b -c -"(quote\\"d) str" OR "l o l" OR  a b c ((a "c") b) tag:what -deck:"x y"`,
+		`-(a) spider-man -a b -c -"(quote\\"d) str" OR "l o l" OR  a b c ((a "c") b) tag:what -deck:"x y" (template:d, e f)`,
 	)
 	const spec = `Program(
   Not,
@@ -33,19 +33,28 @@ test('queryParser can parse standard test string', () => {
     ),
     SimpleString
   ),
-  Tag(
+  LabeledGroup(
+    Tag,
     SimpleString
   ),
   Not,
-  Deck(
+  LabeledGroup(
+    Deck,
     QuotedString
+  ),
+  LabeledGroup(
+    Template,
+    SimpleString,
+    Or,
+    SimpleString,
+    SimpleString
   )
 )`
 	testTree(tree, spec)
 })
 
 test('strings are returned in BFS order', () => {
-	const query = `-(a) spider-man -a b -c -"(quote\\"d) str" OR "l o l" OR  a b c ((a "c") b) tag:what -deck:"x y"`
+	const query = `-(a) spider-man -a b -c -"(quote\\"d) str" OR "l o l" OR  a b c ((a "c") b) tag:what -deck:"x y" (template:d, e f)`
 	const { strings } = convert(query)
 	expect(strings).toEqual([
 		'spider-man',
@@ -54,7 +63,6 @@ test('strings are returned in BFS order', () => {
 		'a',
 		'b',
 		'c',
-		'x y', // this should disappear when we add Deck to the converter
 		'b',
 		'a',
 		'c',

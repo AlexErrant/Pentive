@@ -3,11 +3,12 @@ import { parser } from './queryParser'
 import { assertNever } from 'shared'
 import { sql, type RawBuilder, type SqlBool } from 'kysely'
 import { Regex, Wildcard } from './queryParser.terms'
+import { queryTerms } from '..'
 
 class Context {
 	constructor() {
 		this.sql = []
-		this.root = new Group(null, false)
+		this.root = new Group(null, false, 'Group')
 		this.current = this.root
 		this.joinTags = false
 		this.joinFts = false
@@ -49,10 +50,25 @@ function unique(str: string) {
 		.join('')
 }
 
+function getLabel(node: SyntaxNodeRef) {
+	if (node.type.is(queryTerms.Group) || node.type.isTop) return 'Group'
+	let child = node.node.firstChild
+	while (child != null && !stringLabels.includes(child.type.name)) {
+		child = child.nextSibling
+	}
+	const label = child?.name
+	console.assert(
+		labels.includes(label as never),
+		`Expected Label but got ${label}.`,
+	)
+	return label as Label
+}
+
 function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
 	if (node.type.isError) return
 	if (node.name === 'SimpleString' || node.name === 'QuotedString') {
 		maybeAddSeparator(node.node, context)
+		const label = getLabel(node.node.parent!)
 		const value =
 			node.name === 'SimpleString'
 				? input.slice(node.from, node.to)
@@ -61,7 +77,13 @@ function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
 				  )
 		const negate = isNegated(node.node)
 		const wildcard = node.node.nextSibling?.type.is(Wildcard) === true
-		context.current.attach({ type: node.name, value, negate, wildcard })
+		context.current.attach({
+			type: node.name,
+			value,
+			negate,
+			wildcard,
+			label,
+		})
 	} else if (node.type.is(Regex)) {
 		maybeAddSeparator(node.node, context)
 		const tailDelimiterIndex = input.lastIndexOf('/', node.to)
@@ -72,29 +94,19 @@ function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
 			negate: isNegated(node.node),
 		})
 		return false
-	} else if (node.name === 'Group') {
+	} else if (node.name === 'Group' || node.name === 'LabeledGroup') {
 		maybeAddSeparator(node.node, context)
-		const negate = isNegated(node.node)
-		const group = new Group(context.current, negate)
+		let negate = isNegated(node.node)
+		const label = getLabel(node)
+		if (
+			node.type.is(queryTerms.LabeledGroup) &&
+			node.node.firstChild?.type.is(queryTerms.Not) === true
+		) {
+			negate = !negate
+		}
+		const group = new Group(context.current, negate, label)
 		context.current.attach(group)
 		context.current = group
-	} else if (node.name === 'Template' || node.name === 'Tag') {
-		maybeAddSeparator(node.node, context)
-		const values = []
-		let child = node.node.firstChild
-		while (child != null) {
-			const value =
-				child.name === 'SimpleString'
-					? input.slice(child.from, child.to)
-					: unescapeQuoted(
-							input.slice(child.from + 1, child.to - 1), // don't include quotes
-					  )
-			values.push(value)
-			child = child.nextSibling
-		}
-		const negate = isNegated(node.node)
-		context.current.attach({ type: node.name, values, negate })
-		return false
 	}
 }
 
@@ -107,27 +119,45 @@ function isNegated(node: SyntaxNode) {
 }
 
 function astLeave(_input: string, node: SyntaxNodeRef, context: Context) {
-	if (node.name === 'Group') {
+	if (node.name === 'Group' || node.name === 'LabeledGroup') {
 		if (!context.current.isRoot) {
 			context.current = context.current.parent!
 		}
 	}
 }
 
+function getValue(qs: QueryString) {
+	// https://stackoverflow.com/a/46918640 https://blog.haroldadmin.com/posts/escape-fts-queries
+	let r = `"${qs.value.replaceAll('"', '""')}"`
+	if (qs.wildcard) r = r + ' * '
+	return r
+}
+
 function serialize(node: Node, context: Context) {
 	if (node.type === 'SimpleString' || node.type === 'QuotedString') {
-		context.joinFts = true
-		context.sql.push(sql.raw(' (noteFtsFv.rowid '))
-		if (node.negate) context.sql.push(sql.raw(' NOT '))
-		context.sql.push(
-			sql.raw(' IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '),
-		)
-		if (node.wildcard) {
-			context.sql.push('"' + node.value + '" * ')
-		} else {
-			context.sql.push('"' + node.value + '"')
+		if (node.label === 'Group') {
+			context.joinFts = true
+			context.sql.push(sql.raw(' (noteFtsFv.rowid '))
+			if (node.negate) context.sql.push(sql.raw(' NOT '))
+			context.sql.push(
+				sql.raw(
+					' IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH ',
+				),
+			)
+			context.sql.push(getValue(node))
+			context.sql.push(sql.raw(`))`))
+		} else if (node.label === 'Tag') {
+			context.joinTags = true
+			context.sql.push(sql.raw(' ( '))
+			buildTagSearch('card', node, context)
+			context.sql.push(sql.raw(node.negate ? ' AND ' : ' OR '))
+			buildTagSearch('note', node, context)
+			context.sql.push(sql.raw(' ) '))
+		} else if (node.label === 'Template') {
+			context.sql.push(sql.raw(` note.templateId `))
+			context.sql.push(sql.raw(node.negate ? ' != ' : ' = '))
+			context.sql.push(node.value)
 		}
-		context.sql.push(sql.raw(`))`))
 	} else if (node.type === 'Regex') {
 		context.joinFts = true
 		if (node.negate) context.sql.push(sql.raw(' NOT '))
@@ -136,20 +166,6 @@ function serialize(node: Node, context: Context) {
 		context.sql.push(sql.raw(','))
 		context.sql.push(node.flags)
 		context.sql.push(sql.raw(', noteFtsFv.value)'))
-	} else if (node.type === 'Template') {
-		context.sql.push(sql.raw(` note.templateId `))
-		if (node.negate) context.sql.push(sql.raw(' NOT '))
-		// https://ricardoanderegg.com/posts/sqlite-list-array-parameter-query/
-		context.sql.push(sql.raw(` IN (SELECT value FROM json_each(`))
-		context.sql.push(JSON.stringify(node.values))
-		context.sql.push(sql.raw(`)) `))
-	} else if (node.type === 'Tag') {
-		context.joinTags = true
-		context.sql.push(sql.raw(' ( '))
-		buildTagSearch('card', node, context)
-		context.sql.push(sql.raw(node.negate ? ' AND ' : ' OR '))
-		buildTagSearch('note', node, context)
-		context.sql.push(sql.raw(' ) '))
 	} else if (node.type === 'Group') {
 		if (!node.isRoot) {
 			context.sql.push(sql.raw(' ( '))
@@ -171,20 +187,17 @@ function serialize(node: Node, context: Context) {
 
 function buildTagSearch(
 	type: 'note' | 'card',
-	node: TagLeaf,
+	qs: QueryString,
 	context: Context,
 ) {
 	context.sql.push(sql.raw(` ${type}FtsTag.rowid `))
-	if (node.negate) context.sql.push(sql.raw(' NOT '))
+	if (qs.negate) context.sql.push(sql.raw(' NOT '))
 	context.sql.push(
 		sql.raw(
 			` IN (SELECT "rowid" FROM "${type}FtsTag" WHERE "${type}FtsTag"."tags" match `,
 		),
 	)
-	context.sql.push(
-		// https://stackoverflow.com/a/46918640 https://blog.haroldadmin.com/posts/escape-fts-queries
-		node.values.map((x) => `"${x.replaceAll('"', '""')}"`).join(' OR '),
-	)
+	context.sql.push(getValue(qs))
 	context.sql.push(sql.raw(`) `))
 }
 
@@ -202,14 +215,16 @@ function andOrNothing(node: SyntaxNode): '' | 'AND' | 'OR' {
 		}
 
 		if (left.name === 'Or') return 'OR'
+		if (stringLabels.includes(left.name)) {
+			return ''
+		}
 		if (
 			left.name === 'SimpleString' ||
 			left.name === 'QuotedString' ||
 			left.name === 'Regex' ||
 			left.name === 'Group' ||
-			left.name === 'Tag' ||
-			left.name === 'Deck' ||
-			left.name === 'Template'
+			left.name === 'LabeledGroup' ||
+			left.name === 'Deck'
 		) {
 			return 'AND'
 		}
@@ -218,44 +233,41 @@ function andOrNothing(node: SyntaxNode): '' | 'AND' | 'OR' {
 	return ''
 }
 
-interface TagLeaf {
-	type: 'Tag'
-	values: string[]
+interface QueryString {
+	type: 'SimpleString' | 'QuotedString'
+	label: Label
+	value: string
 	negate: boolean
+	wildcard: boolean
 }
 
 type Leaf =
 	| { type: 'OR' | 'AND' }
-	| {
-			type: 'SimpleString' | 'QuotedString'
-			value: string
-			negate: boolean
-			wildcard: boolean
-	  }
+	| QueryString
 	| {
 			type: 'Regex'
 			pattern: string
 			flags: string
 			negate: boolean
 	  }
-	| {
-			type: 'Template'
-			values: string[]
-			negate: boolean
-	  }
-	| TagLeaf
 
 export type Node = Group | Leaf
 
+const labels = ['Group', 'Tag', 'Template'] as const
+const stringLabels = labels as readonly string[]
+type Label = (typeof labels)[number]
+
 export class Group {
-	constructor(parent: Group | null, negate: boolean) {
+	constructor(parent: Group | null, negate: boolean, label: Label) {
 		this.parent = parent
 		this.isRoot = parent == null
 		this.children = []
 		this.negate = negate
+		this.label = label
 	}
 
 	type = 'Group' as const
+	label: Label
 	parent: Group | null
 	isRoot: boolean
 	children: Node[]
@@ -282,7 +294,7 @@ export class Group {
 		while (cursor < this.children.length) {
 			const andOrNull = this.children[cursor + 1]
 			if (start != null && (andOrNull == null || andOrNull.type === 'OR')) {
-				const newGroup = new Group(this, false)
+				const newGroup = new Group(this, false, 'Group')
 				const newChildren = this.children.splice(start, length, newGroup) // remove a sequence of ANDs and replace with their Group
 				newGroup.attachMany(newChildren)
 				start = null
@@ -313,9 +325,7 @@ function distributeNegate(node: Node, negate: boolean) {
 	} else if (
 		node.type === 'SimpleString' ||
 		node.type === 'QuotedString' ||
-		node.type === 'Regex' ||
-		node.type === 'Template' ||
-		node.type === 'Tag'
+		node.type === 'Regex'
 	) {
 		if (negate) node.negate = !node.negate
 	} else if (node.type === 'AND') {
@@ -332,7 +342,7 @@ function findStrings(root: Node) {
 	const queue = [root]
 	while (queue.length > 0) {
 		const i = queue.shift()!
-		if (i.type === 'Group') {
+		if (i.type === 'Group' && i.label === 'Group') {
 			queue.push(...i.children)
 		} else if (i.type === 'SimpleString' || i.type === 'QuotedString') {
 			if (!i.negate) {

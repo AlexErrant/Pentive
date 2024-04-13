@@ -227,12 +227,13 @@ describe('groupAnds', () => {
 		value: 'x',
 		negate: false,
 		wildcard: false,
+		label: 'Group',
 	}
 	const or = { type: 'OR' as const }
 	const and = { type: 'AND' as const }
 
 	function testGroupAnds(children: Node[], expected: string) {
-		const group = new Group(null, false)
+		const group = new Group(null, false, 'Group')
 		group.attachMany(children)
 		group.groupAnds()
 		expect(stringify(group)).toEqual(expected)
@@ -320,23 +321,13 @@ describe('skip error nodes', () => {
 
 describe('template', () => {
 	test('1', async () => {
-		await assertEqual(
-			'template:foo',
-			`note.templateId IN (SELECT value FROM json_each('["foo"]'))`,
-		)
+		await assertEqual('template:foo', `(note.templateId = 'foo')`)
 	})
 
 	test('2', async () => {
 		await assertEqual(
-			'template:foo,bar',
-			`note.templateId IN (SELECT value FROM json_each('["foo","bar"]'))`,
-		)
-	})
-
-	test('can contain comma', async () => {
-		await assertEqual(
-			'template:"foo,bar"',
-			`note.templateId IN (SELECT value FROM json_each('["foo,bar"]'))`,
+			'(template:foo,bar)',
+			`(note.templateId = 'foo' OR note.templateId = 'bar')`,
 		)
 	})
 
@@ -346,7 +337,7 @@ describe('template', () => {
 			`
 (noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"a"'))
 AND
-note.templateId IN (SELECT value FROM json_each('["t"]'))
+(note.templateId = 't')
 AND
 (noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"b"'))`,
 		)
@@ -358,7 +349,7 @@ AND
 			`
 (noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"a b"'))
 OR
-note.templateId IN (SELECT value FROM json_each('["t"]'))
+(note.templateId = 't')
 OR
 (noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"c d"'))`,
 		)
@@ -366,22 +357,35 @@ OR
 
 	test('quoted', async () => {
 		await assertEqual(
-			'template:"foo bar",biz,"baz quz"',
-			`note.templateId IN (SELECT value FROM json_each('["foo bar","biz","baz quz"]'))`,
+			'(template:"foo bar",biz,"baz quz")',
+			`(note.templateId = 'foo bar' OR note.templateId = 'biz' OR note.templateId = 'baz quz')`,
 		)
 	})
 
 	test('spaces', async () => {
 		await assertEqual(
-			' template : "foo bar" , biz      , "baz quz" ',
-			`note.templateId IN (SELECT value FROM json_each('["foo bar","biz","baz quz"]'))`,
+			' (template : "foo bar" , biz      , "baz quz") ',
+			`(note.templateId = 'foo bar' OR note.templateId = 'biz' OR note.templateId = 'baz quz')`,
 		)
 	})
 
-	test('neg', async () => {
+	test('neg on group', async () => {
 		await assertEqual(
-			'-template:foo,bar',
-			`note.templateId NOT IN (SELECT value FROM json_each('["foo","bar"]'))`,
+			'-(template:foo,bar)',
+			`(note.templateId != 'foo' AND note.templateId != 'bar')`,
+		)
+	})
+
+	test('neg on tag', async () => {
+		await assertEqual(
+			'(-template:foo,bar)',
+			`(note.templateId != 'foo' AND note.templateId != 'bar')`,
+		)
+	})
+	test('double neg', async () => {
+		await assertEqual(
+			'-(-template:foo,bar)',
+			`(note.templateId = 'foo' OR note.templateId = 'bar')`,
 		)
 	})
 })
@@ -401,24 +405,60 @@ noteFtsTag.rowid IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" 
 
 	test('2', async () => {
 		await assertEqual(
-			'tag:foo,bar',
+			'(tag:foo,bar)',
 			`
 (
-cardFtsTag.rowid IN (SELECT "rowid" FROM "cardFtsTag" WHERE "cardFtsTag"."tags" MATCH '"foo" OR "bar"')
-OR
-noteFtsTag.rowid IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" MATCH '"foo" OR "bar"')
+  (
+    cardFtsTag.rowid IN (SELECT "rowid" FROM "cardFtsTag" WHERE "cardFtsTag"."tags" MATCH '"foo"')
+    OR
+    noteFtsTag.rowid IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" MATCH '"foo"')
+  )
+  OR
+  (
+    cardFtsTag.rowid IN (SELECT "rowid" FROM "cardFtsTag" WHERE "cardFtsTag"."tags" MATCH '"bar"')
+    OR
+    noteFtsTag.rowid IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" MATCH '"bar"')
+  )
+)`,
+		)
+	})
+
+	test('wildcard', async () => {
+		await assertEqual(
+			'(tag:foo*,bar)',
+			`
+(
+  (
+    cardFtsTag.rowid IN (SELECT "rowid" FROM "cardFtsTag" WHERE "cardFtsTag"."tags" MATCH '"foo" * ')
+    OR
+    noteFtsTag.rowid IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" MATCH '"foo" * ')
+  )
+  OR
+  (
+    cardFtsTag.rowid IN (SELECT "rowid" FROM "cardFtsTag" WHERE "cardFtsTag"."tags" MATCH '"bar"')
+    OR
+    noteFtsTag.rowid IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" MATCH '"bar"')
+  )
 )`,
 		)
 	})
 
 	test('can contain doublequote and backslash', async () => {
 		await assertEqual(
-			`tag:"a\\"b","c\\\\b"`,
+			`(tag:"a\\"b","c\\\\b")`,
 			`
 (
-cardFtsTag.rowid IN (SELECT "rowid" FROM "cardFtsTag" WHERE "cardFtsTag"."tags" MATCH '"a""b" OR "c\\b"')
-OR
-noteFtsTag.rowid IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" MATCH '"a""b" OR "c\\b"')
+  (
+    cardFtsTag.rowid IN (SELECT "rowid" FROM "cardFtsTag" WHERE "cardFtsTag"."tags" MATCH '"a""b"')
+    OR
+    noteFtsTag.rowid IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" MATCH '"a""b"')
+  )
+  OR
+  (
+    cardFtsTag.rowid IN (SELECT "rowid" FROM "cardFtsTag" WHERE "cardFtsTag"."tags" MATCH '"c\\b"')
+    OR
+    noteFtsTag.rowid IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" MATCH '"c\\b"')
+  )
 )`,
 		)
 	})
@@ -457,36 +497,112 @@ OR
 
 	test('quoted', async () => {
 		await assertEqual(
-			'tag:"foo bar",biz,"baz quz"',
+			'(tag:"foo bar",biz,"baz quz")',
 			`
 (
-cardFtsTag.rowid IN (SELECT "rowid" FROM "cardFtsTag" WHERE "cardFtsTag"."tags" MATCH '"foo bar" OR "biz" OR "baz quz"')
-OR
-noteFtsTag.rowid IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" MATCH '"foo bar" OR "biz" OR "baz quz"')
+  (
+    cardFtsTag.rowid IN (SELECT "rowid" FROM "cardFtsTag" WHERE "cardFtsTag"."tags" MATCH '"foo bar"')
+    OR
+    noteFtsTag.rowid IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" MATCH '"foo bar"')
+  )
+  OR
+  (
+    cardFtsTag.rowid IN (SELECT "rowid" FROM "cardFtsTag" WHERE "cardFtsTag"."tags" MATCH '"biz"')
+    OR
+    noteFtsTag.rowid IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" MATCH '"biz"')
+  )
+  OR
+  (
+    cardFtsTag.rowid IN (SELECT "rowid" FROM "cardFtsTag" WHERE "cardFtsTag"."tags" MATCH '"baz quz"')
+    OR
+    noteFtsTag.rowid IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" MATCH '"baz quz"')
+  )
 )`,
 		)
 	})
 
 	test('spaces', async () => {
 		await assertEqual(
-			' tag : "foo bar" , biz      , "baz quz" ',
+			'( tag : "foo bar" , biz      , "baz quz" )',
 			`
 (
-cardFtsTag.rowid IN (SELECT "rowid" FROM "cardFtsTag" WHERE "cardFtsTag"."tags" MATCH '"foo bar" OR "biz" OR "baz quz"')
-OR
-noteFtsTag.rowid IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" MATCH '"foo bar" OR "biz" OR "baz quz"')
+  (
+    cardFtsTag.rowid IN (SELECT "rowid" FROM "cardFtsTag" WHERE "cardFtsTag"."tags" MATCH '"foo bar"')
+    OR
+    noteFtsTag.rowid IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" MATCH '"foo bar"')
+  )
+  OR
+  (
+    cardFtsTag.rowid IN (SELECT "rowid" FROM "cardFtsTag" WHERE "cardFtsTag"."tags" MATCH '"biz"')
+    OR
+    noteFtsTag.rowid IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" MATCH '"biz"')
+  )
+  OR
+  (
+    cardFtsTag.rowid IN (SELECT "rowid" FROM "cardFtsTag" WHERE "cardFtsTag"."tags" MATCH '"baz quz"')
+    OR
+    noteFtsTag.rowid IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" MATCH '"baz quz"')
+  )
 )`,
 		)
 	})
 
-	test('neg', async () => {
+	test('neg on group', async () => {
 		await assertEqual(
-			'-tag:foo,bar',
+			'-(tag:foo,bar)',
 			`
 (
-cardFtsTag.rowid NOT IN (SELECT "rowid" FROM "cardFtsTag" WHERE "cardFtsTag"."tags" MATCH '"foo" OR "bar"')
-AND
-noteFtsTag.rowid NOT IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" MATCH '"foo" OR "bar"')
+  (  
+    cardFtsTag.rowid NOT IN (SELECT "rowid" FROM "cardFtsTag" WHERE "cardFtsTag"."tags" MATCH '"foo"')
+    AND
+    noteFtsTag.rowid NOT IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" MATCH '"foo"')
+  )
+  AND
+  (
+    cardFtsTag.rowid NOT IN (SELECT "rowid" FROM "cardFtsTag" WHERE "cardFtsTag"."tags" MATCH '"bar"')
+    AND
+    noteFtsTag.rowid NOT IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" MATCH '"bar"')
+  )
+)`,
+		)
+	})
+
+	test('neg on tag', async () => {
+		await assertEqual(
+			'(-tag:foo,bar)',
+			`
+(
+  (  
+    cardFtsTag.rowid NOT IN (SELECT "rowid" FROM "cardFtsTag" WHERE "cardFtsTag"."tags" MATCH '"foo"')
+    AND
+    noteFtsTag.rowid NOT IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" MATCH '"foo"')
+  )
+  AND
+  (
+    cardFtsTag.rowid NOT IN (SELECT "rowid" FROM "cardFtsTag" WHERE "cardFtsTag"."tags" MATCH '"bar"')
+    AND
+    noteFtsTag.rowid NOT IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" MATCH '"bar"')
+  )
+)`,
+		)
+	})
+
+	test('double neg', async () => {
+		await assertEqual(
+			'-(-tag:foo,bar)',
+			`
+(
+  (
+    cardFtsTag.rowid IN (SELECT "rowid" FROM "cardFtsTag" WHERE "cardFtsTag"."tags" MATCH '"foo"')
+    OR
+    noteFtsTag.rowid IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" MATCH '"foo"')
+  )
+  OR
+  (
+    cardFtsTag.rowid IN (SELECT "rowid" FROM "cardFtsTag" WHERE "cardFtsTag"."tags" MATCH '"bar"')
+    OR
+    noteFtsTag.rowid IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" MATCH '"bar"')
+  )
 )`,
 		)
 	})

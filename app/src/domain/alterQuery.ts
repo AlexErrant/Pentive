@@ -21,7 +21,7 @@ function spliceSlice(
 function getToAdd(tags: string[] | null) {
 	return tags === null || tags.length === 0
 		? ''
-		: 'tag:' + tags.map((t) => '"' + escapedQuoted(t) + '"').join(',')
+		: '(tag:' + tags.map((t) => '"' + escapedQuoted(t) + '"').join(',') + ')'
 }
 
 export function alterQuery(query: string, input: { tags?: string[] }) {
@@ -30,7 +30,12 @@ export function alterQuery(query: string, input: { tags?: string[] }) {
 	let handledTags = false
 	tree.cursor().iterate((node) => {
 		if (node.node.parent?.type.is(queryTerms.Program) === true) {
-			if (node.type.is(queryTerms.Tag) && input.tags != null) {
+			if (
+				(node.type.is(queryTerms.LabeledGroup) ||
+					node.type.is(queryTerms.Labeled)) &&
+				node.node.firstChild?.node.type.is(queryTerms.Tag) === true &&
+				input.tags != null
+			) {
 				q = spliceSlice(q, node.from, node.to - node.from, getToAdd(input.tags))
 				handledTags = true
 			}
