@@ -3,7 +3,7 @@ import { parser } from './queryParser'
 import { assertNever } from 'shared'
 import { sql, type RawBuilder, type SqlBool } from 'kysely'
 import { Regex, Wildcard } from './queryParser.terms'
-import { queryTerms } from '..'
+import { queryTerms as qt } from '..'
 
 class Context {
 	constructor() {
@@ -51,7 +51,7 @@ function unique(str: string) {
 }
 
 function getLabel(node: SyntaxNodeRef) {
-	if (node.type.is(queryTerms.Group) || node.type.isTop) return 'Group'
+	if (node.type.is(qt.Group) || node.type.isTop) return 'Group'
 	let child = node.node.firstChild
 	while (child != null && !stringLabels.includes(child.type.name)) {
 		child = child.nextSibling
@@ -69,12 +69,11 @@ function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
 	if (node.name === 'SimpleString' || node.name === 'QuotedString') {
 		maybeAddSeparator(node.node, context)
 		const label = getLabel(node.node.parent!)
-		const value =
-			node.name === 'SimpleString'
-				? input.slice(node.from, node.to)
-				: unescapeQuoted(
-						input.slice(node.from + 1, node.to - 1), // don't include quotes
-				  )
+		const value = node.type.is(qt.SimpleString)
+			? input.slice(node.from, node.to)
+			: unescapeQuoted(
+					input.slice(node.from + 1, node.to - 1), // don't include quotes
+			  )
 		const negate = isNegated(node.node)
 		const wildcard = node.node.nextSibling?.type.is(Wildcard) === true
 		context.current.attach({
@@ -94,13 +93,17 @@ function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
 			negate: isNegated(node.node),
 		})
 		return false
-	} else if (node.name === 'Group' || node.name === 'LabeledGroup') {
+	} else if (
+		node.type.is(qt.Group) ||
+		node.type.is(qt.LabeledGroup) ||
+		node.type.is(qt.Labeled)
+	) {
 		maybeAddSeparator(node.node, context)
 		let negate = isNegated(node.node)
 		const label = getLabel(node)
 		if (
-			node.type.is(queryTerms.LabeledGroup) &&
-			node.node.firstChild?.type.is(queryTerms.Not) === true
+			node.type.is(qt.LabeledGroup) &&
+			node.node.firstChild?.type.is(qt.Not) === true
 		) {
 			negate = !negate
 		}
@@ -115,11 +118,15 @@ function isNegated(node: SyntaxNode) {
 	while (left?.type.isError === true) {
 		left = left.prevSibling
 	}
-	return left?.name === 'Not'
+	return left?.type.is(qt.Not) === true
 }
 
 function astLeave(_input: string, node: SyntaxNodeRef, context: Context) {
-	if (node.name === 'Group' || node.name === 'LabeledGroup') {
+	if (
+		node.type.is(qt.Group) ||
+		node.type.is(qt.LabeledGroup) ||
+		node.type.is(qt.Labeled)
+	) {
 		if (!context.current.isRoot) {
 			context.current = context.current.parent!
 		}
@@ -209,22 +216,23 @@ function maybeAddSeparator(node: SyntaxNode, context: Context) {
 function andOrNothing(node: SyntaxNode): '' | 'AND' | 'OR' {
 	let left = node.prevSibling
 	while (left != null) {
-		if (left.type.isError || left.name === 'Not') {
+		if (left.type.isError || left.type.is(qt.Not)) {
 			left = left.prevSibling
 			continue
 		}
 
-		if (left.name === 'Or') return 'OR'
+		if (left.type.is(qt.Or)) return 'OR'
 		if (stringLabels.includes(left.name)) {
 			return ''
 		}
 		if (
-			left.name === 'SimpleString' ||
-			left.name === 'QuotedString' ||
-			left.name === 'Regex' ||
-			left.name === 'Group' ||
-			left.name === 'LabeledGroup' ||
-			left.name === 'Deck'
+			left.type.is(qt.SimpleString) ||
+			left.type.is(qt.QuotedString) ||
+			left.type.is(qt.Regex) ||
+			left.type.is(qt.Group) ||
+			left.type.is(qt.LabeledGroup) ||
+			left.type.is(qt.Labeled) ||
+			left.type.is(qt.Deck)
 		) {
 			return 'AND'
 		}
