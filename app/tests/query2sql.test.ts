@@ -227,13 +227,12 @@ describe('groupAnds', () => {
 		value: 'x',
 		negate: false,
 		wildcard: false,
-		label: 'Group',
 	}
 	const or = { type: 'OR' as const }
 	const and = { type: 'AND' as const }
 
 	function testGroupAnds(children: Node[], expected: string) {
-		const group = new Group(null, false, 'Group')
+		const group = new Group(null, false)
 		group.attachMany(children)
 		group.groupAnds()
 		expect(stringify(group)).toEqual(expected)

@@ -8,7 +8,7 @@ import { queryTerms as qt } from '..'
 class Context {
 	constructor() {
 		this.sql = []
-		this.root = new Group(null, false, 'Group')
+		this.root = new Group(null, false)
 		this.current = this.root
 		this.joinTags = false
 		this.joinFts = false
@@ -51,7 +51,7 @@ function unique(str: string) {
 }
 
 function getLabel(node: SyntaxNodeRef) {
-	if (node.type.is(qt.Group) || node.type.isTop) return 'Group'
+	if (node.type.is(qt.Group) || node.type.isTop) return undefined
 	let child = node.node.firstChild
 	while (child != null && !stringLabels.includes(child.type.name)) {
 		child = child.nextSibling
@@ -142,7 +142,7 @@ function getValue(qs: QueryString) {
 
 function serialize(node: Node, context: Context) {
 	if (node.type === 'SimpleString' || node.type === 'QuotedString') {
-		if (node.label === 'Group') {
+		if (node.label == null) {
 			context.joinFts = true
 			context.sql.push(sql.raw(' (noteFtsFv.rowid '))
 			if (node.negate) context.sql.push(sql.raw(' NOT '))
@@ -243,7 +243,7 @@ function andOrNothing(node: SyntaxNode): '' | 'AND' | 'OR' {
 
 interface QueryString {
 	type: 'SimpleString' | 'QuotedString'
-	label: Label
+	label?: Label
 	value: string
 	negate: boolean
 	wildcard: boolean
@@ -261,12 +261,12 @@ type Leaf =
 
 export type Node = Group | Leaf
 
-const labels = ['Group', 'Tag', 'Template'] as const
+const labels = ['Tag', 'Template'] as const
 const stringLabels = labels as readonly string[]
 type Label = (typeof labels)[number]
 
 export class Group {
-	constructor(parent: Group | null, negate: boolean, label: Label) {
+	constructor(parent: Group | null, negate: boolean, label?: Label) {
 		this.parent = parent
 		this.isRoot = parent == null
 		this.children = []
@@ -275,7 +275,7 @@ export class Group {
 	}
 
 	type = 'Group' as const
-	label: Label
+	label?: Label
 	parent: Group | null
 	isRoot: boolean
 	children: Node[]
@@ -302,7 +302,7 @@ export class Group {
 		while (cursor < this.children.length) {
 			const andOrNull = this.children[cursor + 1]
 			if (start != null && (andOrNull == null || andOrNull.type === 'OR')) {
-				const newGroup = new Group(this, false, 'Group')
+				const newGroup = new Group(this, false)
 				const newChildren = this.children.splice(start, length, newGroup) // remove a sequence of ANDs and replace with their Group
 				newGroup.attachMany(newChildren)
 				start = null
@@ -350,7 +350,7 @@ function findStrings(root: Node) {
 	const queue = [root]
 	while (queue.length > 0) {
 		const i = queue.shift()!
-		if (i.type === 'Group' && i.label === 'Group') {
+		if (i.type === 'Group' && i.label == null) {
 			queue.push(...i.children)
 		} else if (i.type === 'SimpleString' || i.type === 'QuotedString') {
 			if (!i.negate) {
