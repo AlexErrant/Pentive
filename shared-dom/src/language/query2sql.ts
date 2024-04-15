@@ -19,6 +19,14 @@ class Context {
 	current: Group
 	joinTags: boolean
 	joinFts: boolean
+
+	trustedSql(trustedSql: string) {
+		this.sql.push(sql.raw(` ${trustedSql} `))
+	}
+
+	parameterizeSql(parameter: string) {
+		this.sql.push(parameter)
+	}
 }
 
 export function convert(input: string) {
@@ -136,49 +144,47 @@ function serialize(node: Node, context: Context) {
 	if (node.type === simpleString || node.type === quotedString) {
 		if (node.label == null) {
 			context.joinFts = true
-			context.sql.push(sql.raw(' (noteFtsFv.rowid '))
-			if (node.negate) context.sql.push(sql.raw(' NOT '))
-			context.sql.push(
-				sql.raw(
-					' IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH ',
-				),
+			context.trustedSql('(noteFtsFv.rowid')
+			if (node.negate) context.trustedSql('NOT')
+			context.trustedSql(
+				'IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH',
 			)
-			context.sql.push(getValue(node))
-			context.sql.push(sql.raw(`))`))
+			context.parameterizeSql(getValue(node))
+			context.trustedSql(`))`)
 		} else if (node.label === tag) {
 			context.joinTags = true
-			context.sql.push(sql.raw(' ( '))
+			context.trustedSql('(')
 			buildTagSearch('card', node, context)
-			context.sql.push(sql.raw(node.negate ? ' AND ' : ' OR '))
+			context.trustedSql(node.negate ? 'AND' : 'OR')
 			buildTagSearch('note', node, context)
-			context.sql.push(sql.raw(' ) '))
+			context.trustedSql(')')
 		} else if (node.label === template) {
-			context.sql.push(sql.raw(` note.templateId `))
-			context.sql.push(sql.raw(node.negate ? ' != ' : ' = '))
-			context.sql.push(node.value)
+			context.trustedSql(`note.templateId`)
+			context.trustedSql(node.negate ? '!=' : '=')
+			context.parameterizeSql(node.value)
 		}
 	} else if (node.type === regex) {
 		context.joinFts = true
-		if (node.negate) context.sql.push(sql.raw(' NOT '))
-		context.sql.push(sql.raw(' regexp_with_flags('))
-		context.sql.push(node.pattern)
-		context.sql.push(sql.raw(','))
-		context.sql.push(node.flags)
-		context.sql.push(sql.raw(', noteFtsFv.value)'))
+		if (node.negate) context.trustedSql('NOT')
+		context.trustedSql('regexp_with_flags(')
+		context.parameterizeSql(node.pattern)
+		context.trustedSql(',')
+		context.parameterizeSql(node.flags)
+		context.trustedSql(', noteFtsFv.value)')
 	} else if (node.type === group) {
 		if (!node.isRoot) {
-			context.sql.push(sql.raw(' ( '))
+			context.trustedSql('(')
 		}
 		for (const child of node.children) {
 			serialize(child, context)
 		}
 		if (!node.isRoot) {
-			context.sql.push(sql.raw(' ) '))
+			context.trustedSql(')')
 		}
 	} else if (node.type === and) {
-		context.sql.push(sql.raw(' AND '))
+		context.trustedSql('AND')
 	} else if (node.type === or) {
-		context.sql.push(sql.raw(' OR '))
+		context.trustedSql('OR')
 	} else {
 		assertNever(node.type)
 	}
@@ -189,15 +195,13 @@ function buildTagSearch(
 	qs: QueryString,
 	context: Context,
 ) {
-	context.sql.push(sql.raw(` ${type}FtsTag.rowid `))
-	if (qs.negate) context.sql.push(sql.raw(' NOT '))
-	context.sql.push(
-		sql.raw(
-			` IN (SELECT "rowid" FROM "${type}FtsTag" WHERE "${type}FtsTag"."tags" match `,
-		),
+	context.trustedSql(`${type}FtsTag.rowid`)
+	if (qs.negate) context.trustedSql('NOT')
+	context.trustedSql(
+		`IN (SELECT "rowid" FROM "${type}FtsTag" WHERE "${type}FtsTag"."tags" match`,
 	)
-	context.sql.push(getValue(qs))
-	context.sql.push(sql.raw(`) `))
+	context.parameterizeSql(getValue(qs))
+	context.trustedSql(`)`)
 }
 
 function maybeAddSeparator(node: SyntaxNode, context: Context) {
