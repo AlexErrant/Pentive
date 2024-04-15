@@ -1,39 +1,127 @@
 @top Program { expression* }
 @skip { whitespace }
-@precedence { leftAssociate @left }
+@precedence { unary @right } // https://www.ibm.com/docs/en/i/7.5?topic=operators-operator-precedence-associativity
 
-expression {
-  !leftAssociate Not?
-  (string | Group | LabeledGroup | Labeled)
+expression[@dynamicPrecedence=0] {
+  !unary Not?
+  (string | Group | Label)
   ~x (Or? expression)*
 }
 
-stringExpression {
-  !leftAssociate Not?
+stringExpression[@dynamicPrecedence=1] {
+  !unary Not?
   string
   ~x (Or? stringExpression)*
 }
 
-Group        { "(" expression ")" }
-LabeledGroup { "(" Not? labels stringExpression ")" }
+idExpression[@dynamicPrecedence=2] {
+  !unary Not?
+  id
+  ~x (Or? idExpression)*
+}
+
+Group { "(" expression ")" }
+
+Label {
+  "(" Not? stringLabels stringExpression ")"
+  | "(" Not?   idLabels     idExpression ")"
+  | stringLabels Not? string
+  |     idLabels Not? id
+  | state
+  | kind
+  | due
+  | repsLapses
+  | createdUpdated
+  | reviewed
+}
 
 string {
   Regex |
-  ((SimpleString | QuotedString) Wildcard?)
+  ( SimpleString | QuotedString | Html ) Wildcard?
 }
 
-Tag      { @specialize<SimpleString, "tag">      ":" }
-Deck     { @specialize<SimpleString, "deck">     ":" }
-Template { @specialize<SimpleString, "template"> ":" }
+id { SimpleString | QuotedString }
 
-Or       { @specialize<SimpleString, "OR"> | ","}
+// "keyword"
+kw<word> { @specialize[@name={word}]<SimpleString, word> }
 
-Labeled[@name=LabeledGroup] { labels Not? string }
-labels                      { Deck | Tag | Template }
+stringLabels { 
+  ( kw<"tag">
+  | kw<"deck">
+  | kw<"template">
+  | kw<"setting">
+  | (kw<"field"> ":" FieldName)
+  ) ":"
+}
+
+FieldName {
+  Not? 
+  ( 
+    Regex |
+    ( SimpleString | QuotedString ) Wildcard?
+  )
+}
+
+idLabels { 
+  ( kw<"templateId">
+  | kw<"cardId">
+  | kw<"noteId">
+  | kw<"settingId">
+  ) ":"
+}
+
+Or { @specialize<SimpleString, "OR"> | ","}
+
+state {
+  kw<"state"> ":"
+  ( kw<"normal">
+  | kw<"buried">
+  | kw<"userBuried">
+  | kw<"schedulerBuried">
+  | kw<"suspended"> )
+}
+
+kind {
+  kw<"kind"> ":"
+  ( kw<"new">
+  | kw<"learn">
+  | kw<"review">
+  | kw<"relearn">
+  | kw<"cram"> )
+}
+
+due {
+  kw<"due">
+  ( ":" Number
+  | Comparison Date ) ?
+}
+
+createdUpdated {
+  (
+    ( kw<"note"> | kw<"card"> ) ":" 
+  ) ?
+  ( kw<"created"> | kw<"edited"> )
+  ( ":" Number
+  | Comparison Date )
+}
+
+repsLapses {
+  ( kw<"reps"> | kw<"lapses"> )
+  Comparison Number
+}
+
+reviewed {
+  ( kw<"reviewed"> | kw<"firstReviewed">)
+  Comparison ( Number | Date )
+  ( Comparison Number ) ?
+}
+
+Comparison { ":" | "=" | "<" | ">" | "<=" | ">=" }
 
 @tokens {
   Wildcard { "*" }
   QuotedString { '"' char* '"' }
+  Html         { '`' char* '`' }
 
   // https://github.com/lezer-parser/javascript/blob/392c6115647c9e55c147ac2d702f75be127a7b2d/src/javascript.grammar#L683
   // Not exactly the same because we're more interested in correctness (than tokenization) https://github.com/lezer-parser/javascript/pull/31#issuecomment-2016585616
@@ -44,12 +132,14 @@ labels                      { Deck | Tag | Template }
          !["\\] |
     "\\" $["\\]
   }
-  // a SimpleString is any series of characters that is not backslash, forwardslash, asterisk, comma, parentheses, colon, doublequote, or whitespace (as defined by the Unicode standard)
-  SimpleString { ( ![\\/*,():"\u0009\u000A\u000B\u000C\u000D\u0020\u0085\u00A0\u1680\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200A\u2028\u2029\u202F\u205F\u3000] )+ }
+  // a SimpleString is any series of characters that is not equals, less than, greater than, backtick, backslash, forwardslash, asterisk, comma, parentheses, colon, doublequote, or whitespace (as defined by the Unicode standard)
+  SimpleString { ( ![=<>`\\/*,():"\u0009\u000A\u000B\u000C\u000D\u0020\u0085\u00A0\u1680\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200A\u2028\u2029\u202F\u205F\u3000] )+ }
   whitespace { @whitespace+ }
+  Number { Not? @digit+ }
+  Date { @digit @digit @digit @digit "-" @digit? @digit "-" @digit? @digit }
 
   Not { "-" }
-  @precedence { Not, SimpleString }
+  @precedence { Date, Number, Not, SimpleString }
 }
 
 @external propSource queryHighlighting from "./query.highlight.js"
