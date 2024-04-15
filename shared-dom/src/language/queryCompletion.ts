@@ -8,7 +8,7 @@ import {
 	Program,
 	QuotedString,
 	SimpleString,
-	Tag,
+	tag,
 } from './queryParser.terms'
 import { escapedQuoted } from './query2sql'
 
@@ -73,8 +73,8 @@ export const queryCompletion: (_: {
 				validFor: /^(\w*)?$/,
 			}
 		} else if (
-			nodeBefore.type.is(Tag) ||
-			nodeBefore.parent?.type.is(Tag) === true
+			nodeBefore.type.is(tag) ||
+			nodeBefore.parent?.type.is(tag) === true
 		) {
 			const textBefore = context.state.sliceDoc(nodeBefore.from, context.pos)
 			const tagBefore = /\w*$/.exec(textBefore)

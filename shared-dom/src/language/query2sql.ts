@@ -93,16 +93,12 @@ function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
 			negate: isNegated(node.node),
 		})
 		return false
-	} else if (
-		node.type.is(qt.Group) ||
-		node.type.is(qt.LabeledGroup) ||
-		node.type.is(qt.Labeled)
-	) {
+	} else if (node.type.is(qt.Group) || node.type.is(qt.Label)) {
 		maybeAddSeparator(node.node, context)
 		let negate = isNegated(node.node)
 		const label = getLabel(node)
 		if (
-			node.type.is(qt.LabeledGroup) &&
+			node.type.is(qt.Label) &&
 			node.node.firstChild?.type.is(qt.Not) === true
 		) {
 			negate = !negate
@@ -122,11 +118,7 @@ function isNegated(node: SyntaxNode) {
 }
 
 function astLeave(_input: string, node: SyntaxNodeRef, context: Context) {
-	if (
-		node.type.is(qt.Group) ||
-		node.type.is(qt.LabeledGroup) ||
-		node.type.is(qt.Labeled)
-	) {
+	if (node.type.is(qt.Group) || node.type.is(qt.Label)) {
 		if (!context.current.isRoot) {
 			context.current = context.current.parent!
 		}
@@ -229,10 +221,9 @@ function andOrNothing(node: SyntaxNode): '' | typeof and | typeof or {
 			left.type.is(qt.SimpleString) ||
 			left.type.is(qt.QuotedString) ||
 			left.type.is(qt.Regex) ||
+			left.type.is(qt.Html) ||
 			left.type.is(qt.Group) ||
-			left.type.is(qt.LabeledGroup) ||
-			left.type.is(qt.Labeled) ||
-			left.type.is(qt.Deck)
+			left.type.is(qt.Label)
 		) {
 			return and
 		}

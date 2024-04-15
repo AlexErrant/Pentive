@@ -33,17 +33,17 @@ test('queryParser can parse standard test string', () => {
     ),
     SimpleString
   ),
-  LabeledGroup(
-    Tag,
+  Label(
+    tag,
     SimpleString
   ),
   Not,
-  LabeledGroup(
-    Deck,
+  Label(
+    deck,
     QuotedString
   ),
-  LabeledGroup(
-    Template,
+  Label(
+    template,
     SimpleString,
     Or,
     SimpleString,

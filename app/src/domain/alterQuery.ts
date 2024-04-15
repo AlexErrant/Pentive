@@ -31,9 +31,8 @@ export function alterQuery(query: string, input: { tags?: string[] }) {
 	tree.cursor().iterate((node) => {
 		if (node.node.parent?.type.is(queryTerms.Program) === true) {
 			if (
-				(node.type.is(queryTerms.LabeledGroup) ||
-					node.type.is(queryTerms.Labeled)) &&
-				node.node.firstChild?.node.type.is(queryTerms.Tag) === true &&
+				node.type.is(queryTerms.Label) &&
+				node.node.firstChild?.node.type.is(queryTerms.tag) === true &&
 				input.tags != null
 			) {
 				q = spliceSlice(q, node.from, node.to - node.from, getToAdd(input.tags))
