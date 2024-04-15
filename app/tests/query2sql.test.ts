@@ -13,7 +13,7 @@ async function format(sql: string) {
 	})
 }
 
-async function assertEqual(actual: string, expected: string) {
+async function assertEqual(actual: string, expected: string, argCount: number) {
 	const ky = new Kysely<DB>({
 		// @ts-expect-error don't actually use CRDialect
 		dialect: new CRDialect(),
@@ -27,6 +27,7 @@ async function assertEqual(actual: string, expected: string) {
 		i++
 	}
 	expect(await format(actual2)).toBe(await format(expected))
+	expect(i).toBe(argCount)
 }
 
 test('empty string is null', () => {
@@ -43,6 +44,7 @@ test('SimpleString is fts', async () => {
 	await assertEqual(
 		'a',
 		`(noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"a"'))`,
+		1,
 	)
 })
 
@@ -50,6 +52,7 @@ test('SimpleString* is wildcarded', async () => {
 	await assertEqual(
 		'a*',
 		`(noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"a" * '))`,
+		1,
 	)
 })
 
@@ -57,11 +60,11 @@ describe('not a', () => {
 	const expected = `(noteFtsFv.rowid NOT IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"a"'))`
 
 	test('together', async () => {
-		await assertEqual('-a', expected)
+		await assertEqual('-a', expected, 1)
 	})
 
 	test('separated', async () => {
-		await assertEqual('- a', expected)
+		await assertEqual('- a', expected, 1)
 	})
 })
 
@@ -69,6 +72,7 @@ test('QuotedString is fts', async () => {
 	await assertEqual(
 		'"a b"',
 		`(noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"a b"'))`,
+		1,
 	)
 })
 
@@ -76,18 +80,24 @@ test('QuotedString* is wildcarded', async () => {
 	await assertEqual(
 		'"a b"*',
 		`(noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"a b" * '))`,
+		1,
 	)
 })
 
 describe('regex', () => {
 	test('plain', async () => {
-		await assertEqual('/foo/', `regexp_with_flags('foo', '', noteFtsFv.value)`)
+		await assertEqual(
+			'/foo/',
+			`regexp_with_flags('foo', '', noteFtsFv.value)`,
+			2,
+		)
 	})
 
 	test('with flag', async () => {
 		await assertEqual(
 			'/foo/i',
 			`regexp_with_flags('foo', 'i', noteFtsFv.value)`,
+			2,
 		)
 	})
 
@@ -95,6 +105,7 @@ describe('regex', () => {
 		await assertEqual(
 			'/foo/is',
 			`regexp_with_flags('foo', 'is', noteFtsFv.value)`,
+			2,
 		)
 	})
 
@@ -102,6 +113,7 @@ describe('regex', () => {
 		await assertEqual(
 			'/foo/suuvvyys',
 			`regexp_with_flags('foo', 'suvy', noteFtsFv.value)`,
+			2,
 		)
 	})
 
@@ -113,6 +125,7 @@ regexp_with_flags('foo', '', noteFtsFv.value)
 AND
 regexp_with_flags('bar', '', noteFtsFv.value)
 `,
+			4,
 		)
 	})
 
@@ -120,6 +133,7 @@ regexp_with_flags('bar', '', noteFtsFv.value)
 		await assertEqual(
 			'-/foo/y',
 			`NOT regexp_with_flags('foo', 'y', noteFtsFv.value)`,
+			2,
 		)
 	})
 })
@@ -130,6 +144,7 @@ test('2 SimpleStrings are ANDed', async () => {
 		`(noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"a"'))
 AND
 (noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"b"'))`,
+		2,
 	)
 })
 
@@ -139,6 +154,7 @@ test('2 SimpleStrings can be ORed', async () => {
 		`(noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"a"'))
 OR
 (noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"b"'))`,
+		2,
 	)
 })
 
@@ -150,6 +166,7 @@ test('2 SimpleStrings can be grouped', async () => {
   AND
   (noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"b"'))
 )`,
+		2,
 	)
 })
 
@@ -161,6 +178,7 @@ test('not distributes over AND', async () => {
   OR
   (noteFtsFv.rowid NOT IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"b"'))
 )`,
+		2,
 	)
 })
 
@@ -172,6 +190,7 @@ test('not distributes over OR', async () => {
   AND
   (noteFtsFv.rowid NOT IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"b"'))
 )`,
+		2,
 	)
 })
 
@@ -185,6 +204,7 @@ test('double negative grouping does nothing', async () => {
     (noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"b"'))
   )
 )`,
+		2,
 	)
 })
 
@@ -204,6 +224,7 @@ AND
   OR
   (noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"e"'))
 )`,
+		5,
 	)
 })
 
@@ -294,6 +315,7 @@ test('!(p && !q || r) is (!p || q) && !r', async () => {
   AND
   (noteFtsFv.rowid NOT IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"r"'))
 )`,
+		3,
 	)
 })
 
@@ -302,31 +324,32 @@ describe('skip error nodes', () => {
 	const negatedExpected = `(noteFtsFv.rowid NOT IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"foo"'))`
 
 	test('plain', async () => {
-		await assertEqual('" foo', expected)
+		await assertEqual('" foo', expected, 1)
 	})
 
 	test('negated', async () => {
-		await assertEqual('- " foo', negatedExpected)
+		await assertEqual('- " foo', negatedExpected, 1)
 	})
 
 	test('double error', async () => {
-		await assertEqual(`) " foo`, expected)
+		await assertEqual(`) " foo`, expected, 1)
 	})
 
 	test('double error, negated', async () => {
-		await assertEqual(`- ) " foo`, negatedExpected)
+		await assertEqual(`- ) " foo`, negatedExpected, 1)
 	})
 })
 
 describe('template', () => {
 	test('1', async () => {
-		await assertEqual('template:foo', `(note.templateId = 'foo')`)
+		await assertEqual('template:foo', `(note.templateId = 'foo')`, 1)
 	})
 
 	test('2', async () => {
 		await assertEqual(
 			'(template:foo,bar)',
 			`(note.templateId = 'foo' OR note.templateId = 'bar')`,
+			2,
 		)
 	})
 
@@ -339,6 +362,7 @@ AND
 (note.templateId = 't')
 AND
 (noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"b"'))`,
+			3,
 		)
 	})
 
@@ -351,6 +375,7 @@ OR
 (note.templateId = 't')
 OR
 (noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"c d"'))`,
+			3,
 		)
 	})
 
@@ -358,6 +383,7 @@ OR
 		await assertEqual(
 			'(template:"foo bar",biz,"baz quz")',
 			`(note.templateId = 'foo bar' OR note.templateId = 'biz' OR note.templateId = 'baz quz')`,
+			3,
 		)
 	})
 
@@ -365,6 +391,7 @@ OR
 		await assertEqual(
 			' (template : "foo bar" , biz      , "baz quz") ',
 			`(note.templateId = 'foo bar' OR note.templateId = 'biz' OR note.templateId = 'baz quz')`,
+			3,
 		)
 	})
 
@@ -372,6 +399,7 @@ OR
 		await assertEqual(
 			'-(template:foo,bar)',
 			`(note.templateId != 'foo' AND note.templateId != 'bar')`,
+			2,
 		)
 	})
 
@@ -379,12 +407,14 @@ OR
 		await assertEqual(
 			'(-template:foo,bar)',
 			`(note.templateId != 'foo' AND note.templateId != 'bar')`,
+			2,
 		)
 	})
 	test('double neg', async () => {
 		await assertEqual(
 			'-(-template:foo,bar)',
 			`(note.templateId = 'foo' OR note.templateId = 'bar')`,
+			2,
 		)
 	})
 })
@@ -399,6 +429,7 @@ cardFtsTag.rowid IN (SELECT "rowid" FROM "cardFtsTag" WHERE "cardFtsTag"."tags" 
 OR
 noteFtsTag.rowid IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" MATCH '"foo"')
 )`,
+			2,
 		)
 	})
 
@@ -419,6 +450,7 @@ noteFtsTag.rowid IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" 
     noteFtsTag.rowid IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" MATCH '"bar"')
   )
 )`,
+			4,
 		)
 	})
 
@@ -439,6 +471,7 @@ noteFtsTag.rowid IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" 
     noteFtsTag.rowid IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" MATCH '"bar"')
   )
 )`,
+			4,
 		)
 	})
 
@@ -459,6 +492,7 @@ noteFtsTag.rowid IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" 
     noteFtsTag.rowid IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" MATCH '"c\\b"')
   )
 )`,
+			4,
 		)
 	})
 
@@ -475,6 +509,7 @@ AND
 )
 AND
 (noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"b"'))`,
+			4,
 		)
 	})
 
@@ -491,6 +526,7 @@ OR
 )
 OR
 (noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"c d"'))`,
+			4,
 		)
 	})
 
@@ -517,6 +553,7 @@ OR
     noteFtsTag.rowid IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" MATCH '"baz quz"')
   )
 )`,
+			6,
 		)
 	})
 
@@ -543,6 +580,7 @@ OR
     noteFtsTag.rowid IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" MATCH '"baz quz"')
   )
 )`,
+			6,
 		)
 	})
 
@@ -563,6 +601,7 @@ OR
     noteFtsTag.rowid NOT IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" MATCH '"bar"')
   )
 )`,
+			4,
 		)
 	})
 
@@ -583,6 +622,7 @@ OR
     noteFtsTag.rowid NOT IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" MATCH '"bar"')
   )
 )`,
+			4,
 		)
 	})
 
@@ -603,6 +643,7 @@ OR
     noteFtsTag.rowid IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" MATCH '"bar"')
   )
 )`,
+			4,
 		)
 	})
 })
