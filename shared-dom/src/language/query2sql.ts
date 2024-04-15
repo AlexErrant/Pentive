@@ -66,7 +66,7 @@ function getLabel(node: SyntaxNodeRef) {
 
 function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
 	if (node.type.isError) return
-	if (node.name === 'SimpleString' || node.name === 'QuotedString') {
+	if (node.name === simpleString || node.name === quotedString) {
 		maybeAddSeparator(node.node, context)
 		const label = getLabel(node.node.parent!)
 		const value = node.type.is(qt.SimpleString)
@@ -87,7 +87,7 @@ function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
 		maybeAddSeparator(node.node, context)
 		const tailDelimiterIndex = input.lastIndexOf('/', node.to)
 		context.current.attach({
-			type: 'Regex',
+			type: regex,
 			pattern: input.slice(node.from + 1, tailDelimiterIndex),
 			flags: unique(input.slice(tailDelimiterIndex + 1, node.to)),
 			negate: isNegated(node.node),
@@ -141,7 +141,7 @@ function getValue(qs: QueryString) {
 }
 
 function serialize(node: Node, context: Context) {
-	if (node.type === 'SimpleString' || node.type === 'QuotedString') {
+	if (node.type === simpleString || node.type === quotedString) {
 		if (node.label == null) {
 			context.joinFts = true
 			context.sql.push(sql.raw(' (noteFtsFv.rowid '))
@@ -153,19 +153,19 @@ function serialize(node: Node, context: Context) {
 			)
 			context.sql.push(getValue(node))
 			context.sql.push(sql.raw(`))`))
-		} else if (node.label === 'Tag') {
+		} else if (node.label === tag) {
 			context.joinTags = true
 			context.sql.push(sql.raw(' ( '))
 			buildTagSearch('card', node, context)
 			context.sql.push(sql.raw(node.negate ? ' AND ' : ' OR '))
 			buildTagSearch('note', node, context)
 			context.sql.push(sql.raw(' ) '))
-		} else if (node.label === 'Template') {
+		} else if (node.label === template) {
 			context.sql.push(sql.raw(` note.templateId `))
 			context.sql.push(sql.raw(node.negate ? ' != ' : ' = '))
 			context.sql.push(node.value)
 		}
-	} else if (node.type === 'Regex') {
+	} else if (node.type === regex) {
 		context.joinFts = true
 		if (node.negate) context.sql.push(sql.raw(' NOT '))
 		context.sql.push(sql.raw(' regexp_with_flags('))
@@ -173,7 +173,7 @@ function serialize(node: Node, context: Context) {
 		context.sql.push(sql.raw(','))
 		context.sql.push(node.flags)
 		context.sql.push(sql.raw(', noteFtsFv.value)'))
-	} else if (node.type === 'Group') {
+	} else if (node.type === group) {
 		if (!node.isRoot) {
 			context.sql.push(sql.raw(' ( '))
 		}
@@ -183,9 +183,9 @@ function serialize(node: Node, context: Context) {
 		if (!node.isRoot) {
 			context.sql.push(sql.raw(' ) '))
 		}
-	} else if (node.type === 'AND') {
+	} else if (node.type === and) {
 		context.sql.push(sql.raw(' AND '))
-	} else if (node.type === 'OR') {
+	} else if (node.type === or) {
 		context.sql.push(sql.raw(' OR '))
 	} else {
 		assertNever(node.type)
@@ -213,7 +213,7 @@ function maybeAddSeparator(node: SyntaxNode, context: Context) {
 	if (separator !== '') context.current.attach({ type: separator })
 }
 
-function andOrNothing(node: SyntaxNode): '' | 'AND' | 'OR' {
+function andOrNothing(node: SyntaxNode): '' | typeof and | typeof or {
 	let left = node.prevSibling
 	while (left != null) {
 		if (left.type.isError || left.type.is(qt.Not)) {
@@ -221,7 +221,7 @@ function andOrNothing(node: SyntaxNode): '' | 'AND' | 'OR' {
 			continue
 		}
 
-		if (left.type.is(qt.Or)) return 'OR'
+		if (left.type.is(qt.Or)) return or
 		if (stringLabels.includes(left.name)) {
 			return ''
 		}
@@ -234,7 +234,7 @@ function andOrNothing(node: SyntaxNode): '' | 'AND' | 'OR' {
 			left.type.is(qt.Labeled) ||
 			left.type.is(qt.Deck)
 		) {
-			return 'AND'
+			return and
 		}
 		throw Error('Unhandled node:' + left.node.name)
 	}
@@ -242,7 +242,7 @@ function andOrNothing(node: SyntaxNode): '' | 'AND' | 'OR' {
 }
 
 interface QueryString {
-	type: 'SimpleString' | 'QuotedString'
+	type: typeof simpleString | typeof quotedString
 	label?: Label
 	value: string
 	negate: boolean
@@ -250,10 +250,10 @@ interface QueryString {
 }
 
 type Leaf =
-	| { type: 'OR' | 'AND' }
+	| { type: typeof or | typeof and }
 	| QueryString
 	| {
-			type: 'Regex'
+			type: typeof regex
 			pattern: string
 			flags: string
 			negate: boolean
@@ -261,9 +261,20 @@ type Leaf =
 
 export type Node = Group | Leaf
 
-const labels = ['Tag', 'Template'] as const
+// labels
+const tag = 'Tag' as const
+const template = 'Template' as const
+const labels = [tag, template] as const
 const stringLabels = labels as readonly string[]
 type Label = (typeof labels)[number]
+
+// types
+const group = 'Group' as const
+const simpleString = 'SimpleString' as const
+const quotedString = 'QuotedString' as const
+const or = 'OR' as const
+const and = 'AND' as const
+const regex = 'Regex' as const
 
 export class Group {
 	constructor(parent: Group | null, negate: boolean, label?: Label) {
@@ -274,7 +285,7 @@ export class Group {
 		this.label = label
 	}
 
-	type = 'Group' as const
+	type = group
 	label?: Label
 	parent: Group | null
 	isRoot: boolean
@@ -283,13 +294,13 @@ export class Group {
 
 	attach(child: Node) {
 		this.children.push(child)
-		if (child.type === 'Group') child.parent = this
+		if (child.type === group) child.parent = this
 	}
 
 	attachMany(children: Node[]) {
 		this.children.push(...children)
 		for (const child of children) {
-			if (child.type === 'Group') child.parent = this
+			if (child.type === group) child.parent = this
 		}
 	}
 
@@ -301,14 +312,14 @@ export class Group {
 		let cursor = 0
 		while (cursor < this.children.length) {
 			const andOrNull = this.children[cursor + 1]
-			if (start != null && (andOrNull == null || andOrNull.type === 'OR')) {
+			if (start != null && (andOrNull == null || andOrNull.type === or)) {
 				const newGroup = new Group(this, false)
 				const newChildren = this.children.splice(start, length, newGroup) // remove a sequence of ANDs and replace with their Group
 				newGroup.attachMany(newChildren)
 				start = null
 				length = 1
 				cursor = cursor + 1 - newChildren.length // add 1 for the new group, and remove children's length
-			} else if (andOrNull?.type === 'AND') {
+			} else if (andOrNull?.type === and) {
 				if (start == null) start = cursor
 				length += 2
 			}
@@ -318,12 +329,12 @@ export class Group {
 }
 
 function distributeNegate(node: Node, negate: boolean) {
-	if (node.type === 'Group') {
+	if (node.type === group) {
 		if (negate) node.negate = !node.negate
 		if (
 			node.negate &&
-			node.children.some((c) => c.type === 'AND') &&
-			node.children.some((c) => c.type === 'OR')
+			node.children.some((c) => c.type === and) &&
+			node.children.some((c) => c.type === or)
 		) {
 			node.groupAnds()
 		}
@@ -331,15 +342,15 @@ function distributeNegate(node: Node, negate: boolean) {
 			distributeNegate(child, node.negate)
 		}
 	} else if (
-		node.type === 'SimpleString' ||
-		node.type === 'QuotedString' ||
-		node.type === 'Regex'
+		node.type === simpleString ||
+		node.type === quotedString ||
+		node.type === regex
 	) {
 		if (negate) node.negate = !node.negate
-	} else if (node.type === 'AND') {
-		if (negate) node.type = 'OR'
-	} else if (node.type === 'OR') {
-		if (negate) node.type = 'AND'
+	} else if (node.type === and) {
+		if (negate) node.type = or
+	} else if (node.type === or) {
+		if (negate) node.type = and
 	} else {
 		assertNever(node.type)
 	}
@@ -350,9 +361,9 @@ function findStrings(root: Node) {
 	const queue = [root]
 	while (queue.length > 0) {
 		const i = queue.shift()!
-		if (i.type === 'Group' && i.label == null) {
+		if (i.type === group && i.label == null) {
 			queue.push(...i.children)
-		} else if (i.type === 'SimpleString' || i.type === 'QuotedString') {
+		} else if (i.type === simpleString || i.type === quotedString) {
 			if (!i.negate) {
 				r.push(i.value)
 			}
