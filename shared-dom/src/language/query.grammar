@@ -49,8 +49,8 @@ stringLabels {
   ( kw<"tag">
   | kw<"template">
   | kw<"setting">
-  | (kw<"field"> ":" FieldName)
-  ) ":"
+  | (kw<"field"> is FieldName)
+  ) is
 }
 
 FieldName {
@@ -66,13 +66,13 @@ idLabels {
   | kw<"cardId">
   | kw<"noteId">
   | kw<"settingId">
-  ) ":"
+  ) is
 }
 
 Or { @specialize<SimpleString, "OR"> | ","}
 
 state {
-  kw<"state"> ":"
+  kw<"state"> is
   ( kw<"normal">
   | kw<"buried">
   | kw<"userBuried">
@@ -81,7 +81,7 @@ state {
 }
 
 kind {
-  kw<"kind"> ":"
+  kw<"kind"> is
   ( kw<"new">
   | kw<"learn">
   | kw<"review">
@@ -91,16 +91,18 @@ kind {
 
 due {
   kw<"due">
-  ( ":" Number
-  | Comparison Date ) ?
+  ( is kw<"true">
+  | is kw<"false">
+  | is Number
+  | Comparison Date )
 }
 
 createdUpdated {
   (
-    ( kw<"note"> | kw<"card"> ) ":" 
+    ( kw<"note"> | kw<"card"> ) is
   ) ?
   ( kw<"created"> | kw<"edited"> )
-  ( ":" Number
+  ( is Number
   | Comparison Date )
 }
 
@@ -116,6 +118,7 @@ reviewed {
 }
 
 Comparison { ":" | "=" | "<" | ">" | "<=" | ">=" }
+is { ":" | "="}
 
 @tokens {
   Wildcard { "*" }
