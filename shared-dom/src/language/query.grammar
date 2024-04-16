@@ -47,7 +47,6 @@ kw<word> { @specialize[@name={word}]<SimpleString, word> }
 
 stringLabels { 
   ( kw<"tag">
-  | kw<"deck">
   | kw<"template">
   | kw<"setting">
   | (kw<"field"> ":" FieldName)

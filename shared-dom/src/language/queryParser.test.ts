@@ -5,7 +5,7 @@ import { convert } from './query2sql'
 
 test('queryParser can parse standard test string', () => {
 	const tree = parser.parse(
-		`-(a) spider-man -a b -c -"(quote\\"d) str" OR "l o l" OR  a b c ((a "c") b) tag:what -deck:"x y" (template:d, e f)`,
+		`-(a) spider-man -a b -c -"(quote\\"d) str" OR "l o l" OR  a b c ((a "c") b) tag:what -setting:"x y" (template:d, e f)`,
 	)
 	const spec = `Program(
   Not,
@@ -39,7 +39,7 @@ test('queryParser can parse standard test string', () => {
   ),
   Not,
   Label(
-    deck,
+    setting,
     QuotedString
   ),
   Label(
@@ -54,7 +54,7 @@ test('queryParser can parse standard test string', () => {
 })
 
 test('strings are returned in BFS order', () => {
-	const query = `-(a) spider-man -a b -c -"(quote\\"d) str" OR "l o l" OR  a b c ((a "c") b) tag:what -deck:"x y" (template:d, e f)`
+	const query = `-(a) spider-man -a b -c -"(quote\\"d) str" OR "l o l" OR  a b c ((a "c") b) tag:what -setting:"x y" (template:d, e f)`
 	const { strings } = convert(query)
 	expect(strings).toEqual([
 		'spider-man',

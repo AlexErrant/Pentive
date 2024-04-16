@@ -250,10 +250,47 @@ type Leaf =
 export type Node = Group | Leaf
 
 // labels
-const tag = 'Tag' as const
-const template = 'Template' as const
-const labels = [tag, template] as const
-const stringLabels = labels as readonly string[]
+const tag = 'tag' as const
+const template = 'template' as const
+const templateId = 'templateId' as const
+const setting = 'setting' as const
+const field = 'field' as const
+const cardId = 'cardId' as const
+const noteId = 'noteId' as const
+const settingId = 'settingId' as const
+const state = 'state' as const
+const kind = 'kind' as const
+const due = 'due' as const
+const note = 'note' as const
+const card = 'card' as const
+const created = 'created' as const
+const edited = 'edited' as const
+const reps = 'reps' as const
+const lapses = 'lapses' as const
+const reviewed = 'reviewed' as const
+const firstReviewed = 'firstReviewed' as const
+const labels = [
+	tag,
+	template,
+	templateId,
+	setting,
+	field,
+	cardId,
+	noteId,
+	settingId,
+	state,
+	kind,
+	due,
+	note,
+	card,
+	created,
+	edited,
+	reps,
+	lapses,
+	reviewed,
+	firstReviewed,
+] as const
+export const stringLabels = labels as readonly string[]
 type Label = (typeof labels)[number]
 
 // types
