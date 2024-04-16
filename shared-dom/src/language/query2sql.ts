@@ -147,7 +147,7 @@ function serialize(node: Node, context: Context) {
 			const value = getValue(node)
 			const not = getNot(node.negate)
 			context.parameterizeSql(
-				sql`(noteFtsFv.rowid ${not} IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH ${value}))`,
+				sql`noteFtsFv.rowid ${not} IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH ${value})`,
 			)
 		} else if (node.label === tag) {
 			buildTagSearch(node, context)
