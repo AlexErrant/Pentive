@@ -14,9 +14,10 @@ import { C, ky } from '../topLevelAwait'
 export const cardSettingsCollectionMethods = {
 	bulkUploadCardSettings: async function (cardSetting: CardSetting[]) {
 		const entities = cardSetting.map(
-			({ id, ...r }) =>
+			({ id, name, ...r }) =>
 				({
 					id,
+					name,
 					details: stringifyDetails(r),
 				}) satisfies CardSettingEntity,
 		)
@@ -28,6 +29,7 @@ export const cardSettingsCollectionMethods = {
 				.values(batches[i]!)
 				.onConflict((db) =>
 					db.doUpdateSet({
+						name: (x) => x.ref('excluded.name'),
 						details: (x) => x.ref('excluded.details'),
 					} satisfies OnConflictUpdateCardSettingSet),
 				)
@@ -43,7 +45,7 @@ export const cardSettingsCollectionMethods = {
 			const details = parseDetails(s.details)
 			return {
 				id: s.id satisfies CardSettingId as CardSettingId,
-				name: details.name as string, // nextTODO
+				name: s.name,
 				...details,
 			} satisfies CardSetting as CardSetting
 		})

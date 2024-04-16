@@ -138,6 +138,7 @@ export interface Review {
 
 export interface CardSetting {
 	id: LDbId
+	name: string
 	details: string
 }
 

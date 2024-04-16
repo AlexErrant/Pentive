@@ -1,4 +1,9 @@
 export const initSql = [
+	`CREATE TABLE IF NOT EXISTS cardSetting (
+    id TEXT PRIMARY KEY, -- make BLOB upon SQLite v3.41 and the landing of UNHEX https://sqlite.org/forum/forumpost/30cca4e613d2fa2a grep F235B7FB-8CEA-4AE2-99CC-2790E607B1EB
+    name TEXT,
+    details TEXT
+) STRICT;`,
 	`CREATE TABLE IF NOT EXISTS template (
     id TEXT PRIMARY KEY, -- make BLOB upon SQLite v3.41 and the landing of UNHEX https://sqlite.org/forum/forumpost/30cca4e613d2fa2a grep F235B7FB-8CEA-4AE2-99CC-2790E607B1EB
     name TEXT,
@@ -137,10 +142,6 @@ export const initSql = [
     created INTEGER,
     rating INTEGER,
     kind INTEGER,
-    details TEXT
-) STRICT;`,
-	`CREATE TABLE IF NOT EXISTS cardSetting (
-    id TEXT PRIMARY KEY, -- make BLOB upon SQLite v3.41 and the landing of UNHEX https://sqlite.org/forum/forumpost/30cca4e613d2fa2a grep F235B7FB-8CEA-4AE2-99CC-2790E607B1EB
     details TEXT
 ) STRICT;`,
 	`PRAGMA temp_store=MEMORY;`, // grep 2790D3E0-F98B-4A95-8910-AC3E87F4F2D3
