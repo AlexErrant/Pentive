@@ -24,7 +24,7 @@ class Context {
 		this.sql.push(sql.raw(` ${trustedSql} `))
 	}
 
-	parameterizeSql(parameter: string) {
+	parameterizeSql(parameter: RawBuilder<unknown>) {
 		this.sql.push(parameter)
 	}
 }
@@ -144,33 +144,23 @@ function serialize(node: Node, context: Context) {
 	if (node.type === simpleString || node.type === quotedString) {
 		if (node.label == null) {
 			context.joinFts = true
-			context.trustedSql('(noteFtsFv.rowid')
-			if (node.negate) context.trustedSql('NOT')
-			context.trustedSql(
-				'IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH',
+			const value = getValue(node)
+			const not = getNot(node.negate)
+			context.parameterizeSql(
+				sql`(noteFtsFv.rowid ${not} IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH ${value}))`,
 			)
-			context.parameterizeSql(getValue(node))
-			context.trustedSql(`))`)
 		} else if (node.label === tag) {
-			context.joinTags = true
-			context.trustedSql('(')
-			buildTagSearch('card', node, context)
-			context.trustedSql(node.negate ? 'AND' : 'OR')
-			buildTagSearch('note', node, context)
-			context.trustedSql(')')
+			buildTagSearch(node, context)
 		} else if (node.label === template) {
-			context.trustedSql(`note.templateId`)
-			context.trustedSql(node.negate ? '!=' : '=')
-			context.parameterizeSql(node.value)
+			const equals = sql.raw(node.negate ? '!=' : '=')
+			context.parameterizeSql(sql`note.templateId ${equals} ${node.value}`)
 		}
 	} else if (node.type === regex) {
 		context.joinFts = true
-		if (node.negate) context.trustedSql('NOT')
-		context.trustedSql('regexp_with_flags(')
-		context.parameterizeSql(node.pattern)
-		context.trustedSql(',')
-		context.parameterizeSql(node.flags)
-		context.trustedSql(', noteFtsFv.value)')
+		const not = getNot(node.negate)
+		context.parameterizeSql(
+			sql`${not} regexp_with_flags(${node.pattern}, ${node.flags}, noteFtsFv.value)`,
+		)
 	} else if (node.type === group) {
 		if (!node.isRoot) {
 			context.trustedSql('(')
@@ -190,18 +180,21 @@ function serialize(node: Node, context: Context) {
 	}
 }
 
-function buildTagSearch(
-	type: 'note' | 'card',
-	qs: QueryString,
-	context: Context,
-) {
-	context.trustedSql(`${type}FtsTag.rowid`)
-	if (qs.negate) context.trustedSql('NOT')
-	context.trustedSql(
-		`IN (SELECT "rowid" FROM "${type}FtsTag" WHERE "${type}FtsTag"."tags" match`,
+function buildTagSearch(qs: QueryString, context: Context) {
+	context.joinTags = true
+	const not = getNot(qs.negate)
+	const value = getValue(qs)
+	context.parameterizeSql(
+		sql`(
+cardFtsTag.rowid ${not} IN (SELECT "rowid" FROM "cardFtsTag" WHERE "cardFtsTag"."tags" match ${value})
+${sql.raw(qs.negate ? 'AND' : 'OR')}
+noteFtsTag.rowid ${not} IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" match ${value})
+)`,
 	)
-	context.parameterizeSql(getValue(qs))
-	context.trustedSql(`)`)
+}
+
+function getNot(negate: boolean) {
+	return sql.raw(negate ? 'NOT' : ``)
 }
 
 function maybeAddSeparator(node: SyntaxNode, context: Context) {
