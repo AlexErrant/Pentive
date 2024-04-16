@@ -8,9 +8,10 @@ import {
 	Program,
 	QuotedString,
 	SimpleString,
-	tag,
+	Label,
 } from './queryParser.terms'
-import { escapedQuoted, stringLabels } from './query2sql'
+import { escapedQuoted, getLabel, stringLabels } from './query2sql'
+import { type SyntaxNode } from '@lezer/common'
 
 // I don't think we should use Codemirror's autocomplete for showing history. Doing anything more
 // advanced, e.g. deleting an entry from history, is unsupported in `@codemirror/autocomplete`.
@@ -72,10 +73,7 @@ export const queryCompletion: (_: {
 				options,
 				validFor: /^(\w*)?$/,
 			}
-		} else if (
-			nodeBefore.type.is(tag) ||
-			nodeBefore.parent?.type.is(tag) === true
-		) {
+		} else if (inLabel(nodeBefore, 'tag')) {
 			const textBefore = context.state.sliceDoc(nodeBefore.from, context.pos)
 			const tagBefore = /\w*$/.exec(textBefore)
 			if (tagBefore == null && !context.explicit) return null
@@ -98,3 +96,11 @@ export const queryCompletion: (_: {
 		}
 		return null
 	}
+
+function inLabel(nodeBefore: SyntaxNode, label: string) {
+	return (
+		(nodeBefore.type.is(Label) && getLabel(nodeBefore) === label) ||
+		(nodeBefore.parent?.type.is(Label) === true &&
+			getLabel(nodeBefore.parent) === label)
+	)
+}

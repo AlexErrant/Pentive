@@ -58,7 +58,7 @@ function unique(str: string) {
 		.join('')
 }
 
-function getLabel(node: SyntaxNodeRef) {
+export function getLabel(node: SyntaxNodeRef) {
 	if (node.type.is(qt.Group) || node.type.isTop) return undefined
 	let child = node.node.firstChild
 	while (child != null && !stringLabels.includes(child.type.name)) {
