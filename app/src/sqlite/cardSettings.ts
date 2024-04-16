@@ -61,7 +61,9 @@ export function parseDetails(rawDetails: string) {
 	return JSON.parse(rawDetails) as Record<string, unknown>
 }
 
-// the point of this type is to cause an error if something is added to CardSettingEntity
+// The point of this type is to cause an error if something is added to CardSettingEntity
+// If that happens, you probably want to update the `doUpdateSet` call.
+// If not, you an add an exception to the Exclude below.
 type OnConflictUpdateCardSettingSet = {
 	[K in keyof CardSettingEntity as Exclude<K, 'id'>]: (
 		x: ExpressionBuilder<

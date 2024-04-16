@@ -107,7 +107,9 @@ const groupByToMap = <T, Q>(
 		return map
 	}, new Map<Q, T[]>())
 
-// the point of this type is to cause an error if something is added to CardEntity
+// The point of this type is to cause an error if something is added to CardEntity
+// If that happens, you probably want to update the `doUpdateSet` call.
+// If not, you an add an exception to the Exclude below.
 type OnConflictUpdateCardSet = {
 	[K in keyof CardEntity as Exclude<K, 'id' | 'noteId' | 'created' | 'ord'>]: (
 		x: ExpressionBuilder<

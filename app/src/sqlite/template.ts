@@ -452,7 +452,9 @@ function withLocalMediaIdByRemoteMediaId<
 	}
 }
 
-// the point of this type is to cause an error if something is added to RemoteTemplate
+// The point of this type is to cause an error if something is added to RemoteTemplate
+// If that happens, you probably want to update the `doUpdateSet` call.
+// If not, you an add an exception to the Exclude below.
 type OnConflictUpdateRemoteTemplateSet = {
 	[K in keyof RemoteTemplate as Exclude<K, 'nook' | 'localId'>]: (
 		x: ExpressionBuilder<
