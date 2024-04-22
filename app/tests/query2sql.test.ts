@@ -371,6 +371,20 @@ describe('template', () => {
 		)
 	})
 
+	test('regex', async () => {
+		await assertEqual(
+			'(template:/foo/i,-/bar/ /bix/suuvvyys)',
+			`(
+  regexp_with_flags('foo', 'i', templateNameFts.name)
+  OR NOT
+  regexp_with_flags('bar', '', templateNameFts.name)
+  AND
+  regexp_with_flags('bix', 'suvy', templateNameFts.name)
+)`,
+			6,
+		)
+	})
+
 	test('can contain doublequote and backslash', async () => {
 		await assertEqual(
 			`(template:"a\\"b","c\\\\b")`,
@@ -584,6 +598,20 @@ describe('setting', () => {
   card.cardSettingId IN (SELECT rowid FROM cardSettingNameFts WHERE cardSettingNameFts.name MATCH '"bar"')
 )`,
 			2,
+		)
+	})
+
+	test('regex', async () => {
+		await assertEqual(
+			'(setting:/foo/i,-/bar/ /bix/suuvvyys)',
+			`(
+  regexp_with_flags('foo', 'i', cardSettingNameFts.name)
+  OR NOT
+  regexp_with_flags('bar', '', cardSettingNameFts.name)
+  AND
+  regexp_with_flags('bix', 'suvy', cardSettingNameFts.name)
+)`,
+			6,
 		)
 	})
 
@@ -823,6 +851,32 @@ noteFtsTag.rowid IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" 
   )
 )`,
 			4,
+		)
+	})
+
+	test('regex', async () => {
+		await assertEqual(
+			'(tag:/foo/i,-/bar/ /bix/suuvvyys)',
+			`(
+  (
+    regexp_with_flags('foo', 'i', "cardFtsTag"."tags")
+    OR
+    regexp_with_flags('foo', 'i', "noteFtsTag"."tags")
+  )
+  OR
+  (
+    NOT regexp_with_flags('bar', '', "cardFtsTag"."tags")
+    AND
+    NOT regexp_with_flags('bar', '', "noteFtsTag"."tags")
+  )
+  AND
+  (
+    regexp_with_flags('bix', 'suvy', "cardFtsTag"."tags")
+    OR
+    regexp_with_flags('bix', 'suvy', "noteFtsTag"."tags")
+  )
+)`,
+			12,
 		)
 	})
 

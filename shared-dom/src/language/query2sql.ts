@@ -1,6 +1,6 @@
 import { type SyntaxNodeRef, type SyntaxNode } from '@lezer/common'
 import { parser } from './queryParser'
-import { assertNever } from 'shared'
+import { assertNever, throwExp } from 'shared'
 import { sql, type RawBuilder, type SqlBool } from 'kysely'
 import { Regex, Wildcard } from './queryParser.terms'
 import { queryTerms as qt } from '..'
@@ -105,6 +105,7 @@ function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
 			pattern: input.slice(node.from + 1, tailDelimiterIndex),
 			flags: unique(input.slice(tailDelimiterIndex + 1, node.to)),
 			negate: isNegated(node.node),
+			label: getLabel(node.node.parent!),
 		})
 		return false
 	} else if (node.type.is(qt.Group) || node.type.is(qt.Label)) {
@@ -155,28 +156,6 @@ function serialize(node: Node, context: Context) {
 			context.parameterizeSql(
 				sql`noteFtsFv.rowid ${not} IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH ${value})`,
 			)
-		} else if (node.label === tag) {
-			buildTagSearch(node, context)
-		} else if (node.label === template) {
-			context.joinTemplateFts = true
-			const not = getNot(node.negate)
-			const value = getValue(node)
-			context.parameterizeSql(
-				sql`template.rowid ${not} IN (SELECT rowid FROM templateNameFts WHERE templateNameFts.name MATCH ${value})`,
-			)
-		} else if (node.label === templateId) {
-			const equals = sql.raw(node.negate ? '!=' : '=')
-			context.parameterizeSql(sql`note.templateId ${equals} ${node.value}`)
-		} else if (node.label === setting) {
-			context.joinCardSettingFts = true
-			const not = getNot(node.negate)
-			const value = getValue(node)
-			context.parameterizeSql(
-				sql`card.cardSettingId ${not} IN (SELECT rowid FROM cardSettingNameFts WHERE cardSettingNameFts.name MATCH ${value})`,
-			)
-		} else if (node.label === settingId) {
-			const equals = sql.raw(node.negate ? '!=' : '=')
-			context.parameterizeSql(sql`card.cardSettingId ${equals} ${node.value}`)
 		}
 	} else if (node.type === regex) {
 		context.joinFts = true
@@ -191,8 +170,22 @@ function serialize(node: Node, context: Context) {
 		if (paren) {
 			context.trustedSql('(')
 		}
-		for (const child of node.children) {
-			serialize(child, context)
+		if (node.label == null) {
+			for (const child of node.children) {
+				serialize(child, context)
+			}
+		} else {
+			for (const child of node.children) {
+				if (
+					child.type === 'SimpleString' ||
+					child.type === 'QuotedString' ||
+					child.type === 'Regex'
+				) {
+					handleLabel(child, context)
+				} else {
+					serialize(child, context)
+				}
+			}
 		}
 		if (paren) {
 			context.trustedSql(')')
@@ -206,17 +199,67 @@ function serialize(node: Node, context: Context) {
 	}
 }
 
-function buildTagSearch(qs: QueryString, context: Context) {
+function handleLabel(node: QueryString | QueryRegex, context: Context) {
+	if (node.label === tag) {
+		buildTagSearch(node, context)
+	} else if (node.label === template) {
+		context.joinTemplateFts = true
+		const not = getNot(node.negate)
+		if (node.type === 'Regex') {
+			context.parameterizeSql(
+				sql`${not} regexp_with_flags(${node.pattern}, ${node.flags}, templateNameFts.name)`,
+			)
+		} else {
+			const value = getValue(node)
+			context.parameterizeSql(
+				sql`template.rowid ${not} IN (SELECT rowid FROM templateNameFts WHERE templateNameFts.name MATCH ${value})`,
+			)
+		}
+	} else if (node.label === templateId) {
+		if (node.type === 'Regex') throwExp("you can't regex templateId")
+		const equals = sql.raw(node.negate ? '!=' : '=')
+		context.parameterizeSql(sql`note.templateId ${equals} ${node.value}`)
+	} else if (node.label === setting) {
+		context.joinCardSettingFts = true
+		const not = getNot(node.negate)
+		if (node.type === 'Regex') {
+			context.parameterizeSql(
+				sql`${not} regexp_with_flags(${node.pattern}, ${node.flags}, cardSettingNameFts.name)`,
+			)
+		} else {
+			const value = getValue(node)
+			context.parameterizeSql(
+				sql`card.cardSettingId ${not} IN (SELECT rowid FROM cardSettingNameFts WHERE cardSettingNameFts.name MATCH ${value})`,
+			)
+		}
+	} else if (node.label === settingId) {
+		if (node.type === 'Regex') throwExp("you can't regex settingId")
+		const equals = sql.raw(node.negate ? '!=' : '=')
+		context.parameterizeSql(sql`card.cardSettingId ${equals} ${node.value}`)
+	}
+}
+
+function buildTagSearch(node: QueryString | QueryRegex, context: Context) {
 	context.joinTags = true
-	const not = getNot(qs.negate)
-	const value = getValue(qs)
-	context.parameterizeSql(
-		sql`(
+	const not = getNot(node.negate)
+	if (node.type === 'Regex') {
+		context.parameterizeSql(
+			sql`(
+${not} regexp_with_flags(${node.pattern}, ${node.flags}, "cardFtsTag"."tags")
+${sql.raw(node.negate ? 'AND' : 'OR')}
+${not} regexp_with_flags(${node.pattern}, ${node.flags}, "noteFtsTag"."tags")
+)`,
+		)
+	} else {
+		const value = getValue(node)
+		context.parameterizeSql(
+			sql`(
 cardFtsTag.rowid ${not} IN (SELECT "rowid" FROM "cardFtsTag" WHERE "cardFtsTag"."tags" match ${value})
-${sql.raw(qs.negate ? 'AND' : 'OR')}
+${sql.raw(node.negate ? 'AND' : 'OR')}
 noteFtsTag.rowid ${not} IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" match ${value})
 )`,
-	)
+		)
+	}
 }
 
 function getNot(negate: boolean) {
@@ -263,15 +306,15 @@ interface QueryString {
 	wildcard: boolean
 }
 
-type Leaf =
-	| { type: typeof or | typeof and }
-	| QueryString
-	| {
-			type: typeof regex
-			pattern: string
-			flags: string
-			negate: boolean
-	  }
+interface QueryRegex {
+	type: typeof regex
+	label?: Label
+	pattern: string
+	flags: string
+	negate: boolean
+}
+
+type Leaf = { type: typeof or | typeof and } | QueryString | QueryRegex
 
 export type Node = Group | Leaf
 

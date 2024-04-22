@@ -9,6 +9,7 @@ import {
 	QuotedString,
 	SimpleString,
 	Label,
+	Regex,
 } from './queryParser.terms'
 import {
 	escapedQuoted,
@@ -151,6 +152,7 @@ export const queryCompletion: (_: {
 	}
 
 function inLabel(nodeBefore: SyntaxNode, label: string) {
+	if (nodeBefore.type.is(Regex)) return false
 	return (
 		(nodeBefore.type.is(Label) && getLabel(nodeBefore) === label) ||
 		(nodeBefore.parent?.type.is(Label) === true &&
