@@ -35,15 +35,18 @@ test('queryParser can parse standard test string', () => {
   ),
   Label(
     tag,
+    Is,
     SimpleString
   ),
   Not,
   Label(
     setting,
+    Is,
     QuotedString
   ),
   Label(
     template,
+    Is,
     SimpleString,
     Or,
     SimpleString,

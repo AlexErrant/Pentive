@@ -2,7 +2,7 @@ import { type SyntaxNodeRef, type SyntaxNode } from '@lezer/common'
 import { parser } from './queryParser'
 import { assertNever, throwExp } from 'shared'
 import { sql, type RawBuilder, type SqlBool } from 'kysely'
-import { Regex, Wildcard } from './queryParser.terms'
+import { Is, Regex, Wildcard } from './queryParser.terms'
 import { queryTerms as qt } from '..'
 
 class Context {
@@ -280,7 +280,7 @@ function andOrNothing(node: SyntaxNode): '' | typeof and | typeof or {
 		}
 
 		if (left.type.is(qt.Or)) return or
-		if (stringLabels.includes(left.name)) {
+		if (left.type.is(Is) || stringLabels.includes(left.name)) {
 			return ''
 		}
 		if (
