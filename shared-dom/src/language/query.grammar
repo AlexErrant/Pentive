@@ -20,15 +20,28 @@ idExpression[@dynamicPrecedence=2] {
   ~x (Or? idExpression)*
 }
 
+stateValueExpression[@dynamicPrecedence=3] {
+  !unary Not?
+  stateValue
+  ~x (Or? stateValueExpression)*
+}
+
+kindValueExpression[@dynamicPrecedence=3] {
+  !unary Not?
+  kindValue
+  ~x (Or? kindValueExpression)*
+}
+
 Group { "(" expression ")" }
 
+stateIs { kw<"state"> is }
+kindIs  { kw<"kind">  is }
+
 Label {
-  "(" Not? stringLabels stringExpression ")"
-  | "(" Not?   idLabels     idExpression ")"
-  | stringLabels Not? string
-  |     idLabels Not? id
-  | state
-  | kind
+    "(" Not? stringLabels     stringExpression ")" | stringLabels Not? string
+  | "(" Not?     idLabels         idExpression ")" |     idLabels Not? id
+  | "(" Not?      stateIs stateValueExpression ")" |      stateIs Not? stateValue
+  | "(" Not?       kindIs  kindValueExpression ")" |       kindIs Not?  kindValue
   | due
   | repsLapses
   | createdUpdated
@@ -37,10 +50,10 @@ Label {
 
 string {
   Regex |
-  ( SimpleString | QuotedString | Html ) Wildcard?
+  ( SimpleString | QuotedString | Number | Html ) Wildcard?
 }
 
-id { SimpleString | QuotedString }
+id { SimpleString | QuotedString | Number }
 
 // "keyword"
 kw<word> { @specialize[@name={word}]<SimpleString, word> }
@@ -49,15 +62,15 @@ stringLabels {
   ( kw<"tag">
   | kw<"template">
   | kw<"setting">
-  | (kw<"field"> is FieldName)
-  ) is
+  | kw<"field"> Is FieldName
+  ) Is
 }
 
 FieldName {
   Not? 
   ( 
     Regex |
-    ( SimpleString | QuotedString ) Wildcard?
+    ( SimpleString | QuotedString | Number ) Wildcard?
   )
 }
 
@@ -71,38 +84,36 @@ idLabels {
 
 Or { @specialize<SimpleString, "OR"> | ","}
 
-state {
-  kw<"state"> is
-  ( kw<"normal">
+stateValue {
+    kw<"normal">
   | kw<"buried">
   | kw<"userBuried">
   | kw<"schedulerBuried">
-  | kw<"suspended"> )
+  | kw<"suspended">
 }
 
-kind {
-  kw<"kind"> is
-  ( kw<"new">
+kindValue {
+    kw<"new">
   | kw<"learn">
   | kw<"review">
   | kw<"relearn">
-  | kw<"cram"> )
+  | kw<"cram">
 }
 
 due {
   kw<"due">
   ( is kw<"true">
   | is kw<"false">
-  | is Number
+  | is Not? Number
   | Comparison Date )
 }
 
 createdUpdated {
   (
-    ( kw<"note"> | kw<"card"> ) is
+    ( kw<"note"> | kw<"card"> ) ":"
   ) ?
   ( kw<"created"> | kw<"edited"> )
-  ( is Number
+  ( is Not? Number
   | Comparison Date )
 }
 
@@ -112,13 +123,20 @@ repsLapses {
 }
 
 reviewed {
-  ( kw<"reviewed"> | kw<"firstReviewed">)
-  Comparison ( Number | Date )
-  ( Comparison Number ) ?
+  ( kw<"reviewed"> | kw<"firstReviewed"> )
+  Comparison ( Not? Number | Date )
+  ( Comparison
+    ( Rating
+    | kw<"again">
+    | kw<"hard">
+    | kw<"good">
+    | kw<"easy"> )
+  ) ?
 }
 
 Comparison { ":" | "=" | "<" | ">" | "<=" | ">=" }
-is { ":" | "="}
+Is { ":" | "=" } // Used when we care about the difference between = and :
+is { ":" | "=" } // Used when we don't care. Exists to make the grammar more forgiving for users.
 
 @tokens {
   Wildcard { "*" }
@@ -137,11 +155,13 @@ is { ":" | "="}
   // a SimpleString is any series of characters that is not equals, less than, greater than, backtick, backslash, forwardslash, asterisk, comma, parentheses, colon, doublequote, or whitespace (as defined by the Unicode standard)
   SimpleString { ( ![=<>`\\/*,():"\u0009\u000A\u000B\u000C\u000D\u0020\u0085\u00A0\u1680\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200A\u2028\u2029\u202F\u205F\u3000] )+ }
   whitespace { @whitespace+ }
-  Number { Not? @digit+ }
+  Number { @digit+ }
   Date { @digit @digit @digit @digit "-" @digit? @digit "-" @digit? @digit }
+  Rating { "1" | "2" | "3" | "4" }
 
   Not { "-" }
   @precedence { Date, Number, Not, SimpleString }
+  @precedence { Rating, SimpleString }
 }
 
 @external propSource queryHighlighting from "./query.highlight.js"
