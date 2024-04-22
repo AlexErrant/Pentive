@@ -42,6 +42,16 @@ export const initSql = [
       -- All characters that are not the unit separator are tokenchars 89CDE7EA-EF1B-4054-B381-597EE549CAB4
       tokenize = "unicode61 categories 'L* M* N* P* S* Z* C*' separators '\x1F'"
   );`,
+	`CREATE VIRTUAL TABLE IF NOT EXISTS templateNameFts USING fts5 (
+	    name,
+      content=template,
+      content_rowid=rowid
+  );`,
+	`CREATE VIRTUAL TABLE IF NOT EXISTS cardSettingNameFts USING fts5 (
+	    name,
+      content=cardSetting,
+      content_rowid=rowid
+  );`,
 	`CREATE VIRTUAL TABLE IF NOT EXISTS noteFtsMedia USING fts5 (
 	    media,
       content=note,
@@ -77,6 +87,26 @@ export const initSql = [
      INSERT INTO noteFtsMedia(noteFtsMedia, rowid, media  ) VALUES('delete', old.rowid, getMediaIds(old.fieldValues));
      INSERT INTO noteFtsTag(rowid, tags       ) VALUES (new.rowid, new.tags       );
      INSERT INTO noteFtsMedia(rowid, media    ) VALUES (new.rowid, getMediaIds(new.fieldValues));
+   END;`,
+	`CREATE TRIGGER IF NOT EXISTS template_after_insert AFTER INSERT ON template BEGIN
+      INSERT INTO templateNameFts (rowid, name) VALUES (new.rowid, new.name);
+   END;`,
+	`CREATE TRIGGER IF NOT EXISTS template_after_delete AFTER DELETE ON template BEGIN
+      INSERT INTO templateNameFts (templateNameFts, rowid, name) VALUES('delete', old.rowid, old.name);
+   END;`,
+	`CREATE TRIGGER IF NOT EXISTS template_after_update AFTER UPDATE ON template BEGIN
+      INSERT INTO templateNameFts (templateNameFts, rowid, name) VALUES('delete', old.rowid, old.name);
+      INSERT INTO templateNameFts (rowid, name) VALUES (new.rowid, new.name);
+   END;`,
+	`CREATE TRIGGER IF NOT EXISTS cardSetting_after_insert AFTER INSERT ON cardSetting BEGIN
+      INSERT INTO cardSettingNameFts (rowid, name) VALUES (new.rowid, new.name);
+   END;`,
+	`CREATE TRIGGER IF NOT EXISTS cardSetting_after_delete AFTER DELETE ON cardSetting BEGIN
+      INSERT INTO cardSettingNameFts (cardSettingNameFts, rowid, name) VALUES('delete', old.rowid, old.name);
+   END;`,
+	`CREATE TRIGGER IF NOT EXISTS cardSetting_after_update AFTER UPDATE ON cardSetting BEGIN
+      INSERT INTO cardSettingNameFts (cardSettingNameFts, rowid, name) VALUES('delete', old.rowid, old.name);
+      INSERT INTO cardSettingNameFts (rowid, name) VALUES (new.rowid, new.name);
    END;`,
 	`CREATE TABLE IF NOT EXISTS remoteNote (
     localId TEXT, -- make BLOB upon SQLite v3.41 and the landing of UNHEX https://sqlite.org/forum/forumpost/30cca4e613d2fa2a grep F235B7FB-8CEA-4AE2-99CC-2790E607B1EB

@@ -68,6 +68,16 @@ export interface RemoteNote {
 	uploadDate: number | null
 }
 
+export interface TemplateNameFts {
+	rowid: number
+	name: string
+}
+
+export interface CardSettingNameFts {
+	rowid: number
+	name: string
+}
+
 export interface Plugin {
 	name: PluginName
 	version: PluginVersion
@@ -148,6 +158,8 @@ export interface DB {
 	noteFtsTagVocab: NoteFtsTagVocab
 	noteFtsMediaVocab: NoteFtsMediaVocab
 	cardFtsTagVocab: CardFtsTagVocab
+	cardSettingNameFts: CardSettingNameFts
+	templateNameFts: TemplateNameFts
 	card: Card
 	media: Media
 	note: Note

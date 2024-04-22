@@ -8,7 +8,13 @@ import {
 	type NoteCard,
 } from 'shared'
 import { ky, C, rd } from '../topLevelAwait'
-import { type DB, type Card as CardEntity, type Note } from './database'
+import {
+	type DB,
+	type Card as CardEntity,
+	type Note,
+	type CardSetting,
+	type Template,
+} from './database'
 import {
 	type ExpressionBuilder,
 	type OnConflictDatabase,
@@ -133,6 +139,8 @@ type WithCache = {
 	// I'm not adding rowid to the official type definition of Notes because it adds noise to Insert/Update/Conflict resolution types
 	note: Note & { rowid: number }
 	card: CardEntity & { rowid: number }
+	cardSetting: CardSetting & { rowid: number }
+	template: Template & { rowid: number }
 }
 
 // We cache the query's `card.id`s in a temp table. We use the temp table's rowids as a hack to get cursor pagination.
@@ -215,6 +223,7 @@ async function getCards(
 	const baseQuery = db
 		.selectFrom('card')
 		.innerJoin('note', 'card.noteId', 'note.id')
+		.innerJoin('template', 'template.id', 'note.templateId')
 		.$if(sort != null, (db) => db.orderBy(sort!.col, sort!.direction))
 		// don't `where` when scrolling - redundant since joining on the cache already filters
 		.$if(offset === 0 && conversionResult.sql != null, (db) =>
@@ -225,6 +234,18 @@ async function getCards(
 						.orderBy(sql`noteFtsFv.rank`),
 				)
 				.$if(conversionResult.joinTags, (db) =>
+					db
+						.innerJoin('noteFtsTag', 'noteFtsTag.rowid', 'note.rowid')
+						.innerJoin('cardFtsTag', 'cardFtsTag.rowid', 'card.rowid'),
+				)
+				.$if(conversionResult.joinTemplateFts, (db) =>
+					db.innerJoin(
+						'templateNameFts',
+						'templateNameFts.rowid',
+						'template.rowid',
+					),
+				)
+				.$if(conversionResult.joinCardSettingFts, (db) =>
 					db
 						.innerJoin('noteFtsTag', 'noteFtsTag.rowid', 'note.rowid')
 						.innerJoin('cardFtsTag', 'cardFtsTag.rowid', 'card.rowid'),
@@ -240,7 +261,6 @@ async function getCards(
 				.innerJoin(searchCache!, 'card.id', `${searchCache!}.id`)
 				.where(`${searchCache!}.rowid`, '>=', offset),
 		)
-		.innerJoin('template', 'template.id', 'note.templateId')
 		.leftJoin('remoteNote', 'note.id', 'remoteNote.localId')
 		.leftJoin('remoteTemplate', 'template.id', 'remoteTemplate.localId')
 		.select([

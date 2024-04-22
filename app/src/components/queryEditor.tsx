@@ -177,6 +177,10 @@ const queryLanguage = LRLanguage.define({
 	languageData: {
 		autocomplete: queryCompletion({
 			getTags: db.getTags,
+			getTemplates: async () =>
+				await db.getTemplates().then((ts) => ts.map((t) => t.name)),
+			getCardSettings: async () =>
+				await db.getCardSettings().then((css) => css.map((cs) => cs.name)),
 			getHistory,
 		}) satisfies CompletionSource,
 	},

@@ -10,7 +10,14 @@ import {
 	SimpleString,
 	Label,
 } from './queryParser.terms'
-import { escapedQuoted, getLabel, stringLabels } from './query2sql'
+import {
+	escapedQuoted,
+	getLabel,
+	setting,
+	stringLabels,
+	tag,
+	template,
+} from './query2sql'
 import { type SyntaxNode } from '@lezer/common'
 
 // I don't think we should use Codemirror's autocomplete for showing history. Doing anything more
@@ -33,9 +40,11 @@ function buildHistory(getHistory: () => Set<string>) {
 
 export const queryCompletion: (_: {
 	getTags: () => Promise<string[]>
+	getTemplates: () => Promise<string[]>
+	getCardSettings: () => Promise<string[]>
 	getHistory: () => Set<string>
 }) => CompletionSource =
-	({ getTags, getHistory }) =>
+	({ getTags, getHistory, getTemplates, getCardSettings }) =>
 	async (context) => {
 		if (context.explicit && context.pos === 0) {
 			return {
@@ -73,7 +82,7 @@ export const queryCompletion: (_: {
 				options,
 				validFor: /^(\w*)?$/,
 			}
-		} else if (inLabel(nodeBefore, 'tag')) {
+		} else if (inLabel(nodeBefore, tag)) {
 			const textBefore = context.state.sliceDoc(nodeBefore.from, context.pos)
 			const tagBefore = /\w*$/.exec(textBefore)
 			if (tagBefore == null && !context.explicit) return null
@@ -86,6 +95,50 @@ export const queryCompletion: (_: {
 					return {
 						label: tag,
 						type: 'tag',
+						apply: nodeBefore.type.is(QuotedString)
+							? escaped
+							: '"' + escaped + '"',
+					} satisfies Completion
+				}),
+				validFor: /^(\w*)?$/,
+			}
+		} else if (inLabel(nodeBefore, setting)) {
+			const textBefore = context.state.sliceDoc(nodeBefore.from, context.pos)
+			const cardSettingBefore = /\w*$/.exec(textBefore)
+			if (cardSettingBefore == null && !context.explicit) return null
+			const cardSettings = await getCardSettings()
+			return {
+				from:
+					cardSettingBefore != null
+						? nodeBefore.from + cardSettingBefore.index
+						: context.pos,
+				options: cardSettings.map((cardSetting) => {
+					const escaped = escapedQuoted(cardSetting)
+					return {
+						label: cardSetting,
+						type: 'general',
+						apply: nodeBefore.type.is(QuotedString)
+							? escaped
+							: '"' + escaped + '"',
+					} satisfies Completion
+				}),
+				validFor: /^(\w*)?$/,
+			}
+		} else if (inLabel(nodeBefore, template)) {
+			const textBefore = context.state.sliceDoc(nodeBefore.from, context.pos)
+			const templateBefore = /\w*$/.exec(textBefore)
+			if (templateBefore == null && !context.explicit) return null
+			const templates = await getTemplates()
+			return {
+				from:
+					templateBefore != null
+						? nodeBefore.from + templateBefore.index
+						: context.pos,
+				options: templates.map((template) => {
+					const escaped = escapedQuoted(template)
+					return {
+						label: template,
+						type: 'general',
 						apply: nodeBefore.type.is(QuotedString)
 							? escaped
 							: '"' + escaped + '"',

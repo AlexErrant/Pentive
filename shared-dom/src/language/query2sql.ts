@@ -12,6 +12,8 @@ class Context {
 		this.current = this.root
 		this.joinTags = false
 		this.joinFts = false
+		this.joinTemplateFts = false
+		this.joinCardSettingFts = false
 	}
 
 	sql: Array<string | RawBuilder<unknown>>
@@ -19,6 +21,8 @@ class Context {
 	current: Group
 	joinTags: boolean
 	joinFts: boolean
+	joinTemplateFts: boolean
+	joinCardSettingFts: boolean
 
 	trustedSql(trustedSql: string) {
 		this.sql.push(sql.raw(` ${trustedSql} `))
@@ -47,6 +51,8 @@ export function convert(input: string) {
 				: (sql.join(context.sql, sql``) as RawBuilder<SqlBool>),
 		joinTags: context.joinTags,
 		joinFts: context.joinFts,
+		joinCardSettingFts: context.joinCardSettingFts,
+		joinTemplateFts: context.joinTemplateFts,
 		strings: findStrings(context.root),
 	}
 }
@@ -152,8 +158,25 @@ function serialize(node: Node, context: Context) {
 		} else if (node.label === tag) {
 			buildTagSearch(node, context)
 		} else if (node.label === template) {
+			context.joinTemplateFts = true
+			const not = getNot(node.negate)
+			const value = getValue(node)
+			context.parameterizeSql(
+				sql`template.rowid ${not} IN (SELECT rowid FROM templateNameFts WHERE templateNameFts.name MATCH ${value})`,
+			)
+		} else if (node.label === templateId) {
 			const equals = sql.raw(node.negate ? '!=' : '=')
 			context.parameterizeSql(sql`note.templateId ${equals} ${node.value}`)
+		} else if (node.label === setting) {
+			context.joinCardSettingFts = true
+			const not = getNot(node.negate)
+			const value = getValue(node)
+			context.parameterizeSql(
+				sql`card.cardSettingId ${not} IN (SELECT rowid FROM cardSettingNameFts WHERE cardSettingNameFts.name MATCH ${value})`,
+			)
+		} else if (node.label === settingId) {
+			const equals = sql.raw(node.negate ? '!=' : '=')
+			context.parameterizeSql(sql`card.cardSettingId ${equals} ${node.value}`)
 		}
 	} else if (node.type === regex) {
 		context.joinFts = true
@@ -162,13 +185,16 @@ function serialize(node: Node, context: Context) {
 			sql`${not} regexp_with_flags(${node.pattern}, ${node.flags}, noteFtsFv.value)`,
 		)
 	} else if (node.type === group) {
-		if (!node.isRoot) {
+		const paren =
+			!node.isRoot &&
+			!(node.children.length === 1 && node.children[0]?.type === 'Group') // don't paren if the only child is a group, since that child will have its own parens
+		if (paren) {
 			context.trustedSql('(')
 		}
 		for (const child of node.children) {
 			serialize(child, context)
 		}
-		if (!node.isRoot) {
+		if (paren) {
 			context.trustedSql(')')
 		}
 	} else if (node.type === and) {
@@ -250,10 +276,10 @@ type Leaf =
 export type Node = Group | Leaf
 
 // labels
-const tag = 'tag' as const
-const template = 'template' as const
+export const tag = 'tag' as const
+export const template = 'template' as const
 const templateId = 'templateId' as const
-const setting = 'setting' as const
+export const setting = 'setting' as const
 const field = 'field' as const
 const cardId = 'cardId' as const
 const noteId = 'noteId' as const

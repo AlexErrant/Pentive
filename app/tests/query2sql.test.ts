@@ -197,13 +197,11 @@ test('not distributes over OR', async () => {
 test('double negative grouping does nothing', async () => {
 	await assertEqual(
 		'-(-(a OR b))',
-		`(
-  (
-    noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"a"')
-    OR
-    noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"b"')
-  )
-)`,
+		`((
+  noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"a"')
+  OR
+  noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"b"')
+))`,
 		2,
 	)
 })
@@ -342,13 +340,45 @@ describe('skip error nodes', () => {
 
 describe('template', () => {
 	test('1', async () => {
-		await assertEqual('template:foo', `(note.templateId = 'foo')`, 1)
+		await assertEqual(
+			'template:foo',
+			`(template.rowid IN (SELECT rowid FROM templateNameFts WHERE templateNameFts.name MATCH '"foo"'))`,
+			1,
+		)
 	})
 
 	test('2', async () => {
 		await assertEqual(
 			'(template:foo,bar)',
-			`(note.templateId = 'foo' OR note.templateId = 'bar')`,
+			`(
+  template.rowid IN (SELECT rowid FROM templateNameFts WHERE templateNameFts.name MATCH '"foo"')
+  OR
+  template.rowid IN (SELECT rowid FROM templateNameFts WHERE templateNameFts.name MATCH '"bar"')
+)`,
+			2,
+		)
+	})
+
+	test('wildcard', async () => {
+		await assertEqual(
+			'(template:foo*,bar)',
+			`(
+  template.rowid IN (SELECT rowid FROM templateNameFts WHERE templateNameFts.name MATCH '"foo" * ')
+  OR
+  template.rowid IN (SELECT rowid FROM templateNameFts WHERE templateNameFts.name MATCH '"bar"')
+)`,
+			2,
+		)
+	})
+
+	test('can contain doublequote and backslash', async () => {
+		await assertEqual(
+			`(template:"a\\"b","c\\\\b")`,
+			`(
+  template.rowid IN (SELECT rowid FROM templateNameFts WHERE templateNameFts.name MATCH '"a""b"')
+  OR
+  template.rowid IN (SELECT rowid FROM templateNameFts WHERE templateNameFts.name MATCH '"c\\b"')
+)`,
 			2,
 		)
 	})
@@ -359,7 +389,7 @@ describe('template', () => {
 			`
 noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"a"')
 AND
-(note.templateId = 't')
+(template.rowid IN (SELECT rowid FROM templateNameFts WHERE templateNameFts.name MATCH '"t"'))
 AND
 noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"b"')`,
 			3,
@@ -372,7 +402,7 @@ noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"b"
 			`
 noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"a b"')
 OR
-(note.templateId = 't')
+(template.rowid IN (SELECT rowid FROM templateNameFts WHERE templateNameFts.name MATCH '"t"'))
 OR
 noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"c d"')`,
 			3,
@@ -382,15 +412,27 @@ noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"c 
 	test('quoted', async () => {
 		await assertEqual(
 			'(template:"foo bar",biz,"baz quz")',
-			`(note.templateId = 'foo bar' OR note.templateId = 'biz' OR note.templateId = 'baz quz')`,
+			`(
+  template.rowid IN (SELECT rowid FROM templateNameFts WHERE templateNameFts.name MATCH '"foo bar"')
+  OR
+  template.rowid IN (SELECT rowid FROM templateNameFts WHERE templateNameFts.name MATCH '"biz"')
+  OR
+  template.rowid IN (SELECT rowid FROM templateNameFts WHERE templateNameFts.name MATCH '"baz quz"')
+)`,
 			3,
 		)
 	})
 
 	test('spaces', async () => {
 		await assertEqual(
-			' (template : "foo bar" , biz      , "baz quz") ',
-			`(note.templateId = 'foo bar' OR note.templateId = 'biz' OR note.templateId = 'baz quz')`,
+			' (template: "foo bar" , biz      , "baz quz") ',
+			`(
+  template.rowid IN (SELECT rowid FROM templateNameFts WHERE templateNameFts.name MATCH '"foo bar"')
+  OR
+  template.rowid IN (SELECT rowid FROM templateNameFts WHERE templateNameFts.name MATCH '"biz"')
+  OR
+  template.rowid IN (SELECT rowid FROM templateNameFts WHERE templateNameFts.name MATCH '"baz quz"')
+)`,
 			3,
 		)
 	})
@@ -398,7 +440,11 @@ noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"c 
 	test('neg on group', async () => {
 		await assertEqual(
 			'-(template:foo,bar)',
-			`(note.templateId != 'foo' AND note.templateId != 'bar')`,
+			`(
+  template.rowid NOT IN (SELECT rowid FROM templateNameFts WHERE templateNameFts.name MATCH '"foo"')
+  AND
+  template.rowid NOT IN (SELECT rowid FROM templateNameFts WHERE templateNameFts.name MATCH '"bar"')
+)`,
 			2,
 		)
 	})
@@ -406,14 +452,319 @@ noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"c 
 	test('neg on tag', async () => {
 		await assertEqual(
 			'(-template:foo,bar)',
+			`(
+  template.rowid NOT IN (SELECT rowid FROM templateNameFts WHERE templateNameFts.name MATCH '"foo"')
+  AND
+  template.rowid NOT IN (SELECT rowid FROM templateNameFts WHERE templateNameFts.name MATCH '"bar"')
+)`,
+			2,
+		)
+	})
+
+	test('double neg', async () => {
+		await assertEqual(
+			'-(-template:foo,bar)',
+			`(
+  template.rowid IN (SELECT rowid FROM templateNameFts WHERE templateNameFts.name MATCH '"foo"')
+  OR
+  template.rowid IN (SELECT rowid FROM templateNameFts WHERE templateNameFts.name MATCH '"bar"')
+)`,
+			2,
+		)
+	})
+})
+
+describe('templateId', () => {
+	test('1', async () => {
+		await assertEqual('templateId:foo', `(note.templateId = 'foo')`, 1)
+	})
+
+	test('2', async () => {
+		await assertEqual(
+			'(templateId:foo,bar)',
+			`(note.templateId = 'foo' OR note.templateId = 'bar')`,
+			2,
+		)
+	})
+
+	test('simple string ANDed with template', async () => {
+		await assertEqual(
+			'a templateId:t b',
+			`
+noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"a"')
+AND
+(note.templateId = 't')
+AND
+noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"b"')`,
+			3,
+		)
+	})
+
+	test('quoted string ORed with template', async () => {
+		await assertEqual(
+			'"a b" OR templateId:t OR "c d"',
+			`
+noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"a b"')
+OR
+(note.templateId = 't')
+OR
+noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"c d"')`,
+			3,
+		)
+	})
+
+	test('quoted', async () => {
+		await assertEqual(
+			'(templateId:"foo bar",biz,"baz quz")',
+			`(note.templateId = 'foo bar' OR note.templateId = 'biz' OR note.templateId = 'baz quz')`,
+			3,
+		)
+	})
+
+	test('spaces', async () => {
+		await assertEqual(
+			' (templateId : "foo bar" , biz      , "baz quz") ',
+			`(note.templateId = 'foo bar' OR note.templateId = 'biz' OR note.templateId = 'baz quz')`,
+			3,
+		)
+	})
+
+	test('neg on group', async () => {
+		await assertEqual(
+			'-(templateId:foo,bar)',
 			`(note.templateId != 'foo' AND note.templateId != 'bar')`,
 			2,
 		)
 	})
+
+	test('neg on tag', async () => {
+		await assertEqual(
+			'(-templateId:foo,bar)',
+			`(note.templateId != 'foo' AND note.templateId != 'bar')`,
+			2,
+		)
+	})
+
 	test('double neg', async () => {
 		await assertEqual(
-			'-(-template:foo,bar)',
+			'-(-templateId:foo,bar)',
 			`(note.templateId = 'foo' OR note.templateId = 'bar')`,
+			2,
+		)
+	})
+})
+
+describe('setting', () => {
+	test('1', async () => {
+		await assertEqual(
+			'setting:foo',
+			`(card.cardSettingId IN (SELECT rowid FROM cardSettingNameFts WHERE cardSettingNameFts.name MATCH '"foo"'))`,
+			1,
+		)
+	})
+
+	test('2', async () => {
+		await assertEqual(
+			'(setting:foo,bar)',
+			`(
+  card.cardSettingId IN (SELECT rowid FROM cardSettingNameFts WHERE cardSettingNameFts.name MATCH '"foo"')
+  OR
+  card.cardSettingId IN (SELECT rowid FROM cardSettingNameFts WHERE cardSettingNameFts.name MATCH '"bar"')
+)`,
+			2,
+		)
+	})
+
+	test('wildcard', async () => {
+		await assertEqual(
+			'(setting:foo*,bar)',
+			`(
+  card.cardSettingId IN (SELECT rowid FROM cardSettingNameFts WHERE cardSettingNameFts.name MATCH '"foo" * ')
+  OR
+  card.cardSettingId IN (SELECT rowid FROM cardSettingNameFts WHERE cardSettingNameFts.name MATCH '"bar"')
+)`,
+			2,
+		)
+	})
+
+	test('can contain doublequote and backslash', async () => {
+		await assertEqual(
+			`(setting:"a\\"b","c\\\\b")`,
+			`(
+  card.cardSettingId IN (SELECT rowid FROM cardSettingNameFts WHERE cardSettingNameFts.name MATCH '"a""b"')
+  OR
+  card.cardSettingId IN (SELECT rowid FROM cardSettingNameFts WHERE cardSettingNameFts.name MATCH '"c\\b"')
+)`,
+			2,
+		)
+	})
+
+	test('simple string ANDed with setting', async () => {
+		await assertEqual(
+			'a setting:t b',
+			`
+noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"a"')
+AND
+(card.cardSettingId IN (SELECT rowid FROM cardSettingNameFts WHERE cardSettingNameFts.name MATCH '"t"'))
+AND
+noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"b"')`,
+			3,
+		)
+	})
+
+	test('quoted string ORed with setting', async () => {
+		await assertEqual(
+			'"a b" OR setting:t OR "c d"',
+			`
+noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"a b"')
+OR
+(card.cardSettingId IN (SELECT rowid FROM cardSettingNameFts WHERE cardSettingNameFts.name MATCH '"t"'))
+OR
+noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"c d"')`,
+			3,
+		)
+	})
+
+	test('quoted', async () => {
+		await assertEqual(
+			'(setting:"foo bar",biz,"baz quz")',
+			`(
+  card.cardSettingId IN (SELECT rowid FROM cardSettingNameFts WHERE cardSettingNameFts.name MATCH '"foo bar"')
+  OR
+  card.cardSettingId IN (SELECT rowid FROM cardSettingNameFts WHERE cardSettingNameFts.name MATCH '"biz"')
+  OR
+  card.cardSettingId IN (SELECT rowid FROM cardSettingNameFts WHERE cardSettingNameFts.name MATCH '"baz quz"')
+)`,
+			3,
+		)
+	})
+
+	test('spaces', async () => {
+		await assertEqual(
+			' (setting: "foo bar" , biz      , "baz quz") ',
+			`(
+  card.cardSettingId IN (SELECT rowid FROM cardSettingNameFts WHERE cardSettingNameFts.name MATCH '"foo bar"')
+  OR
+  card.cardSettingId IN (SELECT rowid FROM cardSettingNameFts WHERE cardSettingNameFts.name MATCH '"biz"')
+  OR
+  card.cardSettingId IN (SELECT rowid FROM cardSettingNameFts WHERE cardSettingNameFts.name MATCH '"baz quz"')
+)`,
+			3,
+		)
+	})
+
+	test('neg on group', async () => {
+		await assertEqual(
+			'-(setting:foo,bar)',
+			`(
+  card.cardSettingId NOT IN (SELECT rowid FROM cardSettingNameFts WHERE cardSettingNameFts.name MATCH '"foo"')
+  AND
+  card.cardSettingId NOT IN (SELECT rowid FROM cardSettingNameFts WHERE cardSettingNameFts.name MATCH '"bar"')
+)`,
+			2,
+		)
+	})
+
+	test('neg on tag', async () => {
+		await assertEqual(
+			'(-setting:foo,bar)',
+			`(
+  card.cardSettingId NOT IN (SELECT rowid FROM cardSettingNameFts WHERE cardSettingNameFts.name MATCH '"foo"')
+  AND
+  card.cardSettingId NOT IN (SELECT rowid FROM cardSettingNameFts WHERE cardSettingNameFts.name MATCH '"bar"')
+)`,
+			2,
+		)
+	})
+
+	test('double neg', async () => {
+		await assertEqual(
+			'-(-setting:foo,bar)',
+			`(
+  card.cardSettingId IN (SELECT rowid FROM cardSettingNameFts WHERE cardSettingNameFts.name MATCH '"foo"')
+  OR
+  card.cardSettingId IN (SELECT rowid FROM cardSettingNameFts WHERE cardSettingNameFts.name MATCH '"bar"')
+)`,
+			2,
+		)
+	})
+})
+
+describe('settingId', () => {
+	test('1', async () => {
+		await assertEqual('settingId:foo', `(card.cardSettingId = 'foo')`, 1)
+	})
+
+	test('2', async () => {
+		await assertEqual(
+			'(settingId:foo,bar)',
+			`(card.cardSettingId = 'foo' OR card.cardSettingId = 'bar')`,
+			2,
+		)
+	})
+
+	test('simple string ANDed with setting', async () => {
+		await assertEqual(
+			'a settingId:t b',
+			`
+noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"a"')
+AND
+(card.cardSettingId = 't')
+AND
+noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"b"')`,
+			3,
+		)
+	})
+
+	test('quoted string ORed with setting', async () => {
+		await assertEqual(
+			'"a b" OR settingId:t OR "c d"',
+			`
+noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"a b"')
+OR
+(card.cardSettingId = 't')
+OR
+noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"c d"')`,
+			3,
+		)
+	})
+
+	test('quoted', async () => {
+		await assertEqual(
+			'(settingId:"foo bar",biz,"baz quz")',
+			`(card.cardSettingId = 'foo bar' OR card.cardSettingId = 'biz' OR card.cardSettingId = 'baz quz')`,
+			3,
+		)
+	})
+
+	test('spaces', async () => {
+		await assertEqual(
+			' (settingId : "foo bar" , biz      , "baz quz") ',
+			`(card.cardSettingId = 'foo bar' OR card.cardSettingId = 'biz' OR card.cardSettingId = 'baz quz')`,
+			3,
+		)
+	})
+
+	test('neg on group', async () => {
+		await assertEqual(
+			'-(settingId:foo,bar)',
+			`(card.cardSettingId != 'foo' AND card.cardSettingId != 'bar')`,
+			2,
+		)
+	})
+
+	test('neg on tag', async () => {
+		await assertEqual(
+			'(-settingId:foo,bar)',
+			`(card.cardSettingId != 'foo' AND card.cardSettingId != 'bar')`,
+			2,
+		)
+	})
+
+	test('double neg', async () => {
+		await assertEqual(
+			'-(-settingId:foo,bar)',
+			`(card.cardSettingId = 'foo' OR card.cardSettingId = 'bar')`,
 			2,
 		)
 	})
