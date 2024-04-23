@@ -28,7 +28,7 @@ stateValueExpression[@dynamicPrecedence=3] {
 
 kindValueExpression[@dynamicPrecedence=3] {
   !unary Not?
-  kindValue
+  KindValue
   ~x (Or? kindValueExpression)*
 }
 
@@ -41,7 +41,7 @@ Label {
     "(" Not? stringLabels     stringExpression ")" | stringLabels Not? string
   | "(" Not?     idLabels         idExpression ")" |     idLabels Not? id
   | "(" Not?      stateIs stateValueExpression ")" |      stateIs Not? stateValue
-  | "(" Not?       kindIs  kindValueExpression ")" |       kindIs Not?  kindValue
+  | "(" Not?       kindIs  kindValueExpression ")" |       kindIs Not?  KindValue
   | due
   | repsLapses
   | createdUpdated
@@ -92,14 +92,6 @@ stateValue {
   | kw<"suspended">
 }
 
-kindValue {
-    kw<"new">
-  | kw<"learn">
-  | kw<"review">
-  | kw<"relearn">
-  | kw<"cram">
-}
-
 due {
   kw<"due">
   ( is kw<"true">
@@ -137,6 +129,12 @@ reviewed {
 Comparison { ":" | "=" | "<" | ">" | "<=" | ">=" }
 Is { ":" | "=" } // Used when we care about the difference between = and :
 is { ":" | "=" } // Used when we don't care. Exists to make the grammar more forgiving for users.
+
+@external tokens labelValue from "./query.tokens.ts" {
+  KindValue
+}
+
+@context labelContext from "./query.tokens.ts"
 
 @tokens {
   Wildcard { "*" }
