@@ -12,7 +12,14 @@ import {
 	Regex,
 } from './queryParser.terms'
 import { escapedQuoted, getLabel } from './query2sql'
-import { setting, stringLabels, tag, template } from './stringLabels'
+import {
+	kind,
+	kindValues,
+	setting,
+	stringLabels,
+	tag,
+	template,
+} from './stringLabels'
 import { type SyntaxNode } from '@lezer/common'
 
 // I don't think we should use Codemirror's autocomplete for showing history. Doing anything more
@@ -117,6 +124,22 @@ export const queryCompletion: (_: {
 							: '"' + escaped + '"',
 					} satisfies Completion
 				}),
+				validFor: /^(\w*)?$/,
+			}
+		} else if (inLabel(nodeBefore, kind)) {
+			const textBefore = context.state.sliceDoc(nodeBefore.from, context.pos)
+			const kindBefore = /\w*$/.exec(textBefore)
+			if (kindBefore == null && !context.explicit) return null
+			return {
+				from:
+					kindBefore != null ? nodeBefore.from + kindBefore.index : context.pos,
+				options: kindValues.map(
+					(kind) =>
+						({
+							label: kind,
+							type: 'general',
+						}) satisfies Completion,
+				),
 				validFor: /^(\w*)?$/,
 			}
 		} else if (inLabel(nodeBefore, template)) {

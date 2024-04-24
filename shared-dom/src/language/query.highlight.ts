@@ -3,12 +3,14 @@ import { HighlightStyle, type TagStyle } from '@codemirror/language'
 import { stringLabels } from './stringLabels'
 
 const labelGroup = Tag.define()
+const labelValue = Tag.define()
 
 export const queryHighlighting = styleTags({
 	/* eslint-disable @typescript-eslint/naming-convention */
 	'Not Or Wildcard Is': t.operatorKeyword,
 	Regex: t.regexp,
 	'Label/...': labelGroup,
+	KindValue: labelValue,
 	/* eslint-enable @typescript-eslint/naming-convention */
 	[stringLabels.join(' ')]: t.labelName,
 })
@@ -37,6 +39,10 @@ function createSpecs(isLight: boolean) {
 		{
 			tag: labelGroup,
 			textDecoration: overline,
+		},
+		{
+			tag: labelValue,
+			...notSearchTermStyle,
 		},
 	] satisfies readonly TagStyle[]
 }

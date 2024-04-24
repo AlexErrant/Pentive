@@ -7,7 +7,7 @@ const cardId = 'cardId' as const
 const noteId = 'noteId' as const
 export const settingId = 'settingId' as const
 const state = 'state' as const
-const kind = 'kind' as const
+export const kind = 'kind' as const
 const due = 'due' as const
 const note = 'note' as const
 const card = 'card' as const
@@ -39,3 +39,5 @@ export const labels = [
 	firstReviewed,
 ] as const
 export const stringLabels = labels as readonly string[]
+
+export const kindValues = ['new', 'learn', 'review', 'relearn', 'cram']
