@@ -34,8 +34,8 @@ kindValueExpression[@dynamicPrecedence=3] {
 
 Group { "(" expression ")" }
 
-stateIs { kw<"state"> is }
-kindIs  { kw<"kind">  is }
+stateIs { kw<"state"> Is }
+kindIs  { kw<"kind">  Is }
 
 Label {
     "(" Not? stringLabels     stringExpression ")" | stringLabels Not? string
@@ -79,7 +79,7 @@ idLabels {
   | kw<"cardId">
   | kw<"noteId">
   | kw<"settingId">
-  ) is
+  ) Is
 }
 
 Or { @specialize<SimpleString, "OR"> | ","}
@@ -94,9 +94,9 @@ stateValue {
 
 due {
   kw<"due">
-  ( is kw<"true">
-  | is kw<"false">
-  | is Not? Number
+  ( Is kw<"true">
+  | Is kw<"false">
+  | Is Not? Number
   | Comparison Date )
 }
 
@@ -105,7 +105,7 @@ createdUpdated {
     ( kw<"note"> | kw<"card"> ) ":"
   ) ?
   ( kw<"created"> | kw<"edited"> )
-  ( is Not? Number
+  ( Is Not? Number
   | Comparison Date )
 }
 
@@ -127,8 +127,7 @@ reviewed {
 }
 
 Comparison { ":" | "=" | "<" | ">" | "<=" | ">=" }
-Is { ":" | "=" } // Used when we care about the difference between = and :
-is { ":" | "=" } // Used when we don't care. Exists to make the grammar more forgiving for users.
+Is { ":" | "=" }
 
 @external tokens labelValue from "./query.tokens.ts" {
   KindValue
