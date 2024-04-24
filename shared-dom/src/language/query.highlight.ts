@@ -1,27 +1,16 @@
 import { Tag, styleTags, tags as t } from '@lezer/highlight'
 import { HighlightStyle, type TagStyle } from '@codemirror/language'
+import { stringLabels } from './stringLabels'
 
-const childStringTag = Tag.define()
-
-const prefixes = ['Deck', 'Tag', 'Template']
-function childStringKeys() {
-	const suffixes = ['SimpleString', 'QuotedString']
-	const r = []
-	for (const p of prefixes) {
-		for (const s of suffixes) {
-			r.push(`${p}/${s}`)
-		}
-	}
-	return r.join(' ')
-}
+const labelGroup = Tag.define()
 
 export const queryHighlighting = styleTags({
-	// eslint-disable-next-line @typescript-eslint/naming-convention
-	'Not Or Wildcard': t.operatorKeyword,
-	// eslint-disable-next-line @typescript-eslint/naming-convention
+	/* eslint-disable @typescript-eslint/naming-convention */
+	'Not Or Wildcard Is': t.operatorKeyword,
 	Regex: t.regexp,
-	[childStringKeys()]: childStringTag,
-	[prefixes.join(' ')]: t.labelName,
+	'Label/...': labelGroup,
+	/* eslint-enable @typescript-eslint/naming-convention */
+	[stringLabels.join(' ')]: t.labelName,
 })
 
 const notSearchTermStyle = {
@@ -46,7 +35,7 @@ function createSpecs(isLight: boolean) {
 			...notSearchTermStyle,
 		},
 		{
-			tag: childStringTag,
+			tag: labelGroup,
 			textDecoration: overline,
 		},
 	] satisfies readonly TagStyle[]

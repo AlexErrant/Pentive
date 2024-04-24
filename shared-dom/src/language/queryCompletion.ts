@@ -11,14 +11,8 @@ import {
 	Label,
 	Regex,
 } from './queryParser.terms'
-import {
-	escapedQuoted,
-	getLabel,
-	setting,
-	stringLabels,
-	tag,
-	template,
-} from './query2sql'
+import { escapedQuoted, getLabel } from './query2sql'
+import { setting, stringLabels, tag, template } from './stringLabels'
 import { type SyntaxNode } from '@lezer/common'
 
 // I don't think we should use Codemirror's autocomplete for showing history. Doing anything more

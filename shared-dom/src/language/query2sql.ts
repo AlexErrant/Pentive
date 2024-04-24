@@ -4,6 +4,15 @@ import { assertNever, throwExp } from 'shared'
 import { sql, type RawBuilder, type SqlBool } from 'kysely'
 import { Is, Regex, Wildcard } from './queryParser.terms'
 import { queryTerms as qt } from '..'
+import {
+	stringLabels,
+	labels,
+	tag,
+	template,
+	templateId,
+	setting,
+	settingId,
+} from './stringLabels'
 
 class Context {
 	constructor() {
@@ -318,48 +327,6 @@ type Leaf = { type: typeof or | typeof and } | QueryString | QueryRegex
 
 export type Node = Group | Leaf
 
-// labels
-export const tag = 'tag' as const
-export const template = 'template' as const
-const templateId = 'templateId' as const
-export const setting = 'setting' as const
-const field = 'field' as const
-const cardId = 'cardId' as const
-const noteId = 'noteId' as const
-const settingId = 'settingId' as const
-const state = 'state' as const
-const kind = 'kind' as const
-const due = 'due' as const
-const note = 'note' as const
-const card = 'card' as const
-const created = 'created' as const
-const edited = 'edited' as const
-const reps = 'reps' as const
-const lapses = 'lapses' as const
-const reviewed = 'reviewed' as const
-const firstReviewed = 'firstReviewed' as const
-const labels = [
-	tag,
-	template,
-	templateId,
-	setting,
-	field,
-	cardId,
-	noteId,
-	settingId,
-	state,
-	kind,
-	due,
-	note,
-	card,
-	created,
-	edited,
-	reps,
-	lapses,
-	reviewed,
-	firstReviewed,
-] as const
-export const stringLabels = labels as readonly string[]
 type Label = (typeof labels)[number]
 
 // types
