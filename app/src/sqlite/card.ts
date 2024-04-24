@@ -250,6 +250,25 @@ async function getCards(
 						.innerJoin('noteFtsTag', 'noteFtsTag.rowid', 'note.rowid')
 						.innerJoin('cardFtsTag', 'cardFtsTag.rowid', 'card.rowid'),
 				)
+				.$if(conversionResult.joinLatestReview, (db) =>
+					/* LEFT JOIN "review" AS "latestReview"
+              ON  "latestReview"."cardId" = "card"."id"
+              AND "latestReview"."created" = (
+                SELECT MAX("created") AS "max"
+                FROM   "review"
+                WHERE  "card"."id" = "review"."cardId"
+              ) */
+					db.leftJoin('review as latestReview', (join) =>
+						join
+							.onRef('latestReview.cardId', '=', 'card.id')
+							.on('latestReview.created', '=', (eb) =>
+								eb
+									.selectFrom('review')
+									.select(eb.fn.max('created').as('max'))
+									.whereRef('card.id', '=', 'review.cardId'),
+							),
+					),
+				)
 				.where(conversionResult.sql!),
 		)
 	const searchCache =

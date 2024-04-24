@@ -12,6 +12,8 @@ import {
 	templateId,
 	setting,
 	settingId,
+	kind,
+	type kindValues,
 } from './stringLabels'
 
 class Context {
@@ -23,6 +25,7 @@ class Context {
 		this.joinFts = false
 		this.joinTemplateFts = false
 		this.joinCardSettingFts = false
+		this.joinLatestReview = false
 	}
 
 	sql: Array<string | RawBuilder<unknown>>
@@ -32,6 +35,7 @@ class Context {
 	joinFts: boolean
 	joinTemplateFts: boolean
 	joinCardSettingFts: boolean
+	joinLatestReview: boolean
 
 	trustedSql(trustedSql: string) {
 		this.sql.push(sql.raw(` ${trustedSql} `))
@@ -62,6 +66,7 @@ export function convert(input: string) {
 		joinFts: context.joinFts,
 		joinCardSettingFts: context.joinCardSettingFts,
 		joinTemplateFts: context.joinTemplateFts,
+		joinLatestReview: context.joinLatestReview,
 		strings: findStrings(context.root),
 	}
 }
@@ -89,18 +94,23 @@ export function getLabel(node: SyntaxNodeRef) {
 
 function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
 	if (node.type.isError) return
-	if (node.name === simpleString || node.name === quotedString) {
+	if (
+		node.type.is(qt.SimpleString) ||
+		node.type.is(qt.QuotedString) ||
+		node.type.is(qt.KindValue)
+	) {
 		maybeAddSeparator(node.node, context)
 		const label = getLabel(node.node.parent!)
-		const value = node.type.is(qt.SimpleString)
-			? input.slice(node.from, node.to)
-			: unescapeQuoted(
-					input.slice(node.from + 1, node.to - 1), // don't include quotes
-			  )
+		const value =
+			node.type.is(qt.SimpleString) || node.type.is(qt.KindValue)
+				? input.slice(node.from, node.to)
+				: unescapeQuoted(
+						input.slice(node.from + 1, node.to - 1), // don't include quotes
+				  )
 		const negate = isNegated(node.node)
 		const wildcard = node.node.nextSibling?.type.is(Wildcard) === true
 		context.current.attach({
-			type: node.name,
+			type: node.type.is(qt.QuotedString) ? 'QuotedString' : 'SimpleString',
 			value,
 			negate,
 			wildcard,
@@ -245,6 +255,22 @@ function handleLabel(node: QueryString | QueryRegex, context: Context) {
 		if (node.type === 'Regex') throwExp("you can't regex settingId")
 		const equals = sql.raw(node.negate ? '!=' : '=')
 		context.parameterizeSql(sql`card.cardSettingId ${equals} ${node.value}`)
+	} else if (node.label === kind) {
+		if (node.type === 'Regex') throwExp("you can't regex kind")
+		context.joinLatestReview = true
+		const value = node.value as (typeof kindValues)[number]
+		const n =
+			value === 'new'
+				? null
+				: value === 'learn'
+				? 0
+				: value === 'review'
+				? 1
+				: value === 'relearn'
+				? 2
+				: 3
+		const equals = sql.raw(node.negate ? 'IS NOT' : 'IS')
+		context.parameterizeSql(sql`latestReview.kind ${equals} ${n}`)
 	}
 }
 
@@ -298,7 +324,8 @@ function andOrNothing(node: SyntaxNode): '' | typeof and | typeof or {
 			left.type.is(qt.Regex) ||
 			left.type.is(qt.Html) ||
 			left.type.is(qt.Group) ||
-			left.type.is(qt.Label)
+			left.type.is(qt.Label) ||
+			left.type.is(qt.KindValue)
 		) {
 			return and
 		}

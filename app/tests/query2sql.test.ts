@@ -5,6 +5,7 @@ import { CRDialect } from '../src/sqlite/dialect'
 import { format as actualFormat } from 'prettier'
 import * as plugin from 'prettier-plugin-sql-cst'
 import { type DB } from '../src/sqlite/database'
+import { throwExp } from 'shared'
 
 async function format(sql: string) {
 	return await actualFormat('select * from x where ' + sql, {
@@ -14,6 +15,7 @@ async function format(sql: string) {
 }
 
 async function assertEqual(actual: string, expected: string, argCount: number) {
+	const expected2 = await format(expected)
 	const ky = new Kysely<DB>({
 		// @ts-expect-error don't actually use CRDialect
 		dialect: new CRDialect(),
@@ -23,10 +25,18 @@ async function assertEqual(actual: string, expected: string, argCount: number) {
 	const parameters = compile.parameters
 	let i = 0
 	while (actual2.includes('?')) {
-		actual2 = actual2.replace('?', "'" + (parameters[i]! as string) + "'")
+		const p = parameters[i]
+		actual2 =
+			typeof p === 'string'
+				? actual2.replace('?', "'" + p + "'")
+				: typeof p === 'number'
+				? actual2.replace('?', p.toString())
+				: p == null
+				? actual2.replace('?', 'NULL')
+				: throwExp(`Unhandled type: ${typeof p}`)
 		i++
 	}
-	expect(await format(actual2)).toBe(await format(expected))
+	expect(await format(actual2)).toBe(expected2)
 	expect(i).toBe(argCount)
 }
 
@@ -1049,6 +1059,50 @@ noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"c 
   )
 )`,
 			4,
+		)
+	})
+})
+
+describe('kind', () => {
+	test('new', async () => {
+		await assertEqual('kind:new', `(latestReview.kind IS NULL)`, 1)
+	})
+
+	test('not new, on label', async () => {
+		await assertEqual('-kind:new', `(latestReview.kind IS NOT NULL)`, 1)
+	})
+
+	test('not new, on value', async () => {
+		await assertEqual('kind:-new', `(latestReview.kind IS NOT NULL)`, 1)
+	})
+
+	test('learn', async () => {
+		await assertEqual('kind:learn', `(latestReview.kind IS 0)`, 1)
+	})
+
+	test('not review, on label', async () => {
+		await assertEqual('-kind:review', `(latestReview.kind IS NOT 1)`, 1)
+	})
+
+	test('not review, on value', async () => {
+		await assertEqual('kind:-review', `(latestReview.kind IS NOT 1)`, 1)
+	})
+
+	test('not review, on group', async () => {
+		await assertEqual('-(kind:review)', `(latestReview.kind IS NOT 1)`, 1)
+	})
+
+	test('group', async () => {
+		await assertEqual(
+			'(kind:-new,review -relearn)',
+			`(
+  latestReview.kind IS NOT NULL
+  OR
+  latestReview.kind IS 1
+  AND
+  latestReview.kind IS NOT 2
+)`,
+			3,
 		)
 	})
 })

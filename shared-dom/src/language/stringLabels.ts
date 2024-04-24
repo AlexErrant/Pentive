@@ -40,4 +40,4 @@ export const labels = [
 ] as const
 export const stringLabels = labels as readonly string[]
 
-export const kindValues = ['new', 'learn', 'review', 'relearn', 'cram']
+export const kindValues = ['new', 'learn', 'review', 'relearn', 'cram'] as const
