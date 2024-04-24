@@ -383,15 +383,17 @@ describe('template', () => {
 
 	test('regex', async () => {
 		await assertEqual(
-			'(template:/foo/i,-/bar/ /bix/suuvvyys)',
+			'(template:/foo/i,-/bar/ qux /bix/suuvvyys)',
 			`(
   regexp_with_flags('foo', 'i', templateNameFts.name)
   OR NOT
   regexp_with_flags('bar', '', templateNameFts.name)
   AND
+  template.rowid IN (SELECT rowid FROM templateNameFts WHERE templateNameFts.name MATCH '"qux"')
+  AND
   regexp_with_flags('bix', 'suvy', templateNameFts.name)
 )`,
-			6,
+			7,
 		)
 	})
 
@@ -613,15 +615,17 @@ describe('setting', () => {
 
 	test('regex', async () => {
 		await assertEqual(
-			'(setting:/foo/i,-/bar/ /bix/suuvvyys)',
+			'(setting:/foo/i,-/bar/ qux /bix/suuvvyys)',
 			`(
   regexp_with_flags('foo', 'i', cardSettingNameFts.name)
   OR NOT
   regexp_with_flags('bar', '', cardSettingNameFts.name)
   AND
+  card.cardSettingId IN (SELECT rowid FROM cardSettingNameFts WHERE cardSettingNameFts.name MATCH '"qux"')
+  AND
   regexp_with_flags('bix', 'suvy', cardSettingNameFts.name)
 )`,
-			6,
+			7,
 		)
 	})
 
@@ -866,7 +870,7 @@ noteFtsTag.rowid IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" 
 
 	test('regex', async () => {
 		await assertEqual(
-			'(tag:/foo/i,-/bar/ /bix/suuvvyys)',
+			'(tag:/foo/i,-/bar/ qux /bix/suuvvyys)',
 			`(
   (
     regexp_with_flags('foo', 'i', "cardFtsTag"."tags")
@@ -881,12 +885,18 @@ noteFtsTag.rowid IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" 
   )
   AND
   (
+    cardFtsTag.rowid IN (SELECT "rowid" FROM "cardFtsTag" WHERE "cardFtsTag"."tags" MATCH '"qux"')
+    OR
+    noteFtsTag.rowid IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" MATCH '"qux"')
+  )
+  AND
+  (
     regexp_with_flags('bix', 'suvy', "cardFtsTag"."tags")
     OR
     regexp_with_flags('bix', 'suvy', "noteFtsTag"."tags")
   )
 )`,
-			12,
+			14,
 		)
 	})
 
