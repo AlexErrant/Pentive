@@ -10,7 +10,7 @@ export const queryHighlighting = styleTags({
 	'Not Or Wildcard Is': t.operatorKeyword,
 	Regex: t.regexp,
 	'Label/...': labelGroup,
-	KindValue: labelValue,
+	KindEnum: labelValue,
 	/* eslint-enable @typescript-eslint/naming-convention */
 	[stringLabels.join(' ')]: t.labelName,
 })

@@ -26,10 +26,10 @@ stateValueExpression[@dynamicPrecedence=3] {
   ~x (Or? stateValueExpression)*
 }
 
-kindValueExpression[@dynamicPrecedence=3] {
+kindEnumExpression[@dynamicPrecedence=3] {
   !unary Not?
-  KindValue
-  ~x (Or? kindValueExpression)*
+  KindEnum
+  ~x (Or? kindEnumExpression)*
 }
 
 Group { "(" expression ")" }
@@ -41,7 +41,7 @@ Label {
     "(" Not? stringLabels     stringExpression ")" | stringLabels Not? string
   | "(" Not?     idLabels         idExpression ")" |     idLabels Not? id
   | "(" Not?      stateIs stateValueExpression ")" |      stateIs Not? stateValue
-  | "(" Not?       kindIs  kindValueExpression ")" |       kindIs Not?  KindValue
+  | "(" Not?       kindIs   kindEnumExpression ")" |       kindIs Not?  KindEnum
   | due
   | repsLapses
   | createdUpdated
@@ -130,7 +130,7 @@ Comparison { ":" | "=" | "<" | ">" | "<=" | ">=" }
 Is { ":" | "=" }
 
 @external tokens labelValue from "./query.tokens.ts" {
-  KindValue
+  KindEnum
 }
 
 @context labelContext from "./query.tokens.ts"

@@ -14,7 +14,7 @@ import {
 import { escapedQuoted, getLabel } from './query2sql'
 import {
 	kind,
-	kindValues,
+	kindEnums,
 	setting,
 	stringLabels,
 	tag,
@@ -133,7 +133,7 @@ export const queryCompletion: (_: {
 			return {
 				from:
 					kindBefore != null ? nodeBefore.from + kindBefore.index : context.pos,
-				options: kindValues.map(
+				options: kindEnums.map(
 					(kind) =>
 						({
 							label: kind,

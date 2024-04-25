@@ -1,5 +1,5 @@
 import { ExternalTokenizer, ContextTracker, type Stack } from '@lezer/lr'
-import { kind, Label, KindValue } from './queryParser.terms'
+import { kind, Label, KindEnum } from './queryParser.terms'
 
 class ElementContext {
 	name: number
@@ -38,7 +38,7 @@ export const labelValue = new ExternalTokenizer(
 				input.peek(1) === 101 &&
 				input.peek(2) === 119 // new
 			) {
-				input.acceptToken(KindValue, 3)
+				input.acceptToken(KindEnum, 3)
 			} else if (
 				input.peek(0) === 108 &&
 				input.peek(1) === 101 &&
@@ -46,7 +46,7 @@ export const labelValue = new ExternalTokenizer(
 				input.peek(3) === 114 &&
 				input.peek(4) === 110 // learn
 			) {
-				input.acceptToken(KindValue, 5)
+				input.acceptToken(KindEnum, 5)
 			} else if (
 				input.peek(0) === 114 &&
 				input.peek(1) === 101 &&
@@ -55,7 +55,7 @@ export const labelValue = new ExternalTokenizer(
 				input.peek(4) === 101 &&
 				input.peek(5) === 119 // review
 			) {
-				input.acceptToken(KindValue, 6)
+				input.acceptToken(KindEnum, 6)
 			} else if (
 				input.peek(0) === 114 &&
 				input.peek(1) === 101 &&
@@ -65,14 +65,14 @@ export const labelValue = new ExternalTokenizer(
 				input.peek(5) === 114 &&
 				input.peek(6) === 110 // relearn
 			) {
-				input.acceptToken(KindValue, 7)
+				input.acceptToken(KindEnum, 7)
 			} else if (
 				input.peek(0) === 99 &&
 				input.peek(1) === 114 &&
 				input.peek(2) === 97 &&
 				input.peek(3) === 109 // cram
 			) {
-				input.acceptToken(KindValue, 4)
+				input.acceptToken(KindEnum, 4)
 			}
 		}
 	},

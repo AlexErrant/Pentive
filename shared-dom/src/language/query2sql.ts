@@ -13,7 +13,7 @@ import {
 	setting,
 	settingId,
 	kind,
-	type kindValues,
+	type kindEnums,
 } from './stringLabels'
 
 class Context {
@@ -97,12 +97,12 @@ function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
 	if (
 		node.type.is(qt.SimpleString) ||
 		node.type.is(qt.QuotedString) ||
-		node.type.is(qt.KindValue)
+		node.type.is(qt.KindEnum)
 	) {
 		maybeAddSeparator(node.node, context)
 		const label = getLabel(node.node.parent!)
 		const value =
-			node.type.is(qt.SimpleString) || node.type.is(qt.KindValue)
+			node.type.is(qt.SimpleString) || node.type.is(qt.KindEnum)
 				? input.slice(node.from, node.to)
 				: unescapeQuoted(
 						input.slice(node.from + 1, node.to - 1), // don't include quotes
@@ -258,7 +258,7 @@ function handleLabel(node: QueryString | QueryRegex, context: Context) {
 	} else if (node.label === kind) {
 		if (node.type === 'Regex') throwExp("you can't regex kind")
 		context.joinLatestReview = true
-		const value = node.value as (typeof kindValues)[number]
+		const value = node.value as (typeof kindEnums)[number]
 		const n =
 			value === 'new'
 				? null
@@ -325,7 +325,7 @@ function andOrNothing(node: SyntaxNode): '' | typeof and | typeof or {
 			left.type.is(qt.Html) ||
 			left.type.is(qt.Group) ||
 			left.type.is(qt.Label) ||
-			left.type.is(qt.KindValue)
+			left.type.is(qt.KindEnum)
 		) {
 			return and
 		}
