@@ -20,10 +20,10 @@ idExpression[@dynamicPrecedence=2] {
   ~x (Or? idExpression)*
 }
 
-stateValueExpression[@dynamicPrecedence=3] {
+stateEnumExpression[@dynamicPrecedence=3] {
   !unary Not?
-  stateValue
-  ~x (Or? stateValueExpression)*
+  StateEnum
+  ~x (Or? stateEnumExpression)*
 }
 
 kindEnumExpression[@dynamicPrecedence=3] {
@@ -32,16 +32,24 @@ kindEnumExpression[@dynamicPrecedence=3] {
   ~x (Or? kindEnumExpression)*
 }
 
+fieldValueExpression[@dynamicPrecedence=3] {
+  !unary Not?
+  ( string | FieldValueEnum )
+  ~x (Or? fieldValueExpression)*
+}
+
 Group { "(" expression ")" }
 
 stateIs { kw<"state"> Is }
 kindIs  { kw<"kind">  Is }
+fieldIs { kw<"field"> Is FieldName Is }
 
 Label {
     "(" Not? stringLabels     stringExpression ")" | stringLabels Not? string
   | "(" Not?     idLabels         idExpression ")" |     idLabels Not? id
-  | "(" Not?      stateIs stateValueExpression ")" |      stateIs Not? stateValue
-  | "(" Not?       kindIs   kindEnumExpression ")" |       kindIs Not?  KindEnum
+  | "(" Not?      stateIs  stateEnumExpression ")" |      stateIs Not? StateEnum
+  | "(" Not?       kindIs   kindEnumExpression ")" |       kindIs Not? KindEnum
+  | "(" Not?      fieldIs fieldValueExpression ")" |      fieldIs Not? ( string | FieldValueEnum )
   | due
   | repsLapses
   | createdUpdated
@@ -50,7 +58,7 @@ Label {
 
 string {
   Regex |
-  ( SimpleString | QuotedString | Number | Html ) Wildcard?
+  ( SimpleString | QuotedString | Number | Html | RawStringLiteral | RawHtmlLiteral ) Wildcard?
 }
 
 id { SimpleString | QuotedString | Number }
@@ -58,17 +66,16 @@ id { SimpleString | QuotedString | Number }
 // "keyword"
 kw<word> { @specialize[@name={word}]<SimpleString, word> }
 
-stringLabels { 
-  ( kw<"tag">
+stringLabels {
+  ( noteCardIs? kw<"tag">
   | kw<"template">
   | kw<"setting">
-  | kw<"field"> Is FieldName
   ) Is
 }
 
 FieldName {
-  Not? 
-  ( 
+  Not?
+  (
     Regex |
     ( SimpleString | QuotedString | Number ) Wildcard?
   )
@@ -84,21 +91,14 @@ idLabels {
 
 Or { @specialize<SimpleString, "OR"> | ","}
 
-stateValue {
-    kw<"normal">
-  | kw<"buried">
-  | kw<"userBuried">
-  | kw<"schedulerBuried">
-  | kw<"suspended">
-}
-
 due {
   kw<"due">
-  ( Is kw<"true">
-  | Is kw<"false">
+  ( Is DueEnum
   | Is Not? Number
   | Comparison Date )
 }
+
+DueEnum { "true" | "false" }
 
 createdUpdated {
   (
@@ -110,30 +110,49 @@ createdUpdated {
 }
 
 repsLapses {
-  ( kw<"reps"> | kw<"lapses"> )
+  ( kw<"reps">
+  | kw<"lapses">
+  | noteCardIs?
+    kw<"tag"> Is kw<"count"> )
   Comparison Number
+}
+
+noteCardIs {
+  ( kw<"card"> | kw<"note"> ) ":"
 }
 
 reviewed {
   ( kw<"reviewed"> | kw<"firstReviewed"> )
   Comparison ( Not? Number | Date )
-  ( Comparison
-    ( Rating
-    | kw<"again">
-    | kw<"hard">
-    | kw<"good">
-    | kw<"easy"> )
-  ) ?
+  ( Comparison RatingEnum ) ?
 }
 
 Comparison { ":" | "=" | "<" | ">" | "<=" | ">=" }
 Is { ":" | "=" }
 
-@external tokens labelValue from "./query.tokens.ts" {
+@external tokens kindEnum from "./query.tokens" {
   KindEnum
 }
 
-@context labelContext from "./query.tokens.ts"
+@external tokens stateEnum from "./query.tokens" {
+  StateEnum
+}
+
+@external tokens ratingEnum from "./query.tokens" {
+  RatingEnum
+}
+
+@external tokens fieldValueEnum from "./query.tokens" {
+  FieldValueEnum
+}
+
+@external tokens rawStringLiteral from "./query.tokens" {
+  RawStringLiteral
+}
+
+@external tokens rawHtmlLiteral from "./query.tokens" {
+  RawHtmlLiteral
+}
 
 @tokens {
   Wildcard { "*" }
@@ -154,11 +173,9 @@ Is { ":" | "=" }
   whitespace { @whitespace+ }
   Number { @digit+ }
   Date { @digit @digit @digit @digit "-" @digit? @digit "-" @digit? @digit }
-  Rating { "1" | "2" | "3" | "4" }
 
   Not { "-" }
   @precedence { Date, Number, Not, SimpleString }
-  @precedence { Rating, SimpleString }
 }
 
 @external propSource queryHighlighting from "./query.highlight.js"

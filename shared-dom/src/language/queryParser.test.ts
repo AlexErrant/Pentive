@@ -1,7 +1,12 @@
-import { expect, test } from 'vitest'
+import { describe, expect, test } from 'vitest'
 import { parser } from './queryParser'
-import { testTree } from '@lezer/generator/dist/test'
+import { testTree as testTreeOriginal } from '@lezer/generator/dist/test'
 import { convert } from './query2sql'
+import { type Tree } from '@lezer/common'
+
+function testTree(tree: Tree, expect: string) {
+	testTreeOriginal(tree, expect, () => false)
+}
 
 test('queryParser can parse standard test string', () => {
 	const tree = parser.parse(
@@ -94,4 +99,100 @@ test("can't end with OR", () => {
 	const tree = parser.parse(`a OR`)
 	const spec = `Program(SimpleString,Or,⚠)`
 	testTree(tree, spec)
+})
+
+describe('labels', () => {
+	test('state', () => {
+		const tree = parser.parse(
+			`(state:normal, buried, userBuried, userburied, schedulerBuried, schedulerBuried, suspended)`,
+		)
+		const spec = `Program(Label(state,Is,StateEnum,Or,StateEnum,Or,StateEnum,Or,StateEnum,Or,StateEnum,Or,StateEnum,Or,StateEnum))`
+		testTree(tree, spec)
+	})
+
+	test('rating', () => {
+		const tree = parser.parse(
+			`reviewed:1:1 reviewed:1:2 reviewed:1:3 reviewed:1:4 reviewed:1:again reviewed:1:hard reviewed:1:good reviewed:1:easy`,
+		)
+		const spec = `Program(
+  Label(reviewed,Comparison,Number,Comparison,RatingEnum),
+  Label(reviewed,Comparison,Number,Comparison,RatingEnum),
+  Label(reviewed,Comparison,Number,Comparison,RatingEnum),
+  Label(reviewed,Comparison,Number,Comparison,RatingEnum),
+  Label(reviewed,Comparison,Number,Comparison,RatingEnum),
+  Label(reviewed,Comparison,Number,Comparison,RatingEnum),
+  Label(reviewed,Comparison,Number,Comparison,RatingEnum),
+  Label(reviewed,Comparison,Number,Comparison,RatingEnum)
+)`
+		testTree(tree, spec)
+	})
+
+	test('fieldValue', () => {
+		const tree = parser.parse(`(field:someFieldName:exists,missing x,"exists")`)
+		const spec = `Program(Label(
+  field,
+  Is,
+  FieldName(SimpleString),
+  Is,
+  FieldValueEnum,
+  Or,
+  FieldValueEnum,
+  SimpleString,
+  Or,
+  QuotedString
+))`
+		testTree(tree, spec)
+	})
+})
+
+describe('rawLiteral', () => {
+	test('2', () => {
+		const tree = parser.parse(`a "" foo bar "" b`)
+		const spec = `Program(SimpleString,QuotedString,SimpleString,SimpleString,QuotedString,SimpleString)`
+		testTree(tree, spec)
+	})
+
+	test('3', () => {
+		const tree = parser.parse(`a """ foo "" bar """ 0`)
+		const spec = `Program(SimpleString,RawStringLiteral,Number)`
+		testTree(tree, spec)
+	})
+
+	test('4', () => {
+		const tree = parser.parse(`a """" foo """ bar """" 0`)
+		const spec = `Program(SimpleString,RawStringLiteral,Number)`
+		testTree(tree, spec)
+	})
+
+	test('5', () => {
+		const tree = parser.parse(`a """"" foo """" bar """"" 0`)
+		const spec = `Program(SimpleString,RawStringLiteral,Number)`
+		testTree(tree, spec)
+	})
+
+	test('newline', () => {
+		const tree = parser.parse(`a """
+"foo bar"
+""" 0`)
+		const spec = `Program(SimpleString,RawStringLiteral,Number)`
+		testTree(tree, spec)
+	})
+
+	test('extra trailing "', () => {
+		const tree = parser.parse(`a """ foo "" bar """" 0`)
+		const spec = `Program(SimpleString,RawStringLiteral,⚠,Number)`
+		testTree(tree, spec)
+	})
+
+	test('extra leading "', () => {
+		const tree = parser.parse(`a """" foo "" bar """ 0`)
+		const spec = `Program(SimpleString,QuotedString,QuotedString,SimpleString,QuotedString,SimpleString,QuotedString,⚠,Number)`
+		testTree(tree, spec)
+	})
+
+	test('html', () => {
+		const tree = parser.parse('a ``` foo `` bar ``` 0')
+		const spec = `Program(SimpleString,RawHtmlLiteral,Number)`
+		testTree(tree, spec)
+	})
 })

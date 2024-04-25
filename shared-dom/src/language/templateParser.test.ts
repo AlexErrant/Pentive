@@ -1,6 +1,11 @@
 import { test } from 'vitest'
 import { parser } from './templateParser'
-import { testTree } from '@lezer/generator/dist/test'
+import { testTree as testTreeOriginal } from '@lezer/generator/dist/test'
+import { type Tree } from '@lezer/common'
+
+function testTree(tree: Tree, expect: string) {
+	testTreeOriginal(tree, expect, () => false)
+}
 
 test('templateParser can parse standard test string', () => {
 	const tree = parser.parse(
