@@ -26,16 +26,37 @@ stateEnumExpression[@dynamicPrecedence=3] {
   ~x (Or? stateEnumExpression)*
 }
 
+StateEnum {
+    enum<"normal">
+  | enum<"buried">
+  | enum<"userBuried">
+  | enum<"schedulerBuried">
+  | enum<"suspended">
+}
+
 kindEnumExpression[@dynamicPrecedence=3] {
   !unary Not?
   KindEnum
   ~x (Or? kindEnumExpression)*
 }
 
+KindEnum {
+    enum<"new">
+  | enum<"learn">
+  | enum<"review">
+  | enum<"relearn">
+  | enum<"cram">
+}
+
 fieldValueExpression[@dynamicPrecedence=3] {
   !unary Not?
   ( string | FieldValueEnum )
   ~x (Or? fieldValueExpression)*
+}
+
+FieldValueEnum[@dynamicPrecedence=1] {
+    enum<"exists">
+  | enum<"missing">
 }
 
 Group { "(" expression ")" }
@@ -58,13 +79,21 @@ Label {
 
 string {
   Regex |
-  ( SimpleString | QuotedString | Number | Html | RawStringLiteral | RawHtmlLiteral ) Wildcard?
+  ( SimpleString
+  | QuotedString1
+  | QuotedString2
+  | Number
+  | Html
+  | RawStringLiteral
+  | RawHtmlLiteral )
+  Wildcard?
 }
 
-id { SimpleString | QuotedString | Number }
+id { SimpleString | QuotedString1 | QuotedString2 | Number }
 
-// "keyword"
-kw<word> { @specialize[@name={word}]<SimpleString, word> }
+kw     <word> { @extend[@name={word}]<SimpleString, word> } // "keyword"
+enum   <word> { @extend              <SimpleString, word> }
+enumNum<word> { @extend              <Number      , word> }
 
 stringLabels {
   ( noteCardIs? kw<"tag">
@@ -77,7 +106,7 @@ FieldName {
   Not?
   (
     Regex |
-    ( SimpleString | QuotedString | Number ) Wildcard?
+    ( SimpleString | QuotedString1 | QuotedString2 | Number ) Wildcard?
   )
 }
 
@@ -89,7 +118,7 @@ idLabels {
   ) Is
 }
 
-Or { @specialize<SimpleString, "OR"> | ","}
+Or { @specialize<SimpleString, "OR"> | "," }
 
 due {
   kw<"due">
@@ -127,24 +156,19 @@ reviewed {
   ( Comparison RatingEnum ) ?
 }
 
+RatingEnum[@dynamicPrecedence=1] {
+    enumNum<"1">
+  | enumNum<"2">
+  | enumNum<"3">
+  | enumNum<"4">
+  | enum<"again">
+  | enum<"hard">
+  | enum<"good">
+  | enum<"easy">
+}
+
 Comparison { ":" | "=" | "<" | ">" | "<=" | ">=" }
 Is { ":" | "=" }
-
-@external tokens kindEnum from "./query.tokens" {
-  KindEnum
-}
-
-@external tokens stateEnum from "./query.tokens" {
-  StateEnum
-}
-
-@external tokens ratingEnum from "./query.tokens" {
-  RatingEnum
-}
-
-@external tokens fieldValueEnum from "./query.tokens" {
-  FieldValueEnum
-}
 
 @external tokens rawStringLiteral from "./query.tokens" {
   RawStringLiteral
@@ -156,20 +180,29 @@ Is { ":" | "=" }
 
 @tokens {
   Wildcard { "*" }
-  QuotedString { '"' char* '"' }
-  Html         { '`' char* '`' }
+  QuotedString1 { "'" char1* "'" }
+  QuotedString2 { '"' char2* '"' }
+  Html          { '`' charb* '`' }
 
   // https://github.com/lezer-parser/javascript/blob/392c6115647c9e55c147ac2d702f75be127a7b2d/src/javascript.grammar#L683
   // Not exactly the same because we're more interested in correctness (than tokenization) https://github.com/lezer-parser/javascript/pull/31#issuecomment-2016585616
   Regex[isolate] { "/" (![/\\\n[] | "\\" ![\n] | "[" (![\n\\\]] | "\\" ![\n])* "]")+ "/" $[dgimsuvy]* }
 
-  // a char is any non-doublequote or non-backslash... or a backslash followed by a doublequote or backslash
-  char {
+  // a char is any non-quote or non-backslash... or a backslash followed by a quote or backslash
+  char1 {
+         !['\\] |
+    "\\" $['\\]
+  }
+  char2 {
          !["\\] |
     "\\" $["\\]
   }
-  // a SimpleString is any series of characters that is not equals, less than, greater than, backtick, backslash, forwardslash, asterisk, comma, parentheses, colon, doublequote, or whitespace (as defined by the Unicode standard)
-  SimpleString { ( ![=<>`\\/*,():"\u0009\u000A\u000B\u000C\u000D\u0020\u0085\u00A0\u1680\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200A\u2028\u2029\u202F\u205F\u3000] )+ }
+  charb {
+         ![`\\] |
+    "\\" $[`\\]
+  }
+  // a SimpleString is any series of characters that is not equals, less than, greater than, backtick, backslash, forwardslash, asterisk, comma, parentheses, colon, quote, doublequote, or whitespace (as defined by the Unicode standard)
+  SimpleString { ( ![=<>`\\/*,():'"\u0009\u000A\u000B\u000C\u000D\u0020\u0085\u00A0\u1680\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200A\u2028\u2029\u202F\u205F\u3000] )+ }
   whitespace { @whitespace+ }
   Number { @digit+ }
   Date { @digit @digit @digit @digit "-" @digit? @digit "-" @digit? @digit }

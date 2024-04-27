@@ -13,7 +13,10 @@ function getDecorations(state: EditorState): DecorationSet {
 	let activeParenSet = false
 	syntaxTree(state).iterate({
 		enter: (node) => {
-			if (node.type.is(queryTerms.QuotedString)) {
+			if (
+				node.type.is(queryTerms.QuotedString1) ||
+				node.type.is(queryTerms.QuotedString2)
+			) {
 				if (
 					state.selection.main.head > node.from &&
 					state.selection.main.head < node.to

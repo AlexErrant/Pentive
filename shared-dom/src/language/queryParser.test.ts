@@ -24,9 +24,9 @@ test('queryParser can parse standard test string', () => {
   Not,
   SimpleString,
   Not,
-  QuotedString,
+  QuotedString2,
   Or,
-  QuotedString,
+  QuotedString2,
   Or,
   SimpleString,
   SimpleString,
@@ -34,7 +34,7 @@ test('queryParser can parse standard test string', () => {
   Group(
     Group(
       SimpleString,
-      QuotedString
+      QuotedString2
     ),
     SimpleString
   ),
@@ -47,7 +47,7 @@ test('queryParser can parse standard test string', () => {
   Label(
     setting,
     Is,
-    QuotedString
+    QuotedString2
   ),
   Label(
     template,
@@ -104,9 +104,9 @@ test("can't end with OR", () => {
 describe('labels', () => {
 	test('state', () => {
 		const tree = parser.parse(
-			`(state:normal, buried, userBuried, userburied, schedulerBuried, schedulerBuried, suspended)`,
+			`(state:normal, buried, userBuried, schedulerBuried, suspended)`,
 		)
-		const spec = `Program(Label(state,Is,StateEnum,Or,StateEnum,Or,StateEnum,Or,StateEnum,Or,StateEnum,Or,StateEnum,Or,StateEnum))`
+		const spec = `Program(Label(state,Is,StateEnum,Or,StateEnum,Or,StateEnum,Or,StateEnum,Or,StateEnum))`
 		testTree(tree, spec)
 	})
 
@@ -139,7 +139,7 @@ describe('labels', () => {
   FieldValueEnum,
   SimpleString,
   Or,
-  QuotedString
+  QuotedString2
 ))`
 		testTree(tree, spec)
 	})
@@ -148,7 +148,7 @@ describe('labels', () => {
 describe('rawLiteral', () => {
 	test('2', () => {
 		const tree = parser.parse(`a "" foo bar "" b`)
-		const spec = `Program(SimpleString,QuotedString,SimpleString,SimpleString,QuotedString,SimpleString)`
+		const spec = `Program(SimpleString,QuotedString2,SimpleString,SimpleString,QuotedString2,SimpleString)`
 		testTree(tree, spec)
 	})
 
@@ -170,7 +170,15 @@ describe('rawLiteral', () => {
 		testTree(tree, spec)
 	})
 
-	test('newline', () => {
+	test('newline 1', () => {
+		const tree = parser.parse(`a '''
+'foo bar'
+''' 0`)
+		const spec = `Program(SimpleString,RawStringLiteral,Number)`
+		testTree(tree, spec)
+	})
+
+	test('newline 2', () => {
 		const tree = parser.parse(`a """
 "foo bar"
 """ 0`)
@@ -186,7 +194,13 @@ describe('rawLiteral', () => {
 
 	test('extra leading "', () => {
 		const tree = parser.parse(`a """" foo "" bar """ 0`)
-		const spec = `Program(SimpleString,QuotedString,QuotedString,SimpleString,QuotedString,SimpleString,QuotedString,⚠,Number)`
+		const spec = `Program(SimpleString,QuotedString2,QuotedString2,SimpleString,QuotedString2,SimpleString,QuotedString2,⚠,Number)`
+		testTree(tree, spec)
+	})
+
+	test("'", () => {
+		const tree = parser.parse(`a ''' foo '' bar ''' 0`)
+		const spec = `Program(SimpleString,RawStringLiteral,Number)`
 		testTree(tree, spec)
 	})
 

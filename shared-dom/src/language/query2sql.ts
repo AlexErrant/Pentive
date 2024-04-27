@@ -96,21 +96,33 @@ function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
 	if (node.type.isError) return
 	if (
 		node.type.is(qt.SimpleString) ||
-		node.type.is(qt.QuotedString) ||
-		node.type.is(qt.KindEnum)
+		node.type.is(qt.KindEnum) ||
+		node.type.is(qt.QuotedString1) ||
+		node.type.is(qt.QuotedString2)
 	) {
 		maybeAddSeparator(node.node, context)
 		const label = getLabel(node.node.parent!)
 		const value =
 			node.type.is(qt.SimpleString) || node.type.is(qt.KindEnum)
 				? input.slice(node.from, node.to)
-				: unescapeQuoted(
+				: node.type.is(qt.QuotedString1)
+				? unescapeQuoted1(
 						input.slice(node.from + 1, node.to - 1), // don't include quotes
 				  )
+				: node.type.is(qt.QuotedString2)
+				? unescapeQuoted2(
+						input.slice(node.from + 1, node.to - 1), // don't include quotes
+				  )
+				: throwExp('you missed one')
 		const negate = isNegated(node.node)
 		const wildcard = node.node.nextSibling?.type.is(Wildcard) === true
 		context.current.attach({
-			type: node.type.is(qt.QuotedString) ? 'QuotedString' : 'SimpleString',
+			type:
+				node.type.is(qt.QuotedString1) ||
+				node.type.is(qt.QuotedString2) ||
+				node.type.is(qt.RawStringLiteral)
+					? 'QuotedString'
+					: 'SimpleString',
 			value,
 			negate,
 			wildcard,
@@ -320,7 +332,8 @@ function andOrNothing(node: SyntaxNode): '' | typeof and | typeof or {
 		}
 		if (
 			left.type.is(qt.SimpleString) ||
-			left.type.is(qt.QuotedString) ||
+			left.type.is(qt.QuotedString1) ||
+			left.type.is(qt.QuotedString2) ||
 			left.type.is(qt.Regex) ||
 			left.type.is(qt.Html) ||
 			left.type.is(qt.Group) ||
@@ -460,9 +473,15 @@ function findStrings(root: Node) {
 	return r
 }
 
-export function escapedQuoted(str: string) {
-	return str.replaceAll('\\', '\\\\').replaceAll('"', '\\"') // the order here is important
+export function escapedQuoted1(str: string) {
+	return str.replaceAll('\\', '\\\\').replaceAll("'", "\\'") // the order here is important
 }
-export function unescapeQuoted(str: string) {
+export function unescapeQuoted1(str: string) {
+	return str.replaceAll('\\\\', '\\').replaceAll("\\'", "'")
+}
+export function escapedQuoted2(str: string) {
+	return str.replaceAll('\\', '\\\\').replaceAll('"', '\\"')
+}
+export function unescapeQuoted2(str: string) {
 	return str.replaceAll('\\\\', '\\').replaceAll('\\"', '"')
 }

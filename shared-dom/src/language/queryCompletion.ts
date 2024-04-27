@@ -6,12 +6,14 @@ import { syntaxTree } from '@codemirror/language'
 import {
 	Group,
 	Program,
-	QuotedString,
+	QuotedString1,
+	QuotedString2,
 	SimpleString,
 	Label,
 	Regex,
+	RawStringLiteral,
 } from './queryParser.terms'
-import { escapedQuoted, getLabel } from './query2sql'
+import { escapedQuoted1, escapedQuoted2, getLabel } from './query2sql'
 import {
 	kind,
 	kindEnums,
@@ -92,16 +94,14 @@ export const queryCompletion: (_: {
 			return {
 				from:
 					tagBefore != null ? nodeBefore.from + tagBefore.index : context.pos,
-				options: tags.map((tag) => {
-					const escaped = escapedQuoted(tag)
-					return {
-						label: tag,
-						type: 'tag',
-						apply: nodeBefore.type.is(QuotedString)
-							? escaped
-							: '"' + escaped + '"',
-					} satisfies Completion
-				}),
+				options: tags.map(
+					(tag) =>
+						({
+							label: tag,
+							type: 'tag',
+							apply: buildApply(nodeBefore, tag),
+						}) satisfies Completion,
+				),
 				validFor: /^(\w*)?$/,
 			}
 		} else if (inLabel(nodeBefore, setting)) {
@@ -114,16 +114,14 @@ export const queryCompletion: (_: {
 					cardSettingBefore != null
 						? nodeBefore.from + cardSettingBefore.index
 						: context.pos,
-				options: cardSettings.map((cardSetting) => {
-					const escaped = escapedQuoted(cardSetting)
-					return {
-						label: cardSetting,
-						type: 'general',
-						apply: nodeBefore.type.is(QuotedString)
-							? escaped
-							: '"' + escaped + '"',
-					} satisfies Completion
-				}),
+				options: cardSettings.map(
+					(cardSetting) =>
+						({
+							label: cardSetting,
+							type: 'general',
+							apply: buildApply(nodeBefore, cardSetting),
+						}) satisfies Completion,
+				),
 				validFor: /^(\w*)?$/,
 			}
 		} else if (inLabel(nodeBefore, kind)) {
@@ -152,16 +150,14 @@ export const queryCompletion: (_: {
 					templateBefore != null
 						? nodeBefore.from + templateBefore.index
 						: context.pos,
-				options: templates.map((template) => {
-					const escaped = escapedQuoted(template)
-					return {
-						label: template,
-						type: 'general',
-						apply: nodeBefore.type.is(QuotedString)
-							? escaped
-							: '"' + escaped + '"',
-					} satisfies Completion
-				}),
+				options: templates.map(
+					(template) =>
+						({
+							label: template,
+							type: 'general',
+							apply: buildApply(nodeBefore, template),
+						}) satisfies Completion,
+				),
 				validFor: /^(\w*)?$/,
 			}
 		}
@@ -175,4 +171,14 @@ function inLabel(nodeBefore: SyntaxNode, label: string) {
 		(nodeBefore.parent?.type.is(Label) === true &&
 			getLabel(nodeBefore.parent) === label)
 	)
+}
+
+function buildApply(nodeBefore: SyntaxNode, option: string) {
+	return nodeBefore.type.is(QuotedString1)
+		? escapedQuoted1(option)
+		: nodeBefore.type.is(QuotedString2)
+		? escapedQuoted2(option)
+		: nodeBefore.type.is(RawStringLiteral)
+		? option
+		: '"' + escapedQuoted2(option) + '"'
 }

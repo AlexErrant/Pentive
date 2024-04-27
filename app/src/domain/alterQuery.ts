@@ -1,4 +1,4 @@
-import { escapedQuoted, queryParser, queryTerms } from 'shared-dom'
+import { escapedQuoted2, queryParser, queryTerms } from 'shared-dom'
 
 // https://stackoverflow.com/a/21350614
 function spliceSlice(
@@ -21,7 +21,7 @@ function spliceSlice(
 function getToAdd(tags: string[] | null) {
 	return tags === null || tags.length === 0
 		? ''
-		: '(tag:' + tags.map((t) => '"' + escapedQuoted(t) + '"').join(',') + ')'
+		: '(tag:' + tags.map((t) => '"' + escapedQuoted2(t) + '"').join(',') + ')'
 }
 
 export function alterQuery(query: string, input: { tags?: string[] }) {
