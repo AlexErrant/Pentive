@@ -23,6 +23,7 @@ import {
 	closeBracketsKeymap,
 	type CompletionSource,
 	startCompletion,
+	type CloseBracketConfig,
 } from '@codemirror/autocomplete'
 import { lintKeymap } from '@codemirror/lint'
 import {
@@ -175,6 +176,9 @@ function appendHistory(value: string) {
 const queryLanguage = LRLanguage.define({
 	parser: queryParser,
 	languageData: {
+		closeBrackets: {
+			brackets: ['(', "'", '"', '`', "'''", '"""', '```'],
+		} satisfies CloseBracketConfig,
 		autocomplete: queryCompletion({
 			getTags: db.getTags,
 			getTemplates: async () =>

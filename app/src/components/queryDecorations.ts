@@ -15,7 +15,8 @@ function getDecorations(state: EditorState): DecorationSet {
 		enter: (node) => {
 			if (
 				node.type.is(queryTerms.QuotedString1) ||
-				node.type.is(queryTerms.QuotedString2)
+				node.type.is(queryTerms.QuotedString2) ||
+				node.type.is(queryTerms.Html)
 			) {
 				if (
 					state.selection.main.head > node.from &&
@@ -34,6 +35,27 @@ function getDecorations(state: EditorState): DecorationSet {
 						escapeDecorator.range(i + node.from + 1, i + node.from + 2),
 					)
 					i = s.indexOf('\\', i + 2)
+				}
+			} else if (
+				node.type.is(queryTerms.RawStringLiteral) ||
+				node.type.is(queryTerms.RawHtmlLiteral)
+			) {
+				const quoted = state.sliceDoc(node.from, node.to)
+				let i = 3 // the min number of quotes is 3 so might as well start there
+				let charcode = quoted.charCodeAt(i)
+				while (charcode === 34 || charcode === 39 || charcode === 96) {
+					i++
+					charcode = quoted.charCodeAt(i)
+				}
+				if (
+					state.selection.main.head > node.from &&
+					state.selection.main.head < node.to
+				) {
+					decorations.push(activeDecorator.range(node.from, node.from + i))
+					decorations.push(activeDecorator.range(node.to - i, node.to))
+				} else {
+					decorations.push(quoteDecorator.range(node.from, node.from + i))
+					decorations.push(quoteDecorator.range(node.to - i, node.to))
 				}
 			}
 		},
