@@ -207,14 +207,14 @@ function serialize(node: Node, context: Context) {
 			const value = getValue(node)
 			const not = getNot(node.negate)
 			context.parameterizeSql(
-				sql`noteFtsFv.rowid ${not} IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH ${value})`,
+				sql`noteFtsFv.rowid ${not} IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.text MATCH ${value})`,
 			)
 		}
 	} else if (node.type === regex) {
 		context.joinFts = true
 		const not = getNot(node.negate)
 		context.parameterizeSql(
-			sql`${not} regexp_with_flags(${node.pattern}, ${node.flags}, noteFtsFv.value)`,
+			sql`${not} regexp_with_flags(${node.pattern}, ${node.flags}, noteFtsFv.html)`,
 		)
 	} else if (node.type === group) {
 		const paren =

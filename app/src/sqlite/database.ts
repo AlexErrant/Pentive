@@ -43,7 +43,8 @@ export interface Note {
 export interface NoteFtsFv {
 	noteId: string
 	field: string
-	value: string
+	text: string
+	html: string
 }
 
 export interface NoteFtsMedia {

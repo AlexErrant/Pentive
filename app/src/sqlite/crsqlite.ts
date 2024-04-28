@@ -1,5 +1,5 @@
 import sqliteWasm, { type DB as crDB } from '@vlcn.io/crsqlite-wasm'
-import { initSql, parseMap } from 'shared'
+import { initSql, parseMap, toFts } from 'shared'
 import { lrpc } from '../lrpcClient'
 import { stringify as uuidStringify } from 'uuid'
 import { type DB } from './database'
@@ -57,6 +57,19 @@ export async function createDb() {
 			)
 			const s = db.api.value_text(values[2]!)
 			db.api.result(context, pattern.test(s) ? 1 : 0)
+		},
+		undefined,
+		undefined,
+	)
+	db.api.create_function(
+		db.db,
+		'toFtsText',
+		1,
+		SQLITE_UTF8 | SQLITE_DETERMINISTIC,
+		0,
+		function (context, values) {
+			const text = toFts(db.api.value_text(values[0]!))
+			db.api.result(context, text)
 		},
 		undefined,
 		undefined,

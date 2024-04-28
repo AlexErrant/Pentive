@@ -33,7 +33,8 @@ export const initSql = [
 	`CREATE VIRTUAL TABLE IF NOT EXISTS noteFtsFv USING fts5 (
 	    noteId,
 	    field,
-	    value,
+	    text, -- the field's value stripped of HTML and made to be FTS friendly
+	    html  -- the field's raw value
   );`,
 	`CREATE VIRTUAL TABLE IF NOT EXISTS noteFtsTag USING fts5 (
 	    tags,
@@ -62,10 +63,11 @@ export const initSql = [
 	`CREATE VIRTUAL TABLE IF NOT EXISTS noteFtsTagVocab USING fts5vocab(noteFtsTag, instance);`,
 	`CREATE VIRTUAL TABLE IF NOT EXISTS noteFtsMediaVocab USING fts5vocab(noteFtsMedia, instance);`,
 	`CREATE TRIGGER IF NOT EXISTS note_after_insert AFTER INSERT ON note BEGIN
-      INSERT INTO noteFtsFv (noteId, field, value)
-        SELECT 
+      INSERT INTO noteFtsFv (noteId, field, text, html)
+        SELECT
           new.id,
           json_each.key,
+          toFtsText(json_each.value),
           json_each.value
         FROM json_each(new.fieldValues);
       INSERT INTO noteFtsTag  (rowid, tags       ) VALUES (new.rowid, new.tags       );
@@ -77,10 +79,11 @@ export const initSql = [
      INSERT INTO noteFtsMedia(noteFtsMedia, rowid, media  ) VALUES('delete', old.rowid, getMediaIds(old.fieldValues));
    END;`,
 	`CREATE TRIGGER IF NOT EXISTS note_after_update AFTER UPDATE ON note BEGIN
-      REPLACE INTO noteFtsFv (noteId, field, value)
-        SELECT 
+      REPLACE INTO noteFtsFv (noteId, field, text, html)
+        SELECT
           new.id,
           json_each.key,
+          toFtsText(json_each.value),
           json_each.value
         FROM json_each(new.fieldValues);
      INSERT INTO noteFtsTag(noteFtsTag, rowid, tags       ) VALUES('delete', old.rowid, old.tags       );
