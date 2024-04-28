@@ -28,7 +28,14 @@ async function assertEqual(actual: string, expected: string, argCount: number) {
 		const p = parameters[i]
 		actual2 =
 			typeof p === 'string'
-				? actual2.replace('?', "'" + p + "'")
+				? actual2.replace(
+						'?',
+						"'" +
+							// We need to escape single quote when un-parameterizing the sql.
+							// This SHOULD NOT be done in business code! grep F7943BD6-FE43-4BA0-B912-343E4E6DE3EE
+							p.replaceAll("'", "''") +
+							"'",
+				  )
 				: typeof p === 'number'
 				? actual2.replace('?', p.toString())
 				: p == null
@@ -78,18 +85,76 @@ describe('not a', () => {
 	})
 })
 
-test('QuotedString is fts', async () => {
+test('QuotedString1 is fts', async () => {
 	await assertEqual(
-		'"a b"',
-		`noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"a b"')`,
+		String.raw`'a \' \\ b'`,
+		String.raw`noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"a '' \ b"')`,
 		1,
 	)
 })
 
-test('QuotedString* is wildcarded', async () => {
+test('QuotedString1* is wildcarded', async () => {
 	await assertEqual(
-		'"a b"*',
-		`noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"a b" * ')`,
+		String.raw`'a \' \\ b'*`,
+		String.raw`noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"a '' \ b" * ')`,
+		1,
+	)
+})
+
+test('QuotedString2 is fts', async () => {
+	await assertEqual(
+		String.raw`"a \" \\ b"`,
+		String.raw`noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"a "" \ b"')`,
+		1,
+	)
+})
+
+test('QuotedString2* is wildcarded', async () => {
+	await assertEqual(
+		String.raw`"a \" \\ b"*`,
+		String.raw`noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"a "" \ b" * ')`,
+		1,
+	)
+})
+
+test('TripleQuotedString1 is fts', async () => {
+	await assertEqual(
+		String.raw`x '''a '' \ b''' y`,
+		String.raw`
+noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"x"')
+AND
+noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"a '''' \ b"')
+AND
+noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"y"')`,
+		3,
+	)
+})
+
+test('TripleQuotedString2 is fts', async () => {
+	await assertEqual(
+		String.raw`x """a "" \ b""" y`,
+		String.raw`
+noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"x"')
+AND
+noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"a """" \ b"')
+AND
+noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"y"')`,
+		3,
+	)
+})
+
+test('TripleQuotedString1* is wildcarded', async () => {
+	await assertEqual(
+		String.raw`'''a '' \ b'''*`,
+		String.raw`noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"a '''' \ b" * ')`,
+		1,
+	)
+})
+
+test('TripleQuotedString2* is wildcarded', async () => {
+	await assertEqual(
+		String.raw`"""a "" \ b"""*`,
+		String.raw`noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.value MATCH '"a """" \ b" * ')`,
 		1,
 	)
 })
@@ -399,11 +464,11 @@ describe('template', () => {
 
 	test('can contain doublequote and backslash', async () => {
 		await assertEqual(
-			`(template:"a\\"b","c\\\\b")`,
-			`(
+			String.raw`(template:"a\"b","c\\b")`,
+			String.raw`(
   template.rowid IN (SELECT rowid FROM templateNameFts WHERE templateNameFts.name MATCH '"a""b"')
   OR
-  template.rowid IN (SELECT rowid FROM templateNameFts WHERE templateNameFts.name MATCH '"c\\b"')
+  template.rowid IN (SELECT rowid FROM templateNameFts WHERE templateNameFts.name MATCH '"c\b"')
 )`,
 			2,
 		)
@@ -631,11 +696,11 @@ describe('setting', () => {
 
 	test('can contain doublequote and backslash', async () => {
 		await assertEqual(
-			`(setting:"a\\"b","c\\\\b")`,
-			`(
+			String.raw`(setting:"a\"b","c\\b")`,
+			String.raw`(
   card.cardSettingId IN (SELECT rowid FROM cardSettingNameFts WHERE cardSettingNameFts.name MATCH '"a""b"')
   OR
-  card.cardSettingId IN (SELECT rowid FROM cardSettingNameFts WHERE cardSettingNameFts.name MATCH '"c\\b"')
+  card.cardSettingId IN (SELECT rowid FROM cardSettingNameFts WHERE cardSettingNameFts.name MATCH '"c\b"')
 )`,
 			2,
 		)
@@ -902,8 +967,8 @@ noteFtsTag.rowid IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" 
 
 	test('can contain doublequote and backslash', async () => {
 		await assertEqual(
-			`(tag:"a\\"b","c\\\\b")`,
-			`
+			String.raw`(tag:"a\"b","c\\b")`,
+			String.raw`
 (
   (
     cardFtsTag.rowid IN (SELECT "rowid" FROM "cardFtsTag" WHERE "cardFtsTag"."tags" MATCH '"a""b"')
@@ -912,9 +977,9 @@ noteFtsTag.rowid IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" 
   )
   OR
   (
-    cardFtsTag.rowid IN (SELECT "rowid" FROM "cardFtsTag" WHERE "cardFtsTag"."tags" MATCH '"c\\b"')
+    cardFtsTag.rowid IN (SELECT "rowid" FROM "cardFtsTag" WHERE "cardFtsTag"."tags" MATCH '"c\b"')
     OR
-    noteFtsTag.rowid IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" MATCH '"c\\b"')
+    noteFtsTag.rowid IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" MATCH '"c\b"')
   )
 )`,
 			4,

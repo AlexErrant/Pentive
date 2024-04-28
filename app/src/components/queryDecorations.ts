@@ -1,7 +1,7 @@
 import { Decoration, type DecorationSet, EditorView } from '@codemirror/view'
 import { type Range, StateField, type EditorState } from '@codemirror/state'
 import { syntaxTree } from '@codemirror/language'
-import { queryTerms } from 'shared-dom'
+import { getQuoteCount, queryTerms } from 'shared-dom'
 
 const quoteDecorator = Decoration.mark({ class: 'query-quote' })
 const parenDecorator = Decoration.mark({ class: 'query-paren' })
@@ -41,12 +41,7 @@ function getDecorations(state: EditorState): DecorationSet {
 				node.type.is(queryTerms.RawHtmlLiteral)
 			) {
 				const quoted = state.sliceDoc(node.from, node.to)
-				let i = 3 // the min number of quotes is 3 so might as well start there
-				let charcode = quoted.charCodeAt(i)
-				while (charcode === 34 || charcode === 39 || charcode === 96) {
-					i++
-					charcode = quoted.charCodeAt(i)
-				}
+				const i = getQuoteCount(quoted)
 				if (
 					state.selection.main.head > node.from &&
 					state.selection.main.head < node.to

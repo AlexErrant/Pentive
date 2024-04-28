@@ -92,13 +92,30 @@ export function getLabel(node: SyntaxNodeRef) {
 	return label as Label
 }
 
+export function getQuoteCount(quoted: string) {
+	let i = 3 // the min number of quotes is 3 so might as well start there
+	let charcode = quoted.charCodeAt(i)
+	while (charcode === 34 || charcode === 39 || charcode === 96) {
+		i++
+		charcode = quoted.charCodeAt(i)
+	}
+	return i
+}
+
+function getRawLiteralContent(input: string, node: SyntaxNodeRef) {
+	const quoted = input.slice(node.from, node.to)
+	const quoteCount = getQuoteCount(quoted)
+	return quoted.slice(quoteCount, -quoteCount)
+}
+
 function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
 	if (node.type.isError) return
 	if (
 		node.type.is(qt.SimpleString) ||
 		node.type.is(qt.KindEnum) ||
 		node.type.is(qt.QuotedString1) ||
-		node.type.is(qt.QuotedString2)
+		node.type.is(qt.QuotedString2) ||
+		node.type.is(qt.RawStringLiteral)
 	) {
 		maybeAddSeparator(node.node, context)
 		const label = getLabel(node.node.parent!)
@@ -113,7 +130,9 @@ function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
 				? unescapeQuoted2(
 						input.slice(node.from + 1, node.to - 1), // don't include quotes
 				  )
-				: throwExp('you missed one')
+				: node.type.is(qt.RawStringLiteral)
+				? getRawLiteralContent(input, node)
+				: throwExp('You missed ' + node.type.name)
 		const negate = isNegated(node.node)
 		const wildcard = node.node.nextSibling?.type.is(Wildcard) === true
 		context.current.attach({
@@ -172,8 +191,11 @@ function astLeave(_input: string, node: SyntaxNodeRef, context: Context) {
 }
 
 function getValue(qs: QueryString) {
-	// https://stackoverflow.com/a/46918640 https://blog.haroldadmin.com/posts/escape-fts-queries
-	let r = `"${qs.value.replaceAll('"', '""')}"`
+	let r = `"${
+		qs.value.replaceAll('"', '""') // https://stackoverflow.com/a/46918640 https://blog.haroldadmin.com/posts/escape-fts-queries
+		// .replaceAll("'", "''") // Do NOT uncomment!
+		// Parameterized values do NOT need to escape single-quote. grep F7943BD6-FE43-4BA0-B912-343E4E6DE3EE
+	}"`
 	if (qs.wildcard) r = r + ' * '
 	return r
 }
@@ -334,6 +356,8 @@ function andOrNothing(node: SyntaxNode): '' | typeof and | typeof or {
 			left.type.is(qt.SimpleString) ||
 			left.type.is(qt.QuotedString1) ||
 			left.type.is(qt.QuotedString2) ||
+			left.type.is(qt.RawStringLiteral) ||
+			left.type.is(qt.RawHtmlLiteral) ||
 			left.type.is(qt.Regex) ||
 			left.type.is(qt.Html) ||
 			left.type.is(qt.Group) ||
