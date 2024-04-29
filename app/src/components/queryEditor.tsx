@@ -102,6 +102,7 @@ const basicSetup = [
 	bracketMatching(),
 	closeBrackets(),
 	autocompletion({
+		selectOnOpen: false,
 		activateOnCompletion: ({ apply }) =>
 			typeof apply === 'string' && apply.slice(-1) === ':',
 	}),
