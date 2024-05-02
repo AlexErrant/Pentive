@@ -215,7 +215,7 @@ const baseTheme = EditorView.baseTheme({
 		color: 'darkorange',
 		fontWeight: 'bold',
 	},
-	[`${prefix} .query-active`]: {
+	[`${prefix} .query-active *`]: {
 		color: 'red',
 		fontWeight: 'bold',
 	},

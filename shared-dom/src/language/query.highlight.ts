@@ -4,10 +4,12 @@ import { stringLabels } from './stringLabels'
 
 const labelGroup = Tag.define()
 const labelValue = Tag.define()
+const delimiter = Tag.define()
 
 export const queryHighlighting = styleTags({
 	/* eslint-disable @typescript-eslint/naming-convention */
 	'Not Or Wildcard Is': t.operatorKeyword,
+	'Open Close': delimiter,
 	Regex: t.regexp,
 	'Label/...': labelGroup,
 	'RatingEnum StateEnum KindEnum DueEnum FieldValueEnum': labelValue,
@@ -42,6 +44,10 @@ function createSpecs(isLight: boolean) {
 		},
 		{
 			tag: labelValue,
+			...notSearchTermStyle,
+		},
+		{
+			tag: delimiter,
 			...notSearchTermStyle,
 		},
 	] satisfies readonly TagStyle[]

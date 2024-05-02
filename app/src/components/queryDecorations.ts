@@ -1,7 +1,7 @@
 import { Decoration, type DecorationSet, EditorView } from '@codemirror/view'
 import { type Range, StateField, type EditorState } from '@codemirror/state'
 import { syntaxTree } from '@codemirror/language'
-import { getQuoteCount, queryTerms } from 'shared-dom'
+import { queryTerms } from 'shared-dom'
 
 const quoteDecorator = Decoration.mark({ class: 'query-quote' })
 const parenDecorator = Decoration.mark({ class: 'query-paren' })
@@ -13,6 +13,13 @@ function getDecorations(state: EditorState): DecorationSet {
 	let activeParenSet = false
 	syntaxTree(state).iterate({
 		enter: (node) => {
+			if (
+				node.type.isError ||
+				state.selection.main.head < node.from ||
+				state.selection.main.head > node.to
+			) {
+				return false
+			}
 			if (
 				node.type.is(queryTerms.QuotedString1) ||
 				node.type.is(queryTerms.QuotedString2) ||
@@ -37,21 +44,21 @@ function getDecorations(state: EditorState): DecorationSet {
 					i = s.indexOf('\\', i + 2)
 				}
 			} else if (
-				node.type.is(queryTerms.RawStringLiteral) ||
-				node.type.is(queryTerms.RawHtmlLiteral)
+				node.type.is(queryTerms.RawQuoted) ||
+				node.type.is(queryTerms.RawHtml)
 			) {
-				const quoted = state.sliceDoc(node.from, node.to)
-				const i = getQuoteCount(quoted)
+				const open = node.node.getChild('Open')
+				if (open == null) return false
+				const close = node.node.getChild('Close')
+				if (close == null) return false
 				if (
-					state.selection.main.head > node.from &&
-					state.selection.main.head < node.to
+					state.selection.main.head >= open.from &&
+					state.selection.main.head <= close.to
 				) {
-					decorations.push(activeDecorator.range(node.from, node.from + i))
-					decorations.push(activeDecorator.range(node.to - i, node.to))
-				} else {
-					decorations.push(quoteDecorator.range(node.from, node.from + i))
-					decorations.push(quoteDecorator.range(node.to - i, node.to))
+					decorations.push(activeDecorator.range(open.from, open.to))
+					decorations.push(activeDecorator.range(close.from, close.to))
 				}
+				return false
 			}
 		},
 		leave: (node) => {

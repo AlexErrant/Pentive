@@ -11,7 +11,7 @@ import {
 	SimpleString,
 	Label,
 	Regex,
-	RawStringLiteral,
+	RawQuoted,
 } from './queryParser.terms'
 import { escapedQuoted1, escapedQuoted2, getLabel } from './query2sql'
 import {
@@ -178,7 +178,7 @@ function buildApply(nodeBefore: SyntaxNode, option: string) {
 		? escapedQuoted1(option)
 		: nodeBefore.type.is(QuotedString2)
 		? escapedQuoted2(option)
-		: nodeBefore.type.is(RawStringLiteral)
+		: nodeBefore.type.is(RawQuoted)
 		? option
 		: '"' + escapedQuoted2(option) + '"'
 }

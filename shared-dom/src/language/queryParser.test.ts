@@ -154,19 +154,19 @@ describe('rawLiteral', () => {
 
 	test('3', () => {
 		const tree = parser.parse(`a """ foo "" bar """ 0`)
-		const spec = `Program(SimpleString,RawStringLiteral,Number)`
+		const spec = `Program(SimpleString,RawQuoted(Open,Content,Close),Number)`
 		testTree(tree, spec)
 	})
 
 	test('4', () => {
 		const tree = parser.parse(`a """" foo """ bar """" 0`)
-		const spec = `Program(SimpleString,RawStringLiteral,Number)`
+		const spec = `Program(SimpleString,RawQuoted(Open,Content,Close),Number)`
 		testTree(tree, spec)
 	})
 
 	test('5', () => {
 		const tree = parser.parse(`a """"" foo """" bar """"" 0`)
-		const spec = `Program(SimpleString,RawStringLiteral,Number)`
+		const spec = `Program(SimpleString,RawQuoted(Open,Content,Close),Number)`
 		testTree(tree, spec)
 	})
 
@@ -174,7 +174,7 @@ describe('rawLiteral', () => {
 		const tree = parser.parse(`a '''
 'foo bar'
 ''' 0`)
-		const spec = `Program(SimpleString,RawStringLiteral,Number)`
+		const spec = `Program(SimpleString,RawQuoted(Open,Content,Close),Number)`
 		testTree(tree, spec)
 	})
 
@@ -182,31 +182,31 @@ describe('rawLiteral', () => {
 		const tree = parser.parse(`a """
 "foo bar"
 """ 0`)
-		const spec = `Program(SimpleString,RawStringLiteral,Number)`
+		const spec = `Program(SimpleString,RawQuoted(Open,Content,Close),Number)`
 		testTree(tree, spec)
 	})
 
 	test('extra trailing "', () => {
 		const tree = parser.parse(`a """ foo "" bar """" 0`)
-		const spec = `Program(SimpleString,RawStringLiteral,⚠,Number)`
+		const spec = `Program(SimpleString,RawQuoted(Open,Content,Close),⚠,Number)`
 		testTree(tree, spec)
 	})
 
 	test('extra leading "', () => {
 		const tree = parser.parse(`a """" foo "" bar """ 0`)
-		const spec = `Program(SimpleString,QuotedString2,QuotedString2,SimpleString,QuotedString2,SimpleString,QuotedString2,⚠,Number)`
+		const spec = `Program(SimpleString,RawQuoted(Open,⚠),SimpleString,QuotedString2,SimpleString,RawQuoted(Open,⚠),Number)`
 		testTree(tree, spec)
 	})
 
 	test("'", () => {
 		const tree = parser.parse(`a ''' foo '' bar ''' 0`)
-		const spec = `Program(SimpleString,RawStringLiteral,Number)`
+		const spec = `Program(SimpleString,RawQuoted(Open,Content,Close),Number)`
 		testTree(tree, spec)
 	})
 
 	test('html', () => {
 		const tree = parser.parse('a ``` foo `` bar ``` 0')
-		const spec = `Program(SimpleString,RawHtmlLiteral,Number)`
+		const spec = `Program(SimpleString,RawHtml(Open,Content,Close),Number)`
 		testTree(tree, spec)
 	})
 })

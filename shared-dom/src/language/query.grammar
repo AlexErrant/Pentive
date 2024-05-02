@@ -1,5 +1,6 @@
 @top Program { expression* }
 @skip { whitespace }
+@detectDelim
 @precedence { unary @right } // https://www.ibm.com/docs/en/i/7.5?topic=operators-operator-precedence-associativity
 
 expression[@dynamicPrecedence=0] {
@@ -84,8 +85,8 @@ string {
   | QuotedString2
   | Number
   | Html
-  | RawStringLiteral
-  | RawHtmlLiteral )
+  | RawQuoted
+  | RawHtml )
   Wildcard?
 }
 
@@ -170,12 +171,47 @@ RatingEnum[@dynamicPrecedence=1] {
 Comparison { ":" | "=" | "<" | ">" | "<=" | ">=" }
 Is { ":" | "=" }
 
-@external tokens rawStringLiteral from "./query.tokens" {
-  RawStringLiteral
+@skip {} {
+  RawQuoted {
+      RawQuoted1Open RawQuoted1Content RawQuoted1Close
+    | RawQuoted2Open RawQuoted2Content RawQuoted2Close
+  }
+  RawHtml {
+    RawHtmlOpen RawHtmlContent RawHtmlClose
+  }
 }
 
-@external tokens rawHtmlLiteral from "./query.tokens" {
-  RawHtmlLiteral
+@external tokens rawQuotedOpen from "./query.tokens" {
+  RawQuoted1Open[closedBy=RawQuoted1Close,@name=Open],
+  RawQuoted2Open[closedBy=RawQuoted2Close,@name=Open]
+}
+
+@external tokens rawHtmlOpen from "./query.tokens" {
+  RawHtmlOpen[closedBy=RawHtmlClose,@name=Open]
+}
+
+@external tokens rawQuoted1Content from "./query.tokens" {
+  RawQuoted1Content[@name=Content]
+}
+
+@external tokens rawQuoted2Content from "./query.tokens" {
+  RawQuoted2Content[@name=Content]
+}
+
+@external tokens rawHtmlContent from "./query.tokens" {
+  RawHtmlContent[@name=Content]
+}
+
+@external tokens rawQuoted1Close from "./query.tokens" {
+  RawQuoted1Close[openedBy=RawQuoted1Open,@name=Close]
+}
+
+@external tokens rawQuoted2Close from "./query.tokens" {
+  RawQuoted2Close[openedBy=RawQuoted2Open,@name=Close]
+}
+
+@external tokens rawHtmlClose from "./query.tokens" {
+  RawHtmlClose[openedBy=RawHtmlOpen,@name=Close]
 }
 
 @tokens {

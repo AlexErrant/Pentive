@@ -115,7 +115,7 @@ function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
 		node.type.is(qt.KindEnum) ||
 		node.type.is(qt.QuotedString1) ||
 		node.type.is(qt.QuotedString2) ||
-		node.type.is(qt.RawStringLiteral)
+		node.type.is(qt.RawQuoted)
 	) {
 		maybeAddSeparator(node.node, context)
 		const label = getLabel(node.node.parent!)
@@ -130,7 +130,7 @@ function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
 				? unescapeQuoted2(
 						input.slice(node.from + 1, node.to - 1), // don't include quotes
 				  )
-				: node.type.is(qt.RawStringLiteral)
+				: node.type.is(qt.RawQuoted)
 				? getRawLiteralContent(input, node)
 				: throwExp('You missed ' + node.type.name)
 		const negate = isNegated(node.node)
@@ -139,7 +139,7 @@ function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
 			type:
 				node.type.is(qt.QuotedString1) ||
 				node.type.is(qt.QuotedString2) ||
-				node.type.is(qt.RawStringLiteral)
+				node.type.is(qt.RawQuoted)
 					? 'QuotedString'
 					: 'SimpleString',
 			value,
@@ -356,8 +356,8 @@ function andOrNothing(node: SyntaxNode): '' | typeof and | typeof or {
 			left.type.is(qt.SimpleString) ||
 			left.type.is(qt.QuotedString1) ||
 			left.type.is(qt.QuotedString2) ||
-			left.type.is(qt.RawStringLiteral) ||
-			left.type.is(qt.RawHtmlLiteral) ||
+			left.type.is(qt.RawQuoted) ||
+			left.type.is(qt.RawHtml) ||
 			left.type.is(qt.Regex) ||
 			left.type.is(qt.Html) ||
 			left.type.is(qt.Group) ||
