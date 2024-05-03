@@ -85,7 +85,7 @@ describe('not a', () => {
 	})
 })
 
-test('QuotedString1 is fts', async () => {
+test('Quoted1 is fts', async () => {
 	await assertEqual(
 		String.raw`'a \' \\ b'`,
 		String.raw`noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.text MATCH '"a '' \ b"')`,
@@ -93,7 +93,7 @@ test('QuotedString1 is fts', async () => {
 	)
 })
 
-test('QuotedString1* is wildcarded', async () => {
+test('Quoted1* is wildcarded', async () => {
 	await assertEqual(
 		String.raw`'a \' \\ b'*`,
 		String.raw`noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.text MATCH '"a '' \ b" * ')`,
@@ -101,7 +101,7 @@ test('QuotedString1* is wildcarded', async () => {
 	)
 })
 
-test('QuotedString2 is fts', async () => {
+test('Quoted2 is fts', async () => {
 	await assertEqual(
 		String.raw`"a \" \\ b"`,
 		String.raw`noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.text MATCH '"a "" \ b"')`,
@@ -109,7 +109,7 @@ test('QuotedString2 is fts', async () => {
 	)
 })
 
-test('QuotedString2* is wildcarded', async () => {
+test('Quoted2* is wildcarded', async () => {
 	await assertEqual(
 		String.raw`"a \" \\ b"*`,
 		String.raw`noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.text MATCH '"a "" \ b" * ')`,
@@ -117,7 +117,7 @@ test('QuotedString2* is wildcarded', async () => {
 	)
 })
 
-test('TripleQuotedString1 is fts', async () => {
+test('RawQuoted1 is fts', async () => {
 	await assertEqual(
 		String.raw`x '''a '' \ b''' y`,
 		String.raw`
@@ -130,7 +130,7 @@ noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.text MATCH '"y"'
 	)
 })
 
-test('TripleQuotedString2 is fts', async () => {
+test('RawQuoted2 is fts', async () => {
 	await assertEqual(
 		String.raw`x """a "" \ b""" y`,
 		String.raw`
@@ -143,7 +143,7 @@ noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.text MATCH '"y"'
 	)
 })
 
-test('TripleQuotedString1* is wildcarded', async () => {
+test('RawQuoted1* is wildcarded', async () => {
 	await assertEqual(
 		String.raw`'''a '' \ b'''*`,
 		String.raw`noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.text MATCH '"a '''' \ b" * ')`,
@@ -151,7 +151,7 @@ test('TripleQuotedString1* is wildcarded', async () => {
 	)
 })
 
-test('TripleQuotedString2* is wildcarded', async () => {
+test('RawQuoted2* is wildcarded', async () => {
 	await assertEqual(
 		String.raw`"""a "" \ b"""*`,
 		String.raw`noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.text MATCH '"a """" \ b" * ')`,
@@ -393,8 +393,8 @@ test('!(p && !q || r) is (!p || q) && !r', async () => {
 })
 
 describe('skip error nodes', () => {
-	const expected = `noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.text MATCH '"foo"')`
-	const negatedExpected = `noteFtsFv.rowid NOT IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.text MATCH '"foo"')`
+	const expected = `noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.text MATCH '" foo"')`
+	const negatedExpected = `noteFtsFv.rowid NOT IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.text MATCH '" foo"')`
 
 	test('plain', async () => {
 		await assertEqual('" foo', expected, 1)

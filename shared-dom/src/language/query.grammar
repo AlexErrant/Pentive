@@ -81,8 +81,8 @@ Label {
 string {
   Regex |
   ( SimpleString
-  | QuotedString1
-  | QuotedString2
+  | Quoted1
+  | Quoted2
   | Number
   | Html
   | RawQuoted
@@ -90,7 +90,7 @@ string {
   Wildcard?
 }
 
-id { SimpleString | QuotedString1 | QuotedString2 | Number }
+id { SimpleString | Quoted1 | Quoted2 | Number }
 
 kw     <word> { @extend[@name={word}]<SimpleString, word> } // "keyword"
 enum   <word> { @extend              <SimpleString, word> }
@@ -107,7 +107,7 @@ FieldName {
   Not?
   (
     Regex |
-    ( SimpleString | QuotedString1 | QuotedString2 | Number ) Wildcard?
+    ( SimpleString | Quoted1 | Quoted2 | Number ) Wildcard?
   )
 }
 
@@ -171,6 +171,30 @@ RatingEnum[@dynamicPrecedence=1] {
 Comparison { ":" | "=" | "<" | ">" | "<=" | ">=" }
 Is { ":" | "=" }
 
+@local tokens {
+  Quoted1Escape[@name=Escape] { "\\" ( '\\' | "'" | "*" | "_" ) }
+  Quoted1Close[openedBy=Quoted1Open,@name=Close] { "'" "^"? "#"? "#"? "^"? }
+  Quoted1Wildcard[@name=Wildcard] { "*" }
+  Quoted1Wildcard1[@name=Wildcard1] { "_" }
+  @else Quoted1Content[@name=Content]
+}
+
+@local tokens {
+  Quoted2Escape[@name=Escape] { "\\" ( '\\' | '"' | "*" | "_" ) }
+  Quoted2Close[openedBy=Quoted2Open,@name=Close] { '"' "^"? "#"? "#"? "^"? }
+  Quoted2Wildcard[@name=Wildcard] { "*" }
+  Quoted2Wildcard1[@name=Wildcard1] { "_" }
+  @else Quoted2Content[@name=Content]
+}
+
+@local tokens {
+     HtmlEscape[@name=Escape] { "\\" ( '\\' | '`' | "*" | "_" ) }
+        HtmlClose[openedBy=HtmlOpen,@name=Close] { '`' "^"? "#"? "#"? "^"? }
+  HtmlWildcard[@name=Wildcard] { "*" }
+  HtmlWildcard1[@name=Wildcard1] { "_" }
+  @else HtmlContent[@name=Content]
+}
+
 @skip {} {
   RawQuoted {
       RawQuoted1Open RawQuoted1Content RawQuoted1Close
@@ -179,6 +203,15 @@ Is { ":" | "=" }
   RawHtml {
     RawHtmlOpen RawHtmlContent RawHtmlClose
   }
+  quoted1Content { Quoted1Escape | Quoted1Wildcard | Quoted1Wildcard1 | Quoted1Content }
+  quoted2Content { Quoted2Escape | Quoted2Wildcard | Quoted2Wildcard1 | Quoted2Content }
+     htmlContent {    HtmlEscape |    HtmlWildcard |    HtmlWildcard1 |    HtmlContent }
+  Quoted1Open[closedBy=Quoted1Close,@name=Open] { "^"? "#"? "#"? "^"? "'" }
+  Quoted2Open[closedBy=Quoted2Close,@name=Open] { "^"? "#"? "#"? "^"? '"' }
+     HtmlOpen[closedBy=   HtmlClose,@name=Open] { "^"? "#"? "#"? "^"? '`' }
+  Quoted1 { Quoted1Open quoted1Content* Quoted1Close }
+  Quoted2 { Quoted2Open quoted2Content* Quoted2Close }
+  Html    {    HtmlOpen    htmlContent*    HtmlClose }
 }
 
 @external tokens rawQuotedOpen from "./query.tokens" {
@@ -216,29 +249,13 @@ Is { ":" | "=" }
 
 @tokens {
   Wildcard { "*" }
-  QuotedString1 { "'" char1* "'" }
-  QuotedString2 { '"' char2* '"' }
-  Html          { '`' charb* '`' }
 
   // https://github.com/lezer-parser/javascript/blob/392c6115647c9e55c147ac2d702f75be127a7b2d/src/javascript.grammar#L683
   // Not exactly the same because we're more interested in correctness (than tokenization) https://github.com/lezer-parser/javascript/pull/31#issuecomment-2016585616
   Regex[isolate] { "/" (![/\\\n[] | "\\" ![\n] | "[" (![\n\\\]] | "\\" ![\n])* "]")+ "/" $[dgimsuvy]* }
 
-  // a char is any non-quote or non-backslash... or a backslash followed by a quote or backslash
-  char1 {
-         !['\\] |
-    "\\" $['\\]
-  }
-  char2 {
-         !["\\] |
-    "\\" $["\\]
-  }
-  charb {
-         ![`\\] |
-    "\\" $[`\\]
-  }
-  // a SimpleString is any series of characters that is not equals, less than, greater than, backtick, backslash, forwardslash, asterisk, comma, parentheses, colon, quote, doublequote, or whitespace (as defined by the Unicode standard)
-  SimpleString { ( ![=<>`\\/*,():'"\u0009\u000A\u000B\u000C\u000D\u0020\u0085\u00A0\u1680\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200A\u2028\u2029\u202F\u205F\u3000] )+ }
+  // a SimpleString is any series of characters that is not pound, caret, equals, less than, greater than, backtick, backslash, forwardslash, asterisk, comma, parentheses, colon, quote, doublequote, or whitespace (as defined by the Unicode standard)
+  SimpleString { ( ![#^=<>`\\/*,():'"\u0009\u000A\u000B\u000C\u000D\u0020\u0085\u00A0\u1680\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200A\u2028\u2029\u202F\u205F\u3000] )+ }
   whitespace { @whitespace+ }
   Number { @digit+ }
   Date { @digit @digit @digit @digit "-" @digit? @digit "-" @digit? @digit }

@@ -6,8 +6,8 @@ import { syntaxTree } from '@codemirror/language'
 import {
 	Group,
 	Program,
-	QuotedString1,
-	QuotedString2,
+	Quoted1,
+	Quoted2,
 	SimpleString,
 	Label,
 	Regex,
@@ -174,9 +174,9 @@ function inLabel(nodeBefore: SyntaxNode, label: string) {
 }
 
 function buildApply(nodeBefore: SyntaxNode, option: string) {
-	return nodeBefore.type.is(QuotedString1)
+	return nodeBefore.type.is(Quoted1)
 		? escapedQuoted1(option)
-		: nodeBefore.type.is(QuotedString2)
+		: nodeBefore.type.is(Quoted2)
 		? escapedQuoted2(option)
 		: nodeBefore.type.is(RawQuoted)
 		? option

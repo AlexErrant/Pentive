@@ -3,7 +3,7 @@ import { parser } from './queryParser'
 import { assertNever, throwExp } from 'shared'
 import { sql, type RawBuilder, type SqlBool } from 'kysely'
 import { Is, Regex, Wildcard } from './queryParser.terms'
-import { queryTerms as qt } from '..'
+import * as qt from './queryParser.terms'
 import {
 	stringLabels,
 	labels,
@@ -92,20 +92,32 @@ export function getLabel(node: SyntaxNodeRef) {
 	return label as Label
 }
 
-export function getQuoteCount(quoted: string) {
-	let i = 3 // the min number of quotes is 3 so might as well start there
-	let charcode = quoted.charCodeAt(i)
-	while (charcode === 34 || charcode === 39 || charcode === 96) {
-		i++
-		charcode = quoted.charCodeAt(i)
-	}
-	return i
-}
+const content = [
+	qt.Quoted1Content,
+	qt.Quoted2Content,
+	qt.HtmlContent,
+	qt.RawQuoted1Content,
+	qt.RawQuoted2Content,
+	qt.RawHtmlContent,
+]
+const escape = [
+	qt.Quoted1Escape, //
+	qt.Quoted2Escape,
+	qt.HtmlEscape,
+]
 
-function getRawLiteralContent(input: string, node: SyntaxNodeRef) {
-	const quoted = input.slice(node.from, node.to)
-	const quoteCount = getQuoteCount(quoted)
-	return quoted.slice(quoteCount, -quoteCount)
+function buildContent(node: SyntaxNodeRef, input: string) {
+	const r: string[] = []
+	let child = node.node.firstChild?.nextSibling
+	while (child != null) {
+		if (content.includes(child.type.id)) {
+			r.push(input.slice(child.from, child.to))
+		} else if (escape.includes(child.type.id)) {
+			r.push(input.slice(child.from + 1, child.to))
+		}
+		child = child.nextSibling
+	}
+	return r.join('')
 }
 
 function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
@@ -113,8 +125,8 @@ function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
 	if (
 		node.type.is(qt.SimpleString) ||
 		node.type.is(qt.KindEnum) ||
-		node.type.is(qt.QuotedString1) ||
-		node.type.is(qt.QuotedString2) ||
+		node.type.is(qt.Quoted1) ||
+		node.type.is(qt.Quoted2) ||
 		node.type.is(qt.RawQuoted)
 	) {
 		maybeAddSeparator(node.node, context)
@@ -122,25 +134,19 @@ function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
 		const value =
 			node.type.is(qt.SimpleString) || node.type.is(qt.KindEnum)
 				? input.slice(node.from, node.to)
-				: node.type.is(qt.QuotedString1)
-				? unescapeQuoted1(
-						input.slice(node.from + 1, node.to - 1), // don't include quotes
-				  )
-				: node.type.is(qt.QuotedString2)
-				? unescapeQuoted2(
-						input.slice(node.from + 1, node.to - 1), // don't include quotes
-				  )
-				: node.type.is(qt.RawQuoted)
-				? getRawLiteralContent(input, node)
+				: node.type.is(qt.Quoted1) ||
+				  node.type.is(qt.Quoted2) ||
+				  node.type.is(qt.RawQuoted)
+				? buildContent(node, input)
 				: throwExp('You missed ' + node.type.name)
 		const negate = isNegated(node.node)
 		const wildcard = node.node.nextSibling?.type.is(Wildcard) === true
 		context.current.attach({
 			type:
-				node.type.is(qt.QuotedString1) ||
-				node.type.is(qt.QuotedString2) ||
+				node.type.is(qt.Quoted1) ||
+				node.type.is(qt.Quoted2) ||
 				node.type.is(qt.RawQuoted)
-					? 'QuotedString'
+					? 'Quoted'
 					: 'SimpleString',
 			value,
 			negate,
@@ -201,7 +207,7 @@ function getValue(qs: QueryString) {
 }
 
 function serialize(node: Node, context: Context) {
-	if (node.type === simpleString || node.type === quotedString) {
+	if (node.type === simpleString || node.type === quoted) {
 		if (node.label == null) {
 			context.joinFts = true
 			const value = getValue(node)
@@ -231,7 +237,7 @@ function serialize(node: Node, context: Context) {
 			for (const child of node.children) {
 				if (
 					child.type === 'SimpleString' ||
-					child.type === 'QuotedString' ||
+					child.type === 'Quoted' ||
 					child.type === 'Regex'
 				) {
 					handleLabel(child, context)
@@ -354,8 +360,8 @@ function andOrNothing(node: SyntaxNode): '' | typeof and | typeof or {
 		}
 		if (
 			left.type.is(qt.SimpleString) ||
-			left.type.is(qt.QuotedString1) ||
-			left.type.is(qt.QuotedString2) ||
+			left.type.is(qt.Quoted1) ||
+			left.type.is(qt.Quoted2) ||
 			left.type.is(qt.RawQuoted) ||
 			left.type.is(qt.RawHtml) ||
 			left.type.is(qt.Regex) ||
@@ -372,7 +378,7 @@ function andOrNothing(node: SyntaxNode): '' | typeof and | typeof or {
 }
 
 interface QueryString {
-	type: typeof simpleString | typeof quotedString
+	type: typeof simpleString | typeof quoted
 	label?: Label
 	value: string
 	negate: boolean
@@ -396,7 +402,7 @@ type Label = (typeof labels)[number]
 // types
 const group = 'Group' as const
 const simpleString = 'SimpleString' as const
-const quotedString = 'QuotedString' as const
+const quoted = 'Quoted' as const
 const or = 'OR' as const
 const and = 'AND' as const
 const regex = 'Regex' as const
@@ -468,7 +474,7 @@ function distributeNegate(node: Node, negate: boolean) {
 		}
 	} else if (
 		node.type === simpleString ||
-		node.type === quotedString ||
+		node.type === quoted ||
 		node.type === regex
 	) {
 		if (negate) node.negate = !node.negate
@@ -488,7 +494,7 @@ function findStrings(root: Node) {
 		const i = queue.shift()!
 		if (i.type === group && i.label == null) {
 			queue.push(...i.children)
-		} else if (i.type === simpleString || i.type === quotedString) {
+		} else if (i.type === simpleString || i.type === quoted) {
 			if (!i.negate) {
 				r.push(i.value)
 			}

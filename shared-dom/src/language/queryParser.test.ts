@@ -24,9 +24,9 @@ test('queryParser can parse standard test string', () => {
   Not,
   SimpleString,
   Not,
-  QuotedString2,
+  Quoted2(Open,Content,Escape,Content,Close),
   Or,
-  QuotedString2,
+  Quoted2(Open,Content,Close),
   Or,
   SimpleString,
   SimpleString,
@@ -34,7 +34,7 @@ test('queryParser can parse standard test string', () => {
   Group(
     Group(
       SimpleString,
-      QuotedString2
+      Quoted2(Open,Content,Close)
     ),
     SimpleString
   ),
@@ -47,7 +47,7 @@ test('queryParser can parse standard test string', () => {
   Label(
     setting,
     Is,
-    QuotedString2
+    Quoted2(Open,Content,Close)
   ),
   Label(
     template,
@@ -139,7 +139,7 @@ describe('labels', () => {
   FieldValueEnum,
   SimpleString,
   Or,
-  QuotedString2
+  Quoted2(Open,Content,Close)
 ))`
 		testTree(tree, spec)
 	})
@@ -148,7 +148,7 @@ describe('labels', () => {
 describe('rawLiteral', () => {
 	test('2', () => {
 		const tree = parser.parse(`a "" foo bar "" b`)
-		const spec = `Program(SimpleString,QuotedString2,SimpleString,SimpleString,QuotedString2,SimpleString)`
+		const spec = `Program(SimpleString,Quoted2(Open,Close),SimpleString,SimpleString,Quoted2(Open,Close),SimpleString)`
 		testTree(tree, spec)
 	})
 
@@ -188,13 +188,13 @@ describe('rawLiteral', () => {
 
 	test('extra trailing "', () => {
 		const tree = parser.parse(`a """ foo "" bar """" 0`)
-		const spec = `Program(SimpleString,RawQuoted(Open,Content,Close),⚠,Number)`
+		const spec = `Program(SimpleString,RawQuoted(Open,Content,Close),Quoted2(Open,Content,⚠))`
 		testTree(tree, spec)
 	})
 
 	test('extra leading "', () => {
 		const tree = parser.parse(`a """" foo "" bar """ 0`)
-		const spec = `Program(SimpleString,RawQuoted(Open,⚠),SimpleString,QuotedString2,SimpleString,RawQuoted(Open,⚠),Number)`
+		const spec = `Program(SimpleString,RawQuoted(Open,⚠),SimpleString,Quoted2(Open,Close),SimpleString,RawQuoted(Open,⚠),Number)`
 		testTree(tree, spec)
 	})
 

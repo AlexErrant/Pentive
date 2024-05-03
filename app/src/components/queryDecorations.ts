@@ -21,8 +21,8 @@ function getDecorations(state: EditorState): DecorationSet {
 				return false
 			}
 			if (
-				node.type.is(queryTerms.QuotedString1) ||
-				node.type.is(queryTerms.QuotedString2) ||
+				node.type.is(queryTerms.Quoted1) ||
+				node.type.is(queryTerms.Quoted2) ||
 				node.type.is(queryTerms.Html)
 			) {
 				if (
