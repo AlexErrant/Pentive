@@ -34,7 +34,8 @@ export const initSql = [
 	    noteId,
 	    field,
 	    text, -- the field's value stripped of HTML and made to be FTS friendly
-	    html  -- the field's raw value
+	    html, -- the field's raw value
+      tokenize='trigram'
   );`,
 	`CREATE VIRTUAL TABLE IF NOT EXISTS noteFtsTag USING fts5 (
 	    tags,
@@ -46,12 +47,14 @@ export const initSql = [
 	`CREATE VIRTUAL TABLE IF NOT EXISTS templateNameFts USING fts5 (
 	    name,
       content=template,
-      content_rowid=rowid
+      content_rowid=rowid,
+      tokenize='trigram'
   );`,
 	`CREATE VIRTUAL TABLE IF NOT EXISTS cardSettingNameFts USING fts5 (
 	    name,
       content=cardSetting,
-      content_rowid=rowid
+      content_rowid=rowid,
+      tokenize='trigram'
   );`,
 	`CREATE VIRTUAL TABLE IF NOT EXISTS noteFtsMedia USING fts5 (
 	    media,

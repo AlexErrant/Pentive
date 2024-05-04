@@ -197,11 +197,7 @@ function astLeave(_input: string, node: SyntaxNodeRef, context: Context) {
 }
 
 function getValue(qs: QueryString) {
-	let r = `"${
-		qs.value.replaceAll('"', '""') // https://stackoverflow.com/a/46918640 https://blog.haroldadmin.com/posts/escape-fts-queries
-		// .replaceAll("'", "''") // Do NOT uncomment!
-		// Parameterized values do NOT need to escape single-quote. grep F7943BD6-FE43-4BA0-B912-343E4E6DE3EE
-	}"`
+	let r = `%${qs.value}%`
 	if (qs.wildcard) r = r + ' * '
 	return r
 }
@@ -213,7 +209,7 @@ function serialize(node: Node, context: Context) {
 			const value = getValue(node)
 			const not = getNot(node.negate)
 			context.parameterizeSql(
-				sql`noteFtsFv.rowid ${not} IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.text MATCH ${value})`,
+				sql`noteFtsFv.rowid ${not} IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.text LIKE ${value} ESCAPE '@')`, // @ as escape because using \ as escape makes me question which plane of reality I'm occupying.
 			)
 		}
 	} else if (node.type === regex) {
@@ -271,7 +267,7 @@ function handleLabel(node: QueryString | QueryRegex, context: Context) {
 		} else {
 			const value = getValue(node)
 			context.parameterizeSql(
-				sql`template.rowid ${not} IN (SELECT rowid FROM templateNameFts WHERE templateNameFts.name MATCH ${value})`,
+				sql`template.rowid ${not} IN (SELECT rowid FROM templateNameFts WHERE templateNameFts.name LIKE ${value} ESCAPE '@')`,
 			)
 		}
 	} else if (node.label === templateId) {
@@ -288,7 +284,7 @@ function handleLabel(node: QueryString | QueryRegex, context: Context) {
 		} else {
 			const value = getValue(node)
 			context.parameterizeSql(
-				sql`card.cardSettingId ${not} IN (SELECT rowid FROM cardSettingNameFts WHERE cardSettingNameFts.name MATCH ${value})`,
+				sql`card.cardSettingId ${not} IN (SELECT rowid FROM cardSettingNameFts WHERE cardSettingNameFts.name LIKE ${value} ESCAPE '@')`,
 			)
 		}
 	} else if (node.label === settingId) {
@@ -329,9 +325,9 @@ ${not} regexp_with_flags(${node.pattern}, ${node.flags}, "noteFtsTag"."tags")
 		const value = getValue(node)
 		context.parameterizeSql(
 			sql`(
-cardFtsTag.rowid ${not} IN (SELECT "rowid" FROM "cardFtsTag" WHERE "cardFtsTag"."tags" match ${value})
+cardFtsTag.rowid ${not} IN (SELECT "rowid" FROM "cardFtsTag" WHERE "cardFtsTag"."tags" LIKE ${value} ESCAPE '@')
 ${sql.raw(node.negate ? 'AND' : 'OR')}
-noteFtsTag.rowid ${not} IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" match ${value})
+noteFtsTag.rowid ${not} IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" LIKE ${value} ESCAPE '@')
 )`,
 		)
 	}
