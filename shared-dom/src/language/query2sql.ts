@@ -2,7 +2,7 @@ import { type SyntaxNodeRef, type SyntaxNode } from '@lezer/common'
 import { parser } from './queryParser'
 import { assertNever, throwExp } from 'shared'
 import { sql, type RawBuilder, type SqlBool } from 'kysely'
-import { Is, Regex, Wildcard } from './queryParser.terms'
+import { Is, Regex } from './queryParser.terms'
 import * as qt from './queryParser.terms'
 import {
 	stringLabels,
@@ -105,15 +105,47 @@ const escape = [
 	qt.Quoted2Escape,
 	qt.HtmlEscape,
 ]
+const wildcard = [
+	qt.HtmlWildcard, //
+	qt.Quoted1Wildcard,
+	qt.Quoted2Wildcard,
+]
+const wildcard1 = [
+	qt.HtmlWildcard1, //
+	qt.Quoted1Wildcard1,
+	qt.Quoted2Wildcard1,
+]
 
 function buildContent(node: SyntaxNodeRef, input: string) {
 	const r: string[] = []
 	let child = node.node.firstChild?.nextSibling
 	while (child != null) {
 		if (content.includes(child.type.id)) {
-			r.push(input.slice(child.from, child.to))
+			r.push(
+				input
+					.slice(child.from, child.to)
+					.replaceAll('@', '@@')
+					.replaceAll('%', '@%'),
+			)
 		} else if (escape.includes(child.type.id)) {
-			r.push(input.slice(child.from + 1, child.to))
+			const char = input.charAt(child.to - 1)
+			const c =
+				char === '*'
+					? '*'
+					: char === '_'
+					? '@_'
+					: char === '\\'
+					? '\\'
+					: char === "'"
+					? "'"
+					: char === '"'
+					? '"'
+					: throwExp('you forgot ' + char)
+			r.push(c)
+		} else if (wildcard.includes(child.type.id)) {
+			r.push('%')
+		} else if (wildcard1.includes(child.type.id)) {
+			r.push('_')
 		}
 		child = child.nextSibling
 	}
@@ -140,7 +172,6 @@ function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
 				? buildContent(node, input)
 				: throwExp('You missed ' + node.type.name)
 		const negate = isNegated(node.node)
-		const wildcard = node.node.nextSibling?.type.is(Wildcard) === true
 		context.current.attach({
 			type:
 				node.type.is(qt.Quoted1) ||
@@ -150,7 +181,6 @@ function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
 					: 'SimpleString',
 			value,
 			negate,
-			wildcard,
 			label,
 		})
 	} else if (node.type.is(Regex)) {
@@ -197,8 +227,7 @@ function astLeave(_input: string, node: SyntaxNodeRef, context: Context) {
 }
 
 function getValue(qs: QueryString) {
-	let r = `%${qs.value}%`
-	if (qs.wildcard) r = r + ' * '
+	const r = `%${qs.value}%`
 	return r
 }
 
@@ -378,7 +407,6 @@ interface QueryString {
 	label?: Label
 	value: string
 	negate: boolean
-	wildcard: boolean
 }
 
 interface QueryRegex {

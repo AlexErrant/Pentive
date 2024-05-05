@@ -65,12 +65,64 @@ test('SimpleString is fts', async () => {
 	)
 })
 
-test('SimpleString* is wildcarded', async () => {
-	await assertEqual(
-		String.raw`a*`,
-		String.raw`noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.text LIKE '%a% * ' ESCAPE '@')`,
-		1,
-	)
+describe('special characters', () => {
+	async function x(actual: string, expected: string) {
+		await assertEqual(
+			actual,
+			String.raw`noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.text LIKE '${expected}' ESCAPE '@')`,
+			1,
+		)
+	}
+	test('*', async () => {
+		await x(
+			String.raw`"a*b"`, //
+			String.raw`%a%b%`,
+		)
+	})
+	test('_', async () => {
+		await x(
+			String.raw`"a_b"`, //
+			String.raw`%a_b%`,
+		)
+	})
+	// eslint-disable-next-line no-useless-escape
+	test(`\*`, async () => {
+		await x(
+			String.raw`"a\*b"`, //
+			String.raw`%a*b%`,
+		)
+	})
+	// eslint-disable-next-line no-useless-escape
+	test(`\_`, async () => {
+		await x(
+			String.raw`"a\_b"`, //
+			String.raw`%a@_b%`,
+		)
+	})
+	test(`\\`, async () => {
+		await x(
+			String.raw`"a\\b"`, //
+			String.raw`%a\b%`,
+		)
+	})
+	test('@', async () => {
+		await x(
+			String.raw`"a@b"`, //
+			String.raw`%a@@b%`,
+		)
+	})
+	test('%', async () => {
+		await x(
+			String.raw`"a%b"`, //
+			String.raw`%a@%b%`,
+		)
+	})
+	test('order of `replaceAll` is important', async () => {
+		await x(
+			String.raw`"a@%b"`, //
+			String.raw`%a@@@%b%`,
+		)
+	})
 })
 
 describe('not a', () => {
@@ -93,26 +145,10 @@ test('Quoted1 is fts', async () => {
 	)
 })
 
-test('Quoted1* is wildcarded', async () => {
-	await assertEqual(
-		String.raw`'a \' \\ b'*`,
-		String.raw`noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.text LIKE '%a '' \ b% * ' ESCAPE '@')`,
-		1,
-	)
-})
-
 test('Quoted2 is fts', async () => {
 	await assertEqual(
 		String.raw`"a \" \\ b"`,
 		String.raw`noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.text LIKE '%a " \ b%' ESCAPE '@')`,
-		1,
-	)
-})
-
-test('Quoted2* is wildcarded', async () => {
-	await assertEqual(
-		String.raw`"a \" \\ b"*`,
-		String.raw`noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.text LIKE '%a " \ b% * ' ESCAPE '@')`,
 		1,
 	)
 })
@@ -140,22 +176,6 @@ noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.text LIKE '%a ""
 AND
 noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.text LIKE '%y%' ESCAPE '@')`,
 		3,
-	)
-})
-
-test('RawQuoted1* is wildcarded', async () => {
-	await assertEqual(
-		String.raw`'''a '' \ b'''*`,
-		String.raw`noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.text LIKE '%a '''' \ b% * ' ESCAPE '@')`,
-		1,
-	)
-})
-
-test('RawQuoted2* is wildcarded', async () => {
-	await assertEqual(
-		String.raw`"""a "" \ b"""*`,
-		String.raw`noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.text LIKE '%a "" \ b% * ' ESCAPE '@')`,
-		1,
 	)
 })
 
@@ -320,7 +340,6 @@ describe('groupAnds', () => {
 		type: 'SimpleString' as const,
 		value: 'x',
 		negate: false,
-		wildcard: false,
 	}
 	const or = { type: 'OR' as const }
 	const and = { type: 'AND' as const }
@@ -427,18 +446,6 @@ describe('template', () => {
 			String.raw`(template:foo,bar)`,
 			String.raw`(
   template.rowid IN (SELECT rowid FROM templateNameFts WHERE templateNameFts.name LIKE '%foo%' ESCAPE '@')
-  OR
-  template.rowid IN (SELECT rowid FROM templateNameFts WHERE templateNameFts.name LIKE '%bar%' ESCAPE '@')
-)`,
-			2,
-		)
-	})
-
-	test('wildcard', async () => {
-		await assertEqual(
-			String.raw`(template:foo*,bar)`,
-			String.raw`(
-  template.rowid IN (SELECT rowid FROM templateNameFts WHERE templateNameFts.name LIKE '%foo% * ' ESCAPE '@')
   OR
   template.rowid IN (SELECT rowid FROM templateNameFts WHERE templateNameFts.name LIKE '%bar%' ESCAPE '@')
 )`,
@@ -663,18 +670,6 @@ describe('setting', () => {
 			String.raw`(setting:foo,bar)`,
 			String.raw`(
   card.cardSettingId IN (SELECT rowid FROM cardSettingNameFts WHERE cardSettingNameFts.name LIKE '%foo%' ESCAPE '@')
-  OR
-  card.cardSettingId IN (SELECT rowid FROM cardSettingNameFts WHERE cardSettingNameFts.name LIKE '%bar%' ESCAPE '@')
-)`,
-			2,
-		)
-	})
-
-	test('wildcard', async () => {
-		await assertEqual(
-			String.raw`(setting:foo*,bar)`,
-			String.raw`(
-  card.cardSettingId IN (SELECT rowid FROM cardSettingNameFts WHERE cardSettingNameFts.name LIKE '%foo% * ' ESCAPE '@')
   OR
   card.cardSettingId IN (SELECT rowid FROM cardSettingNameFts WHERE cardSettingNameFts.name LIKE '%bar%' ESCAPE '@')
 )`,
@@ -908,27 +903,6 @@ noteFtsTag.rowid IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" 
     cardFtsTag.rowid IN (SELECT "rowid" FROM "cardFtsTag" WHERE "cardFtsTag"."tags" LIKE '%foo%' ESCAPE '@')
     OR
     noteFtsTag.rowid IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" LIKE '%foo%' ESCAPE '@')
-  )
-  OR
-  (
-    cardFtsTag.rowid IN (SELECT "rowid" FROM "cardFtsTag" WHERE "cardFtsTag"."tags" LIKE '%bar%' ESCAPE '@')
-    OR
-    noteFtsTag.rowid IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" LIKE '%bar%' ESCAPE '@')
-  )
-)`,
-			4,
-		)
-	})
-
-	test('wildcard', async () => {
-		await assertEqual(
-			String.raw`(tag:foo*,bar)`,
-			String.raw`
-(
-  (
-    cardFtsTag.rowid IN (SELECT "rowid" FROM "cardFtsTag" WHERE "cardFtsTag"."tags" LIKE '%foo% * ' ESCAPE '@')
-    OR
-    noteFtsTag.rowid IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" LIKE '%foo% * ' ESCAPE '@')
   )
   OR
   (

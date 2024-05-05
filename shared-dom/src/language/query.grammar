@@ -87,10 +87,9 @@ string {
   | Html
   | RawQuoted
   | RawHtml )
-  Wildcard?
 }
 
-id { SimpleString | Quoted1 | Quoted2 | Number }
+id { SimpleString | Quoted1 | Quoted2 | Number | RawQuoted }
 
 kw     <word> { @extend[@name={word}]<SimpleString, word> } // "keyword"
 enum   <word> { @extend              <SimpleString, word> }
@@ -107,7 +106,7 @@ FieldName {
   Not?
   (
     Regex |
-    ( SimpleString | Quoted1 | Quoted2 | Number ) Wildcard?
+    ( SimpleString | Quoted1 | Quoted2 | Number | RawQuoted )
   )
 }
 
@@ -248,8 +247,6 @@ Is { ":" | "=" }
 }
 
 @tokens {
-  Wildcard { "*" }
-
   // https://github.com/lezer-parser/javascript/blob/392c6115647c9e55c147ac2d702f75be127a7b2d/src/javascript.grammar#L683
   // Not exactly the same because we're more interested in correctness (than tokenization) https://github.com/lezer-parser/javascript/pull/31#issuecomment-2016585616
   Regex[isolate] { "/" (![/\\\n[] | "\\" ![\n] | "[" (![\n\\\]] | "\\" ![\n])* "]")+ "/" $[dgimsuvy]* }
