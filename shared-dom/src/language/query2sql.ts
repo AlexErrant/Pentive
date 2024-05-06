@@ -92,42 +92,31 @@ export function getLabel(node: SyntaxNodeRef) {
 	return label as Label
 }
 
-const content = [
-	qt.Quoted1Content,
-	qt.Quoted2Content,
-	qt.HtmlContent,
-	qt.RawQuoted1Content,
-	qt.RawQuoted2Content,
-	qt.RawHtmlContent,
-]
-const escape = [
-	qt.Quoted1Escape, //
-	qt.Quoted2Escape,
-	qt.HtmlEscape,
-]
-const wildcard = [
-	qt.HtmlWildcard, //
-	qt.Quoted1Wildcard,
-	qt.Quoted2Wildcard,
-]
-const wildcard1 = [
-	qt.HtmlWildcard1, //
-	qt.Quoted1Wildcard1,
-	qt.Quoted2Wildcard1,
-]
-
 function buildContent(node: SyntaxNodeRef, input: string) {
 	const r: string[] = []
-	let child = node.node.firstChild?.nextSibling
+	if (node.node.firstChild == null) throwExp('How did you get this error?')
+	let child = node.node.firstChild.nextSibling
+	let close = null
 	while (child != null) {
-		if (content.includes(child.type.id)) {
+		if (
+			child.type.id === qt.Quoted1Content ||
+			child.type.id === qt.Quoted2Content ||
+			child.type.id === qt.HtmlContent ||
+			child.type.id === qt.RawQuoted1Content ||
+			child.type.id === qt.RawQuoted2Content ||
+			child.type.id === qt.RawHtmlContent
+		) {
 			r.push(
 				input
 					.slice(child.from, child.to)
 					.replaceAll('@', '@@')
 					.replaceAll('%', '@%'),
 			)
-		} else if (escape.includes(child.type.id)) {
+		} else if (
+			child.type.id === qt.Quoted1Escape ||
+			child.type.id === qt.Quoted2Escape ||
+			child.type.id === qt.HtmlEscape
+		) {
 			const char = input.charAt(child.to - 1)
 			const c =
 				char === '*'
@@ -142,14 +131,37 @@ function buildContent(node: SyntaxNodeRef, input: string) {
 					? '"'
 					: throwExp('you forgot ' + char)
 			r.push(c)
-		} else if (wildcard.includes(child.type.id)) {
+		} else if (
+			child.type.id === qt.HtmlWildcard ||
+			child.type.id === qt.Quoted1Wildcard ||
+			child.type.id === qt.Quoted2Wildcard
+		) {
 			r.push('%')
-		} else if (wildcard1.includes(child.type.id)) {
+		} else if (
+			child.type.id === qt.HtmlWildcard1 ||
+			child.type.id === qt.Quoted1Wildcard1 ||
+			child.type.id === qt.Quoted2Wildcard1
+		) {
 			r.push('_')
+		}
+		if (
+			child.type.id === qt.Quoted1Close ||
+			child.type.id === qt.Quoted2Close ||
+			child.type.id === qt.RawQuoted1Close ||
+			child.type.id === qt.RawQuoted2Close ||
+			child.type.id === qt.HtmlClose ||
+			child.type.id === qt.RawHtmlClose
+		) {
+			close = input.slice(child.from, child.to)
+			break
 		}
 		child = child.nextSibling
 	}
-	return r.join('')
+	const wildcardLeft = !input
+		.slice(node.node.firstChild.from, node.node.firstChild.to)
+		.includes('##')
+	const wildcardRight = close == null ? true : !close.includes('##')
+	return [r.join(''), wildcardLeft, wildcardRight] as const
 }
 
 function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
@@ -163,9 +175,9 @@ function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
 	) {
 		maybeAddSeparator(node.node, context)
 		const label = getLabel(node.node.parent!)
-		const value =
+		const [value, wildcardLeft, wildcardRight] =
 			node.type.is(qt.SimpleString) || node.type.is(qt.KindEnum)
-				? input.slice(node.from, node.to)
+				? [input.slice(node.from, node.to), true, true]
 				: node.type.is(qt.Quoted1) ||
 				  node.type.is(qt.Quoted2) ||
 				  node.type.is(qt.RawQuoted)
@@ -180,6 +192,8 @@ function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
 					? 'Quoted'
 					: 'SimpleString',
 			value,
+			wildcardLeft,
+			wildcardRight,
 			negate,
 			label,
 		})
@@ -226,9 +240,8 @@ function astLeave(_input: string, node: SyntaxNodeRef, context: Context) {
 	}
 }
 
-function getValue(qs: QueryString) {
-	const r = `%${qs.value}%`
-	return r
+function getValue({ value, wildcardLeft, wildcardRight }: QueryString) {
+	return `${wildcardLeft ? '%' : ''}${value}${wildcardRight ? '%' : ''}`
 }
 
 function serialize(node: Node, context: Context) {
@@ -407,6 +420,8 @@ interface QueryString {
 	label?: Label
 	value: string
 	negate: boolean
+	wildcardLeft: boolean
+	wildcardRight: boolean
 }
 
 interface QueryRegex {

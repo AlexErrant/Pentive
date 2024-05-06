@@ -125,6 +125,46 @@ describe('special characters', () => {
 	})
 })
 
+describe('delimiter special characters', () => {
+	async function x(actual: string, expected: string) {
+		await assertEqual(
+			actual,
+			String.raw`noteFtsFv.rowid IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.text LIKE '${expected}' ESCAPE '@')`,
+			1,
+		)
+	}
+	test('normal', async () => {
+		await x(
+			String.raw`"foo"`, //
+			String.raw`%foo%`,
+		)
+	})
+	test('left', async () => {
+		await x(
+			String.raw`##"foo"`, //
+			String.raw`foo%`,
+		)
+	})
+	test('right', async () => {
+		await x(
+			String.raw`"foo"##`, //
+			String.raw`%foo`,
+		)
+	})
+	test('both', async () => {
+		await x(
+			String.raw`##"foo"##`, //
+			String.raw`foo`,
+		)
+	})
+	test('missing trailing delimiter', async () => {
+		await x(
+			String.raw`##"foo`, //
+			String.raw`foo%`,
+		)
+	})
+})
+
 describe('not a', () => {
 	const expected = String.raw`noteFtsFv.rowid NOT IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.text LIKE '%a%' ESCAPE '@')`
 
@@ -340,6 +380,8 @@ describe('groupAnds', () => {
 		type: 'SimpleString' as const,
 		value: 'x',
 		negate: false,
+		wildcardLeft: true,
+		wildcardRight: true,
 	}
 	const or = { type: 'OR' as const }
 	const and = { type: 'AND' as const }
