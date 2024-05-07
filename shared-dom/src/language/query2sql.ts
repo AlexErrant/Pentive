@@ -1,6 +1,6 @@
 import { type SyntaxNodeRef, type SyntaxNode } from '@lezer/common'
 import { parser } from './queryParser'
-import { assertNever, throwExp } from 'shared'
+import { assertNever, escapeRegExp, throwExp } from 'shared'
 import { sql, type RawBuilder, type SqlBool } from 'kysely'
 import { Is, Regex } from './queryParser.terms'
 import * as qt from './queryParser.terms'
@@ -94,6 +94,8 @@ export function getLabel(node: SyntaxNodeRef) {
 
 function buildContent(node: SyntaxNodeRef, input: string) {
 	const r: string[] = []
+	const regex: string[] = []
+	let needsRegex = false // we need regex for % and _ because `ESCAPE` isn't supported https://sqlite.org/forum/forumpost/314bf902e0
 	if (node.node.firstChild == null) throwExp('How did you get this error?')
 	let child = node.node.firstChild.nextSibling
 	let close = null
@@ -106,43 +108,37 @@ function buildContent(node: SyntaxNodeRef, input: string) {
 			child.type.id === qt.RawQuoted2Content ||
 			child.type.id === qt.RawHtmlContent
 		) {
-			r.push(
-				input
-					.slice(child.from, child.to)
-					.replaceAll('@', '@@')
-					.replaceAll('%', '@%'),
-			)
+			const value = input.slice(child.from, child.to)
+			regex.push(escapeRegExp(value))
+			if (input.includes('%')) {
+				needsRegex = true
+				r.push(value.replaceAll('%', '_'))
+			} else {
+				r.push(value)
+			}
 		} else if (
 			child.type.id === qt.Quoted1Escape ||
 			child.type.id === qt.Quoted2Escape ||
 			child.type.id === qt.HtmlEscape
 		) {
 			const char = input.charAt(child.to - 1)
-			const c =
-				char === '*'
-					? '*'
-					: char === '_'
-					? '@_'
-					: char === '\\'
-					? '\\'
-					: char === "'"
-					? "'"
-					: char === '"'
-					? '"'
-					: throwExp('you forgot ' + char)
-			r.push(c)
+			r.push(char)
+			regex.push(escapeRegExp(char))
+			if (char === '_') needsRegex = true
 		} else if (
 			child.type.id === qt.HtmlWildcard ||
 			child.type.id === qt.Quoted1Wildcard ||
 			child.type.id === qt.Quoted2Wildcard
 		) {
 			r.push('%')
+			regex.push('.*')
 		} else if (
 			child.type.id === qt.HtmlWildcard1 ||
 			child.type.id === qt.Quoted1Wildcard1 ||
 			child.type.id === qt.Quoted2Wildcard1
 		) {
 			r.push('_')
+			regex.push('.')
 		}
 		if (
 			child.type.id === qt.Quoted1Close ||
@@ -161,7 +157,8 @@ function buildContent(node: SyntaxNodeRef, input: string) {
 		.slice(node.node.firstChild.from, node.node.firstChild.to)
 		.includes('##')
 	const wildcardRight = close == null ? true : !close.includes('##')
-	return [r.join(''), wildcardLeft, wildcardRight] as const
+	const regexPattern = needsRegex ? regex.join('') : undefined
+	return [r.join(''), wildcardLeft, wildcardRight, regexPattern] as const
 }
 
 function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
@@ -175,9 +172,9 @@ function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
 	) {
 		maybeAddSeparator(node.node, context)
 		const label = getLabel(node.node.parent!)
-		const [value, wildcardLeft, wildcardRight] =
+		const [value, wildcardLeft, wildcardRight, regexPattern] =
 			node.type.is(qt.SimpleString) || node.type.is(qt.KindEnum)
-				? [input.slice(node.from, node.to), true, true]
+				? [input.slice(node.from, node.to), true, true, undefined]
 				: node.type.is(qt.Quoted1) ||
 				  node.type.is(qt.Quoted2) ||
 				  node.type.is(qt.RawQuoted)
@@ -194,6 +191,7 @@ function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
 			value,
 			wildcardLeft,
 			wildcardRight,
+			regexPattern,
 			negate,
 			label,
 		})
@@ -240,18 +238,24 @@ function astLeave(_input: string, node: SyntaxNodeRef, context: Context) {
 	}
 }
 
-function getValue({ value, wildcardLeft, wildcardRight }: QueryString) {
-	return `${wildcardLeft ? '%' : ''}${value}${wildcardRight ? '%' : ''}`
+function buildFilter(qs: QueryString, column: string) {
+	const col = sql.raw(column)
+	const left = qs.wildcardLeft ? '%' : ''
+	const right = qs.wildcardRight ? '%' : ''
+	const value = `${left}${qs.value}${right}`
+	return qs.regexPattern != null
+		? sql`${col} LIKE ${value} AND regexp_with_flags(${qs.regexPattern}, 'i', ${col})`
+		: sql`${col} LIKE ${value}`
 }
 
 function serialize(node: Node, context: Context) {
 	if (node.type === simpleString || node.type === quoted) {
 		if (node.label == null) {
 			context.joinFts = true
-			const value = getValue(node)
+			const filter = buildFilter(node, 'noteFtsFv.text')
 			const not = getNot(node.negate)
 			context.parameterizeSql(
-				sql`noteFtsFv.rowid ${not} IN (SELECT rowid FROM noteFtsFv WHERE noteFtsFv.text LIKE ${value} ESCAPE '@')`, // @ as escape because using \ as escape makes me question which plane of reality I'm occupying.
+				sql`noteFtsFv.rowid ${not} IN (SELECT rowid FROM noteFtsFv WHERE ${filter})`,
 			)
 		}
 	} else if (node.type === regex) {
@@ -307,9 +311,9 @@ function handleLabel(node: QueryString | QueryRegex, context: Context) {
 				sql`${not} regexp_with_flags(${node.pattern}, ${node.flags}, templateNameFts.name)`,
 			)
 		} else {
-			const value = getValue(node)
+			const filter = buildFilter(node, 'templateNameFts.name')
 			context.parameterizeSql(
-				sql`template.rowid ${not} IN (SELECT rowid FROM templateNameFts WHERE templateNameFts.name LIKE ${value} ESCAPE '@')`,
+				sql`template.rowid ${not} IN (SELECT rowid FROM templateNameFts WHERE ${filter})`,
 			)
 		}
 	} else if (node.label === templateId) {
@@ -324,9 +328,9 @@ function handleLabel(node: QueryString | QueryRegex, context: Context) {
 				sql`${not} regexp_with_flags(${node.pattern}, ${node.flags}, cardSettingNameFts.name)`,
 			)
 		} else {
-			const value = getValue(node)
+			const filter = buildFilter(node, 'cardSettingNameFts.name')
 			context.parameterizeSql(
-				sql`card.cardSettingId ${not} IN (SELECT rowid FROM cardSettingNameFts WHERE cardSettingNameFts.name LIKE ${value} ESCAPE '@')`,
+				sql`card.cardSettingId ${not} IN (SELECT rowid FROM cardSettingNameFts WHERE ${filter})`,
 			)
 		}
 	} else if (node.label === settingId) {
@@ -364,12 +368,13 @@ ${not} regexp_with_flags(${node.pattern}, ${node.flags}, "noteFtsTag"."tags")
 )`,
 		)
 	} else {
-		const value = getValue(node)
+		const cardFilter = buildFilter(node, `"cardFtsTag"."tags"`)
+		const noteFilter = buildFilter(node, `"noteFtsTag"."tags"`)
 		context.parameterizeSql(
 			sql`(
-cardFtsTag.rowid ${not} IN (SELECT "rowid" FROM "cardFtsTag" WHERE "cardFtsTag"."tags" LIKE ${value} ESCAPE '@')
+cardFtsTag.rowid ${not} IN (SELECT "rowid" FROM "cardFtsTag" WHERE ${cardFilter})
 ${sql.raw(node.negate ? 'AND' : 'OR')}
-noteFtsTag.rowid ${not} IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" LIKE ${value} ESCAPE '@')
+noteFtsTag.rowid ${not} IN (SELECT "rowid" FROM "noteFtsTag" WHERE ${noteFilter})
 )`,
 		)
 	}
@@ -419,6 +424,7 @@ interface QueryString {
 	type: typeof simpleString | typeof quoted
 	label?: Label
 	value: string
+	regexPattern?: string // only intended for internal use. Specifically to supplement where FTS is lacking, like escaping, word boundaries, and case sensitivity.
 	negate: boolean
 	wildcardLeft: boolean
 	wildcardRight: boolean

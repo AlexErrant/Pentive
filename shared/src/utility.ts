@@ -73,3 +73,8 @@ export const objKeys: <TKey extends string, TVal>(
 export const objEntries: <TKey extends string, TVal>(
 	o: Record<TKey, TVal>,
 ) => Array<[TKey, TVal]> = Object.entries
+
+// https://stackoverflow.com/a/6969486
+export function escapeRegExp(string: string): string {
+	return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') // $& means the whole matched string
+}
