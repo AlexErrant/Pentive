@@ -220,61 +220,62 @@ async function getCards(
 	sort?: { col: 'card.due' | 'card.created'; direction: 'asc' | 'desc' },
 ) {
 	const db = ky.withTables<WithCache>()
-	const baseQuery = db
-		.selectFrom('card')
-		.innerJoin('note', 'card.noteId', 'note.id')
-		.innerJoin('template', 'template.id', 'note.templateId')
-		.$if(sort != null, (db) => db.orderBy(sort!.col, sort!.direction))
-		// don't `where` when scrolling - redundant since joining on the cache already filters
-		.$if(offset === 0 && conversionResult.sql != null, (db) =>
-			db
-				.$if(conversionResult.joinFts, (db) =>
-					db
-						.innerJoin('noteFtsFv', 'noteFtsFv.noteId', 'note.id')
-						.orderBy(sql`noteFtsFv.rank`),
-				)
-				.$if(conversionResult.joinTags, (db) =>
-					db
-						.innerJoin('noteFtsTag', 'noteFtsTag.rowid', 'note.rowid')
-						.innerJoin('cardFtsTag', 'cardFtsTag.rowid', 'card.rowid'),
-				)
-				.$if(conversionResult.joinTemplateFts, (db) =>
-					db.innerJoin(
-						'templateNameFts',
-						'templateNameFts.rowid',
-						'template.rowid',
-					),
-				)
-				.$if(conversionResult.joinCardSettingFts, (db) =>
-					db
-						.innerJoin('noteFtsTag', 'noteFtsTag.rowid', 'note.rowid')
-						.innerJoin('cardFtsTag', 'cardFtsTag.rowid', 'card.rowid'),
-				)
-				.$if(conversionResult.joinLatestReview, (db) =>
-					/* LEFT JOIN "review" AS "latestReview"
+	const baseQuery = (db1 = db) =>
+		db1
+			.selectFrom('card')
+			.innerJoin('note', 'card.noteId', 'note.id')
+			.innerJoin('template', 'template.id', 'note.templateId')
+			.$if(sort != null, (db) => db.orderBy(sort!.col, sort!.direction))
+			// don't `where` when scrolling - redundant since joining on the cache already filters
+			.$if(offset === 0 && conversionResult.sql != null, (db) =>
+				db
+					.$if(conversionResult.joinFts, (db) =>
+						db
+							.innerJoin('noteFtsFv', 'noteFtsFv.noteId', 'note.id')
+							.orderBy(sql`noteFtsFv.rank`),
+					)
+					.$if(conversionResult.joinTags, (db) =>
+						db
+							.innerJoin('noteFtsTag', 'noteFtsTag.rowid', 'note.rowid')
+							.innerJoin('cardFtsTag', 'cardFtsTag.rowid', 'card.rowid'),
+					)
+					.$if(conversionResult.joinTemplateFts, (db) =>
+						db.innerJoin(
+							'templateNameFts',
+							'templateNameFts.rowid',
+							'template.rowid',
+						),
+					)
+					.$if(conversionResult.joinCardSettingFts, (db) =>
+						db
+							.innerJoin('noteFtsTag', 'noteFtsTag.rowid', 'note.rowid')
+							.innerJoin('cardFtsTag', 'cardFtsTag.rowid', 'card.rowid'),
+					)
+					.$if(conversionResult.joinLatestReview, (db) =>
+						/* LEFT JOIN "review" AS "latestReview"
               ON  "latestReview"."cardId" = "card"."id"
               AND "latestReview"."created" = (
                 SELECT MAX("created") AS "max"
                 FROM   "review"
                 WHERE  "card"."id" = "review"."cardId"
               ) */
-					db.leftJoin('review as latestReview', (join) =>
-						join
-							.onRef('latestReview.cardId', '=', 'card.id')
-							.on('latestReview.created', '=', (eb) =>
-								eb
-									.selectFrom('review')
-									.select(eb.fn.max('created').as('max'))
-									.whereRef('card.id', '=', 'review.cardId'),
-							),
-					),
-				)
-				.where(conversionResult.sql!),
-		)
+						db.leftJoin('review as latestReview', (join) =>
+							join
+								.onRef('latestReview.cardId', '=', 'card.id')
+								.on('latestReview.created', '=', (eb) =>
+									eb
+										.selectFrom('review')
+										.select(eb.fn.max('created').as('max'))
+										.whereRef('card.id', '=', 'review.cardId'),
+								),
+						),
+					)
+					.where(conversionResult.sql!),
+			)
 	const searchCache =
 		// If user has scrolled, build/use the cache.
-		offset === 0 ? null : await buildCache(baseQuery, query)
-	const entities = baseQuery
+		offset === 0 ? null : await buildCache(baseQuery(), query)
+	const entities = baseQuery()
 		.$if(searchCache != null, (qb) =>
 			qb
 				.innerJoin(searchCache!, 'card.id', `${searchCache!}.id`)

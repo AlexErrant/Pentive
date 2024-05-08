@@ -287,14 +287,14 @@ const dataSource = {
 				setColumnDefs(cleanedQuery, regex())
 				if (countishWrong && gridRef.api.isLastRowIndexKnown() !== true) {
 					const start = performance.now()
-					const count = await db.getCardsCount(x.searchCache, x.baseQuery)
+					const count = await db.getCardsCount(x.searchCache, x.baseQuery())
 					const end = performance.now()
 					console.log(`Count took ${end - start} ms`, cleanedQuery)
 					p.successCallback(x.noteCards, count.c)
 				}
 				if (countishWrong && x.searchCache == null) {
 					// asynchronously/nonblockingly build the cache
-					db.buildCache(x.baseQuery, cleanedQuery).catch((e) => {
+					db.buildCache(x.baseQuery(), cleanedQuery).catch((e) => {
 						C.toastWarn('Error building cache', e)
 					})
 				}
