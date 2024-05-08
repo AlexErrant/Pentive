@@ -6,6 +6,7 @@ import {
 	type Card,
 	type State,
 	type NoteCard,
+	type LDbId,
 } from 'shared'
 import { ky, C, rd } from '../topLevelAwait'
 import {
@@ -22,6 +23,7 @@ import {
 	type OnConflictTables,
 	sql,
 	type SelectQueryBuilder,
+	type QueryCreator,
 } from 'kysely'
 import _ from 'lodash'
 import { md5 } from '../domain/utility'
@@ -172,10 +174,7 @@ async function buildCache(
 		.executeTakeFirstOrThrow()
 		.then((x) => x.c === 1)
 	if (!cacheExists) {
-		const { sql, parameters } = baseQuery
-			.clearSelect()
-			.select('card.id as id')
-			.compile()
+		const { sql, parameters } = baseQuery.compile()
 		// console.log(
 		// 	'PRAGMA temp_store',
 		// 	(await sql`PRAGMA temp_store;`.execute(db)).rows[0],
@@ -193,10 +192,12 @@ async function buildCache(
 
 async function getCardsCount(
 	searchCache: SearchCache | null,
-	baseQuery: SelectQueryBuilder<
+	baseQuery: (db1?: QueryCreator<DB & WithCache>) => SelectQueryBuilder<
 		DB & WithCache,
-		'card' | 'note',
-		Partial<unknown>
+		'card' | 'note' | 'template',
+		{
+			id: LDbId
+		} & Partial<unknown>
 	>,
 ) {
 	const db = ky.withTables<WithCache>()
@@ -206,7 +207,9 @@ async function getCardsCount(
 					.selectFrom(searchCache)
 					.select(db.fn.max(`${searchCache}.rowid`).as('c'))
 					.executeTakeFirstOrThrow()
-			: baseQuery
+			: db
+					.with('cardIds', baseQuery)
+					.selectFrom('cardIds')
 					.select(db.fn.countAll<number>().as('c'))
 					.executeTakeFirstOrThrow()
 	return await count
@@ -220,9 +223,11 @@ async function getCards(
 	sort?: { col: 'card.due' | 'card.created'; direction: 'asc' | 'desc' },
 ) {
 	const db = ky.withTables<WithCache>()
-	const baseQuery = (db1 = db) =>
+	const baseQuery = (db1: QueryCreator<DB & WithCache> = db) =>
 		db1
 			.selectFrom('card')
+			.select('card.id')
+			.distinct()
 			.innerJoin('note', 'card.noteId', 'note.id')
 			.innerJoin('template', 'template.id', 'note.templateId')
 			.$if(sort != null, (db) => db.orderBy(sort!.col, sort!.direction))
@@ -275,7 +280,12 @@ async function getCards(
 	const searchCache =
 		// If user has scrolled, build/use the cache.
 		offset === 0 ? null : await buildCache(baseQuery(), query)
-	const entities = baseQuery()
+	const entities = db
+		.with('cardIds', baseQuery)
+		.selectFrom('cardIds')
+		.innerJoin('card', 'card.id', 'cardIds.id')
+		.innerJoin('note', 'card.noteId', 'note.id')
+		.innerJoin('template', 'note.templateId', 'template.id')
 		.$if(searchCache != null, (qb) =>
 			qb
 				.innerJoin(searchCache!, 'card.id', `${searchCache!}.id`)

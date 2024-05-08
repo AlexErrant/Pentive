@@ -278,19 +278,26 @@ const dataSource = {
 				console.log(`GetCards ${end - start} ms`, cleanedQuery)
 				const countish = x.noteCards.length
 				const countishWrong = countish === cacheBlockSize
-				p.successCallback(x.noteCards, countishWrong ? undefined : countish)
-				if (countish === 0) {
-					gridRef.api.showNoRowsOverlay()
-				} else {
-					gridRef.api.hideOverlay()
+				p.successCallback(
+					x.noteCards,
+					countishWrong || gridRef.api.isLastRowIndexKnown() === true
+						? undefined
+						: countish,
+				)
+				if (p.startRow === 0) {
+					if (countish === 0) {
+						gridRef.api.showNoRowsOverlay()
+					} else {
+						gridRef.api.hideOverlay()
+					}
 				}
 				setColumnDefs(cleanedQuery, regex())
 				if (countishWrong && gridRef.api.isLastRowIndexKnown() !== true) {
 					const start = performance.now()
-					const count = await db.getCardsCount(x.searchCache, x.baseQuery())
+					const count = await db.getCardsCount(x.searchCache, x.baseQuery)
 					const end = performance.now()
 					console.log(`Count took ${end - start} ms`, cleanedQuery)
-					p.successCallback(x.noteCards, count.c)
+					gridRef.api.setRowCount(count.c, true)
 				}
 				if (countishWrong && x.searchCache == null) {
 					// asynchronously/nonblockingly build the cache
