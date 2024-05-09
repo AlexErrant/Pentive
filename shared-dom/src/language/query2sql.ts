@@ -158,7 +158,19 @@ function buildContent(node: SyntaxNodeRef, input: string) {
 		.includes('##')
 	const wildcardRight = close == null ? true : !close.includes('##')
 	const regexPattern = needsRegex ? regex.join('') : undefined
-	return [r.join(''), wildcardLeft, wildcardRight, regexPattern] as const
+	return {
+		value: r.join(''),
+		wildcardLeft,
+		wildcardRight,
+		regexPattern,
+	} satisfies Content
+}
+
+interface Content {
+	value: string
+	wildcardLeft: boolean
+	wildcardRight: boolean
+	regexPattern?: string
 }
 
 function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
@@ -172,9 +184,14 @@ function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
 	) {
 		maybeAddSeparator(node.node, context)
 		const label = getLabel(node.node.parent!)
-		const [value, wildcardLeft, wildcardRight, regexPattern] =
+		const { value, wildcardLeft, wildcardRight, regexPattern } =
 			node.type.is(qt.SimpleString) || node.type.is(qt.KindEnum)
-				? [input.slice(node.from, node.to), true, true, undefined]
+				? ({
+						value: input.slice(node.from, node.to),
+						wildcardLeft: true,
+						wildcardRight: true,
+						regexPattern: undefined,
+				  } satisfies Content)
 				: node.type.is(qt.Quoted1) ||
 				  node.type.is(qt.Quoted2) ||
 				  node.type.is(qt.RawQuoted)

@@ -331,69 +331,68 @@ async function getCards(
 		])
 		.limit(limit)
 		.execute()
-	const r = {
+	const noteCards = Array.from(
+		groupByToMap(await entities, (x) => x.card_id).values(),
+	).map((tncR) => {
+		const tnc = tncR[0]!
+		const note = noteEntityToDomain(
+			{
+				ankiNoteId: tnc.note_ankiNoteId,
+				created: tnc.note_created,
+				fieldValues: tnc.note_fieldValues,
+				id: tnc.note_id,
+				updated: tnc.note_updated,
+				tags: tnc.note_tags,
+				templateId: tnc.note_templateId,
+				templateFields: tnc.template_fields,
+			},
+			tncR
+				.filter((x) => x.remoteNoteNook != null)
+				.map((x) => ({
+					remoteId: x.remoteNoteId!,
+					nook: x.remoteNoteNook!,
+					uploadDate: x.remoteNoteUploadDate,
+					localId: x.note_id,
+				})),
+		)
+		const template = templateEntityToDomain(
+			{
+				ankiId: tnc.template_ankiId,
+				created: tnc.template_created,
+				css: tnc.template_css,
+				fields: tnc.template_fields,
+				id: tnc.template_id,
+				updated: tnc.template_updated,
+				name: tnc.template_name,
+				templateType: tnc.template_templateType,
+			},
+			tncR
+				.filter((x) => x.remoteTemplateNook != null)
+				.map((x) => ({
+					remoteId: x.remoteTemplateId!,
+					nook: x.remoteTemplateNook!,
+					uploadDate: x.remoteTemplateUploadDate,
+					localId: x.template_id,
+				})),
+		)
+		const card = cardEntityToDomain({
+			cardSettingId: tnc.card_cardSettingId,
+			created: tnc.card_created,
+			tags: tnc.card_tags,
+			due: tnc.card_due,
+			id: tnc.card_id,
+			updated: tnc.card_updated,
+			noteId: tnc.card_noteId,
+			ord: tnc.card_ord,
+			state: tnc.card_state,
+		})
+		return { note, template, card } satisfies NoteCard
+	})
+	return {
 		searchCache,
 		baseQuery,
-		noteCards: Array.from(
-			groupByToMap(await entities, (x) => x.card_id).values(),
-		).map((tncR) => {
-			const tnc = tncR[0]!
-			const note = noteEntityToDomain(
-				{
-					ankiNoteId: tnc.note_ankiNoteId,
-					created: tnc.note_created,
-					fieldValues: tnc.note_fieldValues,
-					id: tnc.note_id,
-					updated: tnc.note_updated,
-					tags: tnc.note_tags,
-					templateId: tnc.note_templateId,
-					templateFields: tnc.template_fields,
-				},
-				tncR
-					.filter((x) => x.remoteNoteNook != null)
-					.map((x) => ({
-						remoteId: x.remoteNoteId!,
-						nook: x.remoteNoteNook!,
-						uploadDate: x.remoteNoteUploadDate,
-						localId: x.note_id,
-					})),
-			)
-			const template = templateEntityToDomain(
-				{
-					ankiId: tnc.template_ankiId,
-					created: tnc.template_created,
-					css: tnc.template_css,
-					fields: tnc.template_fields,
-					id: tnc.template_id,
-					updated: tnc.template_updated,
-					name: tnc.template_name,
-					templateType: tnc.template_templateType,
-				},
-				tncR
-					.filter((x) => x.remoteTemplateNook != null)
-					.map((x) => ({
-						remoteId: x.remoteTemplateId!,
-						nook: x.remoteTemplateNook!,
-						uploadDate: x.remoteTemplateUploadDate,
-						localId: x.template_id,
-					})),
-			)
-			const card = cardEntityToDomain({
-				cardSettingId: tnc.card_cardSettingId,
-				created: tnc.card_created,
-				tags: tnc.card_tags,
-				due: tnc.card_due,
-				id: tnc.card_id,
-				updated: tnc.card_updated,
-				noteId: tnc.card_noteId,
-				ord: tnc.card_ord,
-				state: tnc.card_state,
-			})
-			const r: NoteCard = { note, template, card }
-			return r
-		}),
+		noteCards,
 	}
-	return r
 }
 
 export const cardCollectionMethods = {
