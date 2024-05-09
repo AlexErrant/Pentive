@@ -6,6 +6,7 @@ import {
 	type InsertObject,
 	type Compilable,
 	type ExpressionWrapper,
+	type SqlBool,
 } from 'kysely'
 import { PlanetScaleDialect } from 'kysely-planetscale'
 import { type DB } from './dbSchema.js'
@@ -291,7 +292,10 @@ export async function searchNotes(input: string, userId: UserId | null) {
 					.as('til'),
 			),
 		)
-		.where(sql`MATCH(fts) AGAINST (${input} IN NATURAL LANGUAGE MODE)`)
+		.where(
+			// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+			sql`MATCH(fts) AGAINST (${input} IN NATURAL LANGUAGE MODE)` as RawBuilder<SqlBool>,
+		)
 		.execute()
 	return r.map(noteToNookView)
 }
