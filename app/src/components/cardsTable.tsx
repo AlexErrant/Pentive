@@ -107,10 +107,12 @@ const columnDefs: Array<ColDef<NoteCard>> = [
 	{
 		headerName: 'Short Front',
 		cellRenderer: (x: ICellRendererParams<NoteCard>) => shortRenderer(0, x),
+		cellClass: ['has-[mark]:bg-yellow-50'],
 	},
 	{
 		headerName: 'Short Back',
 		cellRenderer: (x: ICellRendererParams<NoteCard>) => shortRenderer(1, x),
+		cellClass: ['has-[mark]:bg-yellow-50'],
 	},
 	{
 		headerName: 'Due',
