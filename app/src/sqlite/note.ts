@@ -9,6 +9,7 @@ import {
 	type RemoteMediaNum,
 	type RemoteTemplateId,
 	type Note,
+	notEmpty,
 } from 'shared'
 import { type DB } from './database'
 import { type InsertObject } from 'kysely'
@@ -140,19 +141,18 @@ export const noteCollectionMethods = {
 							C.toastImpossible(
 								'Zero remotes - is something wrong with the SQL query?',
 							)
-						const remoteIds = Array.from(note.remotes).map(([nook]) => {
-							const rt =
-								remoteTemplates.find(
-									(rt) => rt.localId === note.templateId && nook === rt.nook,
-								) ??
-								C.toastImpossible(
-									`No template found for id '${note.templateId}' with nook '${nook}'.`,
-								)
-							return (
-								(rt.remoteId as RemoteTemplateId) ??
-								C.toastImpossible(`Template ${rt.localId} has no remoteId.`)
-							)
-						})
+						const remoteIds = Array.from(note.remotes)
+							.map(([nook]) => {
+								const rt =
+									remoteTemplates.find(
+										(rt) => rt.localId === note.templateId && nook === rt.nook,
+									) ??
+									C.toastImpossible(
+										`No template found for id '${note.templateId}' with nook '${nook}'.`,
+									)
+								return rt.remoteId as RemoteTemplateId | null
+							})
+							.filter(notEmpty)
 						return domainToCreateRemote(note, remoteIds)
 					})
 					.map((n) => withLocalMediaIdByRemoteMediaId(dp, n)),

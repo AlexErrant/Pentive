@@ -1,9 +1,10 @@
 import {
-	createResource,
 	For,
 	type Setter,
 	Show,
 	type VoidComponent,
+	createEffect,
+	createSignal,
 } from 'solid-js'
 import {
 	objEntries,
@@ -15,24 +16,24 @@ import {
 import { db } from '../db'
 import { type NoteCardView } from '../uiLogic/cards'
 
+interface Remotes {
+	readonly nookId: NookId
+	readonly remoteTemplateId: {
+		remoteTemplateId: RemoteTemplateId
+		uploadDate: Date
+	} | null
+	readonly remote: {
+		remoteNoteId: RemoteNoteId
+		uploadDate: Date
+	} | null
+	readonly uploadable: boolean
+}
+
 function toggleNook(
 	uploadable: boolean,
 	noteId: NoteId,
 	nook: NookId,
-	setRemotes: Setter<
-		Array<{
-			readonly nookId: NookId
-			readonly remoteTemplateId: {
-				remoteTemplateId: RemoteTemplateId
-				uploadDate: Date
-			} | null
-			readonly remote: {
-				remoteNoteId: RemoteNoteId
-				uploadDate: Date
-			} | null
-			readonly uploadable: boolean
-		}>
-	>,
+	setRemotes: Setter<Remotes[]>,
 ) {
 	return (
 		<input
@@ -55,21 +56,22 @@ function toggleNook(
 export const CardsRemote: VoidComponent<{
 	readonly noteCard: NoteCardView
 }> = (props) => {
-	const [getRemotes, { mutate: setRemotes }] = createResource(
-		() => props.noteCard,
-		({ note, template }) =>
-			objEntries(template.remotes).map(([nookId, remoteTemplateId]) => {
-				const remote = note.remotes.get(nookId) ?? null
-				const uploadable = note.remotes.has(nookId)
+	const [getRemotes, setRemotes] = createSignal<Remotes[]>([])
+	createEffect(() => {
+		const remotes = objEntries(props.noteCard.template.remotes).map(
+			([nookId, remoteTemplateId]) => {
+				const remote = props.noteCard.note.remotes.get(nookId) ?? null
+				const uploadable = props.noteCard.note.remotes.has(nookId)
 				return {
 					nookId,
 					remoteTemplateId,
 					remote,
 					uploadable,
-				} as const
-			}),
-		{ initialValue: [] },
-	)
+				} satisfies Remotes
+			},
+		)
+		setRemotes(remotes)
+	})
 	return (
 		<Show when={getRemotes().length !== 0}>
 			Remote Nooks:

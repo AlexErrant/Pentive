@@ -314,7 +314,7 @@ async function getCards(
 				eb
 					.selectFrom('remoteTemplate')
 					.select(['uploadDate', 'nook', 'remoteId'])
-					.whereRef('note.id', '=', 'remoteTemplate.localId'),
+					.whereRef('note.templateId', '=', 'remoteTemplate.localId'),
 			).as('remoteTemplate'),
 
 			jsonArrayFrom(
