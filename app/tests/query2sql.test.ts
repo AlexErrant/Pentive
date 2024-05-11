@@ -376,6 +376,7 @@ describe('groupAnds', () => {
 	const x: Node = {
 		type: 'SimpleString' as const,
 		value: 'x',
+		fieldValueHighlight: 'x',
 		negate: false,
 		wildcardLeft: true,
 		wildcardRight: true,

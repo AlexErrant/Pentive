@@ -61,22 +61,6 @@ test('queryParser can parse standard test string', () => {
 	testTree(tree, spec)
 })
 
-test('strings are returned in BFS order', () => {
-	const query = `-(a) spider-man -a b -c -"(quote\\"d) str" OR "l o l" OR  a b c ((a "c") b) tag:what -setting:"x y" (template:d, e f)`
-	const { strings } = convert(query)
-	expect(strings).toEqual([
-		'spider-man',
-		'b',
-		'l o l',
-		'a',
-		'b',
-		'c',
-		'b',
-		'a',
-		'c',
-	])
-})
-
 test('OR must be a standalone keyword', () => {
 	const tree = parser.parse(`a OR b ORc d`)
 	const spec = `Program(SimpleString,Or,SimpleString,SimpleString,SimpleString)`

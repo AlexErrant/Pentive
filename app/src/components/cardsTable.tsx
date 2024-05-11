@@ -6,7 +6,7 @@ import {
 	Show,
 	For,
 } from 'solid-js'
-import { type NoteCard, type CardId, toOneLine } from 'shared'
+import { type NoteCard, type CardId } from 'shared'
 import '@github/relative-time-element'
 import AgGridSolid, { type AgGridSolidRef } from 'ag-grid-solid'
 import 'ag-grid-community/styles/ag-grid.css'
@@ -32,6 +32,58 @@ import { alterQuery } from '../domain/alterQuery'
 LicenseManager.setLicenseKey(import.meta.env.VITE_AG_GRID_LICENSE)
 
 let gridRef: AgGridSolidRef
+const [fvHighlight, setFvHighlight] = createSignal<RegExp | undefined>()
+
+interface SearchText {
+	isHighlight: boolean
+	text: string
+}
+
+const shortRenderer = (index: number, props: ICellRendererParams<NoteCard>) => {
+	const short = () => {
+		if (props.data == null) {
+			return ''
+		} else {
+			const short = getOk(
+				C.body(props.data.card, props.data.note, props.data.template, true),
+			)?.at(index)
+			if (short == null) return ''
+			const fvh = fvHighlight()
+			if (fvh == null) return short
+			const r: SearchText[] = []
+			let i = 0
+			for (const match of short.matchAll(fvh)) {
+				console.assert(match.index != null, 'index is null')
+				if (match.index! !== i) {
+					r.push({ isHighlight: false, text: short.slice(i, match.index) })
+				}
+				const text = match[0]
+				r.push({ isHighlight: true, text })
+				i = match.index! + text.length
+			}
+			if (i !== short.length) {
+				r.push({ isHighlight: false, text: short.slice(i) })
+			}
+			return r
+		}
+	}
+	return (
+		<Show
+			when={typeof short() === 'string'}
+			fallback={
+				<For each={short() as SearchText[]}>
+					{(x) => (
+						<Show when={x.isHighlight} fallback={x.text}>
+							<mark>{x.text}</mark>
+						</Show>
+					)}
+				</For>
+			}
+		>
+			{short() as string}
+		</Show>
+	)
+}
 
 const columnDefs: Array<ColDef<NoteCard>> = [
 	{ field: 'card.id', hide: true },
@@ -54,23 +106,11 @@ const columnDefs: Array<ColDef<NoteCard>> = [
 	},
 	{
 		headerName: 'Short Front',
-		valueGetter: (x) => {
-			if (x.data != null) {
-				return getOk(
-					C.body(x.data.card, x.data.note, x.data.template, true),
-				)?.at(0)
-			}
-		},
+		cellRenderer: (x: ICellRendererParams<NoteCard>) => shortRenderer(0, x),
 	},
 	{
 		headerName: 'Short Back',
-		valueGetter: (x) => {
-			if (x.data != null) {
-				return getOk(
-					C.body(x.data.card, x.data.note, x.data.template, true),
-				)?.at(1)
-			}
-		},
+		cellRenderer: (x: ICellRendererParams<NoteCard>) => shortRenderer(1, x),
 	},
 	{
 		headerName: 'Due',
@@ -240,11 +280,6 @@ const onGridReady = ({ api }: GridReadyEvent) => {
 	api.setDatasource(dataSource)
 }
 
-// https://stackoverflow.com/a/6969486
-function escapeRegExp(string: string): string {
-	return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') // $& means the whole matched string
-}
-
 const dataSource = {
 	getRows: (p: IGetRowsParams) => {
 		const sort =
@@ -256,15 +291,6 @@ const dataSource = {
 				: undefined
 		const cleanedQuery = query().trim()
 		const conversionResult = convert(cleanedQuery)
-		const regex = () => {
-			const firstWord = conversionResult.strings[0] // lowTODO handle multiple words
-			if (firstWord == null) return null
-			const escapedFirstWord = escapeRegExp(firstWord)
-			return new RegExp(
-				`(?<left>.{0,20})\\b(?<searchWord>${escapedFirstWord})(?<right>.{0,20})`,
-				'si',
-			)
-		}
 		const start = performance.now()
 		db.getCards(
 			p.startRow,
@@ -291,7 +317,7 @@ const dataSource = {
 						gridRef.api.hideOverlay()
 					}
 				}
-				setColumnDefs(cleanedQuery, regex())
+				setFvHighlight(x.fieldValueHighlight)
 				if (countishWrong && gridRef.api.isLastRowIndexKnown() !== true) {
 					const start = performance.now()
 					const count = await db.getCardsCount(x.searchCache, x.baseQuery)
@@ -311,58 +337,4 @@ const dataSource = {
 				p.failCallback()
 			})
 	},
-}
-
-function minifyAndExec(value: string, regex: RegExp | null) {
-	const minified = value.replace(/\s+/g, ' ')
-	if (regex == null) return null
-	return regex.exec(minified)
-}
-
-function setColumnDefs(ftsSearchActual: string, regex: RegExp | null) {
-	if (ftsSearchActual !== '' && gridRef.api.getColumnDef('Search') == null) {
-		gridRef.api.setColumnDefs([
-			{
-				headerName: 'Search',
-				pinned: 'left',
-				colId: 'Search',
-				cellRenderer: (props: ICellRendererParams<NoteCard>) => {
-					const [match, setMatch] = createSignal<RegExpExecArray>()
-					createEffect(() => {
-						for (const v of props.data?.note.fieldValues.values() ?? []) {
-							const r = minifyAndExec(toOneLine(v), regex)
-							if (r != null) {
-								setMatch(r)
-								return
-							}
-						}
-						for (const v of props.data?.note.fieldValues.values() ?? []) {
-							const r = minifyAndExec(v, regex)
-							if (r != null) {
-								setMatch(r)
-								return
-							}
-						}
-					})
-					return (
-						<Show when={match()}>
-							<span>{match()?.groups?.left ?? ''}</span>
-							<mark>
-								{/* use the match's casing - not the search's (firstWord) */}
-								{match()?.groups?.searchWord ??
-									C.toastImpossible('searchWord is missing')}
-							</mark>
-							<span>{match()?.groups?.right ?? ''}</span>
-						</Show>
-					)
-				},
-			} satisfies ColDef<NoteCard>,
-			...columnDefs,
-		])
-	} else if (
-		ftsSearchActual === '' &&
-		gridRef.api.getColumnDef('Search') != null
-	) {
-		gridRef.api.setColumnDefs(columnDefs)
-	}
 }

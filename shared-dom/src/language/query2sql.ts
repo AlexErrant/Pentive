@@ -26,6 +26,7 @@ class Context {
 		this.joinTemplateFts = false
 		this.joinCardSettingFts = false
 		this.joinLatestReview = false
+		this.fieldValueHighlight = []
 	}
 
 	sql: Array<string | RawBuilder<unknown>>
@@ -36,6 +37,7 @@ class Context {
 	joinTemplateFts: boolean
 	joinCardSettingFts: boolean
 	joinLatestReview: boolean
+	fieldValueHighlight: string[]
 
 	trustedSql(trustedSql: string) {
 		this.sql.push(sql.raw(` ${trustedSql} `))
@@ -67,7 +69,7 @@ export function convert(input: string) {
 		joinCardSettingFts: context.joinCardSettingFts,
 		joinTemplateFts: context.joinTemplateFts,
 		joinLatestReview: context.joinLatestReview,
-		strings: findStrings(context.root),
+		fieldValueHighlight: context.fieldValueHighlight,
 	}
 }
 
@@ -157,12 +159,13 @@ function buildContent(node: SyntaxNodeRef, input: string) {
 		.slice(node.node.firstChild.from, node.node.firstChild.to)
 		.includes('##')
 	const wildcardRight = close == null ? true : !close.includes('##')
-	const regexPattern = needsRegex ? regex.join('') : undefined
+	const fieldValueHighlight = regex.join('')
 	return {
 		value: r.join(''),
 		wildcardLeft,
 		wildcardRight,
-		regexPattern,
+		regexPattern: needsRegex ? fieldValueHighlight : undefined,
+		fieldValueHighlight,
 	} satisfies Content
 }
 
@@ -171,6 +174,7 @@ interface Content {
 	wildcardLeft: boolean
 	wildcardRight: boolean
 	regexPattern?: string
+	fieldValueHighlight: string
 }
 
 function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
@@ -184,13 +188,20 @@ function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
 	) {
 		maybeAddSeparator(node.node, context)
 		const label = getLabel(node.node.parent!)
-		const { value, wildcardLeft, wildcardRight, regexPattern } =
+		const {
+			value,
+			wildcardLeft,
+			wildcardRight,
+			regexPattern,
+			fieldValueHighlight,
+		} =
 			node.type.is(qt.SimpleString) || node.type.is(qt.KindEnum)
 				? ({
 						value: input.slice(node.from, node.to),
 						wildcardLeft: true,
 						wildcardRight: true,
 						regexPattern: undefined,
+						fieldValueHighlight: input.slice(node.from, node.to),
 				  } satisfies Content)
 				: node.type.is(qt.Quoted1) ||
 				  node.type.is(qt.Quoted2) ||
@@ -209,6 +220,7 @@ function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
 			wildcardLeft,
 			wildcardRight,
 			regexPattern,
+			fieldValueHighlight,
 			negate,
 			label,
 		})
@@ -270,6 +282,9 @@ function serialize(node: Node, context: Context) {
 		if (node.label == null) {
 			context.joinFts = true
 			const filter = buildFilter(node, 'noteFtsFv.text')
+			if (!node.negate && node.fieldValueHighlight != null) {
+				context.fieldValueHighlight.push(node.fieldValueHighlight)
+			}
 			const not = getNot(node.negate)
 			context.parameterizeSql(
 				sql`noteFtsFv.rowid ${not} IN (SELECT rowid FROM noteFtsFv WHERE ${filter})`,
@@ -442,6 +457,7 @@ interface QueryString {
 	label?: Label
 	value: string
 	regexPattern?: string // only intended for internal use. Specifically to supplement where FTS is lacking, like escaping, word boundaries, and case sensitivity.
+	fieldValueHighlight: string
 	negate: boolean
 	wildcardLeft: boolean
 	wildcardRight: boolean
@@ -547,22 +563,6 @@ function distributeNegate(node: Node, negate: boolean) {
 	} else {
 		assertNever(node.type)
 	}
-}
-
-function findStrings(root: Node) {
-	const r: string[] = []
-	const queue = [root]
-	while (queue.length > 0) {
-		const i = queue.shift()!
-		if (i.type === group && i.label == null) {
-			queue.push(...i.children)
-		} else if (i.type === simpleString || i.type === quoted) {
-			if (!i.negate) {
-				r.push(i.value)
-			}
-		}
-	}
-	return r
 }
 
 export function escapedQuoted1(str: string) {

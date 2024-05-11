@@ -388,10 +388,15 @@ async function getCards(
 		})
 		return { note, template, card } satisfies NoteCard
 	})
+	const fieldValueHighlight =
+		conversionResult.fieldValueHighlight.length === 0
+			? undefined
+			: new RegExp(conversionResult.fieldValueHighlight.join('|'), 'igs')
 	return {
 		searchCache,
 		baseQuery,
 		noteCards,
+		fieldValueHighlight,
 	}
 }
 
