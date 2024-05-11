@@ -1,3 +1,4 @@
+import { jsonArrayFrom } from 'kysely/helpers/sqlite'
 import {
 	type CardId,
 	type NoteId,
@@ -103,17 +104,6 @@ function cardEntityToDomain(card: CardEntity): Card {
 	}
 	return r
 }
-
-// https://stackoverflow.com/a/64489535
-const groupByToMap = <T, Q>(
-	array: T[],
-	predicate: (value: T, index: number, array: T[]) => Q,
-) =>
-	array.reduce((map, value, index, array) => {
-		const key = predicate(value, index, array)
-		map.get(key)?.push(value) ?? map.set(key, [value])
-		return map
-	}, new Map<Q, T[]>())
 
 // The point of this type is to cause an error if something is added to CardEntity
 // If that happens, you probably want to update the `doUpdateSet` call.
@@ -280,20 +270,19 @@ async function getCards(
 	const searchCache =
 		// If user has scrolled, build/use the cache.
 		offset === 0 ? null : await buildCache(baseQuery(), query)
-	const entities = db
+	const entities = await db
 		.with('cardIds', baseQuery)
 		.selectFrom('cardIds')
 		.innerJoin('card', 'card.id', 'cardIds.id')
 		.innerJoin('note', 'card.noteId', 'note.id')
 		.innerJoin('template', 'note.templateId', 'template.id')
+		// Don't do left/right joins! `getCards` should return the `limit` number of cards, and left/right joins screw this up.
 		.$if(searchCache != null, (qb) =>
 			qb
 				.innerJoin(searchCache!, 'card.id', `${searchCache!}.id`)
 				.where(`${searchCache!}.rowid`, '>=', offset),
 		)
-		.leftJoin('remoteNote', 'note.id', 'remoteNote.localId')
-		.leftJoin('remoteTemplate', 'template.id', 'remoteTemplate.localId')
-		.select([
+		.select((eb) => [
 			'card.cardSettingId as card_cardSettingId',
 			'card.created as card_created',
 			'card.tags as card_tags',
@@ -321,70 +310,69 @@ async function getCards(
 			'template.name as template_name',
 			'template.templateType as template_templateType',
 
-			'remoteTemplate.nook as remoteTemplateNook',
-			'remoteTemplate.remoteId as remoteTemplateId',
-			'remoteTemplate.uploadDate as remoteTemplateUploadDate',
+			jsonArrayFrom(
+				eb
+					.selectFrom('remoteTemplate')
+					.select(['uploadDate', 'nook', 'remoteId'])
+					.whereRef('note.id', '=', 'remoteTemplate.localId'),
+			).as('remoteTemplate'),
 
-			'remoteNote.nook as remoteNoteNook',
-			'remoteNote.remoteId as remoteNoteId',
-			'remoteNote.uploadDate as remoteNoteUploadDate',
+			jsonArrayFrom(
+				eb
+					.selectFrom('remoteNote')
+					.select(['uploadDate', 'nook', 'remoteId'])
+					.whereRef('note.id', '=', 'remoteNote.localId'),
+			).as('remoteNote'),
 		])
 		.limit(limit)
 		.execute()
-	const noteCards = Array.from(
-		groupByToMap(await entities, (x) => x.card_id).values(),
-	).map((tncR) => {
-		const tnc = tncR[0]!
+	const noteCards = entities.map((entity) => {
 		const note = noteEntityToDomain(
 			{
-				ankiNoteId: tnc.note_ankiNoteId,
-				created: tnc.note_created,
-				fieldValues: tnc.note_fieldValues,
-				id: tnc.note_id,
-				updated: tnc.note_updated,
-				tags: tnc.note_tags,
-				templateId: tnc.note_templateId,
-				templateFields: tnc.template_fields,
+				ankiNoteId: entity.note_ankiNoteId,
+				created: entity.note_created,
+				fieldValues: entity.note_fieldValues,
+				id: entity.note_id,
+				updated: entity.note_updated,
+				tags: entity.note_tags,
+				templateId: entity.note_templateId,
+				templateFields: entity.template_fields,
 			},
-			tncR
-				.filter((x) => x.remoteNoteNook != null)
-				.map((x) => ({
-					remoteId: x.remoteNoteId!,
-					nook: x.remoteNoteNook!,
-					uploadDate: x.remoteNoteUploadDate,
-					localId: x.note_id,
-				})),
+			forceParse(entity.remoteNote).map((rn) => ({
+				nook: rn.nook!,
+				localId: entity.note_id,
+				remoteId: rn.remoteId,
+				uploadDate: rn.uploadDate,
+			})),
 		)
 		const template = templateEntityToDomain(
 			{
-				ankiId: tnc.template_ankiId,
-				created: tnc.template_created,
-				css: tnc.template_css,
-				fields: tnc.template_fields,
-				id: tnc.template_id,
-				updated: tnc.template_updated,
-				name: tnc.template_name,
-				templateType: tnc.template_templateType,
+				ankiId: entity.template_ankiId,
+				created: entity.template_created,
+				css: entity.template_css,
+				fields: entity.template_fields,
+				id: entity.template_id,
+				updated: entity.template_updated,
+				name: entity.template_name,
+				templateType: entity.template_templateType,
 			},
-			tncR
-				.filter((x) => x.remoteTemplateNook != null)
-				.map((x) => ({
-					remoteId: x.remoteTemplateId!,
-					nook: x.remoteTemplateNook!,
-					uploadDate: x.remoteTemplateUploadDate,
-					localId: x.template_id,
-				})),
+			forceParse(entity.remoteTemplate).map((rt) => ({
+				nook: rt.nook!,
+				localId: entity.template_id,
+				remoteId: rt.remoteId,
+				uploadDate: rt.uploadDate,
+			})),
 		)
 		const card = cardEntityToDomain({
-			cardSettingId: tnc.card_cardSettingId,
-			created: tnc.card_created,
-			tags: tnc.card_tags,
-			due: tnc.card_due,
-			id: tnc.card_id,
-			updated: tnc.card_updated,
-			noteId: tnc.card_noteId,
-			ord: tnc.card_ord,
-			state: tnc.card_state,
+			cardSettingId: entity.card_cardSettingId,
+			created: entity.card_created,
+			tags: entity.card_tags,
+			due: entity.card_due,
+			id: entity.card_id,
+			updated: entity.card_updated,
+			noteId: entity.card_noteId,
+			ord: entity.card_ord,
+			state: entity.card_state,
 		})
 		return { note, template, card } satisfies NoteCard
 	})
@@ -398,6 +386,10 @@ async function getCards(
 		noteCards,
 		fieldValueHighlight,
 	}
+}
+
+function forceParse<T>(x: T): T {
+	return JSON.parse(x as string) as T // I don't want to use ParseJSONResultsPlugin because it parses all columns unconditionally. I parse manually instead.
 }
 
 export const cardCollectionMethods = {
