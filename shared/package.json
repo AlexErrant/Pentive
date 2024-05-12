@@ -12,8 +12,7 @@
 		"eslint": "eslint . --ignore-path .gitignore",
 		"eslint:fix": "eslint . --fix --ignore-path .gitignore",
 		"format:check": "prettier --ignore-path .gitignore --check .",
-		"format": "prettier --ignore-path .gitignore --write .",
-		"test": "vitest"
+		"format": "prettier --ignore-path .gitignore --write ."
 	},
 	"devDependencies": {
 		"@types/html-to-text": "^9.0.2",
