@@ -44,6 +44,7 @@ export async function createDb() {
 	// 	undefined,
 	// 	undefined,
 	// )
+	const segmenter = new Intl.Segmenter(undefined, { granularity: 'word' })
 	db.api.create_function(
 		db.db,
 		'regexp_with_flags',
@@ -57,6 +58,28 @@ export async function createDb() {
 			)
 			const s = db.api.value_text(values[2]!)
 			db.api.result(context, pattern.test(s) ? 1 : 0)
+		},
+		undefined,
+		undefined,
+	)
+	db.api.create_function(
+		db.db,
+		'word',
+		3,
+		SQLITE_UTF8 | SQLITE_DETERMINISTIC,
+		0,
+		function (context, values) {
+			const leftRightBoth = db.api.value_int(values[0]!)
+			const word = db.api.value_text(values[1]!)
+			const col = db.api.value_text(values[2]!)
+			const segments = Array.from(segmenter.segment(col))
+			const b =
+				leftRightBoth === 0
+					? segments.some((s) => s.segment.startsWith(word))
+					: leftRightBoth === 1
+					? segments.some((s) => s.segment === word)
+					: segments.some((s) => s.segment.endsWith(word))
+			db.api.result(context, b ? 1 : 0)
 		},
 		undefined,
 		undefined,

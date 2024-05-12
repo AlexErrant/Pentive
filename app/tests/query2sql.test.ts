@@ -380,6 +380,8 @@ describe('groupAnds', () => {
 		negate: false,
 		wildcardLeft: true,
 		wildcardRight: true,
+		boundLeft: true,
+		boundRight: true,
 	}
 	const or = { type: 'OR' as const }
 	const and = { type: 'AND' as const }

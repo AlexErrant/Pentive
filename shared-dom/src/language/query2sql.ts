@@ -155,15 +155,19 @@ function buildContent(node: SyntaxNodeRef, input: string) {
 		}
 		child = child.nextSibling
 	}
-	const wildcardLeft = !input
-		.slice(node.node.firstChild.from, node.node.firstChild.to)
-		.includes('##')
+	const open = input.slice(node.node.firstChild.from, node.node.firstChild.to)
+	const wildcardLeft = !open.includes('##')
 	const wildcardRight = close == null ? true : !close.includes('##')
+	const boundLeft = wildcardLeft && open.includes('#')
+	const boundRight =
+		close == null ? false : wildcardRight && close.includes('#')
 	const fieldValueHighlight = regex.join('')
 	return {
 		value: r.join(''),
 		wildcardLeft,
 		wildcardRight,
+		boundLeft,
+		boundRight,
 		regexPattern: needsRegex ? fieldValueHighlight : undefined,
 		fieldValueHighlight,
 	} satisfies Content
@@ -173,6 +177,8 @@ interface Content {
 	value: string
 	wildcardLeft: boolean
 	wildcardRight: boolean
+	boundLeft: boolean
+	boundRight: boolean
 	regexPattern?: string
 	fieldValueHighlight: string
 }
@@ -192,6 +198,8 @@ function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
 			value,
 			wildcardLeft,
 			wildcardRight,
+			boundLeft,
+			boundRight,
 			regexPattern,
 			fieldValueHighlight,
 		} =
@@ -200,6 +208,8 @@ function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
 						value: input.slice(node.from, node.to),
 						wildcardLeft: true,
 						wildcardRight: true,
+						boundLeft: false,
+						boundRight: false,
 						regexPattern: undefined,
 						fieldValueHighlight: input.slice(node.from, node.to),
 				  } satisfies Content)
@@ -219,6 +229,8 @@ function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
 			value,
 			wildcardLeft,
 			wildcardRight,
+			boundLeft,
+			boundRight,
 			regexPattern,
 			fieldValueHighlight,
 			negate,
@@ -272,9 +284,20 @@ function buildFilter(qs: QueryString, column: string) {
 	const left = qs.wildcardLeft ? '%' : ''
 	const right = qs.wildcardRight ? '%' : ''
 	const value = `${left}${qs.value}${right}`
-	return qs.regexPattern != null
-		? sql`${col} LIKE ${value} AND regexp_with_flags(${qs.regexPattern}, 'i', ${col})`
-		: sql`${col} LIKE ${value}`
+	const filterList = [sql`${col} LIKE ${value}`]
+	if (qs.regexPattern != null) {
+		filterList.push(
+			sql` AND regexp_with_flags(${qs.regexPattern}, 'i', ${col})`,
+		)
+	}
+	if (qs.boundLeft && qs.boundRight) {
+		filterList.push(sql` AND word(1, ${qs.value}, ${col})`)
+	} else if (qs.boundLeft) {
+		filterList.push(sql` AND word(0, ${qs.value}, ${col})`)
+	} else if (qs.boundRight) {
+		filterList.push(sql` AND word(2, ${qs.value}, ${col})`)
+	}
+	return sql.join(filterList, sql``) as RawBuilder<SqlBool>
 }
 
 function serialize(node: Node, context: Context) {
@@ -461,6 +484,8 @@ interface QueryString {
 	negate: boolean
 	wildcardLeft: boolean
 	wildcardRight: boolean
+	boundLeft: boolean
+	boundRight: boolean
 }
 
 interface QueryRegex {
