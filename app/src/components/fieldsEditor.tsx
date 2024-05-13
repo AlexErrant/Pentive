@@ -45,7 +45,7 @@ export const FieldsEditor: VoidComponent<{
 											await mutate(i)
 										}),
 									)
-									return [f, doc.body.innerHTML] as const
+									return [f, doc.body.innerHTML] satisfies [string, string]
 								}),
 							)
 							const noteCards = toNoteCards({

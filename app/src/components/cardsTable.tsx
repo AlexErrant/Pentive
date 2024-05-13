@@ -53,13 +53,12 @@ const shortRenderer = (index: number, props: ICellRendererParams<NoteCard>) => {
 			const r: SearchText[] = []
 			let i = 0
 			for (const match of short.matchAll(fvh)) {
-				console.assert(match.index != null, 'index is null')
-				if (match.index! !== i) {
+				if (match.index !== i) {
 					r.push({ isHighlight: false, text: short.slice(i, match.index) })
 				}
 				const text = match[0]
 				r.push({ isHighlight: true, text })
-				i = match.index! + text.length
+				i = match.index + text.length
 			}
 			if (i !== short.length) {
 				r.push({ isHighlight: false, text: short.slice(i) })

@@ -2,10 +2,7 @@ import { type Card, type NoteCard, type Override, type Template } from 'shared'
 
 export interface NoteCardView {
 	template: Template
-	note: Override<
-		NoteCard['note'],
-		{ fieldValues: Array<readonly [string, string]> }
-	>
+	note: Override<NoteCard['note'], { fieldValues: Array<[string, string]> }>
 	mainCard?: Card
 	cards: Card[]
 }
