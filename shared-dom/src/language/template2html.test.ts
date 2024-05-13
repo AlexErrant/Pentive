@@ -6,7 +6,7 @@ import { getDefaultTemplate, throwExp, type Ord } from 'shared'
 
 test('can handle opening (and closing) brace', () => {
 	const input = `x{y{z{{}}`
-	const tree = validate.call(defaultRenderContainer, input)!
+	const tree = validate.call(defaultRenderContainer, input)
 	if (Array.isArray(tree)) throwExp('ya goofed')
 	const r = convert.call(
 		defaultRenderContainer,

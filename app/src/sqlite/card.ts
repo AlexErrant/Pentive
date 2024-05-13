@@ -339,7 +339,7 @@ async function getCards(
 				templateFields: entity.template_fields,
 			},
 			forceParse(entity.remoteNote).map((rn) => ({
-				nook: rn.nook!,
+				nook: rn.nook,
 				localId: entity.note_id,
 				remoteId: rn.remoteId,
 				uploadDate: rn.uploadDate,
@@ -357,7 +357,7 @@ async function getCards(
 				templateType: entity.template_templateType,
 			},
 			forceParse(entity.remoteTemplate).map((rt) => ({
-				nook: rt.nook!,
+				nook: rt.nook,
 				localId: entity.template_id,
 				remoteId: rt.remoteId,
 				uploadDate: rt.uploadDate,

@@ -68,6 +68,10 @@ module.exports = {
 						format: ['camelCase'],
 					},
 					{
+						selector: 'import',
+						format: null,
+					},
+					{
 						selector: 'variable',
 						format: ['camelCase', 'UPPER_CASE'],
 					},
@@ -134,6 +138,10 @@ module.exports = {
 					{
 						selector: 'default',
 						format: ['camelCase'],
+					},
+					{
+						selector: 'import',
+						format: null,
 					},
 					{
 						selector: 'variable',
