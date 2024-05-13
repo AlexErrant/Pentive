@@ -29,7 +29,7 @@
 		"eslint-plugin-promise": "^6.1.1",
 		"prettier": "^3.0.3",
 		"standard": "^17.1.0",
-		"typescript": "~5.2.2"
+		"typescript": "~5.4.5"
 	},
 	"dependencies": {
 		"@scure/base": "^1.1.1",

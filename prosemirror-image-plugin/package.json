@@ -54,7 +54,7 @@
     "rollup-plugin-copy": "^3.5.0",
     "rollup-plugin-minification": "^0.2.0",
     "rollup-plugin-typescript2": "^0.36.0",
-    "typescript": "^5.2.2"
+    "typescript": "^5.4.5"
   },
   "dependencies": {
     "@typescript-eslint/eslint-plugin": "^6.5.0",

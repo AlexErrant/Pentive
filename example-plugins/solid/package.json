@@ -24,7 +24,7 @@
 	"devDependencies": {
 		"@solidjs/router": "^0.8.3",
 		"eslint": "^8.50.0",
-		"typescript": "~5.2.2",
+		"typescript": "~5.4.5",
 		"vite": "^4.4.9",
 		"vite-plugin-solid": "^2.10.2"
 	},

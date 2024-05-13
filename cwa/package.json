@@ -6,7 +6,7 @@
 	"devDependencies": {
 		"@cloudflare/workers-types": "^4.20230922.0",
 		"eslint": "^8.50.0",
-		"typescript": "~5.2.2",
+		"typescript": "~5.4.5",
 		"wrangler": "^3.10.0"
 	},
 	"private": true,
