@@ -2,7 +2,7 @@
 	"extends": "../tsconfig.options.json",
 	"compilerOptions": {
 		"strict": true,
-		"target": "ES2021",
+		"target": "ES2022",
 		"module": "ESNext",
 		"moduleResolution": "node",
 		"allowSyntheticDefaultImports": true,

@@ -2,7 +2,7 @@
 	"extends": "../tsconfig.options.json",
 	"compilerOptions": {
 		"strict": true,
-		"target": "ES2021",
+		"target": "ES2022",
 		"module": "ES2022",
 		"moduleResolution": "node",
 		"allowSyntheticDefaultImports": true,
@@ -12,7 +12,7 @@
 		"jsx": "preserve",
 		"jsxImportSource": "solid-js",
 		"types": ["@cloudflare/workers-types", "vite/client"],
-		"lib": ["WebWorker", "DOM", "ES2021.String", "ES2021"],
+		"lib": ["WebWorker", "DOM", "ES2022"],
 		"composite": true,
 		"declaration": true,
 		"outDir": "dist"
