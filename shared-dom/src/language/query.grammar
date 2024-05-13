@@ -170,6 +170,8 @@ RatingEnum[@dynamicPrecedence=1] {
 Comparison { ":" | "=" | "<" | ">" | "<=" | ">=" }
 Is { ":" | "=" }
 
+// If you add characters that need escaping, also update 36E8AC4E-5658-443C-96F1-E131B231861C
+
 @local tokens {
   Quoted1Escape[@name=Escape] { "\\" ( '\\' | "'" | "*" | "_" ) }
   Quoted1Close[openedBy=Quoted1Open,@name=Close] { "'" "^"? "#"? "#"? "^"? }

@@ -565,15 +565,18 @@ function distributeNegate(node: Node, negate: boolean) {
 	}
 }
 
+// grep 36E8AC4E-5658-443C-96F1-E131B231861C
 export function escapedQuoted1(str: string) {
-	return str.replaceAll('\\', '\\\\').replaceAll("'", "\\'") // the order here is important
-}
-export function unescapeQuoted1(str: string) {
-	return str.replaceAll('\\\\', '\\').replaceAll("\\'", "'")
+	return str
+		.replaceAll('\\', '\\\\') // this should be first
+		.replaceAll("'", "\\'")
+		.replaceAll('*', '\\*')
+		.replaceAll('_', '\\_')
 }
 export function escapedQuoted2(str: string) {
-	return str.replaceAll('\\', '\\\\').replaceAll('"', '\\"')
-}
-export function unescapeQuoted2(str: string) {
-	return str.replaceAll('\\\\', '\\').replaceAll('\\"', '"')
+	return str
+		.replaceAll('\\', '\\\\') // this should be first
+		.replaceAll('"', '\\"')
+		.replaceAll('*', '\\*')
+		.replaceAll('_', '\\_')
 }
