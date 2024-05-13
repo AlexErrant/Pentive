@@ -9,7 +9,6 @@ import { setSessionStorage } from './session'
 
 export default createHandler(
 	renderAsync((event) => {
-		/* eslint-disable solid/reactivity -- event.env and event.responseHeaders should never change at runtime */
 		setKysely(event.env.planetscaleDbUrl)
 		setSessionStorage({
 			hubSessionSecret: event.env.hubSessionSecret,
@@ -19,7 +18,6 @@ export default createHandler(
 			oauthCodeVerifierSecret: event.env.oauthCodeVerifierSecret,
 		})
 		event.responseHeaders.set(hstsName, hstsValue)
-		/* eslint-enable solid/reactivity */
 		return <StartServer event={event} />
 	}),
 )
