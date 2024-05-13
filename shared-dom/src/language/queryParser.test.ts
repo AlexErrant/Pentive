@@ -1,7 +1,6 @@
-import { describe, expect, test } from 'vitest'
+import { describe, test } from 'vitest'
 import { parser } from './queryParser'
 import { testTree as testTreeOriginal } from '@lezer/generator/dist/test'
-import { convert } from './query2sql'
 import { type Tree } from '@lezer/common'
 
 function testTree(tree: Tree, expect: string) {

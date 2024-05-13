@@ -97,7 +97,7 @@ describe('special characters', () => {
 		await x(
 			String.raw`"a\_b"`, //
 			String.raw`%a_b%`,
-			String.raw`AND regexp_with_flags('a_b', '', noteFtsFv.text)`,
+			String.raw`AND regexp_with_flags('a_b', 'i', noteFtsFv.text)`,
 		)
 	})
 	test(`\\`, async () => {
@@ -110,14 +110,14 @@ describe('special characters', () => {
 		await x(
 			String.raw`"a%b"`, //
 			String.raw`%a_b%`,
-			String.raw`AND regexp_with_flags('a%b', '', noteFtsFv.text)`,
+			String.raw`AND regexp_with_flags('a%b', 'i', noteFtsFv.text)`,
 		)
 	})
 	test('* is escaped when regexed', async () => {
 		await x(
 			String.raw`"a\*b\_c"`, //
 			String.raw`%a*b_c%`,
-			String.raw`AND regexp_with_flags('a\*b_c', '', noteFtsFv.text)`,
+			String.raw`AND regexp_with_flags('a\*b_c', 'i', noteFtsFv.text)`,
 		)
 	})
 })
