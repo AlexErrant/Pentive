@@ -84,7 +84,7 @@ export const queryCompletion: (_: {
 			return {
 				from,
 				options,
-				validFor: /^(\w*)?$/,
+				validFor: () => true,
 			}
 		} else if (inLabel(nodeBefore, tag)) {
 			const textBefore = context.state.sliceDoc(nodeBefore.from, context.pos)
