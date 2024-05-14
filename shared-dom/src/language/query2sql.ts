@@ -37,7 +37,7 @@ class Context {
 	joinTemplateFts: boolean
 	joinCardSettingFts: boolean
 	joinLatestReview: boolean
-	fieldValueHighlight: string[]
+	fieldValueHighlight: FieldValueHighlight[]
 
 	trustedSql(trustedSql: string) {
 		this.sql.push(sql.raw(` ${trustedSql} `))
@@ -46,6 +46,12 @@ class Context {
 	parameterizeSql(parameter: RawBuilder<unknown>) {
 		this.sql.push(parameter)
 	}
+}
+
+export interface FieldValueHighlight {
+	regex: string
+	boundLeft: boolean
+	boundRight: boolean
 }
 
 export function convert(input: string) {
@@ -169,7 +175,7 @@ function buildContent(node: SyntaxNodeRef, input: string) {
 		boundLeft,
 		boundRight,
 		regexPattern: needsRegex ? fieldValueHighlight : undefined,
-		fieldValueHighlight,
+		fieldValueHighlight: { regex: fieldValueHighlight, boundRight, boundLeft },
 	} satisfies Content
 }
 
@@ -180,7 +186,7 @@ interface Content {
 	boundLeft: boolean
 	boundRight: boolean
 	regexPattern?: string
-	fieldValueHighlight: string
+	fieldValueHighlight: FieldValueHighlight
 }
 
 function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
@@ -211,7 +217,11 @@ function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
 						boundLeft: false,
 						boundRight: false,
 						regexPattern: undefined,
-						fieldValueHighlight: input.slice(node.from, node.to),
+						fieldValueHighlight: {
+							regex: escapeRegExp(input.slice(node.from, node.to)),
+							boundLeft: false,
+							boundRight: false,
+						},
 				  } satisfies Content)
 				: node.type.is(qt.Quoted1) ||
 				  node.type.is(qt.Quoted2) ||
@@ -480,7 +490,7 @@ interface QueryString {
 	label?: Label
 	value: string
 	regexPattern?: string // only intended for internal use. Specifically to supplement where FTS is lacking, like escaping, word boundaries, and case sensitivity.
-	fieldValueHighlight: string
+	fieldValueHighlight: FieldValueHighlight
 	negate: boolean
 	wildcardLeft: boolean
 	wildcardRight: boolean

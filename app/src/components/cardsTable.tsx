@@ -5,8 +5,10 @@ import {
 	type VoidComponent,
 	Show,
 	For,
+	createMemo,
+	type Accessor,
 } from 'solid-js'
-import { type NoteCard, type CardId } from 'shared'
+import { type NoteCard, type CardId, throwExp } from 'shared'
 import '@github/relative-time-element'
 import AgGridSolid, { type AgGridSolidRef } from 'ag-grid-solid'
 import 'ag-grid-community/styles/ag-grid.css'
@@ -22,7 +24,7 @@ import { LicenseManager } from 'ag-grid-enterprise'
 import { db } from '../db'
 import { assertNever } from 'shared'
 import { agGridTheme } from '../globalState'
-import { Upload, convert, getOk } from 'shared-dom'
+import { type FieldValueHighlight, Upload, convert, getOk } from 'shared-dom'
 import { C } from '../topLevelAwait'
 import FiltersTable from './filtersTable'
 import './cardsTable.css'
@@ -32,14 +34,28 @@ import { alterQuery } from '../domain/alterQuery'
 LicenseManager.setLicenseKey(import.meta.env.VITE_AG_GRID_LICENSE)
 
 let gridRef: AgGridSolidRef
-const [fvHighlight, setFvHighlight] = createSignal<RegExp | undefined>()
+const [fvHighlight, setFvHighlight] = createSignal<
+	FieldValueHighlight[] | undefined
+>()
 
 interface SearchText {
 	isHighlight: boolean
 	text: string
 }
+const segmenter = new Intl.Segmenter(undefined, { granularity: 'word' })
+
+const regexCtor = (fvhs: FieldValueHighlight[] | undefined, global?: true) => {
+	if (fvhs == null || fvhs.length === 0) return null
+	return new RegExp(
+		fvhs.map((fvh) => fvh.regex).join('|'),
+		// The `g` flag introduces state to methods like `test` which WILL mindfuck you.
+		// Only `regex()` needs `g` for `matchAll`, but be forewarned in case you make changes.
+		'is' + (global ? 'g' : ''),
+	)
+}
 
 const shortRenderer = (index: number, props: ICellRendererParams<NoteCard>) => {
+	const { regex, regexLeft, regexRight, regexBoth } = props.context as Regexes
 	const short = () => {
 		if (props.data == null) {
 			return ''
@@ -49,15 +65,35 @@ const shortRenderer = (index: number, props: ICellRendererParams<NoteCard>) => {
 			)?.at(index)
 			if (short == null) return ''
 			const fvh = fvHighlight()
-			if (fvh == null) return short
+			if (fvh == null || fvh.length === 0) return short
+			const segments = Array.from(segmenter.segment(short))
 			const r: SearchText[] = []
 			let i = 0
-			for (const match of short.matchAll(fvh)) {
+			const rl = regexLeft()
+			const rr = regexRight()
+			const rb = regexBoth()
+			for (const match of short.matchAll(regex())) {
 				if (match.index !== i) {
 					r.push({ isHighlight: false, text: short.slice(i, match.index) })
 				}
 				const text = match[0]
-				r.push({ isHighlight: true, text })
+				if (rl == null && rr == null && rb == null) {
+					r.push({ isHighlight: true, text })
+				} else {
+					const left = segments.some((s) => s.index === match.index)
+					const right = segments.some(
+						(s) => s.index + s.segment.length === match.index + text.length,
+					)
+					if (rb?.test(text) === true) {
+						r.push({ isHighlight: left && right, text })
+					} else if (rl?.test(text) === true) {
+						r.push({ isHighlight: left, text })
+					} else if (rr?.test(text) === true) {
+						r.push({ isHighlight: right, text })
+					} else {
+						throwExp('impossible')
+					}
+				}
 				i = match.index + text.length
 			}
 			if (i !== short.length) {
@@ -195,6 +231,13 @@ function setDatasource() {
 	gridRef?.api.setDatasource(dataSource)
 }
 
+interface Regexes {
+	regex: Accessor<RegExp>
+	regexLeft: Accessor<RegExp | null>
+	regexRight: Accessor<RegExp | null>
+	regexBoth: Accessor<RegExp | null>
+}
+
 const CardsTable: VoidComponent<{
 	readonly onSelectionChanged: (noteCards: NoteCard[]) => void
 }> = (props) => {
@@ -203,6 +246,22 @@ const CardsTable: VoidComponent<{
 			defer: true,
 		}),
 	)
+	const regex = createMemo(() => regexCtor(fvHighlight(), true)!)
+	const regexLeft = createMemo(() =>
+		regexCtor(fvHighlight()?.filter((f) => f.boundLeft)),
+	)
+	const regexRight = createMemo(() =>
+		regexCtor(fvHighlight()?.filter((f) => f.boundRight)),
+	)
+	const regexBoth = createMemo(() =>
+		regexCtor(fvHighlight()?.filter((f) => f.boundRight && f.boundLeft)),
+	)
+	const regexes = {
+		regex,
+		regexLeft,
+		regexRight,
+		regexBoth,
+	} satisfies Regexes
 	return (
 		<div class='flex h-full flex-col'>
 			<div class='m-0.5 p-0.5'>
@@ -214,6 +273,7 @@ const CardsTable: VoidComponent<{
 			</div>
 			<div class={`${agGridTheme()} h-full`}>
 				<AgGridSolid
+					context={regexes}
 					sideBar={{
 						position: 'left',
 						defaultToolPanel: 'filters',
