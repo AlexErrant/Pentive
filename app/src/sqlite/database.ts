@@ -40,11 +40,18 @@ export interface Note {
 	fieldValues: string
 }
 
-export interface NoteFtsFv {
+export interface NoteField {
+	rowid: number
 	noteId: string
 	field: string
-	text: string
-	html: string
+}
+
+export interface NoteFvFts {
+	rowid: number
+	field: string
+	value: string
+	normalizedField: string
+	normalizedValue: string
 }
 
 export interface NoteFtsMedia {
@@ -164,7 +171,8 @@ export interface DB {
 	card: Card
 	media: Media
 	note: Note
-	noteFtsFv: NoteFtsFv
+	noteField: NoteField
+	noteFvFts: NoteFvFts
 	noteFtsMedia: NoteFtsMedia
 	noteFtsTag: NoteFtsTag
 	cardFtsTag: CardFtsTag

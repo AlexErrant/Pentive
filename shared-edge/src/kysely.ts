@@ -31,7 +31,7 @@ import {
 	type TemplateType,
 	imgPlaceholder,
 	relativeChar,
-	toFts,
+	ftsNormalize,
 } from 'shared'
 import { binary16fromBase64URL, ulidAsHex, ulidAsRaw } from './convertBinary.js'
 import { nullMap, parseMap, stringifyMap, throwExp, undefinedMap } from 'shared'
@@ -909,7 +909,7 @@ function toNoteCreate(
 		updated,
 		fieldValues: serializeFieldValues(n.fieldValues),
 		fts: Array.from(n.fieldValues)
-			.map(([, v]) => toFts(v))
+			.map(([, v]) => ftsNormalize(v, true))
 			.concat(n.tags)
 			.join(' '),
 		tags: serializeTags(n.tags),

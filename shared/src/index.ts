@@ -4,6 +4,8 @@ export const initSql = [
     name TEXT,
     details TEXT
 ) STRICT;`,
+	`CREATE VIEW IF NOT EXISTS cardSettingName AS
+    SELECT rowid, name, ftsNormalize(name) AS normalized FROM cardSetting;`,
 	`CREATE TABLE IF NOT EXISTS template (
     id TEXT PRIMARY KEY, -- make BLOB upon SQLite v3.41 and the landing of UNHEX https://sqlite.org/forum/forumpost/30cca4e613d2fa2a grep F235B7FB-8CEA-4AE2-99CC-2790E607B1EB
     name TEXT,
@@ -14,6 +16,8 @@ export const initSql = [
     templateType TEXT,
     ankiId INTEGER
 ) STRICT;`,
+	`CREATE VIEW IF NOT EXISTS templateName AS
+    SELECT rowid, name, ftsNormalize(name) AS normalized FROM template;`,
 	`CREATE TABLE IF NOT EXISTS remoteTemplate (
     localId TEXT, -- make BLOB upon SQLite v3.41 and the landing of UNHEX https://sqlite.org/forum/forumpost/30cca4e613d2fa2a grep F235B7FB-8CEA-4AE2-99CC-2790E607B1EB
     nook TEXT,
@@ -30,11 +34,27 @@ export const initSql = [
     tags TEXT,
     fieldValues TEXT
 ) STRICT;`,
-	`CREATE VIRTUAL TABLE IF NOT EXISTS noteFtsFv USING fts5 (
-	    noteId,
+	`CREATE TABLE IF NOT EXISTS noteField (
+	    noteId TEXT, -- make BLOB upon SQLite v3.41 and the landing of UNHEX https://sqlite.org/forum/forumpost/30cca4e613d2fa2a grep F235B7FB-8CEA-4AE2-99CC-2790E607B1EB
+	    field TEXT,
+      PRIMARY KEY (noteId, field)
+  );`,
+	`CREATE VIEW IF NOT EXISTS noteFieldValue AS
+SELECT
+  noteField.rowid,
+  field,
+  ftsNormalize(field) as normalizedField,
+               json_extract(fieldValues, '$.' || field)  as value,
+  ftsNormalize(json_extract(fieldValues, '$.' || field)) as normalizedValue
+FROM noteField
+JOIN note on note.id = noteField.noteId;`,
+	`CREATE VIRTUAL TABLE IF NOT EXISTS noteFvFts USING fts5 (
 	    field,
-	    text, -- the field's value stripped of HTML and made to be FTS friendly
-	    html, -- the field's raw value
+      value,
+	    normalizedField,
+	    normalizedValue,
+      content=noteFieldValue,
+      content_rowid=rowid,
       tokenize='trigram'
   );`,
 	`CREATE VIRTUAL TABLE IF NOT EXISTS noteFtsTag USING fts5 (
@@ -46,13 +66,15 @@ export const initSql = [
   );`,
 	`CREATE VIRTUAL TABLE IF NOT EXISTS templateNameFts USING fts5 (
 	    name,
-      content=template,
+	    normalized,
+      content=templateName,
       content_rowid=rowid,
       tokenize='trigram'
   );`,
 	`CREATE VIRTUAL TABLE IF NOT EXISTS cardSettingNameFts USING fts5 (
 	    name,
-      content=cardSetting,
+	    normalized,
+      content=cardSettingName,
       content_rowid=rowid,
       tokenize='trigram'
   );`,
@@ -66,29 +88,44 @@ export const initSql = [
 	`CREATE VIRTUAL TABLE IF NOT EXISTS noteFtsTagVocab USING fts5vocab(noteFtsTag, instance);`,
 	`CREATE VIRTUAL TABLE IF NOT EXISTS noteFtsMediaVocab USING fts5vocab(noteFtsMedia, instance);`,
 	`CREATE TRIGGER IF NOT EXISTS note_after_insert AFTER INSERT ON note BEGIN
-      INSERT INTO noteFtsFv (noteId, field, text, html)
+      INSERT INTO noteField (noteId, field)
         SELECT
           new.id,
-          json_each.key,
-          toFtsText(json_each.value),
-          json_each.value
+          json_each.key
         FROM json_each(new.fieldValues);
+      INSERT INTO noteFvFts (rowid, field, normalizedField, value, normalizedValue)
+        SELECT
+          rowid,
+          field,
+          ftsNormalize(field),
+                       json_extract(new.fieldValues, '$.' || field),
+          ftsNormalize(json_extract(new.fieldValues, '$.' || field))
+        FROM noteField
+        WHERE noteField.noteId = new.id;
       INSERT INTO noteFtsTag  (rowid, tags       ) VALUES (new.rowid, new.tags       );
       INSERT INTO noteFtsMedia(rowid, media      ) VALUES (new.rowid, getMediaIds(new.fieldValues));
    END;`,
 	`CREATE TRIGGER IF NOT EXISTS note_after_delete AFTER DELETE ON note BEGIN
-     DELETE FROM noteFtsFv WHERE noteId = old.id;
+     DELETE FROM noteFvFts WHERE rowid IN (SELECT rowid FROM noteField WHERE noteId = old.id);
+     DELETE FROM noteField WHERE noteId = old.id;
      INSERT INTO noteFtsTag(noteFtsTag, rowid, tags       ) VALUES('delete', old.rowid, old.tags       );
      INSERT INTO noteFtsMedia(noteFtsMedia, rowid, media  ) VALUES('delete', old.rowid, getMediaIds(old.fieldValues));
    END;`,
 	`CREATE TRIGGER IF NOT EXISTS note_after_update AFTER UPDATE ON note BEGIN
-      REPLACE INTO noteFtsFv (noteId, field, text, html)
+      REPLACE INTO noteField (noteId, field)
         SELECT
           new.id,
-          json_each.key,
-          toFtsText(json_each.value),
-          json_each.value
+          json_each.key
         FROM json_each(new.fieldValues);
+      REPLACE INTO noteFvFts (rowid, field, normalizedField, value, normalizedValue)
+        SELECT
+          rowid,
+          field,
+          ftsNormalize(field),
+                       json_extract(new.fieldValues, '$.' || field),
+          ftsNormalize(json_extract(new.fieldValues, '$.' || field))
+        FROM noteField
+        WHERE noteField.noteId = new.id;
      INSERT INTO noteFtsTag(noteFtsTag, rowid, tags       ) VALUES('delete', old.rowid, old.tags       );
      INSERT INTO noteFtsMedia(noteFtsMedia, rowid, media  ) VALUES('delete', old.rowid, getMediaIds(old.fieldValues));
      INSERT INTO noteFtsTag(rowid, tags       ) VALUES (new.rowid, new.tags       );

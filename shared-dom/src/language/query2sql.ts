@@ -314,20 +314,20 @@ function serialize(node: Node, context: Context) {
 	if (node.type === simpleString || node.type === quoted) {
 		if (node.label == null) {
 			context.joinFts = true
-			const filter = buildFilter(node, 'noteFtsFv.text')
+			const filter = buildFilter(node, 'noteFvFts.normalizedValue')
 			if (!node.negate && node.fieldValueHighlight != null) {
 				context.fieldValueHighlight.push(node.fieldValueHighlight)
 			}
 			const not = getNot(node.negate)
 			context.parameterizeSql(
-				sql`noteFtsFv.rowid ${not} IN (SELECT rowid FROM noteFtsFv WHERE ${filter})`,
+				sql`noteFvFts.rowid ${not} IN (SELECT rowid FROM noteFvFts WHERE ${filter})`,
 			)
 		}
 	} else if (node.type === regex) {
 		context.joinFts = true
 		const not = getNot(node.negate)
 		context.parameterizeSql(
-			sql`${not} regexp_with_flags(${node.pattern}, ${node.flags}, noteFtsFv.html)`,
+			sql`${not} regexp_with_flags(${node.pattern}, ${node.flags}, noteFvFts.value)`,
 		)
 	} else if (node.type === group) {
 		const paren =

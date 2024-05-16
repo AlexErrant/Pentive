@@ -1,5 +1,5 @@
 import sqliteWasm, { type DB as crDB } from '@vlcn.io/crsqlite-wasm'
-import { initSql, parseMap, toFts } from 'shared'
+import { initSql, parseMap, ftsNormalize } from 'shared'
 import { lrpc } from '../lrpcClient'
 import { stringify as uuidStringify } from 'uuid'
 import { type DB } from './database'
@@ -86,13 +86,13 @@ export async function createDb() {
 	)
 	db.api.create_function(
 		db.db,
-		'toFtsText',
+		'ftsNormalize',
 		1,
 		SQLITE_UTF8 | SQLITE_DETERMINISTIC,
 		0,
 		function (context, values) {
-			const text = toFts(db.api.value_text(values[0]!))
-			db.api.result(context, text)
+			const normalized = ftsNormalize(db.api.value_text(values[0]!), true)
+			db.api.result(context, normalized)
 		},
 		undefined,
 		undefined,
