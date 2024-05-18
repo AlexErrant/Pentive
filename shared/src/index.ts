@@ -25,7 +25,7 @@ export const initSql = [
     uploadDate INTEGER,
     PRIMARY KEY (localId, nook)
 ) STRICT;`,
-	`CREATE TABLE IF NOT EXISTS note (
+	`CREATE TABLE IF NOT EXISTS noteBase (
     id TEXT PRIMARY KEY, -- make BLOB upon SQLite v3.41 and the landing of UNHEX https://sqlite.org/forum/forumpost/30cca4e613d2fa2a grep F235B7FB-8CEA-4AE2-99CC-2790E607B1EB
     templateId TEXT, -- make BLOB upon SQLite v3.41 and the landing of UNHEX https://sqlite.org/forum/forumpost/30cca4e613d2fa2a grep F235B7FB-8CEA-4AE2-99CC-2790E607B1EB
     ankiNoteId INTEGER,
@@ -34,6 +34,19 @@ export const initSql = [
     tags TEXT,
     fieldValues TEXT
 ) STRICT;`,
+	`CREATE VIEW IF NOT EXISTS note AS
+    SELECT rowid, * FROM noteBase;`,
+	`CREATE TRIGGER IF NOT EXISTS note_after_insert INSTEAD OF INSERT ON note BEGIN
+    INSERT INTO noteBase (id,     templateId,     ankiNoteId,     created,     updated,     tags,     fieldValues)
+    VALUES           (new.id, new.templateId, new.ankiNoteId, new.created, new.updated, new.tags, new.fieldValues);
+   END;`,
+	`CREATE TRIGGER IF NOT EXISTS note_after_delete INSTEAD OF DELETE ON note BEGIN
+    DELETE FROM noteBase WHERE id = old.id;
+   END;`,
+	`CREATE TRIGGER IF NOT EXISTS note_after_update INSTEAD OF UPDATE ON note BEGIN
+    REPLACE INTO noteBase (id,     templateId,     ankiNoteId,     created,     updated,     tags,     fieldValues)
+    VALUES            (new.id, new.templateId, new.ankiNoteId, new.created, new.updated, new.tags, new.fieldValues);
+   END;`,
 	`CREATE TABLE IF NOT EXISTS noteField (
 	    noteId TEXT, -- make BLOB upon SQLite v3.41 and the landing of UNHEX https://sqlite.org/forum/forumpost/30cca4e613d2fa2a grep F235B7FB-8CEA-4AE2-99CC-2790E607B1EB
 	    field TEXT,
@@ -47,7 +60,7 @@ SELECT
                json_extract(fieldValues, '$.' || field)  as value,
   ftsNormalize(json_extract(fieldValues, '$.' || field)) as normalizedValue
 FROM noteField
-JOIN note on note.id = noteField.noteId;`,
+JOIN noteBase on noteBase.id = noteField.noteId;`,
 	`CREATE VIRTUAL TABLE IF NOT EXISTS noteFvFts USING fts5 (
 	    field,
       value,
@@ -59,7 +72,7 @@ JOIN note on note.id = noteField.noteId;`,
   );`,
 	`CREATE VIRTUAL TABLE IF NOT EXISTS noteFtsTag USING fts5 (
 	    tags,
-      content=note,
+      content=noteBase,
       content_rowid=rowid,
       -- All characters that are not the unit separator are tokenchars 89CDE7EA-EF1B-4054-B381-597EE549CAB4
       tokenize = "unicode61 categories 'L* M* N* P* S* Z* C*' separators '\x1F'"
@@ -80,14 +93,14 @@ JOIN note on note.id = noteField.noteId;`,
   );`,
 	`CREATE VIRTUAL TABLE IF NOT EXISTS noteFtsMedia USING fts5 (
 	    media,
-      content=note,
+      content=noteBase,
       content_rowid=rowid,
       -- All characters that are not the unit separator are tokenchars 89CDE7EA-EF1B-4054-B381-597EE549CAB4
       tokenize = "unicode61 categories 'L* M* N* P* S* Z* C*' separators '\x1F'"
   );`,
 	`CREATE VIRTUAL TABLE IF NOT EXISTS noteFtsTagVocab USING fts5vocab(noteFtsTag, instance);`,
 	`CREATE VIRTUAL TABLE IF NOT EXISTS noteFtsMediaVocab USING fts5vocab(noteFtsMedia, instance);`,
-	`CREATE TRIGGER IF NOT EXISTS note_after_insert AFTER INSERT ON note BEGIN
+	`CREATE TRIGGER IF NOT EXISTS noteBase_after_insert AFTER INSERT ON noteBase BEGIN
       INSERT INTO noteField (noteId, field)
         SELECT
           new.id,
@@ -105,13 +118,13 @@ JOIN note on note.id = noteField.noteId;`,
       INSERT INTO noteFtsTag  (rowid, tags       ) VALUES (new.rowid, new.tags       );
       INSERT INTO noteFtsMedia(rowid, media      ) VALUES (new.rowid, getMediaIds(new.fieldValues));
    END;`,
-	`CREATE TRIGGER IF NOT EXISTS note_after_delete AFTER DELETE ON note BEGIN
+	`CREATE TRIGGER IF NOT EXISTS noteBase_after_delete AFTER DELETE ON noteBase BEGIN
      DELETE FROM noteFvFts WHERE rowid IN (SELECT rowid FROM noteField WHERE noteId = old.id);
      DELETE FROM noteField WHERE noteId = old.id;
      INSERT INTO noteFtsTag(noteFtsTag, rowid, tags       ) VALUES('delete', old.rowid, old.tags       );
      INSERT INTO noteFtsMedia(noteFtsMedia, rowid, media  ) VALUES('delete', old.rowid, getMediaIds(old.fieldValues));
    END;`,
-	`CREATE TRIGGER IF NOT EXISTS note_after_update AFTER UPDATE ON note BEGIN
+	`CREATE TRIGGER IF NOT EXISTS noteBase_after_update AFTER UPDATE ON noteBase BEGIN
       REPLACE INTO noteField (noteId, field)
         SELECT
           new.id,
@@ -220,12 +233,12 @@ JOIN note on note.id = noteField.noteId;`,
 	`PRAGMA temp_store=MEMORY;`, // grep 2790D3E0-F98B-4A95-8910-AC3E87F4F2D3
 	`CREATE INDEX IF NOT EXISTS card_noteId_idx on card(noteId);`,
 	`CREATE INDEX IF NOT EXISTS card_created_idx on card(created);`,
-	`CREATE INDEX IF NOT EXISTS note_templateId_idx on note(templateId);`,
+	`CREATE INDEX IF NOT EXISTS noteBase_templateId_idx on noteBase(templateId);`,
 	`CREATE INDEX IF NOT EXISTS card_due_idx on card(due);`,
 	`CREATE INDEX IF NOT EXISTS review_cardId_idx on review(cardId);`,
 	`SELECT crsql_as_crr('template');`,
 	`SELECT crsql_as_crr('remoteTemplate');`,
-	`SELECT crsql_as_crr('note');`,
+	`SELECT crsql_as_crr('noteBase');`,
 	`SELECT crsql_as_crr('remoteNote');`,
 	`SELECT crsql_as_crr('card');`,
 	`SELECT crsql_as_crr('media');`,
