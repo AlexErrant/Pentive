@@ -91,15 +91,7 @@ JOIN noteBase on noteBase.id = noteField.noteId;`,
       content_rowid=rowid,
       tokenize='trigram'
   );`,
-	`CREATE VIRTUAL TABLE IF NOT EXISTS noteFtsMedia USING fts5 (
-	    media,
-      content=noteBase,
-      content_rowid=rowid,
-      -- All characters that are not the unit separator are tokenchars 89CDE7EA-EF1B-4054-B381-597EE549CAB4
-      tokenize = "unicode61 categories 'L* M* N* P* S* Z* C*' separators '\x1F'"
-  );`,
 	`CREATE VIRTUAL TABLE IF NOT EXISTS noteFtsTagVocab USING fts5vocab(noteFtsTag, instance);`,
-	`CREATE VIRTUAL TABLE IF NOT EXISTS noteFtsMediaVocab USING fts5vocab(noteFtsMedia, instance);`,
 	`CREATE TRIGGER IF NOT EXISTS noteBase_after_insert AFTER INSERT ON noteBase BEGIN
       INSERT INTO noteField (noteId, field)
         SELECT
@@ -116,13 +108,11 @@ JOIN noteBase on noteBase.id = noteField.noteId;`,
         FROM noteField
         WHERE noteField.noteId = new.id;
       INSERT INTO noteFtsTag  (rowid, tags       ) VALUES (new.rowid, new.tags       );
-      INSERT INTO noteFtsMedia(rowid, media      ) VALUES (new.rowid, getMediaIds(new.fieldValues));
    END;`,
 	`CREATE TRIGGER IF NOT EXISTS noteBase_after_delete AFTER DELETE ON noteBase BEGIN
      DELETE FROM noteFvFts WHERE rowid IN (SELECT rowid FROM noteField WHERE noteId = old.id);
      DELETE FROM noteField WHERE noteId = old.id;
      INSERT INTO noteFtsTag(noteFtsTag, rowid, tags       ) VALUES('delete', old.rowid, old.tags       );
-     INSERT INTO noteFtsMedia(noteFtsMedia, rowid, media  ) VALUES('delete', old.rowid, getMediaIds(old.fieldValues));
    END;`,
 	`CREATE TRIGGER IF NOT EXISTS noteBase_after_update AFTER UPDATE ON noteBase BEGIN
       REPLACE INTO noteField (noteId, field)
@@ -140,9 +130,7 @@ JOIN noteBase on noteBase.id = noteField.noteId;`,
         FROM noteField
         WHERE noteField.noteId = new.id;
      INSERT INTO noteFtsTag(noteFtsTag, rowid, tags       ) VALUES('delete', old.rowid, old.tags       );
-     INSERT INTO noteFtsMedia(noteFtsMedia, rowid, media  ) VALUES('delete', old.rowid, getMediaIds(old.fieldValues));
      INSERT INTO noteFtsTag(rowid, tags       ) VALUES (new.rowid, new.tags       );
-     INSERT INTO noteFtsMedia(rowid, media    ) VALUES (new.rowid, getMediaIds(new.fieldValues));
    END;`,
 	`CREATE TRIGGER IF NOT EXISTS template_after_insert AFTER INSERT ON template BEGIN
       INSERT INTO templateNameFts (rowid, name) VALUES (new.rowid, new.name);
