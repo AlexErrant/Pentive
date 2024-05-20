@@ -159,7 +159,7 @@ JOIN noteBase on noteBase.id = noteField.noteId;`,
     uploadDate INTEGER,
     PRIMARY KEY (localId, nook)
 ) STRICT;`,
-	`CREATE TABLE IF NOT EXISTS card (
+	`CREATE TABLE IF NOT EXISTS cardBase (
     id TEXT PRIMARY KEY, -- make BLOB upon SQLite v3.41 and the landing of UNHEX https://sqlite.org/forum/forumpost/30cca4e613d2fa2a grep F235B7FB-8CEA-4AE2-99CC-2790E607B1EB
     ord INTEGER,
     noteId TEXT, -- make BLOB upon SQLite v3.41 and the landing of UNHEX https://sqlite.org/forum/forumpost/30cca4e613d2fa2a grep F235B7FB-8CEA-4AE2-99CC-2790E607B1EB
@@ -170,21 +170,23 @@ JOIN noteBase on noteBase.id = noteField.noteId;`,
     due INTEGER,
     state INTEGER
 ) STRICT;`,
+	`CREATE VIEW IF NOT EXISTS card AS
+    SELECT rowid, * FROM cardBase;`,
 	`CREATE VIRTUAL TABLE IF NOT EXISTS cardFtsTag USING fts5 (
 	    tags,
-      content=card,
+      content=cardBase,
       content_rowid=rowid,
       -- All characters that are not the unit separator are tokenchars 89CDE7EA-EF1B-4054-B381-597EE549CAB4
       tokenize = "unicode61 categories 'L* M* N* P* S* Z* C*' separators '\x1F'"
   );`,
 	`CREATE VIRTUAL TABLE IF NOT EXISTS cardFtsTagVocab USING fts5vocab(cardFtsTag, instance);`,
-	`CREATE TRIGGER IF NOT EXISTS card_after_insert AFTER INSERT ON card BEGIN
+	`CREATE TRIGGER IF NOT EXISTS cardBase_after_insert AFTER INSERT ON cardBase BEGIN
      INSERT INTO cardFtsTag(rowid, tags       ) VALUES (new.rowid, new.tags       );
    END;`,
-	`CREATE TRIGGER IF NOT EXISTS card_after_delete AFTER DELETE ON card BEGIN
+	`CREATE TRIGGER IF NOT EXISTS cardBase_after_delete AFTER DELETE ON cardBase BEGIN
      INSERT INTO cardFtsTag(cardFtsTag, rowid, tags       ) VALUES('delete', old.rowid, old.tags       );
    END;`,
-	`CREATE TRIGGER IF NOT EXISTS card_after_update AFTER UPDATE ON card BEGIN
+	`CREATE TRIGGER IF NOT EXISTS cardBase_after_update AFTER UPDATE ON cardBase BEGIN
      INSERT INTO cardFtsTag(cardFtsTag, rowid, tags       ) VALUES('delete', old.rowid, old.tags       );
      INSERT INTO cardFtsTag(rowid, tags       ) VALUES (new.rowid, new.tags       );
    END;`,
@@ -219,16 +221,16 @@ JOIN noteBase on noteBase.id = noteField.noteId;`,
     details TEXT
 ) STRICT;`,
 	`PRAGMA temp_store=MEMORY;`, // grep 2790D3E0-F98B-4A95-8910-AC3E87F4F2D3
-	`CREATE INDEX IF NOT EXISTS card_noteId_idx on card(noteId);`,
-	`CREATE INDEX IF NOT EXISTS card_created_idx on card(created);`,
+	`CREATE INDEX IF NOT EXISTS cardBase_noteId_idx on cardBase(noteId);`,
+	`CREATE INDEX IF NOT EXISTS cardBase_created_idx on cardBase(created);`,
 	`CREATE INDEX IF NOT EXISTS noteBase_templateId_idx on noteBase(templateId);`,
-	`CREATE INDEX IF NOT EXISTS card_due_idx on card(due);`,
+	`CREATE INDEX IF NOT EXISTS cardBase_due_idx on cardBase(due);`,
 	`CREATE INDEX IF NOT EXISTS review_cardId_idx on review(cardId);`,
 	`SELECT crsql_as_crr('template');`,
 	`SELECT crsql_as_crr('remoteTemplate');`,
 	`SELECT crsql_as_crr('noteBase');`,
 	`SELECT crsql_as_crr('remoteNote');`,
-	`SELECT crsql_as_crr('card');`,
+	`SELECT crsql_as_crr('cardBase');`,
 	`SELECT crsql_as_crr('media');`,
 	`SELECT crsql_as_crr('remoteMedia');`,
 	`SELECT crsql_as_crr('plugin');`,

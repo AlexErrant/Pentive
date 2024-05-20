@@ -10,7 +10,7 @@ import {
 	type PluginVersion,
 } from 'shared'
 
-export interface Card {
+export interface CardBase {
 	id: LDbId
 	ord: Ord
 	noteId: LDbId
@@ -21,6 +21,8 @@ export interface Card {
 	due: number
 	state: number | null
 }
+
+export interface Card extends CardBase {}
 
 export interface Media {
 	id: MediaId
@@ -156,6 +158,7 @@ export interface DB {
 	cardSettingNameFts: CardSettingNameFts
 	templateNameFts: TemplateNameFts
 	card: Card
+	cardBase: CardBase
 	media: Media
 	note: Note
 	noteField: NoteField

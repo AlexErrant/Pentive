@@ -12,7 +12,7 @@ import {
 import { ky, C, rd } from '../topLevelAwait'
 import {
 	type DB,
-	type Card as CardEntity,
+	type CardBase,
 	type Note,
 	type CardSetting,
 	type Template,
@@ -68,7 +68,7 @@ function deserializeState(s: number | null): State | undefined {
 	}
 }
 
-function cardToDocType(card: Card): InsertObject<DB, 'card'> {
+function cardToDocType(card: Card): InsertObject<DB, 'cardBase'> {
 	const { id, noteId, due, ord, tags, cardSettingId, state } = card
 	const now = C.getDate().getTime()
 	return {
@@ -84,7 +84,7 @@ function cardToDocType(card: Card): InsertObject<DB, 'card'> {
 	}
 }
 
-function cardEntityToDomain(card: CardEntity): Card {
+function cardBaseToDomain(card: CardBase): Card {
 	const r = {
 		id: card.id as CardId,
 		noteId: card.noteId as NoteId,
@@ -105,14 +105,14 @@ function cardEntityToDomain(card: CardEntity): Card {
 	return r
 }
 
-// The point of this type is to cause an error if something is added to CardEntity
+// The point of this type is to cause an error if something is added to CardBase
 // If that happens, you probably want to update the `doUpdateSet` call.
 // If not, you an add an exception to the Exclude below.
 type OnConflictUpdateCardSet = {
-	[K in keyof CardEntity as Exclude<K, 'id' | 'noteId' | 'created' | 'ord'>]: (
+	[K in keyof CardBase as Exclude<K, 'id' | 'noteId' | 'created' | 'ord'>]: (
 		x: ExpressionBuilder<
-			OnConflictDatabase<DB, 'card'>,
-			OnConflictTables<'card'>
+			OnConflictDatabase<DB, 'cardBase'>,
+			OnConflictTables<'cardBase'>
 		>,
 	) => unknown
 }
@@ -130,7 +130,7 @@ type WithCache = {
 	}
 	// I'm not adding rowid to the official type definition of Notes because it adds noise to Insert/Update/Conflict resolution types
 	note: Note & { rowid: number }
-	card: CardEntity & { rowid: number }
+	card: CardBase & { rowid: number }
 	cardSetting: CardSetting & { rowid: number }
 	template: Template & { rowid: number }
 }
@@ -364,7 +364,7 @@ async function getCards(
 				uploadDate: rt.uploadDate,
 			})),
 		)
-		const card = cardEntityToDomain({
+		const card = cardBaseToDomain({
 			cardSettingId: entity.card_cardSettingId,
 			created: entity.card_created,
 			tags: entity.card_tags,
@@ -398,7 +398,7 @@ export const cardCollectionMethods = {
 		for (let i = 0; i < batches.length; i++) {
 			C.toastInfo('card batch ' + i)
 			await ky
-				.insertInto('card')
+				.insertInto('cardBase')
 				.values(batches[i]!)
 				.onConflict((db) =>
 					db.doUpdateSet({
@@ -418,7 +418,7 @@ export const cardCollectionMethods = {
 			.selectAll()
 			.where('id', '=', cardId)
 			.executeTakeFirst()
-		return card == null ? null : cardEntityToDomain(card)
+		return card == null ? null : cardBaseToDomain(card)
 	},
 	getCardsByNote: async function (noteId: NoteId) {
 		const cards = await ky
@@ -426,7 +426,7 @@ export const cardCollectionMethods = {
 			.selectAll()
 			.where('noteId', '=', noteId)
 			.execute()
-		return cards.map(cardEntityToDomain)
+		return cards.map(cardBaseToDomain)
 	},
 	getCards,
 	getCardsCount,
