@@ -14,5 +14,5 @@
 		"outDir": "dist",
 		"lib": ["ES2022"]
 	},
-	"include": ["src/**/*", "generateSql.ts", "src/sql.json"]
+	"include": ["src/**/*", "sql/generateSql.ts", "src/sql.json"]
 }

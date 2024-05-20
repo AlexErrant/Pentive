@@ -1,8 +1,11 @@
 import * as fs from 'fs'
 
-const init = fs.readFileSync('./init.sql').toString()
+const note = fs.readFileSync('./sql/note.sql').toString()
+const card = fs.readFileSync('./sql/card.sql').toString()
+const init = fs.readFileSync('./sql/init.sql').toString()
 
-const sql = init
+const sql = [note, card, init]
+	.join('\n')
 	.split(';')
 	.map((x) => x.trim())
 	.filter((x) => x !== '')
