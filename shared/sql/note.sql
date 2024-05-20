@@ -91,4 +91,6 @@ CREATE TRIGGER IF NOT EXISTS noteBase_after_update AFTER UPDATE ON noteBase BEGI
   INSERT INTO noteFtsTag(noteFtsTag, rowid, tags       ) VALUES('delete', old.rowid, old.tags       );
   INSERT INTO noteFtsTag(rowid, tags       ) VALUES (new.rowid, new.tags       );
 END;
-
+CREATE INDEX IF NOT EXISTS noteBase_templateId_idx on noteBase(templateId);
+SELECT crsql_as_crr('noteBase');
+SELECT crsql_as_crr('noteField');

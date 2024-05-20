@@ -29,3 +29,7 @@ CREATE TRIGGER IF NOT EXISTS cardBase_after_update AFTER UPDATE ON cardBase BEGI
   INSERT INTO cardFtsTag(cardFtsTag, rowid, tags       ) VALUES('delete', old.rowid, old.tags       );
   INSERT INTO cardFtsTag(rowid, tags       ) VALUES (new.rowid, new.tags       );
 END;
+CREATE INDEX IF NOT EXISTS cardBase_noteId_idx on cardBase(noteId);
+CREATE INDEX IF NOT EXISTS cardBase_created_idx on cardBase(created);
+CREATE INDEX IF NOT EXISTS cardBase_due_idx on cardBase(due);
+SELECT crsql_as_crr('cardBase');
