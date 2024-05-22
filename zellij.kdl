@@ -29,11 +29,19 @@ layout {
               command "pnpm"
               args "ugc"
             }
-            pane {
-              name "peer"
-              cwd "peer"
-              command "pnpm"
-              args "dev"
+            pane split_direction="horizontal" {
+              pane {
+                name "peer"
+                cwd "peer"
+                command "pnpm"
+                args "dev"
+              }
+              pane {
+                name "generateSql"
+                cwd "shared"
+                command "pnpm"
+                args "generateSql"
+              }
             }
             pane {
               name "cwa"

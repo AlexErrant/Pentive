@@ -9,7 +9,7 @@
 	"exports": "./src/index.ts",
 	"scripts": {
 		"tsc-build": "tsc --build",
-		"generateSql": "ts-node --esm ./sql/generateSql.ts",
+		"generateSql": "nodemon --watch sql --ext sql --esm ./sql/generateSql.ts",
 		"eslint": "eslint . --ignore-path .gitignore",
 		"eslint:fix": "eslint . --fix --ignore-path .gitignore",
 		"format:check": "prettier --ignore-path .gitignore --check .",
