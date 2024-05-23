@@ -14,7 +14,6 @@ export interface CardBase {
 	id: LDbId
 	ord: Ord
 	noteId: LDbId
-	tags: string
 	created: number
 	updated: number
 	cardSettingId: LDbId | null
@@ -22,7 +21,14 @@ export interface CardBase {
 	state: number | null
 }
 
-export interface Card extends CardBase {}
+export interface Card extends CardBase {
+	tags: string
+}
+
+export interface CardTag {
+	tag: string
+	cardId: LDbId
+}
 
 export interface Media {
 	id: MediaId
@@ -124,13 +130,9 @@ export interface NoteFtsTagVocab {
 	offset: number
 }
 
-export interface CardFtsTagVocab {
-	term: string
-	doc: number
-	col: string
-	offset: number
+export interface DistinctCardTag {
+	tag: string
 }
-
 export interface SqliteTempMaster {
 	name: string
 }
@@ -154,7 +156,8 @@ export interface DB {
 	// eslint-disable-next-line @typescript-eslint/naming-convention
 	sqlite_temp_master: SqliteTempMaster
 	noteFtsTagVocab: NoteFtsTagVocab
-	cardFtsTagVocab: CardFtsTagVocab
+	distinctCardTag: DistinctCardTag
+	cardTag: CardTag
 	cardSettingNameFts: CardSettingNameFts
 	templateNameFts: TemplateNameFts
 	card: Card

@@ -12,10 +12,12 @@ import {
 import { ky, C, rd } from '../topLevelAwait'
 import {
 	type DB,
+	type Card as CardView,
 	type CardBase,
 	type Note,
 	type CardSetting,
 	type Template,
+	type CardTag,
 } from './database'
 import {
 	type ExpressionBuilder,
@@ -28,12 +30,7 @@ import {
 } from 'kysely'
 import _ from 'lodash'
 import { md5 } from '../domain/utility'
-import {
-	noteEntityToDomain,
-	parseTags,
-	stringifyTags,
-	templateEntityToDomain,
-} from './util'
+import { noteEntityToDomain, templateEntityToDomain } from './util'
 import { type convert } from 'shared-dom'
 
 function serializeState(s: State): number {
@@ -68,31 +65,35 @@ function deserializeState(s: number | null): State | undefined {
 	}
 }
 
-function cardToDocType(card: Card): InsertObject<DB, 'cardBase'> {
+function cardToDocType(
+	card: Card,
+): [InsertObject<DB, 'cardBase'>, Array<InsertObject<DB, 'cardTag'>>] {
 	const { id, noteId, due, ord, tags, cardSettingId, state } = card
 	const now = C.getDate().getTime()
-	return {
-		id,
-		noteId,
-		created: now,
-		updated: now,
-		due: due.getTime(),
-		ord,
-		tags: stringifyTags(tags),
-		cardSettingId: cardSettingId ?? null,
-		state: undefinedMap(state, serializeState) ?? null,
-	}
+	return [
+		{
+			id,
+			noteId,
+			created: now,
+			updated: now,
+			due: due.getTime(),
+			ord,
+			cardSettingId: cardSettingId ?? null,
+			state: undefinedMap(state, serializeState) ?? null,
+		},
+		Array.from(tags).map((tag) => ({ tag, cardId: id })),
+	] satisfies [InsertObject<DB, 'cardBase'>, Array<InsertObject<DB, 'cardTag'>>]
 }
 
-function cardBaseToDomain(card: CardBase): Card {
+function cardBaseToDomain(card: CardView): Card {
 	const r = {
-		id: card.id as CardId,
-		noteId: card.noteId as NoteId,
+		id: card.id,
+		noteId: card.noteId,
 		created: new Date(card.created),
 		updated: new Date(card.updated),
 		due: new Date(card.due),
 		ord: card.ord,
-		tags: parseTags(card.tags),
+		tags: new Set(JSON.parse(card.tags) as string[]),
 		state: deserializeState(card.state),
 		cardSettingId: card.cardSettingId ?? undefined,
 	}
@@ -389,27 +390,65 @@ function forceParse<T>(x: T): T {
 	return JSON.parse(x as string) as T // I don't want to use ParseJSONResultsPlugin because it parses all columns unconditionally. I parse manually instead.
 }
 
+// eslint-disable-next-line @typescript-eslint/consistent-type-definitions -- interface deesn't work with `withTables`
+type CardTagRowid = {
+	// I'm not adding rowid to the official type definition because it adds noise to Insert/Update/Conflict resolution types
+	cardTag: CardTag & { rowid: number }
+}
+
 export const cardCollectionMethods = {
 	upsertCard: async function (card: Card) {
 		await this.bulkUpsertCards([card])
 	},
 	bulkUpsertCards: async function (cards: Card[]) {
+		// highTODO make this a transaction
 		const batches = _.chunk(cards.map(cardToDocType), 1000)
 		for (let i = 0; i < batches.length; i++) {
 			C.toastInfo('card batch ' + i)
+			const cardsTags = batches[i]!
+			const cards = cardsTags.map((ct) => ct[0])
+			const tags = cardsTags.flatMap((ct) => ct[1])
 			await ky
 				.insertInto('cardBase')
-				.values(batches[i]!)
+				.values(cards)
 				.onConflict((db) =>
 					db.doUpdateSet({
 						updated: (x) => x.ref('excluded.updated'),
 						due: (x) => x.ref('excluded.due'),
-						tags: (x) => x.ref('excluded.tags'),
 						cardSettingId: (x) => x.ref('excluded.cardSettingId'),
 						state: (x) => x.ref('excluded.state'),
 					} satisfies OnConflictUpdateCardSet),
 				)
 				.execute()
+			const cardIds = sql.join(cards.map((c) => c.id as CardId))
+			const cardsTagsJson = JSON.stringify(
+				tags.map((t) => ({ [t.cardId as string]: t.tag })),
+			)
+			await ky
+				.withTables<CardTagRowid>()
+				.deleteFrom('cardTag')
+				.where(
+					'rowid',
+					'in',
+					sql<number>`
+(SELECT rowid
+FROM (SELECT cardId, tag FROM cardTag where cardId in (${cardIds})
+      EXCEPT
+      SELECT key AS cardId,
+             value AS tag
+      FROM json_tree(${cardsTagsJson})
+      WHERE TYPE = 'text'
+     ) as x
+JOIN cardTag ON cardTag.cardId = x.cardId AND cardTag.tag = x.tag)`,
+				)
+				.execute()
+			if (tags.length !== 0) {
+				await ky
+					.insertInto('cardTag')
+					.values(tags)
+					.onConflict((x) => x.doNothing())
+					.execute()
+			}
 		}
 	},
 	getCard: async function (cardId: CardId) {
