@@ -7,7 +7,7 @@ export const tagCollectionMethods = {
 		const tags = await ky
 			.selectFrom('distinctCardTag')
 			.select('tag')
-			// .union((db) => db.selectFrom('distinctNoteTag').select('tag'))
+			.union((db) => db.selectFrom('distinctNoteTag').select('tag'))
 			.orderBy('tag')
 			.execute()
 		return tags.map((t) => t.tag)

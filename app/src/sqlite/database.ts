@@ -25,6 +25,11 @@ export interface Card extends CardBase {
 	tags: string
 }
 
+export interface NoteTag {
+	tag: string
+	noteId: LDbId
+}
+
 export interface CardTag {
 	tag: string
 	cardId: LDbId
@@ -38,14 +43,17 @@ export interface Media {
 	hash: Uint8Array
 }
 
-export interface Note {
+export interface NoteBase {
 	id: LDbId
 	templateId: LDbId
 	ankiNoteId: number | null
 	created: number
 	updated: number
-	tags: string
 	fieldValues: string
+}
+
+export interface Note extends NoteBase {
+	tags: string
 }
 
 export interface NoteField {
@@ -123,16 +131,13 @@ export interface RemoteTemplate {
 	uploadDate: number | null
 }
 
-export interface NoteFtsTagVocab {
-	term: string
-	doc: number
-	col: string
-	offset: number
+export interface DistinctNoteTag {
+	tag: string
 }
-
 export interface DistinctCardTag {
 	tag: string
 }
+
 export interface SqliteTempMaster {
 	name: string
 }
@@ -155,15 +160,17 @@ export interface CardSetting {
 export interface DB {
 	// eslint-disable-next-line @typescript-eslint/naming-convention
 	sqlite_temp_master: SqliteTempMaster
-	noteFtsTagVocab: NoteFtsTagVocab
 	distinctCardTag: DistinctCardTag
+	distinctNoteTag: DistinctNoteTag
 	cardTag: CardTag
+	noteTag: NoteTag
 	cardSettingNameFts: CardSettingNameFts
 	templateNameFts: TemplateNameFts
 	card: Card
 	cardBase: CardBase
 	media: Media
 	note: Note
+	noteBase: NoteBase
 	noteField: NoteField
 	noteFvFts: NoteFvFts
 	noteFtsTag: NoteFtsTag

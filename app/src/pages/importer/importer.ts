@@ -142,7 +142,7 @@ async function importAnkiDb(sqlite: Entry): Promise<void> {
 			notesMap.set(note.id, parseNote(note, templatesMap))
 		}
 		notes.free()
-		await db.bulkInsertNotes(Array.from(notesMap.values()))
+		await db.bulkUpsertNotes(Array.from(notesMap.values()))
 		const cards = ankiDb.prepare('select * from cards') // lowTODO select exact columns
 		while (cards.step()) {
 			const row = cards.getAsObject()

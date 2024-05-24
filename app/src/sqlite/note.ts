@@ -11,28 +11,34 @@ import {
 	type Note,
 	notEmpty,
 } from 'shared'
-import { type DB } from './database'
-import { type InsertObject } from 'kysely'
+import { type NoteBase, type DB, type NoteTag } from './database'
+import {
+	sql,
+	type ExpressionBuilder,
+	type OnConflictDatabase,
+	type OnConflictTables,
+	type InsertObject,
+} from 'kysely'
 import _ from 'lodash'
 import { C, ky, tx } from '../topLevelAwait'
 import {
 	noteEntityToDomain,
-	stringifyTags,
 	updateLocalMediaIdByRemoteMediaIdAndGetNewDoc,
 } from './util'
 
-function noteToDocType(note: Note): InsertObject<DB, 'note'> {
+function noteToDocType(note: Note) {
 	const now = C.getDate().getTime()
-	const r: InsertObject<DB, 'note'> = {
-		id: note.id,
-		templateId: note.templateId,
-		created: now,
-		updated: now,
-		tags: stringifyTags(note.tags),
-		fieldValues: stringifyMap(note.fieldValues),
-		ankiNoteId: note.ankiNoteId,
-	}
-	return r
+	return [
+		{
+			id: note.id,
+			templateId: note.templateId,
+			created: now,
+			updated: now,
+			fieldValues: stringifyMap(note.fieldValues),
+			ankiNoteId: note.ankiNoteId,
+		},
+		Array.from(note.tags).map((tag) => ({ tag, noteId: note.id })),
+	] satisfies [InsertObject<DB, 'noteBase'>, Array<InsertObject<DB, 'noteTag'>>]
 }
 
 function domainToCreateRemote(
@@ -59,21 +65,75 @@ function domainToEditRemote(
 	return r
 }
 
+// The point of this type is to cause an error if something is added to NoteBase
+// If that happens, you probably want to update the `doUpdateSet` call.
+// If not, you an add an exception to the Exclude below.
+type OnConflictUpdateNoteSet = {
+	[K in keyof NoteBase as Exclude<K, 'id' | 'created'>]: (
+		x: ExpressionBuilder<
+			OnConflictDatabase<DB, 'noteBase'>,
+			OnConflictTables<'noteBase'>
+		>,
+	) => unknown
+}
+
+// eslint-disable-next-line @typescript-eslint/consistent-type-definitions -- interface deesn't work with `withTables`
+type NoteTagRowid = {
+	// I'm not adding rowid to the official type definition because it adds noise to Insert/Update/Conflict resolution types
+	noteTag: NoteTag & { rowid: number }
+}
+
 export const noteCollectionMethods = {
 	upsertNote: async function (note: Note) {
-		const values = noteToDocType(note)
-		const conflictValues = { ...values, id: undefined, created: undefined }
-		await ky
-			.insertInto('note')
-			.values(values)
-			.onConflict((db) => db.doUpdateSet(conflictValues))
-			.execute()
+		await this.bulkUpsertNotes([note])
 	},
-	bulkInsertNotes: async function (notes: Note[]) {
+	bulkUpsertNotes: async function (notes: Note[]) {
+		// highTODO make this a transaction
 		const batches = _.chunk(notes.map(noteToDocType), 1000)
 		for (let i = 0; i < batches.length; i++) {
 			C.toastInfo('note batch ' + i)
-			await ky.insertInto('note').values(batches[i]!).execute()
+			const noteTags = batches[i]!
+			const notes = noteTags.map((ct) => ct[0])
+			const tags = noteTags.flatMap((ct) => ct[1])
+			await ky
+				.insertInto('noteBase')
+				.values(notes)
+				.onConflict((db) =>
+					db.doUpdateSet({
+						updated: (x) => x.ref('excluded.updated'),
+						templateId: (x) => x.ref('excluded.templateId'),
+						ankiNoteId: (x) => x.ref('excluded.ankiNoteId'),
+						fieldValues: (x) => x.ref('excluded.fieldValues'),
+					} satisfies OnConflictUpdateNoteSet),
+				)
+				.execute()
+			const noteIds = sql.join(notes.map((c) => c.id))
+			const notesTagsJson = JSON.stringify(
+				tags.map((t) => ({ [t.noteId as string]: t.tag })),
+			)
+			await ky
+				.withTables<NoteTagRowid>()
+				.deleteFrom('noteTag')
+				.where(
+					'rowid',
+					'in',
+					sql<number>`
+(SELECT rowid
+FROM (SELECT noteId, tag FROM noteTag where noteId in (${noteIds})
+      EXCEPT
+      SELECT key AS noteId,
+             value AS tag
+      FROM json_tree(${notesTagsJson})
+      WHERE TYPE = 'text'
+     ) as x
+JOIN noteTag ON noteTag.noteId = x.noteId AND noteTag.tag = x.tag)`,
+				)
+				.execute()
+			await ky
+				.insertInto('noteTag')
+				.values(tags)
+				.onConflict((x) => x.doNothing())
+				.execute()
 		}
 	},
 	getNote: async function (noteId: NoteId) {
@@ -84,7 +144,7 @@ export const noteCollectionMethods = {
 			.execute()
 		const note = await ky
 			.selectFrom('note')
-			.selectAll('note')
+			.selectAll()
 			.innerJoin('template', 'note.templateId', 'template.id')
 			.select('template.fields as templateFields')
 			.where('note.id', '=', noteId)
@@ -99,7 +159,7 @@ export const noteCollectionMethods = {
 			.execute()
 		const notes = await ky
 			.selectFrom('note')
-			.selectAll('note')
+			.selectAll()
 			.innerJoin('template', 'note.templateId', 'template.id')
 			.select('template.fields as templateFields')
 			.where('note.id', 'in', noteIds)
@@ -125,7 +185,7 @@ export const noteCollectionMethods = {
 			.execute()
 		const notesAndStuff = await ky
 			.selectFrom('note')
-			.selectAll('note')
+			.selectAll()
 			.innerJoin('template', 'note.templateId', 'template.id')
 			.select('template.fields as templateFields')
 			.where('note.id', 'in', localIds)
@@ -163,10 +223,10 @@ export const noteCollectionMethods = {
 		const dp = new DOMParser()
 		const remoteNotes = await ky
 			.selectFrom('remoteNote')
-			.leftJoin('note', 'remoteNote.localId', 'note.id')
+			.leftJoin('noteBase', 'remoteNote.localId', 'noteBase.id')
 			.selectAll('remoteNote')
 			.where('remoteId', 'is not', null)
-			.whereRef('remoteNote.uploadDate', '<', 'note.updated')
+			.whereRef('remoteNote.uploadDate', '<', 'noteBase.updated')
 			.execute()
 		const localIds = [...new Set(remoteNotes.map((t) => t.localId))]
 		const remoteTemplates = await ky
@@ -175,7 +235,7 @@ export const noteCollectionMethods = {
 			.execute()
 		const notesAndStuff = await ky
 			.selectFrom('note')
-			.selectAll('note')
+			.selectAll()
 			.innerJoin('template', 'note.templateId', 'template.id')
 			.select('template.fields as templateFields')
 			.where('note.id', 'in', localIds)
@@ -228,8 +288,8 @@ export const noteCollectionMethods = {
 		const mediaBinaries = await ky
 			.selectFrom('remoteMedia')
 			.innerJoin('media', 'remoteMedia.localMediaId', 'media.id')
-			.innerJoin('note', 'remoteMedia.localEntityId', 'note.id')
-			.leftJoin('remoteNote', 'remoteNote.localId', 'note.id')
+			.innerJoin('noteBase', 'remoteMedia.localEntityId', 'noteBase.id')
+			.leftJoin('remoteNote', 'remoteNote.localId', 'noteBase.id')
 			.select([
 				'remoteMedia.localMediaId',
 				'media.data',
@@ -283,7 +343,7 @@ export const noteCollectionMethods = {
 				.execute()
 			const note = await db
 				.selectFrom('note')
-				.selectAll('note')
+				.selectAll()
 				.innerJoin('template', 'note.templateId', 'template.id')
 				.select('template.fields as templateFields')
 				.where('note.id', '=', noteId)
@@ -376,16 +436,6 @@ export const noteCollectionMethods = {
 					remoteNoteIds,
 				)} not found. (This is the worst error message ever - medTODO.)`,
 			)
-	},
-	updateNote: async function (note: Note) {
-		const { id, created, ...rest } = noteToDocType(note)
-		const r = await ky
-			.updateTable('note')
-			.set(rest)
-			.where('id', '=', id)
-			.returningAll()
-			.execute()
-		if (r.length !== 1) C.toastFatal(`No note found for id '${note.id}'.`)
 	},
 }
 
