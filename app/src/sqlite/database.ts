@@ -49,25 +49,30 @@ export interface NoteBase {
 	ankiNoteId: number | null
 	created: number
 	updated: number
-	fieldValues: string
 }
 
 export interface Note extends NoteBase {
 	tags: string
+	fieldValues: string
 }
 
-export interface NoteField {
-	rowid: number
+export interface NoteFieldValue {
 	noteId: string
 	field: string
+	value: string
 }
 
-export interface NoteFvFts {
+export interface NoteFieldFts {
 	rowid: number
 	field: string
+	normalized: string
+}
+
+export interface NoteValueFts {
+	rowid: number
 	value: string
-	normalizedField: string
-	normalizedValue: string
+	normalized: string
+	rank: number
 }
 
 export interface NoteFtsTag {
@@ -171,8 +176,9 @@ export interface DB {
 	media: Media
 	note: Note
 	noteBase: NoteBase
-	noteField: NoteField
-	noteFvFts: NoteFvFts
+	noteFieldValue: NoteFieldValue
+	noteFieldFts: NoteFieldFts
+	noteValueFts: NoteValueFts
 	noteFtsTag: NoteFtsTag
 	cardFtsTag: CardFtsTag
 	remoteNote: RemoteNote

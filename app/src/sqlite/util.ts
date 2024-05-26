@@ -18,28 +18,12 @@ import {
 	type Template,
 	imgPlaceholder,
 	type Field,
+	parseSet,
 } from 'shared'
 import { C } from '../topLevelAwait'
 
-export const unitSeparator = '\x1f' // if this changes, also change noteFtsTag's separator 89CDE7EA-EF1B-4054-B381-597EE549CAB4
-
-export function stringifyTagsArray(tags: string[]) {
-	for (const tag of tags) {
-		if (tag.includes(unitSeparator))
-			C.toastFatal('Tags cannot contain the unit separator.')
-	}
-	return tags.join(unitSeparator)
-}
-
-// highTODO property test
-export function stringifyTags(tags: Set<string>) {
-	return stringifyTagsArray(Array.from(tags.values()))
-}
-
 export function parseTags(rawTags: string) {
-	if (rawTags === '') return new Set<string>()
-	const parsed = rawTags.split(unitSeparator)
-	return new Set(parsed)
+	return parseSet<string>(rawTags)
 }
 
 export function updateLocalMediaIdByRemoteMediaIdAndGetNewDoc(

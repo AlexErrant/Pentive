@@ -18,6 +18,7 @@ import {
 	type CardSetting,
 	type Template,
 	type CardTag,
+	type NoteFieldValue,
 } from './database'
 import {
 	type ExpressionBuilder,
@@ -30,7 +31,7 @@ import {
 } from 'kysely'
 import _ from 'lodash'
 import { md5 } from '../domain/utility'
-import { noteEntityToDomain, templateEntityToDomain } from './util'
+import { noteEntityToDomain, parseTags, templateEntityToDomain } from './util'
 import { type convert } from 'shared-dom'
 
 function serializeState(s: State): number {
@@ -93,7 +94,7 @@ function cardBaseToDomain(card: CardView): Card {
 		updated: new Date(card.updated),
 		due: new Date(card.due),
 		ord: card.ord,
-		tags: new Set(JSON.parse(card.tags) as string[]),
+		tags: parseTags(card.tags),
 		state: deserializeState(card.state),
 		cardSettingId: card.cardSettingId ?? undefined,
 	}
@@ -134,6 +135,7 @@ type WithCache = {
 	card: CardBase & { rowid: number }
 	cardSetting: CardSetting & { rowid: number }
 	template: Template & { rowid: number }
+	noteFieldValue: NoteFieldValue & { rowid: number }
 }
 
 // We cache the query's `card.id`s in a temp table. We use the temp table's rowids as a hack to get cursor pagination.
@@ -227,9 +229,13 @@ async function getCards(
 				db
 					.$if(conversionResult.joinFts, (db) =>
 						db
-							.innerJoin('noteField', 'noteField.noteId', 'note.id')
-							.innerJoin('noteFvFts', 'noteFvFts.rowid', 'noteField.rowid')
-							.orderBy(sql`noteFvFts.rank`),
+							.innerJoin('noteFieldValue', 'noteFieldValue.noteId', 'note.id')
+							.innerJoin(
+								'noteValueFts',
+								'noteValueFts.rowid',
+								'noteFieldValue.rowid',
+							)
+							.orderBy('rank'),
 					)
 					.$if(conversionResult.joinTags, (db) =>
 						db

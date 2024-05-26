@@ -3,7 +3,6 @@ import {
 	type EditRemoteNote,
 	type NookId,
 	type RemoteNoteId,
-	stringifyMap,
 	type NoteId,
 	type MediaId,
 	type RemoteMediaNum,
@@ -11,7 +10,7 @@ import {
 	type Note,
 	notEmpty,
 } from 'shared'
-import { type NoteBase, type DB, type NoteTag } from './database'
+import { type NoteBase, type DB, type NoteFieldValue } from './database'
 import {
 	sql,
 	type ExpressionBuilder,
@@ -25,6 +24,7 @@ import {
 	noteEntityToDomain,
 	updateLocalMediaIdByRemoteMediaIdAndGetNewDoc,
 } from './util'
+import { saveTags } from './tag'
 
 function noteToDocType(note: Note) {
 	const now = C.getDate().getTime()
@@ -34,11 +34,19 @@ function noteToDocType(note: Note) {
 			templateId: note.templateId,
 			created: now,
 			updated: now,
-			fieldValues: stringifyMap(note.fieldValues),
 			ankiNoteId: note.ankiNoteId,
 		},
 		Array.from(note.tags).map((tag) => ({ tag, noteId: note.id })),
-	] satisfies [InsertObject<DB, 'noteBase'>, Array<InsertObject<DB, 'noteTag'>>]
+		Array.from(note.fieldValues).map(([field, value]) => ({
+			noteId: note.id,
+			field,
+			value,
+		})),
+	] satisfies [
+		InsertObject<DB, 'noteBase'>,
+		Array<InsertObject<DB, 'noteTag'>>,
+		Array<InsertObject<DB, 'noteFieldValue'>>,
+	]
 }
 
 function domainToCreateRemote(
@@ -77,10 +85,22 @@ type OnConflictUpdateNoteSet = {
 	) => unknown
 }
 
+// The point of this type is to cause an error if something is added to NoteFieldValue
+// If that happens, you probably want to update the `doUpdateSet` call.
+// If not, you an add an exception to the Exclude below.
+type OnConflictUpdateNoteValueSet = {
+	[K in keyof NoteFieldValue as Exclude<K, 'noteId' | 'field'>]: (
+		x: ExpressionBuilder<
+			OnConflictDatabase<DB, 'noteFieldValue'>,
+			OnConflictTables<'noteFieldValue'>
+		>,
+	) => unknown
+}
+
 // eslint-disable-next-line @typescript-eslint/consistent-type-definitions -- interface deesn't work with `withTables`
-type NoteTagRowid = {
+type NoteFieldValueRowid = {
 	// I'm not adding rowid to the official type definition because it adds noise to Insert/Update/Conflict resolution types
-	noteTag: NoteTag & { rowid: number }
+	noteFieldValue: NoteFieldValue & { rowid: number }
 }
 
 export const noteCollectionMethods = {
@@ -88,53 +108,61 @@ export const noteCollectionMethods = {
 		await this.bulkUpsertNotes([note])
 	},
 	bulkUpsertNotes: async function (notes: Note[]) {
-		// highTODO make this a transaction
 		const batches = _.chunk(notes.map(noteToDocType), 1000)
-		for (let i = 0; i < batches.length; i++) {
-			C.toastInfo('note batch ' + i)
-			const noteTags = batches[i]!
-			const notes = noteTags.map((ct) => ct[0])
-			const tags = noteTags.flatMap((ct) => ct[1])
-			await ky
-				.insertInto('noteBase')
-				.values(notes)
-				.onConflict((db) =>
-					db.doUpdateSet({
-						updated: (x) => x.ref('excluded.updated'),
-						templateId: (x) => x.ref('excluded.templateId'),
-						ankiNoteId: (x) => x.ref('excluded.ankiNoteId'),
-						fieldValues: (x) => x.ref('excluded.fieldValues'),
-					} satisfies OnConflictUpdateNoteSet),
+		await tx(async (ky) => {
+			for (let i = 0; i < batches.length; i++) {
+				C.toastInfo('note batch ' + i)
+				const batch = batches[i]!
+				const notes = batch.map((ct) => ct[0])
+				const tags = batch.flatMap((ct) => ct[1])
+				const fieldValues = batch.flatMap((ct) => ct[2])
+				await ky
+					.insertInto('noteBase')
+					.values(notes)
+					.onConflict((db) =>
+						db.doUpdateSet({
+							updated: (x) => x.ref('excluded.updated'),
+							templateId: (x) => x.ref('excluded.templateId'),
+							ankiNoteId: (x) => x.ref('excluded.ankiNoteId'),
+						} satisfies OnConflictUpdateNoteSet),
+					)
+					.execute()
+				const noteIds = notes.map((c) => c.id)
+				await saveTags(noteIds, tags)
+				const fieldValuesJson = JSON.stringify(
+					fieldValues.map((fv) => ({ [fv.noteId as string]: fv.field })),
 				)
-				.execute()
-			const noteIds = sql.join(notes.map((c) => c.id))
-			const notesTagsJson = JSON.stringify(
-				tags.map((t) => ({ [t.noteId as string]: t.tag })),
-			)
-			await ky
-				.withTables<NoteTagRowid>()
-				.deleteFrom('noteTag')
-				.where(
-					'rowid',
-					'in',
-					sql<number>`
+				await ky
+					.withTables<NoteFieldValueRowid>()
+					.deleteFrom('noteFieldValue')
+					.where(
+						'rowid',
+						'in',
+						sql<number>`
 (SELECT rowid
-FROM (SELECT noteId, tag FROM noteTag where noteId in (${noteIds})
+FROM (SELECT noteId, field FROM noteFieldValue where noteId in (${sql.join(
+							noteIds,
+						)})
       EXCEPT
       SELECT key AS noteId,
-             value AS tag
-      FROM json_tree(${notesTagsJson})
+             value AS field
+      FROM json_tree(${fieldValuesJson})
       WHERE TYPE = 'text'
      ) as x
-JOIN noteTag ON noteTag.noteId = x.noteId AND noteTag.tag = x.tag)`,
-				)
-				.execute()
-			await ky
-				.insertInto('noteTag')
-				.values(tags)
-				.onConflict((x) => x.doNothing())
-				.execute()
-		}
+JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field = x.field)`,
+					)
+					.execute()
+				await ky
+					.insertInto('noteFieldValue')
+					.values(fieldValues)
+					.onConflict((x) =>
+						x.doUpdateSet({
+							value: (x) => x.ref('excluded.value'),
+						} satisfies OnConflictUpdateNoteValueSet),
+					)
+					.execute()
+			}
+		})
 	},
 	getNote: async function (noteId: NoteId) {
 		const remoteNotes = await ky

@@ -60,7 +60,7 @@ test('whitespace is null', () => {
 test('SimpleString is fts', async () => {
 	await assertEqual(
 		String.raw`a`,
-		String.raw`noteFvFts.rowid IN (SELECT rowid FROM noteFvFts WHERE noteFvFts.normalizedValue LIKE '%a%')`,
+		String.raw`noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%a%')`,
 		1,
 	)
 })
@@ -69,7 +69,7 @@ describe('special characters', () => {
 	async function x(actual: string, expected: string, regex = '') {
 		await assertEqual(
 			actual,
-			String.raw`noteFvFts.rowid IN (SELECT rowid FROM noteFvFts WHERE noteFvFts.normalizedValue LIKE '${expected}'${regex})`,
+			String.raw`noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '${expected}'${regex})`,
 			regex === '' ? 1 : 2,
 		)
 	}
@@ -97,7 +97,7 @@ describe('special characters', () => {
 		await x(
 			String.raw`"a\_b"`, //
 			String.raw`%a_b%`,
-			String.raw`AND regexp_with_flags('a_b', 'i', noteFvFts.normalizedValue)`,
+			String.raw`AND regexp_with_flags('a_b', 'i', noteValueFts.normalized)`,
 		)
 	})
 	test(`\\`, async () => {
@@ -110,14 +110,14 @@ describe('special characters', () => {
 		await x(
 			String.raw`"a%b"`, //
 			String.raw`%a_b%`,
-			String.raw`AND regexp_with_flags('a%b', 'i', noteFvFts.normalizedValue)`,
+			String.raw`AND regexp_with_flags('a%b', 'i', noteValueFts.normalized)`,
 		)
 	})
 	test('* is escaped when regexed', async () => {
 		await x(
 			String.raw`"a\*b\_c"`, //
 			String.raw`%a*b_c%`,
-			String.raw`AND regexp_with_flags('a\*b_c', 'i', noteFvFts.normalizedValue)`,
+			String.raw`AND regexp_with_flags('a\*b_c', 'i', noteValueFts.normalized)`,
 		)
 	})
 })
@@ -126,7 +126,7 @@ describe('delimiter special characters', () => {
 	async function x(actual: string, expected: string) {
 		await assertEqual(
 			actual,
-			String.raw`noteFvFts.rowid IN (SELECT rowid FROM noteFvFts WHERE noteFvFts.normalizedValue LIKE '${expected}')`,
+			String.raw`noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '${expected}')`,
 			1,
 		)
 	}
@@ -163,7 +163,7 @@ describe('delimiter special characters', () => {
 })
 
 describe('not a', () => {
-	const expected = String.raw`noteFvFts.rowid NOT IN (SELECT rowid FROM noteFvFts WHERE noteFvFts.normalizedValue LIKE '%a%')`
+	const expected = String.raw`noteValueFts.rowid NOT IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%a%')`
 
 	test('together', async () => {
 		await assertEqual('-a', expected, 1)
@@ -177,7 +177,7 @@ describe('not a', () => {
 test('Quoted1 is fts', async () => {
 	await assertEqual(
 		String.raw`'a \' \\ b'`,
-		String.raw`noteFvFts.rowid IN (SELECT rowid FROM noteFvFts WHERE noteFvFts.normalizedValue LIKE '%a '' \ b%')`,
+		String.raw`noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%a '' \ b%')`,
 		1,
 	)
 })
@@ -185,7 +185,7 @@ test('Quoted1 is fts', async () => {
 test('Quoted2 is fts', async () => {
 	await assertEqual(
 		String.raw`"a \" \\ b"`,
-		String.raw`noteFvFts.rowid IN (SELECT rowid FROM noteFvFts WHERE noteFvFts.normalizedValue LIKE '%a " \ b%')`,
+		String.raw`noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%a " \ b%')`,
 		1,
 	)
 })
@@ -194,11 +194,11 @@ test('RawQuoted1 is fts', async () => {
 	await assertEqual(
 		String.raw`x '''a '' \ b''' y`,
 		String.raw`
-noteFvFts.rowid IN (SELECT rowid FROM noteFvFts WHERE noteFvFts.normalizedValue LIKE '%x%')
+noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%x%')
 AND
-noteFvFts.rowid IN (SELECT rowid FROM noteFvFts WHERE noteFvFts.normalizedValue LIKE '%a '''' \ b%')
+noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%a '''' \ b%')
 AND
-noteFvFts.rowid IN (SELECT rowid FROM noteFvFts WHERE noteFvFts.normalizedValue LIKE '%y%')`,
+noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%y%')`,
 		3,
 	)
 })
@@ -207,11 +207,11 @@ test('RawQuoted2 is fts', async () => {
 	await assertEqual(
 		String.raw`x """a "" \ b""" y`,
 		String.raw`
-noteFvFts.rowid IN (SELECT rowid FROM noteFvFts WHERE noteFvFts.normalizedValue LIKE '%x%')
+noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%x%')
 AND
-noteFvFts.rowid IN (SELECT rowid FROM noteFvFts WHERE noteFvFts.normalizedValue LIKE '%a "" \ b%')
+noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%a "" \ b%')
 AND
-noteFvFts.rowid IN (SELECT rowid FROM noteFvFts WHERE noteFvFts.normalizedValue LIKE '%y%')`,
+noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%y%')`,
 		3,
 	)
 })
@@ -220,7 +220,7 @@ describe('regex', () => {
 	test('plain', async () => {
 		await assertEqual(
 			String.raw`/foo/`,
-			String.raw`regexp_with_flags('foo', '', noteFvFts.value)`,
+			String.raw`regexp_with_flags('foo', '', noteFieldValue.value)`,
 			2,
 		)
 	})
@@ -228,7 +228,7 @@ describe('regex', () => {
 	test('with flag', async () => {
 		await assertEqual(
 			String.raw`/foo/i`,
-			String.raw`regexp_with_flags('foo', 'i', noteFvFts.value)`,
+			String.raw`regexp_with_flags('foo', 'i', noteFieldValue.value)`,
 			2,
 		)
 	})
@@ -236,7 +236,7 @@ describe('regex', () => {
 	test('with flags', async () => {
 		await assertEqual(
 			String.raw`/foo/is`,
-			String.raw`regexp_with_flags('foo', 'is', noteFvFts.value)`,
+			String.raw`regexp_with_flags('foo', 'is', noteFieldValue.value)`,
 			2,
 		)
 	})
@@ -244,7 +244,7 @@ describe('regex', () => {
 	test('flags are deduped', async () => {
 		await assertEqual(
 			String.raw`/foo/suuvvyys`,
-			String.raw`regexp_with_flags('foo', 'suvy', noteFvFts.value)`,
+			String.raw`regexp_with_flags('foo', 'suvy', noteFieldValue.value)`,
 			2,
 		)
 	})
@@ -253,9 +253,9 @@ describe('regex', () => {
 		await assertEqual(
 			String.raw`/foo/ /bar/`,
 			String.raw`
-regexp_with_flags('foo', '', noteFvFts.value)
+regexp_with_flags('foo', '', noteFieldValue.value)
 AND
-regexp_with_flags('bar', '', noteFvFts.value)
+regexp_with_flags('bar', '', noteFieldValue.value)
 `,
 			4,
 		)
@@ -264,7 +264,7 @@ regexp_with_flags('bar', '', noteFvFts.value)
 	test('NOT works', async () => {
 		await assertEqual(
 			String.raw`-/foo/y`,
-			String.raw`NOT regexp_with_flags('foo', 'y', noteFvFts.value)`,
+			String.raw`NOT regexp_with_flags('foo', 'y', noteFieldValue.value)`,
 			2,
 		)
 	})
@@ -273,9 +273,9 @@ regexp_with_flags('bar', '', noteFvFts.value)
 test('2 SimpleStrings are ANDed', async () => {
 	await assertEqual(
 		String.raw`a b`,
-		String.raw`noteFvFts.rowid IN (SELECT rowid FROM noteFvFts WHERE noteFvFts.normalizedValue LIKE '%a%')
+		String.raw`noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%a%')
 AND
-noteFvFts.rowid IN (SELECT rowid FROM noteFvFts WHERE noteFvFts.normalizedValue LIKE '%b%')`,
+noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%b%')`,
 		2,
 	)
 })
@@ -283,9 +283,9 @@ noteFvFts.rowid IN (SELECT rowid FROM noteFvFts WHERE noteFvFts.normalizedValue 
 test('2 SimpleStrings can be ORed', async () => {
 	await assertEqual(
 		String.raw`a OR b`,
-		String.raw`noteFvFts.rowid IN (SELECT rowid FROM noteFvFts WHERE noteFvFts.normalizedValue LIKE '%a%')
+		String.raw`noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%a%')
 OR
-noteFvFts.rowid IN (SELECT rowid FROM noteFvFts WHERE noteFvFts.normalizedValue LIKE '%b%')`,
+noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%b%')`,
 		2,
 	)
 })
@@ -294,9 +294,9 @@ test('2 SimpleStrings can be grouped', async () => {
 	await assertEqual(
 		String.raw`(a b)`,
 		String.raw`(
-  noteFvFts.rowid IN (SELECT rowid FROM noteFvFts WHERE noteFvFts.normalizedValue LIKE '%a%')
+  noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%a%')
   AND
-  noteFvFts.rowid IN (SELECT rowid FROM noteFvFts WHERE noteFvFts.normalizedValue LIKE '%b%')
+  noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%b%')
 )`,
 		2,
 	)
@@ -306,9 +306,9 @@ test('not distributes over AND', async () => {
 	await assertEqual(
 		String.raw`-(a b)`,
 		String.raw`(
-  noteFvFts.rowid NOT IN (SELECT rowid FROM noteFvFts WHERE noteFvFts.normalizedValue LIKE '%a%')
+  noteValueFts.rowid NOT IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%a%')
   OR
-  noteFvFts.rowid NOT IN (SELECT rowid FROM noteFvFts WHERE noteFvFts.normalizedValue LIKE '%b%')
+  noteValueFts.rowid NOT IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%b%')
 )`,
 		2,
 	)
@@ -318,9 +318,9 @@ test('not distributes over OR', async () => {
 	await assertEqual(
 		String.raw`-(a OR b)`,
 		String.raw`(
-  noteFvFts.rowid NOT IN (SELECT rowid FROM noteFvFts WHERE noteFvFts.normalizedValue LIKE '%a%')
+  noteValueFts.rowid NOT IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%a%')
   AND
-  noteFvFts.rowid NOT IN (SELECT rowid FROM noteFvFts WHERE noteFvFts.normalizedValue LIKE '%b%')
+  noteValueFts.rowid NOT IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%b%')
 )`,
 		2,
 	)
@@ -330,9 +330,9 @@ test('double negative grouping does nothing', async () => {
 	await assertEqual(
 		String.raw`-(-(a OR b))`,
 		String.raw`((
-  noteFvFts.rowid IN (SELECT rowid FROM noteFvFts WHERE noteFvFts.normalizedValue LIKE '%a%')
+  noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%a%')
   OR
-  noteFvFts.rowid IN (SELECT rowid FROM noteFvFts WHERE noteFvFts.normalizedValue LIKE '%b%')
+  noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%b%')
 ))`,
 		2,
 	)
@@ -342,17 +342,17 @@ test('2 groups', async () => {
 	await assertEqual(
 		String.raw`(a b) OR c (d OR e)`,
 		String.raw`(
-  noteFvFts.rowid IN (SELECT rowid FROM noteFvFts WHERE noteFvFts.normalizedValue LIKE '%a%')
+  noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%a%')
   AND
-  noteFvFts.rowid IN (SELECT rowid FROM noteFvFts WHERE noteFvFts.normalizedValue LIKE '%b%')
+  noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%b%')
 )
 OR
-noteFvFts.rowid IN (SELECT rowid FROM noteFvFts WHERE noteFvFts.normalizedValue LIKE '%c%')
+noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%c%')
 AND
 (
-  noteFvFts.rowid IN (SELECT rowid FROM noteFvFts WHERE noteFvFts.normalizedValue LIKE '%d%')
+  noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%d%')
   OR
-  noteFvFts.rowid IN (SELECT rowid FROM noteFvFts WHERE noteFvFts.normalizedValue LIKE '%e%')
+  noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%e%')
 )`,
 		5,
 	)
@@ -446,20 +446,20 @@ test('!(p && !q || r) is (!p || q) && !r', async () => {
 		String.raw`-(p -q OR r)`,
 		String.raw`(
   (
-    noteFvFts.rowid NOT IN (SELECT rowid FROM noteFvFts WHERE noteFvFts.normalizedValue LIKE '%p%')
+    noteValueFts.rowid NOT IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%p%')
     OR
-    noteFvFts.rowid IN (SELECT rowid FROM noteFvFts WHERE noteFvFts.normalizedValue LIKE '%q%')
+    noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%q%')
   )
   AND
-  noteFvFts.rowid NOT IN (SELECT rowid FROM noteFvFts WHERE noteFvFts.normalizedValue LIKE '%r%')
+  noteValueFts.rowid NOT IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%r%')
 )`,
 		3,
 	)
 })
 
 describe('skip error nodes', () => {
-	const expected = String.raw`noteFvFts.rowid IN (SELECT rowid FROM noteFvFts WHERE noteFvFts.normalizedValue LIKE '% foo%')`
-	const negatedExpected = String.raw`noteFvFts.rowid NOT IN (SELECT rowid FROM noteFvFts WHERE noteFvFts.normalizedValue LIKE '% foo%')`
+	const expected = String.raw`noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '% foo%')`
+	const negatedExpected = String.raw`noteValueFts.rowid NOT IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '% foo%')`
 
 	test('plain', async () => {
 		await assertEqual(String.raw`" foo`, expected, 1)
@@ -531,11 +531,11 @@ describe('template', () => {
 		await assertEqual(
 			String.raw`a template:t b`,
 			String.raw`
-noteFvFts.rowid IN (SELECT rowid FROM noteFvFts WHERE noteFvFts.normalizedValue LIKE '%a%')
+noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%a%')
 AND
 (template.rowid IN (SELECT rowid FROM templateNameFts WHERE templateNameFts.name LIKE '%t%'))
 AND
-noteFvFts.rowid IN (SELECT rowid FROM noteFvFts WHERE noteFvFts.normalizedValue LIKE '%b%')`,
+noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%b%')`,
 			3,
 		)
 	})
@@ -544,11 +544,11 @@ noteFvFts.rowid IN (SELECT rowid FROM noteFvFts WHERE noteFvFts.normalizedValue 
 		await assertEqual(
 			String.raw`"a b" OR template:t OR "c d"`,
 			String.raw`
-noteFvFts.rowid IN (SELECT rowid FROM noteFvFts WHERE noteFvFts.normalizedValue LIKE '%a b%')
+noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%a b%')
 OR
 (template.rowid IN (SELECT rowid FROM templateNameFts WHERE templateNameFts.name LIKE '%t%'))
 OR
-noteFvFts.rowid IN (SELECT rowid FROM noteFvFts WHERE noteFvFts.normalizedValue LIKE '%c d%')`,
+noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%c d%')`,
 			3,
 		)
 	})
@@ -639,11 +639,11 @@ describe('templateId', () => {
 		await assertEqual(
 			String.raw`a templateId:t b`,
 			String.raw`
-noteFvFts.rowid IN (SELECT rowid FROM noteFvFts WHERE noteFvFts.normalizedValue LIKE '%a%')
+noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%a%')
 AND
 (note.templateId = 't')
 AND
-noteFvFts.rowid IN (SELECT rowid FROM noteFvFts WHERE noteFvFts.normalizedValue LIKE '%b%')`,
+noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%b%')`,
 			3,
 		)
 	})
@@ -652,11 +652,11 @@ noteFvFts.rowid IN (SELECT rowid FROM noteFvFts WHERE noteFvFts.normalizedValue 
 		await assertEqual(
 			String.raw`"a b" OR templateId:t OR "c d"`,
 			String.raw`
-noteFvFts.rowid IN (SELECT rowid FROM noteFvFts WHERE noteFvFts.normalizedValue LIKE '%a b%')
+noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%a b%')
 OR
 (note.templateId = 't')
 OR
-noteFvFts.rowid IN (SELECT rowid FROM noteFvFts WHERE noteFvFts.normalizedValue LIKE '%c d%')`,
+noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%c d%')`,
 			3,
 		)
 	})
@@ -755,11 +755,11 @@ describe('setting', () => {
 		await assertEqual(
 			String.raw`a setting:t b`,
 			String.raw`
-noteFvFts.rowid IN (SELECT rowid FROM noteFvFts WHERE noteFvFts.normalizedValue LIKE '%a%')
+noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%a%')
 AND
 (card.cardSettingId IN (SELECT rowid FROM cardSettingNameFts WHERE cardSettingNameFts.name LIKE '%t%'))
 AND
-noteFvFts.rowid IN (SELECT rowid FROM noteFvFts WHERE noteFvFts.normalizedValue LIKE '%b%')`,
+noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%b%')`,
 			3,
 		)
 	})
@@ -768,11 +768,11 @@ noteFvFts.rowid IN (SELECT rowid FROM noteFvFts WHERE noteFvFts.normalizedValue 
 		await assertEqual(
 			String.raw`"a b" OR setting:t OR "c d"`,
 			String.raw`
-noteFvFts.rowid IN (SELECT rowid FROM noteFvFts WHERE noteFvFts.normalizedValue LIKE '%a b%')
+noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%a b%')
 OR
 (card.cardSettingId IN (SELECT rowid FROM cardSettingNameFts WHERE cardSettingNameFts.name LIKE '%t%'))
 OR
-noteFvFts.rowid IN (SELECT rowid FROM noteFvFts WHERE noteFvFts.normalizedValue LIKE '%c d%')`,
+noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%c d%')`,
 			3,
 		)
 	})
@@ -863,11 +863,11 @@ describe('settingId', () => {
 		await assertEqual(
 			String.raw`a settingId:t b`,
 			String.raw`
-noteFvFts.rowid IN (SELECT rowid FROM noteFvFts WHERE noteFvFts.normalizedValue LIKE '%a%')
+noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%a%')
 AND
 (card.cardSettingId = 't')
 AND
-noteFvFts.rowid IN (SELECT rowid FROM noteFvFts WHERE noteFvFts.normalizedValue LIKE '%b%')`,
+noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%b%')`,
 			3,
 		)
 	})
@@ -876,11 +876,11 @@ noteFvFts.rowid IN (SELECT rowid FROM noteFvFts WHERE noteFvFts.normalizedValue 
 		await assertEqual(
 			String.raw`"a b" OR settingId:t OR "c d"`,
 			String.raw`
-noteFvFts.rowid IN (SELECT rowid FROM noteFvFts WHERE noteFvFts.normalizedValue LIKE '%a b%')
+noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%a b%')
 OR
 (card.cardSettingId = 't')
 OR
-noteFvFts.rowid IN (SELECT rowid FROM noteFvFts WHERE noteFvFts.normalizedValue LIKE '%c d%')`,
+noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%c d%')`,
 			3,
 		)
 	})
@@ -1018,7 +1018,7 @@ noteFtsTag.rowid IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" 
 		await assertEqual(
 			String.raw`a tag:t b`,
 			String.raw`
-noteFvFts.rowid IN (SELECT rowid FROM noteFvFts WHERE noteFvFts.normalizedValue LIKE '%a%')
+noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%a%')
 AND
 (
   cardFtsTag.rowid IN (SELECT "rowid" FROM "cardFtsTag" WHERE "cardFtsTag"."tags" LIKE '%t%')
@@ -1026,7 +1026,7 @@ AND
   noteFtsTag.rowid IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" LIKE '%t%')
 )
 AND
-noteFvFts.rowid IN (SELECT rowid FROM noteFvFts WHERE noteFvFts.normalizedValue LIKE '%b%')`,
+noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%b%')`,
 			4,
 		)
 	})
@@ -1035,7 +1035,7 @@ noteFvFts.rowid IN (SELECT rowid FROM noteFvFts WHERE noteFvFts.normalizedValue 
 		await assertEqual(
 			String.raw`"a b" OR tag:t OR "c d"`,
 			String.raw`
-noteFvFts.rowid IN (SELECT rowid FROM noteFvFts WHERE noteFvFts.normalizedValue LIKE '%a b%')
+noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%a b%')
 OR
 (
   cardFtsTag.rowid IN (SELECT "rowid" FROM "cardFtsTag" WHERE "cardFtsTag"."tags" LIKE '%t%')
@@ -1043,7 +1043,7 @@ OR
   noteFtsTag.rowid IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" LIKE '%t%')
 )
 OR
-noteFvFts.rowid IN (SELECT rowid FROM noteFvFts WHERE noteFvFts.normalizedValue LIKE '%c d%')`,
+noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%c d%')`,
 			4,
 		)
 	})

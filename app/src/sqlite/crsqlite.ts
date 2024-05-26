@@ -1,5 +1,5 @@
 import sqliteWasm, { type DB as crDB } from '@vlcn.io/crsqlite-wasm'
-import { initSql, parseMap, ftsNormalize } from 'shared'
+import { initSql, ftsNormalize } from 'shared'
 import { lrpc } from '../lrpcClient'
 import { stringify as uuidStringify } from 'uuid'
 import { type DB } from './database'
@@ -8,19 +8,19 @@ import { Kysely } from 'kysely'
 import crsqliteUrl from '@vlcn.io/crsqlite-wasm/crsqlite.wasm?url'
 import wdbRtc from './wholeDbRtc'
 import { wholeDbReplicator } from 'shared-dom'
-import { unitSeparator } from './util'
 import { C } from '../topLevelAwait'
 import { SQLITE_DETERMINISTIC, SQLITE_UTF8 } from '@vlcn.io/wa-sqlite'
 
-const dp = new DOMParser()
+// const dp = new DOMParser()
 
-export function getMediaIds(fvs: string) {
-	const values = parseMap<string, string>(fvs).values()
-	return Array.from(values)
-		.flatMap((v) => dp.parseFromString(v, 'text/html'))
-		.flatMap((d) => Array.from(d.images))
-		.map((i) => i.getAttribute('src'))
-		.join(unitSeparator)
+function getMediaIds(fvs: string) {
+	// highTODO uncomment and fix by adding the mediaId table back
+	// const values = parseMap<string, string>(fvs).values()
+	// return Array.from(values)
+	// 	.flatMap((v) => dp.parseFromString(v, 'text/html'))
+	// 	.flatMap((d) => Array.from(d.images))
+	// 	.map((i) => i.getAttribute('src'))
+	// 	.join(unitSeparator)
 }
 
 export async function createDb() {
