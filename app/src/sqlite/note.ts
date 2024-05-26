@@ -25,6 +25,7 @@ import {
 	updateLocalMediaIdByRemoteMediaIdAndGetNewDoc,
 } from './util'
 import { saveTags } from './tag'
+import { initSql } from 'shared'
 
 function noteToDocType(note: Note) {
 	const now = C.getDate().getTime()
@@ -110,39 +111,41 @@ export const noteCollectionMethods = {
 	bulkUpsertNotes: async function (notes: Note[]) {
 		const batches = _.chunk(notes.map(noteToDocType), 1000)
 		await tx(async (ky) => {
-			for (let i = 0; i < batches.length; i++) {
-				C.toastInfo('note batch ' + i)
-				const batch = batches[i]!
-				const notes = batch.map((ct) => ct[0])
-				const tags = batch.flatMap((ct) => ct[1])
-				const fieldValues = batch.flatMap((ct) => ct[2])
-				await ky
-					.insertInto('noteBase')
-					.values(notes)
-					.onConflict((db) =>
-						db.doUpdateSet({
-							updated: (x) => x.ref('excluded.updated'),
-							templateId: (x) => x.ref('excluded.templateId'),
-							ankiNoteId: (x) => x.ref('excluded.ankiNoteId'),
-						} satisfies OnConflictUpdateNoteSet),
+			try {
+				await sql`drop trigger noteFieldValue_after_insert`.execute(ky)
+				for (let i = 0; i < batches.length; i++) {
+					C.toastInfo('note batch ' + i)
+					const batch = batches[i]!
+					const notes = batch.map((ct) => ct[0])
+					const tags = batch.flatMap((ct) => ct[1])
+					const fieldValues = batch.flatMap((ct) => ct[2])
+					await ky
+						.insertInto('noteBase')
+						.values(notes)
+						.onConflict((db) =>
+							db.doUpdateSet({
+								updated: (x) => x.ref('excluded.updated'),
+								templateId: (x) => x.ref('excluded.templateId'),
+								ankiNoteId: (x) => x.ref('excluded.ankiNoteId'),
+							} satisfies OnConflictUpdateNoteSet),
+						)
+						.execute()
+					const noteIds = notes.map((c) => c.id)
+					await saveTags(noteIds, tags)
+					const fieldValuesJson = JSON.stringify(
+						fieldValues.map((fv) => ({ [fv.noteId as string]: fv.field })),
 					)
-					.execute()
-				const noteIds = notes.map((c) => c.id)
-				await saveTags(noteIds, tags)
-				const fieldValuesJson = JSON.stringify(
-					fieldValues.map((fv) => ({ [fv.noteId as string]: fv.field })),
-				)
-				await ky
-					.withTables<NoteFieldValueRowid>()
-					.deleteFrom('noteFieldValue')
-					.where(
-						'rowid',
-						'in',
-						sql<number>`
+					await ky
+						.withTables<NoteFieldValueRowid>()
+						.deleteFrom('noteFieldValue')
+						.where(
+							'rowid',
+							'in',
+							sql<number>`
 (SELECT rowid
 FROM (SELECT noteId, field FROM noteFieldValue where noteId in (${sql.join(
-							noteIds,
-						)})
+								noteIds,
+							)})
       EXCEPT
       SELECT key AS noteId,
              value AS field
@@ -150,17 +153,44 @@ FROM (SELECT noteId, field FROM noteFieldValue where noteId in (${sql.join(
       WHERE TYPE = 'text'
      ) as x
 JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field = x.field)`,
-					)
-					.execute()
-				await ky
-					.insertInto('noteFieldValue')
-					.values(fieldValues)
-					.onConflict((x) =>
-						x.doUpdateSet({
-							value: (x) => x.ref('excluded.value'),
-						} satisfies OnConflictUpdateNoteValueSet),
-					)
-					.execute()
+						)
+						.execute()
+					await ky
+						.insertInto('noteFieldValue')
+						.values(fieldValues)
+						.onConflict((x) =>
+							x.doUpdateSet({
+								value: (x) => x.ref('excluded.value'),
+							} satisfies OnConflictUpdateNoteValueSet),
+						)
+						.execute()
+					await ky
+						.insertInto('noteValueFts')
+						.columns(['rowid', 'value', 'normalized'])
+						.expression((eb) =>
+							eb
+								.selectFrom('noteFieldValue')
+								.select([
+									'rowid',
+									'value',
+									sql`ftsNormalize(value)`.as('normalized'),
+								])
+								.where('noteId', 'in', noteIds),
+						)
+						.execute()
+				}
+				await sql`INSERT INTO noteFieldFts(noteFieldFts) VALUES('rebuild')`.execute(
+					ky,
+				)
+			} finally {
+				const start = initSql.findIndex((x) =>
+					x.includes('noteFieldValue_after_insert'),
+				)
+				const end = initSql.findIndex(
+					(sql, i) => i > start && sql.includes('END'),
+				)
+				const trigger = initSql.slice(start, end + 1)
+				await sql.raw(trigger.join('')).execute(ky)
 			}
 		})
 	},
