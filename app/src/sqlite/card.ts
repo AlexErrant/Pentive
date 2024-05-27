@@ -19,6 +19,7 @@ import {
 	type Template,
 	type CardTag,
 	type NoteFieldValue,
+	type NoteTag,
 } from './database'
 import {
 	type ExpressionBuilder,
@@ -33,6 +34,7 @@ import _ from 'lodash'
 import { md5 } from '../domain/utility'
 import { noteEntityToDomain, parseTags, templateEntityToDomain } from './util'
 import { type convert } from 'shared-dom'
+import { type CardTagRowid, type NoteTagRowid } from './tag'
 
 function serializeState(s: State): number {
 	switch (s) {
@@ -136,6 +138,8 @@ type WithCache = {
 	cardSetting: CardSetting & { rowid: number }
 	template: Template & { rowid: number }
 	noteFieldValue: NoteFieldValue & { rowid: number }
+	noteTag: NoteTag & { rowid: number }
+	cardTag: CardTag & { rowid: number }
 }
 
 // We cache the query's `card.id`s in a temp table. We use the temp table's rowids as a hack to get cursor pagination.
@@ -216,7 +220,9 @@ async function getCards(
 	sort?: { col: 'card.due' | 'card.created'; direction: 'asc' | 'desc' },
 ) {
 	const db = ky.withTables<WithCache>()
-	const baseQuery = (db1: QueryCreator<DB & WithCache> = db) =>
+	const baseQuery = (
+		db1: QueryCreator<DB & WithCache & CardTagRowid & NoteTagRowid> = db,
+	) =>
 		db1
 			.selectFrom('card')
 			.select('card.id')
@@ -239,8 +245,10 @@ async function getCards(
 					)
 					.$if(conversionResult.joinTags, (db) =>
 						db
-							.innerJoin('noteFtsTag', 'noteFtsTag.rowid', 'note.rowid')
-							.innerJoin('cardFtsTag', 'cardFtsTag.rowid', 'card.rowid'),
+							.innerJoin('noteTag', 'noteTag.noteId', 'note.id')
+							.innerJoin('cardTag', 'cardTag.cardId', 'card.id')
+							.innerJoin('noteTagFts', 'noteTagFts.tag', 'noteTag.tag')
+							.innerJoin('cardTagFts', 'cardTagFts.tag', 'cardTag.tag'),
 					)
 					.$if(conversionResult.joinTemplateFts, (db) =>
 						db.innerJoin(
@@ -251,8 +259,8 @@ async function getCards(
 					)
 					.$if(conversionResult.joinCardSettingFts, (db) =>
 						db
-							.innerJoin('noteFtsTag', 'noteFtsTag.rowid', 'note.rowid')
-							.innerJoin('cardFtsTag', 'cardFtsTag.rowid', 'card.rowid'),
+							.innerJoin('noteTagFts', 'noteTagFts.rowid', 'note.rowid')
+							.innerJoin('cardTagFts', 'cardTagFts.rowid', 'card.rowid'),
 					)
 					.$if(conversionResult.joinLatestReview, (db) =>
 						/* LEFT JOIN "review" AS "latestReview"
@@ -394,12 +402,6 @@ async function getCards(
 
 function forceParse<T>(x: T): T {
 	return JSON.parse(x as string) as T // I don't want to use ParseJSONResultsPlugin because it parses all columns unconditionally. I parse manually instead.
-}
-
-// eslint-disable-next-line @typescript-eslint/consistent-type-definitions -- interface deesn't work with `withTables`
-type CardTagRowid = {
-	// I'm not adding rowid to the official type definition because it adds noise to Insert/Update/Conflict resolution types
-	cardTag: CardTag & { rowid: number }
 }
 
 export const cardCollectionMethods = {

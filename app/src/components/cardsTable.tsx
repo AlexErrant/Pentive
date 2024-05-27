@@ -217,7 +217,10 @@ const columnDefs: Array<ColDef<NoteCard>> = [
 	},
 	{
 		headerName: 'Tags',
-		valueGetter: (x) => Array.from(x.data?.note.tags.keys() ?? []).join(', '),
+		valueGetter: (x) =>
+			Array.from(x.data?.card.tags.keys() ?? [])
+				.concat(Array.from(x.data?.note.tags.keys() ?? []))
+				.join(', '),
 	},
 ]
 

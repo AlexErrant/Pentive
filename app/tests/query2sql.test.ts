@@ -927,14 +927,27 @@ noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normali
 })
 
 describe('tag', () => {
+	function cardQuery(x: string) {
+		return String.raw`cardTagFts.tag LIKE '${x}'`
+	}
+	function noteQuery(x: string) {
+		return String.raw`noteTagFts.tag LIKE '${x}'`
+	}
+	function cardNotQuery(x: string) {
+		return String.raw`cardTagFts.tag NOT LIKE '${x}'`
+	}
+	function noteNotQuery(x: string) {
+		return String.raw`noteTagFts.tag NOT LIKE '${x}'`
+	}
+
 	test('1', async () => {
 		await assertEqual(
 			String.raw`tag:foo`,
 			String.raw`
 (
-cardFtsTag.rowid IN (SELECT "rowid" FROM "cardFtsTag" WHERE "cardFtsTag"."tags" LIKE '%foo%')
-OR
-noteFtsTag.rowid IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" LIKE '%foo%')
+  ${cardQuery('%foo%')}
+  OR
+  ${noteQuery('%foo%')}
 )`,
 			2,
 		)
@@ -943,18 +956,17 @@ noteFtsTag.rowid IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" 
 	test('2', async () => {
 		await assertEqual(
 			String.raw`(tag:foo,bar)`,
-			String.raw`
-(
+			String.raw`(
   (
-    cardFtsTag.rowid IN (SELECT "rowid" FROM "cardFtsTag" WHERE "cardFtsTag"."tags" LIKE '%foo%')
+    ${cardQuery('%foo%')}
     OR
-    noteFtsTag.rowid IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" LIKE '%foo%')
+    ${noteQuery('%foo%')}
   )
   OR
   (
-    cardFtsTag.rowid IN (SELECT "rowid" FROM "cardFtsTag" WHERE "cardFtsTag"."tags" LIKE '%bar%')
+    ${cardQuery('%bar%')}
     OR
-    noteFtsTag.rowid IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" LIKE '%bar%')
+    ${noteQuery('%bar%')}
   )
 )`,
 			4,
@@ -966,27 +978,27 @@ noteFtsTag.rowid IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" 
 			String.raw`(tag:/foo/i,-/bar/ qux /bix/suuvvyys)`,
 			String.raw`(
   (
-    regexp_with_flags('foo', 'i', "cardFtsTag"."tags")
+    regexp_with_flags('foo', 'i', cardTagFts.tag)
     OR
-    regexp_with_flags('foo', 'i', "noteFtsTag"."tags")
+    regexp_with_flags('foo', 'i', noteTagFts.tag)
   )
   OR
   (
-    NOT regexp_with_flags('bar', '', "cardFtsTag"."tags")
+    NOT regexp_with_flags('bar', '', cardTagFts.tag)
     AND
-    NOT regexp_with_flags('bar', '', "noteFtsTag"."tags")
+    NOT regexp_with_flags('bar', '', noteTagFts.tag)
   )
   AND
   (
-    cardFtsTag.rowid IN (SELECT "rowid" FROM "cardFtsTag" WHERE "cardFtsTag"."tags" LIKE '%qux%')
+    ${cardQuery('%qux%')}
     OR
-    noteFtsTag.rowid IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" LIKE '%qux%')
+    ${noteQuery('%qux%')}
   )
   AND
   (
-    regexp_with_flags('bix', 'suvy', "cardFtsTag"."tags")
+    regexp_with_flags('bix', 'suvy', cardTagFts.tag)
     OR
-    regexp_with_flags('bix', 'suvy', "noteFtsTag"."tags")
+    regexp_with_flags('bix', 'suvy', noteTagFts.tag)
   )
 )`,
 			14,
@@ -999,15 +1011,15 @@ noteFtsTag.rowid IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" 
 			String.raw`
 (
   (
-    cardFtsTag.rowid IN (SELECT "rowid" FROM "cardFtsTag" WHERE "cardFtsTag"."tags" LIKE '%a"b%')
+    ${cardQuery('%a"b%')}
     OR
-    noteFtsTag.rowid IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" LIKE '%a"b%')
+    ${noteQuery('%a"b%')}
   )
   OR
   (
-    cardFtsTag.rowid IN (SELECT "rowid" FROM "cardFtsTag" WHERE "cardFtsTag"."tags" LIKE '%c\b%')
+    ${cardQuery(String.raw`%c\b%`)}
     OR
-    noteFtsTag.rowid IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" LIKE '%c\b%')
+    ${noteQuery(String.raw`%c\b%`)}
   )
 )`,
 			4,
@@ -1021,9 +1033,9 @@ noteFtsTag.rowid IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" 
 noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%a%')
 AND
 (
-  cardFtsTag.rowid IN (SELECT "rowid" FROM "cardFtsTag" WHERE "cardFtsTag"."tags" LIKE '%t%')
+  ${cardQuery('%t%')}
   OR
-  noteFtsTag.rowid IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" LIKE '%t%')
+  ${noteQuery('%t%')}
 )
 AND
 noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%b%')`,
@@ -1038,9 +1050,9 @@ noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normali
 noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%a b%')
 OR
 (
-  cardFtsTag.rowid IN (SELECT "rowid" FROM "cardFtsTag" WHERE "cardFtsTag"."tags" LIKE '%t%')
+  ${cardQuery('%t%')}
   OR
-  noteFtsTag.rowid IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" LIKE '%t%')
+  ${noteQuery('%t%')}
 )
 OR
 noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%c d%')`,
@@ -1054,21 +1066,21 @@ noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normali
 			String.raw`
 (
   (
-    cardFtsTag.rowid IN (SELECT "rowid" FROM "cardFtsTag" WHERE "cardFtsTag"."tags" LIKE '%foo bar%')
+    ${cardQuery('%foo bar%')}
     OR
-    noteFtsTag.rowid IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" LIKE '%foo bar%')
+    ${noteQuery('%foo bar%')}
   )
   OR
   (
-    cardFtsTag.rowid IN (SELECT "rowid" FROM "cardFtsTag" WHERE "cardFtsTag"."tags" LIKE '%biz%')
+    ${cardQuery('%biz%')}
     OR
-    noteFtsTag.rowid IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" LIKE '%biz%')
+    ${noteQuery('%biz%')}
   )
   OR
   (
-    cardFtsTag.rowid IN (SELECT "rowid" FROM "cardFtsTag" WHERE "cardFtsTag"."tags" LIKE '%baz quz%')
+    ${cardQuery('%baz quz%')}
     OR
-    noteFtsTag.rowid IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" LIKE '%baz quz%')
+    ${noteQuery('%baz quz%')}
   )
 )`,
 			6,
@@ -1081,21 +1093,21 @@ noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normali
 			String.raw`
 (
   (
-    cardFtsTag.rowid IN (SELECT "rowid" FROM "cardFtsTag" WHERE "cardFtsTag"."tags" LIKE '%foo bar%')
+    ${cardQuery('%foo bar%')}
     OR
-    noteFtsTag.rowid IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" LIKE '%foo bar%')
+    ${noteQuery('%foo bar%')}
   )
   OR
   (
-    cardFtsTag.rowid IN (SELECT "rowid" FROM "cardFtsTag" WHERE "cardFtsTag"."tags" LIKE '%biz%')
+    ${cardQuery('%biz%')}
     OR
-    noteFtsTag.rowid IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" LIKE '%biz%')
+    ${noteQuery('%biz%')}
   )
   OR
   (
-    cardFtsTag.rowid IN (SELECT "rowid" FROM "cardFtsTag" WHERE "cardFtsTag"."tags" LIKE '%baz quz%')
+    ${cardQuery('%baz quz%')}
     OR
-    noteFtsTag.rowid IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" LIKE '%baz quz%')
+    ${noteQuery('%baz quz%')}
   )
 )`,
 			6,
@@ -1108,15 +1120,15 @@ noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normali
 			String.raw`
 (
   (  
-    cardFtsTag.rowid NOT IN (SELECT "rowid" FROM "cardFtsTag" WHERE "cardFtsTag"."tags" LIKE '%foo%')
+    ${cardNotQuery('%foo%')}
     AND
-    noteFtsTag.rowid NOT IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" LIKE '%foo%')
+    ${noteNotQuery('%foo%')}
   )
   AND
   (
-    cardFtsTag.rowid NOT IN (SELECT "rowid" FROM "cardFtsTag" WHERE "cardFtsTag"."tags" LIKE '%bar%')
+    ${cardNotQuery('%bar%')}
     AND
-    noteFtsTag.rowid NOT IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" LIKE '%bar%')
+    ${noteNotQuery('%bar%')}
   )
 )`,
 			4,
@@ -1129,15 +1141,15 @@ noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normali
 			String.raw`
 (
   (  
-    cardFtsTag.rowid NOT IN (SELECT "rowid" FROM "cardFtsTag" WHERE "cardFtsTag"."tags" LIKE '%foo%')
+    ${cardNotQuery('%foo%')}
     AND
-    noteFtsTag.rowid NOT IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" LIKE '%foo%')
+    ${noteNotQuery('%foo%')}
   )
   AND
   (
-    cardFtsTag.rowid NOT IN (SELECT "rowid" FROM "cardFtsTag" WHERE "cardFtsTag"."tags" LIKE '%bar%')
+    ${cardNotQuery('%bar%')}
     AND
-    noteFtsTag.rowid NOT IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" LIKE '%bar%')
+    ${noteNotQuery('%bar%')}
   )
 )`,
 			4,
@@ -1150,15 +1162,15 @@ noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normali
 			String.raw`
 (
   (
-    cardFtsTag.rowid IN (SELECT "rowid" FROM "cardFtsTag" WHERE "cardFtsTag"."tags" LIKE '%foo%')
+    ${cardQuery('%foo%')}
     OR
-    noteFtsTag.rowid IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" LIKE '%foo%')
+    ${noteQuery('%foo%')}
   )
   OR
   (
-    cardFtsTag.rowid IN (SELECT "rowid" FROM "cardFtsTag" WHERE "cardFtsTag"."tags" LIKE '%bar%')
+    ${cardQuery('%bar%')}
     OR
-    noteFtsTag.rowid IN (SELECT "rowid" FROM "noteFtsTag" WHERE "noteFtsTag"."tags" LIKE '%bar%')
+    ${noteQuery('%bar%')}
   )
 )`,
 			4,

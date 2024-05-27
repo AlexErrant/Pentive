@@ -1,7 +1,7 @@
 import { type NoteId } from 'shared'
 import { ky, tx } from '../topLevelAwait'
 import { type InsertObject, sql } from 'kysely'
-import { type DB, type NoteTag } from './database'
+import { type CardTag, type DB, type NoteTag } from './database'
 
 export const tagCollectionMethods = {
 	getTags: async function () {
@@ -22,9 +22,15 @@ export const tagCollectionMethods = {
 }
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-definitions -- interface deesn't work with `withTables`
-type NoteTagRowid = {
+export type NoteTagRowid = {
 	// I'm not adding rowid to the official type definition because it adds noise to Insert/Update/Conflict resolution types
 	noteTag: NoteTag & { rowid: number }
+}
+
+// eslint-disable-next-line @typescript-eslint/consistent-type-definitions -- interface deesn't work with `withTables`
+export type CardTagRowid = {
+	// I'm not adding rowid to the official type definition because it adds noise to Insert/Update/Conflict resolution types
+	cardTag: CardTag & { rowid: number }
 }
 
 export async function saveTags(

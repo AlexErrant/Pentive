@@ -75,14 +75,14 @@ export interface NoteValueFts {
 	rank: number
 }
 
-export interface NoteFtsTag {
+export interface NoteTagFts {
 	rowid: number
-	tags: string
+	tag: string
 }
 
-export interface CardFtsTag {
+export interface CardTagFts {
 	rowid: number
-	tags: string
+	tag: string
 }
 
 export interface RemoteNote {
@@ -179,8 +179,8 @@ export interface DB {
 	noteFieldValue: NoteFieldValue
 	noteFieldFts: NoteFieldFts
 	noteValueFts: NoteValueFts
-	noteFtsTag: NoteFtsTag
-	cardFtsTag: CardFtsTag
+	noteTagFts: NoteTagFts
+	cardTagFts: CardTagFts
 	remoteNote: RemoteNote
 	plugin: Plugin
 	remoteMedia: RemoteMedia

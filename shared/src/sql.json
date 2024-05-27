@@ -1,6 +1,6 @@
 [
     "CREATE TABLE IF NOT EXISTS noteBase (\n  id TEXT PRIMARY KEY, -- make BLOB upon SQLite v3.41 and the landing of UNHEX https://sqlite.org/forum/forumpost/30cca4e613d2fa2a grep F235B7FB-8CEA-4AE2-99CC-2790E607B1EB\n  templateId TEXT, -- make BLOB upon SQLite v3.41 and the landing of UNHEX https://sqlite.org/forum/forumpost/30cca4e613d2fa2a grep F235B7FB-8CEA-4AE2-99CC-2790E607B1EB\n  ankiNoteId INTEGER,\n  created INTEGER,\n  updated INTEGER\n) STRICT;",
-    "CREATE VIEW IF NOT EXISTS note AS\n  SELECT\n    rowid,\n    *,\n    (SELECT json_array(tag) FROM notetag WHERE noteId = noteBase.id) AS tags,\n    (SELECT json_group_object(field, value) FROM noteFieldValue WHERE noteId = noteBase.id) AS fieldValues\n    FROM noteBase;",
+    "CREATE VIEW IF NOT EXISTS note AS\n  SELECT\n    rowid,\n    *,\n    (SELECT json_group_array(tag) FROM notetag WHERE noteId = noteBase.id) AS tags,\n    (SELECT json_group_object(field, value) FROM noteFieldValue WHERE noteId = noteBase.id) AS fieldValues\n    FROM noteBase;",
     "CREATE TABLE IF NOT EXISTS noteTag (\n  noteId TEXT, -- make BLOB upon SQLite v3.41 and the landing of UNHEX https://sqlite.org/forum/forumpost/30cca4e613d2fa2a grep F235B7FB-8CEA-4AE2-99CC-2790E607B1EB\n  tag TEXT,\n  PRIMARY KEY (noteId, tag)\n);",
     "CREATE VIEW IF NOT EXISTS distinctNoteTag AS\n  SELECT MIN(rowid) AS rowid, tag FROM noteTag GROUP BY tag;",
     "CREATE VIRTUAL TABLE IF NOT EXISTS noteTagFts USING fts5 (\n  tag,\n  content=distinctNoteTag,\n  tokenize = \"trigram\"\n);",
@@ -33,7 +33,7 @@
     "SELECT crsql_as_crr('noteTag');",
     "SELECT crsql_as_crr('noteFieldValue');",
     "CREATE TABLE IF NOT EXISTS cardBase (\n  id TEXT PRIMARY KEY, -- make BLOB upon SQLite v3.41 and the landing of UNHEX https://sqlite.org/forum/forumpost/30cca4e613d2fa2a grep F235B7FB-8CEA-4AE2-99CC-2790E607B1EB\n  ord INTEGER,\n  noteId TEXT, -- make BLOB upon SQLite v3.41 and the landing of UNHEX https://sqlite.org/forum/forumpost/30cca4e613d2fa2a grep F235B7FB-8CEA-4AE2-99CC-2790E607B1EB\n  created INTEGER,\n  updated INTEGER,\n  cardSettingId TEXT, -- make BLOB upon SQLite v3.41 and the landing of UNHEX https://sqlite.org/forum/forumpost/30cca4e613d2fa2a grep F235B7FB-8CEA-4AE2-99CC-2790E607B1EB\n  due INTEGER,\n  state INTEGER\n) STRICT;",
-    "CREATE VIEW IF NOT EXISTS card AS\n  SELECT\n    rowid,\n    *,\n    (SELECT json_array(tag) FROM cardtag WHERE cardId = cardBase.id) AS tags\n    FROM cardBase;",
+    "CREATE VIEW IF NOT EXISTS card AS\n  SELECT\n    rowid,\n    *,\n    (SELECT json_group_array(tag) FROM cardtag WHERE cardId = cardBase.id) AS tags\n    FROM cardBase;",
     "CREATE TABLE IF NOT EXISTS cardTag (\n  cardId TEXT, -- make BLOB upon SQLite v3.41 and the landing of UNHEX https://sqlite.org/forum/forumpost/30cca4e613d2fa2a grep F235B7FB-8CEA-4AE2-99CC-2790E607B1EB\n  tag TEXT,\n  PRIMARY KEY (cardId, tag)\n);",
     "CREATE VIEW IF NOT EXISTS distinctCardTag AS\n  SELECT MIN(rowid) AS rowid, tag FROM cardTag GROUP BY tag;",
     "CREATE VIRTUAL TABLE IF NOT EXISTS cardTagFts USING fts5 (\n  tag,\n  content=distinctCardTag,\n  tokenize = \"trigram\"\n);",

@@ -294,7 +294,8 @@ function buildFilter(qs: QueryString, column: string) {
 	const left = qs.wildcardLeft ? '%' : ''
 	const right = qs.wildcardRight ? '%' : ''
 	const value = `${left}${qs.value}${right}`
-	const filterList = [sql`${col} LIKE ${value}`]
+	const not = getNot(qs.negate)
+	const filterList = [sql`${col} ${not} LIKE ${value}`]
 	if (qs.regexPattern != null) {
 		filterList.push(
 			sql` AND regexp_with_flags(${qs.regexPattern}, 'i', ${col})`,
@@ -427,19 +428,19 @@ function buildTagSearch(node: QueryString | QueryRegex, context: Context) {
 	if (node.type === 'Regex') {
 		context.parameterizeSql(
 			sql`(
-${not} regexp_with_flags(${node.pattern}, ${node.flags}, "cardFtsTag"."tags")
+${not} regexp_with_flags(${node.pattern}, ${node.flags}, cardTagFts.tag)
 ${sql.raw(node.negate ? 'AND' : 'OR')}
-${not} regexp_with_flags(${node.pattern}, ${node.flags}, "noteFtsTag"."tags")
+${not} regexp_with_flags(${node.pattern}, ${node.flags}, noteTagFts.tag)
 )`,
 		)
 	} else {
-		const cardFilter = buildFilter(node, `"cardFtsTag"."tags"`)
-		const noteFilter = buildFilter(node, `"noteFtsTag"."tags"`)
+		const cardFilter = buildFilter(node, `cardTagFts.tag`)
+		const noteFilter = buildFilter(node, `noteTagFts.tag`)
 		context.parameterizeSql(
 			sql`(
-cardFtsTag.rowid ${not} IN (SELECT "rowid" FROM "cardFtsTag" WHERE ${cardFilter})
+${cardFilter}
 ${sql.raw(node.negate ? 'AND' : 'OR')}
-noteFtsTag.rowid ${not} IN (SELECT "rowid" FROM "noteFtsTag" WHERE ${noteFilter})
+${noteFilter}
 )`,
 		)
 	}
