@@ -315,14 +315,10 @@ function serialize(node: Node, context: Context) {
 	if (node.type === simpleString || node.type === quoted) {
 		if (node.label == null) {
 			context.joinFts = true
-			const filter = buildFilter(node, 'noteValueFts.normalized')
+			context.parameterizeSql(buildFilter(node, 'noteValueFts.normalized'))
 			if (!node.negate && node.fieldValueHighlight != null) {
 				context.fieldValueHighlight.push(node.fieldValueHighlight)
 			}
-			const not = getNot(node.negate)
-			context.parameterizeSql(
-				sql`noteValueFts.rowid ${not} IN (SELECT rowid FROM noteValueFts WHERE ${filter})`,
-			)
 		}
 	} else if (node.type === regex) {
 		context.joinFts = true
@@ -333,6 +329,7 @@ function serialize(node: Node, context: Context) {
 	} else if (node.type === group) {
 		const paren =
 			!node.isRoot &&
+			node.label == null &&
 			!(node.children.length === 1 && node.children[0]?.type === 'Group') // don't paren if the only child is a group, since that child will have its own parens
 		if (paren) {
 			context.trustedSql('(')
@@ -377,10 +374,7 @@ function handleLabel(node: QueryString | QueryRegex, context: Context) {
 				sql`${not} regexp_with_flags(${node.pattern}, ${node.flags}, templateNameFts.name)`,
 			)
 		} else {
-			const filter = buildFilter(node, 'templateNameFts.name')
-			context.parameterizeSql(
-				sql`template.rowid ${not} IN (SELECT rowid FROM templateNameFts WHERE ${filter})`,
-			)
+			context.parameterizeSql(buildFilter(node, 'templateNameFts.name'))
 		}
 	} else if (node.label === templateId) {
 		if (node.type === 'Regex') throwExp("you can't regex templateId")
@@ -394,10 +388,7 @@ function handleLabel(node: QueryString | QueryRegex, context: Context) {
 				sql`${not} regexp_with_flags(${node.pattern}, ${node.flags}, cardSettingNameFts.name)`,
 			)
 		} else {
-			const filter = buildFilter(node, 'cardSettingNameFts.name')
-			context.parameterizeSql(
-				sql`card.cardSettingId ${not} IN (SELECT rowid FROM cardSettingNameFts WHERE ${filter})`,
-			)
+			context.parameterizeSql(buildFilter(node, 'cardSettingNameFts.name'))
 		}
 	} else if (node.label === settingId) {
 		if (node.type === 'Regex') throwExp("you can't regex settingId")

@@ -60,7 +60,7 @@ test('whitespace is null', () => {
 test('SimpleString is fts', async () => {
 	await assertEqual(
 		String.raw`a`,
-		String.raw`noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%a%')`,
+		String.raw`noteValueFts.normalized LIKE '%a%'`,
 		1,
 	)
 })
@@ -69,7 +69,7 @@ describe('special characters', () => {
 	async function x(actual: string, expected: string, regex = '') {
 		await assertEqual(
 			actual,
-			String.raw`noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '${expected}'${regex})`,
+			String.raw`noteValueFts.normalized LIKE '${expected}'${regex}`,
 			regex === '' ? 1 : 2,
 		)
 	}
@@ -126,7 +126,7 @@ describe('delimiter special characters', () => {
 	async function x(actual: string, expected: string) {
 		await assertEqual(
 			actual,
-			String.raw`noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '${expected}')`,
+			String.raw`noteValueFts.normalized LIKE '${expected}'`,
 			1,
 		)
 	}
@@ -163,7 +163,7 @@ describe('delimiter special characters', () => {
 })
 
 describe('not a', () => {
-	const expected = String.raw`noteValueFts.rowid NOT IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%a%')`
+	const expected = String.raw`noteValueFts.normalized NOT LIKE '%a%'`
 
 	test('together', async () => {
 		await assertEqual('-a', expected, 1)
@@ -177,7 +177,7 @@ describe('not a', () => {
 test('Quoted1 is fts', async () => {
 	await assertEqual(
 		String.raw`'a \' \\ b'`,
-		String.raw`noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%a '' \ b%')`,
+		String.raw`noteValueFts.normalized LIKE '%a '' \ b%'`,
 		1,
 	)
 })
@@ -185,7 +185,7 @@ test('Quoted1 is fts', async () => {
 test('Quoted2 is fts', async () => {
 	await assertEqual(
 		String.raw`"a \" \\ b"`,
-		String.raw`noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%a " \ b%')`,
+		String.raw`noteValueFts.normalized LIKE '%a " \ b%'`,
 		1,
 	)
 })
@@ -194,11 +194,11 @@ test('RawQuoted1 is fts', async () => {
 	await assertEqual(
 		String.raw`x '''a '' \ b''' y`,
 		String.raw`
-noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%x%')
+noteValueFts.normalized LIKE '%x%'
 AND
-noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%a '''' \ b%')
+noteValueFts.normalized LIKE '%a '''' \ b%'
 AND
-noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%y%')`,
+noteValueFts.normalized LIKE '%y%'`,
 		3,
 	)
 })
@@ -207,11 +207,11 @@ test('RawQuoted2 is fts', async () => {
 	await assertEqual(
 		String.raw`x """a "" \ b""" y`,
 		String.raw`
-noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%x%')
+noteValueFts.normalized LIKE '%x%'
 AND
-noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%a "" \ b%')
+noteValueFts.normalized LIKE '%a "" \ b%'
 AND
-noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%y%')`,
+noteValueFts.normalized LIKE '%y%'`,
 		3,
 	)
 })
@@ -273,9 +273,9 @@ regexp_with_flags('bar', '', noteFieldValue.value)
 test('2 SimpleStrings are ANDed', async () => {
 	await assertEqual(
 		String.raw`a b`,
-		String.raw`noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%a%')
+		String.raw`noteValueFts.normalized LIKE '%a%'
 AND
-noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%b%')`,
+noteValueFts.normalized LIKE '%b%'`,
 		2,
 	)
 })
@@ -283,9 +283,9 @@ noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normali
 test('2 SimpleStrings can be ORed', async () => {
 	await assertEqual(
 		String.raw`a OR b`,
-		String.raw`noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%a%')
+		String.raw`noteValueFts.normalized LIKE '%a%'
 OR
-noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%b%')`,
+noteValueFts.normalized LIKE '%b%'`,
 		2,
 	)
 })
@@ -294,9 +294,9 @@ test('2 SimpleStrings can be grouped', async () => {
 	await assertEqual(
 		String.raw`(a b)`,
 		String.raw`(
-  noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%a%')
+  noteValueFts.normalized LIKE '%a%'
   AND
-  noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%b%')
+  noteValueFts.normalized LIKE '%b%'
 )`,
 		2,
 	)
@@ -306,9 +306,9 @@ test('not distributes over AND', async () => {
 	await assertEqual(
 		String.raw`-(a b)`,
 		String.raw`(
-  noteValueFts.rowid NOT IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%a%')
+  noteValueFts.normalized NOT LIKE '%a%'
   OR
-  noteValueFts.rowid NOT IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%b%')
+  noteValueFts.normalized NOT LIKE '%b%'
 )`,
 		2,
 	)
@@ -318,9 +318,9 @@ test('not distributes over OR', async () => {
 	await assertEqual(
 		String.raw`-(a OR b)`,
 		String.raw`(
-  noteValueFts.rowid NOT IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%a%')
+  noteValueFts.normalized NOT LIKE '%a%'
   AND
-  noteValueFts.rowid NOT IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%b%')
+  noteValueFts.normalized NOT LIKE '%b%'
 )`,
 		2,
 	)
@@ -329,11 +329,11 @@ test('not distributes over OR', async () => {
 test('double negative grouping does nothing', async () => {
 	await assertEqual(
 		String.raw`-(-(a OR b))`,
-		String.raw`((
-  noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%a%')
+		String.raw`(
+  noteValueFts.normalized LIKE '%a%'
   OR
-  noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%b%')
-))`,
+  noteValueFts.normalized LIKE '%b%'
+)`,
 		2,
 	)
 })
@@ -342,17 +342,17 @@ test('2 groups', async () => {
 	await assertEqual(
 		String.raw`(a b) OR c (d OR e)`,
 		String.raw`(
-  noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%a%')
+  noteValueFts.normalized LIKE '%a%'
   AND
-  noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%b%')
+  noteValueFts.normalized LIKE '%b%'
 )
 OR
-noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%c%')
+noteValueFts.normalized LIKE '%c%'
 AND
 (
-  noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%d%')
+  noteValueFts.normalized LIKE '%d%'
   OR
-  noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%e%')
+  noteValueFts.normalized LIKE '%e%'
 )`,
 		5,
 	)
@@ -446,20 +446,20 @@ test('!(p && !q || r) is (!p || q) && !r', async () => {
 		String.raw`-(p -q OR r)`,
 		String.raw`(
   (
-    noteValueFts.rowid NOT IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%p%')
+    noteValueFts.normalized NOT LIKE '%p%'
     OR
-    noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%q%')
+    noteValueFts.normalized LIKE '%q%'
   )
   AND
-  noteValueFts.rowid NOT IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%r%')
+  noteValueFts.normalized NOT LIKE '%r%'
 )`,
 		3,
 	)
 })
 
 describe('skip error nodes', () => {
-	const expected = String.raw`noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '% foo%')`
-	const negatedExpected = String.raw`noteValueFts.rowid NOT IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '% foo%')`
+	const expected = String.raw`noteValueFts.normalized LIKE '% foo%'`
+	const negatedExpected = String.raw`noteValueFts.normalized NOT LIKE '% foo%'`
 
 	test('plain', async () => {
 		await assertEqual(String.raw`" foo`, expected, 1)
@@ -482,7 +482,7 @@ describe('template', () => {
 	test('1', async () => {
 		await assertEqual(
 			String.raw`template:foo`,
-			String.raw`(template.rowid IN (SELECT rowid FROM templateNameFts WHERE templateNameFts.name LIKE '%foo%'))`,
+			String.raw`templateNameFts.name LIKE '%foo%'`,
 			1,
 		)
 	})
@@ -490,11 +490,10 @@ describe('template', () => {
 	test('2', async () => {
 		await assertEqual(
 			String.raw`(template:foo,bar)`,
-			String.raw`(
-  template.rowid IN (SELECT rowid FROM templateNameFts WHERE templateNameFts.name LIKE '%foo%')
-  OR
-  template.rowid IN (SELECT rowid FROM templateNameFts WHERE templateNameFts.name LIKE '%bar%')
-)`,
+			String.raw`
+templateNameFts.name LIKE '%foo%'
+OR
+templateNameFts.name LIKE '%bar%'`,
 			2,
 		)
 	})
@@ -502,15 +501,15 @@ describe('template', () => {
 	test('regex', async () => {
 		await assertEqual(
 			String.raw`(template:/foo/i,-/bar/ qux /bix/suuvvyys)`,
-			String.raw`(
-  regexp_with_flags('foo', 'i', templateNameFts.name)
-  OR NOT
-  regexp_with_flags('bar', '', templateNameFts.name)
-  AND
-  template.rowid IN (SELECT rowid FROM templateNameFts WHERE templateNameFts.name LIKE '%qux%')
-  AND
-  regexp_with_flags('bix', 'suvy', templateNameFts.name)
-)`,
+			String.raw`
+regexp_with_flags('foo', 'i', templateNameFts.name)
+OR NOT
+regexp_with_flags('bar', '', templateNameFts.name)
+AND
+templateNameFts.name LIKE '%qux%'
+AND
+regexp_with_flags('bix', 'suvy', templateNameFts.name)
+`,
 			7,
 		)
 	})
@@ -518,11 +517,10 @@ describe('template', () => {
 	test('can contain doublequote and backslash', async () => {
 		await assertEqual(
 			String.raw`(template:"a\"b","c\\b")`,
-			String.raw`(
-  template.rowid IN (SELECT rowid FROM templateNameFts WHERE templateNameFts.name LIKE '%a"b%')
-  OR
-  template.rowid IN (SELECT rowid FROM templateNameFts WHERE templateNameFts.name LIKE '%c\b%')
-)`,
+			String.raw`
+templateNameFts.name LIKE '%a"b%'
+OR
+templateNameFts.name LIKE '%c\b%'`,
 			2,
 		)
 	})
@@ -531,11 +529,11 @@ describe('template', () => {
 		await assertEqual(
 			String.raw`a template:t b`,
 			String.raw`
-noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%a%')
+noteValueFts.normalized LIKE '%a%'
 AND
-(template.rowid IN (SELECT rowid FROM templateNameFts WHERE templateNameFts.name LIKE '%t%'))
+templateNameFts.name LIKE '%t%'
 AND
-noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%b%')`,
+noteValueFts.normalized LIKE '%b%'`,
 			3,
 		)
 	})
@@ -544,11 +542,11 @@ noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normali
 		await assertEqual(
 			String.raw`"a b" OR template:t OR "c d"`,
 			String.raw`
-noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%a b%')
+noteValueFts.normalized LIKE '%a b%'
 OR
-(template.rowid IN (SELECT rowid FROM templateNameFts WHERE templateNameFts.name LIKE '%t%'))
+templateNameFts.name LIKE '%t%'
 OR
-noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%c d%')`,
+noteValueFts.normalized LIKE '%c d%'`,
 			3,
 		)
 	})
@@ -556,13 +554,12 @@ noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normali
 	test('quoted', async () => {
 		await assertEqual(
 			String.raw`(template:"foo bar",biz,"baz quz")`,
-			String.raw`(
-  template.rowid IN (SELECT rowid FROM templateNameFts WHERE templateNameFts.name LIKE '%foo bar%')
-  OR
-  template.rowid IN (SELECT rowid FROM templateNameFts WHERE templateNameFts.name LIKE '%biz%')
-  OR
-  template.rowid IN (SELECT rowid FROM templateNameFts WHERE templateNameFts.name LIKE '%baz quz%')
-)`,
+			String.raw`
+templateNameFts.name LIKE '%foo bar%'
+OR
+templateNameFts.name LIKE '%biz%'
+OR
+templateNameFts.name LIKE '%baz quz%'`,
 			3,
 		)
 	})
@@ -570,13 +567,12 @@ noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normali
 	test('spaces', async () => {
 		await assertEqual(
 			String.raw` (template: "foo bar" , biz      , "baz quz") `,
-			String.raw`(
-  template.rowid IN (SELECT rowid FROM templateNameFts WHERE templateNameFts.name LIKE '%foo bar%')
-  OR
-  template.rowid IN (SELECT rowid FROM templateNameFts WHERE templateNameFts.name LIKE '%biz%')
-  OR
-  template.rowid IN (SELECT rowid FROM templateNameFts WHERE templateNameFts.name LIKE '%baz quz%')
-)`,
+			String.raw`
+templateNameFts.name LIKE '%foo bar%'
+OR
+templateNameFts.name LIKE '%biz%'
+OR
+templateNameFts.name LIKE '%baz quz%'`,
 			3,
 		)
 	})
@@ -584,11 +580,10 @@ noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normali
 	test('neg on group', async () => {
 		await assertEqual(
 			String.raw`-(template:foo,bar)`,
-			String.raw`(
-  template.rowid NOT IN (SELECT rowid FROM templateNameFts WHERE templateNameFts.name LIKE '%foo%')
-  AND
-  template.rowid NOT IN (SELECT rowid FROM templateNameFts WHERE templateNameFts.name LIKE '%bar%')
-)`,
+			String.raw`
+templateNameFts.name NOT LIKE '%foo%'
+AND
+templateNameFts.name NOT LIKE '%bar%'`,
 			2,
 		)
 	})
@@ -596,11 +591,10 @@ noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normali
 	test('neg on tag', async () => {
 		await assertEqual(
 			String.raw`(-template:foo,bar)`,
-			String.raw`(
-  template.rowid NOT IN (SELECT rowid FROM templateNameFts WHERE templateNameFts.name LIKE '%foo%')
-  AND
-  template.rowid NOT IN (SELECT rowid FROM templateNameFts WHERE templateNameFts.name LIKE '%bar%')
-)`,
+			String.raw`
+templateNameFts.name NOT LIKE '%foo%'
+AND
+templateNameFts.name NOT LIKE '%bar%'`,
 			2,
 		)
 	})
@@ -608,11 +602,10 @@ noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normali
 	test('double neg', async () => {
 		await assertEqual(
 			String.raw`-(-template:foo,bar)`,
-			String.raw`(
-  template.rowid IN (SELECT rowid FROM templateNameFts WHERE templateNameFts.name LIKE '%foo%')
-  OR
-  template.rowid IN (SELECT rowid FROM templateNameFts WHERE templateNameFts.name LIKE '%bar%')
-)`,
+			String.raw`
+templateNameFts.name LIKE '%foo%'
+OR
+templateNameFts.name LIKE '%bar%'`,
 			2,
 		)
 	})
@@ -622,7 +615,7 @@ describe('templateId', () => {
 	test('1', async () => {
 		await assertEqual(
 			String.raw`templateId:foo`,
-			String.raw`(note.templateId = 'foo')`,
+			String.raw`note.templateId = 'foo'`,
 			1,
 		)
 	})
@@ -630,7 +623,7 @@ describe('templateId', () => {
 	test('2', async () => {
 		await assertEqual(
 			String.raw`(templateId:foo,bar)`,
-			String.raw`(note.templateId = 'foo' OR note.templateId = 'bar')`,
+			String.raw`note.templateId = 'foo' OR note.templateId = 'bar'`,
 			2,
 		)
 	})
@@ -639,11 +632,11 @@ describe('templateId', () => {
 		await assertEqual(
 			String.raw`a templateId:t b`,
 			String.raw`
-noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%a%')
+noteValueFts.normalized LIKE '%a%'
 AND
-(note.templateId = 't')
+note.templateId = 't'
 AND
-noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%b%')`,
+noteValueFts.normalized LIKE '%b%'`,
 			3,
 		)
 	})
@@ -652,11 +645,11 @@ noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normali
 		await assertEqual(
 			String.raw`"a b" OR templateId:t OR "c d"`,
 			String.raw`
-noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%a b%')
+noteValueFts.normalized LIKE '%a b%'
 OR
-(note.templateId = 't')
+note.templateId = 't'
 OR
-noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%c d%')`,
+noteValueFts.normalized LIKE '%c d%'`,
 			3,
 		)
 	})
@@ -664,7 +657,7 @@ noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normali
 	test('quoted', async () => {
 		await assertEqual(
 			String.raw`(templateId:"foo bar",biz,"baz quz")`,
-			String.raw`(note.templateId = 'foo bar' OR note.templateId = 'biz' OR note.templateId = 'baz quz')`,
+			String.raw`note.templateId = 'foo bar' OR note.templateId = 'biz' OR note.templateId = 'baz quz'`,
 			3,
 		)
 	})
@@ -672,7 +665,7 @@ noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normali
 	test('spaces', async () => {
 		await assertEqual(
 			String.raw` (templateId : "foo bar" , biz      , "baz quz") `,
-			String.raw`(note.templateId = 'foo bar' OR note.templateId = 'biz' OR note.templateId = 'baz quz')`,
+			String.raw`note.templateId = 'foo bar' OR note.templateId = 'biz' OR note.templateId = 'baz quz'`,
 			3,
 		)
 	})
@@ -680,7 +673,7 @@ noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normali
 	test('neg on group', async () => {
 		await assertEqual(
 			String.raw`-(templateId:foo,bar)`,
-			String.raw`(note.templateId != 'foo' AND note.templateId != 'bar')`,
+			String.raw`note.templateId != 'foo' AND note.templateId != 'bar'`,
 			2,
 		)
 	})
@@ -688,7 +681,7 @@ noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normali
 	test('neg on tag', async () => {
 		await assertEqual(
 			String.raw`(-templateId:foo,bar)`,
-			String.raw`(note.templateId != 'foo' AND note.templateId != 'bar')`,
+			String.raw`note.templateId != 'foo' AND note.templateId != 'bar'`,
 			2,
 		)
 	})
@@ -696,7 +689,7 @@ noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normali
 	test('double neg', async () => {
 		await assertEqual(
 			String.raw`-(-templateId:foo,bar)`,
-			String.raw`(note.templateId = 'foo' OR note.templateId = 'bar')`,
+			String.raw`note.templateId = 'foo' OR note.templateId = 'bar'`,
 			2,
 		)
 	})
@@ -706,7 +699,7 @@ describe('setting', () => {
 	test('1', async () => {
 		await assertEqual(
 			String.raw`setting:foo`,
-			String.raw`(card.cardSettingId IN (SELECT rowid FROM cardSettingNameFts WHERE cardSettingNameFts.name LIKE '%foo%'))`,
+			String.raw`cardSettingNameFts.name LIKE '%foo%'`,
 			1,
 		)
 	})
@@ -714,11 +707,10 @@ describe('setting', () => {
 	test('2', async () => {
 		await assertEqual(
 			String.raw`(setting:foo,bar)`,
-			String.raw`(
-  card.cardSettingId IN (SELECT rowid FROM cardSettingNameFts WHERE cardSettingNameFts.name LIKE '%foo%')
-  OR
-  card.cardSettingId IN (SELECT rowid FROM cardSettingNameFts WHERE cardSettingNameFts.name LIKE '%bar%')
-)`,
+			String.raw`
+cardSettingNameFts.name LIKE '%foo%'
+OR
+cardSettingNameFts.name LIKE '%bar%'`,
 			2,
 		)
 	})
@@ -726,15 +718,14 @@ describe('setting', () => {
 	test('regex', async () => {
 		await assertEqual(
 			String.raw`(setting:/foo/i,-/bar/ qux /bix/suuvvyys)`,
-			String.raw`(
-  regexp_with_flags('foo', 'i', cardSettingNameFts.name)
-  OR NOT
-  regexp_with_flags('bar', '', cardSettingNameFts.name)
-  AND
-  card.cardSettingId IN (SELECT rowid FROM cardSettingNameFts WHERE cardSettingNameFts.name LIKE '%qux%')
-  AND
-  regexp_with_flags('bix', 'suvy', cardSettingNameFts.name)
-)`,
+			String.raw`
+regexp_with_flags('foo', 'i', cardSettingNameFts.name)
+OR NOT
+regexp_with_flags('bar', '', cardSettingNameFts.name)
+AND
+cardSettingNameFts.name LIKE '%qux%'
+AND
+regexp_with_flags('bix', 'suvy', cardSettingNameFts.name)`,
 			7,
 		)
 	})
@@ -742,11 +733,10 @@ describe('setting', () => {
 	test('can contain doublequote and backslash', async () => {
 		await assertEqual(
 			String.raw`(setting:"a\"b","c\\b")`,
-			String.raw`(
-  card.cardSettingId IN (SELECT rowid FROM cardSettingNameFts WHERE cardSettingNameFts.name LIKE '%a"b%')
-  OR
-  card.cardSettingId IN (SELECT rowid FROM cardSettingNameFts WHERE cardSettingNameFts.name LIKE '%c\b%')
-)`,
+			String.raw`
+cardSettingNameFts.name LIKE '%a"b%'
+OR
+cardSettingNameFts.name LIKE '%c\b%'`,
 			2,
 		)
 	})
@@ -755,11 +745,11 @@ describe('setting', () => {
 		await assertEqual(
 			String.raw`a setting:t b`,
 			String.raw`
-noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%a%')
+noteValueFts.normalized LIKE '%a%'
 AND
-(card.cardSettingId IN (SELECT rowid FROM cardSettingNameFts WHERE cardSettingNameFts.name LIKE '%t%'))
+cardSettingNameFts.name LIKE '%t%'
 AND
-noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%b%')`,
+noteValueFts.normalized LIKE '%b%'`,
 			3,
 		)
 	})
@@ -768,11 +758,11 @@ noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normali
 		await assertEqual(
 			String.raw`"a b" OR setting:t OR "c d"`,
 			String.raw`
-noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%a b%')
+noteValueFts.normalized LIKE '%a b%'
 OR
-(card.cardSettingId IN (SELECT rowid FROM cardSettingNameFts WHERE cardSettingNameFts.name LIKE '%t%'))
+cardSettingNameFts.name LIKE '%t%'
 OR
-noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%c d%')`,
+noteValueFts.normalized LIKE '%c d%'`,
 			3,
 		)
 	})
@@ -780,13 +770,12 @@ noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normali
 	test('quoted', async () => {
 		await assertEqual(
 			String.raw`(setting:"foo bar",biz,"baz quz")`,
-			String.raw`(
-  card.cardSettingId IN (SELECT rowid FROM cardSettingNameFts WHERE cardSettingNameFts.name LIKE '%foo bar%')
-  OR
-  card.cardSettingId IN (SELECT rowid FROM cardSettingNameFts WHERE cardSettingNameFts.name LIKE '%biz%')
-  OR
-  card.cardSettingId IN (SELECT rowid FROM cardSettingNameFts WHERE cardSettingNameFts.name LIKE '%baz quz%')
-)`,
+			String.raw`
+cardSettingNameFts.name LIKE '%foo bar%'
+OR
+cardSettingNameFts.name LIKE '%biz%'
+OR
+cardSettingNameFts.name LIKE '%baz quz%'`,
 			3,
 		)
 	})
@@ -794,13 +783,12 @@ noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normali
 	test('spaces', async () => {
 		await assertEqual(
 			String.raw` (setting: "foo bar" , biz      , "baz quz") `,
-			String.raw`(
-  card.cardSettingId IN (SELECT rowid FROM cardSettingNameFts WHERE cardSettingNameFts.name LIKE '%foo bar%')
-  OR
-  card.cardSettingId IN (SELECT rowid FROM cardSettingNameFts WHERE cardSettingNameFts.name LIKE '%biz%')
-  OR
-  card.cardSettingId IN (SELECT rowid FROM cardSettingNameFts WHERE cardSettingNameFts.name LIKE '%baz quz%')
-)`,
+			String.raw`
+cardSettingNameFts.name LIKE '%foo bar%'
+OR
+cardSettingNameFts.name LIKE '%biz%'
+OR
+cardSettingNameFts.name LIKE '%baz quz%'`,
 			3,
 		)
 	})
@@ -808,11 +796,10 @@ noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normali
 	test('neg on group', async () => {
 		await assertEqual(
 			String.raw`-(setting:foo,bar)`,
-			String.raw`(
-  card.cardSettingId NOT IN (SELECT rowid FROM cardSettingNameFts WHERE cardSettingNameFts.name LIKE '%foo%')
-  AND
-  card.cardSettingId NOT IN (SELECT rowid FROM cardSettingNameFts WHERE cardSettingNameFts.name LIKE '%bar%')
-)`,
+			String.raw`
+cardSettingNameFts.name NOT LIKE '%foo%'
+AND
+cardSettingNameFts.name NOT LIKE '%bar%'`,
 			2,
 		)
 	})
@@ -820,11 +807,10 @@ noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normali
 	test('neg on tag', async () => {
 		await assertEqual(
 			String.raw`(-setting:foo,bar)`,
-			String.raw`(
-  card.cardSettingId NOT IN (SELECT rowid FROM cardSettingNameFts WHERE cardSettingNameFts.name LIKE '%foo%')
-  AND
-  card.cardSettingId NOT IN (SELECT rowid FROM cardSettingNameFts WHERE cardSettingNameFts.name LIKE '%bar%')
-)`,
+			String.raw`
+cardSettingNameFts.name NOT LIKE '%foo%'
+AND
+cardSettingNameFts.name NOT LIKE '%bar%'`,
 			2,
 		)
 	})
@@ -832,11 +818,10 @@ noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normali
 	test('double neg', async () => {
 		await assertEqual(
 			String.raw`-(-setting:foo,bar)`,
-			String.raw`(
-  card.cardSettingId IN (SELECT rowid FROM cardSettingNameFts WHERE cardSettingNameFts.name LIKE '%foo%')
-  OR
-  card.cardSettingId IN (SELECT rowid FROM cardSettingNameFts WHERE cardSettingNameFts.name LIKE '%bar%')
-)`,
+			String.raw`
+cardSettingNameFts.name LIKE '%foo%'
+OR
+cardSettingNameFts.name LIKE '%bar%'`,
 			2,
 		)
 	})
@@ -846,7 +831,7 @@ describe('settingId', () => {
 	test('1', async () => {
 		await assertEqual(
 			String.raw`settingId:foo`,
-			String.raw`(card.cardSettingId = 'foo')`,
+			String.raw`card.cardSettingId = 'foo'`,
 			1,
 		)
 	})
@@ -854,7 +839,7 @@ describe('settingId', () => {
 	test('2', async () => {
 		await assertEqual(
 			String.raw`(settingId:foo,bar)`,
-			String.raw`(card.cardSettingId = 'foo' OR card.cardSettingId = 'bar')`,
+			String.raw`card.cardSettingId = 'foo' OR card.cardSettingId = 'bar'`,
 			2,
 		)
 	})
@@ -863,11 +848,11 @@ describe('settingId', () => {
 		await assertEqual(
 			String.raw`a settingId:t b`,
 			String.raw`
-noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%a%')
+noteValueFts.normalized LIKE '%a%'
 AND
-(card.cardSettingId = 't')
+card.cardSettingId = 't'
 AND
-noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%b%')`,
+noteValueFts.normalized LIKE '%b%'`,
 			3,
 		)
 	})
@@ -876,11 +861,11 @@ noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normali
 		await assertEqual(
 			String.raw`"a b" OR settingId:t OR "c d"`,
 			String.raw`
-noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%a b%')
+noteValueFts.normalized LIKE '%a b%'
 OR
-(card.cardSettingId = 't')
+card.cardSettingId = 't'
 OR
-noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%c d%')`,
+noteValueFts.normalized LIKE '%c d%'`,
 			3,
 		)
 	})
@@ -888,7 +873,7 @@ noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normali
 	test('quoted', async () => {
 		await assertEqual(
 			String.raw`(settingId:"foo bar",biz,"baz quz")`,
-			String.raw`(card.cardSettingId = 'foo bar' OR card.cardSettingId = 'biz' OR card.cardSettingId = 'baz quz')`,
+			String.raw`card.cardSettingId = 'foo bar' OR card.cardSettingId = 'biz' OR card.cardSettingId = 'baz quz'`,
 			3,
 		)
 	})
@@ -896,7 +881,7 @@ noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normali
 	test('spaces', async () => {
 		await assertEqual(
 			String.raw` (settingId : "foo bar" , biz      , "baz quz") `,
-			String.raw`(card.cardSettingId = 'foo bar' OR card.cardSettingId = 'biz' OR card.cardSettingId = 'baz quz')`,
+			String.raw`card.cardSettingId = 'foo bar' OR card.cardSettingId = 'biz' OR card.cardSettingId = 'baz quz'`,
 			3,
 		)
 	})
@@ -904,7 +889,7 @@ noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normali
 	test('neg on group', async () => {
 		await assertEqual(
 			String.raw`-(settingId:foo,bar)`,
-			String.raw`(card.cardSettingId != 'foo' AND card.cardSettingId != 'bar')`,
+			String.raw`card.cardSettingId != 'foo' AND card.cardSettingId != 'bar'`,
 			2,
 		)
 	})
@@ -912,7 +897,7 @@ noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normali
 	test('neg on tag', async () => {
 		await assertEqual(
 			String.raw`(-settingId:foo,bar)`,
-			String.raw`(card.cardSettingId != 'foo' AND card.cardSettingId != 'bar')`,
+			String.raw`card.cardSettingId != 'foo' AND card.cardSettingId != 'bar'`,
 			2,
 		)
 	})
@@ -920,7 +905,7 @@ noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normali
 	test('double neg', async () => {
 		await assertEqual(
 			String.raw`-(-settingId:foo,bar)`,
-			String.raw`(card.cardSettingId = 'foo' OR card.cardSettingId = 'bar')`,
+			String.raw`card.cardSettingId = 'foo' OR card.cardSettingId = 'bar'`,
 			2,
 		)
 	})
@@ -956,7 +941,7 @@ describe('tag', () => {
 	test('2', async () => {
 		await assertEqual(
 			String.raw`(tag:foo,bar)`,
-			String.raw`(
+			String.raw`
   (
     ${cardQuery('%foo%')}
     OR
@@ -968,7 +953,7 @@ describe('tag', () => {
     OR
     ${noteQuery('%bar%')}
   )
-)`,
+`,
 			4,
 		)
 	})
@@ -976,31 +961,31 @@ describe('tag', () => {
 	test('regex', async () => {
 		await assertEqual(
 			String.raw`(tag:/foo/i,-/bar/ qux /bix/suuvvyys)`,
-			String.raw`(
-  (
-    regexp_with_flags('foo', 'i', cardTagFts.tag)
-    OR
-    regexp_with_flags('foo', 'i', noteTagFts.tag)
-  )
+			String.raw`
+(
+  regexp_with_flags('foo', 'i', cardTagFts.tag)
   OR
-  (
-    NOT regexp_with_flags('bar', '', cardTagFts.tag)
-    AND
-    NOT regexp_with_flags('bar', '', noteTagFts.tag)
-  )
+  regexp_with_flags('foo', 'i', noteTagFts.tag)
+)
+OR
+(
+  NOT regexp_with_flags('bar', '', cardTagFts.tag)
   AND
-  (
-    ${cardQuery('%qux%')}
-    OR
-    ${noteQuery('%qux%')}
-  )
-  AND
-  (
-    regexp_with_flags('bix', 'suvy', cardTagFts.tag)
-    OR
-    regexp_with_flags('bix', 'suvy', noteTagFts.tag)
-  )
-)`,
+  NOT regexp_with_flags('bar', '', noteTagFts.tag)
+)
+AND
+(
+  ${cardQuery('%qux%')}
+  OR
+  ${noteQuery('%qux%')}
+)
+AND
+(
+  regexp_with_flags('bix', 'suvy', cardTagFts.tag)
+  OR
+  regexp_with_flags('bix', 'suvy', noteTagFts.tag)
+)
+`,
 			14,
 		)
 	})
@@ -1010,17 +995,15 @@ describe('tag', () => {
 			String.raw`(tag:"a\"b","c\\b")`,
 			String.raw`
 (
-  (
-    ${cardQuery('%a"b%')}
-    OR
-    ${noteQuery('%a"b%')}
-  )
+  ${cardQuery('%a"b%')}
   OR
-  (
-    ${cardQuery(String.raw`%c\b%`)}
-    OR
-    ${noteQuery(String.raw`%c\b%`)}
-  )
+  ${noteQuery('%a"b%')}
+)
+OR
+(
+  ${cardQuery(String.raw`%c\b%`)}
+  OR
+  ${noteQuery(String.raw`%c\b%`)}
 )`,
 			4,
 		)
@@ -1030,7 +1013,7 @@ describe('tag', () => {
 		await assertEqual(
 			String.raw`a tag:t b`,
 			String.raw`
-noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%a%')
+noteValueFts.normalized LIKE '%a%'
 AND
 (
   ${cardQuery('%t%')}
@@ -1038,7 +1021,7 @@ AND
   ${noteQuery('%t%')}
 )
 AND
-noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%b%')`,
+noteValueFts.normalized LIKE '%b%'`,
 			4,
 		)
 	})
@@ -1047,7 +1030,7 @@ noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normali
 		await assertEqual(
 			String.raw`"a b" OR tag:t OR "c d"`,
 			String.raw`
-noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%a b%')
+noteValueFts.normalized LIKE '%a b%'
 OR
 (
   ${cardQuery('%t%')}
@@ -1055,7 +1038,7 @@ OR
   ${noteQuery('%t%')}
 )
 OR
-noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normalized LIKE '%c d%')`,
+noteValueFts.normalized LIKE '%c d%'`,
 			4,
 		)
 	})
@@ -1065,23 +1048,21 @@ noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normali
 			String.raw`(tag:"foo bar",biz,"baz quz")`,
 			String.raw`
 (
-  (
-    ${cardQuery('%foo bar%')}
-    OR
-    ${noteQuery('%foo bar%')}
-  )
+  ${cardQuery('%foo bar%')}
   OR
-  (
-    ${cardQuery('%biz%')}
-    OR
-    ${noteQuery('%biz%')}
-  )
+  ${noteQuery('%foo bar%')}
+)
+OR
+(
+  ${cardQuery('%biz%')}
   OR
-  (
-    ${cardQuery('%baz quz%')}
-    OR
-    ${noteQuery('%baz quz%')}
-  )
+  ${noteQuery('%biz%')}
+)
+OR
+(
+  ${cardQuery('%baz quz%')}
+  OR
+  ${noteQuery('%baz quz%')}
 )`,
 			6,
 		)
@@ -1092,23 +1073,21 @@ noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normali
 			String.raw`( tag : "foo bar" , biz      , "baz quz" )`,
 			String.raw`
 (
-  (
-    ${cardQuery('%foo bar%')}
-    OR
-    ${noteQuery('%foo bar%')}
-  )
+  ${cardQuery('%foo bar%')}
   OR
-  (
-    ${cardQuery('%biz%')}
-    OR
-    ${noteQuery('%biz%')}
-  )
+  ${noteQuery('%foo bar%')}
+)
+OR
+(
+  ${cardQuery('%biz%')}
   OR
-  (
-    ${cardQuery('%baz quz%')}
-    OR
-    ${noteQuery('%baz quz%')}
-  )
+  ${noteQuery('%biz%')}
+)
+OR
+(
+  ${cardQuery('%baz quz%')}
+  OR
+  ${noteQuery('%baz quz%')}
 )`,
 			6,
 		)
@@ -1119,17 +1098,15 @@ noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normali
 			String.raw`-(tag:foo,bar)`,
 			String.raw`
 (
-  (  
-    ${cardNotQuery('%foo%')}
-    AND
-    ${noteNotQuery('%foo%')}
-  )
+  ${cardNotQuery('%foo%')}
   AND
-  (
-    ${cardNotQuery('%bar%')}
-    AND
-    ${noteNotQuery('%bar%')}
-  )
+  ${noteNotQuery('%foo%')}
+)
+AND
+(
+  ${cardNotQuery('%bar%')}
+  AND
+  ${noteNotQuery('%bar%')}
 )`,
 			4,
 		)
@@ -1140,17 +1117,15 @@ noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normali
 			String.raw`(-tag:foo,bar)`,
 			String.raw`
 (
-  (  
-    ${cardNotQuery('%foo%')}
-    AND
-    ${noteNotQuery('%foo%')}
-  )
+  ${cardNotQuery('%foo%')}
   AND
-  (
-    ${cardNotQuery('%bar%')}
-    AND
-    ${noteNotQuery('%bar%')}
-  )
+  ${noteNotQuery('%foo%')}
+)
+AND
+(
+  ${cardNotQuery('%bar%')}
+  AND
+  ${noteNotQuery('%bar%')}
 )`,
 			4,
 		)
@@ -1161,17 +1136,15 @@ noteValueFts.rowid IN (SELECT rowid FROM noteValueFts WHERE noteValueFts.normali
 			String.raw`-(-tag:foo,bar)`,
 			String.raw`
 (
-  (
-    ${cardQuery('%foo%')}
-    OR
-    ${noteQuery('%foo%')}
-  )
+  ${cardQuery('%foo%')}
   OR
-  (
-    ${cardQuery('%bar%')}
-    OR
-    ${noteQuery('%bar%')}
-  )
+  ${noteQuery('%foo%')}
+)
+OR
+(
+  ${cardQuery('%bar%')}
+  OR
+  ${noteQuery('%bar%')}
 )`,
 			4,
 		)
@@ -1182,7 +1155,7 @@ describe('kind', () => {
 	test('new', async () => {
 		await assertEqual(
 			String.raw`kind:new`,
-			String.raw`(latestReview.kind IS NULL)`,
+			String.raw`latestReview.kind IS NULL`,
 			1,
 		)
 	})
@@ -1190,7 +1163,7 @@ describe('kind', () => {
 	test('not new, on label', async () => {
 		await assertEqual(
 			String.raw`-kind:new`,
-			String.raw`(latestReview.kind IS NOT NULL)`,
+			String.raw`latestReview.kind IS NOT NULL`,
 			1,
 		)
 	})
@@ -1198,7 +1171,7 @@ describe('kind', () => {
 	test('not new, on value', async () => {
 		await assertEqual(
 			String.raw`kind:-new`,
-			String.raw`(latestReview.kind IS NOT NULL)`,
+			String.raw`latestReview.kind IS NOT NULL`,
 			1,
 		)
 	})
@@ -1206,7 +1179,7 @@ describe('kind', () => {
 	test('learn', async () => {
 		await assertEqual(
 			String.raw`kind:learn`,
-			String.raw`(latestReview.kind IS 0)`,
+			String.raw`latestReview.kind IS 0`,
 			1,
 		)
 	})
@@ -1214,7 +1187,7 @@ describe('kind', () => {
 	test('not review, on label', async () => {
 		await assertEqual(
 			String.raw`-kind:review`,
-			String.raw`(latestReview.kind IS NOT 1)`,
+			String.raw`latestReview.kind IS NOT 1`,
 			1,
 		)
 	})
@@ -1222,7 +1195,7 @@ describe('kind', () => {
 	test('not review, on value', async () => {
 		await assertEqual(
 			String.raw`kind:-review`,
-			String.raw`(latestReview.kind IS NOT 1)`,
+			String.raw`latestReview.kind IS NOT 1`,
 			1,
 		)
 	})
@@ -1230,7 +1203,7 @@ describe('kind', () => {
 	test('not review, on group', async () => {
 		await assertEqual(
 			String.raw`-(kind:review)`,
-			String.raw`(latestReview.kind IS NOT 1)`,
+			String.raw`latestReview.kind IS NOT 1`,
 			1,
 		)
 	})
@@ -1238,13 +1211,12 @@ describe('kind', () => {
 	test('group', async () => {
 		await assertEqual(
 			String.raw`(kind:-new,review -relearn)`,
-			String.raw`(
-  latestReview.kind IS NOT NULL
-  OR
-  latestReview.kind IS 1
-  AND
-  latestReview.kind IS NOT 2
-)`,
+			String.raw`
+latestReview.kind IS NOT NULL
+OR
+latestReview.kind IS 1
+AND
+latestReview.kind IS NOT 2`,
 			3,
 		)
 	})
