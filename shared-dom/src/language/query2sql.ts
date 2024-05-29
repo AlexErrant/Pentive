@@ -46,6 +46,14 @@ class Context {
 	parameterizeSql(parameter: RawBuilder<unknown>) {
 		this.sql.push(parameter)
 	}
+
+	like(qs: QueryString, column: string) {
+		this.sql.push(like(qs, column))
+	}
+
+	regexpWithFlags(node: QueryRegex, column: string) {
+		this.sql.push(regexpWithFlags(node, column))
+	}
 }
 
 export interface FieldValueHighlight {
@@ -289,7 +297,7 @@ function astLeave(_input: string, node: SyntaxNodeRef, context: Context) {
 	}
 }
 
-function buildFilter(qs: QueryString, column: string) {
+function like(qs: QueryString, column: string) {
 	const col = sql.raw(column)
 	const left = qs.wildcardLeft ? '%' : ''
 	const right = qs.wildcardRight ? '%' : ''
@@ -298,34 +306,37 @@ function buildFilter(qs: QueryString, column: string) {
 	const filterList = [sql`${col} ${not} LIKE ${value}`]
 	if (qs.regexPattern != null) {
 		filterList.push(
-			sql` AND regexp_with_flags(${qs.regexPattern}, 'i', ${col})`,
+			sql` AND ${not} regexp_with_flags(${qs.regexPattern}, 'i', ${col})`,
 		)
 	}
 	if (qs.boundLeft && qs.boundRight) {
-		filterList.push(sql` AND word(1, ${qs.value}, ${col})`)
+		filterList.push(sql` AND ${not} word(1, ${qs.value}, ${col})`)
 	} else if (qs.boundLeft) {
-		filterList.push(sql` AND word(0, ${qs.value}, ${col})`)
+		filterList.push(sql` AND ${not} word(0, ${qs.value}, ${col})`)
 	} else if (qs.boundRight) {
-		filterList.push(sql` AND word(2, ${qs.value}, ${col})`)
+		filterList.push(sql` AND ${not} word(2, ${qs.value}, ${col})`)
 	}
 	return sql.join(filterList, sql``) as RawBuilder<SqlBool>
+}
+
+function regexpWithFlags(node: QueryRegex, column: string) {
+	const col = sql.raw(column)
+	const not = getNot(node.negate)
+	return sql`${not} regexp_with_flags(${node.pattern}, ${node.flags}, ${col})`
 }
 
 function serialize(node: Node, context: Context) {
 	if (node.type === simpleString || node.type === quoted) {
 		if (node.label == null) {
 			context.joinFts = true
-			context.parameterizeSql(buildFilter(node, 'noteValueFts.normalized'))
+			context.like(node, 'noteValueFts.normalized')
 			if (!node.negate && node.fieldValueHighlight != null) {
 				context.fieldValueHighlight.push(node.fieldValueHighlight)
 			}
 		}
 	} else if (node.type === regex) {
 		context.joinFts = true
-		const not = getNot(node.negate)
-		context.parameterizeSql(
-			sql`${not} regexp_with_flags(${node.pattern}, ${node.flags}, noteFieldValue.value)`,
-		)
+		context.regexpWithFlags(node, `noteFieldValue.value`)
 	} else if (node.type === group) {
 		const paren =
 			!node.isRoot &&
@@ -368,13 +379,10 @@ function handleLabel(node: QueryString | QueryRegex, context: Context) {
 		buildTagSearch(node, context)
 	} else if (node.label === template) {
 		context.joinTemplateFts = true
-		const not = getNot(node.negate)
 		if (node.type === 'Regex') {
-			context.parameterizeSql(
-				sql`${not} regexp_with_flags(${node.pattern}, ${node.flags}, templateNameFts.name)`,
-			)
+			context.regexpWithFlags(node, `templateNameFts.name`)
 		} else {
-			context.parameterizeSql(buildFilter(node, 'templateNameFts.name'))
+			context.like(node, 'templateNameFts.name')
 		}
 	} else if (node.label === templateId) {
 		if (node.type === 'Regex') throwExp("you can't regex templateId")
@@ -382,13 +390,10 @@ function handleLabel(node: QueryString | QueryRegex, context: Context) {
 		context.parameterizeSql(sql`note.templateId ${equals} ${node.value}`)
 	} else if (node.label === setting) {
 		context.joinCardSettingFts = true
-		const not = getNot(node.negate)
 		if (node.type === 'Regex') {
-			context.parameterizeSql(
-				sql`${not} regexp_with_flags(${node.pattern}, ${node.flags}, cardSettingNameFts.name)`,
-			)
+			context.regexpWithFlags(node, `cardSettingNameFts.name`)
 		} else {
-			context.parameterizeSql(buildFilter(node, 'cardSettingNameFts.name'))
+			context.like(node, 'cardSettingNameFts.name')
 		}
 	} else if (node.label === settingId) {
 		if (node.type === 'Regex') throwExp("you can't regex settingId")
@@ -415,23 +420,20 @@ function handleLabel(node: QueryString | QueryRegex, context: Context) {
 
 function buildTagSearch(node: QueryString | QueryRegex, context: Context) {
 	context.joinTags = true
-	const not = getNot(node.negate)
 	if (node.type === 'Regex') {
 		context.parameterizeSql(
 			sql`(
-${not} regexp_with_flags(${node.pattern}, ${node.flags}, cardTagFts.tag)
+${regexpWithFlags(node, `cardTagFts.tag`)}
 ${sql.raw(node.negate ? 'AND' : 'OR')}
-${not} regexp_with_flags(${node.pattern}, ${node.flags}, noteTagFts.tag)
+${regexpWithFlags(node, `noteTagFts.tag`)}
 )`,
 		)
 	} else {
-		const cardFilter = buildFilter(node, `cardTagFts.tag`)
-		const noteFilter = buildFilter(node, `noteTagFts.tag`)
 		context.parameterizeSql(
 			sql`(
-${cardFilter}
+${like(node, `cardTagFts.tag`)}
 ${sql.raw(node.negate ? 'AND' : 'OR')}
-${noteFilter}
+${like(node, `noteTagFts.tag`)}
 )`,
 		)
 	}
