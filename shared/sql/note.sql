@@ -100,6 +100,8 @@ CREATE TRIGGER IF NOT EXISTS noteFieldValue_after_update AFTER UPDATE ON noteFie
 END;
 
 CREATE INDEX IF NOT EXISTS noteBase_templateId_idx on noteBase(templateId);
+CREATE INDEX IF NOT EXISTS noteTag_tag_idx on noteTag(tag);
+CREATE INDEX IF NOT EXISTS noteFieldValue_field_idx on noteFieldValue(field);
 SELECT crsql_as_crr('noteBase');
 SELECT crsql_as_crr('noteTag');
 SELECT crsql_as_crr('noteFieldValue');

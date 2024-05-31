@@ -49,4 +49,5 @@ END;
 CREATE INDEX IF NOT EXISTS cardBase_noteId_idx on cardBase(noteId);
 CREATE INDEX IF NOT EXISTS cardBase_created_idx on cardBase(created);
 CREATE INDEX IF NOT EXISTS cardBase_due_idx on cardBase(due);
+CREATE INDEX IF NOT EXISTS cardTag_tag_idx on cardTag(tag);
 SELECT crsql_as_crr('cardBase');
