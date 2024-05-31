@@ -110,16 +110,16 @@ export const noteCollectionMethods = {
 	},
 	bulkUpsertNotes: async function (notes: Note[]) {
 		const batches = _.chunk(notes.map(noteToDocType), 1000)
-		await tx(async (ky) => {
+		await tx(async (db) => {
 			try {
-				await sql`drop trigger noteFieldValue_after_insert`.execute(ky)
+				await sql`drop trigger noteFieldValue_after_insert`.execute(db)
 				for (let i = 0; i < batches.length; i++) {
 					C.toastInfo('note batch ' + i)
 					const batch = batches[i]!
 					const notes = batch.map((ct) => ct[0])
 					const tags = batch.flatMap((ct) => ct[1])
 					const fieldValues = batch.flatMap((ct) => ct[2])
-					await ky
+					await db
 						.insertInto('noteBase')
 						.values(notes)
 						.onConflict((db) =>
@@ -135,7 +135,7 @@ export const noteCollectionMethods = {
 					const fieldValuesJson = JSON.stringify(
 						fieldValues.map((fv) => ({ [fv.noteId as string]: fv.field })),
 					)
-					await ky
+					await db
 						.withTables<NoteFieldValueRowid>()
 						.deleteFrom('noteFieldValue')
 						.where(
@@ -155,7 +155,7 @@ FROM (SELECT noteId, field FROM noteFieldValue where noteId in (${sql.join(
 JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field = x.field)`,
 						)
 						.execute()
-					await ky
+					await db
 						.insertInto('noteFieldValue')
 						.values(fieldValues)
 						.onConflict((x) =>
@@ -164,7 +164,7 @@ JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field
 							} satisfies OnConflictUpdateNoteValueSet),
 						)
 						.execute()
-					await ky
+					await db
 						.insertInto('noteValueFts')
 						.columns(['rowid', 'value', 'normalized'])
 						.expression((eb) =>
@@ -180,7 +180,7 @@ JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field
 						.execute()
 				}
 				await sql`INSERT INTO noteFieldFts(noteFieldFts) VALUES('rebuild')`.execute(
-					ky,
+					db,
 				)
 			} finally {
 				const start = initSql.findIndex((x) =>
@@ -190,7 +190,7 @@ JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field
 					(sql, i) => i > start && sql.includes('END'),
 				)
 				const trigger = initSql.slice(start, end + 1)
-				await sql.raw(trigger.join('')).execute(ky)
+				await sql.raw(trigger.join('')).execute(db)
 			}
 		})
 	},
