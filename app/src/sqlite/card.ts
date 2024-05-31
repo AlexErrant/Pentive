@@ -7,7 +7,6 @@ import {
 	type Card,
 	type State,
 	type NoteCard,
-	type LDbId,
 } from 'shared'
 import { ky, C, rd } from '../topLevelAwait'
 import {
@@ -130,7 +129,7 @@ type SearchCache = typeof searchCacheConst
 type WithCache = {
 	[searchCacheConst]: {
 		rowid: number
-		id: string
+		cardRowid: number
 	}
 	// I'm not adding rowid to the official type definition of Notes because it adds noise to Insert/Update/Conflict resolution types
 	note: Note & { rowid: number }
@@ -189,13 +188,9 @@ async function buildCache(
 
 async function getCardsCount(
 	searchCache: SearchCache | null,
-	baseQuery: (db1?: QueryCreator<DB & WithCache>) => SelectQueryBuilder<
-		DB & WithCache,
-		'card' | 'note' | 'template',
-		{
-			id: LDbId
-		} & Partial<unknown>
-	>,
+	baseQuery: (
+		db1?: QueryCreator<DB & WithCache>,
+	) => SelectQueryBuilder<DB, 'card' | 'note', Partial<unknown>>,
 ) {
 	const db = ky.withTables<WithCache>()
 	const count =
@@ -205,8 +200,8 @@ async function getCardsCount(
 					.select(db.fn.max(`${searchCache}.rowid`).as('c'))
 					.executeTakeFirstOrThrow()
 			: db
-					.with('cardIds', baseQuery)
-					.selectFrom('cardIds')
+					.with('cardRowids', baseQuery)
+					.selectFrom('cardRowids')
 					.select(db.fn.countAll<number>().as('c'))
 					.executeTakeFirstOrThrow()
 	return await count
@@ -225,7 +220,7 @@ async function getCards(
 	) =>
 		db1
 			.selectFrom('card')
-			.select('card.id')
+			.select('card.rowid as cardRowid')
 			.distinct()
 			.innerJoin('note', 'card.noteId', 'note.id')
 			.innerJoin('template', 'template.id', 'note.templateId')
@@ -287,15 +282,15 @@ async function getCards(
 		// If user has scrolled, build/use the cache.
 		offset === 0 ? null : await buildCache(baseQuery(), query)
 	const entities = await db
-		.with('cardIds', baseQuery)
-		.selectFrom('cardIds')
-		.innerJoin('card', 'card.id', 'cardIds.id')
+		.with('cardRowids', baseQuery)
+		.selectFrom('cardRowids')
+		.innerJoin('card', 'card.rowid', 'cardRowids.cardRowid')
 		.innerJoin('note', 'card.noteId', 'note.id')
 		.innerJoin('template', 'note.templateId', 'template.id')
 		// Don't do left/right joins! `getCards` should return the `limit` number of cards, and left/right joins screw this up.
 		.$if(searchCache != null, (qb) =>
 			qb
-				.innerJoin(searchCache!, 'card.id', `${searchCache!}.id`)
+				.innerJoin(searchCache!, 'card.rowid', `${searchCache!}.cardRowid`)
 				.where(`${searchCache!}.rowid`, '>=', offset),
 		)
 		.select((eb) => [
