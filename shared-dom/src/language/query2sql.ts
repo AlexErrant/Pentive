@@ -303,7 +303,7 @@ function like(qs: QueryString, column: string) {
 	const right = qs.wildcardRight ? '%' : ''
 	const value = `${left}${qs.value}${right}`
 	const not = getNot(qs.negate)
-	const filterList = [sql`${col} ${not} LIKE ${value}`]
+	const filterList = [sql`(${col} ${not} LIKE ${value}`]
 	if (qs.regexPattern != null) {
 		filterList.push(
 			sql` AND ${not} regexp_with_flags(${qs.regexPattern}, 'i', ${col})`,
@@ -316,6 +316,7 @@ function like(qs: QueryString, column: string) {
 	} else if (qs.boundRight) {
 		filterList.push(sql` AND ${not} word(2, ${qs.value}, ${col})`)
 	}
+	filterList.push(sql.raw(`)`))
 	return sql.join(filterList, sql``) as RawBuilder<SqlBool>
 }
 
@@ -340,7 +341,6 @@ function serialize(node: Node, context: Context) {
 	} else if (node.type === group) {
 		const paren =
 			!node.isRoot &&
-			node.label == null &&
 			!(node.children.length === 1 && node.children[0]?.type === 'Group') // don't paren if the only child is a group, since that child will have its own parens
 		if (paren) {
 			context.trustedSql('(')
