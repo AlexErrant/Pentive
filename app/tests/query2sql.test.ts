@@ -162,8 +162,17 @@ describe('delimiter special characters', () => {
 	})
 })
 
+function fieldValueNegation(value: string) {
+	return `NOT EXISTS (
+  SELECT 1
+  FROM noteValueFts AS z
+  JOIN noteFieldValue AS y ON y.rowid = z.rowid
+  WHERE (z.normalized LIKE '%${value}%') AND y.noteid = note.id
+)`
+}
+
 describe('not a', () => {
-	const expected = String.raw`(noteValueFts.normalized NOT LIKE '%a%')`
+	const expected = fieldValueNegation('a')
 
 	test('together', async () => {
 		await assertEqual('-a', expected, 1)
@@ -308,9 +317,9 @@ test('not distributes over AND', async () => {
 	await assertEqual(
 		String.raw`-(a b)`,
 		String.raw`(
-  (noteValueFts.normalized NOT LIKE '%a%')
+  ${fieldValueNegation('a')}
   OR
-  (noteValueFts.normalized NOT LIKE '%b%')
+  ${fieldValueNegation('b')}
 )`,
 		2,
 	)
@@ -320,9 +329,9 @@ test('not distributes over OR', async () => {
 	await assertEqual(
 		String.raw`-(a OR b)`,
 		String.raw`(
-  (noteValueFts.normalized NOT LIKE '%a%')
+  ${fieldValueNegation('a')}
   AND
-  (noteValueFts.normalized NOT LIKE '%b%')
+  ${fieldValueNegation('b')}
 )`,
 		2,
 	)
@@ -449,12 +458,12 @@ test('!(p && !q || r) is (!p || q) && !r', async () => {
 		String.raw`-(p -q OR r)`,
 		String.raw`(
   (
-    (noteValueFts.normalized NOT LIKE '%p%')
+    ${fieldValueNegation('p')}
     OR
     (noteValueFts.normalized LIKE '%q%')
   )
   AND
-  (noteValueFts.normalized NOT LIKE '%r%')
+  ${fieldValueNegation('r')}
 )`,
 		3,
 	)
@@ -462,7 +471,7 @@ test('!(p && !q || r) is (!p || q) && !r', async () => {
 
 describe('skip error nodes', () => {
 	const expected = String.raw`(noteValueFts.normalized LIKE '% foo%')`
-	const negatedExpected = String.raw`(noteValueFts.normalized NOT LIKE '% foo%')`
+	const negatedExpected = fieldValueNegation(' foo')
 
 	test('plain', async () => {
 		await assertEqual(String.raw`" foo`, expected, 1)
@@ -938,10 +947,18 @@ describe('tag', () => {
 		return String.raw`(noteTagFts.tag LIKE '${x}')`
 	}
 	function cardNotQuery(x: string) {
-		return String.raw`(cardTagFts.tag NOT LIKE '${x}')`
+		return String.raw`NOT EXISTS (
+  SELECT 1
+  FROM cardTag AS z
+  WHERE (z.tag LIKE '${x}') AND z.cardId = card.id
+)`
 	}
 	function noteNotQuery(x: string) {
-		return String.raw`(noteTagFts.tag NOT LIKE '${x}')`
+		return String.raw`NOT EXISTS (
+  SELECT 1
+  FROM noteTag AS z
+  WHERE (z.tag LIKE '${x}') AND z.noteId = note.id
+)`
 	}
 
 	test('1', async () => {
