@@ -21,23 +21,39 @@ class Context {
 		this.sql = []
 		this.root = new Group(null, false)
 		this.current = this.root
-		this.joinTags = false
-		this.joinFts = false
+		this.joinCardTags = []
+		this.joinNoteTags = []
+		this.joinFts = []
 		this.joinTemplateFts = false
 		this.joinCardSettingFts = false
 		this.joinLatestReview = false
 		this.fieldValueHighlight = []
+		this.joinTableName = 0
 	}
 
 	sql: Array<string | RawBuilder<unknown>>
 	root: Group
 	current: Group
-	joinTags: boolean
-	joinFts: boolean
+	joinCardTags: Array<{
+		sql: RawBuilder<SqlBool>
+		name: string
+	}>
+
+	joinNoteTags: Array<{
+		sql: RawBuilder<SqlBool>
+		name: string
+	}>
+
+	joinFts: Array<{
+		sql: RawBuilder<SqlBool>
+		name: string
+	}>
+
 	joinTemplateFts: boolean
 	joinCardSettingFts: boolean
 	joinLatestReview: boolean
 	fieldValueHighlight: FieldValueHighlight[]
+	joinTableName: number
 
 	trustedSql(trustedSql: string) {
 		this.sql.push(sql.raw(` ${trustedSql} `))
@@ -47,14 +63,8 @@ class Context {
 		this.sql.push(parameter)
 	}
 
-	like(
-		qs: QueryString,
-		column: string,
-		complexNegationFilter?: (
-			likeClause: RawBuilder<SqlBool>,
-		) => RawBuilder<SqlBool>,
-	) {
-		this.sql.push(like(qs, column, complexNegationFilter))
+	like(qs: QueryString, column: string, forcePositive?: true) {
+		this.sql.push(like(qs, column, forcePositive))
 	}
 
 	regexpWithFlags(node: QueryRegex, column: string) {
@@ -84,7 +94,8 @@ export function convert(input: string) {
 			context.sql.length === 0
 				? null
 				: (sql.join(context.sql, sql``) as RawBuilder<SqlBool>),
-		joinTags: context.joinTags,
+		joinCardTags: context.joinCardTags,
+		joinNoteTags: context.joinNoteTags,
 		joinFts: context.joinFts,
 		joinCardSettingFts: context.joinCardSettingFts,
 		joinTemplateFts: context.joinTemplateFts,
@@ -303,18 +314,12 @@ function astLeave(_input: string, node: SyntaxNodeRef, context: Context) {
 	}
 }
 
-function like(
-	qs: QueryString,
-	column: string,
-	complexNegationFilter?: (
-		likeClause: RawBuilder<SqlBool>,
-	) => RawBuilder<SqlBool>,
-) {
+function like(qs: QueryString, column: string, forcePositive?: true) {
 	const col = sql.raw(column)
 	const left = qs.wildcardLeft ? '%' : ''
 	const right = qs.wildcardRight ? '%' : ''
 	const value = `${left}${qs.value}${right}`
-	const not = complexNegationFilter === undefined ? getNot(qs.negate) : sql`` // "if complex negation, handle in a special way (not the standard  `getNot` way)"
+	const not = forcePositive === true ? sql`` : getNot(qs.negate)
 	const filterList = [sql`(${col} ${not} LIKE ${value}`]
 	if (qs.regexPattern != null) {
 		filterList.push(
@@ -329,35 +334,29 @@ function like(
 		filterList.push(sql` AND ${not} word(2, ${qs.value}, ${col})`)
 	}
 	filterList.push(sql.raw(`)`))
-	const likeClause = sql.join(filterList, sql``) as RawBuilder<SqlBool>
-	if (qs.negate && complexNegationFilter !== undefined) {
-		return complexNegationFilter(likeClause)
-	}
-	return likeClause
+	return sql.join(filterList, sql``) as RawBuilder<SqlBool>
 }
 
 function regexpWithFlags(node: QueryRegex, column: string) {
 	const col = sql.raw(column)
 	const not = getNot(node.negate)
-	return sql`${not} regexp_with_flags(${node.pattern}, ${node.flags}, ${col})`
+	return sql<SqlBool>`${not} regexp_with_flags(${node.pattern}, ${node.flags}, ${col})`
 }
 
 function serialize(node: Node, context: Context) {
 	if (node.type === simpleString || node.type === quoted) {
 		if (node.label == null) {
-			context.joinFts = true
-			context.like(
-				node,
-				node.negate ? `z.normalized` : `noteValueFts.normalized`,
-				(likeClause) =>
-					sql`NOT EXISTS (SELECT 1 FROM noteValueFts z JOIN noteFieldValue y on y.rowid = z.rowid WHERE ${likeClause} AND y.noteid = note.id)`,
-			)
+			const name = getJoinTableName(context)
+			context.joinFts.push({
+				name,
+				sql: like(node, `noteValueFts.normalized`, true),
+			})
+			context.trustedSql(`${name}.z IS ${node.negate ? '' : 'NOT'} NULL`) // `z` from 2DB5DD73-603E-4DF7-A366-A53375AF0093
 			if (!node.negate && node.fieldValueHighlight != null) {
 				context.fieldValueHighlight.push(node.fieldValueHighlight)
 			}
 		}
 	} else if (node.type === regex) {
-		context.joinFts = true
 		context.regexpWithFlags(node, `noteFieldValue.value`)
 	} else if (node.type === group) {
 		const paren =
@@ -439,8 +438,13 @@ function handleLabel(node: QueryString | QueryRegex, context: Context) {
 	}
 }
 
+function getJoinTableName(context: Context) {
+	context.joinTableName++
+	// x because sqlite doesn't like identifiers starting with numbers
+	return 'x' + context.joinTableName
+}
+
 function buildTagSearch(node: QueryString | QueryRegex, context: Context) {
-	context.joinTags = true
 	if (node.type === 'Regex') {
 		context.parameterizeSql(
 			sql`(
@@ -450,22 +454,20 @@ ${regexpWithFlags(node, `noteTagFts.tag`)}
 )`,
 		)
 	} else {
-		context.parameterizeSql(
-			sql`(
-${like(
-	node,
-	node.negate ? `z.tag` : `cardTagFts.tag`,
-	(likeClause) =>
-		sql` NOT EXISTS (SELECT 1 FROM cardTag z WHERE ${likeClause} AND z.cardId = card.id)`, // empirically, *not* joining cardTagFts to use the fts index is faster
-)}
-${sql.raw(node.negate ? 'AND' : 'OR')}
-${like(
-	node,
-	node.negate ? `z.tag` : `noteTagFts.tag`,
-	(likeClause) =>
-		sql` NOT EXISTS (SELECT 1 FROM noteTag z WHERE ${likeClause} AND z.noteId = note.id)`, // empirically, *not* joining noteTagFts to use the fts index is faster
-)}
-)`,
+		const cardName = getJoinTableName(context)
+		const noteName = getJoinTableName(context)
+		context.joinCardTags.push({
+			name: cardName,
+			sql: like(node, `cardTagFts.tag`, true),
+		})
+		context.joinNoteTags.push({
+			name: noteName,
+			sql: like(node, `noteTagFts.tag`, true),
+		})
+		context.trustedSql(
+			`(${cardName}.tag IS ${node.negate ? '' : 'NOT'} NULL ${
+				node.negate ? 'AND' : 'OR'
+			} ${noteName}.tag IS ${node.negate ? '' : 'NOT'} NULL)`,
 		)
 	}
 }
@@ -599,8 +601,6 @@ export class Group {
 
 // We don't use the db to handle negation distribution because handling negation of tags and fieldValues is complex.
 // We need to know if they're positive or negative to build their negation logic, namely `NOT EXISTS (SELECT 1 FROM...`
-// A lowTODO improvement for improving negation speed is to use a left join as discussed here https://github.com/tidyverse/dbplyr/issues/1355#issue-1857041217
-// I've yet to confirm this is actually faster... also not sure how to build the query dynamically. Might be worth checking if other ways are faster.
 function distributeNegate(node: Node, negate: boolean) {
 	if (node.type === group) {
 		if (negate) node.negate = !node.negate

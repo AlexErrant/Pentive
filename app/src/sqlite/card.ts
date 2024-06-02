@@ -120,6 +120,11 @@ type OnConflictUpdateCardSet = {
 	) => unknown
 }
 
+// This exists to lie to Typescript, saying that all fts join tables are called `joinFts`.
+// There are multiple fts join tables with different names, but idk how to get that working with Kysely.
+const joinFtsConst = 'joinFts' as const
+type JoinFts = typeof joinFtsConst
+
 // This exists to lie to Typescript, saying that all caches are called `searchCache`.
 // There are multiple caches with different names, but idk how to get that working with Kysely.
 const searchCacheConst = 'searchCache' as const
@@ -127,6 +132,7 @@ type SearchCache = typeof searchCacheConst
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-definitions -- interface deesn't work with `withTables`
 type WithCache = {
+	[joinFtsConst]: Record<string, never>
 	[searchCacheConst]: {
 		rowid: number
 		cardRowid: number
@@ -228,23 +234,64 @@ async function getCards(
 			// don't `where` when scrolling - redundant since joining on the cache already filters
 			.$if(offset === 0 && conversionResult.sql != null, (db) =>
 				db
-					.$if(conversionResult.joinFts, (db) =>
-						db
-							.innerJoin('noteFieldValue', 'noteFieldValue.noteId', 'note.id')
-							.innerJoin(
-								'noteValueFts',
-								'noteValueFts.rowid',
-								'noteFieldValue.rowid',
+					.$if(conversionResult.joinFts.length !== 0, (dbSeed) => {
+						let dbReturn = dbSeed
+						conversionResult.joinFts.forEach((t) => {
+							const name = t.name as JoinFts
+							const dbJoined = dbReturn.leftJoin(
+								(eb) =>
+									eb
+										.selectFrom('noteValueFts')
+										.innerJoin(
+											'noteFieldValue',
+											'noteFieldValue.rowid',
+											'noteValueFts.rowid',
+										)
+										.select(['noteFieldValue.noteId as z']) // `z` also goes here 2DB5DD73-603E-4DF7-A366-A53375AF0093
+										.where(t.sql)
+										.as(name),
+								(join) => join.onRef(`${name}.z`, '=', 'note.id'),
 							)
-							.orderBy('rank'),
-					)
-					.$if(conversionResult.joinTags, (db) =>
-						db
-							.innerJoin('noteTag', 'noteTag.noteId', 'note.id')
-							.innerJoin('cardTag', 'cardTag.cardId', 'card.id')
-							.innerJoin('noteTagFts', 'noteTagFts.tag', 'noteTag.tag')
-							.innerJoin('cardTagFts', 'cardTagFts.tag', 'cardTag.tag'),
-					)
+							dbReturn = dbJoined
+						})
+						return dbReturn
+					})
+					.$if(conversionResult.joinCardTags.length !== 0, (dbSeed) => {
+						let dbReturn = dbSeed
+						conversionResult.joinCardTags.forEach((t) => {
+							const name = t.name as JoinFts
+							const dbJoined = dbReturn.leftJoin(
+								(eb) =>
+									eb
+										.selectFrom('cardTagFts')
+										.innerJoin('cardTag', 'cardTag.tag', 'cardTagFts.tag')
+										.select(['cardTag.tag', 'cardTag.cardId'])
+										.where(t.sql)
+										.as(name),
+								(join) => join.onRef(`${name}.cardId`, '=', 'card.id'),
+							)
+							dbReturn = dbJoined
+						})
+						return dbReturn
+					})
+					.$if(conversionResult.joinNoteTags.length !== 0, (dbSeed) => {
+						let dbReturn = dbSeed
+						conversionResult.joinNoteTags.forEach((t) => {
+							const name = t.name as JoinFts
+							const dbJoined = dbReturn.leftJoin(
+								(eb) =>
+									eb
+										.selectFrom('noteTagFts')
+										.innerJoin('noteTag', 'noteTag.tag', 'noteTagFts.tag')
+										.select(['noteTag.tag', 'noteTag.noteId as z']) // z to make typescript happy; otherwise `noteId` gets consoliated with `card.noteId` and made nullable
+										.where(t.sql)
+										.as(name),
+								(join) => join.onRef(`${name}.z`, '=', 'note.id'),
+							)
+							dbReturn = dbJoined
+						})
+						return dbReturn
+					})
 					.$if(conversionResult.joinTemplateFts, (db) =>
 						db.innerJoin(
 							'templateNameFts',

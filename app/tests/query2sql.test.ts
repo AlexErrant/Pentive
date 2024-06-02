@@ -1,6 +1,11 @@
 import { describe, expect, test } from 'vitest'
 import { type Node, Group, convert as actualConvert } from 'shared-dom'
-import { Kysely } from 'kysely'
+import {
+	type CompiledQuery,
+	Kysely,
+	type SqlBool,
+	type RawBuilder,
+} from 'kysely'
 import { CRDialect } from '../src/sqlite/dialect'
 import { format as actualFormat } from 'prettier'
 import * as plugin from 'prettier-plugin-sql-cst'
@@ -14,21 +19,15 @@ async function format(sql: string) {
 	})
 }
 
-async function assertEqual(actual: string, expected: string, argCount: number) {
-	const expected2 = await format(expected)
-	const ky = new Kysely<DB>({
-		// @ts-expect-error don't actually use CRDialect
-		dialect: new CRDialect(),
-	})
-	const compile = actualConvert(actual).sql!.compile(ky)
-	let actual2 = compile.sql
-	const parameters = compile.parameters
-	let i = 0
-	while (actual2.includes('?')) {
-		const p = parameters[i]
-		actual2 =
+function unparameterize(i: { i: number }, query: CompiledQuery<SqlBool>) {
+	let parameterizedSql = query.sql
+	const parameters = query.parameters
+	let j = 0
+	while (parameterizedSql.includes('?')) {
+		const p = parameters[j]
+		parameterizedSql =
 			typeof p === 'string'
-				? actual2.replace(
+				? parameterizedSql.replace(
 						'?',
 						"'" +
 							// We need to escape single quote when un-parameterizing the sql.
@@ -37,14 +36,57 @@ async function assertEqual(actual: string, expected: string, argCount: number) {
 							"'",
 				  )
 				: typeof p === 'number'
-				? actual2.replace('?', p.toString())
+				? parameterizedSql.replace('?', p.toString())
 				: p == null
-				? actual2.replace('?', 'NULL')
+				? parameterizedSql.replace('?', 'NULL')
 				: throwExp(`Unhandled type: ${typeof p}`)
-		i++
+		i.i++
+		j++
 	}
+	return parameterizedSql
+}
+
+async function assertEqual(
+	actual: string,
+	expected: string,
+	joinsOrArgCount: Record<string, string> | number,
+	argCount?: number,
+) {
+	const i = { i: 0 }
+	const expected2 = await format(expected)
+	const ky = new Kysely<DB>({
+		// @ts-expect-error don't actually use CRDialect
+		dialect: new CRDialect(),
+	})
+	const converted = actualConvert(actual)
+	const compile = converted.sql!.compile(ky)
+	const actual2 = unparameterize(i, compile)
 	expect(await format(actual2)).toBe(expected2)
-	expect(i).toBe(argCount)
+	if (typeof joinsOrArgCount === 'number') {
+		expect(i.i).toBe(joinsOrArgCount)
+	} else {
+		// eslint-disable-next-line no-inner-declarations
+		async function testJoin(
+			list: Array<{
+				sql: RawBuilder<SqlBool>
+				name: string
+			}>,
+		) {
+			for await (const x of list) {
+				const compile = x.sql.compile(ky)
+				const p = unparameterize(i, compile)
+				const expected =
+					(joinsOrArgCount as Record<string, string>)[x.name] ??
+					throwExp(x.name + " can't be null dude")
+				expect(await format(p)).toEqual(await format(expected))
+			}
+		}
+		await testJoin(converted.joinFts)
+		await testJoin(converted.joinCardTags)
+		await testJoin(converted.joinNoteTags)
+		expect(argCount).not.toBeUndefined()
+		expect(i.i).toBe(argCount)
+	}
 }
 
 test('empty string is null', () => {
@@ -60,7 +102,8 @@ test('whitespace is null', () => {
 test('SimpleString is fts', async () => {
 	await assertEqual(
 		String.raw`a`,
-		String.raw`(noteValueFts.normalized LIKE '%a%')`,
+		String.raw`x1.z IS NOT NULL`,
+		{ x1: String.raw`(noteValueFts.normalized LIKE '%a%')` },
 		1,
 	)
 })
@@ -69,7 +112,8 @@ describe('special characters', () => {
 	async function x(actual: string, expected: string, regex = '') {
 		await assertEqual(
 			actual,
-			String.raw`(noteValueFts.normalized LIKE '${expected}'${regex})`,
+			String.raw`x1.z IS NOT NULL`,
+			{ x1: String.raw`(noteValueFts.normalized LIKE '${expected}'${regex})` },
 			regex === '' ? 1 : 2,
 		)
 	}
@@ -126,7 +170,8 @@ describe('delimiter special characters', () => {
 	async function x(actual: string, expected: string) {
 		await assertEqual(
 			actual,
-			String.raw`(noteValueFts.normalized LIKE '${expected}')`,
+			String.raw`x1.z IS NOT NULL`,
+			{ x1: String.raw`(noteValueFts.normalized LIKE '${expected}')` },
 			1,
 		)
 	}
@@ -162,31 +207,23 @@ describe('delimiter special characters', () => {
 	})
 })
 
-function fieldValueNegation(value: string) {
-	return `NOT EXISTS (
-  SELECT 1
-  FROM noteValueFts AS z
-  JOIN noteFieldValue AS y ON y.rowid = z.rowid
-  WHERE (z.normalized LIKE '%${value}%') AND y.noteid = note.id
-)`
-}
-
 describe('not a', () => {
-	const expected = fieldValueNegation('a')
+	const expected = String.raw`(noteValueFts.normalized LIKE '%a%')`
 
 	test('together', async () => {
-		await assertEqual('-a', expected, 1)
+		await assertEqual('-a', String.raw`x1.z IS NULL`, { x1: expected }, 1)
 	})
 
 	test('separated', async () => {
-		await assertEqual('- a', expected, 1)
+		await assertEqual('- a', String.raw`x1.z IS NULL`, { x1: expected }, 1)
 	})
 })
 
 test('Quoted1 is fts', async () => {
 	await assertEqual(
 		String.raw`'a \' \\ b'`,
-		String.raw`(noteValueFts.normalized LIKE '%a '' \ b%')`,
+		String.raw`x1.z IS NOT NULL`,
+		{ x1: String.raw`(noteValueFts.normalized LIKE '%a '' \ b%')` },
 		1,
 	)
 })
@@ -194,7 +231,8 @@ test('Quoted1 is fts', async () => {
 test('Quoted2 is fts', async () => {
 	await assertEqual(
 		String.raw`"a \" \\ b"`,
-		String.raw`(noteValueFts.normalized LIKE '%a " \ b%')`,
+		String.raw`x1.z IS NOT NULL`,
+		{ x1: String.raw`(noteValueFts.normalized LIKE '%a " \ b%')` },
 		1,
 	)
 })
@@ -202,12 +240,12 @@ test('Quoted2 is fts', async () => {
 test('RawQuoted1 is fts', async () => {
 	await assertEqual(
 		String.raw`x '''a '' \ b''' y`,
-		String.raw`
-(noteValueFts.normalized LIKE '%x%')
-AND
-(noteValueFts.normalized LIKE '%a '''' \ b%')
-AND
-(noteValueFts.normalized LIKE '%y%')`,
+		String.raw`x1.z IS NOT NULL AND x2.z IS NOT NULL AND x3.z IS NOT NULL`,
+		{
+			x1: String.raw`(noteValueFts.normalized LIKE '%x%')`,
+			x2: String.raw`(noteValueFts.normalized LIKE '%a '''' \ b%')`,
+			x3: String.raw`(noteValueFts.normalized LIKE '%y%')`,
+		},
 		3,
 	)
 })
@@ -215,12 +253,12 @@ AND
 test('RawQuoted2 is fts', async () => {
 	await assertEqual(
 		String.raw`x """a "" \ b""" y`,
-		String.raw`
-(noteValueFts.normalized LIKE '%x%')
-AND
-(noteValueFts.normalized LIKE '%a "" \ b%')
-AND
-(noteValueFts.normalized LIKE '%y%')`,
+		String.raw`x1.z IS NOT NULL AND x2.z IS NOT NULL AND x3.z IS NOT NULL`,
+		{
+			x1: String.raw`(noteValueFts.normalized LIKE '%x%')`,
+			x2: String.raw`(noteValueFts.normalized LIKE '%a "" \ b%')`,
+			x3: String.raw`(noteValueFts.normalized LIKE '%y%')`,
+		},
 		3,
 	)
 })
@@ -282,10 +320,11 @@ regexp_with_flags('bar', '', noteFieldValue.value)
 test('2 SimpleStrings are ANDed', async () => {
 	await assertEqual(
 		String.raw`a b`,
-		String.raw`
-(noteValueFts.normalized LIKE '%a%')
-AND
-(noteValueFts.normalized LIKE '%b%')`,
+		String.raw`x1.z IS NOT NULL AND x2.z IS NOT NULL`,
+		{
+			x1: String.raw`(noteValueFts.normalized LIKE '%a%')`,
+			x2: String.raw`(noteValueFts.normalized LIKE '%b%')`,
+		},
 		2,
 	)
 })
@@ -293,10 +332,11 @@ AND
 test('2 SimpleStrings can be ORed', async () => {
 	await assertEqual(
 		String.raw`a OR b`,
-		String.raw`
-(noteValueFts.normalized LIKE '%a%')
-OR
-(noteValueFts.normalized LIKE '%b%')`,
+		String.raw`x1.z IS NOT NULL OR x2.z IS NOT NULL`,
+		{
+			x1: String.raw`(noteValueFts.normalized LIKE '%a%')`,
+			x2: String.raw`(noteValueFts.normalized LIKE '%b%')`,
+		},
 		2,
 	)
 })
@@ -304,11 +344,11 @@ OR
 test('2 SimpleStrings can be grouped', async () => {
 	await assertEqual(
 		String.raw`(a b)`,
-		String.raw`(
-  (noteValueFts.normalized LIKE '%a%')
-  AND
-  (noteValueFts.normalized LIKE '%b%')
-)`,
+		String.raw`(x1.z IS NOT NULL AND x2.z IS NOT NULL)`,
+		{
+			x1: String.raw`(noteValueFts.normalized LIKE '%a%')`,
+			x2: String.raw`(noteValueFts.normalized LIKE '%b%')`,
+		},
 		2,
 	)
 })
@@ -316,11 +356,11 @@ test('2 SimpleStrings can be grouped', async () => {
 test('not distributes over AND', async () => {
 	await assertEqual(
 		String.raw`-(a b)`,
-		String.raw`(
-  ${fieldValueNegation('a')}
-  OR
-  ${fieldValueNegation('b')}
-)`,
+		String.raw`(x1.z IS NULL OR x2.z IS NULL)`,
+		{
+			x1: String.raw`(noteValueFts.normalized LIKE '%a%')`,
+			x2: String.raw`(noteValueFts.normalized LIKE '%b%')`,
+		},
 		2,
 	)
 })
@@ -328,11 +368,11 @@ test('not distributes over AND', async () => {
 test('not distributes over OR', async () => {
 	await assertEqual(
 		String.raw`-(a OR b)`,
-		String.raw`(
-  ${fieldValueNegation('a')}
-  AND
-  ${fieldValueNegation('b')}
-)`,
+		String.raw`(x1.z IS NULL AND x2.z IS NULL)`,
+		{
+			x1: String.raw`(noteValueFts.normalized LIKE '%a%')`,
+			x2: String.raw`(noteValueFts.normalized LIKE '%b%')`,
+		},
 		2,
 	)
 })
@@ -340,11 +380,11 @@ test('not distributes over OR', async () => {
 test('double negative grouping does nothing', async () => {
 	await assertEqual(
 		String.raw`-(-(a OR b))`,
-		String.raw`(
-  (noteValueFts.normalized LIKE '%a%')
-  OR
-  (noteValueFts.normalized LIKE '%b%')
-)`,
+		String.raw`(x1.z IS NOT NULL OR x2.z IS NOT NULL)`,
+		{
+			x1: String.raw`(noteValueFts.normalized LIKE '%a%')`,
+			x2: String.raw`(noteValueFts.normalized LIKE '%b%')`,
+		},
 		2,
 	)
 })
@@ -353,19 +393,16 @@ test('2 groups', async () => {
 	await assertEqual(
 		String.raw`(a b) OR c (d OR e)`,
 		String.raw`
-(
-  (noteValueFts.normalized LIKE '%a%')
-  AND
-  (noteValueFts.normalized LIKE '%b%')
-)
-OR
-(noteValueFts.normalized LIKE '%c%')
-AND
-(
-  (noteValueFts.normalized LIKE '%d%')
-  OR
-  (noteValueFts.normalized LIKE '%e%')
-)`,
+(x1.z IS NOT NULL AND x2.z IS NOT NULL)
+OR x3.z IS NOT NULL
+AND (x4.z IS NOT NULL OR x5.z IS NOT NULL)`,
+		{
+			x1: String.raw`(noteValueFts.normalized LIKE '%a%')`,
+			x2: String.raw`(noteValueFts.normalized LIKE '%b%')`,
+			x3: String.raw`(noteValueFts.normalized LIKE '%c%')`,
+			x4: String.raw`(noteValueFts.normalized LIKE '%d%')`,
+			x5: String.raw`(noteValueFts.normalized LIKE '%e%')`,
+		},
 		5,
 	)
 })
@@ -456,37 +493,53 @@ describe('groupAnds', () => {
 test('!(p && !q || r) is (!p || q) && !r', async () => {
 	await assertEqual(
 		String.raw`-(p -q OR r)`,
-		String.raw`(
-  (
-    ${fieldValueNegation('p')}
-    OR
-    (noteValueFts.normalized LIKE '%q%')
-  )
-  AND
-  ${fieldValueNegation('r')}
-)`,
+		String.raw` ((x1.z IS NULL OR x2.z IS NOT NULL) AND x3.z IS NULL)`,
+		{
+			x1: String.raw`(noteValueFts.normalized LIKE '%p%')`,
+			x2: String.raw`(noteValueFts.normalized LIKE '%q%')`,
+			x3: String.raw`(noteValueFts.normalized LIKE '%r%')`,
+		},
 		3,
 	)
 })
 
 describe('skip error nodes', () => {
-	const expected = String.raw`(noteValueFts.normalized LIKE '% foo%')`
-	const negatedExpected = fieldValueNegation(' foo')
+	const expected = { x1: String.raw`(noteValueFts.normalized LIKE '% foo%')` }
 
 	test('plain', async () => {
-		await assertEqual(String.raw`" foo`, expected, 1)
+		await assertEqual(
+			String.raw`" foo`,
+			String.raw`x1.z IS NOT NULL`,
+			expected,
+			1,
+		)
 	})
 
 	test('negated', async () => {
-		await assertEqual(String.raw`- " foo`, negatedExpected, 1)
+		await assertEqual(
+			String.raw`- " foo`,
+			String.raw`x1.z IS NULL`,
+			expected,
+			1,
+		)
 	})
 
 	test('double error', async () => {
-		await assertEqual(String.raw`) " foo`, expected, 1)
+		await assertEqual(
+			String.raw`) " foo`,
+			String.raw`x1.z IS NOT NULL`,
+			expected,
+			1,
+		)
 	})
 
 	test('double error, negated', async () => {
-		await assertEqual(String.raw`- ) " foo`, negatedExpected, 1)
+		await assertEqual(
+			String.raw`- ) " foo`,
+			String.raw`x1.z IS NULL`,
+			expected,
+			1,
+		)
 	})
 })
 
@@ -543,11 +596,15 @@ describe('template', () => {
 		await assertEqual(
 			String.raw`a template:t b`,
 			String.raw`
-(noteValueFts.normalized LIKE '%a%')
+x1.z IS NOT NULL
 AND
 (templateNameFts.name LIKE '%t%')
 AND
-(noteValueFts.normalized LIKE '%b%')`,
+x2.z IS NOT NULL`,
+			{
+				x1: String.raw`(noteValueFts.normalized LIKE '%a%')`,
+				x2: String.raw`(noteValueFts.normalized LIKE '%b%')`,
+			},
 			3,
 		)
 	})
@@ -556,11 +613,15 @@ AND
 		await assertEqual(
 			String.raw`"a b" OR template:t OR "c d"`,
 			String.raw`
-(noteValueFts.normalized LIKE '%a b%')
+x1.z IS NOT NULL
 OR
 (templateNameFts.name LIKE '%t%')
 OR
-(noteValueFts.normalized LIKE '%c d%')`,
+x2.z IS NOT NULL`,
+			{
+				x1: String.raw`(noteValueFts.normalized LIKE '%a b%')`,
+				x2: String.raw`(noteValueFts.normalized LIKE '%c d%')`,
+			},
 			3,
 		)
 	})
@@ -651,11 +712,15 @@ describe('templateId', () => {
 		await assertEqual(
 			String.raw`a templateId:t b`,
 			String.raw`
-(noteValueFts.normalized LIKE '%a%')
+x1.z IS NOT NULL
 AND
 (note.templateId = 't')
 AND
-(noteValueFts.normalized LIKE '%b%')`,
+x2.z IS NOT NULL`,
+			{
+				x1: String.raw`(noteValueFts.normalized LIKE '%a%')`,
+				x2: String.raw`(noteValueFts.normalized LIKE '%b%')`,
+			},
 			3,
 		)
 	})
@@ -664,11 +729,15 @@ AND
 		await assertEqual(
 			String.raw`"a b" OR templateId:t OR "c d"`,
 			String.raw`
-(noteValueFts.normalized LIKE '%a b%')
+x1.z IS NOT NULL
 OR
 (note.templateId = 't')
 OR
-(noteValueFts.normalized LIKE '%c d%')`,
+x2.z IS NOT NULL`,
+			{
+				x1: String.raw`(noteValueFts.normalized LIKE '%a b%')`,
+				x2: String.raw`(noteValueFts.normalized LIKE '%c d%')`,
+			},
 			3,
 		)
 	})
@@ -768,11 +837,15 @@ describe('setting', () => {
 		await assertEqual(
 			String.raw`a setting:t b`,
 			String.raw`
-(noteValueFts.normalized LIKE '%a%')
+x1.z IS NOT NULL
 AND
 (cardSettingNameFts.name LIKE '%t%')
 AND
-(noteValueFts.normalized LIKE '%b%')`,
+x2.z IS NOT NULL`,
+			{
+				x1: String.raw`(noteValueFts.normalized LIKE '%a%')`,
+				x2: String.raw`(noteValueFts.normalized LIKE '%b%')`,
+			},
 			3,
 		)
 	})
@@ -781,11 +854,15 @@ AND
 		await assertEqual(
 			String.raw`"a b" OR setting:t OR "c d"`,
 			String.raw`
-(noteValueFts.normalized LIKE '%a b%')
+x1.z IS NOT NULL
 OR
 (cardSettingNameFts.name LIKE '%t%')
 OR
-(noteValueFts.normalized LIKE '%c d%')`,
+x2.z IS NOT NULL`,
+			{
+				x1: String.raw`(noteValueFts.normalized LIKE '%a b%')`,
+				x2: String.raw`(noteValueFts.normalized LIKE '%c d%')`,
+			},
 			3,
 		)
 	})
@@ -876,11 +953,15 @@ describe('settingId', () => {
 		await assertEqual(
 			String.raw`a settingId:t b`,
 			String.raw`
-(noteValueFts.normalized LIKE '%a%')
+x1.z IS NOT NULL
 AND
 (card.cardSettingId = 't')
 AND
-(noteValueFts.normalized LIKE '%b%')`,
+x2.z IS NOT NULL`,
+			{
+				x1: String.raw`(noteValueFts.normalized LIKE '%a%')`,
+				x2: String.raw`(noteValueFts.normalized LIKE '%b%')`,
+			},
 			3,
 		)
 	})
@@ -889,11 +970,15 @@ AND
 		await assertEqual(
 			String.raw`"a b" OR settingId:t OR "c d"`,
 			String.raw`
-(noteValueFts.normalized LIKE '%a b%')
+x1.z IS NOT NULL
 OR
 (card.cardSettingId = 't')
 OR
-(noteValueFts.normalized LIKE '%c d%')`,
+x2.z IS NOT NULL`,
+			{
+				x1: String.raw`(noteValueFts.normalized LIKE '%a b%')`,
+				x2: String.raw`(noteValueFts.normalized LIKE '%c d%')`,
+			},
 			3,
 		)
 	})
@@ -946,30 +1031,12 @@ describe('tag', () => {
 	function noteQuery(x: string) {
 		return String.raw`(noteTagFts.tag LIKE '${x}')`
 	}
-	function cardNotQuery(x: string) {
-		return String.raw`NOT EXISTS (
-  SELECT 1
-  FROM cardTag AS z
-  WHERE (z.tag LIKE '${x}') AND z.cardId = card.id
-)`
-	}
-	function noteNotQuery(x: string) {
-		return String.raw`NOT EXISTS (
-  SELECT 1
-  FROM noteTag AS z
-  WHERE (z.tag LIKE '${x}') AND z.noteId = note.id
-)`
-	}
 
 	test('1', async () => {
 		await assertEqual(
 			String.raw`tag:foo`,
-			String.raw`
-(
-  ${cardQuery('%foo%')}
-  OR
-  ${noteQuery('%foo%')}
-)`,
+			String.raw`(x1.tag IS NOT NULL OR x2.tag IS NOT NULL)`,
+			{ x1: cardQuery('%foo%'), x2: noteQuery('%foo%') },
 			2,
 		)
 	})
@@ -978,18 +1045,16 @@ describe('tag', () => {
 		await assertEqual(
 			String.raw`(tag:foo,bar)`,
 			String.raw`(
-  (
-    ${cardQuery('%foo%')}
-    OR
-    ${noteQuery('%foo%')}
-  )
+  (x1.tag IS NOT NULL OR x2.tag IS NOT NULL)
   OR
-  (
-    ${cardQuery('%bar%')}
-    OR
-    ${noteQuery('%bar%')}
-  )
+  (x3.tag IS NOT NULL OR x4.tag IS NOT NULL)
 )`,
+			{
+				x1: cardQuery('%foo%'),
+				x2: noteQuery('%foo%'),
+				x3: cardQuery('%bar%'),
+				x4: noteQuery('%bar%'),
+			},
 			4,
 		)
 	})
@@ -1011,9 +1076,7 @@ describe('tag', () => {
   )
   AND
   (
-    ${cardQuery('%qux%')}
-    OR
-    ${noteQuery('%qux%')}
+    x1.tag IS NOT NULL OR x2.tag IS NOT NULL
   )
   AND
   (
@@ -1022,6 +1085,7 @@ describe('tag', () => {
     regexp_with_flags('bix', 'suvy', noteTagFts.tag)
   )
 )`,
+			{ x1: cardQuery('%qux%'), x2: noteQuery('%qux%') },
 			14,
 		)
 	})
@@ -1030,18 +1094,16 @@ describe('tag', () => {
 		await assertEqual(
 			String.raw`(tag:"a\"b","c\\b")`,
 			String.raw`(
-  (
-    ${cardQuery('%a"b%')}
-    OR
-    ${noteQuery('%a"b%')}
-  )
+  (x1.tag IS NOT NULL OR x2.tag IS NOT NULL)
   OR
-  (
-    ${cardQuery(String.raw`%c\b%`)}
-    OR
-    ${noteQuery(String.raw`%c\b%`)}
-  )
+  (x3.tag IS NOT NULL OR x4.tag IS NOT NULL)
 )`,
+			{
+				x1: cardQuery('%a"b%'),
+				x2: noteQuery('%a"b%'),
+				x3: cardQuery(String.raw`%c\b%`),
+				x4: noteQuery(String.raw`%c\b%`),
+			},
 			4,
 		)
 	})
@@ -1050,15 +1112,17 @@ describe('tag', () => {
 		await assertEqual(
 			String.raw`a tag:t b`,
 			String.raw`
-(noteValueFts.normalized LIKE '%a%')
+x1.z IS NOT NULL
 AND
-(
-  ${cardQuery('%t%')}
-  OR
-  ${noteQuery('%t%')}
-)
+(x2.tag IS NOT NULL OR x3.tag IS NOT NULL)
 AND
-(noteValueFts.normalized LIKE '%b%')`,
+x4.z IS NOT NULL`,
+			{
+				x1: String.raw`(noteValueFts.normalized LIKE '%a%')`,
+				x2: cardQuery('%t%'),
+				x3: noteQuery('%t%'),
+				x4: String.raw`(noteValueFts.normalized LIKE '%b%')`,
+			},
 			4,
 		)
 	})
@@ -1067,15 +1131,18 @@ AND
 		await assertEqual(
 			String.raw`"a b" OR tag:t OR "c d"`,
 			String.raw`
-(noteValueFts.normalized LIKE '%a b%')
+x1.z IS NOT NULL
 OR
-(
-  ${cardQuery('%t%')}
-  OR
-  ${noteQuery('%t%')}
-)
+(x2.tag IS NOT NULL OR x3.tag IS NOT NULL)
 OR
-(noteValueFts.normalized LIKE '%c d%')`,
+x4.z IS NOT NULL
+`,
+			{
+				x1: String.raw`(noteValueFts.normalized LIKE '%a b%')`,
+				x2: cardQuery('%t%'),
+				x3: noteQuery('%t%'),
+				x4: String.raw`(noteValueFts.normalized LIKE '%c d%')`,
+			},
 			4,
 		)
 	})
@@ -1084,24 +1151,20 @@ OR
 		await assertEqual(
 			String.raw`(tag:"foo bar",biz,"baz quz")`,
 			String.raw`(
-  (
-    ${cardQuery('%foo bar%')}
-    OR
-    ${noteQuery('%foo bar%')}
-  )
+  (x1.tag IS NOT NULL OR x2.tag IS NOT NULL)
   OR
-  (
-    ${cardQuery('%biz%')}
-    OR
-    ${noteQuery('%biz%')}
-  )
+  (x3.tag IS NOT NULL OR x4.tag IS NOT NULL)
   OR
-  (
-    ${cardQuery('%baz quz%')}
-    OR
-    ${noteQuery('%baz quz%')}
-  )
+  (x5.tag IS NOT NULL OR x6.tag IS NOT NULL)
 )`,
+			{
+				x1: cardQuery('%foo bar%'),
+				x2: noteQuery('%foo bar%'),
+				x3: cardQuery('%biz%'),
+				x4: noteQuery('%biz%'),
+				x5: cardQuery('%baz quz%'),
+				x6: noteQuery('%baz quz%'),
+			},
 			6,
 		)
 	})
@@ -1110,24 +1173,20 @@ OR
 		await assertEqual(
 			String.raw`( tag : "foo bar" , biz      , "baz quz" )`,
 			String.raw`(
-  (
-    ${cardQuery('%foo bar%')}
-    OR
-    ${noteQuery('%foo bar%')}
-  )
+  (x1.tag IS NOT NULL OR x2.tag IS NOT NULL)
   OR
-  (
-    ${cardQuery('%biz%')}
-    OR
-    ${noteQuery('%biz%')}
-  )
+  (x3.tag IS NOT NULL OR x4.tag IS NOT NULL)
   OR
-  (
-    ${cardQuery('%baz quz%')}
-    OR
-    ${noteQuery('%baz quz%')}
-  )
+  (x5.tag IS NOT NULL OR x6.tag IS NOT NULL)
 )`,
+			{
+				x1: cardQuery('%foo bar%'),
+				x2: noteQuery('%foo bar%'),
+				x3: cardQuery('%biz%'),
+				x4: noteQuery('%biz%'),
+				x5: cardQuery('%baz quz%'),
+				x6: noteQuery('%baz quz%'),
+			},
 			6,
 		)
 	})
@@ -1136,18 +1195,16 @@ OR
 		await assertEqual(
 			String.raw`-(tag:foo,bar)`,
 			String.raw`(
-  (
-    ${cardNotQuery('%foo%')}
-    AND
-    ${noteNotQuery('%foo%')}
-  )
+  (x1.tag IS NULL AND x2.tag IS NULL)
   AND
-  (
-    ${cardNotQuery('%bar%')}
-    AND
-    ${noteNotQuery('%bar%')}
-  )
+  (x3.tag IS NULL AND x4.tag IS NULL)
 )`,
+			{
+				x1: cardQuery('%foo%'),
+				x2: noteQuery('%foo%'),
+				x3: cardQuery('%bar%'),
+				x4: noteQuery('%bar%'),
+			},
 			4,
 		)
 	})
@@ -1156,18 +1213,16 @@ OR
 		await assertEqual(
 			String.raw`(-tag:foo,bar)`,
 			String.raw`(
-  (
-    ${cardNotQuery('%foo%')}
-    AND
-    ${noteNotQuery('%foo%')}
-  )
+  (x1.tag IS NULL AND x2.tag IS NULL)
   AND
-  (
-    ${cardNotQuery('%bar%')}
-    AND
-    ${noteNotQuery('%bar%')}
-  )
+  (x3.tag IS NULL AND x4.tag IS NULL)
 )`,
+			{
+				x1: cardQuery('%foo%'),
+				x2: noteQuery('%foo%'),
+				x3: cardQuery('%bar%'),
+				x4: noteQuery('%bar%'),
+			},
 			4,
 		)
 	})
@@ -1176,18 +1231,16 @@ OR
 		await assertEqual(
 			String.raw`-(-tag:foo,bar)`,
 			String.raw`(
-  (
-    ${cardQuery('%foo%')}
-    OR
-    ${noteQuery('%foo%')}
-  )
+  (x1.tag IS NOT NULL OR x2.tag IS NOT NULL)
   OR
-  (
-    ${cardQuery('%bar%')}
-    OR
-    ${noteQuery('%bar%')}
-  )
+  (x3.tag IS NOT NULL OR x4.tag IS NOT NULL)
 )`,
+			{
+				x1: cardQuery('%foo%'),
+				x2: noteQuery('%foo%'),
+				x3: cardQuery('%bar%'),
+				x4: noteQuery('%bar%'),
+			},
 			4,
 		)
 	})
