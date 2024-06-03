@@ -345,16 +345,14 @@ function regexpWithFlags(node: QueryRegex, column: string) {
 
 function serialize(node: Node, context: Context) {
 	if (node.type === simpleString || node.type === quoted) {
-		if (node.label == null) {
-			const name = getJoinTableName(context)
-			context.joinFts.push({
-				name,
-				sql: like(node, `noteValueFts.normalized`, true),
-			})
-			context.trustedSql(`${name}.z IS ${node.negate ? '' : 'NOT'} NULL`) // `z` from 2DB5DD73-603E-4DF7-A366-A53375AF0093
-			if (!node.negate && node.fieldValueHighlight != null) {
-				context.fieldValueHighlight.push(node.fieldValueHighlight)
-			}
+		const name = getJoinTableName(context)
+		context.joinFts.push({
+			name,
+			sql: like(node, `noteValueFts.normalized`, true),
+		})
+		context.trustedSql(`${name}.z IS ${node.negate ? '' : 'NOT'} NULL`) // `z` from 2DB5DD73-603E-4DF7-A366-A53375AF0093
+		if (!node.negate && node.fieldValueHighlight != null) {
+			context.fieldValueHighlight.push(node.fieldValueHighlight)
 		}
 	} else if (node.type === regex) {
 		context.regexpWithFlags(node, `noteFieldValue.value`)
