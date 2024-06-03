@@ -145,6 +145,10 @@ type WithCache = {
 	noteFieldValue: NoteFieldValue & { rowid: number }
 	noteTag: NoteTag & { rowid: number }
 	cardTag: CardTag & { rowid: number }
+	cardRowids: {
+		cardRowid: number
+		rank?: number
+	}
 }
 
 // We cache the query's `card.id`s in a temp table. We use the temp table's rowids as a hack to get cursor pagination.
@@ -156,7 +160,7 @@ type WithCache = {
 // medTODO Consider building the cache incrementally so its write doesn't block reads.
 //
 // Rejected ideas for improving limit+offset perf:
-// 1. Loading all relevant ids like Anki. This makes initial load for large numbers of cards unacceptably slow on the web.
+// 1. Loading all relevant ids. This makes initial load for large numbers of cards unacceptably slow on the web.
 // 2. Deferred joins. https://planetscale.com/learn/courses/mysql-for-developers/examples/deferred-joins https://aaronfrancis.com/2022/efficient-pagination-using-deferred-joins
 //    They're ~2x faster than a normal limit+offset if including a FTS search criteria, but that's still not fast enough. Maybe FTS doesn't count as a covering index.
 async function buildCache(
@@ -227,7 +231,6 @@ async function getCards(
 		db1
 			.selectFrom('card')
 			.select('card.rowid as cardRowid')
-			.distinct()
 			.innerJoin('note', 'card.noteId', 'note.id')
 			.innerJoin('template', 'template.id', 'note.templateId')
 			.$if(sort != null, (db) => db.orderBy(sort!.col, sort!.direction))
@@ -247,14 +250,17 @@ async function getCards(
 											'noteFieldValue.rowid',
 											'noteValueFts.rowid',
 										)
-										.select(['noteFieldValue.noteId as z']) // `z` also goes here 2DB5DD73-603E-4DF7-A366-A53375AF0093
+										.select(['noteFieldValue.noteId as z', 'rank']) // `z` also goes here 2DB5DD73-603E-4DF7-A366-A53375AF0093
 										.where(t.sql)
 										.as(name),
 								(join) => join.onRef(`${name}.z`, '=', 'note.id'),
 							)
 							dbReturn = dbJoined
 						})
-						return dbReturn
+						const rankSum = conversionResult.joinFts
+							.map((t) => t.name + '.rank')
+							.join('+')
+						return dbReturn.select(sql.raw(rankSum).as('rank')).orderBy('rank')
 					})
 					.$if(conversionResult.joinCardTags.length !== 0, (dbSeed) => {
 						let dbReturn = dbSeed
@@ -325,20 +331,21 @@ async function getCards(
 					)
 					.where(conversionResult.sql!),
 			)
+			.groupBy('card.rowid')
 	const searchCache =
 		// If user has scrolled, build/use the cache.
 		offset === 0 ? null : await buildCache(baseQuery(), query)
-	const entities = await db
-		.with('cardRowids', baseQuery)
-		.selectFrom('cardRowids')
-		.innerJoin('card', 'card.rowid', 'cardRowids.cardRowid')
+	const table = searchCache ?? ('cardRowids' as const)
+	const maybeCte: QueryCreator<DB & WithCache> =
+		searchCache == null ? db.with('cardRowids', baseQuery) : db
+	const entities = await maybeCte
+		.selectFrom(table)
+		.innerJoin('card', 'card.rowid', `${table}.cardRowid`)
 		.innerJoin('note', 'card.noteId', 'note.id')
 		.innerJoin('template', 'note.templateId', 'template.id')
 		// Don't do left/right joins! `getCards` should return the `limit` number of cards, and left/right joins screw this up.
 		.$if(searchCache != null, (qb) =>
-			qb
-				.innerJoin(searchCache!, 'card.rowid', `${searchCache!}.cardRowid`)
-				.where(`${searchCache!}.rowid`, '>=', offset),
+			qb.where(`${searchCache!}.rowid`, '>=', offset),
 		)
 		.select((eb) => [
 			'card.cardSettingId as card_cardSettingId',
