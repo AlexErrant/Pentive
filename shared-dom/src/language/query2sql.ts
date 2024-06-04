@@ -429,10 +429,10 @@ function handleLabel(node: QueryString | QueryRegex, context: Context) {
 	if (node.label === tag) {
 		buildTagSearch(node, context)
 	} else if (node.label === template) {
-		context.joinTemplateNameFts = true
 		if (node.type === 'Regex') {
-			context.regexpWithFlags(node, `templateNameFts.name`)
+			context.regexpWithFlags(node, `template.name`)
 		} else {
+			context.joinTemplateNameFts = true
 			context.like(node, 'templateNameFts.name')
 		}
 	} else if (node.label === templateId) {
@@ -440,10 +440,10 @@ function handleLabel(node: QueryString | QueryRegex, context: Context) {
 		const equals = sql.raw(node.negate ? '!=' : '=')
 		context.parameterizeSql(sql`note.templateId ${equals} ${node.value}`)
 	} else if (node.label === setting) {
-		context.joinCardSettingNameFts = true
 		if (node.type === 'Regex') {
-			context.regexpWithFlags(node, `cardSettingNameFts.name`)
+			context.regexpWithFlags(node, `cardSetting.name`)
 		} else {
+			context.joinCardSettingNameFts = true
 			context.like(node, 'cardSettingNameFts.name')
 		}
 	} else if (node.label === settingId) {

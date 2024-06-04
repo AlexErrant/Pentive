@@ -579,13 +579,13 @@ describe('template', () => {
 		await assertEqual(
 			String.raw`(template:/foo/i,-/bar/ qux /bix/suuvvyys)`,
 			String.raw`(
-  regexp_with_flags('foo', 'i', templateNameFts.name)
+  regexp_with_flags('foo', 'i', template.name)
   OR NOT
-  regexp_with_flags('bar', '', templateNameFts.name)
+  regexp_with_flags('bar', '', template.name)
   AND
   (templateNameFts.name LIKE '%qux%')
   AND
-  regexp_with_flags('bix', 'suvy', templateNameFts.name)
+  regexp_with_flags('bix', 'suvy', template.name)
 )`,
 			7,
 		)
@@ -820,13 +820,13 @@ describe('setting', () => {
 		await assertEqual(
 			String.raw`(setting:/foo/i,-/bar/ qux /bix/suuvvyys)`,
 			String.raw`(
-  regexp_with_flags('foo', 'i', cardSettingNameFts.name)
+  regexp_with_flags('foo', 'i', cardSetting.name)
   OR NOT
-  regexp_with_flags('bar', '', cardSettingNameFts.name)
+  regexp_with_flags('bar', '', cardSetting.name)
   AND
   (cardSettingNameFts.name LIKE '%qux%')
   AND
-  regexp_with_flags('bix', 'suvy', cardSettingNameFts.name)
+  regexp_with_flags('bix', 'suvy', cardSetting.name)
 )`,
 			7,
 		)
