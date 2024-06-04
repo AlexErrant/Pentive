@@ -16,6 +16,11 @@ import {
 	type kindEnums,
 } from './stringLabels'
 
+type JoinTable = Array<{
+	sql: RawBuilder<SqlBool>
+	name: string
+}>
+
 class Context {
 	constructor() {
 		this.sql = []
@@ -23,9 +28,12 @@ class Context {
 		this.current = this.root
 		this.joinCardTags = []
 		this.joinNoteTags = []
-		this.joinFts = []
-		this.joinTemplateFts = false
-		this.joinCardSettingFts = false
+		this.joinCardTagsFts = []
+		this.joinNoteTagsFts = []
+		this.joinNoteValueFts = []
+		this.joinNoteFieldValue = []
+		this.joinTemplateNameFts = false
+		this.joinCardSettingNameFts = false
 		this.joinLatestReview = false
 		this.fieldValueHighlight = []
 		this.joinTableName = 0
@@ -34,23 +42,14 @@ class Context {
 	sql: Array<string | RawBuilder<unknown>>
 	root: Group
 	current: Group
-	joinCardTags: Array<{
-		sql: RawBuilder<SqlBool>
-		name: string
-	}>
-
-	joinNoteTags: Array<{
-		sql: RawBuilder<SqlBool>
-		name: string
-	}>
-
-	joinFts: Array<{
-		sql: RawBuilder<SqlBool>
-		name: string
-	}>
-
-	joinTemplateFts: boolean
-	joinCardSettingFts: boolean
+	joinCardTags: JoinTable
+	joinNoteTags: JoinTable
+	joinCardTagsFts: JoinTable
+	joinNoteTagsFts: JoinTable
+	joinNoteValueFts: JoinTable
+	joinNoteFieldValue: JoinTable
+	joinTemplateNameFts: boolean
+	joinCardSettingNameFts: boolean
 	joinLatestReview: boolean
 	fieldValueHighlight: FieldValueHighlight[]
 	joinTableName: number
@@ -73,7 +72,8 @@ class Context {
 }
 
 export interface FieldValueHighlight {
-	regex: string
+	pattern: string
+	flags: string
 	boundLeft: boolean
 	boundRight: boolean
 }
@@ -94,18 +94,21 @@ export function convert(input: string) {
 			context.sql.length === 0
 				? null
 				: (sql.join(context.sql, sql``) as RawBuilder<SqlBool>),
-		joinCardTags: context.joinCardTags,
-		joinNoteTags: context.joinNoteTags,
-		joinFts: context.joinFts,
-		joinCardSettingFts: context.joinCardSettingFts,
-		joinTemplateFts: context.joinTemplateFts,
+		joinCardTag: context.joinCardTags,
+		joinNoteTag: context.joinNoteTags,
+		joinCardTagFts: context.joinCardTagsFts,
+		joinNoteTagFts: context.joinNoteTagsFts,
+		joinNoteValueFts: context.joinNoteValueFts,
+		joinNoteFieldValue: context.joinNoteFieldValue,
+		joinCardSettingNameFts: context.joinCardSettingNameFts,
+		joinTemplateNameFts: context.joinTemplateNameFts,
 		joinLatestReview: context.joinLatestReview,
 		fieldValueHighlight: context.fieldValueHighlight,
 	}
 }
 
 // https://stackoverflow.com/a/28798479
-function unique(str: string) {
+export function unique(str: string) {
 	return Array.from(str)
 		.filter((item, i, ar) => ar.indexOf(item) === i)
 		.join('')
@@ -200,7 +203,12 @@ function buildContent(node: SyntaxNodeRef, input: string) {
 		boundLeft,
 		boundRight,
 		regexPattern: needsRegex ? fieldValueHighlight : undefined,
-		fieldValueHighlight: { regex: fieldValueHighlight, boundRight, boundLeft },
+		fieldValueHighlight: {
+			pattern: fieldValueHighlight,
+			flags: 'vi', // regex flag 31C731B0-41F5-46A5-93B4-D00D9A6064EA
+			boundRight,
+			boundLeft,
+		},
 	} satisfies Content
 }
 
@@ -243,7 +251,8 @@ function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
 						boundRight: false,
 						regexPattern: undefined,
 						fieldValueHighlight: {
-							regex: escapeRegExp(input.slice(node.from, node.to)),
+							pattern: escapeRegExp(input.slice(node.from, node.to)),
+							flags: 'vi', // regex flag 31C731B0-41F5-46A5-93B4-D00D9A6064EA
 							boundLeft: false,
 							boundRight: false,
 						},
@@ -274,12 +283,20 @@ function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
 	} else if (node.type.is(Regex)) {
 		maybeAddSeparator(node.node, context)
 		const tailDelimiterIndex = input.lastIndexOf('/', node.to)
+		const pattern = input.slice(node.from + 1, tailDelimiterIndex)
+		const flags = unique(input.slice(tailDelimiterIndex + 1, node.to))
 		context.current.attach({
 			type: regex,
-			pattern: input.slice(node.from + 1, tailDelimiterIndex),
-			flags: unique(input.slice(tailDelimiterIndex + 1, node.to)),
+			pattern,
+			flags,
 			negate: isNegated(node.node),
 			label: getLabel(node.node.parent!),
+			fieldValueHighlight: {
+				pattern,
+				flags,
+				boundLeft: false,
+				boundRight: false,
+			},
 		})
 		return false
 	} else if (node.type.is(qt.Group) || node.type.is(qt.Label)) {
@@ -319,7 +336,7 @@ function like(qs: QueryString, column: string, forcePositive?: true) {
 	const left = qs.wildcardLeft ? '%' : ''
 	const right = qs.wildcardRight ? '%' : ''
 	const value = `${left}${qs.value}${right}`
-	const not = forcePositive === true ? sql`` : getNot(qs.negate)
+	const not = getNot(qs.negate, forcePositive)
 	const filterList = [sql`(${col} ${not} LIKE ${value}`]
 	if (qs.regexPattern != null) {
 		filterList.push(
@@ -337,25 +354,38 @@ function like(qs: QueryString, column: string, forcePositive?: true) {
 	return sql.join(filterList, sql``) as RawBuilder<SqlBool>
 }
 
-function regexpWithFlags(node: QueryRegex, column: string) {
+function regexpWithFlags(
+	node: QueryRegex,
+	column: string,
+	forcePositive?: true,
+) {
 	const col = sql.raw(column)
-	const not = getNot(node.negate)
+	const not = getNot(node.negate, forcePositive)
 	return sql<SqlBool>`${not} regexp_with_flags(${node.pattern}, ${node.flags}, ${col})`
 }
 
 function serialize(node: Node, context: Context) {
-	if (node.type === simpleString || node.type === quoted) {
+	if (
+		node.type === simpleString ||
+		node.type === quoted ||
+		node.type === regex
+	) {
 		const name = getJoinTableName(context)
-		context.joinFts.push({
-			name,
-			sql: like(node, `noteValueFts.normalized`, true),
-		})
+		if (node.type === 'Regex') {
+			context.joinNoteFieldValue.push({
+				name,
+				sql: regexpWithFlags(node, `noteFieldValue.value`, true),
+			})
+		} else {
+			context.joinNoteValueFts.push({
+				name,
+				sql: like(node, `noteValueFts.normalized`, true),
+			})
+		}
 		context.trustedSql(`${name}.z IS ${node.negate ? '' : 'NOT'} NULL`) // `z` from 2DB5DD73-603E-4DF7-A366-A53375AF0093
 		if (!node.negate && node.fieldValueHighlight != null) {
 			context.fieldValueHighlight.push(node.fieldValueHighlight)
 		}
-	} else if (node.type === regex) {
-		context.regexpWithFlags(node, `noteFieldValue.value`)
 	} else if (node.type === group) {
 		const paren =
 			!node.isRoot &&
@@ -396,7 +426,7 @@ function handleLabel(node: QueryString | QueryRegex, context: Context) {
 	if (node.label === tag) {
 		buildTagSearch(node, context)
 	} else if (node.label === template) {
-		context.joinTemplateFts = true
+		context.joinTemplateNameFts = true
 		if (node.type === 'Regex') {
 			context.regexpWithFlags(node, `templateNameFts.name`)
 		} else {
@@ -407,7 +437,7 @@ function handleLabel(node: QueryString | QueryRegex, context: Context) {
 		const equals = sql.raw(node.negate ? '!=' : '=')
 		context.parameterizeSql(sql`note.templateId ${equals} ${node.value}`)
 	} else if (node.label === setting) {
-		context.joinCardSettingFts = true
+		context.joinCardSettingNameFts = true
 		if (node.type === 'Regex') {
 			context.regexpWithFlags(node, `cardSettingNameFts.name`)
 		} else {
@@ -443,35 +473,36 @@ function getJoinTableName(context: Context) {
 }
 
 function buildTagSearch(node: QueryString | QueryRegex, context: Context) {
+	const cardName = getJoinTableName(context)
+	const noteName = getJoinTableName(context)
 	if (node.type === 'Regex') {
-		context.parameterizeSql(
-			sql`(
-${regexpWithFlags(node, `cardTagFts.tag`)}
-${sql.raw(node.negate ? 'AND' : 'OR')}
-${regexpWithFlags(node, `noteTagFts.tag`)}
-)`,
-		)
-	} else {
-		const cardName = getJoinTableName(context)
-		const noteName = getJoinTableName(context)
 		context.joinCardTags.push({
 			name: cardName,
-			sql: like(node, `cardTagFts.tag`, true),
+			sql: regexpWithFlags(node, `cardTag.tag`, true),
 		})
 		context.joinNoteTags.push({
 			name: noteName,
+			sql: regexpWithFlags(node, `noteTag.tag`, true),
+		})
+	} else {
+		context.joinCardTagsFts.push({
+			name: cardName,
+			sql: like(node, `cardTagFts.tag`, true),
+		})
+		context.joinNoteTagsFts.push({
+			name: noteName,
 			sql: like(node, `noteTagFts.tag`, true),
 		})
-		context.trustedSql(
-			`(${cardName}.tag IS ${node.negate ? '' : 'NOT'} NULL ${
-				node.negate ? 'AND' : 'OR'
-			} ${noteName}.tag IS ${node.negate ? '' : 'NOT'} NULL)`,
-		)
 	}
+	context.trustedSql(
+		`(${cardName}.tag IS ${node.negate ? '' : 'NOT'} NULL ${
+			node.negate ? 'AND' : 'OR'
+		} ${noteName}.tag IS ${node.negate ? '' : 'NOT'} NULL)`,
+	)
 }
 
-function getNot(negate: boolean) {
-	return sql.raw(negate ? 'NOT' : ``)
+function getNot(negate: boolean, forcePositive?: true) {
+	return forcePositive === true ? sql`` : sql.raw(negate ? 'NOT' : ``)
 }
 
 function maybeAddSeparator(node: SyntaxNode, context: Context) {
@@ -529,6 +560,7 @@ interface QueryRegex {
 	pattern: string
 	flags: string
 	negate: boolean
+	fieldValueHighlight: FieldValueHighlight
 }
 
 type Leaf = { type: typeof or | typeof and } | QueryString | QueryRegex

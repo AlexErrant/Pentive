@@ -24,7 +24,13 @@ import { LicenseManager } from 'ag-grid-enterprise'
 import { db } from '../db'
 import { assertNever } from 'shared'
 import { agGridTheme } from '../globalState'
-import { type FieldValueHighlight, Upload, convert, getOk } from 'shared-dom'
+import {
+	type FieldValueHighlight,
+	Upload,
+	convert,
+	getOk,
+	unique,
+} from 'shared-dom'
 import { C } from '../topLevelAwait'
 import FiltersTable from './filtersTable'
 import './cardsTable.css'
@@ -47,10 +53,13 @@ const segmenter = new Intl.Segmenter(undefined, { granularity: 'word' })
 const regexCtor = (fvhs: FieldValueHighlight[] | undefined, global?: true) => {
 	if (fvhs == null || fvhs.length === 0) return null
 	return new RegExp(
-		fvhs.map((fvh) => fvh.regex).join('|'),
+		fvhs.map((fvh) => fvh.pattern).join('|'), // pipe has lowest prescedence so this *should* work
 		// The `g` flag introduces state to methods like `test` which WILL mindfuck you.
 		// Only `regex()` needs `g` for `matchAll`, but be forewarned in case you make changes.
-		'is' + (global ? 'g' : ''),
+		unique(fvhs.map((x) => x.flags).join('') + (global ? 'g' : '')), // regex flag 31C731B0-41F5-46A5-93B4-D00D9A6064EA
+		// lowTODO use (?imsx-imsx:subexpression) once webkit supports https://github.com/tc39/proposal-regexp-modifiers
+		// Alternatively make an array of regex, build a list of the indexes of their match ranges, and then finally build the SearchText list.
+		// FYI <mark> can overlap. Could also maybe use https://developer.mozilla.org/en-US/docs/Web/API/CSS_Custom_Highlight_API
 	)
 }
 

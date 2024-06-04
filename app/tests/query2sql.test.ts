@@ -81,9 +81,12 @@ async function assertEqual(
 				expect(await format(p)).toEqual(await format(expected))
 			}
 		}
-		await testJoin(converted.joinFts)
-		await testJoin(converted.joinCardTags)
-		await testJoin(converted.joinNoteTags)
+		await testJoin(converted.joinNoteValueFts)
+		await testJoin(converted.joinNoteFieldValue)
+		await testJoin(converted.joinCardTagFts)
+		await testJoin(converted.joinNoteTagFts)
+		await testJoin(converted.joinCardTag)
+		await testJoin(converted.joinNoteTag)
 		expect(argCount).not.toBeUndefined()
 		expect(i.i).toBe(argCount)
 	}
@@ -267,7 +270,8 @@ describe('regex', () => {
 	test('plain', async () => {
 		await assertEqual(
 			String.raw`/foo/`,
-			String.raw`regexp_with_flags('foo', '', noteFieldValue.value)`,
+			String.raw`x1.z IS NOT NULL`,
+			{ x1: String.raw`regexp_with_flags('foo', '', noteFieldValue.value)` },
 			2,
 		)
 	})
@@ -275,7 +279,8 @@ describe('regex', () => {
 	test('with flag', async () => {
 		await assertEqual(
 			String.raw`/foo/i`,
-			String.raw`regexp_with_flags('foo', 'i', noteFieldValue.value)`,
+			String.raw`x1.z IS NOT NULL`,
+			{ x1: String.raw`regexp_with_flags('foo', 'i', noteFieldValue.value)` },
 			2,
 		)
 	})
@@ -283,7 +288,8 @@ describe('regex', () => {
 	test('with flags', async () => {
 		await assertEqual(
 			String.raw`/foo/is`,
-			String.raw`regexp_with_flags('foo', 'is', noteFieldValue.value)`,
+			String.raw`x1.z IS NOT NULL`,
+			{ x1: String.raw`regexp_with_flags('foo', 'is', noteFieldValue.value)` },
 			2,
 		)
 	})
@@ -291,7 +297,10 @@ describe('regex', () => {
 	test('flags are deduped', async () => {
 		await assertEqual(
 			String.raw`/foo/suuvvyys`,
-			String.raw`regexp_with_flags('foo', 'suvy', noteFieldValue.value)`,
+			String.raw`x1.z IS NOT NULL`,
+			{
+				x1: String.raw`regexp_with_flags('foo', 'suvy', noteFieldValue.value)`,
+			},
 			2,
 		)
 	})
@@ -299,11 +308,11 @@ describe('regex', () => {
 	test('two are anded', async () => {
 		await assertEqual(
 			String.raw`/foo/ /bar/`,
-			String.raw`
-regexp_with_flags('foo', '', noteFieldValue.value)
-AND
-regexp_with_flags('bar', '', noteFieldValue.value)
-`,
+			String.raw`x1.z IS NOT NULL AND x2.z IS NOT NULL`,
+			{
+				x1: String.raw`regexp_with_flags('foo', '', noteFieldValue.value)`,
+				x2: String.raw`regexp_with_flags('bar', '', noteFieldValue.value)`,
+			},
 			4,
 		)
 	})
@@ -311,7 +320,8 @@ regexp_with_flags('bar', '', noteFieldValue.value)
 	test('NOT works', async () => {
 		await assertEqual(
 			String.raw`-/foo/y`,
-			String.raw`NOT regexp_with_flags('foo', 'y', noteFieldValue.value)`,
+			String.raw`x1.z IS NULL`,
+			{ x1: String.raw`regexp_with_flags('foo', 'y', noteFieldValue.value)` },
 			2,
 		)
 	})
@@ -426,7 +436,8 @@ describe('groupAnds', () => {
 		type: 'SimpleString' as const,
 		value: 'x',
 		fieldValueHighlight: {
-			regex: 'x',
+			pattern: 'x',
+			flags: '',
 			boundLeft: false,
 			boundRight: false,
 		},
@@ -1063,29 +1074,21 @@ describe('tag', () => {
 		await assertEqual(
 			String.raw`(tag:/foo/i,-/bar/ qux /bix/suuvvyys)`,
 			String.raw`(
-  (
-    regexp_with_flags('foo', 'i', cardTagFts.tag)
-    OR
-    regexp_with_flags('foo', 'i', noteTagFts.tag)
-  )
-  OR
-  (
-    NOT regexp_with_flags('bar', '', cardTagFts.tag)
-    AND
-    NOT regexp_with_flags('bar', '', noteTagFts.tag)
-  )
-  AND
-  (
-    x1.tag IS NOT NULL OR x2.tag IS NOT NULL
-  )
-  AND
-  (
-    regexp_with_flags('bix', 'suvy', cardTagFts.tag)
-    OR
-    regexp_with_flags('bix', 'suvy', noteTagFts.tag)
-  )
+      (x1.tag IS NOT NULL OR  x2.tag IS NOT NULL)
+  OR  (x3.tag IS     NULL AND x4.tag IS     NULL)
+  AND (x5.tag IS NOT NULL OR  x6.tag IS NOT NULL)
+  AND (x7.tag IS NOT NULL OR  x8.tag IS NOT NULL)
 )`,
-			{ x1: cardQuery('%qux%'), x2: noteQuery('%qux%') },
+			{
+				x1: "regexp_with_flags('foo', 'i', cardTag.tag)",
+				x2: "regexp_with_flags('foo', 'i', noteTag.tag)",
+				x3: "regexp_with_flags('bar', '', cardTag.tag)",
+				x4: "regexp_with_flags('bar', '', noteTag.tag)",
+				x5: cardQuery('%qux%'),
+				x6: noteQuery('%qux%'),
+				x7: "regexp_with_flags('bix', 'suvy', cardTag.tag)",
+				x8: "regexp_with_flags('bix', 'suvy', noteTag.tag)",
+			},
 			14,
 		)
 	})
