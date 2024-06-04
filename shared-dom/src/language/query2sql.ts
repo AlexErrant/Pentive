@@ -227,6 +227,7 @@ function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
 	if (
 		node.type.is(qt.SimpleString) ||
 		node.type.is(qt.KindEnum) ||
+		node.type.is(qt.Number) ||
 		node.type.is(qt.Quoted1) ||
 		node.type.is(qt.Quoted2) ||
 		node.type.is(qt.RawQuoted)
@@ -242,7 +243,9 @@ function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
 			regexPattern,
 			fieldValueHighlight,
 		} =
-			node.type.is(qt.SimpleString) || node.type.is(qt.KindEnum)
+			node.type.is(qt.SimpleString) ||
+			node.type.is(qt.KindEnum) ||
+			node.type.is(qt.Number)
 				? ({
 						value: input.slice(node.from, node.to),
 						wildcardLeft: true,
@@ -524,6 +527,7 @@ function andOrNothing(node: SyntaxNode): '' | typeof and | typeof or {
 		}
 		if (
 			left.type.is(qt.SimpleString) ||
+			left.type.is(qt.Number) ||
 			left.type.is(qt.Quoted1) ||
 			left.type.is(qt.Quoted2) ||
 			left.type.is(qt.RawQuoted) ||
