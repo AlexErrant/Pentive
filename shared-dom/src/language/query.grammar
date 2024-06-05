@@ -79,14 +79,14 @@ Label {
 }
 
 string {
-  Regex |
-  ( SimpleString
+  Regex
+  | SimpleString
   | Quoted1
   | Quoted2
   | Number
   | Html
   | RawQuoted
-  | RawHtml )
+  | RawHtml
 }
 
 id { SimpleString | Quoted1 | Quoted2 | Number | RawQuoted }
@@ -96,7 +96,9 @@ enum   <word> { @extend              <SimpleString, word> }
 enumNum<word> { @extend              <Number      , word> }
 
 stringLabels {
-  ( noteCardIs? kw<"tag">
+  ( kw<"tag">
+  | kw<"noteTag">
+  | kw<"cardTag">
   | kw<"template">
   | kw<"setting">
   ) Is
@@ -104,13 +106,10 @@ stringLabels {
 
 FieldName {
   Not?
-  (
-    Regex |
-    ( SimpleString | Quoted1 | Quoted2 | Number | RawQuoted )
-  )
+  ( Regex | SimpleString | Quoted1 | Quoted2 | Number | RawQuoted )
 }
 
-idLabels { 
+idLabels {
   ( kw<"templateId">
   | kw<"cardId">
   | kw<"noteId">
@@ -130,10 +129,12 @@ due {
 DueEnum { "true" | "false" }
 
 createdUpdated {
-  (
-    ( kw<"note"> | kw<"card"> ) ":"
-  ) ?
-  ( kw<"created"> | kw<"edited"> )
+  ( kw<"created">
+  | kw<"noteCreated">
+  | kw<"cardCreated">
+  | kw<"edited"> 
+  | kw<"noteEdited"> 
+  | kw<"cardEdited"> )
   ( Is Not? Number
   | Comparison Date )
 }
@@ -141,13 +142,10 @@ createdUpdated {
 repsLapses {
   ( kw<"reps">
   | kw<"lapses">
-  | noteCardIs?
-    kw<"tag"> Is kw<"count"> )
+  | kw<"tagCount">
+  | kw<"cardTagCount">
+  | kw<"noteTagCount"> )
   Comparison Number
-}
-
-noteCardIs {
-  ( kw<"card"> | kw<"note"> ) ":"
 }
 
 reviewed {
