@@ -230,6 +230,8 @@ function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
 		node.type.is(qt.Number) ||
 		node.type.is(qt.Quoted1) ||
 		node.type.is(qt.Quoted2) ||
+		node.type.is(qt.Html) ||
+		node.type.is(qt.RawHtml) ||
 		node.type.is(qt.RawQuoted)
 	) {
 		maybeAddSeparator(node.node, context)
@@ -262,6 +264,8 @@ function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
 				  } satisfies Content)
 				: node.type.is(qt.Quoted1) ||
 				  node.type.is(qt.Quoted2) ||
+				  node.type.is(qt.Html) ||
+				  node.type.is(qt.RawHtml) ||
 				  node.type.is(qt.RawQuoted)
 				? buildContent(node, input)
 				: throwExp('You missed ' + node.type.name)
@@ -272,6 +276,8 @@ function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
 				node.type.is(qt.Quoted2) ||
 				node.type.is(qt.RawQuoted)
 					? 'Quoted'
+					: node.type.is(qt.Html) || node.type.is(qt.RawHtml)
+					? 'Html'
 					: 'SimpleString',
 			value,
 			wildcardLeft,
@@ -371,6 +377,7 @@ function serialize(node: Node, context: Context) {
 	if (
 		node.type === simpleString ||
 		node.type === quoted ||
+		node.type === html ||
 		node.type === regex
 	) {
 		const name = getJoinTableName(context)
@@ -378,6 +385,11 @@ function serialize(node: Node, context: Context) {
 			context.joinNoteFieldValue.push({
 				name,
 				sql: regexpWithFlags(node, `noteFieldValue.value`, true),
+			})
+		} else if (node.type === 'Html') {
+			context.joinNoteValueFts.push({
+				name,
+				sql: like(node, `noteValueFts.value`, true),
 			})
 		} else {
 			context.joinNoteValueFts.push({
@@ -405,6 +417,7 @@ function serialize(node: Node, context: Context) {
 				if (
 					child.type === 'SimpleString' ||
 					child.type === 'Quoted' ||
+					child.type === 'Html' ||
 					child.type === 'Regex'
 				) {
 					handleLabel(child, context)
@@ -546,7 +559,7 @@ function andOrNothing(node: SyntaxNode): '' | typeof and | typeof or {
 }
 
 interface QueryString {
-	type: typeof simpleString | typeof quoted
+	type: typeof simpleString | typeof quoted | typeof html
 	label?: Label
 	value: string
 	regexPattern?: string // only intended for internal use. Specifically to supplement where FTS is lacking, like escaping, word boundaries, and case sensitivity.
@@ -577,6 +590,7 @@ type Label = (typeof labels)[number]
 const group = 'Group' as const
 const simpleString = 'SimpleString' as const
 const quoted = 'Quoted' as const
+const html = 'Html' as const
 const or = 'OR' as const
 const and = 'AND' as const
 const regex = 'Regex' as const
@@ -651,6 +665,7 @@ function distributeNegate(node: Node, negate: boolean) {
 	} else if (
 		node.type === simpleString ||
 		node.type === quoted ||
+		node.type === html ||
 		node.type === regex
 	) {
 		if (negate) node.negate = !node.negate
