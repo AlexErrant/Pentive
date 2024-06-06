@@ -236,6 +236,7 @@ function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
 	) {
 		maybeAddSeparator(node.node, context)
 		const label = getLabel(node.node.parent!)
+		const negate = isNegated(node.node)
 		const {
 			value,
 			wildcardLeft,
@@ -249,7 +250,10 @@ function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
 			node.type.is(qt.KindEnum) ||
 			node.type.is(qt.Number)
 				? ({
-						value: input.slice(node.from, node.to),
+						value:
+							negate && node.type.is(qt.Number)
+								? '-' + input.slice(node.from, node.to)
+								: input.slice(node.from, node.to),
 						wildcardLeft: true,
 						wildcardRight: true,
 						boundLeft: false,
@@ -269,7 +273,6 @@ function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
 				  node.type.is(qt.RawQuoted)
 				? buildContent(node, input)
 				: throwExp('You missed ' + node.type.name)
-		const negate = isNegated(node.node)
 		context.current.attach({
 			type:
 				node.type.is(qt.Quoted1) ||
@@ -278,6 +281,8 @@ function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
 					? 'Quoted'
 					: node.type.is(qt.Html) || node.type.is(qt.RawHtml)
 					? 'Html'
+					: node.type.is(qt.Number)
+					? 'Number'
 					: 'SimpleString',
 			value,
 			wildcardLeft,
@@ -378,6 +383,7 @@ function serialize(node: Node, context: Context) {
 		node.type === simpleString ||
 		node.type === quoted ||
 		node.type === html ||
+		node.type === number ||
 		node.type === regex
 	) {
 		const name = getJoinTableName(context)
@@ -417,6 +423,7 @@ function serialize(node: Node, context: Context) {
 				if (
 					child.type === 'SimpleString' ||
 					child.type === 'Quoted' ||
+					child.type === 'Number' ||
 					child.type === 'Html' ||
 					child.type === 'Regex'
 				) {
@@ -479,6 +486,41 @@ function handleLabel(node: QueryString | QueryRegex, context: Context) {
 				: 3
 		const equals = sql.raw(node.negate ? 'IS NOT' : 'IS')
 		context.parameterizeSql(sql`latestReview.kind ${equals} ${n}`)
+	} else if (node.label === 'created') {
+		handleCreatedEdited(node, context, undefined, 'created')
+	} else if (node.label === 'edited') {
+		handleCreatedEdited(node, context, undefined, 'edited')
+	} else if (node.label === 'cardCreated') {
+		handleCreatedEdited(node, context, 'card', 'created')
+	} else if (node.label === 'noteCreated') {
+		handleCreatedEdited(node, context, 'note', 'created')
+	} else if (node.label === 'cardEdited') {
+		handleCreatedEdited(node, context, 'card', 'edited')
+	} else if (node.label === 'noteEdited') {
+		handleCreatedEdited(node, context, 'note', 'edited')
+	} else {
+		throwExp('Unhandled label: ' + node.label)
+	}
+}
+
+function handleCreatedEdited(
+	node: Node,
+	context: Context,
+	table: 'note' | 'card' | undefined,
+	column: 'created' | 'edited',
+) {
+	if (node.type === 'Number') {
+		node.fieldValueHighlight = undefined
+		const val = Date.now() - parseInt(node.value) * 86_400_000
+		const col = sql.raw(column)
+		if (table == null) {
+			context.parameterizeSql(
+				sql`(card.${col} > ${val} OR note.${col} > ${val})`,
+			)
+		} else {
+			const tbl = sql.table(table)
+			context.parameterizeSql(sql`${tbl}.${col} > ${val}`)
+		}
 	}
 }
 
@@ -559,11 +601,11 @@ function andOrNothing(node: SyntaxNode): '' | typeof and | typeof or {
 }
 
 interface QueryString {
-	type: typeof simpleString | typeof quoted | typeof html
+	type: typeof simpleString | typeof quoted | typeof html | typeof number
 	label?: Label
 	value: string
 	regexPattern?: string // only intended for internal use. Specifically to supplement where FTS is lacking, like escaping, word boundaries, and case sensitivity.
-	fieldValueHighlight: FieldValueHighlight
+	fieldValueHighlight?: FieldValueHighlight
 	negate: boolean
 	wildcardLeft: boolean
 	wildcardRight: boolean
@@ -591,6 +633,7 @@ const group = 'Group' as const
 const simpleString = 'SimpleString' as const
 const quoted = 'Quoted' as const
 const html = 'Html' as const
+const number = 'Number' as const
 const or = 'OR' as const
 const and = 'AND' as const
 const regex = 'Regex' as const
@@ -666,6 +709,7 @@ function distributeNegate(node: Node, negate: boolean) {
 		node.type === simpleString ||
 		node.type === quoted ||
 		node.type === html ||
+		node.type === number ||
 		node.type === regex
 	) {
 		if (negate) node.negate = !node.negate
