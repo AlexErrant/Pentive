@@ -2,7 +2,6 @@ import { type SyntaxNodeRef, type SyntaxNode } from '@lezer/common'
 import { parser } from './queryParser'
 import { assertNever, escapeRegExp, throwExp } from 'shared'
 import { sql, type RawBuilder, type SqlBool } from 'kysely'
-import { Is, Regex } from './queryParser.terms'
 import * as qt from './queryParser.terms'
 import {
 	stringLabels,
@@ -228,6 +227,7 @@ function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
 		node.type.is(qt.SimpleString) ||
 		node.type.is(qt.KindEnum) ||
 		node.type.is(qt.Number) ||
+		node.type.is(qt.Date) ||
 		node.type.is(qt.Quoted1) ||
 		node.type.is(qt.Quoted2) ||
 		node.type.is(qt.Html) ||
@@ -237,6 +237,16 @@ function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
 		maybeAddSeparator(node.node, context)
 		const label = getLabel(node.node.parent!)
 		const negate = isNegated(node.node)
+		let comparison
+		if (node.type.is(qt.Date)) {
+			const prev = node.node.prevSibling!
+			const maybe = input.slice(prev.from, prev.to) as Comparison
+			if (comparisons.includes(maybe)) {
+				comparison = maybe
+			} else {
+				throwExp('Unhandled comparison: ' + comparison)
+			}
+		}
 		const {
 			value,
 			wildcardLeft,
@@ -248,6 +258,7 @@ function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
 		} =
 			node.type.is(qt.SimpleString) ||
 			node.type.is(qt.KindEnum) ||
+			node.type.is(qt.Date) ||
 			node.type.is(qt.Number)
 				? ({
 						value:
@@ -283,6 +294,8 @@ function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
 					? 'Html'
 					: node.type.is(qt.Number)
 					? 'Number'
+					: node.type.is(qt.Date)
+					? 'Date'
 					: 'SimpleString',
 			value,
 			wildcardLeft,
@@ -293,8 +306,9 @@ function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
 			fieldValueHighlight,
 			negate,
 			label,
+			comparison,
 		})
-	} else if (node.type.is(Regex)) {
+	} else if (node.type.is(qt.Regex)) {
 		maybeAddSeparator(node.node, context)
 		const tailDelimiterIndex = input.lastIndexOf('/', node.to)
 		const pattern = input.slice(node.from + 1, tailDelimiterIndex)
@@ -384,6 +398,7 @@ function serialize(node: Node, context: Context) {
 		node.type === quoted ||
 		node.type === html ||
 		node.type === number ||
+		node.type === date ||
 		node.type === regex
 	) {
 		const name = getJoinTableName(context)
@@ -424,6 +439,7 @@ function serialize(node: Node, context: Context) {
 					child.type === 'SimpleString' ||
 					child.type === 'Quoted' ||
 					child.type === 'Number' ||
+					child.type === 'Date' ||
 					child.type === 'Html' ||
 					child.type === 'Regex'
 				) {
@@ -503,6 +519,8 @@ function handleLabel(node: QueryString | QueryRegex, context: Context) {
 	}
 }
 
+const dayInMs = 86_400_000
+
 function handleCreatedEdited(
 	node: Node,
 	context: Context,
@@ -510,17 +528,45 @@ function handleCreatedEdited(
 	column: 'created' | 'edited',
 ) {
 	if (node.type === 'Number') {
-		node.fieldValueHighlight = undefined
-		const val = Date.now() - parseInt(node.value) * 86_400_000
-		const col = sql.raw(column)
-		if (table == null) {
-			context.parameterizeSql(
-				sql`(card.${col} > ${val} OR note.${col} > ${val})`,
-			)
+		const val = Date.now() - parseInt(node.value) * dayInMs
+		createEditValue(val, context, table, column, '>')
+	} else if (node.type === 'Date') {
+		const [year, month, day] = node.value.split('-')
+		if (year == null || month == null || day == null) throwExp('impossible')
+		const local = new Date(parseInt(year), parseInt(month) - 1, parseInt(day)) // `new Date("2009-01-01") != new Date("2009-1-1")` so I parseInt
+		let comparison = node.comparison!
+		if (comparison === ':') comparison = '>'
+		if (comparison === '=') {
+			context.trustedSql('(')
+			createEditValue(local.getTime(), context, table, column, '>')
+			context.trustedSql('AND')
+			createEditValue(local.getTime() + dayInMs, context, table, column, '<')
+			context.trustedSql(')')
 		} else {
-			const tbl = sql.table(table)
-			context.parameterizeSql(sql`${tbl}.${col} > ${val}`)
+			createEditValue(local.getTime(), context, table, column, comparison)
 		}
+	} else {
+		throwExp('impossible: ' + node.type)
+	}
+	node.fieldValueHighlight = undefined
+}
+
+function createEditValue(
+	val: number,
+	context: Context,
+	table: 'note' | 'card' | undefined,
+	column: 'created' | 'edited',
+	comparison: Comparison,
+) {
+	const col = sql.raw(column)
+	const comp = sql.raw(comparison)
+	if (table == null) {
+		context.parameterizeSql(
+			sql`(card.${col} ${comp} ${val} OR note.${col} ${comp} ${val})`,
+		)
+	} else {
+		const tbl = sql.table(table)
+		context.parameterizeSql(sql`${tbl}.${col} ${comp} ${val}`)
 	}
 }
 
@@ -577,12 +623,17 @@ function andOrNothing(node: SyntaxNode): '' | typeof and | typeof or {
 		}
 
 		if (left.type.is(qt.Or)) return or
-		if (left.type.is(Is) || stringLabels.includes(left.name)) {
+		if (
+			left.type.is(qt.Is) ||
+			stringLabels.includes(left.name) ||
+			left.type.is(qt.Comparison)
+		) {
 			return ''
 		}
 		if (
 			left.type.is(qt.SimpleString) ||
 			left.type.is(qt.Number) ||
+			left.type.is(qt.Date) ||
 			left.type.is(qt.Quoted1) ||
 			left.type.is(qt.Quoted2) ||
 			left.type.is(qt.RawQuoted) ||
@@ -601,7 +652,12 @@ function andOrNothing(node: SyntaxNode): '' | typeof and | typeof or {
 }
 
 interface QueryString {
-	type: typeof simpleString | typeof quoted | typeof html | typeof number
+	type:
+		| typeof simpleString
+		| typeof quoted
+		| typeof html
+		| typeof number
+		| typeof date
 	label?: Label
 	value: string
 	regexPattern?: string // only intended for internal use. Specifically to supplement where FTS is lacking, like escaping, word boundaries, and case sensitivity.
@@ -611,7 +667,11 @@ interface QueryString {
 	wildcardRight: boolean
 	boundLeft: boolean
 	boundRight: boolean
+	comparison?: Comparison
 }
+
+const comparisons = [':', '=', '<', '>', '<=', '>='] as const
+type Comparison = (typeof comparisons)[number]
 
 interface QueryRegex {
 	type: typeof regex
@@ -634,6 +694,7 @@ const simpleString = 'SimpleString' as const
 const quoted = 'Quoted' as const
 const html = 'Html' as const
 const number = 'Number' as const
+const date = 'Date' as const
 const or = 'OR' as const
 const and = 'AND' as const
 const regex = 'Regex' as const
@@ -710,6 +771,7 @@ function distributeNegate(node: Node, negate: boolean) {
 		node.type === quoted ||
 		node.type === html ||
 		node.type === number ||
+		node.type === date ||
 		node.type === regex
 	) {
 		if (negate) node.negate = !node.negate
