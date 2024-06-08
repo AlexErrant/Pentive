@@ -1,14 +1,48 @@
-import { type CardId, type Review } from 'shared'
+import { type Kind, assertNever, type CardId, type Review } from 'shared'
 import { type Review as ReviewEntity } from '../sqlite/database'
 import _ from 'lodash'
 import { C, ky } from '../topLevelAwait'
+
+function serializeKind(s: Kind): number {
+	switch (s) {
+		case 'learn':
+			return 0
+		case 'review':
+			return 1
+		case 'relearn':
+			return 2
+		case 'filtered':
+			return 3
+		case 'manual':
+			return 4
+		default:
+			return assertNever(s)
+	}
+}
+
+function deserializeKind(s: number): Kind {
+	switch (s) {
+		case 0:
+			return 'learn'
+		case 1:
+			return 'review'
+		case 2:
+			return 'relearn'
+		case 3:
+			return 'filtered'
+		case 4:
+			return 'manual'
+		default:
+			return C.toastImpossible(`Expected 0, 1, 2, 3, or 4, but got ${s}`)
+	}
+}
 
 function toEntity({ id, cardId, created, rating, kind, ...r }: Review) {
 	return {
 		id,
 		cardId,
 		rating,
-		kind,
+		kind: serializeKind(kind),
 		created: created.getTime(),
 		details: stringifyDetails(r),
 	} satisfies ReviewEntity
@@ -35,10 +69,11 @@ export const reviewCollectionMethods = {
 			.orderBy('created')
 			.execute()
 		return reviews.map(
-			({ details, created, ...r }) =>
+			({ details, created, kind, ...r }) =>
 				({
 					...r,
 					created: new Date(created),
+					kind: deserializeKind(kind),
 					...parseDetails(details),
 				}) satisfies Review as Review,
 		)

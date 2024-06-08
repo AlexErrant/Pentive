@@ -12,6 +12,7 @@ import {
 	type Note as PNote,
 	type Review,
 	type ReviewId,
+	type Kind,
 } from 'shared'
 import {
 	type Card as ACard,
@@ -159,7 +160,24 @@ export function parseRevlog({
 		id: id.toString() as ReviewId, // highTODO
 		created: new Date(id),
 		rating: ease,
-		kind: type, // changing the name so its easier to grep - `type` is overloaded.
+		kind: convertType(type), // changing the name so its easier to grep - `type` is overloaded.
+	}
+}
+
+function convertType(s: number): Kind {
+	switch (s) {
+		case 0:
+			return 'learn'
+		case 1:
+			return 'review'
+		case 2:
+			return 'relearn'
+		case 3:
+			return 'filtered'
+		case 4:
+			return 'manual'
+		default:
+			return C.toastImpossible(`Expected 0, 1, 2, 3, or 4, but got ${s}`)
 	}
 }
 

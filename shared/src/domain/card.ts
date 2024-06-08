@@ -13,7 +13,8 @@ export const states = [
 	'user buried',
 	'suspended',
 ] as const
-export type State = 'normal' | 'scheduler buried' | 'user buried' | 'suspended'
+
+export type State = (typeof states)[number]
 export type Score = 'again' | 'hard' | 'good' | 'easy'
 
 export interface Card {

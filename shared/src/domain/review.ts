@@ -12,10 +12,19 @@ import { type CardId, type ReviewId } from '../brand.js'
 // 	interval?: number // in seconds
 // }
 
+export const kinds = [
+	'learn',
+	'review',
+	'relearn',
+	'filtered',
+	'manual',
+] as const
+export type Kind = (typeof kinds)[number]
+
 export type Review = {
 	id: ReviewId
 	cardId: CardId
 	created: Date
 	rating: number
-	kind: number // 0=learn, 1=review, 2=relearn, 3=cram highTODO reconsider your life choices
+	kind: Kind
 } & Record<string, unknown>

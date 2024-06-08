@@ -69,7 +69,7 @@ export default function Study(): JSX.Element {
 			cardId: cardId()!,
 			created: C.getDate(),
 			rating,
-			kind: 1, // highTODO
+			kind: 'review', // highTODO
 		})
 		batch(() => {
 			setSide('front')
