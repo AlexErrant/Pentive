@@ -1,4 +1,4 @@
-import sqlJson from './sql.json'
+import sqlJson from './sql.json' assert { type: 'json' }
 export const initSql = sqlJson
 
 // hacky, but better than my previous solution, which was to parse the value, which was slow(er) and fragile.
