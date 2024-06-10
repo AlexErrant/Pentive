@@ -13,6 +13,8 @@ import {
 	type Review,
 	type ReviewId,
 	type Kind,
+	throwExp,
+	dayInMs,
 } from 'shared'
 import {
 	type Card as ACard,
@@ -128,6 +130,7 @@ export function parseCard(
 	notes: Map<number, PNote>,
 	templates: Map<TemplateId, Template>,
 	decks: Decks,
+	colCrtMs: number,
 ): PCard {
 	const note = notes.get(card.nid)
 	if (note == null) return C.toastFatal(`Note ${card.nid} not found`)
@@ -141,9 +144,24 @@ export function parseCard(
 		tags: new Set(['Deck/' + normalize(deck.name)]),
 		created: new Date(card.id),
 		updated: new Date(card.mod),
-		due: new Date(card.due), // highTODO
+		due: parseDue(card.due, card.type, colCrtMs),
 		cardSettingId: deck.conf.toString() as CardSettingId,
 		ord: card.ord,
+	}
+}
+
+function parseDue(due: number, type: number, colCrtMs: number): Date | number {
+	if (type === 0) {
+		// new
+		return due
+	} else if (type === 1 || type === 3) {
+		// learning || relearning
+		return new Date(due * 1000)
+	} else if (type === 2) {
+		// review
+		return new Date(due * dayInMs + colCrtMs)
+	} else {
+		throwExp('Unhandled type: ' + type)
 	}
 }
 

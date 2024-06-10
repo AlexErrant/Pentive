@@ -78,3 +78,5 @@ export const objEntries: <TKey extends string, TVal>(
 export function escapeRegExp(string: string): string {
 	return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') // $& means the whole matched string
 }
+
+export const dayInMs = 86_400_000

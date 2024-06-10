@@ -25,7 +25,7 @@ export interface Card {
 	created: Date
 	updated: Date
 	cardSettingId?: CardSettingId
-	due: Date
+	due: Date | number
 	state?: State
 }
 

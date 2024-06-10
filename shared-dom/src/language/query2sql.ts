@@ -1,6 +1,6 @@
 import { type SyntaxNodeRef, type SyntaxNode } from '@lezer/common'
 import { parser } from './queryParser'
-import { assertNever, escapeRegExp, throwExp } from 'shared'
+import { assertNever, dayInMs, escapeRegExp, throwExp } from 'shared'
 import { sql, type RawBuilder, type SqlBool } from 'kysely'
 import * as qt from './queryParser.terms'
 import {
@@ -518,8 +518,6 @@ function handleLabel(node: QueryString | QueryRegex, context: Context) {
 		throwExp('Unhandled label: ' + node.label)
 	}
 }
-
-const dayInMs = 86_400_000
 
 function handleCreatedEdited(
 	node: Node,

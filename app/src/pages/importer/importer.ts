@@ -15,7 +15,7 @@ import {
 	Uint8ArrayWriter,
 	ZipReader,
 } from '@zip.js/zip.js'
-import { notEmpty } from 'shared'
+import { notEmpty, throwExp } from 'shared'
 import initSqlJs, { type Database } from 'sql.js'
 import {
 	checkCard,
@@ -117,6 +117,7 @@ async function addMediaBatch(
 
 async function importAnkiDb(sqlite: Entry): Promise<void> {
 	const ankiDb = await getAnkiDb(sqlite)
+	let colCrtMs: number | undefined
 	const templatesMap = new Map<TemplateId, Template>()
 	const notesMap = new Map<number, PNote>()
 	let decks: Decks | undefined
@@ -128,6 +129,7 @@ async function importAnkiDb(sqlite: Entry): Promise<void> {
 			const row = cols.getAsObject()
 			const col = checkCol(row)
 			decks = col.decks
+			colCrtMs = col.crt * 1000
 			const templates = parseTemplates(col.models)
 			await db.bulkInsertTemplate(templates)
 			templates.forEach((t) => templatesMap.set(t.id, t))
@@ -144,10 +146,12 @@ async function importAnkiDb(sqlite: Entry): Promise<void> {
 		notes.free()
 		await db.bulkUpsertNotes(Array.from(notesMap.values()))
 		const cards = ankiDb.prepare('select * from cards') // lowTODO select exact columns
+		const colCrtMs2 = colCrtMs ?? throwExp('col is null')
+		const decks2 = decks ?? throwExp('decks is null')
 		while (cards.step()) {
 			const row = cards.getAsObject()
 			const card = checkCard(row)
-			cardsList.push(parseCard(card, notesMap, templatesMap, decks!))
+			cardsList.push(parseCard(card, notesMap, templatesMap, decks2, colCrtMs2))
 		}
 		cards.free()
 		await db.bulkUpsertCards(cardsList)

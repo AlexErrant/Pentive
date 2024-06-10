@@ -165,7 +165,15 @@ const columnDefs: Array<ColDef<NoteCard>> = [
 		sortable: true,
 		cellRenderer: (
 			props: ICellRendererParams<NoteCard, NoteCard['card']['due']>,
-		) => <relative-time date={props.value} />,
+		) => (
+			<>
+				{typeof props.value === 'number' ? (
+					<>New #{props.value}</>
+				) : (
+					<relative-time date={props.value} />
+				)}
+			</>
+		),
 	},
 	{
 		headerName: 'Created',
