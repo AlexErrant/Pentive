@@ -371,7 +371,8 @@ const dataSource = {
 				  }
 				: undefined
 		const cleanedQuery = query().trim()
-		const conversionResult = convert(cleanedQuery)
+		const now = C.getDate()
+		const conversionResult = convert(cleanedQuery, now)
 		const start = performance.now()
 		db.getCards(
 			p.startRow,

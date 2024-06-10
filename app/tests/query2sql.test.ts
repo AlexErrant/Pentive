@@ -58,7 +58,7 @@ async function assertEqual(
 		// @ts-expect-error don't actually use CRDialect
 		dialect: new CRDialect(),
 	})
-	const converted = actualConvert(actual)
+	const converted = actualConvert(actual, new Date())
 	const compile = converted.sql!.compile(ky)
 	const actual2 = unparameterize(i, compile)
 	expect(await format(actual2)).toBe(expected2)
@@ -93,12 +93,12 @@ async function assertEqual(
 }
 
 test('empty string is null', () => {
-	const sql = actualConvert('').sql
+	const sql = actualConvert('', new Date()).sql
 	expect(sql).toBeNull()
 })
 
 test('whitespace is null', () => {
-	const sql = actualConvert(' \t\r\n').sql
+	const sql = actualConvert(' \t\r\n', new Date()).sql
 	expect(sql).toBeNull()
 })
 

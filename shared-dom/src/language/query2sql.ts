@@ -21,7 +21,8 @@ type JoinTable = Array<{
 }>
 
 class Context {
-	constructor() {
+	constructor(now: Date) {
+		this.now = now
 		this.sql = []
 		this.root = new Group(null, false)
 		this.current = this.root
@@ -52,6 +53,7 @@ class Context {
 	joinLatestReview: boolean
 	fieldValueHighlight: FieldValueHighlight[]
 	joinTableName: number
+	now: Date
 
 	trustedSql(trustedSql: string) {
 		this.sql.push(sql.raw(` ${trustedSql} `))
@@ -77,9 +79,9 @@ export interface FieldValueHighlight {
 	boundRight: boolean
 }
 
-export function convert(input: string) {
+export function convert(input: string, now: Date) {
 	const tree = parser.parse(input)
-	const context = new Context()
+	const context = new Context(now)
 	tree.cursor().iterate(
 		(node) => astEnter(input, node, context),
 		(node) => {
@@ -530,7 +532,7 @@ function handleCreatedEditedDue(
 	column: 'created' | 'edited' | 'due',
 ) {
 	if (node.type === 'Number') {
-		const val = Date.now() - parseInt(node.value) * dayInMs
+		const val = context.now.getTime() - parseInt(node.value) * dayInMs
 		handleComparison(val, context, table, column, '>')
 	} else if (node.type === 'SimpleString') {
 		const comp =
@@ -539,7 +541,7 @@ function handleCreatedEditedDue(
 				: node.value === 'false'
 				? '>'
 				: throwExp('impossible')
-		handleComparison(Date.now(), context, table, column, comp)
+		handleComparison(context.now.getTime(), context, table, column, comp)
 	} else if (node.type === 'Date') {
 		const [year, month, day] = node.value.split('-')
 		if (year == null || month == null || day == null) throwExp('impossible')
