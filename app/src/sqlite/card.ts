@@ -389,7 +389,9 @@ async function getCards(
 			.groupBy('card.rowid')
 	const searchCache =
 		// If user has scrolled, build/use the cache.
-		offset === 0 ? null : await buildCache(baseQuery(), query)
+		offset === 0
+			? null
+			: await buildCache(baseQuery(), query + JSON.stringify(sort))
 	const table = searchCache ?? ('cardRowids' as const)
 	const maybeCte: QueryCreator<DB & WithCache> =
 		searchCache == null ? db.with('cardRowids', baseQuery) : db
