@@ -32,8 +32,8 @@ import { type SyntaxNode } from '@lezer/common'
 //
 // https://discuss.codemirror.net/t/how-to-add-new-auto-complete-values-to-existing-auto-completion-results-dynamically/6750/2
 // ^ this indicates that the completions can't be live updated
-function buildHistory(getHistory: () => Set<string>) {
-	return Array.from(getHistory()).map(
+function buildHistoryCompletion(history: string[]) {
+	return history.map(
 		(label) =>
 			({
 				label,
@@ -53,7 +53,7 @@ export const queryCompletion: (_: {
 		if (context.explicit && context.pos === 0) {
 			return {
 				from: 0,
-				options: buildHistory(getHistory).reverse(),
+				options: buildHistoryCompletion(Array.from(getHistory())).reverse(),
 				filter: false,
 			}
 		}
@@ -78,13 +78,14 @@ export const queryCompletion: (_: {
 					}) satisfies Completion,
 			)
 			// only use historical autocomplete if we're replacing everything
+			const history = Array.from(getHistory())
 			if (from === 0) {
-				options.push(...buildHistory(getHistory))
+				options.push(...buildHistoryCompletion(history))
 			}
 			return {
 				from,
 				options,
-				validFor: () => true,
+				validFor: (x) => history.some((h) => h.startsWith(x)),
 			}
 		} else if (inLabel(nodeBefore, tag)) {
 			const textBefore = context.state.sliceDoc(nodeBefore.from, context.pos)
