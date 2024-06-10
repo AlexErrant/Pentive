@@ -226,6 +226,7 @@ function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
 	if (
 		node.type.is(qt.SimpleString) ||
 		node.type.is(qt.KindEnum) ||
+		node.type.is(qt.DueEnum) ||
 		node.type.is(qt.Number) ||
 		node.type.is(qt.Date) ||
 		node.type.is(qt.Quoted1) ||
@@ -258,6 +259,7 @@ function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
 		} =
 			node.type.is(qt.SimpleString) ||
 			node.type.is(qt.KindEnum) ||
+			node.type.is(qt.DueEnum) ||
 			node.type.is(qt.Date) ||
 			node.type.is(qt.Number)
 				? ({
@@ -503,31 +505,41 @@ function handleLabel(node: QueryString | QueryRegex, context: Context) {
 		const equals = sql.raw(node.negate ? 'IS NOT' : 'IS')
 		context.parameterizeSql(sql`latestReview.kind ${equals} ${n}`)
 	} else if (node.label === 'created') {
-		handleCreatedEdited(node, context, undefined, 'created')
+		handleCreatedEditedDue(node, context, undefined, 'created')
 	} else if (node.label === 'edited') {
-		handleCreatedEdited(node, context, undefined, 'edited')
+		handleCreatedEditedDue(node, context, undefined, 'edited')
 	} else if (node.label === 'cardCreated') {
-		handleCreatedEdited(node, context, 'card', 'created')
+		handleCreatedEditedDue(node, context, 'card', 'created')
 	} else if (node.label === 'noteCreated') {
-		handleCreatedEdited(node, context, 'note', 'created')
+		handleCreatedEditedDue(node, context, 'note', 'created')
 	} else if (node.label === 'cardEdited') {
-		handleCreatedEdited(node, context, 'card', 'edited')
+		handleCreatedEditedDue(node, context, 'card', 'edited')
 	} else if (node.label === 'noteEdited') {
-		handleCreatedEdited(node, context, 'note', 'edited')
+		handleCreatedEditedDue(node, context, 'note', 'edited')
+	} else if (node.label === 'due') {
+		handleCreatedEditedDue(node, context, 'card', 'due')
 	} else {
 		throwExp('Unhandled label: ' + node.label)
 	}
 }
 
-function handleCreatedEdited(
+function handleCreatedEditedDue(
 	node: Node,
 	context: Context,
 	table: 'note' | 'card' | undefined,
-	column: 'created' | 'edited',
+	column: 'created' | 'edited' | 'due',
 ) {
 	if (node.type === 'Number') {
 		const val = Date.now() - parseInt(node.value) * dayInMs
-		createEditValue(val, context, table, column, '>')
+		handleComparison(val, context, table, column, '>')
+	} else if (node.type === 'SimpleString') {
+		const comp =
+			node.value === 'true'
+				? '<='
+				: node.value === 'false'
+				? '>'
+				: throwExp('impossible')
+		handleComparison(Date.now(), context, table, column, comp)
 	} else if (node.type === 'Date') {
 		const [year, month, day] = node.value.split('-')
 		if (year == null || month == null || day == null) throwExp('impossible')
@@ -536,12 +548,12 @@ function handleCreatedEdited(
 		if (comparison === ':') comparison = '>'
 		if (comparison === '=') {
 			context.trustedSql('(')
-			createEditValue(local.getTime(), context, table, column, '>')
+			handleComparison(local.getTime(), context, table, column, '>')
 			context.trustedSql('AND')
-			createEditValue(local.getTime() + dayInMs, context, table, column, '<')
+			handleComparison(local.getTime() + dayInMs, context, table, column, '<')
 			context.trustedSql(')')
 		} else {
-			createEditValue(local.getTime(), context, table, column, comparison)
+			handleComparison(local.getTime(), context, table, column, comparison)
 		}
 	} else {
 		throwExp('impossible: ' + node.type)
@@ -549,22 +561,27 @@ function handleCreatedEdited(
 	node.fieldValueHighlight = undefined
 }
 
-function createEditValue(
+function handleComparison(
 	val: number,
 	context: Context,
 	table: 'note' | 'card' | undefined,
-	column: 'created' | 'edited',
+	column: 'created' | 'edited' | 'due',
 	comparison: Comparison,
 ) {
-	const col = sql.raw(column)
 	const comp = sql.raw(comparison)
 	if (table == null) {
+		const col = sql.raw(column)
 		context.parameterizeSql(
 			sql`(card.${col} ${comp} ${val} OR note.${col} ${comp} ${val})`,
 		)
 	} else {
-		const tbl = sql.table(table)
-		context.parameterizeSql(sql`${tbl}.${col} ${comp} ${val}`)
+		if (column === 'due') {
+			context.parameterizeSql(sql`(card.due ${comp} ${val} AND card.due >= 0)`)
+		} else {
+			const tbl = sql.table(table)
+			const col = sql.raw(column)
+			context.parameterizeSql(sql`${tbl}.${col} ${comp} ${val}`)
+		}
 	}
 }
 
@@ -640,7 +657,8 @@ function andOrNothing(node: SyntaxNode): '' | typeof and | typeof or {
 			left.type.is(qt.Html) ||
 			left.type.is(qt.Group) ||
 			left.type.is(qt.Label) ||
-			left.type.is(qt.KindEnum)
+			left.type.is(qt.KindEnum) ||
+			left.type.is(qt.DueEnum)
 		) {
 			return and
 		}

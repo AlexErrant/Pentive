@@ -132,8 +132,8 @@ createdUpdated {
   ( kw<"created">
   | kw<"noteCreated">
   | kw<"cardCreated">
-  | kw<"edited"> 
-  | kw<"noteEdited"> 
+  | kw<"edited">
+  | kw<"noteEdited">
   | kw<"cardEdited"> )
   ( Is Not? Number
   | Comparison Date )
