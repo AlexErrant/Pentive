@@ -40,6 +40,15 @@ function parseField(fld: Fld): Field {
 	}
 }
 
+function newDate(i: number) {
+	const d = new Date(i)
+	if (isNaN(+d)) {
+		// https://stackoverflow.com/q/1353684#comment131454756_67410020
+		throwExp('Invalid date: ' + i)
+	}
+	return d
+}
+
 function parseChildTemplate(tmpl: Tmpl): ChildTemplate {
 	return {
 		id: tmpl.ord as Ord,
@@ -83,8 +92,8 @@ export function parseTemplates(models: Models): Template[] {
 			name: m.name,
 			css: m.css,
 			fields: m.flds.map(parseField),
-			created: new Date(m.id),
-			updated: new Date(m.mod * 1000),
+			created: newDate(m.id),
+			updated: newDate(m.mod * 1000),
 			templateType: parseTemplateType(m),
 			ankiId: m.id,
 			remotes: {},
@@ -110,8 +119,8 @@ export function parseNote(
 		)
 	return {
 		id: note.id.toString() as NoteId, // medTODO
-		created: new Date(note.id),
-		updated: new Date(note.mod),
+		created: newDate(note.id),
+		updated: newDate(note.mod),
 		ankiNoteId: note.id,
 		templateId,
 		fieldValues: new Map(_.zip(fields, values) as Array<[string, string]>),
@@ -142,8 +151,8 @@ export function parseCard(
 		id: card.id.toString() as CardId, // medTODO
 		noteId: card.nid.toString() as NoteId, // medTODO
 		tags: new Set(['Deck/' + normalize(deck.name)]),
-		created: new Date(card.id),
-		updated: new Date(card.mod),
+		created: newDate(card.id),
+		updated: newDate(card.mod),
 		due: parseDue(card.due, card.type, colCrtMs),
 		cardSettingId: deck.conf.toString() as CardSettingId,
 		ord: card.ord,
@@ -156,10 +165,10 @@ function parseDue(due: number, type: number, colCrtMs: number): Date | number {
 		return due
 	} else if (type === 1 || type === 3) {
 		// learning || relearning
-		return new Date(due * 1000)
+		return newDate(due * 1000)
 	} else if (type === 2) {
 		// review
-		return new Date(due * dayInMs + colCrtMs)
+		return newDate(due * dayInMs + colCrtMs)
 	} else {
 		throwExp('Unhandled type: ' + type)
 	}
@@ -176,7 +185,7 @@ export function parseRevlog({
 		...revlog,
 		cardId: cid.toString() as CardId, // highTODO
 		id: id.toString() as ReviewId, // highTODO
-		created: new Date(id),
+		created: newDate(id),
 		rating: ease,
 		kind: convertType(type), // changing the name so its easier to grep - `type` is overloaded.
 	}
