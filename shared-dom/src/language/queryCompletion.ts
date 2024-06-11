@@ -65,7 +65,7 @@ export const queryCompletion: (_: {
 					nodeBefore.parent?.type.is(Program) === true))
 		) {
 			const textBefore = context.state.sliceDoc(nodeBefore.from, context.pos)
-			const tagBefore = /\w*$/.exec(textBefore)
+			const tagBefore = simpleStringRegex.exec(textBefore)
 			if (tagBefore == null && !context.explicit) return null
 			const from =
 				tagBefore != null ? nodeBefore.from + tagBefore.index : context.pos
@@ -89,7 +89,7 @@ export const queryCompletion: (_: {
 			}
 		} else if (inLabel(nodeBefore, tag)) {
 			const textBefore = context.state.sliceDoc(nodeBefore.from, context.pos)
-			const tagBefore = /\w*$/.exec(textBefore)
+			const tagBefore = simpleStringRegex.exec(textBefore)
 			if (tagBefore == null && !context.explicit) return null
 			const tags = await getTags()
 			return {
@@ -103,11 +103,11 @@ export const queryCompletion: (_: {
 							apply: buildApply(nodeBefore, tag),
 						}) satisfies Completion,
 				),
-				validFor: /^(\w*)?$/,
+				validFor: simpleStringRegex,
 			}
 		} else if (inLabel(nodeBefore, setting)) {
 			const textBefore = context.state.sliceDoc(nodeBefore.from, context.pos)
-			const cardSettingBefore = /\w*$/.exec(textBefore)
+			const cardSettingBefore = simpleStringRegex.exec(textBefore)
 			if (cardSettingBefore == null && !context.explicit) return null
 			const cardSettings = await getCardSettings()
 			return {
@@ -123,11 +123,11 @@ export const queryCompletion: (_: {
 							apply: buildApply(nodeBefore, cardSetting),
 						}) satisfies Completion,
 				),
-				validFor: /^(\w*)?$/,
+				validFor: simpleStringRegex,
 			}
 		} else if (inLabel(nodeBefore, kind)) {
 			const textBefore = context.state.sliceDoc(nodeBefore.from, context.pos)
-			const kindBefore = /\w*$/.exec(textBefore)
+			const kindBefore = simpleStringRegex.exec(textBefore)
 			if (kindBefore == null && !context.explicit) return null
 			return {
 				from:
@@ -139,11 +139,11 @@ export const queryCompletion: (_: {
 							type: 'general',
 						}) satisfies Completion,
 				),
-				validFor: /^(\w*)?$/,
+				validFor: simpleStringRegex,
 			}
 		} else if (inLabel(nodeBefore, template)) {
 			const textBefore = context.state.sliceDoc(nodeBefore.from, context.pos)
-			const templateBefore = /\w*$/.exec(textBefore)
+			const templateBefore = simpleStringRegex.exec(textBefore)
 			if (templateBefore == null && !context.explicit) return null
 			const templates = await getTemplates()
 			return {
@@ -159,7 +159,7 @@ export const queryCompletion: (_: {
 							apply: buildApply(nodeBefore, template),
 						}) satisfies Completion,
 				),
-				validFor: /^(\w*)?$/,
+				validFor: simpleStringRegex,
 			}
 		}
 		return null
@@ -183,3 +183,7 @@ function buildApply(nodeBefore: SyntaxNode, option: string) {
 		? option
 		: '"' + escapedQuoted2(option) + '"'
 }
+
+// based on 569040F1-5B10-4D97-8F7B-0D75D81E7688
+const simpleStringRegex =
+	/[^#^=<>`\\/*_,():'"\\u0009\\u000A\\u000B\\u000C\\u000D\\u0020\\u0085\\u00A0\\u1680\\u2000\\u2001\\u2002\\u2003\\u2004\\u2005\\u2006\\u2007\\u2008\\u2009\\u200A\\u2028\\u2029\\u202F\\u205F\\u3000]*$/
