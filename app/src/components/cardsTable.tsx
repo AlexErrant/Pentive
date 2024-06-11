@@ -30,12 +30,14 @@ import {
 	convert,
 	getOk,
 	unique,
+	Hamburger,
 } from 'shared-dom'
 import { C } from '../topLevelAwait'
 import FiltersTable from './filtersTable'
 import './cardsTable.css'
 import QueryEditor from './queryEditor'
 import { alterQuery } from '../domain/alterQuery'
+import CardsTableHelp from './cardsTableHelp'
 
 LicenseManager.setLicenseKey(import.meta.env.VITE_AG_GRID_LICENSE)
 
@@ -248,6 +250,7 @@ const [query, setQuery] = createSignal('')
 const [externalQuery, setExternalQuery] = createSignal('')
 const [count, setCount] = createSignal<number>()
 const [selectedCount, setSelectedCount] = createSignal<number>(0)
+const [showHelp, setHelp] = createSignal(false)
 
 function setDatasource() {
 	setCount(undefined)
@@ -287,6 +290,7 @@ const CardsTable: VoidComponent<{
 	} satisfies Regexes
 	return (
 		<div class='flex h-full flex-col'>
+			{showHelp() && <CardsTableHelp />}
 			<div class='m-0.5 flex flex-row items-center gap-2 p-0.5'>
 				<QueryEditor
 					value={query()}
@@ -297,6 +301,7 @@ const CardsTable: VoidComponent<{
 					? ''
 					: selectedCount() + '/'}
 				{count() ?? '⏳'}
+				<Hamburger class='w-6' onclick={() => setHelp((x) => !x)} />
 			</div>
 			<div class={`${agGridTheme()} h-full`}>
 				<AgGridSolid
