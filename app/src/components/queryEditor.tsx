@@ -80,10 +80,7 @@ const QueryEditor: VoidComponent<{
 	})
 	return (
 		<>
-			<div
-				class='query-editor max-h-40 flex-1 resize-y overflow-auto'
-				ref={ref}
-			/>
+			<div class='query-editor max-h-40 flex-1 overflow-auto' ref={ref} />
 		</>
 	)
 }

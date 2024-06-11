@@ -246,8 +246,11 @@ const getRowId = (params: GetRowIdParams<NoteCard>): CardId =>
 
 const [query, setQuery] = createSignal('')
 const [externalQuery, setExternalQuery] = createSignal('')
+const [count, setCount] = createSignal<number>()
+const [selectedCount, setSelectedCount] = createSignal<number>(0)
 
 function setDatasource() {
+	setCount(undefined)
 	gridRef?.api.setDatasource(dataSource)
 }
 
@@ -284,12 +287,16 @@ const CardsTable: VoidComponent<{
 	} satisfies Regexes
 	return (
 		<div class='flex h-full flex-col'>
-			<div class='m-0.5 p-0.5'>
+			<div class='m-0.5 flex flex-row items-center gap-2 p-0.5'>
 				<QueryEditor
 					value={query()}
 					setValue={setQuery}
 					externalValue={externalQuery()}
 				/>
+				{selectedCount() === 0 || selectedCount() === 1
+					? ''
+					: selectedCount() + '/'}
+				{count() ?? '⏳'}
 			</div>
 			<div class={`${agGridTheme()} h-full`}>
 				<AgGridSolid
@@ -342,6 +349,7 @@ const CardsTable: VoidComponent<{
 					suppressMultiSort={true}
 					onSelectionChanged={(event) => {
 						const ncs = event.api.getSelectedRows() as NoteCard[]
+						setSelectedCount(ncs.length)
 						props.onSelectionChanged(ncs)
 					}}
 					navigateToNextCell={(p) => {
@@ -422,6 +430,10 @@ const dataSource = {
 					const end = performance.now()
 					console.log(`Count took ${end - start} ms`, cleanedQuery)
 					gridRef.api.setRowCount(count.c, true)
+					setCount(count.c)
+				} else {
+					gridRef.api.setRowCount(countish, true)
+					setCount(countish)
 				}
 				if (countishWrong && x.searchCache == null) {
 					// asynchronously/nonblockingly build the cache
