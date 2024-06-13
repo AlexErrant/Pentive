@@ -436,8 +436,7 @@ const dataSource = {
 					console.log(`Count took ${end - start} ms`, cleanedQuery)
 					gridRef.api.setRowCount(count.c, true)
 					setCount(count.c)
-				} else {
-					gridRef.api.setRowCount(countish, true)
+				} else if (!countishWrong) {
 					setCount(countish)
 				}
 				if (countishWrong && x.searchCache == null) {
