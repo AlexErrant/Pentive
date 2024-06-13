@@ -128,7 +128,7 @@ function createEditorState(
 				{
 					key: 'Enter',
 					run: (x) => {
-						const value = x.state.doc.toString()
+						const value = x.state.doc.toString().trim()
 						setValue(value)
 						appendHistory(value)
 						return true
