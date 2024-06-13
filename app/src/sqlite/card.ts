@@ -166,11 +166,12 @@ type WithCache = {
 async function buildCache(
 	baseQuery: SelectQueryBuilder<DB, 'card' | 'note', Partial<unknown>>,
 	query: string,
+	sort?: Sort,
 ) {
 	// const start = performance.now()
 	const cacheName = ('getCardsCache_' +
 		// lowTODO find a better way to name the cache table. Don't use crypto.subtle.digest - it's ~200ms which is absurd
-		md5(query)) as SearchCache
+		md5(query + JSON.stringify(sort ?? 'noSort'))) as SearchCache
 	// const end = performance.now()
 	// console.info(`hash built in ${end - start} ms`)
 	const cacheExists = await ky
@@ -217,12 +218,17 @@ async function getCardsCount(
 	return await count
 }
 
+export interface Sort {
+	col: 'card.due' | 'card.created'
+	direction: 'asc' | 'desc'
+}
+
 async function getCards(
 	offset: number,
 	limit: number,
 	query: string,
 	conversionResult: ReturnType<typeof convert>,
-	sort?: { col: 'card.due' | 'card.created'; direction: 'asc' | 'desc' },
+	sort?: Sort,
 ) {
 	const db = ky.withTables<WithCache>()
 	const baseQuery = (
@@ -389,9 +395,7 @@ async function getCards(
 			.groupBy('card.rowid')
 	const searchCache =
 		// If user has scrolled, build/use the cache.
-		offset === 0
-			? null
-			: await buildCache(baseQuery(), query + JSON.stringify(sort))
+		offset === 0 ? null : await buildCache(baseQuery(), query, sort)
 	const table = searchCache ?? ('cardRowids' as const)
 	const maybeCte: QueryCreator<DB & WithCache> =
 		searchCache == null ? db.with('cardRowids', baseQuery) : db

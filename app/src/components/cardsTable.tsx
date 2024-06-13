@@ -38,6 +38,7 @@ import './cardsTable.css'
 import QueryEditor from './queryEditor'
 import { alterQuery } from '../domain/alterQuery'
 import CardsTableHelp from './cardsTableHelp'
+import { type Sort } from '../sqlite/card'
 
 LicenseManager.setLicenseKey(import.meta.env.VITE_AG_GRID_LICENSE)
 
@@ -394,10 +395,10 @@ const dataSource = {
 	getRows: (p: IGetRowsParams) => {
 		const sort =
 			p.sortModel.length === 1
-				? {
+				? ({
 						col: p.sortModel[0]!.colId as 'card.due' | 'card.created',
 						direction: p.sortModel[0]!.sort,
-				  }
+				  } satisfies Sort)
 				: undefined
 		const cleanedQuery = query().trim()
 		const now = C.getDate()
@@ -441,7 +442,7 @@ const dataSource = {
 				}
 				if (countishWrong && x.searchCache == null) {
 					// asynchronously/nonblockingly build the cache
-					db.buildCache(x.baseQuery(), cleanedQuery).catch((e) => {
+					db.buildCache(x.baseQuery(), cleanedQuery, sort).catch((e) => {
 						C.toastWarn('Error building cache', e)
 					})
 				}
