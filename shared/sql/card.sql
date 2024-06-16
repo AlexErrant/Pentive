@@ -21,24 +21,29 @@ CREATE TABLE IF NOT EXISTS cardTag (
   PRIMARY KEY (cardId, tag)
 );
 CREATE VIEW IF NOT EXISTS distinctCardTag AS
-  SELECT MIN(rowid) AS rowid, tag FROM cardTag GROUP BY tag;
+  SELECT
+    MIN(rowid) AS rowid,
+    tag,
+    ftsNormalize(tag, 1, 1, 0) as normalized
+  FROM cardTag GROUP BY tag;
 CREATE VIRTUAL TABLE IF NOT EXISTS cardTagFts USING fts5 (
   tag,
+  normalized,
   content=distinctCardTag,
   tokenize = "trigram"
 );
 CREATE VIRTUAL TABLE IF NOT EXISTS cardTagFtsInstance USING fts5vocab(cardTagFts, instance);
 CREATE TRIGGER IF NOT EXISTS cardTag_after_insert AFTER INSERT ON cardTag BEGIN
-  INSERT INTO cardTagFts(            rowid, tag)
-                              SELECT rowid, tag
+  INSERT INTO cardTagFts(            rowid, tag, normalized)
+                              SELECT rowid, tag, normalized
                               FROM distinctCardTag
                               WHERE tag = new.tag
-                              AND NOT EXISTS (SELECT rowid FROM cardTagFtsInstance WHERE doc = new.rowid LIMIT 1); -- cardTagFts is external content, so `select * from cardTagFts` will query the underlying view, distinctCardTag. So to figure out if the tag's already in the index, we check the vocab table.
+                              AND NOT EXISTS (SELECT rowid FROM cardTagFtsInstance WHERE doc = new.rowid); -- cardTagFts is external content, so `select * from cardTagFts` will query the underlying view, distinctCardTag. So to figure out if the tag's already in the index, we check the vocab table.
 END;
 CREATE TRIGGER IF NOT EXISTS cardTag_after_delete AFTER DELETE ON cardTag BEGIN
-  INSERT INTO cardTagFts(cardTagFts, rowid, tag) VALUES('delete', old.rowid, old.tag);
-  INSERT INTO cardTagFts(            rowid, tag)
-                              SELECT rowid, tag
+  DELETE FROM cardTagFts WHERE rowid = old.rowid;
+  INSERT INTO cardTagFts(            rowid, tag, normalized)
+                              SELECT rowid, tag, normalized
                               FROM distinctCardTag
                               WHERE tag = old.tag;
 END;

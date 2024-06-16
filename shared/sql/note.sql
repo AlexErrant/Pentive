@@ -19,24 +19,29 @@ CREATE TABLE IF NOT EXISTS noteTag (
   PRIMARY KEY (noteId, tag)
 );
 CREATE VIEW IF NOT EXISTS distinctNoteTag AS
-  SELECT MIN(rowid) AS rowid, tag FROM noteTag GROUP BY tag;
+  SELECT
+    MIN(rowid) AS rowid,
+    tag,
+    ftsNormalize(tag, 1, 1, 0) as normalized
+  FROM noteTag GROUP BY tag;
 CREATE VIRTUAL TABLE IF NOT EXISTS noteTagFts USING fts5 (
   tag,
+  normalized,
   content=distinctNoteTag,
   tokenize = "trigram"
 );
 CREATE VIRTUAL TABLE IF NOT EXISTS noteTagFtsInstance USING fts5vocab(noteTagFts, instance);
 CREATE TRIGGER IF NOT EXISTS noteTag_after_insert AFTER INSERT ON noteTag BEGIN
-  INSERT INTO noteTagFts(            rowid, tag)
-                              SELECT rowid, tag
+  INSERT INTO noteTagFts(            rowid, tag, normalized)
+                              SELECT rowid, tag, normalized
                               FROM distinctNoteTag
                               WHERE tag = new.tag
-                              AND NOT EXISTS (SELECT rowid FROM noteTagFtsInstance WHERE doc = new.rowid LIMIT 1); -- noteTagFts is external content, so `select * from noteTagFts` will query the underlying view, distinctNoteTag. So to figure out if the tag's already in the index, we check the vocab table.
+                              AND NOT EXISTS (SELECT rowid FROM noteTagFtsInstance WHERE doc = new.rowid); -- noteTagFts is external content, so `select * from noteTagFts` will query the underlying view, distinctNoteTag. So to figure out if the tag's already in the index, we check the vocab table.
 END;
 CREATE TRIGGER IF NOT EXISTS noteTag_after_delete AFTER DELETE ON noteTag BEGIN
-  INSERT INTO noteTagFts(noteTagFts, rowid, tag) VALUES('delete', old.rowid, old.tag);
-  INSERT INTO noteTagFts(            rowid, tag)
-                              SELECT rowid, tag
+  DELETE FROM noteTagFts WHERE rowid = old.rowid;
+  INSERT INTO noteTagFts(            rowid, tag, normalized)
+                              SELECT rowid, tag, normalized
                               FROM distinctNoteTag
                               WHERE tag = old.tag;
 END;
@@ -81,7 +86,7 @@ CREATE TRIGGER IF NOT EXISTS noteFieldValue_after_insert AFTER INSERT ON noteFie
                                   SELECT rowid, field, ftsNormalize(field, 1, 1, 0)
                                   FROM distinctNoteField
                                   WHERE field = new.field
-                                  AND NOT EXISTS (SELECT rowid FROM noteFieldFtsInstance WHERE doc = new.rowid LIMIT 1); -- noteFieldFts is external content, so `select * from noteFieldFts` will query the underlying view, distinctNoteField. So to figure out if the field's already in the index, we check the vocab table.
+                                  AND NOT EXISTS (SELECT rowid FROM noteFieldFtsInstance WHERE doc = new.rowid); -- noteFieldFts is external content, so `select * from noteFieldFts` will query the underlying view, distinctNoteField. So to figure out if the field's already in the index, we check the vocab table.
   INSERT INTO noteValueFts(    rowid,     value,              normalized)
                     VALUES(new.rowid, new.value, ftsNormalize(new.value, 1, 1, 0));
 END;
