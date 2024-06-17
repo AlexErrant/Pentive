@@ -13,6 +13,7 @@ import {
 
 const pound = 35
 const caret = 94
+const percent = 37
 const doubleQuote = 34
 const quote = 39
 const backtick = 96
@@ -54,10 +55,12 @@ export const rawHtmlClose = new ExternalTokenizer((input) => {
 let quoteCount: number
 
 function rawOpen(input: InputStream, delimiter: number) {
-	if (input.next === caret) input.advance()
+	if (input.next === caret || input.next === percent) input.advance()
+	if (input.next === caret || input.next === percent) input.advance()
 	if (input.next === pound) input.advance()
 	if (input.next === pound) input.advance()
-	if (input.next === caret) input.advance()
+	if (input.next === caret || input.next === percent) input.advance()
+	if (input.next === caret || input.next === percent) input.advance()
 	let i = 0
 	while (input.next === delimiter) {
 		i++
@@ -86,9 +89,11 @@ function rawClose(input: InputStream, token: number) {
 	for (let index = 0; index < quoteCount; index++) {
 		input.advance()
 	}
-	if (input.next === caret) input.advance()
+	if (input.next === caret || input.next === percent) input.advance()
+	if (input.next === caret || input.next === percent) input.advance()
 	if (input.next === pound) input.advance()
 	if (input.next === pound) input.advance()
-	if (input.next === caret) input.advance()
+	if (input.next === caret || input.next === percent) input.advance()
+	if (input.next === caret || input.next === percent) input.advance()
 	input.acceptToken(token)
 }

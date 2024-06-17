@@ -172,7 +172,7 @@ Is { ":" | "=" }
 
 @local tokens {
   Quoted1Escape[@name=Escape] { "\\" ( '\\' | "'" | "*" | "_" ) }
-  Quoted1Close[openedBy=Quoted1Open,@name=Close] { "'" "^"? "#"? "#"? "^"? }
+  Quoted1Close[openedBy=Quoted1Open,@name=Close] { "'" ("%" | "^" | "#")* }
   Quoted1Wildcard[@name=Wildcard] { "*" }
   Quoted1Wildcard1[@name=Wildcard1] { "_" }
   @else Quoted1Content[@name=Content]
@@ -180,7 +180,7 @@ Is { ":" | "=" }
 
 @local tokens {
   Quoted2Escape[@name=Escape] { "\\" ( '\\' | '"' | "*" | "_" ) }
-  Quoted2Close[openedBy=Quoted2Open,@name=Close] { '"' "^"? "#"? "#"? "^"? }
+  Quoted2Close[openedBy=Quoted2Open,@name=Close] { '"' ("%" | "^" | "#")* }
   Quoted2Wildcard[@name=Wildcard] { "*" }
   Quoted2Wildcard1[@name=Wildcard1] { "_" }
   @else Quoted2Content[@name=Content]
@@ -188,7 +188,7 @@ Is { ":" | "=" }
 
 @local tokens {
      HtmlEscape[@name=Escape] { "\\" ( '\\' | '`' | "*" | "_" ) }
-        HtmlClose[openedBy=HtmlOpen,@name=Close] { '`' "^"? "#"? "#"? "^"? }
+        HtmlClose[openedBy=HtmlOpen,@name=Close] { '`' ("%" | "^" | "#")* }
   HtmlWildcard[@name=Wildcard] { "*" }
   HtmlWildcard1[@name=Wildcard1] { "_" }
   @else HtmlContent[@name=Content]
@@ -205,9 +205,9 @@ Is { ":" | "=" }
   quoted1Content { Quoted1Escape | Quoted1Wildcard | Quoted1Wildcard1 | Quoted1Content }
   quoted2Content { Quoted2Escape | Quoted2Wildcard | Quoted2Wildcard1 | Quoted2Content }
      htmlContent {    HtmlEscape |    HtmlWildcard |    HtmlWildcard1 |    HtmlContent }
-  Quoted1Open[closedBy=Quoted1Close,@name=Open] { "^"? "#"? "#"? "^"? "'" }
-  Quoted2Open[closedBy=Quoted2Close,@name=Open] { "^"? "#"? "#"? "^"? '"' }
-     HtmlOpen[closedBy=   HtmlClose,@name=Open] { "^"? "#"? "#"? "^"? '`' }
+  Quoted1Open[closedBy=Quoted1Close,@name=Open] { ("%" | "^" | "#")* "'" }
+  Quoted2Open[closedBy=Quoted2Close,@name=Open] { ("%" | "^" | "#")* '"' }
+     HtmlOpen[closedBy=   HtmlClose,@name=Open] { ("%" | "^" | "#")* '`' }
   Quoted1 { Quoted1Open quoted1Content* Quoted1Close }
   Quoted2 { Quoted2Open quoted2Content* Quoted2Close }
   Html    {    HtmlOpen    htmlContent*    HtmlClose }
@@ -251,9 +251,9 @@ Is { ":" | "=" }
   // Not exactly the same because we're more interested in correctness (than tokenization) https://github.com/lezer-parser/javascript/pull/31#issuecomment-2016585616
   Regex[isolate] { "/" (![/\\\n[] | "\\" ![\n] | "[" (![\n\\\]] | "\\" ![\n])* "]")+ "/" $[dgimsuvy]* }
 
-  // A SimpleString is any series of characters that is not pound, caret, equals, less than, greater than, backtick, backslash, forwardslash, asterisk, underscore, comma, parentheses, colon, quote, doublequote, or whitespace (as defined by the Unicode standard)
+  // A SimpleString is any series of characters that is not percent, pound, caret, equals, less than, greater than, backtick, backslash, forwardslash, asterisk, underscore, comma, parentheses, colon, quote, doublequote, or whitespace (as defined by the Unicode standard)
   // If you change SimpleString, update 569040F1-5B10-4D97-8F7B-0D75D81E7688
-  SimpleString { ( ![#^=<>`\\/*_,():'"\u0009\u000A\u000B\u000C\u000D\u0020\u0085\u00A0\u1680\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200A\u2028\u2029\u202F\u205F\u3000] )+ }
+  SimpleString { ( ![%#^=<>`\\/*_,():'"\u0009\u000A\u000B\u000C\u000D\u0020\u0085\u00A0\u1680\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200A\u2028\u2029\u202F\u205F\u3000] )+ }
   whitespace { @whitespace+ }
   Number { @digit+ }
   Date { @digit @digit @digit @digit "-" @digit? @digit "-" @digit? @digit }
