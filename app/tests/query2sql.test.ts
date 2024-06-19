@@ -106,67 +106,9 @@ test('SimpleString is fts', async () => {
 	await assertEqual(
 		String.raw`a`,
 		String.raw`x1.z IS NOT NULL`,
-		{ x1: String.raw`(noteValueFts.normalized LIKE '%a%')` },
+		{ x1: String.raw`(noteValueFts.normalized GLOB '*a*')` },
 		1,
 	)
-})
-
-describe('special characters', () => {
-	async function x(actual: string, expected: string, regex = '') {
-		await assertEqual(
-			actual,
-			String.raw`x1.z IS NOT NULL`,
-			{ x1: String.raw`(noteValueFts.normalized LIKE '${expected}'${regex})` },
-			regex === '' ? 1 : 2,
-		)
-	}
-	test('*', async () => {
-		await x(
-			String.raw`"a*b"`, //
-			String.raw`%a%b%`,
-		)
-	})
-	test('_', async () => {
-		await x(
-			String.raw`"a_b"`, //
-			String.raw`%a_b%`,
-		)
-	})
-	// eslint-disable-next-line no-useless-escape
-	test(`\*`, async () => {
-		await x(
-			String.raw`"a\*b"`, //
-			String.raw`%a*b%`,
-		)
-	})
-	// eslint-disable-next-line no-useless-escape
-	test(`\_`, async () => {
-		await x(
-			String.raw`"a\_b"`, //
-			String.raw`%a_b%`,
-			String.raw`AND regexp_with_flags('a_b', 'i', noteValueFts.normalized)`,
-		)
-	})
-	test(`\\`, async () => {
-		await x(
-			String.raw`"a\\b"`, //
-			String.raw`%a\b%`,
-		)
-	})
-	test('%', async () => {
-		await x(
-			String.raw`"a%b"`, //
-			String.raw`%a_b%`,
-			String.raw`AND regexp_with_flags('a%b', 'i', noteValueFts.normalized)`,
-		)
-	})
-	test('* is escaped when regexed', async () => {
-		await x(
-			String.raw`"a\*b\_c"`, //
-			String.raw`%a*b_c%`,
-			String.raw`AND regexp_with_flags('a\*b_c', 'i', noteValueFts.normalized)`,
-		)
-	})
 })
 
 describe('delimiter special characters', () => {
@@ -174,26 +116,26 @@ describe('delimiter special characters', () => {
 		await assertEqual(
 			actual,
 			String.raw`x1.z IS NOT NULL`,
-			{ x1: String.raw`(noteValueFts.normalized LIKE '${expected}')` },
+			{ x1: String.raw`(noteValueFts.normalized GLOB '${expected}')` },
 			1,
 		)
 	}
 	test('normal', async () => {
 		await x(
 			String.raw`"foo"`, //
-			String.raw`%foo%`,
+			String.raw`*foo*`,
 		)
 	})
 	test('left', async () => {
 		await x(
 			String.raw`##"foo"`, //
-			String.raw`foo%`,
+			String.raw`foo*`,
 		)
 	})
 	test('right', async () => {
 		await x(
 			String.raw`"foo"##`, //
-			String.raw`%foo`,
+			String.raw`*foo`,
 		)
 	})
 	test('both', async () => {
@@ -205,13 +147,13 @@ describe('delimiter special characters', () => {
 	test('missing trailing delimiter', async () => {
 		await x(
 			String.raw`##"foo`, //
-			String.raw`foo%`,
+			String.raw`foo*`,
 		)
 	})
 })
 
 describe('not a', () => {
-	const expected = String.raw`(noteValueFts.normalized LIKE '%a%')`
+	const expected = String.raw`(noteValueFts.normalized GLOB '*a*')`
 
 	test('together', async () => {
 		await assertEqual('-a', String.raw`x1.z IS NULL`, { x1: expected }, 1)
@@ -226,7 +168,7 @@ test('Quoted1 is fts', async () => {
 	await assertEqual(
 		String.raw`'a \' \\ b'`,
 		String.raw`x1.z IS NOT NULL`,
-		{ x1: String.raw`(noteValueFts.normalized LIKE '%a '' \ b%')` },
+		{ x1: String.raw`(noteValueFts.normalized GLOB '*a '' \ b*')` },
 		1,
 	)
 })
@@ -235,7 +177,7 @@ test('Quoted2 is fts', async () => {
 	await assertEqual(
 		String.raw`"a \" \\ b"`,
 		String.raw`x1.z IS NOT NULL`,
-		{ x1: String.raw`(noteValueFts.normalized LIKE '%a " \ b%')` },
+		{ x1: String.raw`(noteValueFts.normalized GLOB '*a " \ b*')` },
 		1,
 	)
 })
@@ -245,9 +187,9 @@ test('RawQuoted1 is fts', async () => {
 		String.raw`x '''a '' \ b''' y`,
 		String.raw`x1.z IS NOT NULL AND x2.z IS NOT NULL AND x3.z IS NOT NULL`,
 		{
-			x1: String.raw`(noteValueFts.normalized LIKE '%x%')`,
-			x2: String.raw`(noteValueFts.normalized LIKE '%a '''' \ b%')`,
-			x3: String.raw`(noteValueFts.normalized LIKE '%y%')`,
+			x1: String.raw`(noteValueFts.normalized GLOB '*x*')`,
+			x2: String.raw`(noteValueFts.normalized GLOB '*a '''' \ b*')`,
+			x3: String.raw`(noteValueFts.normalized GLOB '*y*')`,
 		},
 		3,
 	)
@@ -258,9 +200,9 @@ test('RawQuoted2 is fts', async () => {
 		String.raw`x """a "" \ b""" y`,
 		String.raw`x1.z IS NOT NULL AND x2.z IS NOT NULL AND x3.z IS NOT NULL`,
 		{
-			x1: String.raw`(noteValueFts.normalized LIKE '%x%')`,
-			x2: String.raw`(noteValueFts.normalized LIKE '%a "" \ b%')`,
-			x3: String.raw`(noteValueFts.normalized LIKE '%y%')`,
+			x1: String.raw`(noteValueFts.normalized GLOB '*x*')`,
+			x2: String.raw`(noteValueFts.normalized GLOB '*a "" \ b*')`,
+			x3: String.raw`(noteValueFts.normalized GLOB '*y*')`,
 		},
 		3,
 	)
@@ -332,8 +274,8 @@ test('2 SimpleStrings are ANDed', async () => {
 		String.raw`a b`,
 		String.raw`x1.z IS NOT NULL AND x2.z IS NOT NULL`,
 		{
-			x1: String.raw`(noteValueFts.normalized LIKE '%a%')`,
-			x2: String.raw`(noteValueFts.normalized LIKE '%b%')`,
+			x1: String.raw`(noteValueFts.normalized GLOB '*a*')`,
+			x2: String.raw`(noteValueFts.normalized GLOB '*b*')`,
 		},
 		2,
 	)
@@ -344,8 +286,8 @@ test('2 SimpleStrings can be ORed', async () => {
 		String.raw`a OR b`,
 		String.raw`x1.z IS NOT NULL OR x2.z IS NOT NULL`,
 		{
-			x1: String.raw`(noteValueFts.normalized LIKE '%a%')`,
-			x2: String.raw`(noteValueFts.normalized LIKE '%b%')`,
+			x1: String.raw`(noteValueFts.normalized GLOB '*a*')`,
+			x2: String.raw`(noteValueFts.normalized GLOB '*b*')`,
 		},
 		2,
 	)
@@ -356,8 +298,8 @@ test('2 SimpleStrings can be grouped', async () => {
 		String.raw`(a b)`,
 		String.raw`(x1.z IS NOT NULL AND x2.z IS NOT NULL)`,
 		{
-			x1: String.raw`(noteValueFts.normalized LIKE '%a%')`,
-			x2: String.raw`(noteValueFts.normalized LIKE '%b%')`,
+			x1: String.raw`(noteValueFts.normalized GLOB '*a*')`,
+			x2: String.raw`(noteValueFts.normalized GLOB '*b*')`,
 		},
 		2,
 	)
@@ -368,8 +310,8 @@ test('not distributes over AND', async () => {
 		String.raw`-(a b)`,
 		String.raw`(x1.z IS NULL OR x2.z IS NULL)`,
 		{
-			x1: String.raw`(noteValueFts.normalized LIKE '%a%')`,
-			x2: String.raw`(noteValueFts.normalized LIKE '%b%')`,
+			x1: String.raw`(noteValueFts.normalized GLOB '*a*')`,
+			x2: String.raw`(noteValueFts.normalized GLOB '*b*')`,
 		},
 		2,
 	)
@@ -380,8 +322,8 @@ test('not distributes over OR', async () => {
 		String.raw`-(a OR b)`,
 		String.raw`(x1.z IS NULL AND x2.z IS NULL)`,
 		{
-			x1: String.raw`(noteValueFts.normalized LIKE '%a%')`,
-			x2: String.raw`(noteValueFts.normalized LIKE '%b%')`,
+			x1: String.raw`(noteValueFts.normalized GLOB '*a*')`,
+			x2: String.raw`(noteValueFts.normalized GLOB '*b*')`,
 		},
 		2,
 	)
@@ -392,8 +334,8 @@ test('double negative grouping does nothing', async () => {
 		String.raw`-(-(a OR b))`,
 		String.raw`(x1.z IS NOT NULL OR x2.z IS NOT NULL)`,
 		{
-			x1: String.raw`(noteValueFts.normalized LIKE '%a%')`,
-			x2: String.raw`(noteValueFts.normalized LIKE '%b%')`,
+			x1: String.raw`(noteValueFts.normalized GLOB '*a*')`,
+			x2: String.raw`(noteValueFts.normalized GLOB '*b*')`,
 		},
 		2,
 	)
@@ -407,11 +349,11 @@ test('2 groups', async () => {
 OR x3.z IS NOT NULL
 AND (x4.z IS NOT NULL OR x5.z IS NOT NULL)`,
 		{
-			x1: String.raw`(noteValueFts.normalized LIKE '%a%')`,
-			x2: String.raw`(noteValueFts.normalized LIKE '%b%')`,
-			x3: String.raw`(noteValueFts.normalized LIKE '%c%')`,
-			x4: String.raw`(noteValueFts.normalized LIKE '%d%')`,
-			x5: String.raw`(noteValueFts.normalized LIKE '%e%')`,
+			x1: String.raw`(noteValueFts.normalized GLOB '*a*')`,
+			x2: String.raw`(noteValueFts.normalized GLOB '*b*')`,
+			x3: String.raw`(noteValueFts.normalized GLOB '*c*')`,
+			x4: String.raw`(noteValueFts.normalized GLOB '*d*')`,
+			x5: String.raw`(noteValueFts.normalized GLOB '*e*')`,
 		},
 		5,
 	)
@@ -446,6 +388,8 @@ describe('groupAnds', () => {
 		wildcardRight: true,
 		boundLeft: true,
 		boundRight: true,
+		removeCombiningCharacters: false,
+		caseSensitive: false,
 	}
 	const or = { type: 'OR' as const }
 	const and = { type: 'AND' as const }
@@ -506,16 +450,16 @@ test('!(p && !q || r) is (!p || q) && !r', async () => {
 		String.raw`-(p -q OR r)`,
 		String.raw` ((x1.z IS NULL OR x2.z IS NOT NULL) AND x3.z IS NULL)`,
 		{
-			x1: String.raw`(noteValueFts.normalized LIKE '%p%')`,
-			x2: String.raw`(noteValueFts.normalized LIKE '%q%')`,
-			x3: String.raw`(noteValueFts.normalized LIKE '%r%')`,
+			x1: String.raw`(noteValueFts.normalized GLOB '*p*')`,
+			x2: String.raw`(noteValueFts.normalized GLOB '*q*')`,
+			x3: String.raw`(noteValueFts.normalized GLOB '*r*')`,
 		},
 		3,
 	)
 })
 
 describe('skip error nodes', () => {
-	const expected = { x1: String.raw`(noteValueFts.normalized LIKE '% foo%')` }
+	const expected = { x1: String.raw`(noteValueFts.normalized GLOB '* foo*')` }
 
 	test('plain', async () => {
 		await assertEqual(
@@ -558,7 +502,7 @@ describe('template', () => {
 	test('1', async () => {
 		await assertEqual(
 			String.raw`template:foo`,
-			String.raw`(templateNameFts.name LIKE '%foo%')`,
+			String.raw`(templateNameFts.normalized GLOB '*foo*')`,
 			1,
 		)
 	})
@@ -567,9 +511,9 @@ describe('template', () => {
 		await assertEqual(
 			String.raw`(template:foo,bar)`,
 			String.raw`(
-  (templateNameFts.name LIKE '%foo%')
+  (templateNameFts.normalized GLOB '*foo*')
   OR
-  (templateNameFts.name LIKE '%bar%')
+  (templateNameFts.normalized GLOB '*bar*')
 )`,
 			2,
 		)
@@ -583,7 +527,7 @@ describe('template', () => {
   OR NOT
   regexp_with_flags('bar', '', template.name)
   AND
-  (templateNameFts.name LIKE '%qux%')
+  (templateNameFts.normalized GLOB '*qux*')
   AND
   regexp_with_flags('bix', 'suvy', template.name)
 )`,
@@ -595,9 +539,9 @@ describe('template', () => {
 		await assertEqual(
 			String.raw`(template:"a\"b","c\\b")`,
 			String.raw`(
-  (templateNameFts.name LIKE '%a"b%')
+  (templateNameFts.normalized GLOB '*a"b*')
   OR
-  (templateNameFts.name LIKE '%c\b%')
+  (templateNameFts.normalized GLOB '*c\b*')
 )`,
 			2,
 		)
@@ -609,12 +553,12 @@ describe('template', () => {
 			String.raw`
 x1.z IS NOT NULL
 AND
-(templateNameFts.name LIKE '%t%')
+(templateNameFts.normalized GLOB '*t*')
 AND
 x2.z IS NOT NULL`,
 			{
-				x1: String.raw`(noteValueFts.normalized LIKE '%a%')`,
-				x2: String.raw`(noteValueFts.normalized LIKE '%b%')`,
+				x1: String.raw`(noteValueFts.normalized GLOB '*a*')`,
+				x2: String.raw`(noteValueFts.normalized GLOB '*b*')`,
 			},
 			3,
 		)
@@ -626,12 +570,12 @@ x2.z IS NOT NULL`,
 			String.raw`
 x1.z IS NOT NULL
 OR
-(templateNameFts.name LIKE '%t%')
+(templateNameFts.normalized GLOB '*t*')
 OR
 x2.z IS NOT NULL`,
 			{
-				x1: String.raw`(noteValueFts.normalized LIKE '%a b%')`,
-				x2: String.raw`(noteValueFts.normalized LIKE '%c d%')`,
+				x1: String.raw`(noteValueFts.normalized GLOB '*a b*')`,
+				x2: String.raw`(noteValueFts.normalized GLOB '*c d*')`,
 			},
 			3,
 		)
@@ -641,11 +585,11 @@ x2.z IS NOT NULL`,
 		await assertEqual(
 			String.raw`(template:"foo bar",biz,"baz quz")`,
 			String.raw`(
-  (templateNameFts.name LIKE '%foo bar%')
+  (templateNameFts.normalized GLOB '*foo bar*')
   OR
-  (templateNameFts.name LIKE '%biz%')
+  (templateNameFts.normalized GLOB '*biz*')
   OR
-  (templateNameFts.name LIKE '%baz quz%')
+  (templateNameFts.normalized GLOB '*baz quz*')
 )`,
 			3,
 		)
@@ -655,11 +599,11 @@ x2.z IS NOT NULL`,
 		await assertEqual(
 			String.raw` (template: "foo bar" , biz      , "baz quz") `,
 			String.raw`(
-  (templateNameFts.name LIKE '%foo bar%')
+  (templateNameFts.normalized GLOB '*foo bar*')
   OR
-  (templateNameFts.name LIKE '%biz%')
+  (templateNameFts.normalized GLOB '*biz*')
   OR
-  (templateNameFts.name LIKE '%baz quz%')
+  (templateNameFts.normalized GLOB '*baz quz*')
 )`,
 			3,
 		)
@@ -669,9 +613,9 @@ x2.z IS NOT NULL`,
 		await assertEqual(
 			String.raw`-(template:foo,bar)`,
 			String.raw`(
-  (templateNameFts.name NOT LIKE '%foo%')
+  (templateNameFts.normalized NOT GLOB '*foo*')
   AND
-  (templateNameFts.name NOT LIKE '%bar%')
+  (templateNameFts.normalized NOT GLOB '*bar*')
 )`,
 			2,
 		)
@@ -681,9 +625,9 @@ x2.z IS NOT NULL`,
 		await assertEqual(
 			String.raw`(-template:foo,bar)`,
 			String.raw`(
-  (templateNameFts.name NOT LIKE '%foo%')
+  (templateNameFts.normalized NOT GLOB '*foo*')
   AND
-  (templateNameFts.name NOT LIKE '%bar%')
+  (templateNameFts.normalized NOT GLOB '*bar*')
 )`,
 			2,
 		)
@@ -693,9 +637,9 @@ x2.z IS NOT NULL`,
 		await assertEqual(
 			String.raw`-(-template:foo,bar)`,
 			String.raw`(
-  (templateNameFts.name LIKE '%foo%')
+  (templateNameFts.normalized GLOB '*foo*')
   OR
-  (templateNameFts.name LIKE '%bar%')
+  (templateNameFts.normalized GLOB '*bar*')
 )`,
 			2,
 		)
@@ -729,8 +673,8 @@ AND
 AND
 x2.z IS NOT NULL`,
 			{
-				x1: String.raw`(noteValueFts.normalized LIKE '%a%')`,
-				x2: String.raw`(noteValueFts.normalized LIKE '%b%')`,
+				x1: String.raw`(noteValueFts.normalized GLOB '*a*')`,
+				x2: String.raw`(noteValueFts.normalized GLOB '*b*')`,
 			},
 			3,
 		)
@@ -746,8 +690,8 @@ OR
 OR
 x2.z IS NOT NULL`,
 			{
-				x1: String.raw`(noteValueFts.normalized LIKE '%a b%')`,
-				x2: String.raw`(noteValueFts.normalized LIKE '%c d%')`,
+				x1: String.raw`(noteValueFts.normalized GLOB '*a b*')`,
+				x2: String.raw`(noteValueFts.normalized GLOB '*c d*')`,
 			},
 			3,
 		)
@@ -798,7 +742,7 @@ describe('setting', () => {
 	test('1', async () => {
 		await assertEqual(
 			String.raw`setting:foo`,
-			String.raw`(cardSettingNameFts.name LIKE '%foo%')`,
+			String.raw`(cardSettingNameFts.normalized GLOB '*foo*')`,
 			1,
 		)
 	})
@@ -808,9 +752,9 @@ describe('setting', () => {
 			String.raw`(setting:foo,bar)`,
 			String.raw`
 (
-  (cardSettingNameFts.name LIKE '%foo%')
+  (cardSettingNameFts.normalized GLOB '*foo*')
   OR
-  (cardSettingNameFts.name LIKE '%bar%')
+  (cardSettingNameFts.normalized GLOB '*bar*')
 )`,
 			2,
 		)
@@ -824,7 +768,7 @@ describe('setting', () => {
   OR NOT
   regexp_with_flags('bar', '', cardSetting.name)
   AND
-  (cardSettingNameFts.name LIKE '%qux%')
+  (cardSettingNameFts.normalized GLOB '*qux*')
   AND
   regexp_with_flags('bix', 'suvy', cardSetting.name)
 )`,
@@ -836,9 +780,9 @@ describe('setting', () => {
 		await assertEqual(
 			String.raw`(setting:"a\"b","c\\b")`,
 			String.raw`(
-  (cardSettingNameFts.name LIKE '%a"b%')
+  (cardSettingNameFts.normalized GLOB '*a"b*')
   OR
-  (cardSettingNameFts.name LIKE '%c\b%')
+  (cardSettingNameFts.normalized GLOB '*c\b*')
 )`,
 			2,
 		)
@@ -850,12 +794,12 @@ describe('setting', () => {
 			String.raw`
 x1.z IS NOT NULL
 AND
-(cardSettingNameFts.name LIKE '%t%')
+(cardSettingNameFts.normalized GLOB '*t*')
 AND
 x2.z IS NOT NULL`,
 			{
-				x1: String.raw`(noteValueFts.normalized LIKE '%a%')`,
-				x2: String.raw`(noteValueFts.normalized LIKE '%b%')`,
+				x1: String.raw`(noteValueFts.normalized GLOB '*a*')`,
+				x2: String.raw`(noteValueFts.normalized GLOB '*b*')`,
 			},
 			3,
 		)
@@ -867,12 +811,12 @@ x2.z IS NOT NULL`,
 			String.raw`
 x1.z IS NOT NULL
 OR
-(cardSettingNameFts.name LIKE '%t%')
+(cardSettingNameFts.normalized GLOB '*t*')
 OR
 x2.z IS NOT NULL`,
 			{
-				x1: String.raw`(noteValueFts.normalized LIKE '%a b%')`,
-				x2: String.raw`(noteValueFts.normalized LIKE '%c d%')`,
+				x1: String.raw`(noteValueFts.normalized GLOB '*a b*')`,
+				x2: String.raw`(noteValueFts.normalized GLOB '*c d*')`,
 			},
 			3,
 		)
@@ -882,11 +826,11 @@ x2.z IS NOT NULL`,
 		await assertEqual(
 			String.raw`(setting:"foo bar",biz,"baz quz")`,
 			String.raw`(
-  (cardSettingNameFts.name LIKE '%foo bar%')
+  (cardSettingNameFts.normalized GLOB '*foo bar*')
   OR
-  (cardSettingNameFts.name LIKE '%biz%')
+  (cardSettingNameFts.normalized GLOB '*biz*')
   OR
-  (cardSettingNameFts.name LIKE '%baz quz%')
+  (cardSettingNameFts.normalized GLOB '*baz quz*')
 )`,
 			3,
 		)
@@ -896,11 +840,11 @@ x2.z IS NOT NULL`,
 		await assertEqual(
 			String.raw` (setting: "foo bar" , biz      , "baz quz") `,
 			String.raw`(
-  (cardSettingNameFts.name LIKE '%foo bar%')
+  (cardSettingNameFts.normalized GLOB '*foo bar*')
   OR
-  (cardSettingNameFts.name LIKE '%biz%')
+  (cardSettingNameFts.normalized GLOB '*biz*')
   OR
-  (cardSettingNameFts.name LIKE '%baz quz%')
+  (cardSettingNameFts.normalized GLOB '*baz quz*')
 )`,
 			3,
 		)
@@ -910,9 +854,9 @@ x2.z IS NOT NULL`,
 		await assertEqual(
 			String.raw`-(setting:foo,bar)`,
 			String.raw`(
-  (cardSettingNameFts.name NOT LIKE '%foo%')
+  (cardSettingNameFts.normalized NOT GLOB '*foo*')
   AND
-  (cardSettingNameFts.name NOT LIKE '%bar%')
+  (cardSettingNameFts.normalized NOT GLOB '*bar*')
 )`,
 			2,
 		)
@@ -922,9 +866,9 @@ x2.z IS NOT NULL`,
 		await assertEqual(
 			String.raw`(-setting:foo,bar)`,
 			String.raw`(
-  (cardSettingNameFts.name NOT LIKE '%foo%')
+  (cardSettingNameFts.normalized NOT GLOB '*foo*')
   AND
-  (cardSettingNameFts.name NOT LIKE '%bar%')
+  (cardSettingNameFts.normalized NOT GLOB '*bar*')
 )`,
 			2,
 		)
@@ -934,9 +878,9 @@ x2.z IS NOT NULL`,
 		await assertEqual(
 			String.raw`-(-setting:foo,bar)`,
 			String.raw`(
-  (cardSettingNameFts.name LIKE '%foo%')
+  (cardSettingNameFts.normalized GLOB '*foo*')
   OR
-  (cardSettingNameFts.name LIKE '%bar%')
+  (cardSettingNameFts.normalized GLOB '*bar*')
 )`,
 			2,
 		)
@@ -970,8 +914,8 @@ AND
 AND
 x2.z IS NOT NULL`,
 			{
-				x1: String.raw`(noteValueFts.normalized LIKE '%a%')`,
-				x2: String.raw`(noteValueFts.normalized LIKE '%b%')`,
+				x1: String.raw`(noteValueFts.normalized GLOB '*a*')`,
+				x2: String.raw`(noteValueFts.normalized GLOB '*b*')`,
 			},
 			3,
 		)
@@ -987,8 +931,8 @@ OR
 OR
 x2.z IS NOT NULL`,
 			{
-				x1: String.raw`(noteValueFts.normalized LIKE '%a b%')`,
-				x2: String.raw`(noteValueFts.normalized LIKE '%c d%')`,
+				x1: String.raw`(noteValueFts.normalized GLOB '*a b*')`,
+				x2: String.raw`(noteValueFts.normalized GLOB '*c d*')`,
 			},
 			3,
 		)
@@ -1037,17 +981,17 @@ x2.z IS NOT NULL`,
 
 describe('tag', () => {
 	function cardQuery(x: string) {
-		return String.raw`(cardTagFts.tag LIKE '${x}')`
+		return String.raw`(cardTagFts.normalized GLOB '${x}')`
 	}
 	function noteQuery(x: string) {
-		return String.raw`(noteTagFts.tag LIKE '${x}')`
+		return String.raw`(noteTagFts.normalized GLOB '${x}')`
 	}
 
 	test('1', async () => {
 		await assertEqual(
 			String.raw`tag:foo`,
 			String.raw`(x1.tag IS NOT NULL OR x2.tag IS NOT NULL)`,
-			{ x1: cardQuery('%foo%'), x2: noteQuery('%foo%') },
+			{ x1: cardQuery('*foo*'), x2: noteQuery('*foo*') },
 			2,
 		)
 	})
@@ -1061,10 +1005,10 @@ describe('tag', () => {
   (x3.tag IS NOT NULL OR x4.tag IS NOT NULL)
 )`,
 			{
-				x1: cardQuery('%foo%'),
-				x2: noteQuery('%foo%'),
-				x3: cardQuery('%bar%'),
-				x4: noteQuery('%bar%'),
+				x1: cardQuery('*foo*'),
+				x2: noteQuery('*foo*'),
+				x3: cardQuery('*bar*'),
+				x4: noteQuery('*bar*'),
 			},
 			4,
 		)
@@ -1084,8 +1028,8 @@ describe('tag', () => {
 				x2: "regexp_with_flags('foo', 'i', noteTag.tag)",
 				x3: "regexp_with_flags('bar', '', cardTag.tag)",
 				x4: "regexp_with_flags('bar', '', noteTag.tag)",
-				x5: cardQuery('%qux%'),
-				x6: noteQuery('%qux%'),
+				x5: cardQuery('*qux*'),
+				x6: noteQuery('*qux*'),
 				x7: "regexp_with_flags('bix', 'suvy', cardTag.tag)",
 				x8: "regexp_with_flags('bix', 'suvy', noteTag.tag)",
 			},
@@ -1102,10 +1046,10 @@ describe('tag', () => {
   (x3.tag IS NOT NULL OR x4.tag IS NOT NULL)
 )`,
 			{
-				x1: cardQuery('%a"b%'),
-				x2: noteQuery('%a"b%'),
-				x3: cardQuery(String.raw`%c\b%`),
-				x4: noteQuery(String.raw`%c\b%`),
+				x1: cardQuery('*a"b*'),
+				x2: noteQuery('*a"b*'),
+				x3: cardQuery(String.raw`*c\b*`),
+				x4: noteQuery(String.raw`*c\b*`),
 			},
 			4,
 		)
@@ -1121,10 +1065,10 @@ AND
 AND
 x4.z IS NOT NULL`,
 			{
-				x1: String.raw`(noteValueFts.normalized LIKE '%a%')`,
-				x2: cardQuery('%t%'),
-				x3: noteQuery('%t%'),
-				x4: String.raw`(noteValueFts.normalized LIKE '%b%')`,
+				x1: String.raw`(noteValueFts.normalized GLOB '*a*')`,
+				x2: cardQuery('*t*'),
+				x3: noteQuery('*t*'),
+				x4: String.raw`(noteValueFts.normalized GLOB '*b*')`,
 			},
 			4,
 		)
@@ -1141,10 +1085,10 @@ OR
 x4.z IS NOT NULL
 `,
 			{
-				x1: String.raw`(noteValueFts.normalized LIKE '%a b%')`,
-				x2: cardQuery('%t%'),
-				x3: noteQuery('%t%'),
-				x4: String.raw`(noteValueFts.normalized LIKE '%c d%')`,
+				x1: String.raw`(noteValueFts.normalized GLOB '*a b*')`,
+				x2: cardQuery('*t*'),
+				x3: noteQuery('*t*'),
+				x4: String.raw`(noteValueFts.normalized GLOB '*c d*')`,
 			},
 			4,
 		)
@@ -1161,12 +1105,12 @@ x4.z IS NOT NULL
   (x5.tag IS NOT NULL OR x6.tag IS NOT NULL)
 )`,
 			{
-				x1: cardQuery('%foo bar%'),
-				x2: noteQuery('%foo bar%'),
-				x3: cardQuery('%biz%'),
-				x4: noteQuery('%biz%'),
-				x5: cardQuery('%baz quz%'),
-				x6: noteQuery('%baz quz%'),
+				x1: cardQuery('*foo bar*'),
+				x2: noteQuery('*foo bar*'),
+				x3: cardQuery('*biz*'),
+				x4: noteQuery('*biz*'),
+				x5: cardQuery('*baz quz*'),
+				x6: noteQuery('*baz quz*'),
 			},
 			6,
 		)
@@ -1183,12 +1127,12 @@ x4.z IS NOT NULL
   (x5.tag IS NOT NULL OR x6.tag IS NOT NULL)
 )`,
 			{
-				x1: cardQuery('%foo bar%'),
-				x2: noteQuery('%foo bar%'),
-				x3: cardQuery('%biz%'),
-				x4: noteQuery('%biz%'),
-				x5: cardQuery('%baz quz%'),
-				x6: noteQuery('%baz quz%'),
+				x1: cardQuery('*foo bar*'),
+				x2: noteQuery('*foo bar*'),
+				x3: cardQuery('*biz*'),
+				x4: noteQuery('*biz*'),
+				x5: cardQuery('*baz quz*'),
+				x6: noteQuery('*baz quz*'),
 			},
 			6,
 		)
@@ -1203,10 +1147,10 @@ x4.z IS NOT NULL
   (x3.tag IS NULL AND x4.tag IS NULL)
 )`,
 			{
-				x1: cardQuery('%foo%'),
-				x2: noteQuery('%foo%'),
-				x3: cardQuery('%bar%'),
-				x4: noteQuery('%bar%'),
+				x1: cardQuery('*foo*'),
+				x2: noteQuery('*foo*'),
+				x3: cardQuery('*bar*'),
+				x4: noteQuery('*bar*'),
 			},
 			4,
 		)
@@ -1221,10 +1165,10 @@ x4.z IS NOT NULL
   (x3.tag IS NULL AND x4.tag IS NULL)
 )`,
 			{
-				x1: cardQuery('%foo%'),
-				x2: noteQuery('%foo%'),
-				x3: cardQuery('%bar%'),
-				x4: noteQuery('%bar%'),
+				x1: cardQuery('*foo*'),
+				x2: noteQuery('*foo*'),
+				x3: cardQuery('*bar*'),
+				x4: noteQuery('*bar*'),
 			},
 			4,
 		)
@@ -1239,10 +1183,10 @@ x4.z IS NOT NULL
   (x3.tag IS NOT NULL OR x4.tag IS NOT NULL)
 )`,
 			{
-				x1: cardQuery('%foo%'),
-				x2: noteQuery('%foo%'),
-				x3: cardQuery('%bar%'),
-				x4: noteQuery('%bar%'),
+				x1: cardQuery('*foo*'),
+				x2: noteQuery('*foo*'),
+				x3: cardQuery('*bar*'),
+				x4: noteQuery('*bar*'),
 			},
 			4,
 		)

@@ -74,7 +74,7 @@ export async function createDb() {
 			const col = db.api.value_text(values[2]!)
 			const segments = Array.from(segmenter.segment(col))
 			const b =
-				leftRightBoth === 0
+				leftRightBoth === 0 // 0 1 2 correspond to C3B5BEA8-3A89-40CB-971F-6FBA780A6487
 					? segments.some((s) => s.segment.startsWith(word))
 					: leftRightBoth === 1
 					? segments.some((s) => s.segment === word)

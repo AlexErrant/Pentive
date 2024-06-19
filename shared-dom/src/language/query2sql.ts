@@ -1,6 +1,12 @@
 import { type SyntaxNodeRef, type SyntaxNode } from '@lezer/common'
 import { parser } from './queryParser'
-import { assertNever, dayInMs, escapeRegExp, throwExp } from 'shared'
+import {
+	assertNever,
+	dayInMs,
+	escapeRegExp,
+	ftsNormalize,
+	throwExp,
+} from 'shared'
 import { sql, type RawBuilder, type SqlBool } from 'kysely'
 import * as qt from './queryParser.terms'
 import {
@@ -63,8 +69,13 @@ class Context {
 		this.sql.push(parameter)
 	}
 
-	like(qs: QueryString, column: string, forcePositive?: true) {
-		this.sql.push(like(qs, column, forcePositive))
+	like(
+		qs: QueryString,
+		table: Table,
+		sourceColumn: string,
+		forcePositive?: true,
+	) {
+		this.sql.push(like(qs, table, sourceColumn, forcePositive))
 	}
 
 	regexpWithFlags(node: QueryRegex, column: string) {
@@ -129,10 +140,9 @@ export function getLabel(node: SyntaxNodeRef) {
 	return label as Label
 }
 
-function buildContent(node: SyntaxNodeRef, input: string) {
+function buildContent(node: SyntaxNodeRef, input: string, negate: boolean) {
 	const r: string[] = []
 	const regex: string[] = []
-	let needsRegex = false // we need regex for % and _ because `ESCAPE` isn't supported https://sqlite.org/forum/forumpost/314bf902e0
 	if (node.node.firstChild == null) throwExp('How did you get this error?')
 	let child = node.node.firstChild.nextSibling
 	let close = null
@@ -147,12 +157,7 @@ function buildContent(node: SyntaxNodeRef, input: string) {
 		) {
 			const value = input.slice(child.from, child.to)
 			regex.push(escapeRegExp(value))
-			if (input.includes('%')) {
-				needsRegex = true
-				r.push(value.replaceAll('%', '_'))
-			} else {
-				r.push(value)
-			}
+			r.push(value)
 		} else if (
 			child.type.id === qt.Quoted1Escape ||
 			child.type.id === qt.Quoted2Escape ||
@@ -161,20 +166,19 @@ function buildContent(node: SyntaxNodeRef, input: string) {
 			const char = input.charAt(child.to - 1)
 			r.push(char)
 			regex.push(escapeRegExp(char))
-			if (char === '_') needsRegex = true
 		} else if (
 			child.type.id === qt.HtmlWildcard ||
 			child.type.id === qt.Quoted1Wildcard ||
 			child.type.id === qt.Quoted2Wildcard
 		) {
-			r.push('%')
+			r.push('*')
 			regex.push('.*')
 		} else if (
 			child.type.id === qt.HtmlWildcard1 ||
 			child.type.id === qt.Quoted1Wildcard1 ||
 			child.type.id === qt.Quoted2Wildcard1
 		) {
-			r.push('_')
+			r.push('?')
 			regex.push('.')
 		}
 		if (
@@ -196,31 +200,39 @@ function buildContent(node: SyntaxNodeRef, input: string) {
 	const boundLeft = wildcardLeft && open.includes('#')
 	const boundRight =
 		close == null ? false : wildcardRight && close.includes('#')
-	const fieldValueHighlight = regex.join('')
+	const pattern = regex.join('')
+	const caseSensitive = open.includes('^') || close?.includes('^') === true
+	const removeCombiningCharacters =
+		open.includes('%') || close?.includes('%') === true
 	return {
 		value: r.join(''),
 		wildcardLeft,
 		wildcardRight,
 		boundLeft,
 		boundRight,
-		regexPattern: needsRegex ? fieldValueHighlight : undefined,
-		fieldValueHighlight: {
-			pattern: fieldValueHighlight,
-			flags: 'vi', // regex flag 31C731B0-41F5-46A5-93B4-D00D9A6064EA
-			boundRight,
-			boundLeft,
-		},
+		removeCombiningCharacters,
+		caseSensitive,
+		fieldValueHighlight: negate
+			? undefined // if negate, don't highlight, since it won't be in the search
+			: {
+					pattern,
+					flags: caseSensitive ? 'v' : 'vi', // regex flag 31C731B0-41F5-46A5-93B4-D00D9A6064EA
+					boundRight,
+					boundLeft,
+			  },
 	} satisfies Content
 }
 
+// yes this name is terrible
 interface Content {
 	value: string
 	wildcardLeft: boolean
 	wildcardRight: boolean
 	boundLeft: boolean
 	boundRight: boolean
-	regexPattern?: string
-	fieldValueHighlight: FieldValueHighlight
+	removeCombiningCharacters: boolean
+	caseSensitive: boolean
+	fieldValueHighlight?: FieldValueHighlight
 }
 
 function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
@@ -256,8 +268,9 @@ function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
 			wildcardRight,
 			boundLeft,
 			boundRight,
-			regexPattern,
 			fieldValueHighlight,
+			caseSensitive,
+			removeCombiningCharacters,
 		} =
 			node.type.is(qt.SimpleString) ||
 			node.type.is(qt.KindEnum) ||
@@ -273,7 +286,8 @@ function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
 						wildcardRight: true,
 						boundLeft: false,
 						boundRight: false,
-						regexPattern: undefined,
+						caseSensitive: false,
+						removeCombiningCharacters: false,
 						fieldValueHighlight: {
 							pattern: escapeRegExp(input.slice(node.from, node.to)),
 							flags: 'vi', // regex flag 31C731B0-41F5-46A5-93B4-D00D9A6064EA
@@ -286,7 +300,7 @@ function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
 				  node.type.is(qt.Html) ||
 				  node.type.is(qt.RawHtml) ||
 				  node.type.is(qt.RawQuoted)
-				? buildContent(node, input)
+				? buildContent(node, input, negate)
 				: throwExp('You missed ' + node.type.name)
 		context.current.attach({
 			type:
@@ -306,11 +320,12 @@ function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
 			wildcardRight,
 			boundLeft,
 			boundRight,
-			regexPattern,
 			fieldValueHighlight,
 			negate,
 			label,
 			comparison,
+			caseSensitive,
+			removeCombiningCharacters,
 		})
 	} else if (node.type.is(qt.Regex)) {
 		maybeAddSeparator(node.node, context)
@@ -363,24 +378,63 @@ function astLeave(_input: string, node: SyntaxNodeRef, context: Context) {
 	}
 }
 
-function like(qs: QueryString, column: string, forcePositive?: true) {
-	const col = sql.raw(column)
-	const left = qs.wildcardLeft ? '%' : ''
-	const right = qs.wildcardRight ? '%' : ''
-	const value = `${left}${qs.value}${right}`
+type Table =
+	| 'cardTagFts'
+	| 'noteTagFts'
+	| 'cardSettingNameFts'
+	| 'templateNameFts'
+	| 'noteValueFts'
+
+function like(
+	qs: QueryString,
+	table: Table,
+	sourceColumn: string,
+	forcePositive?: true,
+	stripHtml?: '0',
+) {
+	const tbl = sql.raw(table)
+	const left = qs.wildcardLeft ? '*' : ''
+	const right = qs.wildcardRight ? '*' : ''
+	const normalizedValue = ftsNormalize(qs.value, false, true, false)
+	const wildcardedValue = `${left}${normalizedValue}${right}`
 	const not = getNot(qs.negate, forcePositive)
-	const filterList = [sql`(${col} ${not} LIKE ${value}`]
-	if (qs.regexPattern != null) {
-		filterList.push(
-			sql` AND ${not} regexp_with_flags(${qs.regexPattern}, 'i', ${col})`,
+	const removeCombiningCharacters = qs.removeCombiningCharacters ? '1' : '0'
+	const init = qs.removeCombiningCharacters
+		? sql.raw(' (TRUE ') // gotta have something since there may be subsequent ANDs
+		: sql`(${tbl}.normalized ${not} GLOB ${wildcardedValue}`
+	const filterList = [init]
+	const sHtml = stripHtml ?? '1'
+	const caseFoldBool = qs.caseSensitive ? '0' : '1' // "if caseSensitive, do NOT case fold"
+	const col = sql.raw(
+		`ftsNormalize(${table}.${sourceColumn}, ${sHtml}, ${caseFoldBool}, ${removeCombiningCharacters})`,
+	)
+	let customNormalized
+	if (qs.removeCombiningCharacters || qs.caseSensitive) {
+		const caseFoldBool = !qs.caseSensitive
+		customNormalized = ftsNormalize(
+			qs.value,
+			false,
+			caseFoldBool,
+			qs.removeCombiningCharacters,
 		)
+		const value = `${left}${customNormalized}${right}`
+		filterList.push(sql` AND ${col} ${not} GLOB ${value}`)
 	}
-	if (qs.boundLeft && qs.boundRight) {
-		filterList.push(sql` AND ${not} word(1, ${qs.value}, ${col})`)
-	} else if (qs.boundLeft) {
-		filterList.push(sql` AND ${not} word(0, ${qs.value}, ${col})`)
-	} else if (qs.boundRight) {
-		filterList.push(sql` AND ${not} word(2, ${qs.value}, ${col})`)
+	const leftRightBoth = // 0 1 2 correspond to C3B5BEA8-3A89-40CB-971F-6FBA780A6487
+		qs.boundLeft && qs.boundRight
+			? 1
+			: qs.boundLeft
+			? 0
+			: qs.boundRight
+			? 2
+			: null
+	if (leftRightBoth != null) {
+		const lrb = sql.raw(leftRightBoth.toString())
+		const wordFilter =
+			customNormalized === undefined
+				? sql` AND ${not} word(${lrb}, ${normalizedValue}, normalized)`
+				: sql` AND ${not} word(${lrb}, ${customNormalized}, ${col})`
+		filterList.push(wordFilter)
 	}
 	filterList.push(sql.raw(`)`))
 	return sql.join(filterList, sql``) as RawBuilder<SqlBool>
@@ -414,12 +468,12 @@ function serialize(node: Node, context: Context) {
 		} else if (node.type === 'Html') {
 			context.joinNoteValueFts.push({
 				name,
-				sql: like(node, `noteValueFts.value`, true),
+				sql: like(node, `noteValueFts`, `value`, true, '0'),
 			})
 		} else {
 			context.joinNoteValueFts.push({
 				name,
-				sql: like(node, `noteValueFts.normalized`, true),
+				sql: like(node, `noteValueFts`, `value`, true),
 			})
 		}
 		context.trustedSql(`${name}.z IS ${node.negate ? '' : 'NOT'} NULL`) // `z` from 2DB5DD73-603E-4DF7-A366-A53375AF0093
@@ -473,7 +527,7 @@ function handleLabel(node: QueryString | QueryRegex, context: Context) {
 			context.regexpWithFlags(node, `template.name`)
 		} else {
 			context.joinTemplateNameFts = true
-			context.like(node, 'templateNameFts.name')
+			context.like(node, 'templateNameFts', 'name')
 		}
 	} else if (node.label === templateId) {
 		if (node.type === 'Regex') throwExp("you can't regex templateId")
@@ -484,7 +538,7 @@ function handleLabel(node: QueryString | QueryRegex, context: Context) {
 			context.regexpWithFlags(node, `cardSetting.name`)
 		} else {
 			context.joinCardSettingNameFts = true
-			context.like(node, 'cardSettingNameFts.name')
+			context.like(node, 'cardSettingNameFts', 'name')
 		}
 	} else if (node.label === settingId) {
 		if (node.type === 'Regex') throwExp("you can't regex settingId")
@@ -608,11 +662,11 @@ function buildTagSearch(node: QueryString | QueryRegex, context: Context) {
 	} else {
 		context.joinCardTagsFts.push({
 			name: cardName,
-			sql: like(node, `cardTagFts.tag`, true),
+			sql: like(node, `cardTagFts`, `tag`, true),
 		})
 		context.joinNoteTagsFts.push({
 			name: noteName,
-			sql: like(node, `noteTagFts.tag`, true),
+			sql: like(node, `noteTagFts`, `tag`, true),
 		})
 	}
 	context.trustedSql(
@@ -678,13 +732,14 @@ interface QueryString {
 		| typeof date
 	label?: Label
 	value: string
-	regexPattern?: string // only intended for internal use. Specifically to supplement where FTS is lacking, like escaping, word boundaries, and case sensitivity.
+	caseSensitive: boolean
 	fieldValueHighlight?: FieldValueHighlight
 	negate: boolean
 	wildcardLeft: boolean
 	wildcardRight: boolean
 	boundLeft: boolean
 	boundRight: boolean
+	removeCombiningCharacters: boolean
 	comparison?: Comparison
 }
 
