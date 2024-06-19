@@ -75,7 +75,7 @@ class Context {
 		sourceColumn: string,
 		forcePositive?: true,
 	) {
-		this.sql.push(like(qs, table, sourceColumn, forcePositive))
+		this.sql.push(glob(qs, table, sourceColumn, forcePositive))
 	}
 
 	regexpWithFlags(node: QueryRegex, column: string) {
@@ -385,7 +385,7 @@ type Table =
 	| 'templateNameFts'
 	| 'noteValueFts'
 
-function like(
+function glob(
 	qs: QueryString,
 	table: Table,
 	sourceColumn: string,
@@ -468,12 +468,12 @@ function serialize(node: Node, context: Context) {
 		} else if (node.type === 'Html') {
 			context.joinNoteValueFts.push({
 				name,
-				sql: like(node, `noteValueFts`, `value`, true, '0'),
+				sql: glob(node, `noteValueFts`, `value`, true, '0'),
 			})
 		} else {
 			context.joinNoteValueFts.push({
 				name,
-				sql: like(node, `noteValueFts`, `value`, true),
+				sql: glob(node, `noteValueFts`, `value`, true),
 			})
 		}
 		context.trustedSql(`${name}.z IS ${node.negate ? '' : 'NOT'} NULL`) // `z` from 2DB5DD73-603E-4DF7-A366-A53375AF0093
@@ -662,11 +662,11 @@ function buildTagSearch(node: QueryString | QueryRegex, context: Context) {
 	} else {
 		context.joinCardTagsFts.push({
 			name: cardName,
-			sql: like(node, `cardTagFts`, `tag`, true),
+			sql: glob(node, `cardTagFts`, `tag`, true),
 		})
 		context.joinNoteTagsFts.push({
 			name: noteName,
-			sql: like(node, `noteTagFts`, `tag`, true),
+			sql: glob(node, `noteTagFts`, `tag`, true),
 		})
 	}
 	context.trustedSql(
