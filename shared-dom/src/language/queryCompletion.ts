@@ -58,17 +58,17 @@ export const queryCompletion: (_: {
 			}
 		}
 		const nodeBefore = syntaxTree(context.state).resolveInner(context.pos, -1)
+		const textBefore = context.state.sliceDoc(nodeBefore.from, context.pos)
+		const tagBefore = simpleStringRegex.exec(textBefore)
+		if (tagBefore == null && !context.explicit) return null
+		const from =
+			tagBefore != null ? nodeBefore.from + tagBefore.index : context.pos
 		if (
 			nodeBefore.type.is(Program) ||
 			(nodeBefore.type.is(SimpleString) &&
 				(nodeBefore.parent?.type.is(Group) === true ||
 					nodeBefore.parent?.type.is(Program) === true))
 		) {
-			const textBefore = context.state.sliceDoc(nodeBefore.from, context.pos)
-			const tagBefore = simpleStringRegex.exec(textBefore)
-			if (tagBefore == null && !context.explicit) return null
-			const from =
-				tagBefore != null ? nodeBefore.from + tagBefore.index : context.pos
 			const options: Completion[] = stringLabels.map(
 				(option) =>
 					({
@@ -88,13 +88,9 @@ export const queryCompletion: (_: {
 				validFor: (x) => history.some((h) => h.startsWith(x)),
 			}
 		} else if (inLabel(nodeBefore, tag)) {
-			const textBefore = context.state.sliceDoc(nodeBefore.from, context.pos)
-			const tagBefore = simpleStringRegex.exec(textBefore)
-			if (tagBefore == null && !context.explicit) return null
 			const tags = await getTags()
 			return {
-				from:
-					tagBefore != null ? nodeBefore.from + tagBefore.index : context.pos,
+				from,
 				options: tags.map(
 					(tag) =>
 						({
@@ -106,15 +102,9 @@ export const queryCompletion: (_: {
 				validFor: simpleStringRegex,
 			}
 		} else if (inLabel(nodeBefore, setting)) {
-			const textBefore = context.state.sliceDoc(nodeBefore.from, context.pos)
-			const cardSettingBefore = simpleStringRegex.exec(textBefore)
-			if (cardSettingBefore == null && !context.explicit) return null
 			const cardSettings = await getCardSettings()
 			return {
-				from:
-					cardSettingBefore != null
-						? nodeBefore.from + cardSettingBefore.index
-						: context.pos,
+				from,
 				options: cardSettings.map(
 					(cardSetting) =>
 						({
@@ -126,12 +116,8 @@ export const queryCompletion: (_: {
 				validFor: simpleStringRegex,
 			}
 		} else if (inLabel(nodeBefore, kind)) {
-			const textBefore = context.state.sliceDoc(nodeBefore.from, context.pos)
-			const kindBefore = simpleStringRegex.exec(textBefore)
-			if (kindBefore == null && !context.explicit) return null
 			return {
-				from:
-					kindBefore != null ? nodeBefore.from + kindBefore.index : context.pos,
+				from,
 				options: kindEnums.map(
 					(kind) =>
 						({
@@ -142,15 +128,9 @@ export const queryCompletion: (_: {
 				validFor: simpleStringRegex,
 			}
 		} else if (inLabel(nodeBefore, template)) {
-			const textBefore = context.state.sliceDoc(nodeBefore.from, context.pos)
-			const templateBefore = simpleStringRegex.exec(textBefore)
-			if (templateBefore == null && !context.explicit) return null
 			const templates = await getTemplates()
 			return {
-				from:
-					templateBefore != null
-						? nodeBefore.from + templateBefore.index
-						: context.pos,
+				from,
 				options: templates.map(
 					(template) =>
 						({
