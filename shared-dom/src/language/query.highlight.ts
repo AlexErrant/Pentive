@@ -11,6 +11,7 @@ export const queryHighlighting = styleTags({
 	'Not Or Wildcard Is': t.operatorKeyword,
 	'Open Close': delimiter,
 	Regex: t.regexp,
+	Group: t.paren,
 	'Label/...': labelGroup,
 	'RatingEnum StateEnum KindEnum DueEnum FieldValueEnum': labelValue,
 	/* eslint-enable @typescript-eslint/naming-convention */
@@ -41,6 +42,11 @@ function createSpecs(isLight: boolean) {
 		{
 			tag: labelGroup,
 			textDecoration: overline,
+		},
+		{
+			tag: t.paren,
+			...notSearchTermStyle,
+			fontStyle: 'normal',
 		},
 		{
 			tag: labelValue,

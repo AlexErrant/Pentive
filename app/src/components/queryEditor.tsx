@@ -200,18 +200,6 @@ const baseTheme = EditorView.baseTheme({
 	},
 	// https://discuss.codemirror.net/t/changing-the-font-size-of-cm6/2935/11
 	[`${prefix} .cm-scroller`]: { fontFamily: 'inherit' },
-	[`${prefix} .query-escape`]: {
-		color: 'darkorange',
-		fontWeight: 'bold',
-	},
-	[`${prefix} .query-paren`]: {
-		color: 'darkorange',
-		fontWeight: 'bold',
-	},
-	[`${prefix} .query-quote`]: {
-		color: 'darkorange',
-		fontWeight: 'bold',
-	},
 	[`${prefix} .query-active *`]: {
 		color: 'red',
 		fontWeight: 'bold',
