@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS cardSetting (
   details TEXT
 ) STRICT;
 CREATE VIEW IF NOT EXISTS cardSettingName AS
-  SELECT rowid, name, ftsNormalize(name) AS normalized FROM cardSetting;
+  SELECT rowid, name, ftsNormalize(name, 1, 1, 0) AS normalized FROM cardSetting;
 CREATE TABLE IF NOT EXISTS template (
   id TEXT PRIMARY KEY, -- make BLOB upon SQLite v3.41 and the landing of UNHEX https://sqlite.org/forum/forumpost/30cca4e613d2fa2a grep F235B7FB-8CEA-4AE2-99CC-2790E607B1EB
   name TEXT,
@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS template (
   ankiId INTEGER
 ) STRICT;
 CREATE VIEW IF NOT EXISTS templateName AS
-  SELECT rowid, name, ftsNormalize(name) AS normalized FROM template;
+  SELECT rowid, name, ftsNormalize(name, 1, 1, 0) AS normalized FROM template;
 CREATE TABLE IF NOT EXISTS remoteTemplate (
   localId TEXT, -- make BLOB upon SQLite v3.41 and the landing of UNHEX https://sqlite.org/forum/forumpost/30cca4e613d2fa2a grep F235B7FB-8CEA-4AE2-99CC-2790E607B1EB
   nook TEXT,

@@ -87,11 +87,20 @@ export async function createDb() {
 	db.api.create_function(
 		db.db,
 		'ftsNormalize',
-		1,
+		4,
 		SQLITE_UTF8 | SQLITE_DETERMINISTIC,
 		0,
 		function (context, values) {
-			const normalized = ftsNormalize(db.api.value_text(values[0]!), true)
+			const html = db.api.value_text(values[0]!)
+			const stripHtml = db.api.value_int(values[1]!) === 1
+			const caseFoldBool = db.api.value_int(values[2]!) === 1
+			const removeCombiningCharacters = db.api.value_int(values[3]!) === 1
+			const normalized = ftsNormalize(
+				html,
+				stripHtml,
+				caseFoldBool,
+				removeCombiningCharacters,
+			)
 			db.api.result(context, normalized)
 		},
 		undefined,

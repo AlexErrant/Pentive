@@ -173,7 +173,7 @@ JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field
 								.select([
 									'rowid',
 									'value',
-									sql`ftsNormalize(value)`.as('normalized'),
+									sql`ftsNormalize(value, 1, 1, 0)`.as('normalized'),
 								])
 								.where('noteId', 'in', noteIds),
 						)

@@ -54,14 +54,14 @@ CREATE VIEW IF NOT EXISTS distinctNoteField AS
   SELECT
     MIN(rowid) AS rowid,
     field,
-    ftsNormalize(field) AS normalized
+    ftsNormalize(field, 1, 1, 0) AS normalized
   FROM noteFieldValue
   GROUP BY field;
 CREATE VIEW IF NOT EXISTS noteValueFtsView AS
   SELECT
     rowid,
     value,
-    ftsNormalize(value) AS normalized
+    ftsNormalize(value, 1, 1, 0) AS normalized
   FROM noteFieldValue;
 CREATE VIRTUAL TABLE IF NOT EXISTS noteFieldFts USING fts5 (
   field,
@@ -78,12 +78,12 @@ CREATE VIRTUAL TABLE IF NOT EXISTS noteValueFts USING fts5 (
 CREATE VIRTUAL TABLE IF NOT EXISTS noteFieldFtsInstance USING fts5vocab(noteFieldFts, instance);
 CREATE TRIGGER IF NOT EXISTS noteFieldValue_after_insert AFTER INSERT ON noteFieldValue BEGIN
   INSERT INTO noteFieldFts(              rowid, field,         normalized)
-                                  SELECT rowid, field, ftsNormalize(field)
+                                  SELECT rowid, field, ftsNormalize(field, 1, 1, 0)
                                   FROM distinctNoteField
                                   WHERE field = new.field
                                   AND NOT EXISTS (SELECT rowid FROM noteFieldFtsInstance WHERE doc = new.rowid LIMIT 1); -- noteFieldFts is external content, so `select * from noteFieldFts` will query the underlying view, distinctNoteField. So to figure out if the field's already in the index, we check the vocab table.
   INSERT INTO noteValueFts(    rowid,     value,              normalized)
-                    VALUES(new.rowid, new.value, ftsNormalize(new.value));
+                    VALUES(new.rowid, new.value, ftsNormalize(new.value, 1, 1, 0));
 END;
 CREATE TRIGGER IF NOT EXISTS noteFieldValue_after_delete AFTER DELETE ON noteFieldValue BEGIN
   INSERT INTO noteFieldFts(noteFieldFts, rowid, field) VALUES('delete', old.rowid, old.field);
@@ -96,7 +96,7 @@ END;
 CREATE TRIGGER IF NOT EXISTS noteFieldValue_after_update AFTER UPDATE ON noteFieldValue BEGIN
   DELETE FROM noteValueFts WHERE rowid = old.rowid;
   INSERT INTO noteValueFts(    rowid,     value,              normalized)
-                    VALUES(new.rowid, new.value, ftsNormalize(new.value));
+                    VALUES(new.rowid, new.value, ftsNormalize(new.value, 1, 1, 0));
 END;
 
 CREATE INDEX IF NOT EXISTS noteBase_templateId_idx on noteBase(templateId);

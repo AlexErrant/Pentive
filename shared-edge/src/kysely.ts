@@ -909,7 +909,7 @@ function toNoteCreate(
 		updated,
 		fieldValues: serializeFieldValues(n.fieldValues),
 		fts: Array.from(n.fieldValues)
-			.map(([, v]) => ftsNormalize(v, true))
+			.map(([, v]) => ftsNormalize(v, true, true, false))
 			.concat(n.tags)
 			.join(' '),
 		tags: serializeTags(n.tags),
