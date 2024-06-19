@@ -1,0 +1,27 @@
+diff --git a/dist/index.js b/dist/index.js
+index a268ec4158db6ab1a52b7a93b7d48179db802ca6..c6abd9a730bead575887124729cade7b0b065e0b 100644
+--- a/dist/index.js
++++ b/dist/index.js
+@@ -946,7 +946,7 @@ class ActiveResult extends ActiveSource {
+             type == "delete" && cur(tr.startState) == this.from)
+             return new ActiveSource(this.source, type == "input" && conf.activateOnTyping ? 1 /* State.Pending */ : 0 /* State.Inactive */);
+         let explicitPos = this.explicitPos < 0 ? -1 : tr.changes.mapPos(this.explicitPos);
+-        if (checkValid(result.validFor, tr.state, from, to))
++        if (checkValid(result.validFor, tr.state, from, to, tr))
+             return new ActiveResult(this.source, explicitPos, result, from, to);
+         if (result.update &&
+             (result = result.update(result, from, to, new CompletionContext(tr.state, pos, explicitPos >= 0))))
+@@ -965,11 +965,11 @@ class ActiveResult extends ActiveSource {
+         return new ActiveResult(this.source, this.explicitPos < 0 ? -1 : mapping.mapPos(this.explicitPos), this.result, mapping.mapPos(this.from), mapping.mapPos(this.to, 1));
+     }
+ }
+-function checkValid(validFor, state, from, to) {
++function checkValid(validFor, state, from, to, tr) {
+     if (!validFor)
+         return false;
+     let text = state.sliceDoc(from, to);
+-    return typeof validFor == "function" ? validFor(text, from, to, state) : ensureAnchor(validFor, true).test(text);
++    return typeof validFor == "function" ? validFor(text, from, to, state, tr) : ensureAnchor(validFor, true).test(text);
+ }
+ const setActiveEffect = /*@__PURE__*/StateEffect.define({
+     map(sources, mapping) { return sources.map(s => s.map(mapping)); }
