@@ -1,4 +1,5 @@
 import {
+	type CompletionResult,
 	type Completion,
 	type CompletionSource,
 } from '@codemirror/autocomplete'
@@ -23,6 +24,7 @@ import {
 	template,
 } from './stringLabels'
 import { type SyntaxNode } from '@lezer/common'
+import { type Transaction } from '@codemirror/state'
 
 // I don't think we should use Codemirror's autocomplete for showing history. Doing anything more
 // advanced, e.g. deleting an entry from history, is unsupported in `@codemirror/autocomplete`.
@@ -85,8 +87,15 @@ export const queryCompletion: (_: {
 			return {
 				from,
 				options,
-				validFor: (x) => history.some((h) => h.startsWith(x)),
-			}
+				// @ts-expect-error pnpm patched
+				validFor: (x, _a, _b, _c, tr) => {
+					const t = tr as Transaction
+					if (t.isUserEvent('input.complete')) {
+						return false
+					}
+					return history.some((h) => h.startsWith(x as string))
+				},
+			} as unknown as CompletionResult
 		} else if (inLabel(nodeBefore, tag)) {
 			const tags = await getTags()
 			return {
