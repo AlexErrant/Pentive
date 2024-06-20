@@ -1,0 +1,27 @@
+// This file serves as a place to experiment with the globbing grammar without the complexity of the query grammar.
+
+@top Top { (Squared | Wildcard | Wildcard1 | Content)* }
+
+Squared { SquareOpen ( notClose | range )+ ~a SquareClose }
+
+range[@dynamicPrecedence=1] { RangeOpen ~a Dash RangeClose }
+RangeOpen [closedBy=RangeClose] { notClose }
+RangeClose[openedBy=RangeOpen ] { notClose }
+notClose { Dash | Char }
+
+@local tokens {
+  SquareClose[openedBy=SquareOpen] { "]" }
+  Dash { "-" }
+  Char { ![\]-] }
+}
+
+@local tokens {
+  // Ideally "^" would be a token, but I couldn't get the following desired behavior:
+  // [a-b] to parse as SquareOpen,RangeOpen,Dash,RangeClose,SquareClose
+  // [^-b] to parse as SquareOpen,Not,Dash,Char,SquareClose
+  SquareOpen[closedBy=SquareClose] { "[" "^"? }
+  Wildcard  { "*" }
+  Wildcard1 { "?" }
+  @else Content
+}
+
