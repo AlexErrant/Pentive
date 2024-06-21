@@ -171,27 +171,33 @@ Is { ":" | "=" }
 // If you add characters that need escaping, also update 36E8AC4E-5658-443C-96F1-E131B231861C
 
 @local tokens {
-  Quoted1Escape[@name=Escape] { "\\" ( '\\' | "'" | "*" | "_" ) }
-  Quoted1Close[openedBy=Quoted1Open,@name=Close] { "'" ("%" | "^" | "#")* }
-  Quoted1Wildcard[@name=Wildcard] { "*" }
-  Quoted1Wildcard1[@name=Wildcard1] { "_" }
-  @else Quoted1Content[@name=Content]
+  SquareClose[openedBy=SquareOpen] { "]" }
+  Dash { "-" }
+  Char { ![\]-] }
 }
 
 @local tokens {
-  Quoted2Escape[@name=Escape] { "\\" ( '\\' | '"' | "*" | "_" ) }
-  Quoted2Close[openedBy=Quoted2Open,@name=Close] { '"' ("%" | "^" | "#")* }
-  Quoted2Wildcard[@name=Wildcard] { "*" }
-  Quoted2Wildcard1[@name=Wildcard1] { "_" }
-  @else Quoted2Content[@name=Content]
+     Quoted1Close[@name=Close     ,openedBy=Quoted1Open] { "'" ("%" | "^" | "#")* }
+     SquareOpen_1[@name=SquareOpen,closedBy=SquareClose] { "[" "^"? }
+       Wildcard_1[@name=Wildcard                       ] { "*" }
+      Wildcard1_1[@name=Wildcard1                      ] { "?" }
+  @else Content_1[@name=Content]
 }
 
 @local tokens {
-     HtmlEscape[@name=Escape] { "\\" ( '\\' | '`' | "*" | "_" ) }
-        HtmlClose[openedBy=HtmlOpen,@name=Close] { '`' ("%" | "^" | "#")* }
-  HtmlWildcard[@name=Wildcard] { "*" }
-  HtmlWildcard1[@name=Wildcard1] { "_" }
-  @else HtmlContent[@name=Content]
+     Quoted2Close[@name=Close     ,openedBy=Quoted2Open] { '"' ("%" | "^" | "#")* }
+     SquareOpen_2[@name=SquareOpen,closedBy=SquareClose] { "[" "^"? }
+       Wildcard_2[@name=Wildcard                       ] { "*" }
+      Wildcard1_2[@name=Wildcard1                      ] { "?" }
+  @else Content_2[@name=Content]
+}
+
+@local tokens {
+        HtmlClose[@name=Close     ,openedBy=HtmlOpen   ] { "`" ("%" | "^" | "#")* }
+     SquareOpen_3[@name=SquareOpen,closedBy=SquareClose] { "[" "^"? }
+       Wildcard_3[@name=Wildcard                       ] { "*" }
+      Wildcard1_3[@name=Wildcard1                      ] { "?" }
+  @else Content_3[@name=Content]
 }
 
 @skip {} {
@@ -202,15 +208,25 @@ Is { ":" | "=" }
   RawHtml {
     RawHtmlOpen RawHtmlContent RawHtmlClose
   }
-  quoted1Content { Quoted1Escape | Quoted1Wildcard | Quoted1Wildcard1 | Quoted1Content }
-  quoted2Content { Quoted2Escape | Quoted2Wildcard | Quoted2Wildcard1 | Quoted2Content }
-     htmlContent {    HtmlEscape |    HtmlWildcard |    HtmlWildcard1 |    HtmlContent }
   Quoted1Open[closedBy=Quoted1Close,@name=Open] { ("%" | "^" | "#")* "'" }
   Quoted2Open[closedBy=Quoted2Close,@name=Open] { ("%" | "^" | "#")* '"' }
      HtmlOpen[closedBy=   HtmlClose,@name=Open] { ("%" | "^" | "#")* '`' }
-  Quoted1 { Quoted1Open quoted1Content* Quoted1Close }
-  Quoted2 { Quoted2Open quoted2Content* Quoted2Close }
-  Html    {    HtmlOpen    htmlContent*    HtmlClose }
+  Quoted1 { Quoted1Open contentRoot_1 Quoted1Close }
+  Quoted2 { Quoted2Open contentRoot_2 Quoted2Close }
+  Html    {    HtmlOpen contentRoot_3    HtmlClose }
+
+  contentRoot_1 { (Squared_1 | Wildcard_1 | Wildcard1_1 | Content_1)* }
+  contentRoot_2 { (Squared_2 | Wildcard_2 | Wildcard1_2 | Content_2)* }
+  contentRoot_3 { (Squared_3 | Wildcard_3 | Wildcard1_3 | Content_3)* }
+
+  Squared_1[@name=Squared] { SquareOpen_1 ( notClose | range )+ ~a SquareClose }
+  Squared_2[@name=Squared] { SquareOpen_2 ( notClose | range )+ ~a SquareClose }
+  Squared_3[@name=Squared] { SquareOpen_3 ( notClose | range )+ ~a SquareClose }
+
+  range[@dynamicPrecedence=1] { RangeOpen ~a Dash RangeClose }
+  RangeOpen [closedBy=RangeClose] { notClose }
+  RangeClose[openedBy=RangeOpen ] { notClose }
+  notClose { Dash | Char }
 }
 
 @external tokens rawQuotedOpen from "./query.tokens" {
