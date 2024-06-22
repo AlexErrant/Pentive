@@ -9,7 +9,7 @@ function testTree(tree: Tree, expect: string) {
 
 test('queryParser can parse standard test string', () => {
 	const tree = parser.parse(
-		`-(a) spider-man -a b -c -"(quote\\"d) str" OR "l o l" OR  a b c ((a "c") b) tag:what -setting:"x y" (template:d, e f)`,
+		`-(a) spider-man -a b -c OR "l o l" OR  a b c ((a "c") b) tag:what -setting:"x y" (template:d, e f)`,
 	)
 	const spec = `Program(
   Not,
@@ -22,8 +22,6 @@ test('queryParser can parse standard test string', () => {
   SimpleString,
   Not,
   SimpleString,
-  Not,
-  Quoted2(Open,Content,Escape,Content,Close),
   Or,
   Quoted2(Open,Content,Close),
   Or,
@@ -82,6 +80,183 @@ test("can't end with OR", () => {
 	const tree = parser.parse(`a OR`)
 	const spec = `Program(SimpleString,Or,⚠)`
 	testTree(tree, spec)
+})
+
+describe('glob', () => {
+	test(`["'\`] 1`, () => {
+		const tree = parser.parse(`-'(quote["'\`]d) str'`)
+		const spec = `Program(Not,Quoted1(Open,Content,
+Squared(
+  SquareOpen,Char,Char,Char,SquareClose
+),
+Content,Close))`
+		testTree(tree, spec)
+	})
+
+	test(`["'\`] 2`, () => {
+		const tree = parser.parse(`-"(quote["'\`]d) str"`)
+		const spec = `Program(Not,Quoted2(Open,Content,
+Squared(
+  SquareOpen,Char,Char,Char,SquareClose
+),
+Content,Close))`
+		testTree(tree, spec)
+	})
+
+	test(`Quoted1 quotes`, () => {
+		const tree = parser.parse(`'foo"\`bar'`)
+		const spec = `Program(Quoted1(Open,Content,Close))`
+		testTree(tree, spec)
+	})
+
+	test(`Quoted2 quotes`, () => {
+		const tree = parser.parse(`"foo'\`bar"`)
+		const spec = `Program(Quoted2(Open,Content,Close))`
+		testTree(tree, spec)
+	})
+
+	test(`Html quotes`, () => {
+		const tree = parser.parse('`foo\'"bar`')
+		const spec = `Program(Html(Open,Content,Close))`
+		testTree(tree, spec)
+	})
+
+	test(`empty 1`, () => {
+		const tree = parser.parse(`''`)
+		const spec = `Program(Quoted1(Open,Close))`
+		testTree(tree, spec)
+	})
+
+	test(`empty 2`, () => {
+		const tree = parser.parse(`""`)
+		const spec = `Program(Quoted2(Open,Close))`
+		testTree(tree, spec)
+	})
+
+	test(`2 squareds`, () => {
+		const tree = parser.parse(`'a[b]c[d]e'`)
+		const spec = `Program(Quoted1(
+  Open,
+  Content,
+  Squared(
+    SquareOpen,
+    Char,
+    SquareClose
+  ),
+  Content,
+  Squared(
+    SquareOpen,
+    Char,
+    SquareClose
+  ),
+  Content,
+  Close
+))`
+		testTree(tree, spec)
+	})
+
+	test(`2 ranges`, () => {
+		const tree = parser.parse(`'a[b-c]d[e-f]g'`)
+		const spec = `Program(Quoted1(
+  Open,
+  Content,
+  Squared(
+    SquareOpen,
+    RangeOpen(Char),
+    Dash,
+    RangeClose(Char),
+    SquareClose,
+  ),
+  Content,
+  Squared(
+    SquareOpen,
+    RangeOpen(Char),
+    Dash,
+    RangeClose(Char),
+    SquareClose
+  ),
+  Content,
+  Close
+))`
+		testTree(tree, spec)
+	})
+
+	test(`Not with char`, () => {
+		const tree = parser.parse(`'a[^bc]d'`)
+		const spec = `Program(Quoted1(
+  Open,
+  Content,
+  Squared(
+    SquareOpen,
+    Char,
+    Char,
+    SquareClose,
+  ),
+  Content,
+  Close
+))`
+		testTree(tree, spec)
+	})
+
+	test(`Not with range`, () => {
+		const tree = parser.parse(`'a[^b-c]d'`)
+		const spec = `Program(Quoted1(
+  Open,
+  Content,
+  Squared(
+    SquareOpen,
+    RangeOpen(Char),
+    Dash,
+    RangeClose(Char),
+    SquareClose,
+  ),
+  Content,
+  Close
+))`
+		testTree(tree, spec)
+	})
+
+	test(`Not Not`, () => {
+		const tree = parser.parse(`'[^^]'`)
+		const spec = `Program(Quoted1(Open,Squared(
+  SquareOpen,
+  Char
+  SquareClose
+),Close))`
+		testTree(tree, spec)
+	})
+
+	test(`Not Dash`, () => {
+		const tree = parser.parse(`'[^-]'`)
+		const spec = `Program(Quoted1(Open,Squared(
+  SquareOpen,
+  Dash,
+  SquareClose
+),Close))`
+		testTree(tree, spec)
+	})
+
+	test(`Dash Char`, () => {
+		const tree = parser.parse(`'[-a]'`)
+		const spec = `Program(Quoted1(Open,Squared(
+  SquareOpen,
+  Dash,
+  Char,
+  SquareClose
+),Close))`
+		testTree(tree, spec)
+	})
+
+	test(`Not Dash Char`, () => {
+		const tree = parser.parse(`'[^-a]'`)
+		const spec = `Program(Quoted1(Open,Squared(
+  SquareOpen,
+  Dash,
+  Char,
+  SquareClose
+),Close))`
+		testTree(tree, spec)
+	})
 })
 
 describe('labels', () => {
