@@ -141,47 +141,50 @@ export function getLabel(node: SyntaxNodeRef) {
 }
 
 function buildContent(node: SyntaxNodeRef, input: string, negate: boolean) {
-	const r: string[] = []
+	let valueFrom
+	let valueTo
 	const regex: string[] = []
 	if (node.node.firstChild == null) throwExp('How did you get this error?')
 	let child = node.node.firstChild.nextSibling
 	let close = null
 	while (child != null) {
 		if (
-			child.type.id === qt.Quoted1Content ||
-			child.type.id === qt.Quoted2Content ||
-			child.type.id === qt.HtmlContent ||
+			child.type.id === qt.Content_1 ||
+			child.type.id === qt.Content_2 ||
+			child.type.id === qt.Content_3 ||
 			child.type.id === qt.RawQuoted1Content ||
 			child.type.id === qt.RawQuoted2Content ||
 			child.type.id === qt.RawHtmlContent
 		) {
 			const value = input.slice(child.from, child.to)
 			regex.push(escapeRegExp(value))
-			r.push(value)
+			valueFrom ??= child.from
+			valueTo = child.to
 		} else if (
-			child.type.id === qt.Quoted1Escape ||
-			child.type.id === qt.Quoted2Escape ||
-			child.type.id === qt.HtmlEscape
+			child.type.id === qt.Squared_1 ||
+			child.type.id === qt.Squared_2 ||
+			child.type.id === qt.Squared_3
 		) {
-			const char = input.charAt(child.to - 1)
-			r.push(char)
-			regex.push(escapeRegExp(char))
+			valueFrom ??= child.from
+			valueTo = child.to
+			regex.push(input.slice(child.from, child.to))
 		} else if (
-			child.type.id === qt.HtmlWildcard ||
-			child.type.id === qt.Quoted1Wildcard ||
-			child.type.id === qt.Quoted2Wildcard
+			child.type.id === qt.Wildcard_1 ||
+			child.type.id === qt.Wildcard_2 ||
+			child.type.id === qt.Wildcard_3
 		) {
-			r.push('*')
+			valueFrom ??= child.from
+			valueTo = child.to
 			regex.push('.*')
 		} else if (
-			child.type.id === qt.HtmlWildcard1 ||
-			child.type.id === qt.Quoted1Wildcard1 ||
-			child.type.id === qt.Quoted2Wildcard1
+			child.type.id === qt.Wildcard1_1 ||
+			child.type.id === qt.Wildcard1_2 ||
+			child.type.id === qt.Wildcard1_3
 		) {
-			r.push('?')
+			valueFrom ??= child.from
+			valueTo = child.to
 			regex.push('.')
-		}
-		if (
+		} else if (
 			child.type.id === qt.Quoted1Close ||
 			child.type.id === qt.Quoted2Close ||
 			child.type.id === qt.RawQuoted1Close ||
@@ -205,7 +208,7 @@ function buildContent(node: SyntaxNodeRef, input: string, negate: boolean) {
 	const removeCombiningCharacters =
 		open.includes('%') || close?.includes('%') === true
 	return {
-		value: r.join(''),
+		value: input.slice(valueFrom, valueTo),
 		wildcardLeft,
 		wildcardRight,
 		boundLeft,
@@ -223,7 +226,6 @@ function buildContent(node: SyntaxNodeRef, input: string, negate: boolean) {
 	} satisfies Content
 }
 
-// yes this name is terrible
 interface Content {
 	value: string
 	wildcardLeft: boolean

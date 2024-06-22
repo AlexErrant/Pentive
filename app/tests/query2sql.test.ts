@@ -166,18 +166,18 @@ describe('not a', () => {
 
 test('Quoted1 is fts', async () => {
 	await assertEqual(
-		String.raw`'a \' \\ b'`,
+		String.raw`'a ['] \ b'`,
 		String.raw`x1.z IS NOT NULL`,
-		{ x1: String.raw`(noteValueFts.normalized GLOB '*a '' \ b*')` },
+		{ x1: String.raw`(noteValueFts.normalized GLOB '*a [''] \ b*')` },
 		1,
 	)
 })
 
 test('Quoted2 is fts', async () => {
 	await assertEqual(
-		String.raw`"a \" \\ b"`,
+		String.raw`"a ["] \ b"`,
 		String.raw`x1.z IS NOT NULL`,
-		{ x1: String.raw`(noteValueFts.normalized GLOB '*a " \ b*')` },
+		{ x1: String.raw`(noteValueFts.normalized GLOB '*a ["] \ b*')` },
 		1,
 	)
 })
@@ -537,9 +537,9 @@ describe('template', () => {
 
 	test('can contain doublequote and backslash', async () => {
 		await assertEqual(
-			String.raw`(template:"a\"b","c\\b")`,
+			String.raw`(template:"a["]b","c\b")`,
 			String.raw`(
-  (templateNameFts.normalized GLOB '*a"b*')
+  (templateNameFts.normalized GLOB '*a["]b*')
   OR
   (templateNameFts.normalized GLOB '*c\b*')
 )`,
@@ -778,9 +778,9 @@ describe('setting', () => {
 
 	test('can contain doublequote and backslash', async () => {
 		await assertEqual(
-			String.raw`(setting:"a\"b","c\\b")`,
+			String.raw`(setting:"a["]b","c\b")`,
 			String.raw`(
-  (cardSettingNameFts.normalized GLOB '*a"b*')
+  (cardSettingNameFts.normalized GLOB '*a["]b*')
   OR
   (cardSettingNameFts.normalized GLOB '*c\b*')
 )`,
@@ -1039,15 +1039,15 @@ describe('tag', () => {
 
 	test('can contain doublequote and backslash', async () => {
 		await assertEqual(
-			String.raw`(tag:"a\"b","c\\b")`,
+			String.raw`(tag:"a["]b","c\b")`,
 			String.raw`(
   (x1.tag IS NOT NULL OR x2.tag IS NOT NULL)
   OR
   (x3.tag IS NOT NULL OR x4.tag IS NOT NULL)
 )`,
 			{
-				x1: cardQuery('*a"b*'),
-				x2: noteQuery('*a"b*'),
+				x1: cardQuery('*a["]b*'),
+				x2: noteQuery('*a["]b*'),
 				x3: cardQuery(String.raw`*c\b*`),
 				x4: noteQuery(String.raw`*c\b*`),
 			},
