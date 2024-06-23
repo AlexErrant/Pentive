@@ -2,6 +2,8 @@ import { Tag, styleTags, tags as t } from '@lezer/highlight'
 import { HighlightStyle, type TagStyle } from '@codemirror/language'
 import { stringLabels } from './stringLabels'
 
+const wildcard = Tag.define()
+const squared = Tag.define()
 const labelGroup = Tag.define()
 const labelValue = Tag.define()
 const delimiter = Tag.define()
@@ -14,10 +16,13 @@ export const queryHighlighting = styleTags({
 	Group: t.paren,
 	'Label/...': labelGroup,
 	'RatingEnum StateEnum KindEnum DueEnum FieldValueEnum': labelValue,
+	'Squared/...': squared,
+	'Wildcard Wildcard1': wildcard,
 	/* eslint-enable @typescript-eslint/naming-convention */
 	[stringLabels.join(' ')]: t.labelName,
 })
 
+// medTODO needs work. Graphic design is (not) my passion.
 const notSearchTermStyle = {
 	color: 'darkorange',
 	fontStyle: 'italic',
@@ -27,6 +32,12 @@ const notSearchTermStyle = {
 function createSpecs(isLight: boolean) {
 	const overline = `overline ${isLight ? 'black' : 'white'}`
 	return [
+		{
+			tag: [wildcard, squared],
+			...notSearchTermStyle,
+			fontFamily: 'monospace',
+			fontStyle: 'normal',
+		},
 		{ tag: t.operatorKeyword, ...notSearchTermStyle },
 		{
 			tag: t.regexp,

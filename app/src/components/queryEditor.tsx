@@ -175,7 +175,8 @@ const queryLanguage = LRLanguage.define({
 	parser: queryParser,
 	languageData: {
 		closeBrackets: {
-			brackets: ['(', "'", '"', '`', "'''", '"""', '```'],
+			brackets: ['(', "'", '"', '`', "'''", '"""', '```', '['],
+			before: `)]'"\``,
 		} satisfies CloseBracketConfig,
 		autocomplete: queryCompletion({
 			getTags: db.getTags,
