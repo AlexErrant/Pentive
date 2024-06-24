@@ -136,6 +136,11 @@ export interface RemoteTemplate {
 	uploadDate: number | null
 }
 
+export interface DistinctNoteField {
+	field: string
+	normalized: string
+}
+
 export interface DistinctNoteTag {
 	tag: string
 }
@@ -167,6 +172,7 @@ export interface DB {
 	sqlite_temp_master: SqliteTempMaster
 	distinctCardTag: DistinctCardTag
 	distinctNoteTag: DistinctNoteTag
+	distinctNoteField: DistinctNoteField
 	cardTag: CardTag
 	noteTag: NoteTag
 	cardSettingNameFts: CardSettingNameFts

@@ -585,6 +585,12 @@ JOIN cardTag ON cardTag.cardId = x.cardId AND cardTag.tag = x.tag)`,
 			.execute()
 		return cards.map(cardBaseToDomain)
 	},
+	getFields: async () =>
+		await ky
+			.selectFrom('distinctNoteField')
+			.select('field')
+			.execute()
+			.then((x) => x.map((x) => x.field)),
 	getCards,
 	getCardsCount,
 	buildCache,

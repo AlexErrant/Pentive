@@ -184,6 +184,7 @@ const queryLanguage = LRLanguage.define({
 				await db.getTemplates().then((ts) => ts.map((t) => t.name)),
 			getCardSettings: async () =>
 				await db.getCardSettings().then((css) => css.map((cs) => cs.name)),
+			getFields: db.getFields,
 			getHistory,
 		}) satisfies CompletionSource,
 	},

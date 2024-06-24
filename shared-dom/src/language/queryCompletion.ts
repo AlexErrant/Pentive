@@ -15,6 +15,7 @@ import {
 } from './queryParser.terms'
 import { escapedQuoted1, escapedQuoted2, getLabel } from './query2sql'
 import {
+	field,
 	kind,
 	kindEnums,
 	setting,
@@ -46,9 +47,10 @@ export const queryCompletion: (_: {
 	getTags: () => Promise<string[]>
 	getTemplates: () => Promise<string[]>
 	getCardSettings: () => Promise<string[]>
+	getFields: () => Promise<string[]>
 	getHistory: () => Set<string>
 }) => CompletionSource =
-	({ getTags, getHistory, getTemplates, getCardSettings }) =>
+	({ getTags, getHistory, getTemplates, getCardSettings, getFields }) =>
 	async (context) => {
 		if (context.explicit && context.pos === 0) {
 			return {
@@ -111,6 +113,20 @@ export const queryCompletion: (_: {
 							label: cardSetting,
 							type: 'general',
 							apply: buildApply(nodeBefore, cardSetting),
+						}) satisfies Completion,
+				),
+				validFor: simpleStringRegex,
+			}
+		} else if (inLabel(nodeBefore, field)) {
+			const fields = await getFields()
+			return {
+				from,
+				options: fields.map(
+					(field) =>
+						({
+							label: field,
+							type: 'general',
+							apply: buildApply(nodeBefore, field),
 						}) satisfies Completion,
 				),
 				validFor: simpleStringRegex,
