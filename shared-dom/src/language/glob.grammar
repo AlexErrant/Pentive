@@ -1,4 +1,5 @@
-// This file serves as a place to experiment with the globbing grammar without the complexity of the query grammar.
+// This exists because trying to incorporate globbing into "SimpleString" destroyed my will to live.
+// Ideally we only have one grammar file, but I enjoy breathing.
 
 @top Top { (Squared | Wildcard | Wildcard1 | Content)* }
 
@@ -25,3 +26,4 @@ notClose { Dash | Char }
   @else Content
 }
 
+@external propSource queryHighlighting from "./query.highlight.js"

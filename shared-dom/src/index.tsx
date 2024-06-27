@@ -10,7 +10,8 @@ export * from './language/templateLinter.js'
 export * from './language/queryLinter.js'
 export * from './language/query2sql.js'
 export { type Error, type Warning } from './language/template2html.js'
-export { parser as queryParser } from './language/queryParser.js'
+// callers shouldn't know or care that we had to create two grammar files to make the query language work.
+export { globQueryParser as queryParser } from './language/globQueryParser.js'
 export * from './language/queryCompletion.js'
 export {
 	queryDarkHighlightStyle,

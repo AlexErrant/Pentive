@@ -13,6 +13,7 @@
 		"eslint:fix": "eslint . --fix --ignore-path .gitignore",
 		"format:check": "prettier --ignore-path .gitignore --check .",
 		"format": "prettier --ignore-path .gitignore --write .",
+		"generate-glob-parser": "lezer-generator src/language/glob.grammar --typeScript -o src/language/globParser.ts",
 		"generate-query-parser": "lezer-generator src/language/query.grammar --typeScript -o src/language/queryParser.ts",
 		"generate-template-parser": "lezer-generator src/language/template.grammar --typeScript -o src/language/templateParser.ts",
 		"test": "vitest",
