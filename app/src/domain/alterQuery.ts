@@ -1,4 +1,4 @@
-import { escapedQuoted2, queryParser, queryTerms } from 'shared-dom'
+import { escapedQuoted2, globQuery, queryTerms } from 'shared-dom'
 
 // https://stackoverflow.com/a/21350614
 function spliceSlice(
@@ -24,9 +24,11 @@ function getToAdd(tags: string[] | null) {
 		: '(tag:' + tags.map((t) => '"' + escapedQuoted2(t) + '"').join(',') + ')'
 }
 
+const parser = globQuery().language.parser
+
 export function alterQuery(query: string, input: { tags?: string[] }) {
 	let q = query
-	const tree = queryParser.parse(q)
+	const tree = parser.parse(q)
 	let handledTags = false
 	tree.cursor().iterate((node) => {
 		if (node.node.parent?.type.is(queryTerms.Program) === true) {

@@ -12,7 +12,6 @@ import {
 	indentOnInput,
 	bracketMatching,
 	foldKeymap,
-	LRLanguage,
 } from '@codemirror/language'
 import { defaultKeymap, history, historyKeymap } from '@codemirror/commands'
 import { searchKeymap, highlightSelectionMatches } from '@codemirror/search'
@@ -38,7 +37,7 @@ import { theme } from '../globalState'
 import {
 	queryLightHighlightStyle,
 	queryDarkHighlightStyle,
-	queryParser,
+	globQuery,
 	queryLinter,
 	queryCompletion,
 } from 'shared-dom'
@@ -146,7 +145,7 @@ function createEditorState(
 				},
 			]),
 			[...basicSetup],
-			queryLanguage,
+			globQuery(languageData),
 			syntaxHighlighting(queryLightHighlightStyle),
 			syntaxHighlighting(queryDarkHighlightStyle),
 			queryDecorations,
@@ -171,24 +170,21 @@ function appendHistory(value: string) {
 	localStorage.setItem('queryHistory', JSON.stringify([...history].slice(-100)))
 }
 
-const queryLanguage = LRLanguage.define({
-	parser: queryParser,
-	languageData: {
-		closeBrackets: {
-			brackets: ['(', "'", '"', '`', "'''", '"""', '```', '['],
-			before: `)]'"\``,
-		} satisfies CloseBracketConfig,
-		autocomplete: queryCompletion({
-			getTags: db.getTags,
-			getTemplates: async () =>
-				await db.getTemplates().then((ts) => ts.map((t) => t.name)),
-			getCardSettings: async () =>
-				await db.getCardSettings().then((css) => css.map((cs) => cs.name)),
-			getFields: db.getFields,
-			getHistory,
-		}) satisfies CompletionSource,
-	},
-})
+const languageData = {
+	closeBrackets: {
+		brackets: ['(', "'", '"', '`', "'''", '"""', '```', '['],
+		before: `)]'"\``,
+	} satisfies CloseBracketConfig,
+	autocomplete: queryCompletion({
+		getTags: db.getTags,
+		getTemplates: async () =>
+			await db.getTemplates().then((ts) => ts.map((t) => t.name)),
+		getCardSettings: async () =>
+			await db.getCardSettings().then((css) => css.map((cs) => cs.name)),
+		getFields: db.getFields,
+		getHistory,
+	}) satisfies CompletionSource,
+}
 
 // why & https://codemirror.net/examples/styling
 const prefix = '.query-editor &'
