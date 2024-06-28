@@ -126,7 +126,7 @@ due {
   | Comparison Date )
 }
 
-DueEnum { "true" | "false" }
+DueEnum { kw<"true"> | kw<"false"> }
 
 createdUpdated {
   ( kw<"created">
