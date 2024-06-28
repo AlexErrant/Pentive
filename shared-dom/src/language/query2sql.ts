@@ -309,14 +309,14 @@ function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
 				node.type.is(qt.Quoted1) ||
 				node.type.is(qt.Quoted2) ||
 				node.type.is(qt.RawQuoted)
-					? 'Quoted'
+					? quoted
 					: node.type.is(qt.Html) || node.type.is(qt.RawHtml)
-					? 'Html'
+					? html
 					: node.type.is(qt.Number)
-					? 'Number'
+					? number
 					: node.type.is(qt.Date)
-					? 'Date'
-					: 'SimpleString',
+					? date
+					: simpleString,
 			value,
 			wildcardLeft,
 			wildcardRight,
@@ -496,12 +496,12 @@ function serialize(node: Node, context: Context) {
 		} else {
 			for (const child of node.children) {
 				if (
-					child.type === 'SimpleString' ||
-					child.type === 'Quoted' ||
-					child.type === 'Number' ||
-					child.type === 'Date' ||
-					child.type === 'Html' ||
-					child.type === 'Regex'
+					child.type === simpleString ||
+					child.type === quoted ||
+					child.type === number ||
+					child.type === date ||
+					child.type === html ||
+					child.type === regex
 				) {
 					handleLabel(child, context)
 				} else {
@@ -587,10 +587,10 @@ function handleCreatedEditedDue(
 	table: 'note' | 'card' | undefined,
 	column: 'created' | 'edited' | 'due',
 ) {
-	if (node.type === 'Number') {
+	if (node.type === number) {
 		const val = context.now.getTime() - parseInt(node.value) * dayInMs
 		handleComparison(val, context, table, column, '>')
-	} else if (node.type === 'SimpleString') {
+	} else if (node.type === simpleString) {
 		const comp =
 			node.value === 'true'
 				? '<='
@@ -598,7 +598,7 @@ function handleCreatedEditedDue(
 				? '>'
 				: throwExp('impossible')
 		handleComparison(context.now.getTime(), context, table, column, comp)
-	} else if (node.type === 'Date') {
+	} else if (node.type === date) {
 		const [year, month, day] = node.value.split('-')
 		if (year == null || month == null || day == null) throwExp('impossible')
 		const local = new Date(parseInt(year), parseInt(month) - 1, parseInt(day)) // `new Date("2009-01-01") != new Date("2009-1-1")` so I parseInt
