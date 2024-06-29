@@ -8,7 +8,7 @@ export const parser = LRParser.deserialize({
   states: "!|QQOQOOO`OPO'#C^OOOO'#Ch'#ChQQOQOOOOOO'#Ck'#CkOhOPO'#CbOvOPO'#ClOOOO'#Ci'#CiO{OPO,58xOOOO-E6f-E6fO`OPO,59WOOOO-E6g-E6gOOOO1G.d1G.dOOOO'#Cc'#CcOOOO1G.r1G.r",
   stateData: "!W~ORPOXQOYQOZQO~OSSOTSO~OSUXS]XT]XW]X~OSYO~OSSOTSOW[O~O",
   goto: "!UaPPbPPPfjPPPPmsPy!QTQORTUPWR^YQRORXRQWPRZWSTPWR]YTVPW",
-  nodeNames: "⚠ Top Squared SquareOpen Dash Char RangeOpen RangeClose SquareClose Wildcard Wildcard1 Content",
+  nodeNames: "⚠ SimpleString Squared SquareOpen Dash Char RangeOpen RangeClose SquareClose Wildcard Wildcard1 Content",
   maxTerm: 16,
   nodeProps: [
     ["closedBy", 3,"SquareClose",6,"RangeClose"],
@@ -19,7 +19,7 @@ export const parser = LRParser.deserialize({
   repeatNodeCount: 2,
   tokenData: "RORO",
   tokenizers: [new LocalTokenGroup("!O~RVO}h}!Om!O#Ph#P#Qr#Q;'Sh;'S;=`w<%lOh~mOT~~rOS~~wOW~~zP;=`<%lh~", 45), new LocalTokenGroup("t~RRz{[!a!ba!}#Of~aOX~~fOY~~kPR~#Q#Rn~sOR~~", 35, 11)],
-  topRules: {"Top":[0,1]},
+  topRules: {"SimpleString":[0,1]},
   dynamicPrecedences: {"16":1},
   tokenPrec: 0
 })
