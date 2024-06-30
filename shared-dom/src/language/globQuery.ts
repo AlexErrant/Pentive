@@ -4,14 +4,17 @@ import { parseMixed } from '@lezer/common'
 import * as qt from './queryParser.terms'
 import { LRLanguage, LanguageSupport } from '@codemirror/language'
 
-export function globQuery(languageData?: Record<string, unknown>) {
+export function globQuery(
+	queryLanguageData?: Record<string, unknown>,
+	globLanguageData?: Record<string, unknown>,
+) {
 	const queryLanguage = LRLanguage.define({
 		parser: queryParser,
-		languageData,
+		languageData: queryLanguageData,
 	})
 	const globLanguage = LRLanguage.define({
 		parser: globParser,
-		languageData,
+		languageData: globLanguageData,
 	})
 	return new LanguageSupport(
 		queryLanguage.configure({

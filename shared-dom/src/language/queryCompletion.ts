@@ -43,14 +43,20 @@ function buildHistoryCompletion(history: string[]) {
 	)
 }
 
-export const queryCompletion: (_: {
-	getTags: () => Promise<string[]>
-	getTemplates: () => Promise<string[]>
-	getCardSettings: () => Promise<string[]>
-	getFields: () => Promise<string[]>
-	getHistory: () => Set<string>
-}) => CompletionSource =
-	({ getTags, getHistory, getTemplates, getCardSettings, getFields }) =>
+export const queryCompletion: (
+	_: {
+		getTags: () => Promise<string[]>
+		getTemplates: () => Promise<string[]>
+		getCardSettings: () => Promise<string[]>
+		getFields: () => Promise<string[]>
+		getHistory: () => Set<string>
+	},
+	isSimpleString?: true,
+) => CompletionSource =
+	(
+		{ getTags, getHistory, getTemplates, getCardSettings, getFields },
+		isSimpleString,
+	) =>
 	async (context) => {
 		if (context.explicit && context.pos === 0) {
 			return {

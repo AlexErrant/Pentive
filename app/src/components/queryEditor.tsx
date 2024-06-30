@@ -145,7 +145,7 @@ function createEditorState(
 				},
 			]),
 			[...basicSetup],
-			globQuery(languageData),
+			globQuery(getLanguageData(), getLanguageData(true)),
 			syntaxHighlighting(queryLightHighlightStyle),
 			syntaxHighlighting(queryDarkHighlightStyle),
 			queryDecorations,
@@ -170,20 +170,25 @@ function appendHistory(value: string) {
 	localStorage.setItem('queryHistory', JSON.stringify([...history].slice(-100)))
 }
 
-const languageData = {
-	closeBrackets: {
-		brackets: ['(', "'", '"', '`', "'''", '"""', '```', '['],
-		before: `)]'"\``,
-	} satisfies CloseBracketConfig,
-	autocomplete: queryCompletion({
-		getTags: db.getTags,
-		getTemplates: async () =>
-			await db.getTemplates().then((ts) => ts.map((t) => t.name)),
-		getCardSettings: async () =>
-			await db.getCardSettings().then((css) => css.map((cs) => cs.name)),
-		getFields: db.getFields,
-		getHistory,
-	}) satisfies CompletionSource,
+function getLanguageData(isSimpleString?: true) {
+	return {
+		closeBrackets: {
+			brackets: ['(', "'", '"', '`', "'''", '"""', '```', '['],
+			before: `)]'"\``,
+		} satisfies CloseBracketConfig,
+		autocomplete: queryCompletion(
+			{
+				getTags: db.getTags,
+				getTemplates: async () =>
+					await db.getTemplates().then((ts) => ts.map((t) => t.name)),
+				getCardSettings: async () =>
+					await db.getCardSettings().then((css) => css.map((cs) => cs.name)),
+				getFields: db.getFields,
+				getHistory,
+			},
+			isSimpleString,
+		) satisfies CompletionSource,
+	}
 }
 
 // why & https://codemirror.net/examples/styling
