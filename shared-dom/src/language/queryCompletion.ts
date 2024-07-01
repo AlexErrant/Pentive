@@ -58,13 +58,6 @@ export const queryCompletion: (
 		isSimpleString,
 	) =>
 	async (context) => {
-		if (context.explicit && context.pos === 0) {
-			return {
-				from: 0,
-				options: buildHistoryCompletion(Array.from(getHistory())).reverse(),
-				filter: false,
-			}
-		}
 		const nodeBefore = syntaxTree(context.state).resolveInner(context.pos, -1)
 		const textBefore = context.state.sliceDoc(nodeBefore.from, context.pos)
 		const tagBefore = simpleStringRegex.exec(textBefore)
