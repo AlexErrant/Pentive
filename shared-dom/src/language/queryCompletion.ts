@@ -8,7 +8,6 @@ import {
 	Program,
 	Quoted1,
 	Quoted2,
-	SimpleString,
 	Label,
 	Regex,
 	RawQuoted,
@@ -58,15 +57,22 @@ export const queryCompletion: (
 		isSimpleString,
 	) =>
 	async (context) => {
-		const nodeBefore = syntaxTree(context.state).resolveInner(context.pos, -1)
+		let nodeBefore = syntaxTree(context.state).resolveInner(context.pos, -1)
 		const textBefore = context.state.sliceDoc(nodeBefore.from, context.pos)
 		const tagBefore = simpleStringRegex.exec(textBefore)
 		if (tagBefore == null && !context.explicit) return null
 		const from =
 			tagBefore != null ? nodeBefore.from + tagBefore.index : context.pos
+		if (isSimpleString) {
+			// set `nodeBefore` to the "SimpleString" node
+			while (!nodeBefore.type.isTop && nodeBefore.parent != null) {
+				nodeBefore = nodeBefore.parent
+			}
+		}
 		if (
 			nodeBefore.type.is(Program) ||
-			(nodeBefore.type.is(SimpleString) &&
+			nodeBefore.type.is(Group) ||
+			(isSimpleString &&
 				(nodeBefore.parent?.type.is(Group) === true ||
 					nodeBefore.parent?.type.is(Program) === true))
 		) {
@@ -116,7 +122,11 @@ export const queryCompletion: (
 				),
 				validFor: simpleStringRegex,
 			}
-		} else if (inLabel(nodeBefore, field)) {
+		} else if (
+			inLabel(nodeBefore, field) &&
+			(nodeBefore.prevSibling?.name === field ||
+				nodeBefore.parent?.prevSibling?.prevSibling?.name === field)
+		) {
 			const fields = await getFields()
 			return {
 				from,
@@ -125,7 +135,7 @@ export const queryCompletion: (
 						({
 							label: field,
 							type: 'general',
-							apply: buildApply(nodeBefore, field),
+							apply: buildApply(nodeBefore, field) + ':',
 						}) satisfies Completion,
 				),
 				validFor: simpleStringRegex,
@@ -165,7 +175,9 @@ function inLabel(nodeBefore: SyntaxNode, label: string) {
 	return (
 		(nodeBefore.type.is(Label) && getLabel(nodeBefore) === label) ||
 		(nodeBefore.parent?.type.is(Label) === true &&
-			getLabel(nodeBefore.parent) === label)
+			getLabel(nodeBefore.parent) === label) ||
+		(nodeBefore.parent?.parent?.type.is(Label) === true &&
+			getLabel(nodeBefore.parent.parent) === label)
 	)
 }
 
