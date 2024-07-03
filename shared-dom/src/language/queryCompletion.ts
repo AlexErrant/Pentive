@@ -69,32 +69,7 @@ export const queryCompletion: (
 				nodeBefore = nodeBefore.parent
 			}
 		}
-		if (
-			nodeBefore.type.is(Program) ||
-			nodeBefore.type.is(Group) ||
-			(isSimpleString &&
-				(nodeBefore.parent?.type.is(Group) === true ||
-					nodeBefore.parent?.type.is(Program) === true))
-		) {
-			const options: Completion[] = stringLabels.map(
-				(option) =>
-					({
-						label: option,
-						type: 'general',
-						apply: option + ':',
-					}) satisfies Completion,
-			)
-			// only use historical autocomplete if we're replacing everything
-			const history = Array.from(getHistory())
-			if (from === 0) {
-				options.push(...buildHistoryCompletion(history))
-			}
-			return {
-				from,
-				options,
-				validFor: (x) => history.some((h) => h.startsWith(x)),
-			}
-		} else if (inLabel(nodeBefore, tag)) {
+		if (inLabel(nodeBefore, tag)) {
 			const tags = await getTags()
 			return {
 				from,
@@ -140,7 +115,7 @@ export const queryCompletion: (
 				),
 				validFor: simpleStringRegex,
 			}
-		} else if (inLabel(nodeBefore, kind)) {
+		} else if (inLabel(nodeBefore, kind, isSimpleString)) {
 			return {
 				from,
 				options: kindEnums.map(
@@ -166,18 +141,51 @@ export const queryCompletion: (
 				),
 				validFor: simpleStringRegex,
 			}
+		} else if (
+			nodeBefore.type.is(Program) ||
+			nodeBefore.type.is(Group) ||
+			(isSimpleString &&
+				(nodeBefore.parent?.type.is(Group) === true ||
+					nodeBefore.parent?.type.is(Program) === true))
+		) {
+			const options: Completion[] = stringLabels.map(
+				(option) =>
+					({
+						label: option,
+						type: 'general',
+						apply: option + ':',
+					}) satisfies Completion,
+			)
+			// only use historical autocomplete if we're replacing everything
+			const history = Array.from(getHistory())
+			if (from === 0) {
+				options.push(...buildHistoryCompletion(history))
+			}
+			return {
+				from,
+				options,
+				validFor: (x) => history.some((h) => h.startsWith(x)),
+			}
 		}
 		return null
 	}
 
-function inLabel(nodeBefore: SyntaxNode, label: string) {
+function inLabel(
+	nodeBefore: SyntaxNode,
+	label: string,
+	isSimpleString?: true, // not all callers need to provide this - just the ones where incomplete enums yield error nodes, e.g. "kind:re"
+) {
 	if (nodeBefore.type.is(Regex)) return false
 	return (
 		(nodeBefore.type.is(Label) && getLabel(nodeBefore) === label) ||
 		(nodeBefore.parent?.type.is(Label) === true &&
 			getLabel(nodeBefore.parent) === label) ||
 		(nodeBefore.parent?.parent?.type.is(Label) === true &&
-			getLabel(nodeBefore.parent.parent) === label)
+			getLabel(nodeBefore.parent.parent) === label) ||
+		(isSimpleString === true &&
+			nodeBefore.prevSibling?.type.is(Label) === true &&
+			getLabel(nodeBefore.prevSibling) === label &&
+			nodeBefore.prevSibling.lastChild?.node.type.isError === true)
 	)
 }
 
