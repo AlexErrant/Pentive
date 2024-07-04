@@ -19,6 +19,7 @@ import {
 	settingId,
 	kind,
 	type kindEnums,
+	field,
 } from './stringLabels'
 
 type JoinTable = Array<{
@@ -128,6 +129,7 @@ export function unique(str: string) {
 
 export function getLabel(node: SyntaxNodeRef) {
 	if (node.type.is(qt.Group) || node.type.isTop) return undefined
+	if (!node.type.is(qt.Label)) node = node.node.parent! // "if not label, set node to its parent". Note that we reassign `node`.
 	let child = node.node.firstChild
 	while (child != null && !stringLabels.includes(child.type.name)) {
 		child = child.nextSibling
@@ -237,6 +239,28 @@ interface Content {
 	fieldValueHighlight?: FieldValueHighlight
 }
 
+// we cache the field because the next run of astEnter should be on the field's value, and we need the field
+let fieldCache: QueryString | QueryRegex | undefined
+function attachQuery(
+	node: SyntaxNodeRef,
+	label: Label | undefined,
+	context: Context,
+	queryOrField: QueryString | QueryRegex,
+) {
+	if (label === field) {
+		if (node.node.parent?.type.is(qt.FieldName) === true) {
+			fieldCache = queryOrField
+		} else {
+			console.assert(fieldCache, 'query.Field should have a value!')
+			queryOrField.field = fieldCache
+			context.current.attach(queryOrField)
+			fieldCache = undefined
+		}
+	} else {
+		context.current.attach(queryOrField)
+	}
+}
+
 function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
 	if (node.type.isError) return
 	if (
@@ -304,7 +328,7 @@ function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
 				  node.type.is(qt.RawQuoted)
 				? buildContent(node, input, negate)
 				: throwExp('You missed ' + node.type.name)
-		context.current.attach({
+		attachQuery(node, label, context, {
 			type:
 				node.type.is(qt.Quoted1) ||
 				node.type.is(qt.Quoted2) ||
@@ -334,7 +358,7 @@ function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
 		const tailDelimiterIndex = input.lastIndexOf('/', node.to)
 		const pattern = input.slice(node.from + 1, tailDelimiterIndex)
 		const flags = unique(input.slice(tailDelimiterIndex + 1, node.to))
-		context.current.attach({
+		attachQuery(node, getLabel(node.node.parent!), context, {
 			type: regex,
 			pattern,
 			flags,
@@ -386,6 +410,7 @@ type Table =
 	| 'cardSettingNameFts'
 	| 'templateNameFts'
 	| 'noteValueFts'
+	| 'noteFieldValue'
 
 function glob(
 	qs: QueryString,
@@ -393,8 +418,8 @@ function glob(
 	sourceColumn: string,
 	forcePositive?: true,
 	stripHtml?: '0',
+	customNormalizedCol?: RawBuilder<unknown>,
 ) {
-	const tbl = sql.raw(table)
 	const left = qs.wildcardLeft ? '*' : ''
 	const right = qs.wildcardRight ? '*' : ''
 	const normalizedValue = ftsNormalize(qs.value, false, true, false)
@@ -403,23 +428,25 @@ function glob(
 	const removeCombiningCharacters = qs.removeCombiningCharacters ? '1' : '0'
 	const init = qs.removeCombiningCharacters
 		? sql.raw(' (TRUE ') // gotta have something since there may be subsequent ANDs
-		: sql`(${tbl}.normalized ${not} GLOB ${wildcardedValue}`
+		: customNormalizedCol === undefined
+		? sql`(${sql.raw(table)}.normalized ${not} GLOB ${wildcardedValue}`
+		: sql`(${customNormalizedCol} ${not} GLOB ${wildcardedValue}`
 	const filterList = [init]
 	const sHtml = stripHtml ?? '1'
 	const caseFoldBool = qs.caseSensitive ? '0' : '1' // "if caseSensitive, do NOT case fold"
 	const col = sql.raw(
 		`ftsNormalize(${table}.${sourceColumn}, ${sHtml}, ${caseFoldBool}, ${removeCombiningCharacters})`,
 	)
-	let customNormalized
+	let customNormalizedValue
 	if (qs.removeCombiningCharacters || qs.caseSensitive) {
 		const caseFoldBool = !qs.caseSensitive
-		customNormalized = ftsNormalize(
+		customNormalizedValue = ftsNormalize(
 			qs.value,
 			false,
 			caseFoldBool,
 			qs.removeCombiningCharacters,
 		)
-		const value = `${left}${customNormalized}${right}`
+		const value = `${left}${customNormalizedValue}${right}`
 		filterList.push(sql` AND ${col} ${not} GLOB ${value}`)
 	}
 	const leftRightBoth = // 0 1 2 correspond to C3B5BEA8-3A89-40CB-971F-6FBA780A6487
@@ -433,9 +460,9 @@ function glob(
 	if (leftRightBoth != null) {
 		const lrb = sql.raw(leftRightBoth.toString())
 		const wordFilter =
-			customNormalized === undefined
+			customNormalizedValue === undefined
 				? sql` AND ${not} word(${lrb}, ${normalizedValue}, normalized)`
-				: sql` AND ${not} word(${lrb}, ${customNormalized}, ${col})`
+				: sql` AND ${not} word(${lrb}, ${customNormalizedValue}, ${col})`
 		filterList.push(wordFilter)
 	}
 	filterList.push(sql.raw(`)`))
@@ -452,6 +479,31 @@ function regexpWithFlags(
 	return sql<SqlBool>`${not} regexp_with_flags(${node.pattern}, ${node.flags}, ${col})`
 }
 
+function handleField(
+	node: QueryString | QueryRegex,
+	valueSql: RawBuilder<SqlBool>,
+) {
+	if (node.label === field) {
+		if (node.field === undefined) throwExp('impossible')
+		const fieldSql =
+			node.field.type === 'Regex'
+				? regexpWithFlags(node.field, `noteFieldValue.field`, true)
+				: glob(
+						node.field,
+						`noteFieldValue`,
+						`field`,
+						true,
+						undefined,
+						// Running `ftsNormalize` is faster than joining against `noteFieldFts`. IDK why - I blame FTS5/virtual tables having suboptimal query planning.
+						// Could try joining against the result set but that could be a very, very large https://sqlite.org/forum/forumpost/5b303ab003f91660
+						// At least this way the engine *might* take advantage of the SQLITE_DETERMINISTIC flag https://www.sqlite.org/deterministic.html (though currently it doesn't seem to cache)
+						sql.raw('ftsNormalize(noteFieldValue.field, 1, 1, 0)'),
+				  )
+		return sql<SqlBool>`${fieldSql} AND ${valueSql}`
+	}
+	return valueSql
+}
+
 function serialize(node: Node, context: Context) {
 	if (
 		node.type === simpleString ||
@@ -465,17 +517,20 @@ function serialize(node: Node, context: Context) {
 		if (node.type === 'Regex') {
 			context.joinNoteFieldValue.push({
 				name,
-				sql: regexpWithFlags(node, `noteFieldValue.value`, true),
+				sql: handleField(
+					node,
+					regexpWithFlags(node, `noteFieldValue.value`, true),
+				),
 			})
 		} else if (node.type === 'Html') {
 			context.joinNoteValueFts.push({
 				name,
-				sql: glob(node, `noteValueFts`, `value`, true, '0'),
+				sql: handleField(node, glob(node, `noteValueFts`, `value`, true, '0')),
 			})
 		} else {
 			context.joinNoteValueFts.push({
 				name,
-				sql: glob(node, `noteValueFts`, `value`, true),
+				sql: handleField(node, glob(node, `noteValueFts`, `value`, true)),
 			})
 		}
 		context.trustedSql(`${name}.z IS ${node.negate ? '' : 'NOT'} NULL`) // `z` from 2DB5DD73-603E-4DF7-A366-A53375AF0093
@@ -576,6 +631,8 @@ function handleLabel(node: QueryString | QueryRegex, context: Context) {
 		handleCreatedEditedDue(node, context, 'note', 'edited')
 	} else if (node.label === 'due') {
 		handleCreatedEditedDue(node, context, 'card', 'due')
+	} else if (node.label === 'field') {
+		serialize(node, context)
 	} else {
 		throwExp('Unhandled label: ' + node.label)
 	}
@@ -733,6 +790,7 @@ interface QueryString {
 		| typeof number
 		| typeof date
 	label?: Label
+	field?: QueryString | QueryRegex // there's only 1 level of recursion but whatever
 	value: string
 	caseSensitive: boolean
 	fieldValueHighlight?: FieldValueHighlight
@@ -751,6 +809,7 @@ type Comparison = (typeof comparisons)[number]
 interface QueryRegex {
 	type: typeof regex
 	label?: Label
+	field?: QueryString | QueryRegex // there's only 1 level of recursion but whatever
 	pattern: string
 	flags: string
 	negate: boolean
