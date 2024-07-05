@@ -14,9 +14,16 @@ import {
 } from './queryParser.terms'
 import { escapedQuoted1, escapedQuoted2, getLabel } from './query2sql'
 import {
+	cardCreated,
+	cardEdited,
+	created,
+	due,
+	edited,
 	field,
 	kind,
 	kindEnums,
+	noteCreated,
+	noteEdited,
 	setting,
 	stringLabels,
 	tag,
@@ -49,11 +56,12 @@ export const queryCompletion: (
 		getCardSettings: () => Promise<string[]>
 		getFields: () => Promise<string[]>
 		getHistory: () => Set<string>
+		getDate: () => Date
 	},
 	isSimpleString?: true,
 ) => CompletionSource =
 	(
-		{ getTags, getHistory, getTemplates, getCardSettings, getFields },
+		{ getTags, getHistory, getTemplates, getCardSettings, getFields, getDate },
 		isSimpleString,
 	) =>
 	async (context) => {
@@ -127,6 +135,19 @@ export const queryCompletion: (
 				),
 				validFor: simpleStringRegex,
 			}
+		} else if (inLabel(nodeBefore, due)) {
+			return buildDates(getDate(), from, true)
+		} else if (
+			inLabels(nodeBefore, [
+				cardCreated,
+				noteCreated,
+				cardEdited,
+				noteEdited,
+				created,
+				edited,
+			])
+		) {
+			return buildDates(getDate(), from)
 		} else if (inLabel(nodeBefore, template)) {
 			const templates = await getTemplates()
 			return {
@@ -188,6 +209,13 @@ function inLabel(
 			nodeBefore.prevSibling.lastChild?.node.type.isError === true)
 	)
 }
+function inLabels(nodeBefore: SyntaxNode, labels: Array<string | undefined>) {
+	if (nodeBefore.type.is(Regex)) return false
+	return (
+		nodeBefore.parent?.type.is(Label) === true &&
+		labels.includes(getLabel(nodeBefore.parent))
+	)
+}
 
 function buildApply(nodeBefore: SyntaxNode, option: string) {
 	return nodeBefore.type.is(Quoted1)
@@ -197,6 +225,74 @@ function buildApply(nodeBefore: SyntaxNode, option: string) {
 		: nodeBefore.type.is(RawQuoted)
 		? option
 		: '"' + escapedQuoted2(option) + '"'
+}
+
+function buildDates(now: Date, from: number, due?: true) {
+	// https://stackoverflow.com/a/50130338
+	const offset = now.getTimezoneOffset() * 60000
+	const today = new Date(now.getTime() - offset).toISOString().split('T')[0]!
+	// https://stackoverflow.com/a/5511376
+	now.setDate(now.getDate() - 1) // mutates `now`
+	const yesterday = new Date(now.getTime() - offset)
+		.toISOString()
+		.split('T')[0]!
+	now.setDate(now.getDate() - 6) // mutates `now`
+	const week = new Date(now.getTime() - offset).toISOString().split('T')[0]!
+	const dueCompletion: Completion[] =
+		due === true
+			? [
+					{
+						label: 'true',
+						detail: '(is due)',
+						boost: 5,
+					},
+					{
+						label: 'false',
+						detail: '(is not due)',
+						boost: 4,
+					},
+					{
+						label: '-1',
+						detail: '(days ago - Tomorrow)',
+					},
+			  ]
+			: []
+	return {
+		from,
+		options: [
+			...dueCompletion,
+			{
+				label: today,
+				detail: '(Today)',
+				boost: 3,
+			},
+			{
+				label: yesterday,
+				detail: '(Yesterday)',
+				boost: 2,
+			},
+			{
+				label: week,
+				detail: '(1 week ago)',
+				boost: 1,
+				info: 'Also, type in any date (YYYY-MM-DD).',
+			},
+			{
+				label: '0',
+				detail: '(days ago - Today)',
+			},
+			{
+				label: '1',
+				detail: '(day ago - Yesterday)',
+			},
+			{
+				label: '7',
+				detail: '(days ago)',
+				info: 'Also, type in any number to get that many days ago.',
+			},
+		] satisfies Completion[],
+		validFor: simpleStringRegex,
+	}
 }
 
 // based on 569040F1-5B10-4D97-8F7B-0D75D81E7688

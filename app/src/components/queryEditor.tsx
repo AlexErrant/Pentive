@@ -43,6 +43,7 @@ import {
 } from 'shared-dom'
 import { queryDecorations } from './queryDecorations'
 import { db } from '../db'
+import { C } from '../topLevelAwait'
 
 let view: EditorView
 const QueryEditor: VoidComponent<{
@@ -185,6 +186,7 @@ function getLanguageData(isSimpleString?: true) {
 					await db.getCardSettings().then((css) => css.map((cs) => cs.name)),
 				getFields: db.getFields,
 				getHistory,
+				getDate: C.getDate,
 			},
 			isSimpleString,
 		) satisfies CompletionSource,
