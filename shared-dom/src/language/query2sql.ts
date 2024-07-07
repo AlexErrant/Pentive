@@ -663,7 +663,7 @@ function handleCreatedEditedDue(
 		if (comparison === ':') comparison = '>'
 		if (comparison === '=') {
 			context.trustedSql('(')
-			handleComparison(local.getTime(), context, table, column, '>')
+			handleComparison(local.getTime(), context, table, column, '>=')
 			context.trustedSql('AND')
 			handleComparison(local.getTime() + dayInMs, context, table, column, '<')
 			context.trustedSql(')')
@@ -691,7 +691,7 @@ function handleComparison(
 		)
 	} else {
 		if (column === 'due') {
-			context.parameterizeSql(sql`(card.due ${comp} ${val} AND card.due >= 0)`)
+			context.parameterizeSql(sql`(card.due ${comp} ${val} AND card.due >= 0)`) // negative `due`s are not timestamps, but ordinals when the card is "new"
 		} else {
 			const tbl = sql.table(table)
 			const col = sql.raw(column)

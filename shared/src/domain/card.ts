@@ -25,7 +25,7 @@ export interface Card {
 	created: Date
 	updated: Date
 	cardSettingId?: CardSettingId
-	due: Date | number
+	due: Date | number // `Date` is when the card is due. `number` is the ordinal when the card is "new".
 	state?: State
 }
 
