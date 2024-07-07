@@ -20,7 +20,7 @@
 		"test:run": "vitest run"
 	},
 	"devDependencies": {
-		"@lezer/generator": "^1.7.0",
+		"@lezer/generator": "^1.7.1",
 		"@types/lodash": "^4.14.202",
 		"@types/uuid": "^9.0.4",
 		"@typescript-eslint/eslint-plugin": "^6.21.0",
@@ -42,16 +42,16 @@
 		"vitest": "^1.6.0"
 	},
 	"dependencies": {
-		"@codemirror/autocomplete": "^6.16.0",
+		"@codemirror/autocomplete": "^6.17.0",
 		"@codemirror/lang-html": "^6.4.9",
-		"@codemirror/language": "^6.10.1",
-		"@codemirror/lint": "^6.5.0",
+		"@codemirror/language": "^6.10.2",
+		"@codemirror/lint": "^6.8.1",
 		"@codemirror/state": "^6.4.1",
 		"@kobalte/core": "^0.11.0",
 		"@kobalte/tailwindcss": "^0.9.0",
 		"@lezer/common": "^1.2.1",
 		"@lezer/highlight": "^1.2.0",
-		"@lezer/lr": "^1.4.0",
+		"@lezer/lr": "^1.4.1",
 		"immer": "^10.0.2",
 		"kysely": "^0.27.3",
 		"lodash": "^4.17.21",
