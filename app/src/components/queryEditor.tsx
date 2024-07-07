@@ -174,7 +174,7 @@ function appendHistory(value: string) {
 function getLanguageData(isSimpleString?: true) {
 	return {
 		closeBrackets: {
-			brackets: ['(', "'", '"', '`', "'''", '"""', '```', '['],
+			brackets: ['(', "'", '"', '`', "'''", '"""', '```', '[', '/'],
 			before: `)]'"\``,
 		} satisfies CloseBracketConfig,
 		autocomplete: queryCompletion(
