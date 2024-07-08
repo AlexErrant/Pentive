@@ -122,8 +122,8 @@ Or { @specialize<SimpleString, "OR"> | "," }
 due {
   kw<"due">
   ( Is DueEnum
-  | Is Not? Number
-  | Comparison Date )
+  | Comparison ( Not? Number | Date )
+  )
 }
 
 DueEnum { kw<"true"> | kw<"false"> }
@@ -135,8 +135,7 @@ createdUpdated {
   | kw<"edited">
   | kw<"noteEdited">
   | kw<"cardEdited"> )
-  ( Is Not? Number
-  | Comparison Date )
+  Comparison ( Not? Number | Date )
 }
 
 repsLapses {
@@ -165,7 +164,7 @@ RatingEnum[@dynamicPrecedence=1] {
   | enum<"easy">
 }
 
-Comparison { ":" | "=" | "<" | ">" | "<=" | ">=" }
+Comparison { "=" | "<" | ">" | "<=" | ">=" }
 Is { ":" | "=" }
 
 @local tokens {

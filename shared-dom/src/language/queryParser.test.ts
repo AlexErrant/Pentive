@@ -270,7 +270,7 @@ describe('labels', () => {
 
 	test('rating', () => {
 		const tree = parser.parse(
-			`reviewed:1:1 reviewed:1:2 reviewed:1:3 reviewed:1:4 reviewed:1:again reviewed:1:hard reviewed:1:good reviewed:1:easy`,
+			`reviewed=1=1 reviewed=1=2 reviewed=1=3 reviewed=1=4 reviewed=1=again reviewed=1=hard reviewed=1=good reviewed=1=easy`,
 		)
 		const spec = `Program(
   Label(reviewed,Comparison,Number,Comparison,RatingEnum),
