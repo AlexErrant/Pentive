@@ -14,16 +14,12 @@ import {
 } from './queryParser.terms'
 import { escapedQuoted1, escapedQuoted2, getLabel } from './query2sql'
 import {
-	cardCreated,
-	cardEdited,
-	created,
+	isDateValuedLabel,
+	dateValuedLabels,
 	due,
-	edited,
 	field,
 	kind,
 	kindEnums,
-	noteCreated,
-	noteEdited,
 	setting,
 	stringLabels,
 	tag,
@@ -135,17 +131,40 @@ export const queryCompletion: (
 				),
 				validFor: simpleStringRegex,
 			}
-		} else if (inLabel(nodeBefore, due)) {
+		} else if (isSimpleString && isDateValuedLabel(textBefore)) {
+			return {
+				from: from + textBefore.length,
+				options: [
+					{
+						label: '<=',
+						detail: '(before, inclusive)',
+					},
+					{
+						label: '>=',
+						detail: '(after, inclusive)',
+					},
+					{
+						label: '<',
+						detail: '(before)',
+					},
+					{
+						label: '>',
+						detail: '(after)',
+					},
+					{
+						label: '=',
+						detail: '(on)',
+					},
+				],
+			}
+		} else if (
+			// see comment below
+			inLabel(nodeBefore, due)
+		) {
 			return buildDates(getDate(), from, true)
 		} else if (
-			inLabels(nodeBefore, [
-				cardCreated,
-				noteCreated,
-				cardEdited,
-				noteEdited,
-				created,
-				edited,
-			])
+			// note that `inLabel(nodeBefore, due)` must precede this branch since `dateValuedLabels` includes `due`
+			inLabels(nodeBefore, dateValuedLabels)
 		) {
 			return buildDates(getDate(), from)
 		} else if (inLabel(nodeBefore, template)) {
@@ -174,7 +193,7 @@ export const queryCompletion: (
 					({
 						label: option,
 						type: 'general',
-						apply: option + ':',
+						apply: option + (isDateValuedLabel(option) ? '' : ':'),
 					}) satisfies Completion,
 			)
 			// only use historical autocomplete if we're replacing everything
@@ -185,7 +204,10 @@ export const queryCompletion: (
 			return {
 				from,
 				options,
-				validFor: (x) => history.some((h) => h.startsWith(x)),
+				validFor: (s) => {
+					if (isDateValuedLabel(s)) return false
+					return history.some((h) => h.startsWith(s))
+				},
 			}
 		}
 		return null

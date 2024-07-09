@@ -18,3 +18,4 @@ export {
 	queryLightHighlightStyle,
 } from './language/query.highlight.js'
 export * as queryTerms from './language/queryParser.terms.js'
+export { isDateValuedLabel } from './language/stringLabels.js'

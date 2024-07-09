@@ -51,3 +51,15 @@ export const labels = [
 export const stringLabels = labels as readonly string[]
 
 export const kindEnums = ['new', 'learn', 'review', 'relearn', 'cram'] as const
+export const dateValuedLabels = [
+	due,
+	cardCreated,
+	noteCreated,
+	cardEdited,
+	noteEdited,
+	created,
+	edited,
+]
+
+export const isDateValuedLabel = (x: string) =>
+	dateValuedLabels.includes(x as never)

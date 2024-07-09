@@ -40,6 +40,7 @@ import {
 	globQuery,
 	queryLinter,
 	queryCompletion,
+	isDateValuedLabel,
 } from 'shared-dom'
 import { queryDecorations } from './queryDecorations'
 import { db } from '../db'
@@ -100,8 +101,17 @@ const basicSetup = [
 	closeBrackets(),
 	autocompletion({
 		selectOnOpen: false,
-		activateOnCompletion: ({ apply }) =>
-			typeof apply === 'string' && apply.slice(-1) === ':',
+		activateOnCompletion: ({ apply, label }) => {
+			const x = typeof apply === 'string' ? apply : label
+			const lastChar = x.slice(-1)
+			return (
+				lastChar === ':' ||
+				lastChar === '=' ||
+				lastChar === '>' ||
+				lastChar === '<' ||
+				isDateValuedLabel(x)
+			)
+		},
 	}),
 	highlightSelectionMatches(),
 	keymap.of([
