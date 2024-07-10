@@ -279,13 +279,15 @@ function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
 		const label = getLabel(node.node.parent!)
 		const negate = isNegated(node.node)
 		let comparison
-		if (node.type.is(qt.Date)) {
-			const prev = node.node.prevSibling!
-			const maybe = input.slice(prev.from, prev.to) as Comparison
-			if (comparisons.includes(maybe)) {
-				comparison = maybe
-			} else {
-				throwExp('Unhandled comparison: ' + comparison)
+		if (node.type.is(qt.Date) || node.type.is(qt.Number)) {
+			let prev = node.node.prevSibling!
+			let maybe = input.slice(prev.from, prev.to)
+			if (maybe === '-') {
+				prev = prev.prevSibling!
+				maybe = input.slice(prev.from, prev.to)
+			}
+			if (comparisons.includes(maybe as never)) {
+				comparison = maybe as Comparison
 			}
 		}
 		const {
@@ -646,7 +648,7 @@ function handleCreatedEditedDue(
 ) {
 	if (node.type === number) {
 		const val = context.now.getTime() - parseInt(node.value) * dayInMs
-		handleComparison(val, context, table, column, '>')
+		handleComparison(val, context, table, column, node)
 	} else if (node.type === simpleString) {
 		const comp =
 			node.value === 'true'
@@ -654,22 +656,12 @@ function handleCreatedEditedDue(
 				: node.value === 'false'
 				? '>'
 				: throwExp('impossible')
-		handleComparison(context.now.getTime(), context, table, column, comp)
+		handleOneComparison(context.now.getTime(), context, table, column, comp)
 	} else if (node.type === date) {
 		const [year, month, day] = node.value.split('-')
 		if (year == null || month == null || day == null) throwExp('impossible')
 		const local = new Date(parseInt(year), parseInt(month) - 1, parseInt(day)) // `new Date("2009-01-01") != new Date("2009-1-1")` so I parseInt
-		let comparison = node.comparison!
-		if (comparison === ':') comparison = '>'
-		if (comparison === '=') {
-			context.trustedSql('(')
-			handleComparison(local.getTime(), context, table, column, '>=')
-			context.trustedSql('AND')
-			handleComparison(local.getTime() + dayInMs, context, table, column, '<')
-			context.trustedSql(')')
-		} else {
-			handleComparison(local.getTime(), context, table, column, comparison)
-		}
+		handleComparison(local.getTime(), context, table, column, node)
 	} else {
 		throwExp('impossible: ' + node.type)
 	}
@@ -677,12 +669,31 @@ function handleCreatedEditedDue(
 }
 
 function handleComparison(
+	msSinceEpoch: number,
+	context: Context,
+	table: 'note' | 'card' | undefined,
+	column: 'created' | 'edited' | 'due',
+	node: QueryString,
+) {
+	if (node.comparison === '=') {
+		context.trustedSql('(')
+		handleOneComparison(msSinceEpoch, context, table, column, '>=')
+		context.trustedSql('AND')
+		handleOneComparison(msSinceEpoch + dayInMs, context, table, column, '<')
+		context.trustedSql(')')
+	} else {
+		handleOneComparison(msSinceEpoch, context, table, column, node.comparison)
+	}
+}
+
+function handleOneComparison(
 	val: number,
 	context: Context,
 	table: 'note' | 'card' | undefined,
 	column: 'created' | 'edited' | 'due',
-	comparison: Comparison,
+	comparison: Comparison | undefined,
 ) {
+	if (comparison == null) throwExp('Comparison is null')
 	const comp = sql.raw(comparison)
 	if (table == null) {
 		const col = sql.raw(column)
@@ -803,7 +814,7 @@ interface QueryString {
 	comparison?: Comparison
 }
 
-const comparisons = [':', '=', '<', '>', '<=', '>='] as const
+const comparisons = ['=', '<', '>', '<=', '>='] as const
 type Comparison = (typeof comparisons)[number]
 
 interface QueryRegex {
