@@ -161,7 +161,7 @@ export const queryCompletion: (
 			// see comment below
 			inLabel(nodeBefore, due)
 		) {
-			return buildDates(getDate(), from, true)
+			return buildDates(getDate(), from, textBefore)
 		} else if (
 			// note that `inLabel(nodeBefore, due)` must precede this branch since `dateValuedLabels` includes `due`
 			inLabels(nodeBefore, dateValuedLabels)
@@ -231,7 +231,10 @@ function inLabel(
 			nodeBefore.prevSibling.lastChild?.node.type.isError === true)
 	)
 }
-function inLabels(nodeBefore: SyntaxNode, labels: Array<string | undefined>) {
+export function inLabels(
+	nodeBefore: SyntaxNode,
+	labels: Array<string | undefined>,
+) {
 	if (nodeBefore.type.is(Regex)) return false
 	return (
 		nodeBefore.parent?.type.is(Label) === true &&
@@ -249,7 +252,7 @@ function buildApply(nodeBefore: SyntaxNode, option: string) {
 		: '"' + escapedQuoted2(option) + '"'
 }
 
-function buildDates(now: Date, from: number, due?: true) {
+function buildDates(now: Date, from: number, textBefore?: string) {
 	// https://stackoverflow.com/a/50130338
 	const offset = now.getTimezoneOffset() * 60000
 	const today = new Date(now.getTime() - offset).toISOString().split('T')[0]!
@@ -261,18 +264,22 @@ function buildDates(now: Date, from: number, due?: true) {
 	now.setDate(now.getDate() - 6) // mutates `now`
 	const week = new Date(now.getTime() - offset).toISOString().split('T')[0]!
 	const dueCompletion: Completion[] =
-		due === true
+		textBefore != null
 			? [
-					{
-						label: 'true',
-						detail: '(is due)',
-						boost: 5,
-					},
-					{
-						label: 'false',
-						detail: '(is not due)',
-						boost: 4,
-					},
+					...(textBefore === '='
+						? [
+								{
+									label: 'true',
+									detail: '(is due)',
+									boost: 5,
+								},
+								{
+									label: 'false',
+									detail: '(is not due)',
+									boost: 4,
+								},
+						  ]
+						: []),
 					{
 						label: '-1',
 						detail: '(days ago - Tomorrow)',

@@ -1,10 +1,12 @@
-import { EditorState } from '@codemirror/state'
+import { EditorState, StateField } from '@codemirror/state'
 import {
 	EditorView,
 	keymap,
 	highlightSpecialChars,
 	drawSelection,
 	dropCursor,
+	type Tooltip,
+	showTooltip,
 } from '@codemirror/view'
 import {
 	defaultHighlightStyle,
@@ -12,6 +14,7 @@ import {
 	indentOnInput,
 	bracketMatching,
 	foldKeymap,
+	syntaxTree,
 } from '@codemirror/language'
 import { defaultKeymap, history, historyKeymap } from '@codemirror/commands'
 import { searchKeymap, highlightSelectionMatches } from '@codemirror/search'
@@ -41,10 +44,13 @@ import {
 	queryLinter,
 	queryCompletion,
 	isDateValuedLabel,
+	inLabels,
+	dateValuedLabels,
 } from 'shared-dom'
 import { queryDecorations } from './queryDecorations'
 import { db } from '../db'
 import { C } from '../topLevelAwait'
+import { notEmpty } from 'shared'
 
 let view: EditorView
 const QueryEditor: VoidComponent<{
@@ -156,6 +162,8 @@ function createEditorState(
 				},
 			]),
 			[...basicSetup],
+			cursorTooltipField,
+			cursorTooltipBaseTheme,
 			globQuery(getLanguageData(), getLanguageData(true)),
 			syntaxHighlighting(queryLightHighlightStyle),
 			syntaxHighlighting(queryDarkHighlightStyle),
@@ -233,5 +241,61 @@ const baseTheme = EditorView.baseTheme({
 const blackBackground = EditorView.theme({
 	[`${prefix}`]: {
 		backgroundColor: 'black',
+	},
+})
+
+// https://codemirror.net/examples/tooltip
+const cursorTooltipField = StateField.define<readonly Tooltip[]>({
+	create: getTooltip,
+	update(tooltips, tr) {
+		if (!tr.docChanged && tr.selection == null) return tooltips
+		return getTooltip(tr.state)
+	},
+	provide: (f) => showTooltip.computeN([f], (state) => state.field(f)),
+})
+
+function getTooltip(state: EditorState): readonly Tooltip[] {
+	const tree = syntaxTree(state)
+	return state.selection.ranges
+		.filter((range) => range.empty)
+		.map((range) => {
+			const nodeBefore = tree.resolveInner(range.head, -1)
+			if (inLabels(nodeBefore, dateValuedLabels)) {
+				const firstChar = state.sliceDoc(nodeBefore.from, nodeBefore.from + 1)
+				const textContent =
+					firstChar === '<' ? 'Before' : firstChar === '>' ? 'After' : null
+				if (textContent == null) return null
+				return {
+					pos: range.head,
+					above: true,
+					strictSide: true,
+					arrow: true,
+					create: () => {
+						const dom = document.createElement('div')
+						dom.className = 'cm-tooltip-cursor'
+						dom.textContent = textContent
+						return { dom }
+					},
+				} satisfies Tooltip
+			} else {
+				return null
+			}
+		})
+		.filter(notEmpty)
+}
+
+const cursorTooltipBaseTheme = EditorView.baseTheme({
+	'.cm-tooltip.cm-tooltip-cursor': {
+		backgroundColor: '#66b',
+		color: 'white',
+		border: 'none',
+		padding: '2px 7px',
+		borderRadius: '4px',
+		'& .cm-tooltip-arrow:before': {
+			borderTopColor: '#66b',
+		},
+		'& .cm-tooltip-arrow:after': {
+			borderTopColor: 'transparent',
+		},
 	},
 })
