@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest'
-import { type Node, Group, convert as actualConvert } from 'shared-dom'
+import { convert as actualConvert } from 'shared-dom'
 import {
 	type CompiledQuery,
 	Kysely,
@@ -308,7 +308,7 @@ test('2 SimpleStrings can be grouped', async () => {
 test('not distributes over AND', async () => {
 	await assertEqual(
 		String.raw`-(a b)`,
-		String.raw`(x1.z IS NULL OR x2.z IS NULL)`,
+		String.raw`NOT (x1.z IS NOT NULL AND x2.z IS NOT NULL)`,
 		{
 			x1: String.raw`(noteValueFts.normalized GLOB '*a*')`,
 			x2: String.raw`(noteValueFts.normalized GLOB '*b*')`,
@@ -320,7 +320,7 @@ test('not distributes over AND', async () => {
 test('not distributes over OR', async () => {
 	await assertEqual(
 		String.raw`-(a OR b)`,
-		String.raw`(x1.z IS NULL AND x2.z IS NULL)`,
+		String.raw`NOT (x1.z IS NOT NULL OR x2.z IS NOT NULL)`,
 		{
 			x1: String.raw`(noteValueFts.normalized GLOB '*a*')`,
 			x2: String.raw`(noteValueFts.normalized GLOB '*b*')`,
@@ -332,7 +332,7 @@ test('not distributes over OR', async () => {
 test('double negative grouping does nothing', async () => {
 	await assertEqual(
 		String.raw`-(-(a OR b))`,
-		String.raw`(x1.z IS NOT NULL OR x2.z IS NOT NULL)`,
+		String.raw`NOT (NOT (x1.z IS NOT NULL OR x2.z IS NOT NULL))`,
 		{
 			x1: String.raw`(noteValueFts.normalized GLOB '*a*')`,
 			x2: String.raw`(noteValueFts.normalized GLOB '*b*')`,
@@ -359,96 +359,13 @@ AND (x4.z IS NOT NULL OR x5.z IS NOT NULL)`,
 	)
 })
 
-function stringify(node: Node) {
-	if (node.type === 'Group') {
-		let r = '('
-		for (const child of node.children) {
-			r += stringify(child)
-		}
-		r += ')'
-		return r
-	} else {
-		const value = node.type === 'SimpleString' ? 'x' : node.type
-		return value + ' '
-	}
-}
-
-describe('groupAnds', () => {
-	const x: Node = {
-		type: 'SimpleString' as const,
-		value: 'x',
-		fieldValueHighlight: {
-			pattern: 'x',
-			flags: '',
-			boundLeft: false,
-			boundRight: false,
-		},
-		negate: false,
-		wildcardLeft: true,
-		wildcardRight: true,
-		boundLeft: true,
-		boundRight: true,
-		removeCombiningCharacters: false,
-		caseSensitive: false,
-	}
-	const or = { type: 'OR' as const }
-	const and = { type: 'AND' as const }
-
-	function testGroupAnds(children: Node[], expected: string) {
-		const group = new Group(null, false)
-		group.attachMany(children)
-		group.groupAnds()
-		expect(stringify(group)).toEqual(expected)
-	}
-
-	test('OR AND', () => {
-		testGroupAnds(
-			[x, or, x, and, x], //
-			`(x OR (x AND x ))`,
-		)
-	})
-
-	test('AND OR AND', () => {
-		testGroupAnds(
-			[x, and, x, or, x, and, x], //
-			`((x AND x )OR (x AND x ))`,
-		)
-	})
-
-	test('AND OR OR AND', () => {
-		testGroupAnds(
-			[x, and, x, or, x, or, x, and, x],
-			`((x AND x )OR x OR (x AND x ))`,
-		)
-	})
-
-	test('AND OR', () => {
-		testGroupAnds(
-			[x, and, x, or, x], //
-			`((x AND x )OR x )`,
-		)
-	})
-
-	test('OR AND OR', () => {
-		testGroupAnds(
-			[x, or, x, and, x, or, x], //
-			`(x OR (x AND x )OR x )`,
-		)
-	})
-
-	test('OR AND AND OR', () => {
-		testGroupAnds(
-			[x, or, x, and, x, and, x, or, x],
-			`(x OR (x AND x AND x )OR x )`,
-		)
-	})
-})
-
 // https://stackoverflow.com/a/20552239
 test('!(p && !q || r) is (!p || q) && !r', async () => {
 	await assertEqual(
 		String.raw`-(p -q OR r)`,
-		String.raw` ((x1.z IS NULL OR x2.z IS NOT NULL) AND x3.z IS NULL)`,
+		String.raw` NOT (x1.z IS NOT NULL AND
+                     x2.z IS NULL OR
+                     x3.z IS NOT NULL)`,
 		{
 			x1: String.raw`(noteValueFts.normalized GLOB '*p*')`,
 			x2: String.raw`(noteValueFts.normalized GLOB '*q*')`,
@@ -612,22 +529,22 @@ x2.z IS NOT NULL`,
 	test('neg on group', async () => {
 		await assertEqual(
 			String.raw`-(template:foo,bar)`,
-			String.raw`(
-  (templateNameFts.normalized NOT GLOB '*foo*')
-  AND
-  (templateNameFts.normalized NOT GLOB '*bar*')
+			String.raw`NOT (
+  (templateNameFts.normalized GLOB '*foo*')
+  OR
+  (templateNameFts.normalized GLOB '*bar*')
 )`,
 			2,
 		)
 	})
 
-	test('neg on tag', async () => {
+	test('neg on label', async () => {
 		await assertEqual(
 			String.raw`(-template:foo,bar)`,
-			String.raw`(
-  (templateNameFts.normalized NOT GLOB '*foo*')
-  AND
-  (templateNameFts.normalized NOT GLOB '*bar*')
+			String.raw`NOT (
+  (templateNameFts.normalized GLOB '*foo*')
+  OR
+  (templateNameFts.normalized GLOB '*bar*')
 )`,
 			2,
 		)
@@ -716,15 +633,15 @@ x2.z IS NOT NULL`,
 	test('neg on group', async () => {
 		await assertEqual(
 			String.raw`-(templateId:foo,bar)`,
-			String.raw`(note.templateId != 'foo' AND note.templateId != 'bar')`,
+			String.raw`NOT (note.templateId = 'foo' OR note.templateId = 'bar')`,
 			2,
 		)
 	})
 
-	test('neg on tag', async () => {
+	test('neg on label', async () => {
 		await assertEqual(
 			String.raw`(-templateId:foo,bar)`,
-			String.raw`(note.templateId != 'foo' AND note.templateId != 'bar')`,
+			String.raw`NOT (note.templateId = 'foo' OR note.templateId = 'bar')`,
 			2,
 		)
 	})
@@ -853,22 +770,22 @@ x2.z IS NOT NULL`,
 	test('neg on group', async () => {
 		await assertEqual(
 			String.raw`-(setting:foo,bar)`,
-			String.raw`(
-  (cardSettingNameFts.normalized NOT GLOB '*foo*')
-  AND
-  (cardSettingNameFts.normalized NOT GLOB '*bar*')
+			String.raw`NOT (
+  (cardSettingNameFts.normalized GLOB '*foo*')
+  OR
+  (cardSettingNameFts.normalized GLOB '*bar*')
 )`,
 			2,
 		)
 	})
 
-	test('neg on tag', async () => {
+	test('neg on label', async () => {
 		await assertEqual(
 			String.raw`(-setting:foo,bar)`,
-			String.raw`(
-  (cardSettingNameFts.normalized NOT GLOB '*foo*')
-  AND
-  (cardSettingNameFts.normalized NOT GLOB '*bar*')
+			String.raw`NOT (
+  (cardSettingNameFts.normalized GLOB '*foo*')
+  OR
+  (cardSettingNameFts.normalized GLOB '*bar*')
 )`,
 			2,
 		)
@@ -957,15 +874,15 @@ x2.z IS NOT NULL`,
 	test('neg on group', async () => {
 		await assertEqual(
 			String.raw`-(settingId:foo,bar)`,
-			String.raw`(card.cardSettingId != 'foo' AND card.cardSettingId != 'bar')`,
+			String.raw`NOT (card.cardSettingId = 'foo' OR card.cardSettingId = 'bar')`,
 			2,
 		)
 	})
 
-	test('neg on tag', async () => {
+	test('neg on label', async () => {
 		await assertEqual(
 			String.raw`(-settingId:foo,bar)`,
-			String.raw`(card.cardSettingId != 'foo' AND card.cardSettingId != 'bar')`,
+			String.raw`NOT (card.cardSettingId = 'foo' OR card.cardSettingId = 'bar')`,
 			2,
 		)
 	})
@@ -1141,10 +1058,10 @@ x4.z IS NOT NULL
 	test('neg on group', async () => {
 		await assertEqual(
 			String.raw`-(tag:foo,bar)`,
-			String.raw`(
-  (x1.tag IS NULL AND x2.tag IS NULL)
-  AND
-  (x3.tag IS NULL AND x4.tag IS NULL)
+			String.raw`NOT (
+  (x1.tag IS NOT NULL OR x2.tag IS NOT NULL)
+  OR
+  (x3.tag IS NOT NULL OR x4.tag IS NOT NULL)
 )`,
 			{
 				x1: cardQuery('*foo*'),
@@ -1156,13 +1073,13 @@ x4.z IS NOT NULL
 		)
 	})
 
-	test('neg on tag', async () => {
+	test('neg on label', async () => {
 		await assertEqual(
 			String.raw`(-tag:foo,bar)`,
-			String.raw`(
-  (x1.tag IS NULL AND x2.tag IS NULL)
-  AND
-  (x3.tag IS NULL AND x4.tag IS NULL)
+			String.raw`NOT (
+  (x1.tag IS NOT NULL OR x2.tag IS NOT NULL)
+  OR
+  (x3.tag IS NOT NULL OR x4.tag IS NOT NULL)
 )`,
 			{
 				x1: cardQuery('*foo*'),
@@ -1205,7 +1122,7 @@ describe('kind', () => {
 	test('not new, on label', async () => {
 		await assertEqual(
 			String.raw`-kind:new`,
-			String.raw`(latestReview.kind IS NOT NULL)`,
+			String.raw`NOT (latestReview.kind IS NULL)`,
 			1,
 		)
 	})
@@ -1229,7 +1146,7 @@ describe('kind', () => {
 	test('not review, on label', async () => {
 		await assertEqual(
 			String.raw`-kind:review`,
-			String.raw`(latestReview.kind IS NOT 1)`,
+			String.raw`NOT (latestReview.kind IS 1)`,
 			1,
 		)
 	})
@@ -1245,7 +1162,7 @@ describe('kind', () => {
 	test('not review, on group', async () => {
 		await assertEqual(
 			String.raw`-(kind:review)`,
-			String.raw`(latestReview.kind IS NOT 1)`,
+			String.raw`NOT (latestReview.kind IS 1)`,
 			1,
 		)
 	})

@@ -100,7 +100,6 @@ export function convert(input: string, now: Date) {
 			astLeave(input, node, context)
 		},
 	)
-	distributeNegate(context.root, false)
 	serialize(context.root, context)
 	return {
 		sql:
@@ -540,10 +539,9 @@ function serialize(node: Node, context: Context) {
 			context.fieldValueHighlight.push(node.fieldValueHighlight)
 		}
 	} else if (node.type === group) {
-		const paren =
-			!node.isRoot &&
-			!(node.children.length === 1 && node.children[0]?.type === 'Group') // don't paren if the only child is a group, since that child will have its own parens
+		const paren = !node.isRoot
 		if (paren) {
+			if (node.negate) context.trustedSql('NOT')
 			context.trustedSql('(')
 		}
 		if (node.label == null) {
@@ -870,62 +868,6 @@ export class Group {
 		for (const child of children) {
 			if (child.type === group) child.parent = this
 		}
-	}
-
-	// In boolean algebra, the order of operations from highest to lowest priority is: NOT, AND, OR.
-	// We group ANDs to make negation propagation work.
-	groupAnds() {
-		let start: number | null = null
-		let length = 1 // initialize to 1 to include the (eventual) ending node
-		let cursor = 0
-		while (cursor < this.children.length) {
-			const andOrNull = this.children[cursor + 1]
-			if (start != null && (andOrNull == null || andOrNull.type === or)) {
-				const newGroup = new Group(this, false)
-				const newChildren = this.children.splice(start, length, newGroup) // remove a sequence of ANDs and replace with their Group
-				newGroup.attachMany(newChildren)
-				start = null
-				length = 1
-				cursor = cursor + 1 - newChildren.length // add 1 for the new group, and remove children's length
-			} else if (andOrNull?.type === and) {
-				if (start == null) start = cursor
-				length += 2
-			}
-			cursor += 2
-		}
-	}
-}
-
-// We don't use the db to handle negation distribution because handling negation of tags and fieldValues is complex.
-// We need to know if they're positive or negative to build their negation logic, namely `NOT EXISTS (SELECT 1 FROM...`
-function distributeNegate(node: Node, negate: boolean) {
-	if (node.type === group) {
-		if (negate) node.negate = !node.negate
-		if (
-			node.negate &&
-			node.children.some((c) => c.type === and) &&
-			node.children.some((c) => c.type === or)
-		) {
-			node.groupAnds()
-		}
-		for (const child of node.children) {
-			distributeNegate(child, node.negate)
-		}
-	} else if (
-		node.type === simpleString ||
-		node.type === quoted ||
-		node.type === html ||
-		node.type === number ||
-		node.type === date ||
-		node.type === regex
-	) {
-		if (negate) node.negate = !node.negate
-	} else if (node.type === and) {
-		if (negate) node.type = or
-	} else if (node.type === or) {
-		if (negate) node.type = and
-	} else {
-		assertNever(node.type)
 	}
 }
 
