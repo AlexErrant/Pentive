@@ -15,7 +15,9 @@ import {
 import { escapedQuoted1, escapedQuoted2, getLabel } from './query2sql'
 import {
 	isDateValuedLabel,
+	isNumberValuedLabel,
 	dateValuedLabels,
+	numberValuedLabels,
 	due,
 	field,
 	kind,
@@ -157,6 +159,43 @@ export const queryCompletion: (
 					},
 				],
 			}
+		} else if (isSimpleString && isNumberValuedLabel(textBefore)) {
+			return {
+				from: from + textBefore.length,
+				options: [
+					{
+						label: '<=',
+					},
+					{
+						label: '>=',
+					},
+					{
+						label: '<',
+					},
+					{
+						label: '>',
+					},
+					{
+						label: '=',
+					},
+				],
+			}
+		} else if (inLabels(nodeBefore, numberValuedLabels)) {
+			return {
+				from,
+				options: [
+					{
+						label: '0',
+					},
+					{
+						label: '1',
+					},
+					{
+						label: '2',
+						info: 'Also, type in any number.',
+					},
+				],
+			}
 		} else if (
 			// see comment below
 			inLabel(nodeBefore, due)
@@ -193,7 +232,11 @@ export const queryCompletion: (
 					({
 						label: option,
 						type: 'general',
-						apply: option + (isDateValuedLabel(option) ? '' : ':'),
+						apply:
+							option +
+							(isDateValuedLabel(option) || isNumberValuedLabel(option)
+								? ''
+								: ':'),
 					}) satisfies Completion,
 			)
 			// only use historical autocomplete if we're replacing everything
@@ -205,7 +248,7 @@ export const queryCompletion: (
 				from,
 				options,
 				validFor: (s) => {
-					if (isDateValuedLabel(s)) return false
+					if (isDateValuedLabel(s) || isNumberValuedLabel(s)) return false
 					return history.some((h) => h.startsWith(s))
 				},
 			}

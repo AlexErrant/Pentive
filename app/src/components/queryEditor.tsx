@@ -44,6 +44,7 @@ import {
 	queryLinter,
 	queryCompletion,
 	isDateValuedLabel,
+	isNumberValuedLabel,
 	inLabels,
 	dateValuedLabels,
 } from 'shared-dom'
@@ -115,7 +116,8 @@ const basicSetup = [
 				lastChar === '=' ||
 				lastChar === '>' ||
 				lastChar === '<' ||
-				isDateValuedLabel(x)
+				isDateValuedLabel(x) ||
+				isNumberValuedLabel(x)
 			)
 		},
 	}),

@@ -63,3 +63,13 @@ export const dateValuedLabels = [
 
 export const isDateValuedLabel = (x: string) =>
 	dateValuedLabels.includes(x as never)
+
+export const numberValuedLabels = [
+	reps,
+	lapses,
+	tagCount,
+	cardTagCount,
+	noteTagCount,
+]
+export const isNumberValuedLabel = (x: string) =>
+	numberValuedLabels.includes(x as never)
