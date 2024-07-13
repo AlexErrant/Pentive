@@ -8,7 +8,7 @@ export interface Plugin {
 	readonly version: PluginVersion
 	readonly dependencies?: string
 	readonly created: Date
-	readonly updated: Date
+	readonly edited: Date
 	readonly script: Blob
 }
 

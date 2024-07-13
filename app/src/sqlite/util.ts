@@ -74,7 +74,7 @@ export function templateEntityToDomain(
 		id: template.id as TemplateId,
 		name: template.name,
 		created: new Date(template.created),
-		updated: new Date(template.updated),
+		edited: new Date(template.edited),
 		fields: parseTemplateFields(template.fields),
 		css: template.css,
 		templateType: JSON.parse(template.templateType) as TemplateType,
@@ -109,7 +109,7 @@ export function noteEntityToDomain(
 	const r: Note = {
 		id: note.id as NoteId,
 		created: new Date(note.created),
-		updated: new Date(note.updated),
+		edited: new Date(note.edited),
 		templateId: note.templateId,
 		tags: parseTags(note.tags),
 		fieldValues,
@@ -135,7 +135,7 @@ export function pluginEntityToDomain(entity: PluginEntity): Plugin {
 		version: entity.version,
 		dependencies: entity.dependencies ?? undefined,
 		created: new Date(entity.created),
-		updated: new Date(entity.updated),
+		edited: new Date(entity.edited),
 		script: new Blob([entity.script], {
 			type: 'text/javascript',
 		}),

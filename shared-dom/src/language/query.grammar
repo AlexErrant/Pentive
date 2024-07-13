@@ -74,7 +74,7 @@ Label {
   | "(" Not?      fieldIs fieldValueExpression ")" |      fieldIs Not? ( string | FieldValueEnum )
   | due
   | repsLapses
-  | createdUpdated
+  | createdEdited
   | reviewed
 }
 
@@ -128,7 +128,7 @@ due {
 
 DueEnum { kw<"true"> | kw<"false"> }
 
-createdUpdated {
+createdEdited {
   ( kw<"created">
   | kw<"noteCreated">
   | kw<"cardCreated">

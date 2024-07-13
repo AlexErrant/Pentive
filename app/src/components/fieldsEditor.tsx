@@ -75,7 +75,7 @@ async function mutate(img: HTMLImageElement) {
 		await db.insertMedia({
 			id,
 			created: now,
-			updated: now,
+			edited: now,
 			data,
 		})
 		img.setAttribute('src', id)

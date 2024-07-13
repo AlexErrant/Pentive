@@ -58,7 +58,7 @@ export const template = recordWithOptionalFields<Template>(
 		css: fc.string(),
 		fields: fc.array(field),
 		created: reasonableDates,
-		updated: reasonableDates,
+		edited: reasonableDates,
 		templateType,
 		remotes: fc.dictionary(
 			fc.string(),

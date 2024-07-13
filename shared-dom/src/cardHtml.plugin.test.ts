@@ -22,7 +22,7 @@ const clozeWithRequiredEdit: Template = {
 	id: '' as TemplateId,
 	name: '',
 	created: new Date(),
-	updated: new Date(),
+	edited: new Date(),
 	remotes: {},
 	css: '',
 	fields: [{ name: 'Text' }, { name: 'Extra' }],
@@ -45,7 +45,7 @@ function buildPlugin(src: string): Plugin {
 		name: 'somePluginName' as string as PluginName,
 		version: '0.0.0' as PluginVersion,
 		created: new Date(),
-		updated: new Date(),
+		edited: new Date(),
 	}
 }
 

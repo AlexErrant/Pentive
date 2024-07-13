@@ -106,7 +106,7 @@ async function addMediaBatch(
 				: {
 						id: name as MediaId,
 						created: now,
-						updated: now,
+						edited: now,
 						data: array.buffer,
 				  }
 		}),

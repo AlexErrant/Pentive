@@ -15,7 +15,7 @@ export const note = recordWithOptionalFields<Note>(
 			.map((x) => new Map(Object.entries(x))),
 		tags: fc.array(fc.string()).map((x) => new Set(x)),
 		created: reasonableDates,
-		updated: reasonableDates,
+		edited: reasonableDates,
 		remotes: fc
 			.dictionary(
 				fc.string(),

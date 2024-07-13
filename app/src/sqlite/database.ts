@@ -15,7 +15,7 @@ export interface CardBase {
 	ord: Ord
 	noteId: LDbId
 	created: number
-	updated: number
+	edited: number
 	cardSettingId: LDbId | null
 	due: number
 	state: number | null
@@ -38,7 +38,7 @@ export interface CardTag {
 export interface Media {
 	id: MediaId
 	created: number
-	updated: number
+	edited: number
 	data: Uint8Array
 	hash: Uint8Array
 }
@@ -48,7 +48,7 @@ export interface NoteBase {
 	templateId: LDbId
 	ankiNoteId: number | null
 	created: number
-	updated: number
+	edited: number
 }
 
 export interface Note extends NoteBase {
@@ -107,7 +107,7 @@ export interface Plugin {
 	version: PluginVersion
 	dependencies: string | null
 	created: number
-	updated: number
+	edited: number
 	script: Uint8Array
 }
 
@@ -124,7 +124,7 @@ export interface Template {
 	css: string
 	fields: string
 	created: number
-	updated: number
+	edited: number
 	templateType: string
 	ankiId: number | null
 }

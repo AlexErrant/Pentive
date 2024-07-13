@@ -36,7 +36,7 @@ function templateToDocType(template: Template) {
 		name: template.name,
 		css: template.css,
 		created: now,
-		updated: now,
+		edited: now,
 		fields: JSON.stringify(template.fields),
 		templateType: JSON.stringify(template.templateType),
 	}
@@ -97,11 +97,11 @@ export const templateCollectionMethods = {
 			.selectAll()
 			.where('localId', '=', template.id)
 			.execute()
-		// the following deleted/added/updated logic assumes ONE template
+		// the following deleted/added/edited logic assumes ONE template
 		const newRts = remoteTemplates
 		const deleted = oldRts.filter((o) => !newRts.some((n) => n.nook === o.nook))
 		const added = newRts.filter((o) => !oldRts.some((n) => n.nook === o.nook))
-		const updated = newRts.filter((o) => oldRts.some((n) => n.nook === o.nook))
+		const edited = newRts.filter((o) => oldRts.some((n) => n.nook === o.nook))
 		if (deleted.length !== 0) {
 			await ky
 				.deleteFrom('remoteTemplate')
@@ -116,10 +116,10 @@ export const templateCollectionMethods = {
 		if (added.length !== 0) {
 			await ky.insertInto('remoteTemplate').values(added).execute()
 		}
-		if (updated.length !== 0) {
+		if (edited.length !== 0) {
 			await ky
 				.insertInto('remoteTemplate')
-				.values(updated)
+				.values(edited)
 				.onConflict((db) =>
 					db.doUpdateSet({
 						uploadDate: (x) => x.ref('excluded.uploadDate'),
@@ -209,7 +209,7 @@ export const templateCollectionMethods = {
 			.selectFrom('template')
 			.leftJoin('remoteTemplate', 'template.id', 'remoteTemplate.localId')
 			.where('remoteId', 'is not', null)
-			.whereRef('remoteTemplate.uploadDate', '<', 'template.updated')
+			.whereRef('remoteTemplate.uploadDate', '<', 'template.edited')
 			.selectAll()
 			.execute()
 			.then((n) =>
@@ -235,7 +235,7 @@ export const templateCollectionMethods = {
 			.where(({ eb, or, ref }) =>
 				or([
 					eb('remoteMedia.uploadDate', 'is', null),
-					eb('media.updated', '>', ref('remoteMedia.uploadDate')),
+					eb('media.edited', '>', ref('remoteMedia.uploadDate')),
 				]),
 			)
 			.execute()

@@ -26,7 +26,7 @@ export const appExpose = {
 				name: rt.name,
 				css: rt.css,
 				created: now,
-				updated: now,
+				edited: now,
 				templateType: rt.templateType,
 				fields: rt.fields.map((name) => ({ name })),
 				remotes: {
@@ -67,7 +67,7 @@ export const appExpose = {
 				templateId: template.id,
 				// ankiNoteId: rn.ankiNoteId,
 				created: rn.created,
-				updated: rn.updated,
+				edited: rn.edited,
 				tags: new Set(rn.tags),
 				fieldValues: rn.fieldValues,
 				remotes: new Map([[nook, { remoteNoteId: rn.id, uploadDate: now }]]),
@@ -82,7 +82,7 @@ export const appExpose = {
 					noteId: n.id,
 					tags: new Set(),
 					created: now,
-					updated: now,
+					edited: now,
 					due: now,
 				}
 				return card
@@ -146,7 +146,7 @@ async function downloadImages(imgSrcs: Map<MediaId, string>) {
 				await db.insertMedia({
 					id,
 					created: now,
-					updated: now,
+					edited: now,
 					data: await response.arrayBuffer(),
 				})
 			} else {

@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS template (
   css TEXT,
   fields TEXT,
   created INTEGER,
-  updated INTEGER,
+  edited INTEGER,
   templateType TEXT,
   ankiId INTEGER
 ) STRICT;
@@ -68,7 +68,7 @@ CREATE TABLE IF NOT EXISTS remoteNote (
 CREATE TABLE IF NOT EXISTS media (
   id TEXT PRIMARY KEY, -- should stay TEXT!
   created INTEGER,
-  updated INTEGER,
+  edited INTEGER,
   data BLOB,
   hash BLOB
 ) STRICT;
@@ -84,7 +84,7 @@ CREATE TABLE IF NOT EXISTS plugin (
   version TEXT,
   dependencies TEXT,
   created INTEGER,
-  updated INTEGER,
+  edited INTEGER,
   script BLOB
 ) STRICT;
 CREATE TABLE IF NOT EXISTS review (

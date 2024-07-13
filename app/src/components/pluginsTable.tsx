@@ -38,9 +38,9 @@ const columnDefs: Array<ColDef<Plugin>> = [
 		},
 	},
 	{
-		headerName: 'Updated',
+		headerName: 'Edited',
 		cellRenderer: (props: ICellRendererParams<Plugin>) => {
-			return <relative-time date={props.data?.updated} />
+			return <relative-time date={props.data?.edited} />
 		},
 	},
 	{

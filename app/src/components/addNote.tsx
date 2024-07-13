@@ -30,7 +30,7 @@ function toView(template: Template): NoteCardView {
 		id: ulidAsBase64Url() as NoteId,
 		templateId: template.id,
 		created: now,
-		updated: now,
+		edited: now,
 		tags: new Set(),
 		fieldValues: template.fields.map((f) => [f.name, ''] as const),
 		remotes: new Map(),
@@ -75,7 +75,7 @@ export default function AddNote() {
 							noteId: note.id,
 							tags: new Set(),
 							created: now,
-							updated: now,
+							edited: now,
 							due: now,
 						} satisfies Card
 					})

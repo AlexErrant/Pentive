@@ -34,7 +34,7 @@ async function importPlugin(
 	await db.upsertPlugin({
 		...plugin,
 		created: now,
-		updated: now,
+		edited: now,
 	})
 	C.toastInfo('Plugin upserted!')
 }

@@ -8,7 +8,7 @@ function entityToDomain(entity: MediaEntity): Media {
 	return {
 		id: entity.id,
 		created: new Date(entity.created),
-		updated: new Date(entity.updated),
+		edited: new Date(entity.edited),
 		data: entity.data.buffer,
 		hash: entity.hash.buffer,
 	}
@@ -20,15 +20,15 @@ export const mediaCollectionMethods = {
 	insertMedia: async function (media: MediaSansHash) {
 		const db = rd
 		const created = media.created.getTime()
-		const updated = media.updated.getTime()
+		const edited = media.edited.getTime()
 		const hash = await crypto.subtle.digest('SHA-256', media.data)
 		await db.exec(
-			`INSERT INTO media (id,created,updated,data,hash)
+			`INSERT INTO media (id,created,edited,data,hash)
                   VALUES ( ?,      ?,      ?,   ?,   ?)`,
 			[
 				media.id,
 				created,
-				updated,
+				edited,
 				new Uint8Array(media.data),
 				new Uint8Array(hash),
 			],
@@ -40,18 +40,18 @@ export const mediaCollectionMethods = {
 		const db = rd
 		await db.tx(async (tx) => {
 			const insert = await tx.prepare(
-				`INSERT INTO media (id,created,updated,data,hash)
+				`INSERT INTO media (id,created,edited,data,hash)
                     VALUES ( ?,      ?,      ?,   ?,   ?)`,
 			)
 			for (const m of media) {
 				const created = m.created.getTime()
-				const updated = m.updated.getTime()
+				const edited = m.edited.getTime()
 				const hash = await crypto.subtle.digest('SHA-256', m.data)
 				await insert.run(
 					tx,
 					m.id,
 					created,
-					updated,
+					edited,
 					new Uint8Array(m.data),
 					new Uint8Array(hash),
 				)

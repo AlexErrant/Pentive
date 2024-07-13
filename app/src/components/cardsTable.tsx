@@ -208,7 +208,7 @@ const columnDefs: Array<ColDef<NoteCard>> = [
 										<Show
 											when={
 												v!.uploadDate.getTime() <=
-												props.data!.note.updated.getTime()
+												props.data!.note.edited.getTime()
 											}
 										>
 											<Upload class='inline h-[1em]' />

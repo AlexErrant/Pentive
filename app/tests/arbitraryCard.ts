@@ -16,7 +16,7 @@ export const card = recordWithOptionalFields<Card>(
 		noteId: fc.uuidV(4).map((x) => x as NoteId),
 		tags: fc.array(fc.uuidV(4)).map((x) => new Set(x)),
 		created: reasonableDates,
-		updated: reasonableDates,
+		edited: reasonableDates,
 		due: reasonableDates,
 		ord: fc.integer().map((x) => x as Ord),
 	},

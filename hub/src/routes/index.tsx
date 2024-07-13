@@ -8,7 +8,7 @@ export default function Home(): JSX.Element {
 		id: '' as TemplateId,
 		name: '',
 		created: new Date(),
-		updated: new Date(),
+		edited: new Date(),
 		remotes: {},
 		css: '',
 		fields: [{ name: 'Front' }, { name: 'Back' }],

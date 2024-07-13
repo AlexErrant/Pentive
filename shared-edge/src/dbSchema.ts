@@ -31,7 +31,7 @@ export interface Note {
 	id: DbId
 	templateId: DbId
 	created: Generated<Date>
-	updated: Generated<Date>
+	edited: Generated<Date>
 	authorId: string
 	fieldValues: string
 	fts: string
@@ -46,7 +46,7 @@ export interface NoteComment {
 	parentId: DbId | null
 	noteId: DbId
 	created: Generated<Date>
-	updated: Generated<Date>
+	edited: Generated<Date>
 	text: string
 	authorId: string
 	history: string | null
@@ -81,7 +81,7 @@ export interface PostComment {
 	parentId: DbId | null
 	postId: DbId
 	created: Generated<Date>
-	updated: Generated<Date>
+	edited: Generated<Date>
 	text: string
 	authorId: string
 	history: string | null
@@ -98,7 +98,7 @@ export interface PostSubscriber {
 export interface Template {
 	id: DbId
 	created: Generated<Date>
-	updated: Generated<Date>
+	edited: Generated<Date>
 	name: string
 	nook: NookId
 	type: string
@@ -114,7 +114,7 @@ export interface TemplateComment {
 	parentId: DbId | null
 	templateId: DbId
 	created: Generated<Date>
-	updated: Generated<Date>
+	edited: Generated<Date>
 	text: string
 	authorId: string
 	history: string | null

@@ -10,7 +10,7 @@ export interface Note {
 	templateId: TemplateId
 	ankiNoteId?: number
 	created: Date
-	updated: Date
+	edited: Date
 	tags: Set<string>
 	fieldValues: Map<string, string>
 	remotes: Map<NookId, { remoteNoteId: RemoteNoteId; uploadDate: Date } | null>

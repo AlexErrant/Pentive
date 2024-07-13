@@ -35,7 +35,7 @@ const noteUneditable = {
 	id: true,
 	templateId: true,
 	created: true,
-	updated: true,
+	edited: true,
 	nook: true,
 } as const
 
@@ -48,7 +48,7 @@ export const remoteNote = z.object({
 	nook: nookId,
 	templateId: remoteTemplateId,
 	created: dateSchema,
-	updated: dateSchema,
+	edited: dateSchema,
 	fieldValues,
 	tags: z.array(z.string()),
 	ankiId: z.number().positive().optional(),
@@ -98,7 +98,7 @@ export const remoteTemplate = z.object({
 	id: remoteTemplateId,
 	nook: nookId,
 	created: dateSchema,
-	updated: dateSchema,
+	edited: dateSchema,
 	name: z.string(),
 	templateType,
 	fields: z.array(z.string()),
@@ -112,7 +112,7 @@ const templateUneditable = {
 	id: true,
 	nook: true,
 	created: true,
-	updated: true,
+	edited: true,
 } as const
 
 export const createRemoteTemplate = remoteTemplate

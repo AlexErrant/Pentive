@@ -18,7 +18,7 @@ const Comment: Component<{
 				<A href={`/users/${props.comment.authorId}`}>
 					{props.comment.authorId}
 				</A>{' '}
-				<RelativeDate date={props.comment.updated} />
+				<RelativeDate date={props.comment.edited} />
 			</div>
 			<div class='text'>{props.comment.text}</div>
 			<button

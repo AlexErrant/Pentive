@@ -256,7 +256,7 @@ export function toSampleNote(fieldValues: Map<string, string>): Note {
 		id: 'SampleNoteId' as NoteId,
 		templateId: 'SampleTemplateId' as TemplateId,
 		created: new Date(),
-		updated: new Date(),
+		edited: new Date(),
 		tags: new Set(['SampleTag']),
 		fieldValues,
 		remotes: new Map([
@@ -278,7 +278,7 @@ export function toSampleCard(ord: Ord): Card {
 		noteId: 'SampleNoteId' as NoteId,
 		tags: new Set(['SampleCardTag']),
 		created: new Date(),
-		updated: new Date(),
+		edited: new Date(),
 		cardSettingId: 'SampleCardSettingId' as CardSettingId,
 		due: new Date(),
 	}

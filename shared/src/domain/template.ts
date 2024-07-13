@@ -19,7 +19,7 @@ export interface Template {
 	css: string
 	fields: Field[]
 	created: Date
-	updated: Date
+	edited: Date
 	templateType: TemplateType
 	remotes: Record<
 		NookId,
@@ -39,7 +39,7 @@ export const getDefaultTemplate = (id: TemplateId): Template => ({
 		},
 	],
 	created: new Date(),
-	updated: new Date(),
+	edited: new Date(),
 	templateType: {
 		tag: 'standard',
 		templates: [
@@ -84,7 +84,7 @@ export const getDefaultClozeTemplate = (id: TemplateId): Template => ({
 		},
 	],
 	created: new Date(),
-	updated: new Date(),
+	edited: new Date(),
 	templateType: {
 		tag: 'cloze',
 		template: {

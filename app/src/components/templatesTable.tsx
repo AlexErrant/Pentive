@@ -50,7 +50,7 @@ const columnDefs: Array<ColDef<Template>> = [
 									>
 										<Show
 											when={
-												v!.uploadDate.getTime() <= props.data!.updated.getTime()
+												v!.uploadDate.getTime() <= props.data!.edited.getTime()
 											}
 										>
 											<Upload class='inline h-[1em]' />
@@ -85,10 +85,10 @@ const columnDefs: Array<ColDef<Template>> = [
 		),
 	},
 	{
-		headerName: 'Updated',
+		headerName: 'Edited',
 		hide: true,
 		cellRenderer: (props: ICellRendererParams<Template>) => (
-			<relative-time date={props.data?.updated} />
+			<relative-time date={props.data?.edited} />
 		),
 	},
 ]

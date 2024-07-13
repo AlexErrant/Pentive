@@ -34,7 +34,7 @@ function noteToDocType(note: Note) {
 			id: note.id,
 			templateId: note.templateId,
 			created: now,
-			updated: now,
+			edited: now,
 			ankiNoteId: note.ankiNoteId,
 		},
 		Array.from(note.tags).map((tag) => ({ tag, noteId: note.id })),
@@ -124,7 +124,7 @@ export const noteCollectionMethods = {
 						.values(notes)
 						.onConflict((db) =>
 							db.doUpdateSet({
-								updated: (x) => x.ref('excluded.updated'),
+								edited: (x) => x.ref('excluded.edited'),
 								templateId: (x) => x.ref('excluded.templateId'),
 								ankiNoteId: (x) => x.ref('excluded.ankiNoteId'),
 							} satisfies OnConflictUpdateNoteSet),
@@ -284,7 +284,7 @@ JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field
 			.leftJoin('noteBase', 'remoteNote.localId', 'noteBase.id')
 			.selectAll('remoteNote')
 			.where('remoteId', 'is not', null)
-			.whereRef('remoteNote.uploadDate', '<', 'noteBase.updated')
+			.whereRef('remoteNote.uploadDate', '<', 'noteBase.edited')
 			.execute()
 		const localIds = [...new Set(remoteNotes.map((t) => t.localId))]
 		const remoteTemplates = await ky
@@ -358,7 +358,7 @@ JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field
 			.where(({ eb, ref, or }) =>
 				or([
 					eb('remoteMedia.uploadDate', 'is', null),
-					eb('media.updated', '>', ref('remoteMedia.uploadDate')),
+					eb('media.edited', '>', ref('remoteMedia.uploadDate')),
 				]),
 			)
 			.execute()

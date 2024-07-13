@@ -7,19 +7,19 @@ export const pluginCollectionMethods = {
 	upsertPlugin: async function (plugin: Plugin) {
 		const db = rd
 		await db.exec(
-			`INSERT INTO plugin (name,version,dependencies,created,updated,script)
+			`INSERT INTO plugin (name,version,dependencies,created,edited,script)
                    VALUES (   ?,      ?,           ?,      ?,       ?,    ?)
        ON CONFLICT(name) DO UPDATE SET
          version=excluded.version,
          dependencies=excluded.dependencies,
-         updated=excluded.updated,
+         edited=excluded.edited,
          script=excluded.script`,
 			[
 				plugin.name,
 				plugin.version,
 				plugin.dependencies ?? null,
 				plugin.created.getTime(),
-				plugin.updated.getTime(),
+				plugin.edited.getTime(),
 				new Uint8Array(await plugin.script.arrayBuffer()),
 			],
 		)
