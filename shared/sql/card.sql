@@ -13,7 +13,14 @@ CREATE VIEW IF NOT EXISTS card AS
     rowid,
     *,
     (SELECT json_group_array(tag) FROM cardtag WHERE cardId = cardBase.id) AS tags
-    FROM cardBase;
+  FROM cardBase;
+CREATE VIEW IF NOT EXISTS cardWithTagCount AS
+  SELECT
+    *,
+    count(cardTag.tag) as tagCount
+  FROM card
+  LEFT JOIN cardTag on cardTag.cardId = card.id
+  GROUP BY card.rowid;
 
 CREATE TABLE IF NOT EXISTS cardTag (
   cardId TEXT, -- make BLOB upon SQLite v3.41 and the landing of UNHEX https://sqlite.org/forum/forumpost/30cca4e613d2fa2a grep F235B7FB-8CEA-4AE2-99CC-2790E607B1EB

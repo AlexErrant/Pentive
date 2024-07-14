@@ -11,7 +11,14 @@ CREATE VIEW IF NOT EXISTS note AS
     *,
     (SELECT json_group_array(tag) FROM notetag WHERE noteId = noteBase.id) AS tags,
     (SELECT json_group_object(field, value) FROM noteFieldValue WHERE noteId = noteBase.id) AS fieldValues
-    FROM noteBase;
+  FROM noteBase;
+CREATE VIEW IF NOT EXISTS noteWithTagCount AS
+  SELECT
+    *,
+    count(noteTag.tag) as tagCount
+  FROM note
+  LEFT JOIN noteTag on noteTag.noteId = note.id
+  GROUP BY note.rowid;
 
 CREATE TABLE IF NOT EXISTS noteTag (
   noteId TEXT, -- make BLOB upon SQLite v3.41 and the landing of UNHEX https://sqlite.org/forum/forumpost/30cca4e613d2fa2a grep F235B7FB-8CEA-4AE2-99CC-2790E607B1EB

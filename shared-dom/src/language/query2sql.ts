@@ -33,8 +33,10 @@ class Context {
 		this.sql = []
 		this.root = new Group(null, false)
 		this.current = this.root
-		this.joinCardTags = []
-		this.joinNoteTags = []
+		this.joinCardTag = []
+		this.joinNoteTag = []
+		this.cardTagCount = false
+		this.noteTagCount = false
 		this.joinCardTagsFts = []
 		this.joinNoteTagsFts = []
 		this.joinNoteValueFts = []
@@ -49,8 +51,10 @@ class Context {
 	sql: Array<string | RawBuilder<unknown>>
 	root: Group
 	current: Group
-	joinCardTags: JoinTable
-	joinNoteTags: JoinTable
+	joinCardTag: JoinTable
+	joinNoteTag: JoinTable
+	cardTagCount: boolean
+	noteTagCount: boolean
 	joinCardTagsFts: JoinTable
 	joinNoteTagsFts: JoinTable
 	joinNoteValueFts: JoinTable
@@ -106,8 +110,10 @@ export function convert(input: string, now: Date) {
 			context.sql.length === 0
 				? null
 				: (sql.join(context.sql, sql``) as RawBuilder<SqlBool>),
-		joinCardTag: context.joinCardTags,
-		joinNoteTag: context.joinNoteTags,
+		joinCardTag: context.joinCardTag,
+		joinNoteTag: context.joinNoteTag,
+		cardTagCount: context.cardTagCount,
+		noteTagCount: context.noteTagCount,
 		joinCardTagFts: context.joinCardTagsFts,
 		joinNoteTagFts: context.joinNoteTagsFts,
 		joinNoteValueFts: context.joinNoteValueFts,
@@ -633,9 +639,30 @@ function handleLabel(node: QueryString | QueryRegex, context: Context) {
 		handleCreatedEditedDue(node, context, 'card', 'due')
 	} else if (node.label === 'field') {
 		serialize(node, context)
+	} else if (node.label === 'tagCount') {
+		context.cardTagCount = true
+		context.noteTagCount = true
+		handleTagCount(context, node, sql`card.tagCount + note.tagCount`)
+	} else if (node.label === 'cardTagCount') {
+		context.cardTagCount = true
+		handleTagCount(context, node, sql`card.tagCount`)
+	} else if (node.label === 'noteTagCount') {
+		context.noteTagCount = true
+		handleTagCount(context, node, sql`note.tagCount`)
 	} else {
 		throwExp('Unhandled label: ' + node.label)
 	}
+}
+
+function handleTagCount(
+	context: Context,
+	node: QueryString | QueryRegex,
+	col: RawBuilder<unknown>,
+) {
+	if (node.type === 'Regex' || node.comparison == null) throwExp('impossible')
+	context.parameterizeSql(
+		sql`${col} ${sql.raw(node.comparison)} ${parseInt(node.value)}`,
+	)
 }
 
 function handleCreatedEditedDue(
@@ -719,11 +746,11 @@ function buildTagSearch(node: QueryString | QueryRegex, context: Context) {
 	const cardName = getJoinTableName(context)
 	const noteName = getJoinTableName(context)
 	if (node.type === 'Regex') {
-		context.joinCardTags.push({
+		context.joinCardTag.push({
 			name: cardName,
 			sql: regexpWithFlags(node, `cardTag.tag`, true),
 		})
-		context.joinNoteTags.push({
+		context.joinNoteTag.push({
 			name: noteName,
 			sql: regexpWithFlags(node, `noteTag.tag`, true),
 		})

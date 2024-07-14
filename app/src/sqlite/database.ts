@@ -25,6 +25,10 @@ export interface Card extends CardBase {
 	tags: string
 }
 
+export interface CardWithTagCount extends Card {
+	tagCount: number
+}
+
 export interface NoteTag {
 	tag: string
 	noteId: LDbId
@@ -54,6 +58,10 @@ export interface NoteBase {
 export interface Note extends NoteBase {
 	tags: string
 	fieldValues: string
+}
+
+export interface NoteWithTagCount extends Note {
+	tagCount: number
 }
 
 export interface NoteFieldValue {
@@ -178,9 +186,11 @@ export interface DB {
 	cardSettingNameFts: CardSettingNameFts
 	templateNameFts: TemplateNameFts
 	card: Card
+	cardWithTagCount: CardWithTagCount
 	cardBase: CardBase
 	media: Media
 	note: Note
+	noteWithTagCount: NoteWithTagCount
 	noteBase: NoteBase
 	noteFieldValue: NoteFieldValue
 	noteFieldFts: NoteFieldFts

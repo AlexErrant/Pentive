@@ -233,166 +233,183 @@ async function getCards(
 	const db = ky.withTables<WithCache>()
 	const baseQuery = (
 		db1: QueryCreator<DB & WithCache & CardTagRowid & NoteTagRowid> = db,
-	) =>
-		db1
-			.selectFrom('card')
-			.select('card.rowid as cardRowid')
-			.innerJoin('note', 'card.noteId', 'note.id')
-			.innerJoin('template', 'template.id', 'note.templateId')
-			.$if(sort != null, (db) => db.orderBy(sort!.col, sort!.direction))
-			// don't `where` when scrolling - redundant since joining on the cache already filters
-			.$if(offset === 0 && conversionResult.sql != null, (db) =>
-				db
-					.$if(conversionResult.joinNoteValueFts.length !== 0, (dbSeed) => {
-						let dbReturn = dbSeed
-						conversionResult.joinNoteValueFts.forEach((t) => {
-							const name = t.name as JoinFts
-							const dbJoined = dbReturn.leftJoin(
-								(eb) =>
-									eb
-										.selectFrom('noteValueFts')
-										.innerJoin(
-											'noteFieldValue',
-											'noteFieldValue.rowid',
-											'noteValueFts.rowid',
-										)
-										.select(['noteFieldValue.noteId as z', 'rank']) // `z` also goes here 2DB5DD73-603E-4DF7-A366-A53375AF0093
-										.where(t.sql)
-										.as(name),
-								(join) => join.onRef(`${name}.z`, '=', 'note.id'),
-							)
-							dbReturn = dbJoined
+	) => {
+		// `cardWithTagCount` and `noteWithTagCount` exist because `join`ing in the tag table (like further below) forces us to use `HAVING` (instead of `WHERE`).
+		// A separate `HAVING` clause screws up our nonexistant boolean logic, since we use SQLite's query engine/`WHERE` for that.
+		const card = conversionResult.cardTagCount
+			? ('cardWithTagCount as card' as 'card')
+			: 'card'
+		const note = conversionResult.noteTagCount
+			? ('noteWithTagCount as note' as 'note')
+			: 'note'
+		return (
+			db1
+				.selectFrom(card)
+				.select('card.rowid as cardRowid')
+				.innerJoin(note, 'card.noteId', 'note.id')
+				.innerJoin('template', 'template.id', 'note.templateId')
+				.$if(sort != null, (db) => db.orderBy(sort!.col, sort!.direction))
+				// don't `where` when scrolling - redundant since joining on the cache already filters
+				.$if(offset === 0 && conversionResult.sql != null, (db) =>
+					db
+						.$if(conversionResult.joinNoteValueFts.length !== 0, (dbSeed) => {
+							let dbReturn = dbSeed
+							conversionResult.joinNoteValueFts.forEach((t) => {
+								const name = t.name as JoinFts
+								const dbJoined = dbReturn.leftJoin(
+									(eb) =>
+										eb
+											.selectFrom('noteValueFts')
+											.innerJoin(
+												'noteFieldValue',
+												'noteFieldValue.rowid',
+												'noteValueFts.rowid',
+											)
+											.select(['noteFieldValue.noteId as z', 'rank']) // `z` also goes here 2DB5DD73-603E-4DF7-A366-A53375AF0093
+											.where(t.sql)
+											.as(name),
+									(join) => join.onRef(`${name}.z`, '=', 'note.id'),
+								)
+								dbReturn = dbJoined
+							})
+							const rankSum = conversionResult.joinNoteValueFts
+								.map((t) => t.name + '.rank')
+								.join('+')
+							return dbReturn
+								.select(sql.raw(rankSum).as('rank'))
+								.orderBy('rank')
 						})
-						const rankSum = conversionResult.joinNoteValueFts
-							.map((t) => t.name + '.rank')
-							.join('+')
-						return dbReturn.select(sql.raw(rankSum).as('rank')).orderBy('rank')
-					})
-					.$if(conversionResult.joinNoteFieldValue.length !== 0, (dbSeed) => {
-						let dbReturn = dbSeed
-						conversionResult.joinNoteFieldValue.forEach((t) => {
-							const name = t.name as JoinFts
-							const dbJoined = dbReturn.leftJoin(
-								(eb) =>
-									eb
-										.selectFrom('noteFieldValue')
-										.select('noteFieldValue.noteId as z') // z to make typescript happy; otherwise `noteId` gets consoliated with `card.noteId` and made nullable
-										.where(t.sql)
-										.as(name),
-								(join) => join.onRef(`${name}.z`, '=', 'note.id'),
-							)
-							dbReturn = dbJoined
+						.$if(conversionResult.joinNoteFieldValue.length !== 0, (dbSeed) => {
+							let dbReturn = dbSeed
+							conversionResult.joinNoteFieldValue.forEach((t) => {
+								const name = t.name as JoinFts
+								const dbJoined = dbReturn.leftJoin(
+									(eb) =>
+										eb
+											.selectFrom('noteFieldValue')
+											.select('noteFieldValue.noteId as z') // z to make typescript happy; otherwise `noteId` gets consoliated with `card.noteId` and made nullable
+											.where(t.sql)
+											.as(name),
+									(join) => join.onRef(`${name}.z`, '=', 'note.id'),
+								)
+								dbReturn = dbJoined
+							})
+							return dbReturn
 						})
-						return dbReturn
-					})
-					.$if(conversionResult.joinCardTagFts.length !== 0, (dbSeed) => {
-						let dbReturn = dbSeed
-						conversionResult.joinCardTagFts.forEach((t) => {
-							const name = t.name as JoinFts
-							const dbJoined = dbReturn.leftJoin(
-								(eb) =>
-									eb
-										.selectFrom('cardTagFts')
-										.innerJoin('cardTag', 'cardTag.tag', 'cardTagFts.tag')
-										.select(['cardTag.tag', 'cardTag.cardId'])
-										.where(t.sql)
-										.as(name),
-								(join) => join.onRef(`${name}.cardId`, '=', 'card.id'),
-							)
-							dbReturn = dbJoined
+						.$if(conversionResult.joinCardTagFts.length !== 0, (dbSeed) => {
+							let dbReturn = dbSeed
+							conversionResult.joinCardTagFts.forEach((t) => {
+								const name = t.name as JoinFts
+								const dbJoined = dbReturn.leftJoin(
+									(eb) =>
+										eb
+											.selectFrom('cardTagFts')
+											.innerJoin('cardTag', 'cardTag.tag', 'cardTagFts.tag')
+											.select(['cardTag.tag', 'cardTag.cardId'])
+											.where(t.sql)
+											.as(name),
+									(join) => join.onRef(`${name}.cardId`, '=', 'card.id'),
+								)
+								dbReturn = dbJoined
+							})
+							return dbReturn
 						})
-						return dbReturn
-					})
-					.$if(conversionResult.joinNoteTagFts.length !== 0, (dbSeed) => {
-						let dbReturn = dbSeed
-						conversionResult.joinNoteTagFts.forEach((t) => {
-							const name = t.name as JoinFts
-							const dbJoined = dbReturn.leftJoin(
-								(eb) =>
-									eb
-										.selectFrom('noteTagFts')
-										.innerJoin('noteTag', 'noteTag.tag', 'noteTagFts.tag')
-										.select(['noteTag.tag', 'noteTag.noteId as z']) // z to make typescript happy; otherwise `noteId` gets consoliated with `card.noteId` and made nullable
-										.where(t.sql)
-										.as(name),
-								(join) => join.onRef(`${name}.z`, '=', 'note.id'),
-							)
-							dbReturn = dbJoined
+						.$if(conversionResult.joinNoteTagFts.length !== 0, (dbSeed) => {
+							let dbReturn = dbSeed
+							conversionResult.joinNoteTagFts.forEach((t) => {
+								const name = t.name as JoinFts
+								const dbJoined = dbReturn.leftJoin(
+									(eb) =>
+										eb
+											.selectFrom('noteTagFts')
+											.innerJoin('noteTag', 'noteTag.tag', 'noteTagFts.tag')
+											.select(['noteTag.tag', 'noteTag.noteId as z']) // z to make typescript happy; otherwise `noteId` gets consoliated with `card.noteId` and made nullable
+											.where(t.sql)
+											.as(name),
+									(join) => join.onRef(`${name}.z`, '=', 'note.id'),
+								)
+								dbReturn = dbJoined
+							})
+							return dbReturn
 						})
-						return dbReturn
-					})
-					.$if(conversionResult.joinCardTag.length !== 0, (dbSeed) => {
-						let dbReturn = dbSeed
-						conversionResult.joinCardTag.forEach((t) => {
-							const name = t.name as JoinFts
-							const dbJoined = dbReturn.leftJoin(
-								(eb) =>
-									eb
-										.selectFrom('cardTag')
-										.select(['cardTag.tag', 'cardTag.cardId'])
-										.where(t.sql)
-										.as(name),
-								(join) => join.onRef(`${name}.cardId`, '=', 'card.id'),
-							)
-							dbReturn = dbJoined
+						.$if(conversionResult.joinCardTag.length !== 0, (dbSeed) => {
+							let dbReturn = dbSeed
+							conversionResult.joinCardTag.forEach((t) => {
+								const name = t.name as JoinFts
+								const dbJoined = dbReturn.leftJoin(
+									(eb) =>
+										eb
+											.selectFrom('cardTag')
+											.select(['cardTag.tag', 'cardTag.cardId'])
+											.where(t.sql)
+											.as(name),
+									(join) => join.onRef(`${name}.cardId`, '=', 'card.id'),
+								)
+								dbReturn = dbJoined
+							})
+							return dbReturn
 						})
-						return dbReturn
-					})
-					.$if(conversionResult.joinNoteTag.length !== 0, (dbSeed) => {
-						let dbReturn = dbSeed
-						conversionResult.joinNoteTag.forEach((t) => {
-							const name = t.name as JoinFts
-							const dbJoined = dbReturn.leftJoin(
-								(eb) =>
-									eb
-										.selectFrom('noteTag')
-										.select(['noteTag.tag', 'noteTag.noteId as z']) // z to make typescript happy; otherwise `noteId` gets consoliated with `card.noteId` and made nullable
-										.where(t.sql)
-										.as(name),
-								(join) => join.onRef(`${name}.z`, '=', 'note.id'),
-							)
-							dbReturn = dbJoined
+						.$if(conversionResult.joinNoteTag.length !== 0, (dbSeed) => {
+							let dbReturn = dbSeed
+							conversionResult.joinNoteTag.forEach((t) => {
+								const name = t.name as JoinFts
+								const dbJoined = dbReturn.leftJoin(
+									(eb) =>
+										eb
+											.selectFrom('noteTag')
+											.select(['noteTag.tag', 'noteTag.noteId as z']) // z to make typescript happy; otherwise `noteId` gets consoliated with `card.noteId` and made nullable
+											.where(t.sql)
+											.as(name),
+									(join) => join.onRef(`${name}.z`, '=', 'note.id'),
+								)
+								dbReturn = dbJoined
+							})
+							return dbReturn
 						})
-						return dbReturn
-					})
-					.$if(conversionResult.joinTemplateNameFts, (db) =>
-						db.innerJoin(
-							'templateNameFts',
-							'templateNameFts.rowid',
-							'template.rowid',
-						),
-					)
-					.$if(conversionResult.joinCardSettingNameFts, (db) =>
-						db
-							.innerJoin('cardSetting', 'cardSetting.id', 'card.cardSettingId')
-							.innerJoin(
-								'cardSettingNameFts',
-								'cardSettingNameFts.rowid',
-								'cardSetting.rowid',
+						.$if(conversionResult.joinTemplateNameFts, (db) =>
+							db.innerJoin(
+								'templateNameFts',
+								'templateNameFts.rowid',
+								'template.rowid',
 							),
-					)
-					.$if(conversionResult.joinLatestReview, (db) =>
-						/* LEFT JOIN "review" AS "latestReview"
-              ON  "latestReview"."cardId" = "card"."id"
-              AND "latestReview"."created" = (
-                SELECT MAX("created") AS "max"
-                FROM   "review"
-                WHERE  "card"."id" = "review"."cardId"
-              ) */
-						db.leftJoin('review as latestReview', (join) =>
-							join
-								.onRef('latestReview.cardId', '=', 'card.id')
-								.on('latestReview.created', '=', (eb) =>
-									eb
-										.selectFrom('review')
-										.select(eb.fn.max('created').as('max'))
-										.whereRef('card.id', '=', 'review.cardId'),
+						)
+						.$if(conversionResult.joinCardSettingNameFts, (db) =>
+							db
+								.innerJoin(
+									'cardSetting',
+									'cardSetting.id',
+									'card.cardSettingId',
+								)
+								.innerJoin(
+									'cardSettingNameFts',
+									'cardSettingNameFts.rowid',
+									'cardSetting.rowid',
 								),
-						),
-					)
-					.where(conversionResult.sql!),
-			)
-			.groupBy('card.rowid')
+						)
+						.$if(conversionResult.joinLatestReview, (db) =>
+							/* LEFT JOIN "review" AS "latestReview"
+        ON  "latestReview"."cardId" = "card"."id"
+        AND "latestReview"."created" = (
+          SELECT MAX("created") AS "max"
+          FROM   "review"
+          WHERE  "card"."id" = "review"."cardId"
+        ) */
+							db.leftJoin('review as latestReview', (join) =>
+								join
+									.onRef('latestReview.cardId', '=', 'card.id')
+									.on('latestReview.created', '=', (eb) =>
+										eb
+											.selectFrom('review')
+											.select(eb.fn.max('created').as('max'))
+											.whereRef('card.id', '=', 'review.cardId'),
+									),
+							),
+						)
+						.where(conversionResult.sql!),
+				)
+				.groupBy('card.rowid')
+		)
+	}
 	const searchCache =
 		// If user has scrolled, build/use the cache.
 		offset === 0 ? null : await buildCache(baseQuery(), query, sort)
