@@ -116,11 +116,24 @@ function createEditorState(
 		extensions: [
 			keymap.of([
 				{
+					key: 'Ctrl-l',
+					run: () => {
+						console.clear()
+						return true
+					},
+				},
+				{
 					key: 'Ctrl-Enter',
 					run: (x) => {
-						const sql = x.state.doc.toString()
+						const selection = x.state.selection.ranges[0]
+						let sql
+						if (selection == null || selection.from === selection.to) {
+							sql = x.state.doc.toString()
+							localStorage.setItem('sql', sql)
+						} else {
+							sql = x.state.sliceDoc(selection.from, selection.to)
+						}
 						run(sql).catch(console.error)
-						localStorage.setItem('sql', sql)
 						return true
 					},
 				},
