@@ -279,6 +279,11 @@ async function getCards(
 								.select(sql.raw(rankSum).as('rank'))
 								.orderBy('rank')
 						})
+						.$if(conversionResult.joinLapse, (dbSeed) =>
+							dbSeed.leftJoin('cardLapse', (join) =>
+								join.onRef(`cardLapse.cardId`, '=', 'card.id'),
+							),
+						)
 						.$if(conversionResult.joinNoteFieldValue.length !== 0, (dbSeed) => {
 							let dbReturn = dbSeed
 							conversionResult.joinNoteFieldValue.forEach((t) => {

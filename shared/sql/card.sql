@@ -21,6 +21,35 @@ CREATE VIEW IF NOT EXISTS cardWithTagCount AS
   FROM card
   LEFT JOIN cardTag on cardTag.cardId = card.id
   GROUP BY card.rowid;
+CREATE VIEW IF NOT EXISTS cardLapse AS
+  SELECT
+    cardId,
+    COUNT(*) AS lapses
+  FROM
+    (
+      SELECT
+        cardId,
+        SUM (CASE WHEN kind <> 0 THEN 0 ELSE 1 END)
+          OVER (PARTITION BY cardId
+                ORDER BY created DESC)
+          AS lastNonLearning
+          -- When cards are "reset" or marked as "forgotten" by users, cards go through the learning phase again.
+          -- So we want the most recent reviews that aren't learning.
+      FROM review
+      WHERE kind = 1 AND rating = 1
+    )
+  WHERE lastNonLearning = 0
+  GROUP BY cardId;
+/* I don't understand why there's a delta when comparing to my imported anki deck, but whatever. (Anki lapses temporarily imported as `cardSettingId` for convenience).
+SELECT
+  id,
+  CAST(cardSettingId AS DECIMAL) fromanki,
+  COALESCE(lapses, 0) ours
+FROM card
+FULL OUTER JOIN cardlapse
+  ON cardlapse.cardId = card.id
+WHERE fromanki <> ours
+*/
 
 CREATE TABLE IF NOT EXISTS cardTag (
   cardId TEXT, -- make BLOB upon SQLite v3.41 and the landing of UNHEX https://sqlite.org/forum/forumpost/30cca4e613d2fa2a grep F235B7FB-8CEA-4AE2-99CC-2790E607B1EB
