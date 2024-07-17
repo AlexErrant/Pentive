@@ -97,8 +97,6 @@ CREATE TABLE IF NOT EXISTS review (
 ) STRICT;
 PRAGMA temp_store=MEMORY; -- grep 2790D3E0-F98B-4A95-8910-AC3E87F4F2D3
 CREATE INDEX IF NOT EXISTS review_cardId_idx on review(cardId);
-CREATE INDEX IF NOT EXISTS review_kind_idx on review(kind);
-CREATE INDEX IF NOT EXISTS review_rating_idx on review(rating);
 SELECT crsql_as_crr('template');
 SELECT crsql_as_crr('remoteTemplate');
 SELECT crsql_as_crr('remoteNote');

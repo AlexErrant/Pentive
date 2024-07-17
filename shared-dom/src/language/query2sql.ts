@@ -33,7 +33,6 @@ class Context {
 		this.sql = []
 		this.root = new Group(null, false)
 		this.current = this.root
-		this.joinLapse = false
 		this.joinCardTag = []
 		this.joinNoteTag = []
 		this.cardTagCount = false
@@ -52,7 +51,6 @@ class Context {
 	sql: Array<string | RawBuilder<unknown>>
 	root: Group
 	current: Group
-	joinLapse: boolean
 	joinCardTag: JoinTable
 	joinNoteTag: JoinTable
 	cardTagCount: boolean
@@ -112,7 +110,6 @@ export function convert(input: string, now: Date) {
 			context.sql.length === 0
 				? null
 				: (sql.join(context.sql, sql``) as RawBuilder<SqlBool>),
-		joinLapse: context.joinLapse,
 		joinCardTag: context.joinCardTag,
 		joinNoteTag: context.joinNoteTag,
 		cardTagCount: context.cardTagCount,
@@ -642,14 +639,6 @@ function handleLabel(node: QueryString | QueryRegex, context: Context) {
 		handleCreatedEditedDue(node, context, 'card', 'due')
 	} else if (node.label === 'field') {
 		serialize(node, context)
-	} else if (node.label === 'lapses') {
-		context.joinLapse = true
-		if (node.type === 'Regex' || node.comparison == null) throwExp('impossible')
-		context.parameterizeSql(
-			sql`coalesce(cardLapse.lapses, 0) ${sql.raw(node.comparison)} ${parseInt(
-				node.value,
-			)}`,
-		)
 	} else if (node.label === 'tagCount') {
 		context.cardTagCount = true
 		context.noteTagCount = true

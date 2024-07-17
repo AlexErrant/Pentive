@@ -39,11 +39,6 @@ export interface CardTag {
 	cardId: LDbId
 }
 
-export interface CardLapse {
-	cardId: LDbId
-	lapses: number
-}
-
 export interface Media {
 	id: MediaId
 	created: number
@@ -202,7 +197,6 @@ export interface DB {
 	noteValueFts: NoteValueFts
 	noteTagFts: NoteTagFts
 	cardTagFts: CardTagFts
-	cardLapse: CardLapse
 	remoteNote: RemoteNote
 	plugin: Plugin
 	remoteMedia: RemoteMedia
