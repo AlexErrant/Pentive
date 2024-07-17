@@ -70,7 +70,8 @@ function deserializeState(s: number | null): State | undefined {
 function cardToDocType(
 	card: Card,
 ): [InsertObject<DB, 'cardBase'>, Array<InsertObject<DB, 'cardTag'>>] {
-	const { id, noteId, due, ord, tags, cardSettingId, state } = card
+	const { id, noteId, due, ord, tags, cardSettingId, state, lapses, repCount } =
+		card
 	const now = C.getDate().getTime()
 	return [
 		{
@@ -78,6 +79,8 @@ function cardToDocType(
 			noteId,
 			created: now,
 			edited: now,
+			lapses,
+			repCount,
 			due: typeof due === 'number' ? due * -1 : due.getTime(),
 			ord,
 			cardSettingId: cardSettingId ?? null,
@@ -93,6 +96,8 @@ function cardBaseToDomain(card: CardView): Card {
 		noteId: card.noteId,
 		created: new Date(card.created),
 		edited: new Date(card.edited),
+		lapses: card.lapses,
+		repCount: card.repCount,
 		due: card.due < 0 ? card.due * -1 : new Date(card.due),
 		ord: card.ord,
 		tags: parseTags(card.tags),
@@ -432,6 +437,8 @@ async function getCards(
 			'card.due as card_due',
 			'card.id as card_id',
 			'card.edited as card_edited',
+			'card.lapses as card_lapses',
+			'card.repCount as card_repCount',
 			'card.noteId as card_noteId',
 			'card.ord as card_ord',
 			'card.state as card_state',
@@ -513,6 +520,8 @@ async function getCards(
 			due: entity.card_due,
 			id: entity.card_id,
 			edited: entity.card_edited,
+			lapses: entity.card_lapses,
+			repCount: entity.card_repCount,
 			noteId: entity.card_noteId,
 			ord: entity.card_ord,
 			state: entity.card_state,
@@ -550,6 +559,8 @@ export const cardCollectionMethods = {
 					db.doUpdateSet({
 						edited: (x) => x.ref('excluded.edited'),
 						due: (x) => x.ref('excluded.due'),
+						lapses: (x) => x.ref('excluded.lapses'),
+						repCount: (x) => x.ref('excluded.repCount'),
 						cardSettingId: (x) => x.ref('excluded.cardSettingId'),
 						state: (x) => x.ref('excluded.state'),
 					} satisfies OnConflictUpdateCardSet),

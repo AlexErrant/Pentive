@@ -4,6 +4,8 @@ CREATE TABLE IF NOT EXISTS cardBase (
   noteId TEXT, -- make BLOB upon SQLite v3.41 and the landing of UNHEX https://sqlite.org/forum/forumpost/30cca4e613d2fa2a grep F235B7FB-8CEA-4AE2-99CC-2790E607B1EB
   created INTEGER,
   edited INTEGER,
+  lapses INTEGER,
+  repCount INTEGER,
   cardSettingId TEXT, -- make BLOB upon SQLite v3.41 and the landing of UNHEX https://sqlite.org/forum/forumpost/30cca4e613d2fa2a grep F235B7FB-8CEA-4AE2-99CC-2790E607B1EB
   due INTEGER,
   state INTEGER

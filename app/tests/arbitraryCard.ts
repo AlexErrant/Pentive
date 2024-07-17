@@ -18,6 +18,8 @@ export const card = recordWithOptionalFields<Card>(
 		created: reasonableDates,
 		edited: reasonableDates,
 		due: reasonableDates,
+		lapses: fc.nat(),
+		repCount: fc.nat(),
 		ord: fc.integer().map((x) => x as Ord),
 	},
 	{

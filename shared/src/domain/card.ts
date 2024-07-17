@@ -24,6 +24,8 @@ export interface Card {
 	tags: Set<string>
 	created: Date
 	edited: Date
+	lapses: number
+	repCount: number
 	cardSettingId?: CardSettingId
 	due: Date | number // `Date` is when the card is due. `number` is the ordinal when the card is "new".
 	state?: State

@@ -77,6 +77,8 @@ export default function AddNote() {
 							created: now,
 							edited: now,
 							due: now,
+							lapses: 0,
+							repCount: 0,
 						} satisfies Card
 					})
 					setWip('noteCard', 'cards', cards)

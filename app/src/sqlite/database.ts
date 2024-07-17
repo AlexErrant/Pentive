@@ -16,6 +16,8 @@ export interface CardBase {
 	noteId: LDbId
 	created: number
 	edited: number
+	lapses: number
+	repCount: number
 	cardSettingId: LDbId | null
 	due: number
 	state: number | null

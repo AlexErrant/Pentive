@@ -154,6 +154,8 @@ export function parseCard(
 		created: newDate(card.id),
 		edited: newDate(card.mod),
 		due: parseDue(card.due, card.type, colCrtMs),
+		lapses: card.lapses,
+		repCount: card.reps,
 		cardSettingId: deck.conf.toString() as CardSettingId,
 		ord: card.ord,
 	}

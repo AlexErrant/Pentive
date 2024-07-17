@@ -83,6 +83,8 @@ export const appExpose = {
 					tags: new Set(),
 					created: now,
 					edited: now,
+					lapses: 0,
+					repCount: 0,
 					due: now,
 				}
 				return card

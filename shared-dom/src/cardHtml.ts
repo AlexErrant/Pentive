@@ -279,6 +279,8 @@ export function toSampleCard(ord: Ord): Card {
 		tags: new Set(['SampleCardTag']),
 		created: new Date(),
 		edited: new Date(),
+		lapses: 0,
+		repCount: 0,
 		cardSettingId: 'SampleCardSettingId' as CardSettingId,
 		due: new Date(),
 	}

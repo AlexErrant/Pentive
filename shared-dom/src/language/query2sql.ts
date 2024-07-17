@@ -639,6 +639,16 @@ function handleLabel(node: QueryString | QueryRegex, context: Context) {
 		handleCreatedEditedDue(node, context, 'card', 'due')
 	} else if (node.label === 'field') {
 		serialize(node, context)
+	} else if (node.label === 'lapses') {
+		if (node.type === 'Regex' || node.comparison == null) throwExp('impossible')
+		context.parameterizeSql(
+			sql`card.lapses ${sql.raw(node.comparison)} ${parseInt(node.value)}`,
+		)
+	} else if (node.label === 'reps') {
+		if (node.type === 'Regex' || node.comparison == null) throwExp('impossible')
+		context.parameterizeSql(
+			sql`card.repCount ${sql.raw(node.comparison)} ${parseInt(node.value)}`,
+		)
 	} else if (node.label === 'tagCount') {
 		context.cardTagCount = true
 		context.noteTagCount = true
