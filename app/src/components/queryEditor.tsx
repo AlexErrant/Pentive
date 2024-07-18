@@ -47,6 +47,8 @@ import {
 	isNumberValuedLabel,
 	inLabels,
 	dateValuedLabels,
+	firstReviewed,
+	reviewed,
 } from 'shared-dom'
 import { queryDecorations } from './queryDecorations'
 import { db } from '../db'
@@ -108,7 +110,7 @@ const basicSetup = [
 	closeBrackets(),
 	autocompletion({
 		selectOnOpen: false,
-		activateOnCompletion: ({ apply, label }) => {
+		activateOnCompletion: ({ apply, label, type }) => {
 			const x = typeof apply === 'string' ? apply : label
 			const lastChar = x.slice(-1)
 			return (
@@ -117,7 +119,8 @@ const basicSetup = [
 				lastChar === '>' ||
 				lastChar === '<' ||
 				isDateValuedLabel(x) ||
-				isNumberValuedLabel(x)
+				isNumberValuedLabel(x) ||
+				type === 'uglyhack' // grep 3D3FADF2-7338-49F8-9CAF-9CBC2E9C5137
 			)
 		},
 	}),
@@ -264,8 +267,21 @@ function getTooltip(state: EditorState): readonly Tooltip[] {
 			const nodeBefore = tree.resolveInner(range.head, -1)
 			if (inLabels(nodeBefore, dateValuedLabels)) {
 				const firstChar = state.sliceDoc(nodeBefore.from, nodeBefore.from + 1)
+				const threeSibslingsBefore =
+					nodeBefore.prevSibling?.prevSibling?.prevSibling?.type.name
+				const isRatingEum =
+					threeSibslingsBefore === firstReviewed ||
+					threeSibslingsBefore === reviewed
 				const textContent =
-					firstChar === '<' ? 'Before' : firstChar === '>' ? 'After' : null
+					firstChar === '<'
+						? isRatingEum
+							? 'Harder'
+							: 'Before'
+						: firstChar === '>'
+						? isRatingEum
+							? 'Easier'
+							: 'After'
+						: null
 				if (textContent == null) return null
 				return {
 					pos: range.head,

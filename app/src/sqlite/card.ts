@@ -410,6 +410,21 @@ async function getCards(
 									),
 							),
 						)
+						.$if(conversionResult.joinFirstReview, (db) =>
+							db.leftJoin('review as firstReview', (join) =>
+								join
+									.onRef('firstReview.cardId', '=', 'card.id')
+									.on('firstReview.created', '=', (eb) =>
+										eb
+											.selectFrom('review')
+											.select(eb.fn.min('created').as('min'))
+											.whereRef('card.id', '=', 'review.cardId'),
+									),
+							),
+						)
+						.$if(conversionResult.joinReview, (db) =>
+							db.leftJoin('review', 'review.cardId', 'card.id'),
+						)
 						.where(conversionResult.sql!),
 				)
 				.groupBy('card.rowid')

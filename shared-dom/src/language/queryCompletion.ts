@@ -11,6 +11,11 @@ import {
 	Label,
 	Regex,
 	RawQuoted,
+	Comparison,
+	Date as qtDate,
+	reviewed as qtReviewed,
+	firstReviewed as qtFirstReviewed,
+	Number as qtNumber,
 } from './queryParser.terms'
 import { escapedQuoted1, escapedQuoted2, getLabel } from './query2sql'
 import {
@@ -26,6 +31,8 @@ import {
 	stringLabels,
 	tag,
 	template,
+	reviewed,
+	firstReviewed,
 } from './stringLabels'
 import { type SyntaxNode } from '@lezer/common'
 
@@ -198,11 +205,80 @@ export const queryCompletion: (
 			}
 		} else if (
 			// see comment below
+			inLabel(nodeBefore, reviewed) ||
+			inLabel(nodeBefore, firstReviewed)
+		) {
+			if (nodeBefore.type.is(Comparison)) {
+				if (
+					nodeBefore.prevSibling?.type.is(qtReviewed) === true ||
+					nodeBefore.prevSibling?.type.is(qtFirstReviewed) === true
+				) {
+					const datesCompletion = buildDates(getDate(), from)
+					for (const option of datesCompletion.options) {
+						option.type = 'uglyhack' // grep 3D3FADF2-7338-49F8-9CAF-9CBC2E9C5137 We use this to tell `activateOnCompletion` that there's another autocomplete available
+					}
+					return datesCompletion
+				} else {
+					return {
+						from,
+						options: [
+							{
+								label: 'again',
+								detail: '(1)',
+							},
+							{
+								label: 'hard',
+								detail: '(2)',
+							},
+							{
+								label: 'good',
+								detail: '(3)',
+							},
+							{
+								label: 'easy',
+								detail: '(4)',
+							},
+						],
+					}
+				}
+			} else if (nodeBefore.type.is(qtDate) || nodeBefore.type.is(qtNumber)) {
+				return {
+					from: from + textBefore.length,
+					options: [
+						{
+							label: '<=',
+							detail: '(harder than, inclusive)',
+						},
+						{
+							label: '>=',
+							detail: '(easier than, inclusive)',
+						},
+						{
+							label: '<',
+							detail: '(harder than)',
+						},
+						{
+							label: '>',
+							detail: '(easier than)',
+						},
+						{
+							label: '=',
+						},
+						{
+							label: 'The above are optional',
+							apply: ' ',
+						},
+					],
+				}
+			}
+		} else if (
+			// see comment below
 			inLabel(nodeBefore, due)
 		) {
 			return buildDates(getDate(), from, textBefore)
 		} else if (
-			// note that `inLabel(nodeBefore, due)` must precede this branch since `dateValuedLabels` includes `due`
+			// note that `inLabel(nodeBefore, due)` and `inLabel(nodeBefore, reviewed) || inLabel(nodeBefore, firstReviewed)`
+			// must precede this branch since `dateValuedLabels` includes `due`, `reviewed`, and `firstReviewed`
 			inLabels(nodeBefore, dateValuedLabels)
 		) {
 			return buildDates(getDate(), from)

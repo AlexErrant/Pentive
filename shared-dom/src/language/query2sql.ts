@@ -18,7 +18,22 @@ import {
 	setting,
 	settingId,
 	kind,
+	reviewed,
+	firstReviewed,
+	tagCount,
+	cardTagCount,
+	noteTagCount,
+	created,
+	noteCreated,
+	cardCreated,
+	edited,
+	noteEdited,
+	cardEdited,
+	due,
+	lapses,
+	reps,
 	type kindEnums,
+	type ratingEnums,
 	field,
 } from './stringLabels'
 
@@ -44,6 +59,8 @@ class Context {
 		this.joinTemplateNameFts = false
 		this.joinCardSettingNameFts = false
 		this.joinLatestReview = false
+		this.joinReview = false
+		this.joinFirstReview = false
 		this.fieldValueHighlight = []
 		this.joinTableName = 0
 	}
@@ -62,6 +79,8 @@ class Context {
 	joinTemplateNameFts: boolean
 	joinCardSettingNameFts: boolean
 	joinLatestReview: boolean
+	joinReview: boolean
+	joinFirstReview: boolean
 	fieldValueHighlight: FieldValueHighlight[]
 	joinTableName: number
 	now: Date
@@ -121,6 +140,8 @@ export function convert(input: string, now: Date) {
 		joinCardSettingNameFts: context.joinCardSettingNameFts,
 		joinTemplateNameFts: context.joinTemplateNameFts,
 		joinLatestReview: context.joinLatestReview,
+		joinReview: context.joinReview,
+		joinFirstReview: context.joinFirstReview,
 		fieldValueHighlight: context.fieldValueHighlight,
 	}
 }
@@ -392,6 +413,33 @@ function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
 		const group = new Group(context.current, negate, label)
 		context.current.attach(group)
 		context.current = group
+	} else if (
+		(context.current.label === reviewed ||
+			context.current.label === firstReviewed) &&
+		context.current.children.length === 1
+	) {
+		const maybe = input.slice(node.from, node.to)
+		if (comparisons.includes(maybe as never)) {
+			const comparison = maybe as Comparison
+			if (node.node.nextSibling?.type.is(qt.RatingEnum) === true) {
+				const rating = input.slice(
+					node.node.nextSibling.from,
+					node.node.nextSibling.to,
+				) as (typeof ratingEnums)[number]
+				const child = context.current.children[0] as QueryString
+				child.rating =
+					rating === 'again'
+						? 1
+						: rating === 'hard'
+						? 2
+						: rating === 'good'
+						? 3
+						: rating === 'easy'
+						? 4
+						: throwExp('Impossible')
+				child.ratingComparison = comparison
+			}
+		}
 	}
 }
 
@@ -623,40 +671,66 @@ function handleLabel(node: QueryString | QueryRegex, context: Context) {
 				: 3
 		const equals = sql.raw(node.negate ? 'IS NOT' : 'IS')
 		context.parameterizeSql(sql`latestReview.kind ${equals} ${n}`)
-	} else if (node.label === 'created') {
+	} else if (node.label === reviewed) {
+		if (node.type === 'Regex') throwExp("you can't regex reviewed")
+		context.joinReview = true
+		context.trustedSql('(')
+		handleCreatedEditedDue(node, context, 'review', 'created')
+		if (node.ratingComparison != null && node.rating != null) {
+			context.parameterizeSql(
+				sql` AND review.rating ${sql.raw(node.ratingComparison)} ${
+					node.rating
+				}`,
+			)
+		}
+		context.trustedSql(')')
+	} else if (node.label === firstReviewed) {
+		if (node.type === 'Regex') throwExp("you can't regex reviewed")
+		context.joinFirstReview = true
+		context.trustedSql('(')
+		handleCreatedEditedDue(node, context, 'firstReview', 'created')
+		if (node.ratingComparison != null && node.rating != null) {
+			context.parameterizeSql(
+				sql` AND firstReview.rating ${sql.raw(node.ratingComparison)} ${
+					node.rating
+				}`,
+			)
+		}
+		context.trustedSql(')')
+	} else if (node.label === created) {
 		handleCreatedEditedDue(node, context, undefined, 'created')
-	} else if (node.label === 'edited') {
+	} else if (node.label === edited) {
 		handleCreatedEditedDue(node, context, undefined, 'edited')
-	} else if (node.label === 'cardCreated') {
+	} else if (node.label === cardCreated) {
 		handleCreatedEditedDue(node, context, 'card', 'created')
-	} else if (node.label === 'noteCreated') {
+	} else if (node.label === noteCreated) {
 		handleCreatedEditedDue(node, context, 'note', 'created')
-	} else if (node.label === 'cardEdited') {
+	} else if (node.label === cardEdited) {
 		handleCreatedEditedDue(node, context, 'card', 'edited')
-	} else if (node.label === 'noteEdited') {
+	} else if (node.label === noteEdited) {
 		handleCreatedEditedDue(node, context, 'note', 'edited')
-	} else if (node.label === 'due') {
+	} else if (node.label === due) {
 		handleCreatedEditedDue(node, context, 'card', 'due')
-	} else if (node.label === 'field') {
+	} else if (node.label === field) {
 		serialize(node, context)
-	} else if (node.label === 'lapses') {
+	} else if (node.label === lapses) {
 		if (node.type === 'Regex' || node.comparison == null) throwExp('impossible')
 		context.parameterizeSql(
 			sql`card.lapses ${sql.raw(node.comparison)} ${parseInt(node.value)}`,
 		)
-	} else if (node.label === 'reps') {
+	} else if (node.label === reps) {
 		if (node.type === 'Regex' || node.comparison == null) throwExp('impossible')
 		context.parameterizeSql(
 			sql`card.repCount ${sql.raw(node.comparison)} ${parseInt(node.value)}`,
 		)
-	} else if (node.label === 'tagCount') {
+	} else if (node.label === tagCount) {
 		context.cardTagCount = true
 		context.noteTagCount = true
 		handleTagCount(context, node, sql`card.tagCount + note.tagCount`)
-	} else if (node.label === 'cardTagCount') {
+	} else if (node.label === cardTagCount) {
 		context.cardTagCount = true
 		handleTagCount(context, node, sql`card.tagCount`)
-	} else if (node.label === 'noteTagCount') {
+	} else if (node.label === noteTagCount) {
 		context.noteTagCount = true
 		handleTagCount(context, node, sql`note.tagCount`)
 	} else {
@@ -678,7 +752,7 @@ function handleTagCount(
 function handleCreatedEditedDue(
 	node: Node,
 	context: Context,
-	table: 'note' | 'card' | undefined,
+	table: 'firstReview' | 'review' | 'note' | 'card' | undefined,
 	column: 'created' | 'edited' | 'due',
 ) {
 	if (node.type === number) {
@@ -706,7 +780,7 @@ function handleCreatedEditedDue(
 function handleComparison(
 	msSinceEpoch: number,
 	context: Context,
-	table: 'note' | 'card' | undefined,
+	table: 'firstReview' | 'review' | 'note' | 'card' | undefined,
 	column: 'created' | 'edited' | 'due',
 	node: QueryString,
 ) {
@@ -724,7 +798,7 @@ function handleComparison(
 function handleOneComparison(
 	val: number,
 	context: Context,
-	table: 'note' | 'card' | undefined,
+	table: 'firstReview' | 'review' | 'note' | 'card' | undefined,
 	column: 'created' | 'edited' | 'due',
 	comparison: Comparison | undefined,
 ) {
@@ -837,6 +911,8 @@ interface QueryString {
 		| typeof date
 	label?: Label
 	field?: QueryString | QueryRegex // there's only 1 level of recursion but whatever
+	rating?: number
+	ratingComparison?: Comparison
 	value: string
 	caseSensitive: boolean
 	fieldValueHighlight?: FieldValueHighlight

@@ -15,13 +15,13 @@ export const cardCreated = 'cardCreated' as const
 export const cardEdited = 'cardEdited' as const
 export const created = 'created' as const
 export const edited = 'edited' as const
-const reps = 'reps' as const
-const lapses = 'lapses' as const
-const tagCount = 'tagCount' as const
-const noteTagCount = 'noteTagCount' as const
-const cardTagCount = 'cardTagCount' as const
-const reviewed = 'reviewed' as const
-const firstReviewed = 'firstReviewed' as const
+export const reps = 'reps' as const
+export const lapses = 'lapses' as const
+export const tagCount = 'tagCount' as const
+export const noteTagCount = 'noteTagCount' as const
+export const cardTagCount = 'cardTagCount' as const
+export const reviewed = 'reviewed' as const
+export const firstReviewed = 'firstReviewed' as const
 export const labels = [
 	tag,
 	template,
@@ -51,6 +51,7 @@ export const labels = [
 export const stringLabels = labels as readonly string[]
 
 export const kindEnums = ['new', 'learn', 'review', 'relearn', 'cram'] as const
+export const ratingEnums = ['again', 'hard', 'good', 'easy'] as const
 export const dateValuedLabels = [
 	due,
 	cardCreated,
@@ -59,6 +60,8 @@ export const dateValuedLabels = [
 	noteEdited,
 	created,
 	edited,
+	reviewed,
+	firstReviewed,
 ]
 
 export const isDateValuedLabel = (x: string) =>
