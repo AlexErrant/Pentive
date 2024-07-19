@@ -15,6 +15,8 @@ import {
 	tag,
 	template,
 	templateId,
+	cardId,
+	noteId,
 	setting,
 	settingId,
 	kind,
@@ -644,6 +646,14 @@ function handleLabel(node: QueryString | QueryRegex, context: Context) {
 		if (node.type === 'Regex') throwExp("you can't regex templateId")
 		const equals = sql.raw(node.negate ? '!=' : '=')
 		context.parameterizeSql(sql`note.templateId ${equals} ${node.value}`)
+	} else if (node.label === cardId) {
+		if (node.type === 'Regex') throwExp("you can't regex cardId")
+		const equals = sql.raw(node.negate ? '!=' : '=')
+		context.parameterizeSql(sql`card.id ${equals} ${node.value}`)
+	} else if (node.label === noteId) {
+		if (node.type === 'Regex') throwExp("you can't regex noteId")
+		const equals = sql.raw(node.negate ? '!=' : '=')
+		context.parameterizeSql(sql`note.id ${equals} ${node.value}`)
 	} else if (node.label === setting) {
 		if (node.type === 'Regex') {
 			context.regexpWithFlags(node, `cardSetting.name`)
