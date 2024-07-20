@@ -6,7 +6,7 @@ export const field = 'field' as const
 export const cardId = 'cardId' as const
 export const noteId = 'noteId' as const
 export const settingId = 'settingId' as const
-const state = 'state' as const
+export const state = 'state' as const
 export const kind = 'kind' as const
 export const due = 'due' as const
 export const noteCreated = 'noteCreated' as const
@@ -51,6 +51,13 @@ export const labels = [
 export const stringLabels = labels as readonly string[]
 
 export const kindEnums = ['new', 'learn', 'review', 'relearn', 'cram'] as const
+export const stateEnums = [
+	'normal',
+	'buried',
+	'userBuried',
+	'schedulerBuried',
+	'suspended',
+] as const
 export const ratingEnums = ['again', 'hard', 'good', 'easy'] as const
 export const dateValuedLabels = [
 	due,

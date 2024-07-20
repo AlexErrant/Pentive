@@ -35,10 +35,10 @@ import { noteEntityToDomain, parseTags, templateEntityToDomain } from './util'
 import { type convert } from 'shared-dom'
 import { type CardTagRowid, type NoteTagRowid } from './tag'
 
-function serializeState(s: State): number {
+function serializeState(s?: State): number | null {
 	switch (s) {
-		case 'normal':
-			return 0
+		case undefined:
+			return null
 		case 'scheduler buried':
 			return 1
 		case 'user buried':
@@ -54,8 +54,6 @@ function deserializeState(s: number | null): State | undefined {
 	switch (s) {
 		case null:
 			return undefined
-		case 0:
-			return 'normal'
 		case 1:
 			return 'scheduler buried'
 		case 2:

@@ -158,6 +158,14 @@ export function parseCard(
 		repCount: card.reps,
 		cardSettingId: deck.conf.toString() as CardSettingId,
 		ord: card.ord,
+		state:
+			card.queue === -1
+				? 'suspended'
+				: card.queue === -2
+				? 'scheduler buried'
+				: card.queue === -3
+				? 'user buried'
+				: undefined,
 	}
 }
 

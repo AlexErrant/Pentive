@@ -20,6 +20,7 @@ import {
 	setting,
 	settingId,
 	kind,
+	state,
 	reviewed,
 	firstReviewed,
 	tagCount,
@@ -35,6 +36,7 @@ import {
 	lapses,
 	reps,
 	type kindEnums,
+	type stateEnums,
 	type ratingEnums,
 	field,
 } from './stringLabels'
@@ -294,6 +296,7 @@ function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
 	if (
 		node.type.is(qt.SimpleString) ||
 		node.type.is(qt.KindEnum) ||
+		node.type.is(qt.StateEnum) ||
 		node.type.is(qt.DueEnum) ||
 		node.type.is(qt.Number) ||
 		node.type.is(qt.Date) ||
@@ -330,6 +333,7 @@ function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
 		} =
 			node.type.is(qt.SimpleString) ||
 			node.type.is(qt.KindEnum) ||
+			node.type.is(qt.StateEnum) ||
 			node.type.is(qt.DueEnum) ||
 			node.type.is(qt.Date) ||
 			node.type.is(qt.Number)
@@ -681,6 +685,29 @@ function handleLabel(node: QueryString | QueryRegex, context: Context) {
 				: 3
 		const equals = sql.raw(node.negate ? 'IS NOT' : 'IS')
 		context.parameterizeSql(sql`latestReview.kind ${equals} ${n}`)
+	} else if (node.label === state) {
+		if (node.type === 'Regex') throwExp("you can't regex state")
+		const value = node.value as (typeof stateEnums)[number]
+		const n =
+			value === 'normal'
+				? null
+				: value === 'schedulerBuried'
+				? 1
+				: value === 'userBuried'
+				? 2
+				: value === 'suspended'
+				? 3
+				: 4 // 'buried'
+		if (n === 4) {
+			if (node.negate) {
+				context.trustedSql(`(card.state <> 1 AND card.state <> 2)`)
+			} else {
+				context.trustedSql(`(card.state = 1 OR card.state = 2)`)
+			}
+		} else {
+			const equals = sql.raw(node.negate ? 'IS NOT' : 'IS')
+			context.parameterizeSql(sql`card.state ${equals} ${n}`)
+		}
 	} else if (node.label === reviewed) {
 		if (node.type === 'Regex') throwExp("you can't regex reviewed")
 		context.joinReview = true
@@ -743,9 +770,9 @@ function handleLabel(node: QueryString | QueryRegex, context: Context) {
 	} else if (node.label === noteTagCount) {
 		context.noteTagCount = true
 		handleTagCount(context, node, sql`note.tagCount`)
-	} else {
-		throwExp('Unhandled label: ' + node.label)
-	}
+	} else if (node.label == null) {
+		throwExp('Label is null')
+	} else assertNever(node.label)
 }
 
 function handleTagCount(
@@ -903,6 +930,7 @@ function andOrNothing(node: SyntaxNode): '' | typeof and | typeof or {
 			left.type.is(qt.Group) ||
 			left.type.is(qt.Label) ||
 			left.type.is(qt.KindEnum) ||
+			node.type.is(qt.StateEnum) ||
 			left.type.is(qt.DueEnum)
 		) {
 			return and

@@ -27,6 +27,8 @@ import {
 	field,
 	kind,
 	kindEnums,
+	state,
+	stateEnums,
 	setting,
 	stringLabels,
 	tag,
@@ -135,6 +137,18 @@ export const queryCompletion: (
 					(kind) =>
 						({
 							label: kind,
+							type: 'general',
+						}) satisfies Completion,
+				),
+				validFor: simpleStringRegex,
+			}
+		} else if (inLabel(nodeBefore, state, isSimpleString)) {
+			return {
+				from,
+				options: stateEnums.map(
+					(state) =>
+						({
+							label: state,
 							type: 'general',
 						}) satisfies Completion,
 				),
