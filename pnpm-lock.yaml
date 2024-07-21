@@ -299,9 +299,6 @@ importers:
       '@playwright/test':
         specifier: ^1.38.1
         version: 1.38.1
-      '@surma/rollup-plugin-off-main-thread':
-        specifier: ^2.2.3
-        version: 2.2.3
       '@tailwindcss/forms':
         specifier: ^0.5.7
         version: 0.5.7(tailwindcss@3.4.3(ts-node@10.9.1(@types/node@20.14.11)(typescript@5.4.5)))
@@ -320,9 +317,6 @@ importers:
       '@types/sql.js':
         specifier: ^1.4.5
         version: 1.4.5
-      '@types/surma__rollup-plugin-off-main-thread':
-        specifier: ^2.2.3
-        version: 2.2.3
       '@types/uuid':
         specifier: ^9.0.4
         version: 9.0.4
@@ -415,7 +409,7 @@ importers:
         version: 5.3.4(@types/node@20.14.11)(sass@1.77.8)(terser@5.31.3)
       vite-plugin-checker:
         specifier: ^0.6.2
-        version: 0.6.2(eslint@8.57.0)(meow@13.2.0)(optionator@0.9.4)(stylelint@15.10.3(typescript@5.4.5))(typescript@5.4.5)(vite@5.3.4(@types/node@20.14.11)(sass@1.77.8)(terser@5.31.3))
+        version: 0.6.2(eslint@8.57.0)(meow@9.0.0)(optionator@0.9.4)(stylelint@15.10.3(typescript@5.4.5))(typescript@5.4.5)(vite@5.3.4(@types/node@20.14.11)(sass@1.77.8)(terser@5.31.3))
       vite-plugin-pwa:
         specifier: ^0.16.5
         version: 0.16.5(vite@5.3.4(@types/node@20.14.11)(sass@1.77.8)(terser@5.31.3))(workbox-build@7.1.1(@types/babel__core@7.20.5))(workbox-window@7.1.0)
@@ -518,7 +512,7 @@ importers:
         version: 5.3.4(@types/node@20.14.11)(sass@1.77.8)(terser@5.31.3)
       vite-plugin-checker:
         specifier: ^0.6.2
-        version: 0.6.2(eslint@8.57.0)(meow@13.2.0)(optionator@0.9.4)(stylelint@15.10.3(typescript@5.4.5))(typescript@5.4.5)(vite@5.3.4(@types/node@20.14.11)(sass@1.77.8)(terser@5.31.3))
+        version: 0.6.2(eslint@8.57.0)(meow@9.0.0)(optionator@0.9.4)(stylelint@15.10.3(typescript@5.4.5))(typescript@5.4.5)(vite@5.3.4(@types/node@20.14.11)(sass@1.77.8)(terser@5.31.3))
       vite-plugin-pwa:
         specifier: ^0.16.5
         version: 0.16.5(vite@5.3.4(@types/node@20.14.11)(sass@1.77.8)(terser@5.31.3))(workbox-build@7.1.1(@types/babel__core@7.20.5))(workbox-window@7.1.0)
@@ -623,10 +617,10 @@ importers:
         version: 3.59.2
       svelte-check:
         specifier: ^3.5.2
-        version: 3.5.2(@babel/core@7.24.9)(postcss-load-config@6.0.1(postcss@8.4.39))(postcss@8.4.39)(sass@1.77.8)(svelte@3.59.2)
+        version: 3.5.2(@babel/core@7.24.9)(postcss-load-config@4.0.2(postcss@8.4.39))(postcss@8.4.39)(sass@1.77.8)(svelte@3.59.2)
       svelte-preprocess:
         specifier: ^5.0.4
-        version: 5.0.4(@babel/core@7.24.9)(postcss-load-config@6.0.1(postcss@8.4.39))(postcss@8.4.39)(sass@1.77.8)(svelte@3.59.2)(typescript@5.4.5)
+        version: 5.0.4(@babel/core@7.24.9)(postcss-load-config@4.0.2(postcss@8.4.39))(postcss@8.4.39)(sass@1.77.8)(svelte@3.59.2)(typescript@5.4.5)
       tslib:
         specifier: ^2.6.2
         version: 2.6.2
@@ -789,7 +783,7 @@ importers:
         version: 0.5.14(prettier@3.0.3)
       solid-start-cloudflare-workers:
         specifier: ^0.3.6
-        version: 0.3.6(cron-schedule@5.0.1)(solid-start@0.3.6)(vite@5.3.4(@types/node@20.14.11)(sass@1.77.8)(terser@5.31.3))
+        version: 0.3.6(cron-schedule@3.0.6)(solid-start@0.3.6)(vite@5.3.4(@types/node@20.14.11)(sass@1.77.8)(terser@5.31.3))
       solid-start-node:
         specifier: ^0.3.6
         version: 0.3.6(solid-start@0.3.6)(vite@5.3.4(@types/node@20.14.11)(sass@1.77.8)(terser@5.31.3))
@@ -816,7 +810,7 @@ importers:
         version: 5.3.4(@types/node@20.14.11)(sass@1.77.8)(terser@5.31.3)
       vite-plugin-checker:
         specifier: ^0.6.2
-        version: 0.6.2(eslint@8.57.0)(meow@13.2.0)(optionator@0.9.4)(stylelint@15.10.3(typescript@5.4.5))(typescript@5.4.5)(vite@5.3.4(@types/node@20.14.11)(sass@1.77.8)(terser@5.31.3))
+        version: 0.6.2(eslint@8.57.0)(meow@9.0.0)(optionator@0.9.4)(stylelint@15.10.3(typescript@5.4.5))(typescript@5.4.5)(vite@5.3.4(@types/node@20.14.11)(sass@1.77.8)(terser@5.31.3))
       wrangler:
         specifier: ^3.10.0
         version: 3.10.0
@@ -901,7 +895,7 @@ importers:
         version: 5.3.4(@types/node@20.14.11)(sass@1.77.8)(terser@5.31.3)
       vite-plugin-checker:
         specifier: ^0.6.2
-        version: 0.6.2(eslint@8.57.0)(meow@13.2.0)(optionator@0.9.4)(stylelint@15.10.3(typescript@5.4.5))(typescript@5.4.5)(vite@5.3.4(@types/node@20.14.11)(sass@1.77.8)(terser@5.31.3))
+        version: 0.6.2(eslint@8.57.0)(meow@9.0.0)(optionator@0.9.4)(stylelint@15.10.3(typescript@5.4.5))(typescript@5.4.5)(vite@5.3.4(@types/node@20.14.11)(sass@1.77.8)(terser@5.31.3))
       vite-plugin-pwa:
         specifier: ^0.16.5
         version: 0.16.5(vite@5.3.4(@types/node@20.14.11)(sass@1.77.8)(terser@5.31.3))(workbox-build@7.1.1(@types/babel__core@7.20.5))(workbox-window@7.1.0)
@@ -4637,9 +4631,6 @@ packages:
   '@types/stack-utils@2.0.1':
     resolution: {integrity: sha512-Hl219/BT5fLAaz6NDkSuhzasy49dwQS/DSdu4MdggFB8zcXv7vflBI3xp7FEmkmdDkBUI2bPUNeMttp2knYdxw==}
 
-  '@types/surma__rollup-plugin-off-main-thread@2.2.3':
-    resolution: {integrity: sha512-Z9ZbOB+zCKqGpR+/LOYykvOJzLKMAvHkeE0w5GwNZQOCJ/Nw+1gZU40ySiTAbhzQXQtAWs7lvLnOmN38CRGQaA==}
-
   '@types/trusted-types@2.0.7':
     resolution: {integrity: sha512-ScaPdn1dQczgbl0QFTeTOmVHFULt394XJgOQNoyVhZ6r2vLnMLJfBPd53SB52T/3G36VI1/g2MZaX0cwDuXsfw==}
 
@@ -5838,10 +5829,6 @@ packages:
 
   cron-schedule@3.0.6:
     resolution: {integrity: sha512-izfGgKyzzIyLaeb1EtZ3KbglkS6AKp9cv7LxmiyoOu+fXfol1tQDC0Cof0enVZGNtudTHW+3lfuW9ZkLQss4Wg==}
-
-  cron-schedule@5.0.1:
-    resolution: {integrity: sha512-6rcwG2PxiHQqhgsk5ZjKmCBQHLZdoh96fXz/zw9MsVGK89fxY3ajoD+WRHlpgpfHFC1k9E2HnXuWevZlpe06vw==}
-    engines: {node: '>=18'}
 
   cross-spawn@6.0.5:
     resolution: {integrity: sha512-eTVLrBSt7fjbDygz805pMnstIs2VTBNkRm0qxZd+M7A5XDdxVRWO5MxGBXZhjY4cqLYLdtrGqRf8mBPmzwSpWQ==}
@@ -8304,10 +8291,6 @@ packages:
     resolution: {integrity: sha512-O18pf7nyvHTckunPWCV1XUNXU1piu01y2b7ATJ0ppkUkk8ocqVWBrYjJBCwHDjD/ZWcfyrA0P4gKhzWGi5EINQ==}
     engines: {node: '>=14'}
 
-  lilconfig@3.1.2:
-    resolution: {integrity: sha512-eop+wDAvpItUys0FWkHIKeC9ybYrTGbU41U5K7+bttZZeohvnY7M9dZ5kB21GNWiFT2q1OoPTvncPCgSOVO5ow==}
-    engines: {node: '>=14'}
-
   lines-and-columns@1.2.4:
     resolution: {integrity: sha512-7ylylesZQ/PV29jhEDl3Ufjo6ZX7gCqJr5F7PKrqc93v7fzSymt1BpwEU8nAUXs8qzzvqhbjhK5QZg6Mt/HkBg==}
 
@@ -8566,10 +8549,6 @@ packages:
   meow@12.1.1:
     resolution: {integrity: sha512-BhXM0Au22RwUneMPwSCnyhTOizdWoIEPU9sp0Aqa1PnDMR5Wv2FGXYDjuzJEIX+Eo2Rb8xuYe5jrnm5QowQFkw==}
     engines: {node: '>=16.10'}
-
-  meow@13.2.0:
-    resolution: {integrity: sha512-pxQJQzB6djGPXh08dacEloMFopsOqGVRKFPYvPOt9XDZ1HasbgDZA74CJGreSU4G3Ak7EFJGoiH2auq+yXISgA==}
-    engines: {node: '>=18'}
 
   meow@9.0.0:
     resolution: {integrity: sha512-+obSblOQmRhcyBt62furQqRAQpNyWXo8BuQ5bN7dG8wmwQ+vwHKp/rCFD4CrTP8CsDQD1sjoZ94K417XEUk8IQ==}
@@ -9409,24 +9388,6 @@ packages:
       postcss:
         optional: true
       ts-node:
-        optional: true
-
-  postcss-load-config@6.0.1:
-    resolution: {integrity: sha512-oPtTM4oerL+UXmx+93ytZVN82RrlY/wPUV8IeDxFrzIjXOLF1pN+EmKPLbubvKHT2HC20xXsCAH2Z+CKV6Oz/g==}
-    engines: {node: '>= 18'}
-    peerDependencies:
-      jiti: '>=1.21.0'
-      postcss: '>=8.4.31'
-      tsx: ^4.8.1
-      yaml: ^2.4.2
-    peerDependenciesMeta:
-      jiti:
-        optional: true
-      postcss:
-        optional: true
-      tsx:
-        optional: true
-      yaml:
         optional: true
 
   postcss-nested@6.0.1:
@@ -10571,9 +10532,6 @@ packages:
   string-width@5.1.2:
     resolution: {integrity: sha512-HnLOCR3vjcY8beoNLtcjZ5/nxn2afmME6lhrDrebokqMap+XbeW8n9TXpPDOqdGK5qcI3oT0GKTW6wC7EMiVqA==}
     engines: {node: '>=12'}
-
-  string.prototype.matchall@4.0.10:
-    resolution: {integrity: sha512-rGXbGmOEosIQi6Qva94HUjgPs9vKW+dkG7Y8Q5O2OYkWL6wFaTRZO8zM4mhP94uX55wgyrXzfS2aGtGzUL7EJQ==}
 
   string.prototype.matchall@4.0.11:
     resolution: {integrity: sha512-NUdh0aDavY2og7IbBPenWqR9exH+E26Sv8e0/eTe1tltDGZL+GtBkDAnnyBtmekfK6/Dq3MkcGtzXFEd1LQrtg==}
@@ -16126,7 +16084,7 @@ snapshots:
       ejs: 3.1.9
       json5: 2.2.3
       magic-string: 0.25.9
-      string.prototype.matchall: 4.0.10
+      string.prototype.matchall: 4.0.11
 
   '@sveltejs/vite-plugin-svelte-inspector@1.0.4(@sveltejs/vite-plugin-svelte@2.4.6(svelte@3.59.2)(vite@5.3.4(@types/node@20.14.11)(sass@1.77.8)(terser@5.31.3)))(svelte@3.59.2)(vite@5.3.4(@types/node@20.14.11)(sass@1.77.8)(terser@5.31.3))':
     dependencies:
@@ -16405,10 +16363,6 @@ snapshots:
   '@types/stack-trace@0.0.29': {}
 
   '@types/stack-utils@2.0.1': {}
-
-  '@types/surma__rollup-plugin-off-main-thread@2.2.3':
-    dependencies:
-      rollup: 3.29.3
 
   '@types/trusted-types@2.0.7': {}
 
@@ -17959,9 +17913,6 @@ snapshots:
       luxon: 3.4.3
 
   cron-schedule@3.0.6: {}
-
-  cron-schedule@5.0.1:
-    optional: true
 
   cross-spawn@6.0.5:
     dependencies:
@@ -21003,9 +20954,6 @@ snapshots:
 
   lilconfig@3.1.1: {}
 
-  lilconfig@3.1.2:
-    optional: true
-
   lines-and-columns@1.2.4: {}
 
   linkify-it@5.0.0:
@@ -21318,9 +21266,6 @@ snapshots:
 
   meow@12.1.1: {}
 
-  meow@13.2.0:
-    optional: true
-
   meow@9.0.0:
     dependencies:
       '@types/minimist': 1.2.3
@@ -21390,7 +21335,7 @@ snapshots:
 
   mini-svg-data-uri@1.4.4: {}
 
-  miniflare@2.14.1(cron-schedule@5.0.1):
+  miniflare@2.14.1(cron-schedule@3.0.6):
     dependencies:
       '@miniflare/cache': 2.14.1
       '@miniflare/cli-parser': 2.14.1
@@ -21414,7 +21359,7 @@ snapshots:
       source-map-support: 0.5.21
       undici: 5.26.3
     optionalDependencies:
-      cron-schedule: 5.0.1
+      cron-schedule: 3.0.6
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
@@ -22296,13 +22241,6 @@ snapshots:
     optionalDependencies:
       postcss: 8.4.39
       ts-node: 10.9.2(@types/node@20.14.11)(typescript@5.4.5)
-
-  postcss-load-config@6.0.1(postcss@8.4.39):
-    dependencies:
-      lilconfig: 3.1.2
-    optionalDependencies:
-      postcss: 8.4.39
-    optional: true
 
   postcss-nested@6.0.1(postcss@8.4.38):
     dependencies:
@@ -23439,7 +23377,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  solid-start-cloudflare-workers@0.3.6(cron-schedule@5.0.1)(solid-start@0.3.6)(vite@5.3.4(@types/node@20.14.11)(sass@1.77.8)(terser@5.31.3)):
+  solid-start-cloudflare-workers@0.3.6(cron-schedule@3.0.6)(solid-start@0.3.6)(vite@5.3.4(@types/node@20.14.11)(sass@1.77.8)(terser@5.31.3)):
     dependencies:
       '@cloudflare/kv-asset-handler': 0.2.0
       '@cloudflare/workers-types': 3.19.0
@@ -23451,7 +23389,7 @@ snapshots:
       '@rollup/plugin-json': 6.0.0(rollup@3.29.3)
       '@rollup/plugin-node-resolve': 15.2.1(rollup@3.29.3)
       '@types/ws': 8.5.5
-      miniflare: 2.14.1(cron-schedule@5.0.1)
+      miniflare: 2.14.1(cron-schedule@3.0.6)
       rollup: 3.29.3
       solid-start: 0.3.6(@solidjs/meta@0.28.6(solid-js@1.7.12))(@solidjs/router@0.8.3(solid-js@1.7.12))(solid-js@1.7.12)(solid-start-cloudflare-workers@0.3.6)(solid-start-node@0.3.6)(vite@5.3.4(@types/node@20.14.11)(sass@1.77.8)(terser@5.31.3))
       terser: 5.19.3
@@ -23519,7 +23457,7 @@ snapshots:
       vite-plugin-solid: 2.7.0(solid-js@1.7.12)(vite@5.3.4(@types/node@20.14.11)(sass@1.77.8)(terser@5.31.3))
       wait-on: 6.0.1(debug@4.3.4)
     optionalDependencies:
-      solid-start-cloudflare-workers: 0.3.6(cron-schedule@5.0.1)(solid-start@0.3.6)(vite@5.3.4(@types/node@20.14.11)(sass@1.77.8)(terser@5.31.3))
+      solid-start-cloudflare-workers: 0.3.6(cron-schedule@3.0.6)(solid-start@0.3.6)(vite@5.3.4(@types/node@20.14.11)(sass@1.77.8)(terser@5.31.3))
       solid-start-node: 0.3.6(solid-start@0.3.6)(vite@5.3.4(@types/node@20.14.11)(sass@1.77.8)(terser@5.31.3))
     transitivePeerDependencies:
       - '@nuxt/kit'
@@ -23690,18 +23628,6 @@ snapshots:
       eastasianwidth: 0.2.0
       emoji-regex: 9.2.2
       strip-ansi: 7.1.0
-
-  string.prototype.matchall@4.0.10:
-    dependencies:
-      call-bind: 1.0.7
-      define-properties: 1.2.1
-      es-abstract: 1.22.5
-      get-intrinsic: 1.2.4
-      has-symbols: 1.0.3
-      internal-slot: 1.0.7
-      regexp.prototype.flags: 1.5.2
-      set-function-name: 2.0.2
-      side-channel: 1.0.6
 
   string.prototype.matchall@4.0.11:
     dependencies:
@@ -23964,7 +23890,7 @@ snapshots:
 
   supports-preserve-symlinks-flag@1.0.0: {}
 
-  svelte-check@3.5.2(@babel/core@7.24.9)(postcss-load-config@6.0.1(postcss@8.4.39))(postcss@8.4.39)(sass@1.77.8)(svelte@3.59.2):
+  svelte-check@3.5.2(@babel/core@7.24.9)(postcss-load-config@4.0.2(postcss@8.4.39))(postcss@8.4.39)(sass@1.77.8)(svelte@3.59.2):
     dependencies:
       '@jridgewell/trace-mapping': 0.3.18
       chokidar: 3.5.3
@@ -23973,7 +23899,7 @@ snapshots:
       picocolors: 1.0.0
       sade: 1.8.1
       svelte: 3.59.2
-      svelte-preprocess: 5.0.4(@babel/core@7.24.9)(postcss-load-config@6.0.1(postcss@8.4.39))(postcss@8.4.39)(sass@1.77.8)(svelte@3.59.2)(typescript@5.4.5)
+      svelte-preprocess: 5.0.4(@babel/core@7.24.9)(postcss-load-config@4.0.2(postcss@8.4.39))(postcss@8.4.39)(sass@1.77.8)(svelte@3.59.2)(typescript@5.4.5)
       typescript: 5.4.5
     transitivePeerDependencies:
       - '@babel/core'
@@ -23990,7 +23916,7 @@ snapshots:
     dependencies:
       svelte: 3.59.2
 
-  svelte-preprocess@5.0.4(@babel/core@7.24.9)(postcss-load-config@6.0.1(postcss@8.4.39))(postcss@8.4.39)(sass@1.77.8)(svelte@3.59.2)(typescript@5.4.5):
+  svelte-preprocess@5.0.4(@babel/core@7.24.9)(postcss-load-config@4.0.2(postcss@8.4.39))(postcss@8.4.39)(sass@1.77.8)(svelte@3.59.2)(typescript@5.4.5):
     dependencies:
       '@types/pug': 2.0.6
       detect-indent: 6.1.0
@@ -24001,7 +23927,7 @@ snapshots:
     optionalDependencies:
       '@babel/core': 7.24.9
       postcss: 8.4.39
-      postcss-load-config: 6.0.1(postcss@8.4.39)
+      postcss-load-config: 4.0.2(postcss@8.4.39)(ts-node@10.9.2(@types/node@20.14.11)(typescript@5.4.5))
       sass: 1.77.8
       typescript: 5.4.5
 
@@ -24702,7 +24628,7 @@ snapshots:
       - supports-color
       - terser
 
-  vite-plugin-checker@0.6.2(eslint@8.57.0)(meow@13.2.0)(optionator@0.9.4)(stylelint@15.10.3(typescript@5.4.5))(typescript@5.4.5)(vite@5.3.4(@types/node@20.14.11)(sass@1.77.8)(terser@5.31.3)):
+  vite-plugin-checker@0.6.2(eslint@8.57.0)(meow@9.0.0)(optionator@0.9.4)(stylelint@15.10.3(typescript@5.4.5))(typescript@5.4.5)(vite@5.3.4(@types/node@20.14.11)(sass@1.77.8)(terser@5.31.3)):
     dependencies:
       '@babel/code-frame': 7.22.13
       ansi-escapes: 4.3.2
@@ -24724,7 +24650,7 @@ snapshots:
       vscode-uri: 3.0.7
     optionalDependencies:
       eslint: 8.57.0
-      meow: 13.2.0
+      meow: 9.0.0
       optionator: 0.9.4
       stylelint: 15.10.3(typescript@5.4.5)
       typescript: 5.4.5

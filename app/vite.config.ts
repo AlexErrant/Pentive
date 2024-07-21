@@ -2,7 +2,6 @@ import { defineConfig, type UserConfig } from 'vite'
 import { resolve } from 'path'
 import solidPlugin from 'vite-plugin-solid'
 import checker from 'vite-plugin-checker'
-import offMainThread from '@surma/rollup-plugin-off-main-thread'
 import fs from 'fs'
 import { VitePWA } from 'vite-plugin-pwa'
 
@@ -66,7 +65,6 @@ export default defineConfig(({ mode }: UserConfig) => {
 					lintCommand: 'eslint "./src/**/*.{ts,tsx}"',
 				},
 			}),
-			mode === 'production' ? offMainThread() : undefined,
 		],
 		optimizeDeps: {
 			exclude: ['fsrs-browser'], // https://github.com/vitejs/vite/issues/8427
