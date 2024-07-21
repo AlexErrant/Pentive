@@ -16,6 +16,18 @@ import {
 	reviewed as qtReviewed,
 	firstReviewed as qtFirstReviewed,
 	Number as qtNumber,
+	Quoted1Open,
+	Quoted2Open,
+	HtmlOpen,
+	RawQuoted1Open,
+	RawQuoted2Open,
+	RawHtmlOpen,
+	Quoted1Close,
+	Quoted2Close,
+	HtmlClose,
+	RawQuoted1Close,
+	RawQuoted2Close,
+	RawHtmlClose,
 } from './queryParser.terms'
 import { escapedQuoted1, escapedQuoted2, getLabel } from './query2sql'
 import {
@@ -72,7 +84,9 @@ export const queryCompletion: (
 		isSimpleString,
 	) =>
 	async (context) => {
-		let nodeBefore = syntaxTree(context.state).resolveInner(context.pos, -1)
+		const tree = syntaxTree(context.state)
+		let nodeBefore = tree.resolveInner(context.pos, -1)
+		const nodeAfter = tree.resolveInner(context.pos, 1)
 		const textBefore = context.state.sliceDoc(nodeBefore.from, context.pos)
 		const tagBefore = simpleStringRegex.exec(textBefore)
 		if (tagBefore == null && !context.explicit) return null
@@ -311,6 +325,24 @@ export const queryCompletion: (
 				validFor: simpleStringRegex,
 			}
 		} else if (
+			nodeAfter.type.is(Quoted1Open) ||
+			nodeAfter.type.is(Quoted2Open) ||
+			nodeAfter.type.is(RawQuoted1Open) ||
+			nodeAfter.type.is(RawQuoted2Open) ||
+			nodeAfter.type.is(HtmlOpen) ||
+			nodeAfter.type.is(RawHtmlOpen)
+		) {
+			return modifiers(from, true)
+		} else if (
+			nodeBefore.type.is(Quoted1Close) ||
+			nodeBefore.type.is(Quoted2Close) ||
+			nodeBefore.type.is(RawQuoted1Close) ||
+			nodeBefore.type.is(RawQuoted2Close) ||
+			nodeBefore.type.is(HtmlClose) ||
+			nodeBefore.type.is(RawHtmlClose)
+		) {
+			return modifiers(from, false)
+		} else if (
 			nodeBefore.type.is(Program) ||
 			nodeBefore.type.is(Group) ||
 			(isSimpleString &&
@@ -345,6 +377,35 @@ export const queryCompletion: (
 		}
 		return null
 	}
+
+function modifiers(from: number, isStart: boolean) {
+	return {
+		from,
+		options: [
+			{
+				label: ' # - Word Boundary',
+				type: 'general',
+				apply: '#',
+			},
+			{
+				label: ` ## - ${isStart ? 'Starts' : 'Ends'} With`,
+				type: 'general',
+				apply: '##',
+			},
+			{
+				label: ' ^ - Case Sensitive',
+				type: 'general',
+				apply: '^',
+			},
+			{
+				label: ' % - Remove Combining Characters',
+				type: 'general',
+				apply: '%',
+			},
+		] satisfies Completion[],
+		validFor: simpleStringRegex,
+	}
+}
 
 function inLabel(
 	nodeBefore: SyntaxNode,

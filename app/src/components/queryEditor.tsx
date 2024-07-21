@@ -49,6 +49,7 @@ import {
 	dateValuedLabels,
 	firstReviewed,
 	reviewed,
+	queryTerms as qt,
 } from 'shared-dom'
 import { queryDecorations } from './queryDecorations'
 import { db } from '../db'
@@ -264,7 +265,30 @@ function getTooltip(state: EditorState): readonly Tooltip[] {
 	return state.selection.ranges
 		.filter((range) => range.empty)
 		.map((range) => {
+			const nodeAfter = tree.resolveInner(range.head, 1)
+			if (
+				nodeAfter.type.is(qt.Quoted1Open) ||
+				nodeAfter.type.is(qt.Quoted2Open) ||
+				nodeAfter.type.is(qt.RawQuoted1Open) ||
+				nodeAfter.type.is(qt.RawQuoted2Open) ||
+				nodeAfter.type.is(qt.HtmlOpen) ||
+				nodeAfter.type.is(qt.RawHtmlOpen)
+			) {
+				const modifiers = state.sliceDoc(nodeAfter.from, nodeAfter.to)
+				return buildModifiersTooltip(range.head, modifiers, true)
+			}
 			const nodeBefore = tree.resolveInner(range.head, -1)
+			if (
+				nodeBefore.type.is(qt.Quoted1Close) ||
+				nodeBefore.type.is(qt.Quoted2Close) ||
+				nodeBefore.type.is(qt.RawQuoted1Close) ||
+				nodeBefore.type.is(qt.RawQuoted2Close) ||
+				nodeBefore.type.is(qt.HtmlClose) ||
+				nodeBefore.type.is(qt.RawHtmlClose)
+			) {
+				const modifiers = state.sliceDoc(nodeBefore.from, nodeBefore.to)
+				return buildModifiersTooltip(range.head, modifiers, false)
+			}
 			if (inLabels(nodeBefore, dateValuedLabels)) {
 				const firstChar = state.sliceDoc(nodeBefore.from, nodeBefore.from + 1)
 				const threeSibslingsBefore =
@@ -283,18 +307,7 @@ function getTooltip(state: EditorState): readonly Tooltip[] {
 							: 'After'
 						: null
 				if (textContent == null) return null
-				return {
-					pos: range.head,
-					above: true,
-					strictSide: true,
-					arrow: true,
-					create: () => {
-						const dom = document.createElement('div')
-						dom.className = 'cm-tooltip-cursor'
-						dom.textContent = textContent
-						return { dom }
-					},
-				} satisfies Tooltip
+				return buildTooltip(range.head, textContent)
 			} else {
 				return null
 			}
@@ -302,6 +315,35 @@ function getTooltip(state: EditorState): readonly Tooltip[] {
 		.filter(notEmpty)
 }
 
+function buildModifiersTooltip(
+	pos: number,
+	modifiers: string,
+	isStart: boolean,
+) {
+	const textContent: string[] = []
+	if (modifiers.includes('##'))
+		textContent.push(`${isStart ? 'Starts' : 'Ends'} With`)
+	else if (modifiers.includes('#')) textContent.push('Word Boundary')
+	if (modifiers.includes('^')) textContent.push('Case Sensitive')
+	if (modifiers.includes('%')) textContent.push('Remove Combining Characters')
+	if (textContent.length === 0) return null
+	return buildTooltip(pos, textContent.join(', '))
+}
+
+function buildTooltip(pos: number, textContent: string) {
+	return {
+		pos,
+		above: true,
+		strictSide: true,
+		arrow: true,
+		create: () => {
+			const dom = document.createElement('div')
+			dom.className = 'cm-tooltip-cursor'
+			dom.textContent = textContent
+			return { dom }
+		},
+	} satisfies Tooltip
+}
 const cursorTooltipBaseTheme = EditorView.baseTheme({
 	'.cm-tooltip.cm-tooltip-cursor': {
 		backgroundColor: '#66b',
