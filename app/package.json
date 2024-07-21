@@ -65,7 +65,7 @@
 		"tailwindcss": "^3.4.3",
 		"ts-node": "^10.9.1",
 		"typescript": "~5.4.5",
-		"vite": "^4.4.9",
+		"vite": "^5.3.4",
 		"vite-plugin-checker": "^0.6.2",
 		"vite-plugin-pwa": "^0.16.5",
 		"vite-plugin-solid": "^2.10.2",
