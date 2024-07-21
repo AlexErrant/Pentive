@@ -87,13 +87,13 @@ importers:
     dependencies:
       '@codemirror/autocomplete':
         specifier: ^6.17.0
-        version: 6.17.0(@codemirror/language@6.10.2)(@codemirror/state@6.4.1)(@codemirror/view@6.28.4)(@lezer/common@1.2.1)
+        version: 6.17.0(@codemirror/language@6.10.2)(@codemirror/state@6.4.1)(@codemirror/view@6.28.6)(@lezer/common@1.2.1)
       '@codemirror/commands':
         specifier: ^6.6.0
         version: 6.6.0
       '@codemirror/lang-css':
         specifier: ^6.2.1
-        version: 6.2.1(@codemirror/view@6.28.4)
+        version: 6.2.1(@codemirror/view@6.28.6)
       '@codemirror/lang-html':
         specifier: ^6.4.9
         version: 6.4.9
@@ -102,7 +102,7 @@ importers:
         version: 6.0.1
       '@codemirror/lang-sql':
         specifier: ^6.7.0
-        version: 6.7.0(@codemirror/view@6.28.4)
+        version: 6.7.0(@codemirror/view@6.28.6)
       '@codemirror/language':
         specifier: ^6.10.2
         version: 6.10.2
@@ -119,8 +119,8 @@ importers:
         specifier: ^6.1.2
         version: 6.1.2
       '@codemirror/view':
-        specifier: ^6.28.4
-        version: 6.28.4
+        specifier: ^6.28.6
+        version: 6.28.6
       '@github/relative-time-element':
         specifier: ^4.3.0
         version: 4.3.0
@@ -183,7 +183,7 @@ importers:
         version: 1.7.12(@babel/core@7.23.0)
       codemirror-json-schema:
         specifier: ^0.7.8
-        version: 0.7.8(@codemirror/language@6.10.2)(@codemirror/lint@6.8.1)(@codemirror/state@6.4.1)(@codemirror/view@6.28.4)(@lezer/common@1.2.1)(typescript@5.4.5)(vite@5.3.4(@types/node@20.14.11)(sass@1.77.8)(terser@5.31.3))
+        version: 0.7.8(@codemirror/language@6.10.2)(@codemirror/lint@6.8.1)(@codemirror/state@6.4.1)(@codemirror/view@6.28.6)(@lezer/common@1.2.1)(typescript@5.4.5)(vite@5.3.4(@types/node@20.14.11)(sass@1.77.8)(terser@5.31.3))
       comlink:
         specifier: ^4.4.1
         version: 4.4.1
@@ -635,7 +635,7 @@ importers:
     dependencies:
       '@codemirror/autocomplete':
         specifier: ^6.17.0
-        version: 6.17.0(@codemirror/language@6.10.2)(@codemirror/state@6.4.1)(@codemirror/view@6.28.4)(@lezer/common@1.2.1)
+        version: 6.17.0(@codemirror/language@6.10.2)(@codemirror/state@6.4.1)(@codemirror/view@6.28.6)(@lezer/common@1.2.1)
       '@codemirror/commands':
         specifier: ^6.6.0
         version: 6.6.0
@@ -655,8 +655,8 @@ importers:
         specifier: ^6.4.1
         version: 6.4.1
       '@codemirror/view':
-        specifier: ^6.28.4
-        version: 6.28.4
+        specifier: ^6.28.6
+        version: 6.28.6
       '@kobalte/core':
         specifier: ^0.11.0
         version: 0.11.0(solid-js@1.7.12)
@@ -2961,9 +2961,6 @@ packages:
   '@codemirror/theme-one-dark@6.1.2':
     resolution: {integrity: sha512-F+sH0X16j/qFLMAfbciKTxVOwkdAS336b7AXTKOZhy8BR3eH/RelsnLgLFINrpST63mmN2OuwUt0W2ndUgYwUA==}
 
-  '@codemirror/view@6.28.4':
-    resolution: {integrity: sha512-QScv95fiviSQ/CaVGflxAvvvDy/9wi0RFyDl4LkHHWiMr/UPebyuTspmYSeN5Nx6eujcPYwsQzA6ZIZucKZVHQ==}
-
   '@codemirror/view@6.28.6':
     resolution: {integrity: sha512-bhwB1AZ6zU4M3dNKm8Aa2BXwj5mWDqE9IWpqxYKJoLCnx+AcwcMuLO01tLWgc1mx4vT1IVYVqx86YoqUsATrqQ==}
 
@@ -3566,6 +3563,7 @@ packages:
   '@humanwhocodes/config-array@0.11.14':
     resolution: {integrity: sha512-3T8LkOmg45BV5FICb15QQMsyUSWrQ8AygVfC7ZG32zOalnqrilm018ZVCw0eapXux8FtA33q8PSRSstjee3jSg==}
     engines: {node: '>=10.10.0'}
+    deprecated: Use @eslint/config-array instead
 
   '@humanwhocodes/module-importer@1.0.1':
     resolution: {integrity: sha512-bxveV4V8v5Yb4ncFTT3rPSgZBOpCkjfK0y4oVVVJwIuDVBRMDXrPyXRL988i5ap9m9bnyEEjWfm5WkBmtffLfA==}
@@ -3573,6 +3571,7 @@ packages:
 
   '@humanwhocodes/object-schema@2.0.3':
     resolution: {integrity: sha512-93zYdMES/c1D69yZiKDBj0V24vqNzB/koF26KPaagAfd3P/4gUlh3Dys5ogAK+Exi9QyzlD8x/08Zt7wIKcDcA==}
+    deprecated: Use @eslint/object-schema instead
 
   '@iarna/toml@2.2.5':
     resolution: {integrity: sha512-trnsAYxU3xnS1gPHPyU961coFyLkh4gAD/0zQ5mymY4yOZ+CYvsPqUbOFSw0aDM4y0tV7tiFxL/1XfXPNC6IPg==}
@@ -4105,14 +4104,14 @@ packages:
     resolution: {integrity: sha512-7eDbqKv/OBd11jjdZjUwFGN8sHWkeUqLeHXHQxQ1azja2IM7WIH+z/aLgzR6LhB3/MINNwtjesDpjGqTMj2JKQ==}
     engines: {node: '>=12.0'}
 
-  '@shikijs/core@1.10.2':
-    resolution: {integrity: sha512-hCtKSC0PNmidU+TVBUiddE0sF1QsOPVbBBRQlugsKy0QJBfSj9aIQQ/pNEIv58wwM/9cAlWG1yihi+5ovZfYmA==}
+  '@shikijs/core@1.10.3':
+    resolution: {integrity: sha512-D45PMaBaeDHxww+EkcDQtDAtzv00Gcsp72ukBtaLSmqRvh0WgGMq3Al0rl1QQBZfuneO75NXMIzEZGFitThWbg==}
 
-  '@shikijs/markdown-it@1.10.2':
-    resolution: {integrity: sha512-GDPYSZ6B1VgQZ2D+1uJPapd5wvE5C21F/4Abz8uGlvFhV0jqz6S0QFcc3QNZHwbtx4OKUc8y4ZtvWPz5Te/WLA==}
+  '@shikijs/markdown-it@1.10.3':
+    resolution: {integrity: sha512-QH0SbMx+pnUNr6/CWrq3SbfT3myZ0uJGFTsp5+7mlzPbX+73FjRO9K03A7gmv+LutqSiDQCOfkeixSuP7a4sug==}
 
-  '@shikijs/transformers@1.10.2':
-    resolution: {integrity: sha512-gSx8Z4ZIxP0iJlnm8gNolAf3Yxd0KYHJ0OFcT5RFGcZ73/ZhFBJgCfL9OQskHya74qlp3ExpGbrPm7zf7CSidw==}
+  '@shikijs/transformers@1.10.3':
+    resolution: {integrity: sha512-MNjsyye2WHVdxfZUSr5frS97sLGe6G1T+1P41QjyBFJehZphMcr4aBlRLmq6OSPBslYe9byQPVvt/LJCOfxw8Q==}
 
   '@sideway/address@4.1.4':
     resolution: {integrity: sha512-7vwq+rOHVWjyXxVlR76Agnvhy8I9rpzjosTESvmhNeXOXdZZB15Fl+TI9x1SiHZH5Jv2wTGduSxFDIaq0m3DUw==}
@@ -4844,6 +4843,7 @@ packages:
 
   abab@2.0.6:
     resolution: {integrity: sha512-j2afSsaIENvHZN2B8GOpF566vZ5WVk5opAiMTvWgaQT8DkbOqsTfvNAvHoRGU2zzP8cPoqys+xHTRDWW8L+/BA==}
+    deprecated: Use your platform's native atob() and btoa() methods instead
 
   abbrev@1.1.1:
     resolution: {integrity: sha512-nne9/IiQ/hzIhY6pdDnbBtz7DjPTKrY00P/zvPSm5pOFkl6xuGrGnXn/VtTNNfNtAfZ9/1RtehkszU9qcTii0Q==}
@@ -6227,6 +6227,7 @@ packages:
   domexception@4.0.0:
     resolution: {integrity: sha512-A2is4PLG+eeSfoTMA95/s4pvAoSo2mKtiM5jlHkAVewmiO8ISFTFKZjH7UAM1Atli/OT/7JHOrJRJiMKUZKYBw==}
     engines: {node: '>=12'}
+    deprecated: Use your platform's native DOMException instead
 
   domhandler@5.0.3:
     resolution: {integrity: sha512-cgwlv/1iFQiFnU96XXgROh8xTeetsnJiDsTc7TYCLFd9+/WNkIqPTxiM/8pSd8VIrhXGTf1Ny1q1hquVqDJB5w==}
@@ -6284,8 +6285,8 @@ packages:
   ee-first@1.1.1:
     resolution: {integrity: sha512-WMwm9LhRUo+WUaRN+vRuETqG89IgZphVSNkdFgeb6sS/E4OrDIN7t48CAewSHXc6C8lefD8KKfr5vY61brQlow==}
 
-  ejs@3.1.9:
-    resolution: {integrity: sha512-rC+QVNMJWv+MtPgkt0y+0rVEIdbtxVADApW9JXrUVlzHetgcyczP/E7DJmWJ4fJCZF2cPcBk0laWO9ZHMG3DmQ==}
+  ejs@3.1.10:
+    resolution: {integrity: sha512-UeJmFfOrAQS8OJWPZ4qtgHyWExa088/MtK5UEyoJGFH67cDEXkZSviOiKRCZ4Xij0zxI3JECgYs3oKx+AizQBA==}
     engines: {node: '>=0.10.0'}
     hasBin: true
 
@@ -7182,10 +7183,12 @@ packages:
 
   glob@7.2.3:
     resolution: {integrity: sha512-nFR0zLpU2YCaRxwoCJvL6UvCH2JFyFVIvwTLsIf21AuHlMskA1hhTdk+LlYJtOlYt9v6dvszD2BGRqBL+iQK9Q==}
+    deprecated: Glob versions prior to v9 are no longer supported
 
   glob@8.1.0:
     resolution: {integrity: sha512-r8hpEjiQEYlF2QU0df3dS+nxxSIreXQS1qRhMJM0Q5NDdR386C7jb7Hwwod8Fgiuex+k0GFjgft18yvxm5XoCQ==}
     engines: {node: '>=12'}
+    deprecated: Glob versions prior to v9 are no longer supported
 
   global-dirs@3.0.1:
     resolution: {integrity: sha512-NBcGGFbBA9s1VzD41QXDG+3++t9Mn5t1FpLdhESY6oKY4gYTFpX4wO3sqGUa0Srjtbfj3szX0RnemmrVRUdULA==}
@@ -7501,6 +7504,7 @@ packages:
 
   inflight@1.0.6:
     resolution: {integrity: sha512-k92I/b08q4wvFscXCLvqfsHCrjrF7yiXsQuIVvVE7N82W3+aqpzuUdBbfhWcy/FZR3/4IgflMgKLOsvPDrGCJA==}
+    deprecated: This module is not supported, and leaks memory. Do not use it. Check out lru-cache if you want a good and tested way to coalesce async requests by a key value, which is much more comprehensive and powerful.
 
   inherits@2.0.4:
     resolution: {integrity: sha512-k/vGaX4/Yla3WzyMCvTQOXYeIHvqOKtnqBduzTHpzpQZzAskKMhZ2K+EnBiSM9zGSoIFeMpXKxa4dYeZIQqewQ==}
@@ -7902,8 +7906,8 @@ packages:
     resolution: {integrity: sha512-N3yCS/NegsOBokc8GAdM8UcmfsKiSS8cipheD/nivzr700H+nsMOxJjQnvwOcRYVuFkdH0wGUvW2WbXGmrZGbQ==}
     engines: {node: '>=14'}
 
-  jake@10.8.7:
-    resolution: {integrity: sha512-ZDi3aP+fG/LchyBzUM804VjddnwfSfsdeYkwt8NcbKRvo4rFkjhs456iLFn3k2ZUWvNe4i48WACDbza8fhq2+w==}
+  jake@10.9.2:
+    resolution: {integrity: sha512-2P4SQ0HrLQ+fw6llpLnOaGAvN2Zu6778SJMrCUwns4fOoG9ayrTiZk3VV8sCPkVZF8ab0zksVpS8FDY5pRCNBA==}
     engines: {node: '>=10'}
     hasBin: true
 
@@ -9948,10 +9952,12 @@ packages:
 
   rimraf@2.7.1:
     resolution: {integrity: sha512-uWjbaKIK3T1OSVptzX7Nl6PvQ3qAGtKEtVRjRuazjfL3Bx5eI409VZSqgND+4UNnmzLVdPj9FqFJNPqBZFve4w==}
+    deprecated: Rimraf versions prior to v4 are no longer supported
     hasBin: true
 
   rimraf@3.0.2:
     resolution: {integrity: sha512-JZkJMZkAGFFPP2YqXZXPbMlMBgsxzE8ILs4lMIX/2o0L9UBw9O/Y3o6wFw/i9YLapcUJWwqbi3kdxIPdC62TIA==}
+    deprecated: Rimraf versions prior to v4 are no longer supported
     hasBin: true
 
   rollup-plugin-copy@3.5.0:
@@ -10253,8 +10259,8 @@ packages:
     engines: {node: '>=4'}
     hasBin: true
 
-  shiki@1.10.2:
-    resolution: {integrity: sha512-wrddjiCJ6D8zB1MuAGZ37G37rGw+6Ntnqqbl2uXh3P8g5JxneJRRhccPnex/gqorJoXkbpTRC2x54QIsdx2b1Q==}
+  shiki@1.10.3:
+    resolution: {integrity: sha512-eneCLncGuvPdTutJuLyUGS8QNPAVFO5Trvld2wgEq1e002mwctAhJKeMGWtWVXOIEzmlcLRqcgPSorR6AVzOmQ==}
 
   side-channel@1.0.6:
     resolution: {integrity: sha512-fDW/EZ6Q9RiO8eFG8Hj+7u/oW+XrPTIChwCOM2+th2A6OblDtYYIpve9m+KvI9Z4C9qSEXlaGR6bTEYHReuglA==}
@@ -10687,7 +10693,7 @@ packages:
   superagent@7.1.6:
     resolution: {integrity: sha512-gZkVCQR1gy/oUXr+kxJMLDjla434KmSOKbx5iGD30Ql+AkJQ/YlPKECJy2nhqOsHLjGHzoDTXNSjhnvWhzKk7g==}
     engines: {node: '>=6.4.0 <13 || >=14'}
-    deprecated: Please downgrade to v7.1.5 if you need IE/ActiveXObject support OR upgrade to v8.0.0 as we no longer support IE and published an incorrect patch version (see https://github.com/visionmedia/superagent/issues/1731)
+    deprecated: Please upgrade to v9.0.0+ as we have fixed a public vulnerability with formidable dependency. Note that v9.0.0+ requires Node.js v14.18.0+. See https://github.com/ladjs/superagent/pull/1800 for insight. This project is supported and maintained by the team at Forward Email @ https://forwardemail.net
 
   superjson@1.13.3:
     resolution: {integrity: sha512-mJiVjfd2vokfDxsQPOwJ/PtanO87LhpYY88ubI5dUB1Ab58Txbyje3+jpm+/83R/fevaq/107NNhtYBLuoTrFg==}
@@ -14330,13 +14336,6 @@ snapshots:
 
   '@cloudflare/workers-types@4.20230922.0': {}
 
-  '@codemirror/autocomplete@6.17.0(@codemirror/language@6.10.2)(@codemirror/state@6.4.1)(@codemirror/view@6.28.4)(@lezer/common@1.2.1)':
-    dependencies:
-      '@codemirror/language': 6.10.2
-      '@codemirror/state': 6.4.1
-      '@codemirror/view': 6.28.4
-      '@lezer/common': 1.2.1
-
   '@codemirror/autocomplete@6.17.0(@codemirror/language@6.10.2)(@codemirror/state@6.4.1)(@codemirror/view@6.28.6)(@lezer/common@1.2.1)':
     dependencies:
       '@codemirror/language': 6.10.2
@@ -14348,12 +14347,12 @@ snapshots:
     dependencies:
       '@codemirror/language': 6.10.2
       '@codemirror/state': 6.4.1
-      '@codemirror/view': 6.28.4
+      '@codemirror/view': 6.28.6
       '@lezer/common': 1.2.1
 
-  '@codemirror/lang-css@6.2.1(@codemirror/view@6.28.4)':
+  '@codemirror/lang-css@6.2.1(@codemirror/view@6.28.6)':
     dependencies:
-      '@codemirror/autocomplete': 6.17.0(@codemirror/language@6.10.2)(@codemirror/state@6.4.1)(@codemirror/view@6.28.4)(@lezer/common@1.2.1)
+      '@codemirror/autocomplete': 6.17.0(@codemirror/language@6.10.2)(@codemirror/state@6.4.1)(@codemirror/view@6.28.6)(@lezer/common@1.2.1)
       '@codemirror/language': 6.10.2
       '@codemirror/state': 6.4.1
       '@lezer/common': 1.2.1
@@ -14363,23 +14362,23 @@ snapshots:
 
   '@codemirror/lang-html@6.4.9':
     dependencies:
-      '@codemirror/autocomplete': 6.17.0(@codemirror/language@6.10.2)(@codemirror/state@6.4.1)(@codemirror/view@6.28.4)(@lezer/common@1.2.1)
-      '@codemirror/lang-css': 6.2.1(@codemirror/view@6.28.4)
+      '@codemirror/autocomplete': 6.17.0(@codemirror/language@6.10.2)(@codemirror/state@6.4.1)(@codemirror/view@6.28.6)(@lezer/common@1.2.1)
+      '@codemirror/lang-css': 6.2.1(@codemirror/view@6.28.6)
       '@codemirror/lang-javascript': 6.2.2
       '@codemirror/language': 6.10.2
       '@codemirror/state': 6.4.1
-      '@codemirror/view': 6.28.4
+      '@codemirror/view': 6.28.6
       '@lezer/common': 1.2.1
       '@lezer/css': 1.1.8
       '@lezer/html': 1.3.10
 
   '@codemirror/lang-javascript@6.2.2':
     dependencies:
-      '@codemirror/autocomplete': 6.17.0(@codemirror/language@6.10.2)(@codemirror/state@6.4.1)(@codemirror/view@6.28.4)(@lezer/common@1.2.1)
+      '@codemirror/autocomplete': 6.17.0(@codemirror/language@6.10.2)(@codemirror/state@6.4.1)(@codemirror/view@6.28.6)(@lezer/common@1.2.1)
       '@codemirror/language': 6.10.2
       '@codemirror/lint': 6.8.1
       '@codemirror/state': 6.4.1
-      '@codemirror/view': 6.28.4
+      '@codemirror/view': 6.28.6
       '@lezer/common': 1.2.1
       '@lezer/javascript': 1.4.17
 
@@ -14388,9 +14387,9 @@ snapshots:
       '@codemirror/language': 6.10.2
       '@lezer/json': 1.0.2
 
-  '@codemirror/lang-sql@6.7.0(@codemirror/view@6.28.4)':
+  '@codemirror/lang-sql@6.7.0(@codemirror/view@6.28.6)':
     dependencies:
-      '@codemirror/autocomplete': 6.17.0(@codemirror/language@6.10.2)(@codemirror/state@6.4.1)(@codemirror/view@6.28.4)(@lezer/common@1.2.1)
+      '@codemirror/autocomplete': 6.17.0(@codemirror/language@6.10.2)(@codemirror/state@6.4.1)(@codemirror/view@6.28.6)(@lezer/common@1.2.1)
       '@codemirror/language': 6.10.2
       '@codemirror/state': 6.4.1
       '@lezer/common': 1.2.1
@@ -14399,9 +14398,9 @@ snapshots:
     transitivePeerDependencies:
       - '@codemirror/view'
 
-  '@codemirror/lang-yaml@6.1.1(@codemirror/view@6.28.4)':
+  '@codemirror/lang-yaml@6.1.1(@codemirror/view@6.28.6)':
     dependencies:
-      '@codemirror/autocomplete': 6.17.0(@codemirror/language@6.10.2)(@codemirror/state@6.4.1)(@codemirror/view@6.28.4)(@lezer/common@1.2.1)
+      '@codemirror/autocomplete': 6.17.0(@codemirror/language@6.10.2)(@codemirror/state@6.4.1)(@codemirror/view@6.28.6)(@lezer/common@1.2.1)
       '@codemirror/language': 6.10.2
       '@codemirror/state': 6.4.1
       '@lezer/common': 1.2.1
@@ -14414,7 +14413,7 @@ snapshots:
   '@codemirror/language@6.10.2':
     dependencies:
       '@codemirror/state': 6.4.1
-      '@codemirror/view': 6.28.4
+      '@codemirror/view': 6.28.6
       '@lezer/common': 1.2.1
       '@lezer/highlight': 1.2.0
       '@lezer/lr': 1.4.1
@@ -14423,13 +14422,13 @@ snapshots:
   '@codemirror/lint@6.8.1':
     dependencies:
       '@codemirror/state': 6.4.1
-      '@codemirror/view': 6.28.4
+      '@codemirror/view': 6.28.6
       crelt: 1.0.6
 
   '@codemirror/search@6.5.6':
     dependencies:
       '@codemirror/state': 6.4.1
-      '@codemirror/view': 6.28.4
+      '@codemirror/view': 6.28.6
       crelt: 1.0.6
 
   '@codemirror/state@6.4.1': {}
@@ -14438,14 +14437,8 @@ snapshots:
     dependencies:
       '@codemirror/language': 6.10.2
       '@codemirror/state': 6.4.1
-      '@codemirror/view': 6.28.4
+      '@codemirror/view': 6.28.6
       '@lezer/highlight': 1.2.0
-
-  '@codemirror/view@6.28.4':
-    dependencies:
-      '@codemirror/state': 6.4.1
-      style-mod: 4.1.2
-      w3c-keyname: 2.2.8
 
   '@codemirror/view@6.28.6':
     dependencies:
@@ -15716,19 +15709,19 @@ snapshots:
     transitivePeerDependencies:
       - encoding
 
-  '@shikijs/core@1.10.2':
+  '@shikijs/core@1.10.3':
     dependencies:
       '@types/hast': 3.0.4
 
-  '@shikijs/markdown-it@1.10.2':
+  '@shikijs/markdown-it@1.10.3':
     dependencies:
-      '@shikijs/transformers': 1.10.2
+      '@shikijs/transformers': 1.10.3
       markdown-it: 14.1.0
-      shiki: 1.10.2
+      shiki: 1.10.3
 
-  '@shikijs/transformers@1.10.2':
+  '@shikijs/transformers@1.10.3':
     dependencies:
-      shiki: 1.10.2
+      shiki: 1.10.3
 
   '@sideway/address@4.1.4':
     dependencies:
@@ -16081,7 +16074,7 @@ snapshots:
 
   '@surma/rollup-plugin-off-main-thread@2.2.3':
     dependencies:
-      ejs: 3.1.9
+      ejs: 3.1.10
       json5: 2.2.3
       magic-string: 0.25.9
       string.prototype.matchall: 4.0.11
@@ -17665,16 +17658,16 @@ snapshots:
 
   code-point-at@1.1.0: {}
 
-  codemirror-json-schema@0.7.8(@codemirror/language@6.10.2)(@codemirror/lint@6.8.1)(@codemirror/state@6.4.1)(@codemirror/view@6.28.4)(@lezer/common@1.2.1)(typescript@5.4.5)(vite@5.3.4(@types/node@20.14.11)(sass@1.77.8)(terser@5.31.3)):
+  codemirror-json-schema@0.7.8(@codemirror/language@6.10.2)(@codemirror/lint@6.8.1)(@codemirror/state@6.4.1)(@codemirror/view@6.28.6)(@lezer/common@1.2.1)(typescript@5.4.5)(vite@5.3.4(@types/node@20.14.11)(sass@1.77.8)(terser@5.31.3)):
     dependencies:
       '@changesets/changelog-github': 0.4.8
       '@codemirror/language': 6.10.2
       '@codemirror/lint': 6.8.1
       '@codemirror/state': 6.4.1
-      '@codemirror/view': 6.28.4
+      '@codemirror/view': 6.28.6
       '@lezer/common': 1.2.1
       '@sagold/json-pointer': 5.1.2
-      '@shikijs/markdown-it': 1.10.2
+      '@shikijs/markdown-it': 1.10.3
       '@types/json-schema': 7.0.15
       '@types/node': 20.14.11
       json-schema: 0.4.0
@@ -17683,9 +17676,9 @@ snapshots:
       vite-tsconfig-paths: 4.3.2(typescript@5.4.5)(vite@5.3.4(@types/node@20.14.11)(sass@1.77.8)(terser@5.31.3))
       yaml: 2.4.5
     optionalDependencies:
-      '@codemirror/autocomplete': 6.17.0(@codemirror/language@6.10.2)(@codemirror/state@6.4.1)(@codemirror/view@6.28.4)(@lezer/common@1.2.1)
+      '@codemirror/autocomplete': 6.17.0(@codemirror/language@6.10.2)(@codemirror/state@6.4.1)(@codemirror/view@6.28.6)(@lezer/common@1.2.1)
       '@codemirror/lang-json': 6.0.1
-      '@codemirror/lang-yaml': 6.1.1(@codemirror/view@6.28.4)
+      '@codemirror/lang-yaml': 6.1.1(@codemirror/view@6.28.6)
       codemirror-json5: 1.0.3
       json5: 2.2.3
     transitivePeerDependencies:
@@ -17698,7 +17691,7 @@ snapshots:
     dependencies:
       '@codemirror/language': 6.10.2
       '@codemirror/state': 6.4.1
-      '@codemirror/view': 6.28.4
+      '@codemirror/view': 6.28.6
       '@lezer/common': 1.2.1
       '@lezer/highlight': 1.2.0
       json5: 2.2.3
@@ -18389,9 +18382,9 @@ snapshots:
 
   ee-first@1.1.1: {}
 
-  ejs@3.1.9:
+  ejs@3.1.10:
     dependencies:
-      jake: 10.8.7
+      jake: 10.9.2
 
   electron-to-chromium@1.4.532: {}
 
@@ -20374,7 +20367,7 @@ snapshots:
     optionalDependencies:
       '@pkgjs/parseargs': 0.11.0
 
-  jake@10.8.7:
+  jake@10.9.2:
     dependencies:
       async: 3.2.5
       chalk: 4.1.2
@@ -23277,9 +23270,9 @@ snapshots:
       interpret: 1.4.0
       rechoir: 0.6.2
 
-  shiki@1.10.2:
+  shiki@1.10.3:
     dependencies:
-      '@shikijs/core': 1.10.2
+      '@shikijs/core': 1.10.3
       '@types/hast': 3.0.4
 
   side-channel@1.0.6:
