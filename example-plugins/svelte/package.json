@@ -23,7 +23,7 @@
 	},
 	"devDependencies": {
 		"@solidjs/router": "^0.8.3",
-		"@sveltejs/vite-plugin-svelte": "^2.4.6",
+		"@sveltejs/vite-plugin-svelte": "^3.1.1",
 		"@tsconfig/svelte": "^3.0.0",
 		"eslint": "^8.57.0",
 		"solid-js": "^1.7.12",
