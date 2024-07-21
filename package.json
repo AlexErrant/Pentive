@@ -3,9 +3,9 @@
 	"version": "0.0.0",
 	"engines": {
 		"node": "18.18.2",
-		"pnpm": "8.15.6"
+		"pnpm": "9.5.0"
 	},
-	"packageManager": "pnpm@8.15.6",
+	"packageManager": "pnpm@9.5.0",
 	"type": "module",
 	"devDependencies": {
 		"concurrently": "^8.2.1",
