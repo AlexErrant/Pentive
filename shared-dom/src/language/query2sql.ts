@@ -479,8 +479,9 @@ function glob(
 	sourceColumn: string,
 	forcePositive?: true,
 	stripHtml?: '0',
-	customNormalizedCol?: RawBuilder<unknown>,
+	normalizedCol?: RawBuilder<unknown>,
 ) {
+	normalizedCol ??= sql.raw(table + '.normalized')
 	const left = qs.wildcardLeft ? '*' : ''
 	const right = qs.wildcardRight ? '*' : ''
 	const normalizedValue = ftsNormalize(qs.value, false, true, false)
@@ -489,13 +490,11 @@ function glob(
 	const removeCombiningCharacters = qs.removeCombiningCharacters ? '1' : '0'
 	const init = qs.removeCombiningCharacters
 		? sql.raw(' (TRUE ') // gotta have something since there may be subsequent ANDs
-		: customNormalizedCol === undefined
-		? sql`(${sql.raw(table)}.normalized ${not} GLOB ${wildcardedValue}`
-		: sql`(${customNormalizedCol} ${not} GLOB ${wildcardedValue}`
+		: sql`(${normalizedCol} ${not} GLOB ${wildcardedValue}`
 	const filterList = [init]
 	const sHtml = stripHtml ?? '1'
 	const caseFoldBool = qs.caseSensitive ? '0' : '1' // "if caseSensitive, do NOT case fold"
-	const col = sql.raw(
+	const customNormalizedCol = sql.raw(
 		`ftsNormalize(${table}.${sourceColumn}, ${sHtml}, ${caseFoldBool}, ${removeCombiningCharacters})`,
 	)
 	let customNormalizedValue
@@ -508,7 +507,7 @@ function glob(
 			qs.removeCombiningCharacters,
 		)
 		const value = `${left}${customNormalizedValue}${right}`
-		filterList.push(sql` AND ${col} ${not} GLOB ${value}`)
+		filterList.push(sql` AND ${customNormalizedCol} ${not} GLOB ${value}`)
 	}
 	const leftRightBoth = // 0 1 2 correspond to C3B5BEA8-3A89-40CB-971F-6FBA780A6487
 		qs.boundLeft && qs.boundRight
@@ -522,8 +521,8 @@ function glob(
 		const lrb = sql.raw(leftRightBoth.toString())
 		const wordFilter =
 			customNormalizedValue === undefined
-				? sql` AND ${not} word(${lrb}, ${normalizedValue}, normalized)`
-				: sql` AND ${not} word(${lrb}, ${customNormalizedValue}, ${col})`
+				? sql` AND ${not} word(${lrb}, ${normalizedValue}, ${normalizedCol})`
+				: sql` AND ${not} word(${lrb}, ${customNormalizedValue}, ${customNormalizedCol})`
 		filterList.push(wordFilter)
 	}
 	filterList.push(sql.raw(`)`))
