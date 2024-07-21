@@ -39,7 +39,7 @@
 		"typescript": "~5.4.5",
 		"vite": "^5.3.4",
 		"vite-plugin-checker": "^0.6.2",
-		"vite-plugin-pwa": "^0.16.5",
+		"vite-plugin-pwa": "^0.20.0",
 		"vite-plugin-solid": "^2.10.2",
 		"workbox-precaching": "^7.0.0",
 		"wrangler": "^3.10.0"
