@@ -26,8 +26,8 @@ const Diff: VoidComponent<{
 						added === true
 							? 'text-green-500'
 							: removed === true
-							? 'text-red-500'
-							: ''
+								? 'text-red-500'
+								: ''
 					}
 				>
 					{value}

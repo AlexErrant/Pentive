@@ -162,10 +162,10 @@ export function parseCard(
 			card.queue === -1
 				? 'suspended'
 				: card.queue === -2
-				? 'scheduler buried'
-				: card.queue === -3
-				? 'user buried'
-				: undefined,
+					? 'scheduler buried'
+					: card.queue === -3
+						? 'user buried'
+						: undefined,
 	}
 }
 

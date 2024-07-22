@@ -130,7 +130,7 @@ const EditTemplate: VoidComponent<{ template: Template }> = (props) => {
 				<legend>
 					<span class='p-2 px-4 font-bold'>Fields</span>
 					<button
-						class='py-1/2 text-white bg-green-600  m-2 rounded px-2 hover:bg-green-700'
+						class='py-1/2 text-white bg-green-600 m-2 rounded px-2 hover:bg-green-700'
 						onClick={() => {
 							setTemplate('template', 'fields', [
 								...template.template.fields,
@@ -195,7 +195,7 @@ function childTemplates(
 				>
 					<span class='p-2 px-4 font-bold'>Child Templates</span>
 					<button
-						class='py-1/2 text-white bg-green-600  m-2 rounded px-2 hover:bg-green-700'
+						class='py-1/2 text-white bg-green-600 m-2 rounded px-2 hover:bg-green-700'
 						onClick={() => {
 							;(setTemplate as SetStoreFunction<StandardTemplateStore>)(
 								'template',

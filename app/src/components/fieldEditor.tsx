@@ -160,11 +160,11 @@ export const FieldEditor: VoidComponent<{
 						toOneLine(div.innerHTML) === ''
 							? ''
 							: div.childNodes.length === 1 &&
-							  div.childNodes[0]!.nodeName === 'P' &&
-							  (div.childNodes[0] as HTMLParagraphElement).attributes
-									.length === 0
-							? (div.childNodes[0] as HTMLParagraphElement).innerHTML
-							: div.innerHTML
+								  div.childNodes[0]!.nodeName === 'P' &&
+								  (div.childNodes[0] as HTMLParagraphElement).attributes
+										.length === 0
+								? (div.childNodes[0] as HTMLParagraphElement).innerHTML
+								: div.innerHTML
 					props.setNoteCard(
 						'noteCard',
 						'note',

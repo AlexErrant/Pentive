@@ -80,13 +80,13 @@ const RenderPeerControls: VoidComponent<{
 				? {
 						...p,
 						status: 'connected' as const,
-				  }
+					}
 				: props.pending.includes(p.id)
-				? {
-						...p,
-						status: 'pending' as const,
-				  }
-				: p,
+					? {
+							...p,
+							status: 'pending' as const,
+						}
+					: p,
 		)
 	const [name, setName] = createSignal('')
 	return (

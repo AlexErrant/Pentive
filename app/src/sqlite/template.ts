@@ -396,7 +396,7 @@ function toTemplates(allTemplates: TemplateRow[]) {
 					: {
 							remoteTemplateId: row.remoteId!,
 							uploadDate: new Date(row.uploadDate),
-					  }
+						}
 		}
 	}
 	return Array.from(map.values())

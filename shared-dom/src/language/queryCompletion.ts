@@ -440,10 +440,10 @@ function buildApply(nodeBefore: SyntaxNode, option: string) {
 	return nodeBefore.type.is(Quoted1)
 		? escapedQuoted1(option)
 		: nodeBefore.type.is(Quoted2)
-		? escapedQuoted2(option)
-		: nodeBefore.type.is(RawQuoted)
-		? option
-		: '"' + escapedQuoted2(option) + '"'
+			? escapedQuoted2(option)
+			: nodeBefore.type.is(RawQuoted)
+				? option
+				: '"' + escapedQuoted2(option) + '"'
 }
 
 function buildDates(now: Date, from: number, textBefore?: string) {
@@ -472,13 +472,13 @@ function buildDates(now: Date, from: number, textBefore?: string) {
 									detail: '(is not due)',
 									boost: 4,
 								},
-						  ]
+							]
 						: []),
 					{
 						label: '-1',
 						detail: '(days ago - Tomorrow)',
 					},
-			  ]
+				]
 			: []
 	return {
 		from,

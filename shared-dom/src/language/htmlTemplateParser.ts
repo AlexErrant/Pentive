@@ -16,7 +16,7 @@ const htmlTemplateParser = templateParser.configure({
 			? {
 					parser: htmlLanguage.parser,
 					overlay: (node) => node.type.is(Text),
-			  }
+				}
 			: null
 	}),
 })

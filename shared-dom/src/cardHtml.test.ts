@@ -42,7 +42,7 @@ function buildTemplate(
 							back: backTemplate,
 							id: 0 as Ord,
 						},
-				  }
+					}
 				: {
 						tag: 'standard' as const,
 						templates: [
@@ -53,7 +53,7 @@ function buildTemplate(
 								id: 0 as Ord,
 							},
 						],
-				  },
+					},
 		remotes: {},
 	} satisfies Template
 }

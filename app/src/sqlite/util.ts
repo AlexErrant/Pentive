@@ -86,7 +86,7 @@ export function templateEntityToDomain(
 						: {
 								remoteTemplateId: r.remoteId as RemoteTemplateId,
 								uploadDate: new Date(r.uploadDate),
-						  }
+							}
 				return [r.nook, value]
 			}),
 		),

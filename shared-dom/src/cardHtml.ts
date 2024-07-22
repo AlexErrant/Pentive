@@ -67,8 +67,8 @@ export function body(
 ): HtmlResult {
 	let { front, back, shortFront, shortBack } =
 		template.templateType.tag === 'standard'
-			? template.templateType.templates.find((t) => t.id === card.ord) ??
-			  throwExp(`Ord ${card.ord} not found`)
+			? (template.templateType.templates.find((t) => t.id === card.ord) ??
+				throwExp(`Ord ${card.ord} not found`))
 			: template.templateType.template
 	if (short) {
 		front = shortFront == null || shortFront.trim() === '' ? front : shortFront
@@ -310,7 +310,7 @@ export function renderTemplate(
 					? ([
 							f.name,
 							`This is a cloze deletion for {{c${i + 1}::${f.name}}}.`,
-					  ] as const)
+						] as const)
 					: getStandardFieldAndValue(f)
 			})
 		const { front } = template.templateType.template

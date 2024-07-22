@@ -302,10 +302,10 @@ function getTooltip(state: EditorState): readonly Tooltip[] {
 							? 'Harder'
 							: 'Before'
 						: firstChar === '>'
-						? isRatingEum
-							? 'Easier'
-							: 'After'
-						: null
+							? isRatingEum
+								? 'Easier'
+								: 'After'
+							: null
 				if (textContent == null) return null
 				return buildTooltip(range.head, textContent)
 			} else {

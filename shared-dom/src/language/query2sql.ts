@@ -254,7 +254,7 @@ function buildContent(node: SyntaxNodeRef, input: string, negate: boolean) {
 					flags: caseSensitive ? 'v' : 'vi', // regex flag 31C731B0-41F5-46A5-93B4-D00D9A6064EA
 					boundRight,
 					boundLeft,
-			  },
+				},
 	} satisfies Content
 }
 
@@ -354,14 +354,14 @@ function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
 							boundLeft: false,
 							boundRight: false,
 						},
-				  } satisfies Content)
+					} satisfies Content)
 				: node.type.is(qt.Quoted1) ||
-				  node.type.is(qt.Quoted2) ||
-				  node.type.is(qt.Html) ||
-				  node.type.is(qt.RawHtml) ||
-				  node.type.is(qt.RawQuoted)
-				? buildContent(node, input, negate)
-				: throwExp('You missed ' + node.type.name)
+					  node.type.is(qt.Quoted2) ||
+					  node.type.is(qt.Html) ||
+					  node.type.is(qt.RawHtml) ||
+					  node.type.is(qt.RawQuoted)
+					? buildContent(node, input, negate)
+					: throwExp('You missed ' + node.type.name)
 		attachQuery(node, label, context, {
 			type:
 				node.type.is(qt.Quoted1) ||
@@ -369,12 +369,12 @@ function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
 				node.type.is(qt.RawQuoted)
 					? quoted
 					: node.type.is(qt.Html) || node.type.is(qt.RawHtml)
-					? html
-					: node.type.is(qt.Number)
-					? number
-					: node.type.is(qt.Date)
-					? date
-					: simpleString,
+						? html
+						: node.type.is(qt.Number)
+							? number
+							: node.type.is(qt.Date)
+								? date
+								: simpleString,
 			value,
 			wildcardLeft,
 			wildcardRight,
@@ -437,12 +437,12 @@ function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
 					rating === 'again'
 						? 1
 						: rating === 'hard'
-						? 2
-						: rating === 'good'
-						? 3
-						: rating === 'easy'
-						? 4
-						: throwExp('Impossible')
+							? 2
+							: rating === 'good'
+								? 3
+								: rating === 'easy'
+									? 4
+									: throwExp('Impossible')
 				child.ratingComparison = comparison
 			}
 		}
@@ -513,10 +513,10 @@ function glob(
 		qs.boundLeft && qs.boundRight
 			? 1
 			: qs.boundLeft
-			? 0
-			: qs.boundRight
-			? 2
-			: null
+				? 0
+				: qs.boundRight
+					? 2
+					: null
 	if (leftRightBoth != null) {
 		const lrb = sql.raw(leftRightBoth.toString())
 		const wordFilter =
@@ -558,7 +558,7 @@ function handleField(
 						// Could try joining against the result set but that could be a very, very large https://sqlite.org/forum/forumpost/5b303ab003f91660
 						// At least this way the engine *might* take advantage of the SQLITE_DETERMINISTIC flag https://www.sqlite.org/deterministic.html (though currently it doesn't seem to cache)
 						sql.raw('ftsNormalize(noteFieldValue.field, 1, 1, 0)'),
-				  )
+					)
 		return sql<SqlBool>`${fieldSql} AND ${valueSql}`
 	}
 	return valueSql
@@ -676,12 +676,12 @@ function handleLabel(node: QueryString | QueryRegex, context: Context) {
 			value === 'new'
 				? null
 				: value === 'learn'
-				? 0
-				: value === 'review'
-				? 1
-				: value === 'relearn'
-				? 2
-				: 3
+					? 0
+					: value === 'review'
+						? 1
+						: value === 'relearn'
+							? 2
+							: 3
 		const equals = sql.raw(node.negate ? 'IS NOT' : 'IS')
 		context.parameterizeSql(sql`latestReview.kind ${equals} ${n}`)
 	} else if (node.label === state) {
@@ -691,12 +691,12 @@ function handleLabel(node: QueryString | QueryRegex, context: Context) {
 			value === 'normal'
 				? null
 				: value === 'schedulerBuried'
-				? 1
-				: value === 'userBuried'
-				? 2
-				: value === 'suspended'
-				? 3
-				: 4 // 'buried'
+					? 1
+					: value === 'userBuried'
+						? 2
+						: value === 'suspended'
+							? 3
+							: 4 // 'buried'
 		if (n === 4) {
 			if (node.negate) {
 				context.trustedSql(`(card.state <> 1 AND card.state <> 2)`)
@@ -799,8 +799,8 @@ function handleCreatedEditedDue(
 			node.value === 'true'
 				? '<='
 				: node.value === 'false'
-				? '>'
-				: throwExp('impossible')
+					? '>'
+					: throwExp('impossible')
 		handleOneComparison(context.now.getTime(), context, table, column, comp)
 	} else if (node.type === date) {
 		const [year, month, day] = node.value.split('-')

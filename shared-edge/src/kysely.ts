@@ -884,7 +884,7 @@ function toNoteCreates(n: EditRemoteNote | CreateRemoteNote, authorId: UserId) {
 						remoteTemplateId ??
 							throwExp('grep E7F24704-8D0B-460A-BF2C-A97344C535E0'),
 					]),
-			  )
+				)
 			: new Map(n.remoteTemplateIds.map((rt) => [ulidAsRaw(), rt]))
 	return Array.from(remoteIds).map((x) => toNoteCreate(x, n, authorId))
 }
@@ -931,7 +931,7 @@ function toTemplateCreates(
 			? n.remoteIds.map(
 					(id) =>
 						[base64url.decode(id + '=='), 'undefined_nook' as NookId] as const,
-			  )
+				)
 			: n.nooks.map((nook) => [ulidAsRaw(), nook] as const)
 	return remoteIds.map(([id, nook]) => toTemplateCreate(n, id, nook))
 }

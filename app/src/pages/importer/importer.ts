@@ -108,7 +108,7 @@ async function addMediaBatch(
 						created: now,
 						edited: now,
 						data: array.buffer,
-				  }
+					}
 		}),
 	)
 	const media = mediaAndNulls.filter(notEmpty)

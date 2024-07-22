@@ -34,12 +34,12 @@ function unparameterize(i: { i: number }, query: CompiledQuery<SqlBool>) {
 							// This SHOULD NOT be done in business code!
 							p.replaceAll("'", "''") +
 							"'",
-				  )
+					)
 				: typeof p === 'number'
-				? parameterizedSql.replace('?', p.toString())
-				: p == null
-				? parameterizedSql.replace('?', 'NULL')
-				: throwExp(`Unhandled type: ${typeof p}`)
+					? parameterizedSql.replace('?', p.toString())
+					: p == null
+						? parameterizedSql.replace('?', 'NULL')
+						: throwExp(`Unhandled type: ${typeof p}`)
 		i.i++
 		j++
 	}

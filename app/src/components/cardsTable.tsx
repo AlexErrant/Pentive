@@ -398,7 +398,7 @@ const dataSource = {
 				? ({
 						col: p.sortModel[0]!.colId as 'card.due' | 'card.created',
 						direction: p.sortModel[0]!.sort,
-				  } satisfies Sort)
+					} satisfies Sort)
 				: undefined
 		const cleanedQuery = query().trim()
 		const now = C.getDate()

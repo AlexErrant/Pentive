@@ -77,8 +77,8 @@ export async function createDb() {
 				leftRightBoth === 0 // 0 1 2 correspond to C3B5BEA8-3A89-40CB-971F-6FBA780A6487
 					? segments.some((s) => s.segment.startsWith(word))
 					: leftRightBoth === 1
-					? segments.some((s) => s.segment === word)
-					: segments.some((s) => s.segment.endsWith(word))
+						? segments.some((s) => s.segment === word)
+						: segments.some((s) => s.segment.endsWith(word))
 			db.api.result(context, b ? 1 : 0)
 		},
 		undefined,

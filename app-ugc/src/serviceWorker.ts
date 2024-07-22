@@ -91,7 +91,7 @@ async function getLocalMediaResponse(
 					'cache-control': 'max-age=604800, immutable', // 7 days
 					/* eslint-enable @typescript-eslint/naming-convention */
 				},
-		  })
+			})
 }
 
 async function getMessenger(clientId: string) {

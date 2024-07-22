@@ -33,7 +33,7 @@ export default defineConfig(({ mode }) => {
 			: {
 					...betterServiceWorkerDevExperience,
 					...baseBuild,
-			  }
+				}
 	const keyPath = './.cert/key.pem'
 	const certPath = './.cert/cert.pem'
 	let key
