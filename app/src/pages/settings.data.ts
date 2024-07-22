@@ -1,12 +1,4 @@
-import { createResource } from 'solid-js'
-
 import { db } from '../db'
+import { cache } from '@solidjs/router'
 
-function SettingsData() {
-	const [cardSettings] = createResource(db.getCardSettings, {
-		initialValue: [],
-	})
-	return { cardSettings }
-}
-
-export default SettingsData
+export const getCardSettings = cache(db.getCardSettings, 'cardSettings')

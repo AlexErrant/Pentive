@@ -1,8 +1,8 @@
 import { createStore } from 'solid-js/store'
 import { type JSX, Show, onMount, For } from 'solid-js'
 import TemplatesTable from '../components/templatesTable'
-import type TemplatesData from './templates.data'
-import { useRouteData } from '@solidjs/router'
+import { getTemplates } from './templates.data'
+import { createAsync } from '@solidjs/router'
 import { type TemplateId, type Template, getDefaultTemplate } from 'shared'
 import ResizingIframe from '../components/resizingIframe'
 import { GoldenLayout, LayoutConfig } from 'golden-layout'
@@ -14,7 +14,9 @@ import { C } from '../topLevelAwait'
 import TemplateSync from '../components/templateSync'
 
 export default function Templates(): JSX.Element {
-	const templates = useRouteData<typeof TemplatesData>()
+	const templates = createAsync(async () => await getTemplates(), {
+		initialValue: [],
+	})
 	const [selected, setSelected] = createStore<{ template?: Template }>({})
 	let glRoot: HTMLDivElement
 	onMount(() => {

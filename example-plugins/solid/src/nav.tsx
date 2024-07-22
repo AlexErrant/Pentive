@@ -2,7 +2,7 @@
 
 import { For, type VoidComponent } from 'solid-js'
 import { type NavLinkData } from 'app/src/components/contracts'
-import { NavLink, Router } from '@solidjs/router'
+import { A, Router } from '@solidjs/router'
 
 export const Nav: VoidComponent<{ navLinks: NavLinkData[] }> = (props) => {
 	return (
@@ -12,9 +12,9 @@ export const Nav: VoidComponent<{ navLinks: NavLinkData[] }> = (props) => {
 					<For each={props.navLinks}>
 						{({ href, child }) => (
 							<li class='py-2 px-4'>
-								<NavLink href={href} class='no-underline hover:underline'>
+								<A href={href} class='no-underline hover:underline'>
 									{typeof child === 'function' ? child() : child}
-								</NavLink>
+								</A>
 							</li>
 						)}
 					</For>

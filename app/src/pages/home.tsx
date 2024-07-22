@@ -1,13 +1,10 @@
-import { useRouteData } from '@solidjs/router'
 import {
-	createEffect,
 	createSignal,
 	type VoidComponent,
 	type JSX,
 	type Setter,
 } from 'solid-js'
 import { type MediaId } from 'shared'
-import type HomeData from './home.data'
 import { db } from '../db'
 import { importAnki } from './importer/importer'
 import { augcClient } from '../trpcClient'
@@ -48,13 +45,6 @@ const MyPluginBaby: VoidComponent<{
 export default function Home(): JSX.Element {
 	const [count, setCount] = createSignal(1)
 	const [search, setSearch] = createSignal('')
-	const age = useRouteData<typeof HomeData>()
-
-	createEffect(() => {
-		console.log(age())
-		setCount(age() as number) // not sure why, but changing to a mono repo changed the signature of this to include `undefined` - which is wrong. Whatever.
-	})
-
 	return (
 		<section class='text-gray-700 bg-gray-100 p-8'>
 			<h1 class='text-2xl font-bold'>Home</h1>

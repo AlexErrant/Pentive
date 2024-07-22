@@ -6,8 +6,8 @@ import {
 	Suspense,
 	createResource,
 } from 'solid-js'
-import type StudyData from './study.data'
-import { useRouteData } from '@solidjs/router'
+import { getCards } from './study.data'
+import { createAsync } from '@solidjs/router'
 import ResizingIframe from '../components/resizingIframe'
 import { db } from '../db'
 import { cardSetting as cardSettingParser } from './importer/parser'
@@ -17,10 +17,10 @@ import { ulidAsBase64Url } from '../domain/utility'
 import { C } from '../topLevelAwait'
 
 export default function Study(): JSX.Element {
-	const studyData = useRouteData<typeof StudyData>()
+	const cards = createAsync(async () => await getCards())
 	const [i, setI] = createSignal(0)
 	const [side, setSide] = createSignal<'front' | 'back'>('front')
-	const noteCard = () => studyData.cardStudy()?.noteCards.at(i())
+	const noteCard = () => cards()?.noteCards.at(i())
 	const [cardSettings] = createResource(db.getCardSettings)
 	const [fsrsMap] = createResource(cardSettings, async (cardSettings) => {
 		await init()

@@ -1,9 +1,8 @@
 import { ThemeSelector } from 'shared-dom'
 import { For, type VoidComponent, Show } from 'solid-js'
-import { NavLink, useLocation } from '@solidjs/router'
+import { A, useLocation } from '@solidjs/router'
 import { type NavLinkData } from './contracts'
 import { whoAmI } from '../globalState'
-const ends = new Set(['/'])
 
 const Nav: VoidComponent<{ navLinks: NavLinkData[] }> = (props) => {
 	const location = useLocation()
@@ -13,14 +12,14 @@ const Nav: VoidComponent<{ navLinks: NavLinkData[] }> = (props) => {
 				<For each={props.navLinks}>
 					{({ href, child }) => (
 						<li class='px-4 py-2'>
-							<NavLink
+							<A
 								href={href}
 								class='no-underline hover:underline'
 								activeClass='font-bold'
-								end={ends.has(href)}
+								end={href === '/'}
 							>
 								{typeof child === 'function' ? child() : child}
-							</NavLink>
+							</A>
 						</li>
 					)}
 				</For>

@@ -1,12 +1,4 @@
-import { createResource } from 'solid-js'
-
 import { db } from '../db'
+import { cache } from '@solidjs/router'
 
-function TemplatesData() {
-	const [templates] = createResource(db.getTemplates, {
-		initialValue: [],
-	})
-	return templates
-}
-
-export default TemplatesData
+export const getTemplates = cache(db.getTemplates, 'templates')

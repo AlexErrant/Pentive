@@ -1,5 +1,5 @@
 import { type JSX, createEffect } from 'solid-js'
-import { useRoutes } from '@solidjs/router'
+import { Router } from '@solidjs/router'
 import { navLinks, routes } from './routes'
 import { C } from './topLevelAwait'
 import { Toaster } from 'solid-toast'
@@ -15,27 +15,29 @@ export default function App(): JSX.Element {
 		}
 	})
 
-	const Route = useRoutes(routes)
-
 	return (
-		<>
-			{/* this iframe exists to make ensure app-ugc's service worker is cached, so that app may be taken offline at any time */}
-			<iframe
-				hidden
-				style={{
-					width: '0',
-					height: '0',
-					border: 'none',
-					position: 'absolute',
-				}}
-				src={import.meta.env.VITE_APP_UGC_ORIGIN}
-			/>
-			<C.nav navLinks={navLinks} />
+		<Router
+			root={(props) => (
+				<>
+					{/* this iframe exists to make ensure app-ugc's service worker is cached, so that app may be taken offline at any time */}
+					<iframe
+						hidden
+						style={{
+							width: '0',
+							height: '0',
+							border: 'none',
+							position: 'absolute',
+						}}
+						src={import.meta.env.VITE_APP_UGC_ORIGIN}
+					/>
+					<C.nav navLinks={navLinks} />
 
-			<main class='contents'>
-				<Route />
-			</main>
-			<Toaster />
-		</>
+					<main class='contents'>{props.children}</main>
+					<Toaster />
+				</>
+			)}
+		>
+			{routes}
+		</Router>
 	)
 }

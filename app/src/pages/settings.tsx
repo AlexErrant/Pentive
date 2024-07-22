@@ -1,7 +1,7 @@
 import { createStore } from 'solid-js/store'
 import { type JSX, Show, onMount, For, createEffect } from 'solid-js'
-import type SettingsData from './settings.data'
-import { useRouteData } from '@solidjs/router'
+import { getCardSettings } from './settings.data'
+import { createAsync } from '@solidjs/router'
 import {
 	type CardSettingId,
 	type CardSetting,
@@ -14,12 +14,14 @@ import _ from 'lodash'
 import { ulidAsBase64Url } from '../domain/utility'
 
 export default function Settings(): JSX.Element {
-	const initialSettings = useRouteData<typeof SettingsData>()
+	const initialSettings = createAsync(async () => await getCardSettings(), {
+		initialValue: [],
+	})
 	const [settings, setSettings] = createStore({
 		cardSettings: [] as CardSetting[],
 	})
 	createEffect(() => {
-		setSettings({ cardSettings: initialSettings.cardSettings() })
+		setSettings({ cardSettings: initialSettings() })
 	})
 	const [selected, setSelected] = createStore<{ setting?: CardSetting }>({})
 	let glRoot: HTMLDivElement
