@@ -9,7 +9,6 @@ export default defineConfig({
 			'lib',
 		],
 		environment: 'jsdom',
-		pool: 'forks', // https://github.com/vitest-dev/vitest/issues/2008
 	},
 	resolve: {
 		conditions: ['development', 'browser'],
