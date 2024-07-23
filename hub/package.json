@@ -8,7 +8,6 @@
 		"tsc-build": "tsc --build",
 		"eslint": "eslint . --ignore-path .gitignore",
 		"eslint:fix": "eslint . --fix --ignore-path .gitignore",
-		"postinstall": "node add-ts-nocheck.cjs",
 		"format:check": "prettier --ignore-path .gitignore --check .",
 		"format": "prettier --ignore-path .gitignore --write .",
 		"stylelint": "stylelint **/*.css",
@@ -60,8 +59,8 @@
 		"@kobalte/core": "^0.11.0",
 		"@kobalte/tailwindcss": "^0.9.0",
 		"@scure/base": "^1.1.1",
-		"@solidjs/meta": "^0.28.6",
-		"@solidjs/router": "^0.8.3",
+		"@solidjs/meta": "^0.29.4",
+		"@solidjs/router": "^0.14.1",
 		"@trpc/client": "^10.38.5",
 		"@trpc/server": "^10.38.5",
 		"app": "workspace:*",
@@ -78,7 +77,7 @@
 		"solid-js": "^1.7.11",
 		"solid-start": "^0.3.6",
 		"superjson": "^1.13.3",
-		"undici": "^5.25.2"
+		"undici": ">=5.26.2"
 	},
 	"engines": {
 		"node": ">=16"
