@@ -1,6 +1,6 @@
 import { ThemeSelector } from 'shared-dom'
 import { type JSX, Show } from 'solid-js'
-import { A } from 'solid-start'
+import { A } from '@solidjs/router'
 import { createServerAction$, createServerData$ } from 'solid-start/server'
 import { getUserId, logout } from '~/session'
 
@@ -14,7 +14,7 @@ function Nav(): JSX.Element {
 	return (
 		<header class='header'>
 			<nav class='inner flex'>
-				<A href='/'>
+				<A href='/' end>
 					<strong>Pentive</strong>
 				</A>
 				<A href={import.meta.env.VITE_APP_ORIGIN}>

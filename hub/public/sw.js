@@ -5,10 +5,8 @@ self.addEventListener('fetch', (e) => {
 				t.match(e.request).then(
 					(n) =>
 						n ||
-						fetch(e.request).then(async (n) => {
-							await t.put(e.request, n.clone())
-							return n
-						}),
+						// eslint-disable-next-line no-sequences
+						fetch(e.request).then((n) => (t.put(e.request, n.clone()), n)),
 				),
 			),
 		)

@@ -1,14 +1,14 @@
 import { type Component, For, Show } from 'solid-js'
-import { A } from 'solid-start'
-import { type IComment } from '~/types'
+import { A } from '@solidjs/router'
+import { type CommentDefinition } from '~/types'
 import Toggle from './toggle'
 
-const HNComment: Component<{ comment: IComment }> = (props) => {
+const HNComment: Component<{ comment: CommentDefinition }> = (props) => {
 	return (
 		<li class='comment'>
 			<div class='by'>
 				<A href={`/users/${props.comment.user}`}>{props.comment.user}</A>{' '}
-				{props.comment.timeAgo} ago
+				{props.comment.time_ago} ago
 			</div>
 			<div class='text'>{props.comment.content}</div>
 			<Show when={props.comment.comments.length}>

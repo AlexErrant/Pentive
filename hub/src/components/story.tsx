@@ -1,9 +1,9 @@
+import { A } from '@solidjs/router'
 import { type Component, Show } from 'solid-js'
-import { A } from 'solid-start'
 
-import type { IStory } from '../types'
+import type { StoryDefinition } from '../types'
 
-const Story: Component<{ story: IStory }> = (props) => {
+const Story: Component<{ story: StoryDefinition }> = (props) => {
 	return (
 		<li class='news-item'>
 			<span class='score'>{props.story.points}</span>
@@ -12,9 +12,9 @@ const Story: Component<{ story: IStory }> = (props) => {
 					when={props.story.url}
 					fallback={<A href={`/item/${props.story.id}`}>{props.story.title}</A>}
 				>
-					<A href={props.story.url} target='_blank' rel='noreferrer'>
+					<a href={props.story.url} target='_blank' rel='noreferrer'>
 						{props.story.title}
-					</A>
+					</a>
 					<span class='host'> ({props.story.domain})</span>
 				</Show>
 			</span>
@@ -23,14 +23,14 @@ const Story: Component<{ story: IStory }> = (props) => {
 				<Show
 					when={props.story.type !== 'job'}
 					fallback={
-						<A href={`/stories/${props.story.id}`}>{props.story.timeAgo}</A>
+						<A href={`/stories/${props.story.id}`}>{props.story.time_ago}</A>
 					}
 				>
 					by <A href={`/users/${props.story.user}`}>{props.story.user}</A>{' '}
-					{props.story.timeAgo} |{' '}
+					{props.story.time_ago} |{' '}
 					<A href={`/stories/${props.story.id}`}>
-						{props.story.commentsCount !== 0
-							? `${props.story.commentsCount} comments`
+						{props.story.comments_count !== 0
+							? `${props.story.comments_count} comments`
 							: 'discuss'}
 					</A>
 				</Show>

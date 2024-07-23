@@ -1,33 +1,33 @@
-import { type Component, createResource, For, type JSX, Show } from 'solid-js'
-import { A, type RouteDataArgs, useRouteData } from 'solid-start'
+import {
+	createAsync,
+	type RouteDefinition,
+	type RouteSectionProps,
+} from '@solidjs/router'
+import { For, Show } from 'solid-js'
 import Story from '~/components/story'
-import fetchAPI from '~/lib/api'
-import { type IStory } from '~/types'
+import { getStories } from '~/lib/api'
+import { type StoryTypes } from '~/types'
 
-const mapStories = {
-	top: 'news',
-	new: 'newest',
-	show: 'show',
-	ask: 'ask',
-	job: 'jobs',
-} as const
+export const route = {
+	preload({ location, params }) {
+		void getStories(
+			// eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+			(params.stories as StoryTypes) || 'top',
+			// @ts-expect-error xxx
+			// eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+			+location.query.page || 1,
+		)
+	},
+} satisfies RouteDefinition
 
-/* eslint-disable */
-export function routeData({ location, params }: RouteDataArgs) {
-	const page = () => +location.query.page! || 1
-	const type = () => (params.stories || 'top') as keyof typeof mapStories
-	/* eslint-enable */
+export default function Stories(props: RouteSectionProps) {
+	// @ts-expect-error xxx
+	// eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+	const page = () => +props.location.query.page || 1
+	// eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+	const type = () => (props.params.stories || 'top') as StoryTypes
+	const stories = createAsync(async () => await getStories(type(), page()))
 
-	const [stories] = createResource<IStory[], string>(
-		() => `${mapStories[type()]}?page=${page()}`,
-		fetchAPI,
-	)
-
-	return { type, stories, page }
-}
-
-const Stories: Component = () => {
-	const { page, type, stories } = useRouteData<typeof routeData>()
 	return (
 		<div class='news-view'>
 			<div class='news-list-nav'>
@@ -39,13 +39,13 @@ const Stories: Component = () => {
 						</span>
 					}
 				>
-					<A
+					<a
 						class='page-link'
 						href={`/${type()}?page=${page() - 1}`}
 						aria-label='Previous Page'
 					>
 						{'<'} prev
-					</A>
+					</a>
 				</Show>
 				<span>page {page()}</span>
 				<Show
@@ -56,26 +56,22 @@ const Stories: Component = () => {
 						</span>
 					}
 				>
-					<A
+					<a
 						class='page-link'
 						href={`/${type()}?page=${page() + 1}`}
 						aria-label='Next Page'
 					>
 						more {'>'}
-					</A>
+					</a>
 				</Show>
 			</div>
 			<main class='news-list'>
 				<Show when={stories()}>
 					<ul>
-						<For each={stories()}>
-							{(story): JSX.Element => <Story story={story} />}
-						</For>
+						<For each={stories()}>{(story) => <Story story={story} />}</For>
 					</ul>
 				</Show>
 			</main>
 		</div>
 	)
 }
-
-export default Stories

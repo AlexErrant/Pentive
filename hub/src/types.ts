@@ -1,19 +1,29 @@
-export interface IComment {
+export interface CommentDefinition {
 	user: string
-	timeAgo: string
+	time_ago: string
 	content: string
-	comments: IComment[]
+	comments: CommentDefinition[]
 }
 
-export interface IStory {
+export interface StoryDefinition {
 	id: string
 	points: string
 	url: string
 	title: string
 	domain: string
 	type: string
-	timeAgo: string
+	time_ago: string
 	user: string
-	commentsCount: number
-	comments: IComment[]
+	comments_count: number
+	comments: CommentDefinition[]
 }
+
+export interface UserDefinition {
+	error: string
+	id: string
+	created: string
+	karma: number
+	about: string
+}
+
+export type StoryTypes = 'top' | 'new' | 'show' | 'ask' | 'job'

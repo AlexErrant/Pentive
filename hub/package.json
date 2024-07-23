@@ -1,9 +1,9 @@
 {
 	"name": "hub",
 	"scripts": {
-		"dev": "solid-start dev",
-		"build": "solid-start build",
-		"start": "solid-start start",
+		"dev": "vinxi dev",
+		"build": "vinxi build",
+		"start": "vinxi start",
 		"deploy": "wrangler deploy",
 		"tsc-build": "tsc --build",
 		"eslint": "eslint . --ignore-path .gitignore",
@@ -61,6 +61,7 @@
 		"@scure/base": "^1.1.1",
 		"@solidjs/meta": "^0.29.4",
 		"@solidjs/router": "^0.14.1",
+		"@solidjs/start": "^1.0.6",
 		"@trpc/client": "^10.38.5",
 		"@trpc/server": "^10.38.5",
 		"app": "workspace:*",
@@ -74,12 +75,12 @@
 		"shared": "workspace:*",
 		"shared-dom": "workspace:*",
 		"shared-edge": "workspace:*",
-		"solid-js": "^1.7.11",
-		"solid-start": "^0.3.6",
+		"solid-js": "^1.8.18",
 		"superjson": "^1.13.3",
-		"undici": ">=5.26.2"
+		"undici": ">=5.26.2",
+		"vinxi": "^0.4.1"
 	},
 	"engines": {
-		"node": ">=16"
+		"node": ">=18"
 	}
 }

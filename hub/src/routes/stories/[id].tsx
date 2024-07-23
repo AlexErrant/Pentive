@@ -1,45 +1,40 @@
 import {
-	type Component,
-	createResource,
-	For,
-	type Resource,
-	Show,
-} from 'solid-js'
-import { A, type RouteDataArgs, useRouteData } from 'solid-start'
+	createAsync,
+	type RouteDefinition,
+	type RouteSectionProps,
+} from '@solidjs/router'
+import { For, Show } from 'solid-js'
 import Comment from '~/components/hnComment'
-import fetchAPI from '~/lib/api'
-import { type IStory } from '~/types'
+import { getStory } from '~/lib/api'
 
-export function routeData(props: RouteDataArgs): Resource<IStory> {
-	const [story] = createResource<IStory, string>(
-		() => `item/${props.params.id}`,
-		fetchAPI,
-	)
-	return story
-}
+export const route = {
+	preload({ params }) {
+		void getStory(params.id ?? '')
+	},
+} satisfies RouteDefinition
 
-const Story: Component = () => {
-	const story = useRouteData<typeof routeData>()
+export default function Story(props: RouteSectionProps) {
+	const story = createAsync(async () => await getStory(props.params.id ?? ''))
 	return (
 		<Show when={story()}>
 			<div class='item-view'>
 				<div class='item-view-header'>
-					<A href={story()!.url} target='_blank'>
+					<a href={story()!.url} target='_blank'>
 						<h1>{story()!.title}</h1>
-					</A>
+					</a>
 					<Show when={story()!.domain}>
 						<span class='host'>({story()!.domain})</span>
 					</Show>
 					<p class='meta'>
 						{story()!.points} points | by{' '}
-						<A href={`/users/${story()!.user}`}>{story()!.user}</A>{' '}
-						{story()!.timeAgo} ago
+						<a href={`/users/${story()!.user}`}>{story()!.user}</a>{' '}
+						{story()!.time_ago} ago
 					</p>
 				</div>
 				<div class='item-view-comments'>
 					<p class='item-view-comments-header'>
-						{story()!.commentsCount !== 0
-							? `${story()!.commentsCount} comments`
+						{story()!.comments_count !== 0
+							? story()!.comments_count + ' comments'
 							: 'No comments yet.'}
 					</p>
 					<ul class='comment-children'>
@@ -52,5 +47,3 @@ const Story: Component = () => {
 		</Show>
 	)
 }
-
-export default Story
