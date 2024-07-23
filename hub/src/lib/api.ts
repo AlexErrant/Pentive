@@ -9,7 +9,7 @@ export default async function fetchAPI(path: string) {
 	const url = path.startsWith('user') ? user(path) : story(path)
 	const headers: Record<string, string> = isServer
 		? // eslint-disable-next-line @typescript-eslint/naming-convention
-		  { 'User-Agent': 'chrome' }
+			{ 'User-Agent': 'chrome' }
 		: {}
 
 	try {

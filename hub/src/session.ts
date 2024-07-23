@@ -193,7 +193,7 @@ export async function getSession(request: Request): Promise<HubSession | null> {
 		: {
 				sub: (session.payload.sub as UserId) ?? throwExp('`sub` is empty'),
 				jti: session.payload.jti ?? throwExp('`jti` is empty'),
-		  }
+			}
 }
 
 export async function getUserId(request: Request) {
@@ -305,7 +305,7 @@ export async function getInfo(request: Request) {
 	} catch {}
 	return jwt == null
 		? null
-		: (jwt.payload.info as string) ?? throwExp('`info` is empty')
+		: ((jwt.payload.info as string) ?? throwExp('`info` is empty'))
 }
 
 async function generateSession(userId: string, csrf: string): Promise<string> {
