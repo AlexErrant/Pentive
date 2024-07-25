@@ -18,7 +18,7 @@
 		"stylelintw": "stylelint **/*.css --fix"
 	},
 	"devDependencies": {
-		"@cloudflare/workers-types": "^4.20230922.0",
+		"@cloudflare/workers-types": "^4.20240725.0",
 		"@types/iframe-resizer": "^3.5.10",
 		"@types/node": "20.14.11",
 		"@typescript-eslint/eslint-plugin": "^6.21.0",
@@ -41,7 +41,7 @@
 		"vite-plugin-checker": "^0.7.2",
 		"vite-plugin-pwa": "^0.20.0",
 		"workbox-precaching": "^7.0.0",
-		"wrangler": "^3.10.0"
+		"wrangler": "^3.67.0"
 	},
 	"dependencies": {
 		"app": "workspace:*",

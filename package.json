@@ -11,7 +11,7 @@
 		"concurrently": "^8.2.1",
 		"kill-port": "^2.0.1",
 		"typescript": "~5.4.5",
-		"wrangler": "^3.10.0"
+		"wrangler": "^3.67.0"
 	},
 	"scripts": {
 		"kill": "kill-port 3012 3013 3014 3015 3016 3017 3018 3019",

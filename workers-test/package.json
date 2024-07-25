@@ -24,7 +24,7 @@
 		"shared": "workspace:*"
 	},
 	"devDependencies": {
-		"@cloudflare/workers-types": "^4.20230922.0",
+		"@cloudflare/workers-types": "^4.20240725.0",
 		"@types/jest": "29.5.5",
 		"esbuild": "0.19.3",
 		"eslint": "^8.57.0",
@@ -34,6 +34,6 @@
 		"prettier": "^3.3.3",
 		"ts-jest": "29.1.1",
 		"typescript": "~5.4.5",
-		"wrangler": "^3.10.0"
+		"wrangler": "^3.67.0"
 	}
 }
