@@ -1,37 +1,43 @@
 import { type NookId } from 'shared'
 import { getNook } from 'shared-edge'
 import { Show, type VoidComponent } from 'solid-js'
-import { A, Outlet, useRouteData, type RouteDataArgs } from 'solid-start'
-import { createServerData$ } from 'solid-start/server'
+import {
+	A,
+	cache,
+	createAsync,
+	type RouteDefinition,
+	type RouteSectionProps,
+} from '@solidjs/router'
 import RelativeDate from '~/components/relativeDate'
 
-export function routeData({ params }: RouteDataArgs) {
-	return {
-		nook: () => params.nook,
-		nookDetails: createServerData$(
-			async ([_, nook]) => await getNook(nook as NookId),
-			{ key: () => ['n', params.nook], initialValue: null },
-		),
-	}
-}
+const getNookDetailsCached = cache(async (nook: string) => {
+	'use server'
+	return await getNook(nook as NookId)
+}, 'nookDetails')
 
-export default function NookLayout() {
-	const { nookDetails, nook } = useRouteData<typeof routeData>()
+export const route = {
+	preload({ params }) {
+		void getNookDetailsCached(params.nook!)
+	},
+} satisfies RouteDefinition
+
+export default function NookLayout(props: RouteSectionProps) {
+	const nookDetails = createAsync(
+		async () => await getNookDetailsCached(props.params.nook!),
+	)
 	return (
 		<Show
 			when={nookDetails() === undefined}
 			fallback={
 				<div class='flex'>
-					<div class='grow'>
-						<Outlet />
-					</div>
+					<div class='grow'>{props.children}</div>
 					<aside class='basis-40'>
-						<Sidebar nook={nook()!} nookDetails={nookDetails()!} />
+						<Sidebar nook={props.params.nook!} nookDetails={nookDetails()} />
 					</aside>
 				</div>
 			}
 		>
-			<a href={`/nooks/create?nook=${nook() ?? ''}`}>Create Nook</a>
+			<a href={`/nooks/create?nook=${props.params.nook ?? ''}`}>Create Nook</a>
 		</Show>
 	)
 }

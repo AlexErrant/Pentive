@@ -1,27 +1,35 @@
 import { type JSX, Suspense, createSignal } from 'solid-js'
-import { useRouteData } from 'solid-start'
-
-import { createServerData$, redirect } from 'solid-start/server'
 import { getUserId } from '~/session'
 import { devLoginUrl, githubLoginUrl } from './api/auth/[...solidAuth]'
+import {
+	type RouteDefinition,
+	cache,
+	createAsync,
+	redirect,
+} from '@solidjs/router'
 
-export function routeData() {
-	return createServerData$(async (_, { request, env }) => {
-		if ((await getUserId(request)) != null) {
-			throw redirect('/') as unknown
-		}
-		return {}
-	})
-}
+const getUserIdCached = cache(async () => {
+	'use server'
+	if ((await getUserId()) != null) {
+		throw redirect('/') as unknown
+	}
+	return null
+}, 'userId')
+
+export const route = {
+	preload() {
+		void getUserIdCached()
+	},
+} satisfies RouteDefinition
 
 export default function Login(): JSX.Element {
-	useRouteData<typeof routeData>()
+	const emptyString = createAsync(async () => await getUserIdCached())
 	const [alphaKey, setAlphaKey] = createSignal('')
-
 	return (
 		<main>
 			<h1>Login</h1>
 			<Suspense>
+				{emptyString()}
 				<div>
 					<span>Alpha Key:</span>
 					<input

@@ -11,8 +11,7 @@ import { type StoryTypes } from '~/types'
 export const route = {
 	preload({ location, params }) {
 		void getStories(
-			// eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
-			(params.stories as StoryTypes) || 'top',
+			(params.stories ?? 'top') as StoryTypes,
 			// @ts-expect-error xxx
 			// eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
 			+location.query.page || 1,
@@ -24,8 +23,7 @@ export default function Stories(props: RouteSectionProps) {
 	// @ts-expect-error xxx
 	// eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
 	const page = () => +props.location.query.page || 1
-	// eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
-	const type = () => (props.params.stories || 'top') as StoryTypes
+	const type = () => (props.params.stories ?? 'top') as StoryTypes
 	const stories = createAsync(async () => await getStories(type(), page()))
 
 	return (

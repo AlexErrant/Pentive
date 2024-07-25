@@ -1,11 +1,5 @@
-import { Show, type JSX, For } from 'solid-js'
-import { FormError, useRouteData, useSearchParams } from 'solid-start'
+import { For } from 'solid-js'
 import { createNook } from 'shared-edge'
-import {
-	createServerAction$,
-	createServerData$,
-	redirect,
-} from 'solid-start/server'
 import {
 	requireCsrfSignature,
 	requireSession,
@@ -15,15 +9,21 @@ import {
 import { type NookType, type NookId, nookTypes } from 'shared'
 import { RadioGroup } from '@kobalte/core'
 import '../../radio.css'
+import {
+	action,
+	cache,
+	createAsync,
+	redirect,
+	useSubmission,
+	type RouteSectionProps,
+} from '@solidjs/router'
+import { getRequestEvent } from 'solid-js/web'
 
-export function routeData() {
-	return {
-		csrfSignature: createServerData$(
-			async (_, { request }) => await requireCsrfSignature(request),
-			{ key: () => ['csrfSignature'] },
-		),
-	}
-}
+// eslint-disable-next-line @typescript-eslint/require-await
+const getCsrfSignatureCached = cache(async () => {
+	'use server'
+	return requireCsrfSignature()
+}, 'csrfSignature')
 
 function validateSidebar(sidebar: unknown): string | undefined {
 	if (typeof sidebar !== 'string' || sidebar.length < 3) {
@@ -43,64 +43,61 @@ function validateNook(nook: unknown): string | undefined {
 	}
 }
 
-export default function Submit(): JSX.Element {
-	const { csrfSignature } = useRouteData<typeof routeData>()
-	const [searchParams] = useSearchParams()
+const submitting = action(async (form: FormData) => {
+	'use server'
+	const sidebar = form.get('sidebar')
+	const description = form.get('description')
+	const nook = form.get('nook') as NookId
+	const nookType = form.get('nookType') as NookType
+	const csrfSignature = form.get('csrfSignature')
+	if (
+		typeof sidebar !== 'string' ||
+		typeof description !== 'string' ||
+		typeof nook !== 'string' ||
+		typeof csrfSignature !== 'string'
+	) {
+		throw new Error(
+			`Sidebar, description, nook, and csrfSignature should be strings.`,
+		)
+	}
+	const fieldErrors = {
+		sidebar: validateSidebar(sidebar),
+		description: validateDescription(description),
+		nook: validateNook(nook),
+	}
+	if (Object.values(fieldErrors).some(Boolean)) {
+		throw { message: 'Some fields are invalid', fieldErrors } as unknown
+	}
+	const userId = await requireUserId()
+	const session = await requireSession()
+	if (await isInvalidCsrf(csrfSignature, session.jti)) {
+		const searchParams = new URLSearchParams([
+			['redirectTo', new URL(getRequestEvent()!.request.url).pathname],
+		])
+		throw redirect(`/login?${searchParams.toString()}`) as unknown
+	}
 
-	const [submitting, { Form }] = createServerAction$(
-		async (form: FormData, { request }) => {
-			const sidebar = form.get('sidebar')
-			const description = form.get('description')
-			const nook = form.get('nook') as NookId
-			const nookType = form.get('nookType') as NookType
-			const csrfSignature = form.get('csrfSignature')
-			if (
-				typeof sidebar !== 'string' ||
-				typeof description !== 'string' ||
-				typeof nook !== 'string' ||
-				typeof csrfSignature !== 'string'
-			) {
-				throw new FormError(
-					`Sidebar, description, nook, and csrfSignature should be strings.`,
-				)
-			}
-			const fields = { sidebar, description, nook }
-			const fieldErrors = {
-				sidebar: validateSidebar(sidebar),
-				description: validateDescription(description),
-				nook: validateNook(nook),
-			}
-			if (Object.values(fieldErrors).some(Boolean)) {
-				throw new FormError('Some fields are invalid', { fieldErrors, fields })
-			}
-			const userId = await requireUserId(request)
-			const session = await requireSession(request)
-			if (await isInvalidCsrf(csrfSignature, session.jti)) {
-				const searchParams = new URLSearchParams([
-					['redirectTo', new URL(request.url).pathname],
-				])
-				throw redirect(`/login?${searchParams.toString()}`) as unknown
-			}
+	await createNook({
+		userId,
+		nookType,
+		sidebar,
+		description,
+		nook,
+	})
+	return redirect(`/n/${nook}`)
+})
 
-			await createNook({
-				userId,
-				nookType,
-				sidebar,
-				description,
-				nook,
-			})
-			return redirect(`/n/${nook}`)
-		},
-	)
-	const error = (): FormError | undefined =>
-		submitting.error as undefined | FormError
+export default function Submit(props: RouteSectionProps) {
+	const csrfSignature = createAsync(async () => await getCsrfSignatureCached())
+	const isSubmitting = useSubmission(submitting)
+	// const error = () => submitting.error as undefined | Error // nextTODO
 
 	// highTODO idempotency token
 
 	return (
 		<main>
 			<h1>Create Nook</h1>
-			<Form>
+			<form action={submitting} method='post'>
 				<input
 					type='hidden'
 					name='csrfSignature'
@@ -108,15 +105,15 @@ export default function Submit(): JSX.Element {
 				/>
 				<div>
 					<label for='nook-input'>Nook Name</label>
-					<input value={searchParams.nook ?? ''} id='nook-input' name='nook' />
+					<input value={props.params.nook ?? ''} id='nook-input' name='nook' />
 				</div>
 				<div>
 					<label for='sidebar-input'>Sidebar</label>
 					<input id='sidebar-input' name='sidebar' />
 				</div>
-				<Show when={error()?.fieldErrors?.sidebar}>
-					<p>{error()!.fieldErrors!.sidebar}</p>
-				</Show>
+				{/* <Show when={error()?.fieldErrors?.sidebar}>
+					<p>{error()!.fieldErrors!.sidebar}</p> 
+				</Show> */}
 				<div>
 					<label for='description-input'>Description</label>
 					<textarea
@@ -126,12 +123,12 @@ export default function Submit(): JSX.Element {
 						cols='50'
 					/>
 				</div>
-				<Show when={error()?.fieldErrors?.description}>
+				{/* <Show when={error()?.fieldErrors?.description}>
 					<p>{error()!.fieldErrors!.description}</p>
 				</Show>
 				<Show when={error()}>
 					<p>{error()!.message}</p>
-				</Show>
+				</Show> */}
 				<RadioGroup.Root class='radio-group' name='nookType'>
 					<RadioGroup.Label class='radio-group__label'>
 						Nook Type
@@ -152,8 +149,10 @@ export default function Submit(): JSX.Element {
 						</For>
 					</div>
 				</RadioGroup.Root>
-				<button type='submit'>Create Nook</button>
-			</Form>
+				<button type='submit' disabled={isSubmitting.pending}>
+					Create Nook
+				</button>
+			</form>
 		</main>
 	)
 }

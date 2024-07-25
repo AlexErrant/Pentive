@@ -1,11 +1,11 @@
 import { type Component, For, Show, createSignal } from 'solid-js'
-import { A } from 'solid-start'
 import { type Comment as CommentType } from 'shared-edge'
 import Toggle from './toggle'
 import SubmitComment from './submitComment'
 import { cwaClient } from '~/routes/cwaClient'
 import { type Base64Url } from 'shared'
 import RelativeDate from './relativeDate'
+import { A } from '@solidjs/router'
 
 const Comment: Component<{
 	comment: CommentType<Base64Url>

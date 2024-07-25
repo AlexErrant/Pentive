@@ -1,13 +1,16 @@
-import { type JSX, Show } from 'solid-js'
-import { A, useParams, useRouteData } from 'solid-start'
-import { FormError } from 'solid-start/data'
-import {
-	createServerAction$,
-	createServerData$,
-	redirect,
-} from 'solid-start/server'
+import { createEffect } from 'solid-js'
 import { createUserSession, getInfo, getUserId } from '~/session'
 import { getCasedUserId, registerUser } from 'shared-edge'
+import {
+	A,
+	type RouteSectionProps,
+	action,
+	cache,
+	redirect,
+	type RouteDefinition,
+	useSubmission,
+} from '@solidjs/router'
+import { getRequestEvent } from 'solid-js/web'
 
 // https://stackoverflow.com/a/25352300
 function isAlphaNumeric(str: string) {
@@ -38,65 +41,73 @@ async function validateUsername(username: unknown) {
 	}
 }
 
-export function routeData() {
-	return createServerData$(async (_, { request }) => {
-		if ((await getUserId(request)) != null) {
-			throw redirect('/') as unknown
-		}
-		return {}
+const getUserIdCached = cache(async () => {
+	'use server'
+	if ((await getUserId()) != null) {
+		throw redirect('/') as unknown
+	}
+	return null
+}, 'userId')
+
+export const route = {
+	preload() {
+		void getUserIdCached()
+	},
+} satisfies RouteDefinition
+
+const registering = action(async (form: FormData) => {
+	'use server'
+	const username = form.get('username')
+	const redirectTo = form.get('redirectTo') ?? '/'
+	if (typeof username !== 'string' || typeof redirectTo !== 'string') {
+		throw new Error(`Form not submitted correctly.`)
+	}
+	const fields = { username }
+	const fieldErrors = {
+		username: await validateUsername(username),
+	}
+	if (Object.values(fieldErrors).some(Boolean)) {
+		throw { fieldErrors, fields } as unknown
+	}
+	const request = getRequestEvent()?.request
+	if (request == null) return redirect('/error') // medTODO needs a page
+	const email = await getInfo(request)
+	if (email == null) return redirect('/error') // medTODO needs a page
+	await registerUser(username, email)
+	return await createUserSession(username, redirectTo)
+})
+
+export default function RegisterUsername(props: RouteSectionProps) {
+	const isRegistering = useSubmission(registering)
+	createEffect(() => {
+		console.log('Error!', isRegistering.error) // nextTODO
 	})
-}
-
-export default function RegisterUsername(): JSX.Element {
-	useRouteData<typeof routeData>()
-	const params = useParams()
-
-	const [registering, { Form }] = createServerAction$(
-		async (form: FormData, { request }) => {
-			const username = form.get('username')
-			const redirectTo = form.get('redirectTo') ?? '/'
-			if (typeof username !== 'string' || typeof redirectTo !== 'string') {
-				throw new FormError(`Form not submitted correctly.`)
-			}
-			const fields = { username }
-			const fieldErrors = {
-				username: await validateUsername(username),
-			}
-			if (Object.values(fieldErrors).some(Boolean)) {
-				throw new FormError('Fields invalid', { fieldErrors, fields })
-			}
-			const email = await getInfo(request)
-			if (email == null) return redirect('/error') // medTODO needs a page
-			await registerUser(username, email)
-			return await createUserSession(username, redirectTo)
-		},
-	)
-
-	const error = () => registering.error as undefined | FormError
-
+	// const error = () => registering.error as undefined | FormError
 	return (
 		<main>
 			<h1>Register Username</h1>
-			<Form>
+			<form action={registering} method='post'>
 				<input
 					type='hidden'
 					name='redirectTo'
-					value={params.redirectTo ?? '/'}
+					value={props.params.redirectTo ?? '/'}
 				/>
 				<div>
 					<label for='username-input'>Username</label>
 					<input id='username-input' name='username' />
 				</div>
-				<Show when={error()?.fieldErrors?.username}>
-					<p role='alert'>{error()!.fieldErrors!.username}</p>
-				</Show>
-				<Show when={error()}>
-					<p role='alert' id='error-message'>
-						{error()!.message}
-					</p>
-				</Show>
-				<button type='submit'>Register</button>
-			</Form>
+				{/* <Show when={error()?.fieldErrors?.username}> */}
+				{/* 	<p role='alert'>{error()!.fieldErrors!.username}</p> */}
+				{/* </Show> */}
+				{/* <Show when={error()}> */}
+				{/* 	<p role='alert' id='error-message'> */}
+				{/* 		{error()!.message} */}
+				{/* 	</p> */}
+				{/* </Show> */}
+				<button disabled={isRegistering.pending} type='submit'>
+					Register
+				</button>
+			</form>
 			<h2>
 				Until further notice, the database will be deleted often and without
 				warning.

@@ -1,6 +1,4 @@
-import { type Component, For, Show, Suspense } from 'solid-js'
-import { type RouteDataArgs, useRouteData } from 'solid-start'
-import { createServerData$ } from 'solid-start/server'
+import { For, Show, Suspense } from 'solid-js'
 import { type NookId, type RemoteTemplateId } from 'shared'
 import { getTemplate, getTemplateComments } from 'shared-edge'
 import ResizingIframe from '~/components/resizingIframe'
@@ -8,40 +6,67 @@ import Comment from '~/components/comment'
 import SubmitComment from '~/components/submitComment'
 import { cwaClient } from '~/routes/cwaClient'
 import { getUserId } from '~/session'
-import { getAppMessenger } from '~/root'
+import { getAppMessenger } from '~/entry-client'
 import { defaultRenderContainer } from 'shared-dom'
 import { remoteToTemplate } from '~/lib/utility'
 import { unwrap } from 'solid-js/store'
+import {
+	cache,
+	createAsync,
+	type RouteDefinition,
+	type RouteSectionProps,
+} from '@solidjs/router'
 
-export function routeData({ params }: RouteDataArgs) {
-	return {
-		nook: () => params.nook as NookId,
-		templateId: () => params.templateId,
-		data: createServerData$(
-			async ([nook, templateId], { request }) => {
-				return {
-					template: await getUserId(request).then(
-						async (userId) =>
-							await getTemplate(templateId as RemoteTemplateId, {
-								userId: userId ?? undefined,
-								nook: nook as NookId,
-							}),
-					),
-					comments: await getTemplateComments(templateId as RemoteTemplateId),
-				}
-			},
-			{ key: () => [params.nook, params.templateId] },
-		),
-	}
-}
+const getTemplateCached = cache(
+	async (templateId: RemoteTemplateId, nook: NookId) => {
+		'use server'
+		return await getUserId().then(
+			async (userId) =>
+				await getTemplate(templateId, {
+					userId: userId ?? undefined,
+					nook,
+				}),
+		)
+	},
+	'template',
+)
 
-const Thread: Component = () => {
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	const { data, nook } = useRouteData<typeof routeData>()
-	const template = () => remoteToTemplate(data()!.template!)
+const getTemplateCommentsCached = cache(
+	async (templateId: RemoteTemplateId) => {
+		'use server'
+		return await getTemplateComments(templateId)
+	},
+	'templateComments',
+)
+
+export const route = {
+	preload({ params }) {
+		void getTemplateCached(
+			params.templateId as RemoteTemplateId,
+			params.nook as NookId,
+		)
+		void getTemplateCommentsCached(params.templateId as RemoteTemplateId)
+	},
+} satisfies RouteDefinition
+
+export default function Thread(props: RouteSectionProps) {
+	const remoteTemplate = createAsync(
+		async () =>
+			await getTemplateCached(
+				props.params.templateId as RemoteTemplateId,
+				props.params.nook as NookId,
+			),
+	)
+	const comments = createAsync(
+		async () =>
+			await getTemplateCommentsCached(
+				props.params.templateId as RemoteTemplateId,
+			),
+	)
+	const template = () => remoteToTemplate(remoteTemplate()!)
 	return (
 		<Suspense fallback={<p>Loading template...</p>}>
-			<Show when={data()?.template} fallback={<p>"404 Not Found"</p>}>
+			<Show when={remoteTemplate()} fallback={<p>"404 Not Found"</p>}>
 				<div class='item-view-comments'>
 					<p class='item-view-comments-header'>
 						<For each={defaultRenderContainer.templateIndexes(template())}>
@@ -71,10 +96,10 @@ const Thread: Component = () => {
 					</p>
 					<button
 						onClick={async () => {
-							await getAppMessenger().addTemplate(unwrap(data()!.template!))
-							await cwaClient.subscribeToTemplate.mutate(data()!.template!.id)
+							await getAppMessenger().addTemplate(unwrap(remoteTemplate()!))
+							await cwaClient.subscribeToTemplate.mutate(remoteTemplate()!.id)
 						}}
-						disabled={data()?.template?.til != null}
+						disabled={remoteTemplate()?.til != null}
 					>
 						Download
 					</button>
@@ -83,12 +108,12 @@ const Thread: Component = () => {
 							// eslint-disable-next-line solid/reactivity -- doesn't need to be reactive
 							onSubmit={async (text) => {
 								await cwaClient.insertTemplateComment.mutate({
-									templateId: data()!.template!.id,
+									templateId: template().id,
 									text,
 								})
 							}}
 						/>
-						<For each={data()!.comments}>
+						<For each={comments()}>
 							{(comment) => <Comment comment={comment} type='template' />}
 						</For>
 					</ul>
@@ -97,5 +122,3 @@ const Thread: Component = () => {
 		</Suspense>
 	)
 }
-
-export default Thread

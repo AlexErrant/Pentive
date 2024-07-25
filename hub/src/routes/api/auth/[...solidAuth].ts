@@ -1,5 +1,3 @@
-import { redirect, type PageEvent } from 'solid-start'
-
 import {
 	type AuthorizationServer,
 	type Client,
@@ -21,6 +19,8 @@ import {
 	getOauthState,
 } from '~/session'
 import { getUserIdByEmail } from 'shared-edge'
+import { type PageEvent } from '@solidjs/start/server'
+import { redirect } from '@solidjs/router'
 
 export const githubLoginUrl = (alphaKey: string) =>
 	import.meta.env.VITE_HUB_ORIGIN +
@@ -30,6 +30,8 @@ export const githubLoginUrl = (alphaKey: string) =>
 export const devLoginUrl = (username: string) =>
 	import.meta.env.VITE_HUB_ORIGIN + '/api/auth/login/dev?username=' + username
 
+/* eslint-disable */
+// @ts-expect-error nextTODO
 export const GET = async ({ env, request }: PageEvent) => {
 	if (import.meta.env.DEV) {
 		const url = new URL(request.url)
@@ -48,6 +50,7 @@ export const GET = async ({ env, request }: PageEvent) => {
 		}
 	} else return await handleCallback(env, request)
 }
+/* eslint-enable */
 
 async function handleLogin(env: Env) {
 	const redirectUri =
@@ -65,7 +68,7 @@ async function handleLogin(env: Env) {
 	)
 	authorizationUrl.searchParams.set('code_challenge_method', 'S256')
 	authorizationUrl.searchParams.set('state', state)
-	const headers = await createLoginHeaders(state, codeVerifier)
+	const headers = createLoginHeaders(state, codeVerifier)
 	return redirect(authorizationUrl.toString(), { headers })
 }
 
@@ -84,7 +87,7 @@ async function handleCallback(env: Env, request: Request) {
 		as,
 		client,
 		new URL(request.url).searchParams,
-		await getOauthState(request),
+		getOauthState(request),
 	)
 	if (isOAuth2Error(parameters)) {
 		console.error(parameters)
@@ -95,7 +98,7 @@ async function handleCallback(env: Env, request: Request) {
 		client,
 		parameters,
 		import.meta.env.VITE_HUB_ORIGIN + '/api/auth/callback/github',
-		await getOauthCodeVerifier(request),
+		getOauthCodeVerifier(request),
 	)
 
 	let challenges: WWWAuthenticateChallenge[] | undefined

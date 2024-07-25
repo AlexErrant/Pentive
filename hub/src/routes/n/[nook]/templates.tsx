@@ -1,38 +1,42 @@
-import { type Component, For, Show } from 'solid-js'
-import { type RouteDataArgs, useRouteData, A } from 'solid-start'
-import { createServerData$ } from 'solid-start/server'
+import { For, Show } from 'solid-js'
 import { type NookId } from 'shared'
 import { getTemplates } from 'shared-edge'
 import ResizingIframe from '~/components/resizingIframe'
-import { getAppMessenger } from '~/root'
+import { getAppMessenger } from '~/entry-client'
 import { remoteToTemplate } from '~/lib/utility'
 import { unwrap } from 'solid-js/store'
 import { getUserId } from '~/session'
 import { cwaClient } from 'app/src/trpcClient'
 import RelativeDate from '~/components/relativeDate'
+import {
+	A,
+	cache,
+	createAsync,
+	type RouteDefinition,
+	type RouteSectionProps,
+} from '@solidjs/router'
 
-export function routeData({ params }: RouteDataArgs) {
-	return {
-		nook: () => params.nook,
-		data: createServerData$(
-			async (nook, { request }) => {
-				const userId = (await getUserId(request)) ?? undefined
-				return {
-					templates: await getTemplates(nook as NookId, userId),
-				}
-			},
-			{ key: () => params.nook },
-		),
-	}
-}
+const getTemplatesCached = cache(async (nook: NookId) => {
+	'use server'
+	const userId = (await getUserId()) ?? undefined
+	return await getTemplates(nook, userId)
+}, 'templates')
 
-const Threads: Component = () => {
-	const { data, nook } = useRouteData<typeof routeData>()
+export const route = {
+	preload({ params }) {
+		void getTemplatesCached(params.nook as NookId)
+	},
+} satisfies RouteDefinition
+
+export default function Thread(props: RouteSectionProps) {
+	const templates = createAsync(
+		async () => await getTemplatesCached(props.params.nook as NookId),
+	)
 	return (
 		<>
-			<Show when={data()}>
+			<Show when={templates()}>
 				<ul>
-					<For each={data()!.templates}>
+					<For each={templates()}>
 						{(template) => {
 							const localTemplate = () => remoteToTemplate(template)
 							return (
@@ -57,7 +61,7 @@ const Threads: Component = () => {
 												</>
 											)}
 										</div>
-										<a href={`/n/${nook()}/template/${template.id}`}>
+										<a href={`/n/${props.params.nook}/template/${template.id}`}>
 											Comments: {template.comments}
 										</a>
 									</div>
@@ -77,7 +81,11 @@ const Threads: Component = () => {
 											index: 0,
 										}}
 									/>
-									<A href={`/n/${nook()}/template/${template.id}/edit`}>Edit</A>
+									<A
+										href={`/n/${props.params.nook}/template/${template.id}/edit`}
+									>
+										Edit
+									</A>
 								</li>
 							)
 						}}
@@ -87,5 +95,3 @@ const Threads: Component = () => {
 		</>
 	)
 }
-
-export default Threads

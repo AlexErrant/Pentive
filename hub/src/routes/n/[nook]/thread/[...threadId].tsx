@@ -1,21 +1,28 @@
-import { type Component, Show, Suspense } from 'solid-js'
-import { type RouteDataArgs, useRouteData } from 'solid-start'
-import { createServerData$ } from 'solid-start/server'
+import { Show, Suspense } from 'solid-js'
 import { type Base64Url } from 'shared'
 import { getPost } from 'shared-edge'
+import {
+	type RouteSectionProps,
+	createAsync,
+	type RouteDefinition,
+	cache,
+} from '@solidjs/router'
 
-export function routeData({ params }: RouteDataArgs) {
-	return {
-		threadId: () => params.threadId,
-		thread: createServerData$(
-			async (threadId) => await getPost(threadId as Base64Url),
-			{ key: () => params.threadId },
-		),
-	}
-}
+const getPostCached = cache(async (threadId: Base64Url) => {
+	'use server'
+	return await getPost(threadId)
+}, 'posts')
 
-const Thread: Component = () => {
-	const { thread } = useRouteData<typeof routeData>()
+export const route = {
+	preload({ params }) {
+		void getPostCached(params.threadId as Base64Url)
+	},
+} satisfies RouteDefinition
+
+export function Thread(props: RouteSectionProps) {
+	const thread = createAsync(
+		async () => await getPostCached(props.params.threadId as Base64Url),
+	)
 	return (
 		<Suspense fallback={<p>Loading thread...</p>}>
 			<Show when={thread()} fallback={<p>"404 Not Found"</p>}>

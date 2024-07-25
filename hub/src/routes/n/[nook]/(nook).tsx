@@ -1,6 +1,4 @@
-import { type Component, For, Show, type VoidComponent } from 'solid-js'
-import { A, type RouteDataArgs, useRouteData } from 'solid-start'
-import { createServerData$ } from 'solid-start/server'
+import { For, Show, type VoidComponent } from 'solid-js'
 import { getPosts, getNotes } from 'shared-edge'
 import { noteOrdsRenderContainer, noteOrds, toSampleCard } from 'shared-dom'
 import { type NookId, type Ord } from 'shared'
@@ -8,29 +6,47 @@ import ResizingIframe from '~/components/resizingIframe'
 import { getUserId } from '~/session'
 import { remoteToNote, remoteToTemplate } from '~/lib/utility'
 import RelativeDate from '~/components/relativeDate'
+import {
+	A,
+	cache,
+	createAsync,
+	type RouteDefinition,
+	type RouteSectionProps,
+} from '@solidjs/router'
 
-export function routeData({ params }: RouteDataArgs) {
-	return {
-		nook: () => params.nook,
-		data: createServerData$(
-			async (nook, { request }) => {
-				return {
-					posts: await getPosts({ nook }),
-					notes: await getUserId(request).then(
-						async (userId) => await getNotes(nook as NookId, userId),
-					),
-				}
-			},
-			{ key: () => params.nook },
-		),
-	}
-}
+const getPostsCached = cache(async (nook: string) => {
+	'use server'
+	return await getPosts({ nook })
+}, 'posts')
 
-const Threads: Component = () => {
-	const { data, nook } = useRouteData<typeof routeData>()
+const getNotesCached = cache(async (nook: string) => {
+	'use server'
+	return await getUserId().then(
+		async (userId) => await getNotes(nook as NookId, userId),
+	)
+}, 'notes')
+
+export const route = {
+	preload({ params }) {
+		void getPostsCached(params.nook!)
+		void getNotesCached(params.nook!)
+	},
+} satisfies RouteDefinition
+
+export function Thread(props: RouteSectionProps) {
+	const posts = createAsync(
+		async () => await getPostsCached(props.params.nook!),
+	)
+	const notes = createAsync(
+		async () => await getNotesCached(props.params.nook!),
+	)
 	return (
-		<Show when={data()}>
-			<MainContent nook={nook()!} posts={data()!.posts} notes={data()!.notes} />
+		<Show when={posts() != null && notes()}>
+			<MainContent
+				nook={props.params.nook!}
+				posts={posts()!}
+				notes={notes()!}
+			/>
 		</Show>
 	)
 }
@@ -91,5 +107,3 @@ const MainContent: VoidComponent<{
 		</ul>
 	)
 }
-
-export default Threads

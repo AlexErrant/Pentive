@@ -1,5 +1,6 @@
 export interface CommentDefinition {
 	user: string
+	// eslint-disable-next-line @typescript-eslint/naming-convention
 	time_ago: string
 	content: string
 	comments: CommentDefinition[]
@@ -12,8 +13,10 @@ export interface StoryDefinition {
 	title: string
 	domain: string
 	type: string
+	// eslint-disable-next-line @typescript-eslint/naming-convention
 	time_ago: string
 	user: string
+	// eslint-disable-next-line @typescript-eslint/naming-convention
 	comments_count: number
 	comments: CommentDefinition[]
 }

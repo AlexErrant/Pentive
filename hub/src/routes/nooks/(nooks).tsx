@@ -1,16 +1,20 @@
 import { Show, type JSX, For } from 'solid-js'
-import { useRouteData } from 'solid-start'
 import { getNooks } from 'shared-edge'
-import { createServerData$ } from 'solid-start/server'
+import { cache, createAsync, type RouteDefinition } from '@solidjs/router'
 
-export function routeData() {
-	return {
-		nooks: createServerData$(async () => await getNooks()),
-	}
-}
+export const getNooksCached = cache(async () => {
+	'use server'
+	return await getNooks()
+}, 'nooks')
+
+export const route = {
+	preload() {
+		void getNooksCached()
+	},
+} satisfies RouteDefinition
 
 export default function Nooks(): JSX.Element {
-	const { nooks } = useRouteData<typeof routeData>()
+	const nooks = createAsync(async () => await getNooksCached())
 	return (
 		<main>
 			<ul>

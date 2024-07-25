@@ -1,6 +1,4 @@
-import { type Component, For, Show, Suspense } from 'solid-js'
-import { type RouteDataArgs, useRouteData } from 'solid-start'
-import { createServerData$ } from 'solid-start/server'
+import { For, Show, Suspense } from 'solid-js'
 import { type NookId, type RemoteNoteId } from 'shared'
 import { getNote, getNoteComments } from 'shared-edge'
 import ResizingIframe from '~/components/resizingIframe'
@@ -8,35 +6,47 @@ import Comment from '~/components/comment'
 import SubmitComment from '~/components/submitComment'
 import { cwaClient } from '~/routes/cwaClient'
 import { getUserId } from '~/session'
-import { getAppMessenger } from '~/root'
+import { getAppMessenger } from '~/entry-client'
 import { noteOrds, noteOrdsRenderContainer, toSampleCard } from 'shared-dom'
 import { remoteToNote, remoteToTemplate } from '~/lib/utility'
 import { unwrap } from 'solid-js/store'
+import {
+	cache,
+	createAsync,
+	type RouteDefinition,
+	type RouteSectionProps,
+} from '@solidjs/router'
 
-export function routeData({ params }: RouteDataArgs) {
-	return {
-		nook: () => params.nook as NookId,
-		data: createServerData$(
-			async ([_, noteId], { request }) => {
-				return {
-					note: await getUserId(request).then(
-						async (userId) => await getNote(noteId as RemoteNoteId, userId),
-					),
-					comments: await getNoteComments(noteId as RemoteNoteId),
-				}
-			},
-			{ key: () => ['noteId', params.noteId] },
-		),
-	}
-}
+const getNoteCached = cache(async (noteId: RemoteNoteId) => {
+	'use server'
+	return await getUserId().then(async (userId) => await getNote(noteId, userId))
+}, 'note')
 
-const Thread: Component = () => {
-	const { data, nook } = useRouteData<typeof routeData>()
-	const template = () => remoteToTemplate(data()!.note!.template)
-	const note = () => remoteToNote(data()!.note!)
+const getNoteCommentsCached = cache(async (noteId: RemoteNoteId) => {
+	'use server'
+	return await getNoteComments(noteId)
+}, 'noteComments')
+
+export const route = {
+	preload({ params }) {
+		void getNoteCached(params.noteId as RemoteNoteId)
+		void getNoteCommentsCached(params.noteId as RemoteNoteId)
+	},
+} satisfies RouteDefinition
+
+export function Thread(props: RouteSectionProps) {
+	const remoteNote = createAsync(
+		async () => await getNoteCached(props.params.noteId as RemoteNoteId),
+	)
+	const comments = createAsync(
+		async () =>
+			await getNoteCommentsCached(props.params.noteId as RemoteNoteId),
+	)
+	const template = () => remoteToTemplate(remoteNote()!.template)
+	const note = () => remoteToNote(remoteNote()!)
 	return (
 		<Suspense fallback={<p>Loading note...</p>}>
-			<Show when={data()?.note} fallback={<p>"404 Not Found"</p>}>
+			<Show when={remoteNote()} fallback={<p>"404 Not Found"</p>}>
 				<div class='item-view-comments'>
 					<p class='item-view-comments-header'>
 						<For
@@ -71,10 +81,13 @@ const Thread: Component = () => {
 					</p>
 					<button
 						onClick={async () => {
-							await getAppMessenger().addNote(unwrap(data()!.note!), nook())
-							await cwaClient.subscribeToNote.mutate(data()!.note!.id)
+							await getAppMessenger().addNote(
+								unwrap(remoteNote()!),
+								props.params.nook as NookId,
+							)
+							await cwaClient.subscribeToNote.mutate(remoteNote()!.id)
 						}}
-						disabled={data()?.note?.til != null}
+						disabled={remoteNote()!.til != null}
 					>
 						Download
 					</button>
@@ -83,12 +96,12 @@ const Thread: Component = () => {
 							// eslint-disable-next-line solid/reactivity -- doesn't need to be reactive
 							onSubmit={async (text) => {
 								await cwaClient.insertNoteComment.mutate({
-									noteId: data()!.note!.id,
+									noteId: remoteNote()!.id,
 									text,
 								})
 							}}
 						/>
-						<For each={data()!.comments}>
+						<For each={comments()}>
 							{(comment) => <Comment comment={comment} type='note' />}
 						</For>
 					</ul>
@@ -97,5 +110,3 @@ const Thread: Component = () => {
 		</Suspense>
 	)
 }
-
-export default Thread

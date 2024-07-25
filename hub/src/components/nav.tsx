@@ -1,16 +1,33 @@
 import { ThemeSelector } from 'shared-dom'
 import { type JSX, Show } from 'solid-js'
-import { A } from '@solidjs/router'
-import { createServerAction$, createServerData$ } from 'solid-start/server'
+import {
+	A,
+	action,
+	cache,
+	createAsync,
+	type RouteDefinition,
+} from '@solidjs/router'
 import { getUserId, logout } from '~/session'
 
+// eslint-disable-next-line @typescript-eslint/require-await
+const logoutAction = action(async () => {
+	'use server'
+	return logout()
+})
+
+const getUserIdCached = cache(async () => {
+	'use server'
+	return await getUserId()
+}, 'userId')
+
+export const route = {
+	preload() {
+		void getUserIdCached()
+	},
+} satisfies RouteDefinition
+
 function Nav(): JSX.Element {
-	const userId = createServerData$(
-		async (_, { request }) => await getUserId(request),
-	)
-	const [, { Form }] = createServerAction$(
-		async (_: FormData) => await logout(),
-	)
+	const userId = createAsync(async () => await getUserIdCached())
 	return (
 		<header class='header'>
 			<nav class='inner flex'>
@@ -24,12 +41,12 @@ function Nav(): JSX.Element {
 				<span class='profile'>
 					<Show when={userId() != null} fallback={<A href='/login'>Login</A>}>
 						<A href={`/u/${userId()!}`}>{userId()!}</A>
-						<Form class='inline'>
+						<form action={logoutAction} method='post' class='inline'>
 							{/* medTODO csrf */}
 							<button name='logout' type='submit'>
 								Logout
 							</button>
-						</Form>
+						</form>
 					</Show>
 				</span>
 			</nav>
