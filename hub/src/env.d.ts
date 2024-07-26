@@ -1,6 +1,10 @@
 // eslint-disable-next-line @typescript-eslint/triple-slash-reference
 /// <reference types="@cloudflare/workers-types" />
 
+import type {
+	Request as CfRequest,
+	ExecutionContext,
+} from '@cloudflare/workers-types'
 import { type Base64 } from 'shared'
 
 export interface EnvVars {
@@ -19,4 +23,15 @@ export interface EnvVars {
 
 declare global {
 	interface Env extends EnvVars {}
+}
+
+declare module 'vinxi/http' {
+	interface H3EventContext {
+		cf: CfRequest['cf']
+		cloudflare?: {
+			request: CfRequest
+			env: EnvVars
+			context: ExecutionContext
+		}
+	}
 }

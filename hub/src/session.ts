@@ -1,6 +1,5 @@
 import { jwtVerify, type JWTVerifyResult, SignJWT } from 'jose'
 import {
-	type Base64,
 	base64url,
 	csrfSignatureCookieName,
 	hubSessionCookieName,
@@ -12,136 +11,112 @@ import { redirect } from '@solidjs/router'
 import { type CookieSerializeOptions } from 'vinxi/http'
 import { Cookie } from '~/createPlainCookie'
 import { getRequestEvent } from 'solid-js/web'
+import { type EnvVars } from './env'
 
-export function setSessionStorage(x: {
-	hubSessionSecret: Base64
-	csrfSecret: Base64
-	hubInfoSecret: Base64
-	oauthStateSecret: Base64
-	oauthCodeVerifierSecret: Base64
-}): void {
-	hubSessionSecret = base64ToArray(x.hubSessionSecret)
-	csrfSecret = x.csrfSecret
-	hubInfoSecret = base64ToArray(x.hubInfoSecret)
-	const sessionCookieOpts: CookieSerializeOptions = {
-		secure: true,
-		// nextTODO
-		// secrets: [], // intentionally empty. This cookie should only store a signed JWT!
-		sameSite: 'strict',
-		path: '/',
-		maxAge: 60 * 60 * 24 * 30, // 30 days
-		httpOnly: true,
-		domain: import.meta.env.VITE_HUB_DOMAIN, // sadly, making cookies target specific subdomains from the main domain seems very hacky
-		// expires: "", // intentionally missing because docs say it's calculated off `maxAge` when missing https://github.com/solidjs/solid-start/blob/1b22cad87dd7bd74f73d807e1d60b886e753a6ee/packages/start/session/cookies.ts#L56-L57
-	}
-	sessionCookie = new Cookie(hubSessionCookieName, sessionCookieOpts)
-	destroySessionCookie = new Cookie(hubSessionCookieName, {
-		...sessionCookieOpts,
-		maxAge: undefined,
-		expires: new Date(0), // https://github.com/remix-run/remix/issues/5150 https://stackoverflow.com/q/5285940
-	})
-	// lowTODO store this on the client in a cross-domain compatible way - it need not be a cookie https://stackoverflow.com/q/34790887
-	const csrfSignatureCookieOpts: CookieSerializeOptions = {
-		secure: true,
-		// nextTODO
-		// secrets: [], // intentionally empty. This cookie only stores an HMACed CSRF token.
-		sameSite: 'strict',
-		path: '/',
-		maxAge: 60 * 60 * 24 * 30, // 30 days
-		httpOnly: false,
-		domain: import.meta.env.VITE_HUB_DOMAIN, // sadly, making cookies target specific subdomains from the main domain seems very hacky
-		// expires: "", // intentionally missing because docs say it's calculated off `maxAge` when missing https://github.com/solidjs/solid-start/blob/1b22cad87dd7bd74f73d807e1d60b886e753a6ee/packages/start/session/cookies.ts#L56-L57
-	}
-	csrfSignatureCookie = new Cookie(
-		csrfSignatureCookieName,
-		csrfSignatureCookieOpts,
-	)
-	destroyCsrfSignatureCookie = new Cookie(csrfSignatureCookieName, {
-		...csrfSignatureCookieOpts,
-		maxAge: undefined,
-		expires: new Date(0), // https://github.com/remix-run/remix/issues/5150 https://stackoverflow.com/q/5285940
-	})
-
-	const oauthStateCookieOpts: CookieSerializeOptions = {
-		secure: true,
-		// nextTODO
-		// secrets: [x.oauthStateSecret], // encrypted due to https://security.stackexchange.com/a/140889
-		sameSite: 'lax',
-		path: '/',
-		maxAge: 60 * 60 * 24, // 1 day
-		httpOnly: true,
-		// domain: "", // intentionally missing to exclude subdomains
-		// expires: "", // intentionally missing because docs say it's calculated off `maxAge` when missing https://github.com/solidjs/solid-start/blob/1b22cad87dd7bd74f73d807e1d60b886e753a6ee/packages/start/session/cookies.ts#L56-L57
-	}
-	const oauthStateCookieName = '__Host-oauthState'
-	oauthStateCookie = new Cookie(oauthStateCookieName, oauthStateCookieOpts)
-	destroyOauthStateCookie = new Cookie(oauthStateCookieName, {
-		...oauthStateCookieOpts,
-		maxAge: undefined,
-		expires: new Date(0), // https://github.com/remix-run/remix/issues/5150 https://stackoverflow.com/q/5285940
-	})
-
-	const oauthCodeVerifierCookieOpts: CookieSerializeOptions = {
-		secure: true,
-		// nextTODO
-		// secrets: [x.oauthCodeVerifierSecret], // encrypted due to https://stackoverflow.com/a/67520418 https://stackoverflow.com/a/67979777
-		sameSite: 'lax',
-		path: '/',
-		maxAge: 60 * 60 * 24, // 1 day
-		httpOnly: true,
-		// domain: "", // intentionally missing to exclude subdomains
-		// expires: "", // intentionally missing because docs say it's calculated off `maxAge` when missing https://github.com/solidjs/solid-start/blob/1b22cad87dd7bd74f73d807e1d60b886e753a6ee/packages/start/session/cookies.ts#L56-L57
-	}
-	const oauthCodeVerifierCookieName = '__Host-oauthCodeVerifier'
-	oauthCodeVerifierCookie = new Cookie(
-		oauthCodeVerifierCookieName,
-		oauthCodeVerifierCookieOpts,
-	)
-	destroyOauthCodeVerifierCookie = new Cookie(oauthCodeVerifierCookieName, {
-		...oauthCodeVerifierCookieOpts,
-		maxAge: undefined,
-		expires: new Date(0), // https://github.com/remix-run/remix/issues/5150 https://stackoverflow.com/q/5285940
-	})
-
-	const hubInfoCookieOpts: CookieSerializeOptions = {
-		secure: true,
-		// nextTODO
-		// secrets: [], // intentionally empty. This cookie only stores an HMACed JWT.
-		sameSite: 'strict',
-		path: '/',
-		maxAge: 60 * 60 * 2, // 2 hours
-		httpOnly: true,
-		// domain: "", // intentionally missing to exclude subdomains
-		// expires: "", // intentionally missing because docs say it's calculated off `maxAge` when missing https://github.com/solidjs/solid-start/blob/1b22cad87dd7bd74f73d807e1d60b886e753a6ee/packages/start/session/cookies.ts#L56-L57
-	}
-	const hubInfoCookieName = '__Host-hubInfo'
-	hubInfoCookie = new Cookie(hubInfoCookieName, hubInfoCookieOpts)
+const sessionCookieOpts: CookieSerializeOptions = {
+	secure: true,
+	// nextTODO
+	// secrets: [], // intentionally empty. This cookie should only store a signed JWT!
+	sameSite: 'strict',
+	path: '/',
+	maxAge: 60 * 60 * 24 * 30, // 30 days
+	httpOnly: true,
+	domain: import.meta.env.VITE_HUB_DOMAIN, // sadly, making cookies target specific subdomains from the main domain seems very hacky
+	// expires: "", // intentionally missing because docs say it's calculated off `maxAge` when missing https://github.com/solidjs/solid-start/blob/1b22cad87dd7bd74f73d807e1d60b886e753a6ee/packages/start/session/cookies.ts#L56-L57
 }
+const sessionCookie = new Cookie(hubSessionCookieName, sessionCookieOpts)
+const destroySessionCookie = new Cookie(hubSessionCookieName, {
+	...sessionCookieOpts,
+	maxAge: undefined,
+	expires: new Date(0), // https://github.com/remix-run/remix/issues/5150 https://stackoverflow.com/q/5285940
+})
+// lowTODO store this on the client in a cross-domain compatible way - it need not be a cookie https://stackoverflow.com/q/34790887
+const csrfSignatureCookieOpts: CookieSerializeOptions = {
+	secure: true,
+	// nextTODO
+	// secrets: [], // intentionally empty. This cookie only stores an HMACed CSRF token.
+	sameSite: 'strict',
+	path: '/',
+	maxAge: 60 * 60 * 24 * 30, // 30 days
+	httpOnly: false,
+	domain: import.meta.env.VITE_HUB_DOMAIN, // sadly, making cookies target specific subdomains from the main domain seems very hacky
+	// expires: "", // intentionally missing because docs say it's calculated off `maxAge` when missing https://github.com/solidjs/solid-start/blob/1b22cad87dd7bd74f73d807e1d60b886e753a6ee/packages/start/session/cookies.ts#L56-L57
+}
+const csrfSignatureCookie = new Cookie(
+	csrfSignatureCookieName,
+	csrfSignatureCookieOpts,
+)
+const destroyCsrfSignatureCookie = new Cookie(csrfSignatureCookieName, {
+	...csrfSignatureCookieOpts,
+	maxAge: undefined,
+	expires: new Date(0), // https://github.com/remix-run/remix/issues/5150 https://stackoverflow.com/q/5285940
+})
 
-// @ts-expect-error calls should throw null error if not setup
-let sessionCookie = null as Cookie
-// @ts-expect-error calls should throw null error if not setup
-let destroySessionCookie = null as Cookie
-// @ts-expect-error calls should throw null error if not setup
-let csrfSignatureCookie = null as Cookie
-// @ts-expect-error calls should throw null error if not setup
-let destroyCsrfSignatureCookie = null as Cookie
-// @ts-expect-error calls should throw null error if not setup
-let oauthStateCookie = null as Cookie
-// @ts-expect-error calls should throw null error if not setup
-let destroyOauthStateCookie = null as Cookie
-// @ts-expect-error calls should throw null error if not setup
-let oauthCodeVerifierCookie = null as Cookie
-// @ts-expect-error calls should throw null error if not setup
-let destroyOauthCodeVerifierCookie = null as Cookie
-// @ts-expect-error calls should throw null error if not setup
-let hubInfoCookie = null as Cookie
-// @ts-expect-error calls should throw null error if not setup
-let hubSessionSecret = null as Uint8Array
-// @ts-expect-error calls should throw null error if not setup
-let csrfSecret = null as string
-// @ts-expect-error calls should throw null error if not setup
-let hubInfoSecret = null as Uint8Array
+const oauthStateCookieOpts: CookieSerializeOptions = {
+	secure: true,
+	// nextTODO
+	// secrets: [x.oauthStateSecret], // encrypted due to https://security.stackexchange.com/a/140889
+	sameSite: 'lax',
+	path: '/',
+	maxAge: 60 * 60 * 24, // 1 day
+	httpOnly: true,
+	// domain: "", // intentionally missing to exclude subdomains
+	// expires: "", // intentionally missing because docs say it's calculated off `maxAge` when missing https://github.com/solidjs/solid-start/blob/1b22cad87dd7bd74f73d807e1d60b886e753a6ee/packages/start/session/cookies.ts#L56-L57
+}
+const oauthStateCookieName = '__Host-oauthState'
+const oauthStateCookie = new Cookie(oauthStateCookieName, oauthStateCookieOpts)
+const destroyOauthStateCookie = new Cookie(oauthStateCookieName, {
+	...oauthStateCookieOpts,
+	maxAge: undefined,
+	expires: new Date(0), // https://github.com/remix-run/remix/issues/5150 https://stackoverflow.com/q/5285940
+})
+
+const oauthCodeVerifierCookieOpts: CookieSerializeOptions = {
+	secure: true,
+	// nextTODO
+	// secrets: [x.oauthCodeVerifierSecret], // encrypted due to https://stackoverflow.com/a/67520418 https://stackoverflow.com/a/67979777
+	sameSite: 'lax',
+	path: '/',
+	maxAge: 60 * 60 * 24, // 1 day
+	httpOnly: true,
+	// domain: "", // intentionally missing to exclude subdomains
+	// expires: "", // intentionally missing because docs say it's calculated off `maxAge` when missing https://github.com/solidjs/solid-start/blob/1b22cad87dd7bd74f73d807e1d60b886e753a6ee/packages/start/session/cookies.ts#L56-L57
+}
+const oauthCodeVerifierCookieName = '__Host-oauthCodeVerifier'
+const oauthCodeVerifierCookie = new Cookie(
+	oauthCodeVerifierCookieName,
+	oauthCodeVerifierCookieOpts,
+)
+const destroyOauthCodeVerifierCookie = new Cookie(oauthCodeVerifierCookieName, {
+	...oauthCodeVerifierCookieOpts,
+	maxAge: undefined,
+	expires: new Date(0), // https://github.com/remix-run/remix/issues/5150 https://stackoverflow.com/q/5285940
+})
+
+const hubInfoCookieOpts: CookieSerializeOptions = {
+	secure: true,
+	// nextTODO
+	// secrets: [], // intentionally empty. This cookie only stores an HMACed JWT.
+	sameSite: 'strict',
+	path: '/',
+	maxAge: 60 * 60 * 2, // 2 hours
+	httpOnly: true,
+	// domain: "", // intentionally missing to exclude subdomains
+	// expires: "", // intentionally missing because docs say it's calculated off `maxAge` when missing https://github.com/solidjs/solid-start/blob/1b22cad87dd7bd74f73d807e1d60b886e753a6ee/packages/start/session/cookies.ts#L56-L57
+}
+const hubInfoCookieName = '__Host-hubInfo'
+const hubInfoCookie = new Cookie(hubInfoCookieName, hubInfoCookieOpts)
+
+export const env = () => {
+	const env =
+		getRequestEvent()!.nativeEvent.context.cloudflare?.env ??
+		(process.env as unknown as EnvVars)
+	return {
+		...env,
+		hubSessionSecret: base64ToArray(env.hubSessionSecret),
+		hubInfoSecret: base64ToArray(env.hubInfoSecret),
+	}
+}
 
 export function getCsrfSignature() {
 	const cookie = getRequestEvent()!.request.headers.get('Cookie')
@@ -181,7 +156,7 @@ export async function getSession() {
 	if (rawSession == null) return null
 	let session: JWTVerifyResult | null = null
 	try {
-		session = await jwtVerify(rawSession, hubSessionSecret)
+		session = await jwtVerify(rawSession, env().hubSessionSecret)
 	} catch {}
 	return session == null
 		? null
@@ -279,7 +254,7 @@ export async function getInfo(request: Request) {
 	}
 	let jwt: JWTVerifyResult | null = null
 	try {
-		jwt = await jwtVerify(rawInfoJwt, hubInfoSecret)
+		jwt = await jwtVerify(rawInfoJwt, env().hubInfoSecret)
 	} catch {}
 	return jwt == null
 		? null
@@ -296,7 +271,7 @@ async function generateSession(userId: string, csrf: string): Promise<string> {
 		// .setIssuer("urn:example:issuer")
 		// .setAudience("urn:example:audience")
 		// .setExpirationTime("2h")
-		.sign(hubSessionSecret)
+		.sign(env().hubSessionSecret)
 }
 
 let maybeCsrfKey: CryptoKey | null = null
@@ -304,7 +279,7 @@ async function getCsrfKey(): Promise<CryptoKey> {
 	if (maybeCsrfKey == null) {
 		maybeCsrfKey = await crypto.subtle.importKey(
 			'raw',
-			base64ToArray(csrfSecret),
+			base64ToArray(env().csrfSecret),
 			{ name: 'HMAC', hash: 'SHA-256' },
 			false,
 			['sign', 'verify'],
@@ -318,7 +293,7 @@ async function getHubInfoKey(): Promise<CryptoKey> {
 	if (maybeHubInfoKey == null) {
 		maybeHubInfoKey = await crypto.subtle.importKey(
 			'raw',
-			hubInfoSecret,
+			env().hubInfoSecret,
 			{ name: 'HMAC', hash: 'SHA-256' },
 			false,
 			['sign', 'verify'],

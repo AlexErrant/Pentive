@@ -7,13 +7,6 @@ import { createHandler, StartServer } from '@solidjs/start/server'
 export default createHandler(() => {
 	// nextTODO
 	// setKysely(event.env.planetscaleDbUrl)
-	// setSessionStorage({
-	// 	hubSessionSecret: event.env.hubSessionSecret,
-	// 	csrfSecret: event.env.csrfSecret,
-	// 	hubInfoSecret: event.env.hubInfoSecret,
-	// 	oauthStateSecret: event.env.oauthStateSecret,
-	// 	oauthCodeVerifierSecret: event.env.oauthCodeVerifierSecret,
-	// })
 	// event.responseHeaders.set(hstsName, hstsValue)
 	return (
 		<StartServer
