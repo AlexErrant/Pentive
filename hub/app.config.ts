@@ -5,7 +5,7 @@ export default defineConfig({
 	server: {
 		preset: 'cloudflare-module',
 		rollupConfig: {
-			external: ['node:async_hooks'],
+			external: ['__STATIC_CONTENT_MANIFEST', 'node:async_hooks'],
 		},
 		https: {
 			key: './.cert/key.pem',
