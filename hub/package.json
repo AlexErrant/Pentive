@@ -1,7 +1,7 @@
 {
 	"name": "hub",
 	"scripts": {
-		"dev": "vinxi dev",
+		"dev": "vinxi dev --port=3014",
 		"build": "vinxi build",
 		"start": "vinxi start",
 		"deploy": "wrangler deploy",
