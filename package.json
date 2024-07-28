@@ -27,10 +27,12 @@
 		"eslint:fix": "pnpm --parallel --no-bail -r eslint:fix --max-warnings 0",
 		"eslint+test": "concurrently -p \"[{name}]\" -n \"lint,test,check\" -c \"bgBlue.bold,bgGreen.bold,bgMagenta.bold\" \"pnpm eslint\" \"pnpm test\" \"pnpm --filter pentive-svelte-plugin-example check\"",
 		"test": "pnpm --parallel --no-bail -r test:run",
+		"build-deps": "pnpm --filter solid-toast build",
 		"tsc-build": "tsc --build",
 		"tsc-clean": "rm -rf **/tsconfig.tsbuildinfo",
 		"//ci": "simulate cicd locally",
-		"ci": "git clean -xdf && pnpm i && pnpm tsc-build && pnpm eslint+test && ./mkenv.sh && ./rmcert.sh && ./mkcert.sh && pnpm build"
+		"ci": "git clean -xdf && (cd solid-toast; git clean -xdf) && ./mkenv.sh && ./rmcert.sh && ./mkcert.sh && pnpm i && pnpm build-deps && pnpm tsc-build && pnpm eslint+test && pnpm build",
+		"cf": "git clean -xdf && (cd solid-toast; git clean -xdf) && ./mkenv.sh && ./rmcert.sh && ./mkcert.sh && pnpm i && pnpm build-deps && pnpm tsc-build && pnpm build"
 	},
 	"pnpm": {
 		"patchedDependencies": {
