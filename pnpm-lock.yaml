@@ -129,7 +129,7 @@ importers:
         version: 0.11.0(solid-js@1.8.18)
       '@kobalte/tailwindcss':
         specifier: ^0.9.0
-        version: 0.9.0(tailwindcss@3.4.3(ts-node@10.9.1(@types/node@20.14.11)(typescript@5.4.5)))
+        version: 0.9.0(tailwindcss@3.4.3(ts-node@10.9.2(@types/node@20.14.11)(typescript@5.4.5)))
       '@solid-primitives/scheduled':
         specifier: ^1.4.3
         version: 1.4.3(solid-js@1.8.18)
@@ -225,7 +225,7 @@ importers:
         version: link:../lrpc
       nightwind:
         specifier: ^1.1.13
-        version: 1.1.13(patch_hash=3i6ghclomd7vkkb2jwgexhbq3i)(tailwindcss@3.4.3(ts-node@10.9.1(@types/node@20.14.11)(typescript@5.4.5)))
+        version: 1.1.13(patch_hash=3i6ghclomd7vkkb2jwgexhbq3i)(tailwindcss@3.4.3(ts-node@10.9.2(@types/node@20.14.11)(typescript@5.4.5)))
       node-htmldiff:
         specifier: ^0.9.4
         version: 0.9.4
@@ -301,7 +301,7 @@ importers:
         version: 1.38.1
       '@tailwindcss/forms':
         specifier: ^0.5.7
-        version: 0.5.7(tailwindcss@3.4.3(ts-node@10.9.1(@types/node@20.14.11)(typescript@5.4.5)))
+        version: 0.5.7(tailwindcss@3.4.3(ts-node@10.9.2(@types/node@20.14.11)(typescript@5.4.5)))
       '@types/diff':
         specifier: ^5.0.5
         version: 5.0.5
@@ -397,10 +397,10 @@ importers:
         version: 34.0.0(stylelint@15.10.3(typescript@5.4.5))
       tailwindcss:
         specifier: ^3.4.3
-        version: 3.4.3(ts-node@10.9.1(@types/node@20.14.11)(typescript@5.4.5))
-      ts-node:
-        specifier: ^10.9.1
-        version: 10.9.1(@types/node@20.14.11)(typescript@5.4.5)
+        version: 3.4.3(ts-node@10.9.2(@types/node@20.14.11)(typescript@5.4.5))
+      tsx:
+        specifier: ^4.16.2
+        version: 4.16.2
       typescript:
         specifier: ~5.4.5
         version: 5.4.5
@@ -501,9 +501,9 @@ importers:
       stylelint-config-standard:
         specifier: ^34.0.0
         version: 34.0.0(stylelint@15.10.3(typescript@5.4.5))
-      ts-node:
-        specifier: ^10.9.1
-        version: 10.9.1(@types/node@20.14.11)(typescript@5.4.5)
+      tsx:
+        specifier: ^4.16.2
+        version: 4.16.2
       typescript:
         specifier: ~5.4.5
         version: 5.4.5
@@ -890,9 +890,9 @@ importers:
       stylelint-config-standard:
         specifier: ^34.0.0
         version: 34.0.0(stylelint@15.10.3(typescript@5.4.5))
-      ts-node:
-        specifier: ^10.9.1
-        version: 10.9.1(@types/node@20.14.11)(typescript@5.4.5)
+      tsx:
+        specifier: ^4.16.2
+        version: 4.16.2
       typescript:
         specifier: ~5.4.5
         version: 5.4.5
@@ -7402,6 +7402,9 @@ packages:
   get-tsconfig@4.7.2:
     resolution: {integrity: sha512-wuMsz4leaj5hbGgg4IvDU0bqJagpftG5l5cXIAvo8uZrqn0NJqwtfupTN00VnkQJPcIRrxYrm1Ue24btpCha2A==}
 
+  get-tsconfig@4.7.6:
+    resolution: {integrity: sha512-ZAqrLlu18NbDdRaHq+AKXzAmqIUPswPWKUchfytdAjiRFnCe5ojG2bstg6mRiZabkKfCoL/e98pbBELIV/YCeA==}
+
   giget@1.2.3:
     resolution: {integrity: sha512-8EHPljDvs7qKykr6uw8b+lqLiUc/vUg+KVTI0uND4s63TdsZM2Xus3mflvF0DDG9SiM4RlCkFGL+7aAjRmV7KA==}
     hasBin: true
@@ -11608,6 +11611,11 @@ packages:
     peerDependencies:
       typescript: '>=2.8.0 || >= 3.2.0-dev || >= 3.3.0-dev || >= 3.4.0-dev || >= 3.5.0-dev || >= 3.6.0-dev || >= 3.6.0-beta || >= 3.7.0-dev || >= 3.7.0-beta'
 
+  tsx@4.16.2:
+    resolution: {integrity: sha512-C1uWweJDgdtX2x600HjaFaucXTilT7tgUZHbOE4+ypskZ1OP8CRCSDkCxG6Vya9EwaFIVagWwpaVAn5wzypaqQ==}
+    engines: {node: '>=18.0.0'}
+    hasBin: true
+
   tunnel-agent@0.6.0:
     resolution: {integrity: sha512-McnNiV1l8RYeY8tBgEpuodCC1mLUdbSN+CYBL7kJsJNInOP8UjDDEwdk6Mw60vdLLrr5NHKZhMAOSrR2NZuQ+w==}
 
@@ -15204,9 +15212,9 @@ snapshots:
       '@kobalte/utils': 0.9.0(solid-js@1.8.18)
       solid-js: 1.8.18
 
-  '@kobalte/tailwindcss@0.9.0(tailwindcss@3.4.3(ts-node@10.9.1(@types/node@20.14.11)(typescript@5.4.5)))':
+  '@kobalte/tailwindcss@0.9.0(tailwindcss@3.4.3(ts-node@10.9.2(@types/node@20.14.11)(typescript@5.4.5)))':
     dependencies:
-      tailwindcss: 3.4.3(ts-node@10.9.1(@types/node@20.14.11)(typescript@5.4.5))
+      tailwindcss: 3.4.3(ts-node@10.9.2(@types/node@20.14.11)(typescript@5.4.5))
 
   '@kobalte/tailwindcss@0.9.0(tailwindcss@3.4.3(ts-node@10.9.2(@types/node@20.14.12)(typescript@5.4.5)))':
     dependencies:
@@ -16357,10 +16365,10 @@ snapshots:
     dependencies:
       defer-to-connect: 2.0.1
 
-  '@tailwindcss/forms@0.5.7(tailwindcss@3.4.3(ts-node@10.9.1(@types/node@20.14.11)(typescript@5.4.5)))':
+  '@tailwindcss/forms@0.5.7(tailwindcss@3.4.3(ts-node@10.9.2(@types/node@20.14.11)(typescript@5.4.5)))':
     dependencies:
       mini-svg-data-uri: 1.4.4
-      tailwindcss: 3.4.3(ts-node@10.9.1(@types/node@20.14.11)(typescript@5.4.5))
+      tailwindcss: 3.4.3(ts-node@10.9.2(@types/node@20.14.11)(typescript@5.4.5))
 
   '@tailwindcss/forms@0.5.7(tailwindcss@3.4.3(ts-node@10.9.2(@types/node@20.14.12)(typescript@5.4.5)))':
     dependencies:
@@ -20173,6 +20181,10 @@ snapshots:
     dependencies:
       resolve-pkg-maps: 1.0.0
 
+  get-tsconfig@4.7.6:
+    dependencies:
+      resolve-pkg-maps: 1.0.0
+
   giget@1.2.3:
     dependencies:
       citty: 0.1.6
@@ -22282,9 +22294,9 @@ snapshots:
 
   nice-try@1.0.5: {}
 
-  nightwind@1.1.13(patch_hash=3i6ghclomd7vkkb2jwgexhbq3i)(tailwindcss@3.4.3(ts-node@10.9.1(@types/node@20.14.11)(typescript@5.4.5))):
+  nightwind@1.1.13(patch_hash=3i6ghclomd7vkkb2jwgexhbq3i)(tailwindcss@3.4.3(ts-node@10.9.2(@types/node@20.14.11)(typescript@5.4.5))):
     dependencies:
-      tailwindcss: 3.4.3(ts-node@10.9.1(@types/node@20.14.11)(typescript@5.4.5))
+      tailwindcss: 3.4.3(ts-node@10.9.2(@types/node@20.14.11)(typescript@5.4.5))
 
   nightwind@1.1.13(patch_hash=3i6ghclomd7vkkb2jwgexhbq3i)(tailwindcss@3.4.3(ts-node@10.9.2(@types/node@20.14.12)(typescript@5.4.5))):
     dependencies:
@@ -23075,13 +23087,13 @@ snapshots:
       camelcase-css: 2.0.1
       postcss: 8.4.40
 
-  postcss-load-config@4.0.2(postcss@8.4.38)(ts-node@10.9.1(@types/node@20.14.11)(typescript@5.4.5)):
+  postcss-load-config@4.0.2(postcss@8.4.38)(ts-node@10.9.2(@types/node@20.14.11)(typescript@5.4.5)):
     dependencies:
       lilconfig: 3.1.1
       yaml: 2.4.2
     optionalDependencies:
       postcss: 8.4.38
-      ts-node: 10.9.1(@types/node@20.14.11)(typescript@5.4.5)
+      ts-node: 10.9.2(@types/node@20.14.11)(typescript@5.4.5)
 
   postcss-load-config@4.0.2(postcss@8.4.38)(ts-node@10.9.2(@types/node@20.14.12)(typescript@5.4.5)):
     dependencies:
@@ -24936,7 +24948,7 @@ snapshots:
       string-width: 4.2.3
       strip-ansi: 6.0.1
 
-  tailwindcss@3.4.3(ts-node@10.9.1(@types/node@20.14.11)(typescript@5.4.5)):
+  tailwindcss@3.4.3(ts-node@10.9.2(@types/node@20.14.11)(typescript@5.4.5)):
     dependencies:
       '@alloc/quick-lru': 5.2.0
       arg: 5.0.2
@@ -24955,7 +24967,7 @@ snapshots:
       postcss: 8.4.38
       postcss-import: 15.1.0(postcss@8.4.38)
       postcss-js: 4.0.1(postcss@8.4.38)
-      postcss-load-config: 4.0.2(postcss@8.4.38)(ts-node@10.9.1(@types/node@20.14.11)(typescript@5.4.5))
+      postcss-load-config: 4.0.2(postcss@8.4.38)(ts-node@10.9.2(@types/node@20.14.11)(typescript@5.4.5))
       postcss-nested: 6.0.1(postcss@8.4.38)
       postcss-selector-parser: 6.0.16
       resolve: 1.22.8
@@ -25319,6 +25331,13 @@ snapshots:
     dependencies:
       tslib: 1.14.1
       typescript: 5.4.5
+
+  tsx@4.16.2:
+    dependencies:
+      esbuild: 0.21.5
+      get-tsconfig: 4.7.6
+    optionalDependencies:
+      fsevents: 2.3.3
 
   tunnel-agent@0.6.0:
     dependencies:
