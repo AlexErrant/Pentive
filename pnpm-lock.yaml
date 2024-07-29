@@ -733,6 +733,9 @@ importers:
       '@cloudflare/workers-types':
         specifier: ^4.20240725.0
         version: 4.20240725.0
+      '@lezer/lr':
+        specifier: ^1.4.2 || See comment on html-to-text
+        version: 1.4.2
       '@tailwindcss/forms':
         specifier: ^0.5.7
         version: 0.5.7(tailwindcss@3.4.3(ts-node@10.9.2(@types/node@20.14.12)(typescript@5.4.5)))
@@ -3506,6 +3509,9 @@ packages:
 
   '@lezer/lr@1.4.1':
     resolution: {integrity: sha512-CHsKq8DMKBf9b3yXPDIU4DbH+ZJd/sJdYOW2llbW/HudP5u0VS6Bfq1hLYfgU7uAYGFIyGGQIsSOXGPEErZiJw==}
+
+  '@lezer/lr@1.4.2':
+    resolution: {integrity: sha512-pu0K1jCIdnQ12aWNaAVU5bzi7Bd1w54J3ECgANPmYLtQKP0HBj2cE/5coBD66MT10xbtIuUr7tg0Shbsvk0mDA==}
 
   '@lezer/yaml@1.0.3':
     resolution: {integrity: sha512-GuBLekbw9jDBDhGur82nuwkxKQ+a3W5H0GfaAthDXcAu+XdpS43VlnxA9E9hllkpSP5ellRDKjLLj7Lu9Wr6xA==}
@@ -15235,12 +15241,12 @@ snapshots:
     dependencies:
       '@lezer/common': 1.2.1
       '@lezer/highlight': 1.2.0
-      '@lezer/lr': 1.4.1
+      '@lezer/lr': 1.4.2
 
   '@lezer/generator@1.7.1':
     dependencies:
       '@lezer/common': 1.2.1
-      '@lezer/lr': 1.4.1
+      '@lezer/lr': 1.4.2
 
   '@lezer/highlight@1.2.0':
     dependencies:
@@ -15250,21 +15256,25 @@ snapshots:
     dependencies:
       '@lezer/common': 1.2.1
       '@lezer/highlight': 1.2.0
-      '@lezer/lr': 1.4.1
+      '@lezer/lr': 1.4.2
 
   '@lezer/javascript@1.4.17':
     dependencies:
       '@lezer/common': 1.2.1
       '@lezer/highlight': 1.2.0
-      '@lezer/lr': 1.4.1
+      '@lezer/lr': 1.4.2
 
   '@lezer/json@1.0.2':
     dependencies:
       '@lezer/common': 1.2.1
       '@lezer/highlight': 1.2.0
-      '@lezer/lr': 1.4.1
+      '@lezer/lr': 1.4.2
 
   '@lezer/lr@1.4.1':
+    dependencies:
+      '@lezer/common': 1.2.1
+
+  '@lezer/lr@1.4.2':
     dependencies:
       '@lezer/common': 1.2.1
 
@@ -15272,7 +15282,7 @@ snapshots:
     dependencies:
       '@lezer/common': 1.2.1
       '@lezer/highlight': 1.2.0
-      '@lezer/lr': 1.4.1
+      '@lezer/lr': 1.4.2
     optional: true
 
   '@ljharb/through@2.3.9': {}
@@ -21613,7 +21623,7 @@ snapshots:
 
   lezer-json5@2.0.2:
     dependencies:
-      '@lezer/lr': 1.4.1
+      '@lezer/lr': 1.4.2
     optional: true
 
   lie@3.3.0:

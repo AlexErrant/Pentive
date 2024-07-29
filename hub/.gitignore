@@ -25,6 +25,7 @@ Thumbs.db
 
 # Other
 wrangler.toml
+.wrangler/*
 .env
 .env.development
 .env.production

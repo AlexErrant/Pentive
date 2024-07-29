@@ -1,8 +1,10 @@
 name = "hub"
 compatibility_date = "2023-03-21"
 
-main = "./dist/server.js"
+main = "./.output/server/index.mjs"
 account_id = "$cloudflareAccountId"
+compatibility_flags = ["nodejs_als"]
 
 [site]
-bucket= "./dist/public"
+bucket = ".output/public"
+

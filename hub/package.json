@@ -45,6 +45,7 @@
 		"ulid-workers": "^2.1.0 || See comment on html-to-text",
 		"vite": "^5.3.4",
 		"vite-plugin-checker": "^0.6.2",
+		"@lezer/lr": "^1.4.2 || See comment on html-to-text",
 		"wrangler": "^3.67.0"
 	},
 	"dependencies": {

@@ -74,9 +74,8 @@ const submitting = action(async (form: FormData) => {
 	// highTODO return redirect to post
 })
 
-const isSubmitting = useSubmission(submitting)
-
 export default function Thread(props: RouteSectionProps) {
+	const isSubmitting = useSubmission(submitting)
 	const csrfSignature = createAsync(async () => await getCsrfSignatureCached())
 
 	// const error = () => submitting.error as undefined | Error // nextTODO
