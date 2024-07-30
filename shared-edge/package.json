@@ -34,7 +34,7 @@
 	"dependencies": {
 		"@scure/base": "^1.1.1",
 		"hono": "^3.7.2",
-		"jose": "^4.14.6",
+		"jose": "^5.6.3",
 		"kysely": "^0.27.3",
 		"kysely-planetscale": "^1.4.0",
 		"shared": "workspace:*",

@@ -70,7 +70,7 @@
 		"cookie": "^0.5.0",
 		"cwa": "workspace:*",
 		"iframe-resizer": "^4.3.7",
-		"jose": "^4.14.6",
+		"jose": "^5.6.3",
 		"nightwind": "^1.1.13",
 		"oauth4webapi": "^2.3.0",
 		"shared": "workspace:*",

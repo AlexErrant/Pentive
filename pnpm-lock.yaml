@@ -52,8 +52,8 @@ importers:
         specifier: ^3.7.2
         version: 3.7.2
       jose:
-        specifier: ^4.14.6
-        version: 4.14.6
+        specifier: ^5.6.3
+        version: 5.6.3
       kysely:
         specifier: ^0.27.3
         version: 0.27.3
@@ -212,8 +212,8 @@ importers:
         specifier: ^10.0.2
         version: 10.0.2
       jose:
-        specifier: ^4.14.6
-        version: 4.14.6
+        specifier: ^5.6.3
+        version: 5.6.3
       kysely:
         specifier: ^0.27.3
         version: 0.27.3
@@ -535,8 +535,8 @@ importers:
         specifier: ^3.7.2
         version: 3.7.2
       jose:
-        specifier: ^4.14.6
-        version: 4.14.6
+        specifier: ^5.6.3
+        version: 5.6.3
       kysely:
         specifier: ^0.27.3
         version: 0.27.3
@@ -697,8 +697,8 @@ importers:
         specifier: ^4.3.7
         version: 4.3.7
       jose:
-        specifier: ^4.14.6
-        version: 4.14.6
+        specifier: ^5.6.3
+        version: 5.6.3
       nightwind:
         specifier: ^1.1.13
         version: 1.1.13(patch_hash=3i6ghclomd7vkkb2jwgexhbq3i)(tailwindcss@3.4.3(ts-node@10.9.2(@types/node@22.0.0)(typescript@5.4.5)))
@@ -945,8 +945,8 @@ importers:
         specifier: ^1.6.6
         version: 1.6.6
       jose:
-        specifier: ^4.14.6
-        version: 4.14.6
+        specifier: ^5.6.3
+        version: 5.6.3
       lodash:
         specifier: ^4.17.21
         version: 4.17.21
@@ -1316,8 +1316,8 @@ importers:
         specifier: ^3.7.2
         version: 3.7.2
       jose:
-        specifier: ^4.14.6
-        version: 4.14.6
+        specifier: ^5.6.3
+        version: 5.6.3
       kysely:
         specifier: ^0.27.3
         version: 0.27.3
@@ -8615,8 +8615,11 @@ packages:
   joi@17.13.3:
     resolution: {integrity: sha512-otDA4ldcIx+ZXsKHWmp0YizCweVRZG96J10b0FevjfuncLO1oX59THoAmHkNubYJ+9gWsYsp5k8v4ib6oDv1fA==}
 
-  jose@4.14.6:
-    resolution: {integrity: sha512-EqJPEUlZD0/CSUMubKtMaYUOtWe91tZXTWMJZoKSbLk+KtdhNdcvppH8lA9XwVu2V4Ailvsj0GBZJ2ZwDjfesQ==}
+  jose@4.15.9:
+    resolution: {integrity: sha512-1vUQX+IdDMVPj4k8kOxgUqlcK518yluMuGZwqlr44FS1ppZB/5GWh4rZG89erpOBOJjU/OBsnCVFfapsRz6nEA==}
+
+  jose@5.6.3:
+    resolution: {integrity: sha512-1Jh//hEEwMhNYPDDLwXHa2ePWgWiFNNUadVmguAAw2IJ6sj9mNxV5tGXJNqlMkJAybF6Lgw1mISDxTePP/187g==}
 
   js-string-escape@1.0.1:
     resolution: {integrity: sha512-Smw4xcfIQ5LVjAOuJCvN/zIodzA/BBSsluuoSykP+lUvScIi4U6RJLfwHet5cxFnCswUjISV8oAXaqaJDY3chg==}
@@ -22497,7 +22500,9 @@ snapshots:
       '@sideway/formula': 3.0.1
       '@sideway/pinpoint': 2.0.0
 
-  jose@4.14.6: {}
+  jose@4.15.9: {}
+
+  jose@5.6.3: {}
 
   js-string-escape@1.0.1: {}
 
@@ -25222,7 +25227,7 @@ snapshots:
       fs-extra: 11.1.1
       is-wsl: 3.1.0
       java-invoke-local: 0.0.6
-      jose: 4.14.6
+      jose: 4.15.9
       js-string-escape: 1.0.1
       jsonpath-plus: 7.2.0
       jsonschema: 1.4.1
