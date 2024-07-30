@@ -76,7 +76,12 @@ export default defineConfig(({ mode }: UserConfig) => {
 			target: 'ES2022',
 			sourcemap: true,
 			rollupOptions: {
-				external: ['solid-js', 'solid-js/web', '@solidjs/router'],
+				external: [
+					'solid-js',
+					'solid-js/web',
+					'solid-js/store',
+					'@solidjs/router',
+				],
 				// https://vitejs.dev/guide/build.html#multi-page-app
 				input: {
 					main: resolve(__dirname, 'index.html'),
