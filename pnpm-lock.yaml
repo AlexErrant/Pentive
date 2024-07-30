@@ -409,7 +409,7 @@ importers:
         version: 5.3.5(@types/node@20.14.11)(sass@1.77.8)(terser@5.31.3)
       vite-plugin-checker:
         specifier: ^0.7.2
-        version: 0.7.2(eslint@8.57.0)(meow@13.2.0)(optionator@0.9.4)(stylelint@15.10.3(typescript@5.4.5))(typescript@5.4.5)(vite@5.3.5(@types/node@20.14.11)(sass@1.77.8)(terser@5.31.3))
+        version: 0.7.2(eslint@8.57.0)(meow@9.0.0)(optionator@0.9.4)(stylelint@15.10.3(typescript@5.4.5))(typescript@5.4.5)(vite@5.3.5(@types/node@20.14.11)(sass@1.77.8)(terser@5.31.3))
       vite-plugin-pwa:
         specifier: ^0.20.1
         version: 0.20.1(vite@5.3.5(@types/node@20.14.11)(sass@1.77.8)(terser@5.31.3))(workbox-build@7.1.1(@types/babel__core@7.20.5))(workbox-window@7.1.0)
@@ -512,7 +512,7 @@ importers:
         version: 5.3.5(@types/node@20.14.11)(sass@1.77.8)(terser@5.31.3)
       vite-plugin-checker:
         specifier: ^0.7.2
-        version: 0.7.2(eslint@8.57.0)(meow@13.2.0)(optionator@0.9.4)(stylelint@15.10.3(typescript@5.4.5))(typescript@5.4.5)(vite@5.3.5(@types/node@20.14.11)(sass@1.77.8)(terser@5.31.3))
+        version: 0.7.2(eslint@8.57.0)(meow@9.0.0)(optionator@0.9.4)(stylelint@15.10.3(typescript@5.4.5))(typescript@5.4.5)(vite@5.3.5(@types/node@20.14.11)(sass@1.77.8)(terser@5.31.3))
       vite-plugin-pwa:
         specifier: ^0.20.1
         version: 0.20.1(vite@5.3.5(@types/node@20.14.11)(sass@1.77.8)(terser@5.31.3))(workbox-build@7.1.1(@types/babel__core@7.20.5))(workbox-window@7.1.0)
@@ -617,10 +617,10 @@ importers:
         version: 3.59.2
       svelte-check:
         specifier: ^3.5.2
-        version: 3.5.2(@babel/core@7.25.2)(postcss-load-config@6.0.1(postcss@8.4.40))(postcss@8.4.40)(sass@1.77.8)(svelte@3.59.2)
+        version: 3.5.2(@babel/core@7.25.2)(postcss-load-config@4.0.2(postcss@8.4.40))(postcss@8.4.40)(sass@1.77.8)(svelte@3.59.2)
       svelte-preprocess:
         specifier: ^5.0.4
-        version: 5.0.4(@babel/core@7.25.2)(postcss-load-config@6.0.1(postcss@8.4.40))(postcss@8.4.40)(sass@1.77.8)(svelte@3.59.2)(typescript@5.4.5)
+        version: 5.0.4(@babel/core@7.25.2)(postcss-load-config@4.0.2(postcss@8.4.40))(postcss@8.4.40)(sass@1.77.8)(svelte@3.59.2)(typescript@5.4.5)
       tslib:
         specifier: ^2.6.2
         version: 2.6.2
@@ -687,9 +687,9 @@ importers:
       comlink:
         specifier: ^4.4.1
         version: 4.4.1
-      cookie:
-        specifier: ^0.5.0
-        version: 0.5.0
+      cookie-es:
+        specifier: ^1.2.2
+        version: 1.2.2
       cwa:
         specifier: workspace:*
         version: link:../cwa
@@ -739,9 +739,6 @@ importers:
       '@tailwindcss/forms':
         specifier: ^0.5.7
         version: 0.5.7(tailwindcss@3.4.3(ts-node@10.9.2(@types/node@22.0.0)(typescript@5.4.5)))
-      '@types/cookie':
-        specifier: ^0.5.2
-        version: 0.5.2
       '@types/iframe-resizer':
         specifier: ^3.5.10
         version: 3.5.10
@@ -789,7 +786,7 @@ importers:
         version: 0.5.14(prettier@3.3.3)
       solid-start-cloudflare-workers:
         specifier: ^0.3.6
-        version: 0.3.11(cron-schedule@5.0.3)(ioredis@5.4.1)(solid-start@0.3.11)(vite@5.3.5(@types/node@22.0.0)(sass@1.77.8)(terser@5.31.3))
+        version: 0.3.11(cron-schedule@3.0.6)(ioredis@5.4.1)(solid-start@0.3.11)(vite@5.3.5(@types/node@22.0.0)(sass@1.77.8)(terser@5.31.3))
       solid-start-node:
         specifier: ^0.3.6
         version: 0.3.11(solid-start@0.3.11)(vite@5.3.5(@types/node@22.0.0)(sass@1.77.8)(terser@5.31.3))
@@ -816,7 +813,7 @@ importers:
         version: 5.3.5(@types/node@22.0.0)(sass@1.77.8)(terser@5.31.3)
       vite-plugin-checker:
         specifier: ^0.7.2
-        version: 0.7.2(eslint@8.57.0)(meow@13.2.0)(optionator@0.9.4)(stylelint@15.10.3(typescript@5.4.5))(typescript@5.4.5)(vite@5.3.5(@types/node@22.0.0)(sass@1.77.8)(terser@5.31.3))
+        version: 0.7.2(eslint@8.57.0)(meow@9.0.0)(optionator@0.9.4)(stylelint@15.10.3(typescript@5.4.5))(typescript@5.4.5)(vite@5.3.5(@types/node@22.0.0)(sass@1.77.8)(terser@5.31.3))
       wrangler:
         specifier: ^3.67.0
         version: 3.67.0(@cloudflare/workers-types@4.20240725.0)
@@ -901,7 +898,7 @@ importers:
         version: 5.3.5(@types/node@20.14.11)(sass@1.77.8)(terser@5.31.3)
       vite-plugin-checker:
         specifier: ^0.7.2
-        version: 0.7.2(eslint@8.57.0)(meow@13.2.0)(optionator@0.9.4)(stylelint@15.10.3(typescript@5.4.5))(typescript@5.4.5)(vite@5.3.5(@types/node@20.14.11)(sass@1.77.8)(terser@5.31.3))
+        version: 0.7.2(eslint@8.57.0)(meow@9.0.0)(optionator@0.9.4)(stylelint@15.10.3(typescript@5.4.5))(typescript@5.4.5)(vite@5.3.5(@types/node@20.14.11)(sass@1.77.8)(terser@5.31.3))
       vite-plugin-pwa:
         specifier: ^0.20.1
         version: 0.20.1(vite@5.3.5(@types/node@20.14.11)(sass@1.77.8)(terser@5.31.3))(workbox-build@7.1.1(@types/babel__core@7.20.5))(workbox-window@7.1.0)
@@ -935,9 +932,9 @@ importers:
       aws-lambda:
         specifier: ^1.0.7
         version: 1.0.7
-      cookie:
-        specifier: ^0.5.0
-        version: 0.5.0
+      cookie-es:
+        specifier: ^1.2.2
+        version: 1.2.2
       dotenv:
         specifier: ^16.3.1
         version: 16.3.1
@@ -969,9 +966,6 @@ importers:
       '@types/aws-lambda':
         specifier: ^8.10.122
         version: 8.10.122
-      '@types/cookie':
-        specifier: ^0.5.2
-        version: 0.5.2
       '@types/lodash':
         specifier: ^4.14.199
         version: 4.14.199
@@ -4643,9 +4637,6 @@ packages:
   '@types/connect@3.4.35':
     resolution: {integrity: sha512-cdeYyv4KWoEgpBISTxWvqYsVy444DOqehiF3fM3ne10AmJ62RSyNkUnxMJXHQWRQQX2eR94m5y1IZyDwBjV9FQ==}
 
-  '@types/cookie@0.5.2':
-    resolution: {integrity: sha512-DBpRoJGKJZn7RY92dPrgoMew8xCWc2P71beqsjyhEI/Ds9mOyVmBwtekyfhpwFIVt1WrxTonFifiOZ62V8CnNA==}
-
   '@types/cookie@0.5.4':
     resolution: {integrity: sha512-7z/eR6O859gyWIAjuvBWFzNURmf2oPBmJlfVWkwehU5nzIyjwBsTh7WMmEEV4JFnHuQ3ex4oyTvfKzcyJVDBNA==}
 
@@ -6023,8 +6014,8 @@ packages:
   convert-source-map@2.0.0:
     resolution: {integrity: sha512-Kvp459HrV2FEJ1CAsi1Ku+MY3kasH19TFykTz2xWmMeq6bk2NU3XXvfJ+Q61m0xktWwt+1HSYf3JZsTms3aRJg==}
 
-  cookie-es@1.2.1:
-    resolution: {integrity: sha512-ilTPDuxhZX44BSzzRB58gvSY2UevZKQM9fjisn7Z+NJ92CtSU6kO1+22ZN/agbEJANFjK85EiJJbi/gQv18OXA==}
+  cookie-es@1.2.2:
+    resolution: {integrity: sha512-+W7VmiVINB+ywl1HGXJXmrqkOhpKrIiVZV6tQuV54ZyQC7MMuBt81Vc336GMLoHBq5hV/F9eXgt5Mnx0Rha5Fg==}
 
   cookie-signature@1.0.6:
     resolution: {integrity: sha512-QADzlaHc8icV8I7vbaJXJwod9HWYp8uCqf1xa4OfNu1T7JVxQIrUgOWtHdNDtPiywmFbiS12VjotIXLrKM3orQ==}
@@ -6100,10 +6091,6 @@ packages:
 
   cron-schedule@3.0.6:
     resolution: {integrity: sha512-izfGgKyzzIyLaeb1EtZ3KbglkS6AKp9cv7LxmiyoOu+fXfol1tQDC0Cof0enVZGNtudTHW+3lfuW9ZkLQss4Wg==}
-
-  cron-schedule@5.0.3:
-    resolution: {integrity: sha512-28K1ZpQKekkqlD2Jil5PfCJMHm0znUiM6T3D7bAZJG2eflh9zAFAf00jbJpbF8AhaSAgXcUeIilAzYof+vYV0w==}
-    engines: {node: '>=18'}
 
   croner@8.1.0:
     resolution: {integrity: sha512-sz990XOUPR8dG/r5BRKMBd15MYDDUu8oeSaxFD5DqvNgHSZw8Psd1s689/IGET7ezxRMiNlCIyGeY1Gvxp/MLg==}
@@ -8855,10 +8842,6 @@ packages:
     resolution: {integrity: sha512-O18pf7nyvHTckunPWCV1XUNXU1piu01y2b7ATJ0ppkUkk8ocqVWBrYjJBCwHDjD/ZWcfyrA0P4gKhzWGi5EINQ==}
     engines: {node: '>=14'}
 
-  lilconfig@3.1.2:
-    resolution: {integrity: sha512-eop+wDAvpItUys0FWkHIKeC9ybYrTGbU41U5K7+bttZZeohvnY7M9dZ5kB21GNWiFT2q1OoPTvncPCgSOVO5ow==}
-    engines: {node: '>=14'}
-
   lines-and-columns@1.2.4:
     resolution: {integrity: sha512-7ylylesZQ/PV29jhEDl3Ufjo6ZX7gCqJr5F7PKrqc93v7fzSymt1BpwEU8nAUXs8qzzvqhbjhK5QZg6Mt/HkBg==}
 
@@ -9120,10 +9103,6 @@ packages:
   meow@12.1.1:
     resolution: {integrity: sha512-BhXM0Au22RwUneMPwSCnyhTOizdWoIEPU9sp0Aqa1PnDMR5Wv2FGXYDjuzJEIX+Eo2Rb8xuYe5jrnm5QowQFkw==}
     engines: {node: '>=16.10'}
-
-  meow@13.2.0:
-    resolution: {integrity: sha512-pxQJQzB6djGPXh08dacEloMFopsOqGVRKFPYvPOt9XDZ1HasbgDZA74CJGreSU4G3Ak7EFJGoiH2auq+yXISgA==}
-    engines: {node: '>=18'}
 
   meow@9.0.0:
     resolution: {integrity: sha512-+obSblOQmRhcyBt62furQqRAQpNyWXo8BuQ5bN7dG8wmwQ+vwHKp/rCFD4CrTP8CsDQD1sjoZ94K417XEUk8IQ==}
@@ -10023,24 +10002,6 @@ packages:
       postcss:
         optional: true
       ts-node:
-        optional: true
-
-  postcss-load-config@6.0.1:
-    resolution: {integrity: sha512-oPtTM4oerL+UXmx+93ytZVN82RrlY/wPUV8IeDxFrzIjXOLF1pN+EmKPLbubvKHT2HC20xXsCAH2Z+CKV6Oz/g==}
-    engines: {node: '>= 18'}
-    peerDependencies:
-      jiti: '>=1.21.0'
-      postcss: '>=8.4.31'
-      tsx: ^4.8.1
-      yaml: ^2.4.2
-    peerDependenciesMeta:
-      jiti:
-        optional: true
-      postcss:
-        optional: true
-      tsx:
-        optional: true
-      yaml:
         optional: true
 
   postcss-nested@6.0.1:
@@ -17519,8 +17480,6 @@ snapshots:
     dependencies:
       '@types/node': 20.14.11
 
-  '@types/cookie@0.5.2': {}
-
   '@types/cookie@0.5.4': {}
 
   '@types/debug@4.1.12':
@@ -19336,7 +19295,7 @@ snapshots:
 
   convert-source-map@2.0.0: {}
 
-  cookie-es@1.2.1: {}
+  cookie-es@1.2.2: {}
 
   cookie-signature@1.0.6: {}
 
@@ -19416,9 +19375,6 @@ snapshots:
       luxon: 3.4.3
 
   cron-schedule@3.0.6: {}
-
-  cron-schedule@5.0.3:
-    optional: true
 
   croner@8.1.0: {}
 
@@ -21474,7 +21430,7 @@ snapshots:
 
   h3@1.11.1:
     dependencies:
-      cookie-es: 1.2.1
+      cookie-es: 1.2.2
       crossws: 0.2.4
       defu: 6.1.4
       destr: 2.0.3
@@ -21489,7 +21445,7 @@ snapshots:
 
   h3@1.12.0:
     dependencies:
-      cookie-es: 1.2.1
+      cookie-es: 1.2.2
       crossws: 0.2.4
       defu: 6.1.4
       destr: 2.0.3
@@ -22738,9 +22694,6 @@ snapshots:
 
   lilconfig@3.1.1: {}
 
-  lilconfig@3.1.2:
-    optional: true
-
   lines-and-columns@1.2.4: {}
 
   linkify-it@5.0.0:
@@ -23078,9 +23031,6 @@ snapshots:
 
   meow@12.1.1: {}
 
-  meow@13.2.0:
-    optional: true
-
   meow@9.0.0:
     dependencies:
       '@types/minimist': 1.2.3
@@ -23152,7 +23102,7 @@ snapshots:
 
   mini-svg-data-uri@1.4.4: {}
 
-  miniflare@2.14.1(cron-schedule@5.0.3)(ioredis@5.4.1):
+  miniflare@2.14.1(cron-schedule@3.0.6)(ioredis@5.4.1):
     dependencies:
       '@miniflare/cache': 2.14.1
       '@miniflare/cli-parser': 2.14.1
@@ -23176,7 +23126,7 @@ snapshots:
       source-map-support: 0.5.21
       undici: 5.26.3
     optionalDependencies:
-      cron-schedule: 5.0.3
+      cron-schedule: 3.0.6
       ioredis: 5.4.1
     transitivePeerDependencies:
       - bufferutil
@@ -23424,7 +23374,7 @@ snapshots:
       chokidar: 3.6.0
       citty: 0.1.6
       consola: 3.2.3
-      cookie-es: 1.2.1
+      cookie-es: 1.2.2
       croner: 8.1.0
       crossws: 0.2.4
       db0: 0.1.4
@@ -24210,13 +24160,6 @@ snapshots:
     optionalDependencies:
       postcss: 8.4.40
       ts-node: 10.9.2(@types/node@22.0.0)(typescript@5.4.5)
-
-  postcss-load-config@6.0.1(postcss@8.4.40):
-    dependencies:
-      lilconfig: 3.1.2
-    optionalDependencies:
-      postcss: 8.4.40
-    optional: true
 
   postcss-nested@6.0.1(postcss@8.4.38):
     dependencies:
@@ -25475,7 +25418,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  solid-start-cloudflare-workers@0.3.11(cron-schedule@5.0.3)(ioredis@5.4.1)(solid-start@0.3.11)(vite@5.3.5(@types/node@22.0.0)(sass@1.77.8)(terser@5.31.3)):
+  solid-start-cloudflare-workers@0.3.11(cron-schedule@3.0.6)(ioredis@5.4.1)(solid-start@0.3.11)(vite@5.3.5(@types/node@22.0.0)(sass@1.77.8)(terser@5.31.3)):
     dependencies:
       '@cloudflare/kv-asset-handler': 0.2.0
       '@cloudflare/workers-types': 3.19.0
@@ -25487,7 +25430,7 @@ snapshots:
       '@rollup/plugin-json': 6.0.0(rollup@3.29.3)
       '@rollup/plugin-node-resolve': 15.2.3(rollup@3.29.3)
       '@types/ws': 8.5.5
-      miniflare: 2.14.1(cron-schedule@5.0.3)(ioredis@5.4.1)
+      miniflare: 2.14.1(cron-schedule@3.0.6)(ioredis@5.4.1)
       rollup: 3.29.3
       solid-start: 0.3.11(@solidjs/meta@0.29.4(solid-js@1.8.18))(@solidjs/router@0.14.1(solid-js@1.8.18))(solid-js@1.8.18)(solid-start-cloudflare-workers@0.3.11)(solid-start-node@0.3.11)(vite@5.3.5(@types/node@22.0.0)(sass@1.77.8)(terser@5.31.3))
       terser: 5.31.3
@@ -25555,7 +25498,7 @@ snapshots:
       vite-plugin-solid: 2.10.2(solid-js@1.8.18)(vite@5.3.5(@types/node@22.0.0)(sass@1.77.8)(terser@5.31.3))
       wait-on: 6.0.1(debug@4.3.6)
     optionalDependencies:
-      solid-start-cloudflare-workers: 0.3.11(cron-schedule@5.0.3)(ioredis@5.4.1)(solid-start@0.3.11)(vite@5.3.5(@types/node@22.0.0)(sass@1.77.8)(terser@5.31.3))
+      solid-start-cloudflare-workers: 0.3.11(cron-schedule@3.0.6)(ioredis@5.4.1)(solid-start@0.3.11)(vite@5.3.5(@types/node@22.0.0)(sass@1.77.8)(terser@5.31.3))
       solid-start-node: 0.3.11(solid-start@0.3.11)(vite@5.3.5(@types/node@22.0.0)(sass@1.77.8)(terser@5.31.3))
     transitivePeerDependencies:
       - '@nuxt/kit'
@@ -26005,7 +25948,7 @@ snapshots:
 
   supports-preserve-symlinks-flag@1.0.0: {}
 
-  svelte-check@3.5.2(@babel/core@7.25.2)(postcss-load-config@6.0.1(postcss@8.4.40))(postcss@8.4.40)(sass@1.77.8)(svelte@3.59.2):
+  svelte-check@3.5.2(@babel/core@7.25.2)(postcss-load-config@4.0.2(postcss@8.4.40))(postcss@8.4.40)(sass@1.77.8)(svelte@3.59.2):
     dependencies:
       '@jridgewell/trace-mapping': 0.3.18
       chokidar: 3.5.3
@@ -26014,7 +25957,7 @@ snapshots:
       picocolors: 1.0.0
       sade: 1.8.1
       svelte: 3.59.2
-      svelte-preprocess: 5.0.4(@babel/core@7.25.2)(postcss-load-config@6.0.1(postcss@8.4.40))(postcss@8.4.40)(sass@1.77.8)(svelte@3.59.2)(typescript@5.4.5)
+      svelte-preprocess: 5.0.4(@babel/core@7.25.2)(postcss-load-config@4.0.2(postcss@8.4.40))(postcss@8.4.40)(sass@1.77.8)(svelte@3.59.2)(typescript@5.4.5)
       typescript: 5.4.5
     transitivePeerDependencies:
       - '@babel/core'
@@ -26031,7 +25974,7 @@ snapshots:
     dependencies:
       svelte: 3.59.2
 
-  svelte-preprocess@5.0.4(@babel/core@7.25.2)(postcss-load-config@6.0.1(postcss@8.4.40))(postcss@8.4.40)(sass@1.77.8)(svelte@3.59.2)(typescript@5.4.5):
+  svelte-preprocess@5.0.4(@babel/core@7.25.2)(postcss-load-config@4.0.2(postcss@8.4.40))(postcss@8.4.40)(sass@1.77.8)(svelte@3.59.2)(typescript@5.4.5):
     dependencies:
       '@types/pug': 2.0.6
       detect-indent: 6.1.0
@@ -26042,7 +25985,7 @@ snapshots:
     optionalDependencies:
       '@babel/core': 7.25.2
       postcss: 8.4.40
-      postcss-load-config: 6.0.1(postcss@8.4.40)
+      postcss-load-config: 4.0.2(postcss@8.4.40)(ts-node@10.9.2(@types/node@22.0.0)(typescript@5.4.5))
       sass: 1.77.8
       typescript: 5.4.5
 
@@ -26965,7 +26908,7 @@ snapshots:
       - supports-color
       - terser
 
-  vite-plugin-checker@0.7.2(eslint@8.57.0)(meow@13.2.0)(optionator@0.9.4)(stylelint@15.10.3(typescript@5.4.5))(typescript@5.4.5)(vite@5.3.5(@types/node@20.14.11)(sass@1.77.8)(terser@5.31.3)):
+  vite-plugin-checker@0.7.2(eslint@8.57.0)(meow@9.0.0)(optionator@0.9.4)(stylelint@15.10.3(typescript@5.4.5))(typescript@5.4.5)(vite@5.3.5(@types/node@20.14.11)(sass@1.77.8)(terser@5.31.3)):
     dependencies:
       '@babel/code-frame': 7.24.7
       ansi-escapes: 4.3.2
@@ -26984,12 +26927,12 @@ snapshots:
       vscode-uri: 3.0.8
     optionalDependencies:
       eslint: 8.57.0
-      meow: 13.2.0
+      meow: 9.0.0
       optionator: 0.9.4
       stylelint: 15.10.3(typescript@5.4.5)
       typescript: 5.4.5
 
-  vite-plugin-checker@0.7.2(eslint@8.57.0)(meow@13.2.0)(optionator@0.9.4)(stylelint@15.10.3(typescript@5.4.5))(typescript@5.4.5)(vite@5.3.5(@types/node@22.0.0)(sass@1.77.8)(terser@5.31.3)):
+  vite-plugin-checker@0.7.2(eslint@8.57.0)(meow@9.0.0)(optionator@0.9.4)(stylelint@15.10.3(typescript@5.4.5))(typescript@5.4.5)(vite@5.3.5(@types/node@22.0.0)(sass@1.77.8)(terser@5.31.3)):
     dependencies:
       '@babel/code-frame': 7.24.7
       ansi-escapes: 4.3.2
@@ -27008,7 +26951,7 @@ snapshots:
       vscode-uri: 3.0.8
     optionalDependencies:
       eslint: 8.57.0
-      meow: 13.2.0
+      meow: 9.0.0
       optionator: 0.9.4
       stylelint: 15.10.3(typescript@5.4.5)
       typescript: 5.4.5

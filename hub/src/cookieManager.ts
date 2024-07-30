@@ -1,4 +1,4 @@
-import { parse, serialize } from 'cookie'
+import { parse, serialize } from 'cookie-es'
 import { type WithRequired } from 'shared'
 import { type CookieSerializeOptions } from 'vinxi/http'
 
