@@ -8,12 +8,11 @@ import {
 } from 'shared'
 import { base64ToArray } from 'shared-edge'
 import { redirect } from '@solidjs/router'
-import { type CookieSerializeOptions } from 'vinxi/http'
-import { Cookie } from '~/createPlainCookie'
+import { CookieManager } from '~/cookieManager'
 import { getRequestEvent } from 'solid-js/web'
 import { type EnvVars } from './env'
 
-const sessionCookieOpts: CookieSerializeOptions = {
+const sessionCookie = new CookieManager(hubSessionCookieName, {
 	secure: true,
 	// nextTODO
 	// secrets: [], // intentionally empty. This cookie should only store a signed JWT!
@@ -22,16 +21,9 @@ const sessionCookieOpts: CookieSerializeOptions = {
 	maxAge: 60 * 60 * 24 * 30, // 30 days
 	httpOnly: true,
 	domain: import.meta.env.VITE_HUB_DOMAIN, // sadly, making cookies target specific subdomains from the main domain seems very hacky
-	// expires: "", // intentionally missing because docs say it's calculated off `maxAge` when missing https://github.com/solidjs/solid-start/blob/1b22cad87dd7bd74f73d807e1d60b886e753a6ee/packages/start/session/cookies.ts#L56-L57
-}
-const sessionCookie = new Cookie(hubSessionCookieName, sessionCookieOpts)
-const destroySessionCookie = new Cookie(hubSessionCookieName, {
-	...sessionCookieOpts,
-	maxAge: undefined,
-	expires: new Date(0), // https://github.com/remix-run/remix/issues/5150 https://stackoverflow.com/q/5285940
 })
 // lowTODO store this on the client in a cross-domain compatible way - it need not be a cookie https://stackoverflow.com/q/34790887
-const csrfSignatureCookieOpts: CookieSerializeOptions = {
+const csrfSignatureCookie = new CookieManager(csrfSignatureCookieName, {
 	secure: true,
 	// nextTODO
 	// secrets: [], // intentionally empty. This cookie only stores an HMACed CSRF token.
@@ -40,19 +32,9 @@ const csrfSignatureCookieOpts: CookieSerializeOptions = {
 	maxAge: 60 * 60 * 24 * 30, // 30 days
 	httpOnly: false,
 	domain: import.meta.env.VITE_HUB_DOMAIN, // sadly, making cookies target specific subdomains from the main domain seems very hacky
-	// expires: "", // intentionally missing because docs say it's calculated off `maxAge` when missing https://github.com/solidjs/solid-start/blob/1b22cad87dd7bd74f73d807e1d60b886e753a6ee/packages/start/session/cookies.ts#L56-L57
-}
-const csrfSignatureCookie = new Cookie(
-	csrfSignatureCookieName,
-	csrfSignatureCookieOpts,
-)
-const destroyCsrfSignatureCookie = new Cookie(csrfSignatureCookieName, {
-	...csrfSignatureCookieOpts,
-	maxAge: undefined,
-	expires: new Date(0), // https://github.com/remix-run/remix/issues/5150 https://stackoverflow.com/q/5285940
 })
 
-const oauthStateCookieOpts: CookieSerializeOptions = {
+const oauthStateCookie = new CookieManager('__Host-oauthState', {
 	secure: true,
 	// nextTODO
 	// secrets: [x.oauthStateSecret], // encrypted due to https://security.stackexchange.com/a/140889
@@ -61,17 +43,9 @@ const oauthStateCookieOpts: CookieSerializeOptions = {
 	maxAge: 60 * 60 * 24, // 1 day
 	httpOnly: true,
 	// domain: "", // intentionally missing to exclude subdomains
-	// expires: "", // intentionally missing because docs say it's calculated off `maxAge` when missing https://github.com/solidjs/solid-start/blob/1b22cad87dd7bd74f73d807e1d60b886e753a6ee/packages/start/session/cookies.ts#L56-L57
-}
-const oauthStateCookieName = '__Host-oauthState'
-const oauthStateCookie = new Cookie(oauthStateCookieName, oauthStateCookieOpts)
-const destroyOauthStateCookie = new Cookie(oauthStateCookieName, {
-	...oauthStateCookieOpts,
-	maxAge: undefined,
-	expires: new Date(0), // https://github.com/remix-run/remix/issues/5150 https://stackoverflow.com/q/5285940
 })
 
-const oauthCodeVerifierCookieOpts: CookieSerializeOptions = {
+const oauthCodeVerifierCookie = new CookieManager('__Host-oauthCodeVerifier', {
 	secure: true,
 	// nextTODO
 	// secrets: [x.oauthCodeVerifierSecret], // encrypted due to https://stackoverflow.com/a/67520418 https://stackoverflow.com/a/67979777
@@ -80,20 +54,9 @@ const oauthCodeVerifierCookieOpts: CookieSerializeOptions = {
 	maxAge: 60 * 60 * 24, // 1 day
 	httpOnly: true,
 	// domain: "", // intentionally missing to exclude subdomains
-	// expires: "", // intentionally missing because docs say it's calculated off `maxAge` when missing https://github.com/solidjs/solid-start/blob/1b22cad87dd7bd74f73d807e1d60b886e753a6ee/packages/start/session/cookies.ts#L56-L57
-}
-const oauthCodeVerifierCookieName = '__Host-oauthCodeVerifier'
-const oauthCodeVerifierCookie = new Cookie(
-	oauthCodeVerifierCookieName,
-	oauthCodeVerifierCookieOpts,
-)
-const destroyOauthCodeVerifierCookie = new Cookie(oauthCodeVerifierCookieName, {
-	...oauthCodeVerifierCookieOpts,
-	maxAge: undefined,
-	expires: new Date(0), // https://github.com/remix-run/remix/issues/5150 https://stackoverflow.com/q/5285940
 })
 
-const hubInfoCookieOpts: CookieSerializeOptions = {
+const hubInfoCookie = new CookieManager('__Host-hubInfo', {
 	secure: true,
 	// nextTODO
 	// secrets: [], // intentionally empty. This cookie only stores an HMACed JWT.
@@ -102,10 +65,7 @@ const hubInfoCookieOpts: CookieSerializeOptions = {
 	maxAge: 60 * 60 * 2, // 2 hours
 	httpOnly: true,
 	// domain: "", // intentionally missing to exclude subdomains
-	// expires: "", // intentionally missing because docs say it's calculated off `maxAge` when missing https://github.com/solidjs/solid-start/blob/1b22cad87dd7bd74f73d807e1d60b886e753a6ee/packages/start/session/cookies.ts#L56-L57
-}
-const hubInfoCookieName = '__Host-hubInfo'
-const hubInfoCookie = new Cookie(hubInfoCookieName, hubInfoCookieOpts)
+})
 
 export const env = () => {
 	const env =
@@ -203,8 +163,8 @@ export async function requireSession(redirectTo?: string) {
 
 export function logout() {
 	const headers = new Headers()
-	headers.append('Set-Cookie', destroySessionCookie.serialize('')) // lowTODO parallelize
-	headers.append('Set-Cookie', destroyCsrfSignatureCookie.serialize('')) // lowTODO parallelize
+	headers.append('Set-Cookie', sessionCookie.clear())
+	headers.append('Set-Cookie', csrfSignatureCookie.clear())
 	return redirect('/login', {
 		headers,
 	})
@@ -222,8 +182,8 @@ export async function createUserSession(
 	// If you ever separate csrf from the session cookie https://security.stackexchange.com/a/220810 https://security.stackexchange.com/a/248434
 	// REST endpoints may need csrf https://security.stackexchange.com/q/166724
 	headers.append('Set-Cookie', csrfSignatureCookie.serialize(csrfSignature))
-	headers.append('Set-Cookie', destroyOauthStateCookie.serialize(''))
-	headers.append('Set-Cookie', destroyOauthCodeVerifierCookie.serialize(''))
+	headers.append('Set-Cookie', oauthStateCookie.clear())
+	headers.append('Set-Cookie', oauthCodeVerifierCookie.clear())
 	return redirect(redirectTo, {
 		headers,
 	})
