@@ -67,15 +67,24 @@ const hubInfoCookie = new CookieManager('__Host-hubInfo', {
 	// domain: "", // intentionally missing to exclude subdomains
 })
 
+type ParsedEnv = Omit<EnvVars, 'hubSessionSecret' | 'hubInfoSecret'> & {
+	hubSessionSecret: Uint8Array
+	hubInfoSecret: Uint8Array
+}
+
+let envCache: ParsedEnv | undefined
+
 export const env = () => {
+	if (envCache != null) return envCache
 	const env =
 		getRequestEvent()!.nativeEvent.context.cloudflare?.env ??
 		(process.env as unknown as EnvVars)
-	return {
+	envCache = {
 		...env,
 		hubSessionSecret: base64ToArray(env.hubSessionSecret),
 		hubInfoSecret: base64ToArray(env.hubInfoSecret),
 	}
+	return envCache
 }
 
 export function getCsrfSignature() {

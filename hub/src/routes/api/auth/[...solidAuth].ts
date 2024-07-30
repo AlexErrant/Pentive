@@ -15,6 +15,7 @@ import {
 	createInfoHeaders,
 	createLoginHeaders,
 	createUserSession,
+	env,
 	getOauthCodeVerifier,
 	getOauthState,
 } from '~/session'
@@ -30,9 +31,7 @@ export const githubLoginUrl = (alphaKey: string) =>
 export const devLoginUrl = (username: string) =>
 	import.meta.env.VITE_HUB_ORIGIN + '/api/auth/login/dev?username=' + username
 
-/* eslint-disable */
-// @ts-expect-error nextTODO
-export const GET = async ({ env, request }: PageEvent) => {
+export const GET = async ({ request }: PageEvent) => {
 	if (import.meta.env.DEV) {
 		const url = new URL(request.url)
 		const username = url.searchParams.get('username')
@@ -43,20 +42,19 @@ export const GET = async ({ env, request }: PageEvent) => {
 	const url = new URL(request.url)
 	if (url.pathname === '/api/auth/login/github') {
 		const alphaKey = url.searchParams.get('alphaKey')
-		if (alphaKey === env.alphaKey) {
-			return await handleLogin(env)
+		if (alphaKey === env().alphaKey) {
+			return await handleLogin()
 		} else {
 			return redirect('/badAlphaKey')
 		}
-	} else return await handleCallback(env, request)
+	} else return await handleCallback(request)
 }
-/* eslint-enable */
 
-async function handleLogin(env: Env) {
+async function handleLogin() {
 	const redirectUri =
 		import.meta.env.VITE_HUB_ORIGIN + '/api/auth/callback/github'
 	const authorizationUrl = new URL('https://github.com/login/oauth/authorize')
-	authorizationUrl.searchParams.set('client_id', env.githubId)
+	authorizationUrl.searchParams.set('client_id', env().githubId)
 	authorizationUrl.searchParams.set('redirect_uri', redirectUri)
 	authorizationUrl.searchParams.set('response_type', 'code')
 	authorizationUrl.searchParams.set('scope', 'user:email')
@@ -72,15 +70,15 @@ async function handleLogin(env: Env) {
 	return redirect(authorizationUrl.toString(), { headers })
 }
 
-async function handleCallback(env: Env, request: Request) {
+async function handleCallback(request: Request) {
 	const as: AuthorizationServer = {
 		issuer: 'https://github.com/login/oauth/authorize',
 		/* eslint-disable @typescript-eslint/naming-convention */
 		token_endpoint: 'https://github.com/login/oauth/access_token',
 	}
 	const client: Client = {
-		client_id: env.githubId,
-		client_secret: env.githubSecret,
+		client_id: env().githubId,
+		client_secret: env().githubSecret,
 		/* eslint-enable @typescript-eslint/naming-convention */
 	}
 	const parameters = validateAuthResponse(
