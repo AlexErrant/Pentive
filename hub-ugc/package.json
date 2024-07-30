@@ -37,9 +37,9 @@
 		"stylelint-config-standard": "^34.0.0",
 		"tsx": "^4.16.2",
 		"typescript": "~5.4.5",
-		"vite": "^5.3.4",
+		"vite": "^5.3.5",
 		"vite-plugin-checker": "^0.7.2",
-		"vite-plugin-pwa": "^0.20.0",
+		"vite-plugin-pwa": "^0.20.1",
 		"vite-plugin-solid": "^2.10.2",
 		"workbox-precaching": "^7.0.0",
 		"wrangler": "^3.67.0"

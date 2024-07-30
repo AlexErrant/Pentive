@@ -18,6 +18,7 @@
 	"devDependencies": {
 		"@cloudflare/kv-asset-handler": "^0.3.0",
 		"@cloudflare/workers-types": "^4.20240725.0",
+		"@lezer/lr": "^1.4.2 || See comment on html-to-text",
 		"@tailwindcss/forms": "^0.5.7",
 		"@types/cookie": "^0.5.2",
 		"@types/iframe-resizer": "^3.5.10",
@@ -43,9 +44,8 @@
 		"tailwindcss": "^3.4.3",
 		"typescript": "~5.4.5",
 		"ulid-workers": "^2.1.0 || See comment on html-to-text",
-		"vite": "^5.3.4",
-		"vite-plugin-checker": "^0.6.2",
-		"@lezer/lr": "^1.4.2 || See comment on html-to-text",
+		"vite": "^5.3.5",
+		"vite-plugin-checker": "^0.7.2",
 		"wrangler": "^3.67.0"
 	},
 	"dependencies": {
