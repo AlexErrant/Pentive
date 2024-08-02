@@ -13,7 +13,8 @@ create table media_User
 (
     mediaHash BLOB not null,
     userId    TEXT not null,
-    primary key (mediaHash, userId)
+    primary key (mediaHash, userId),
+    foreign key (userId) references user(id)
 ) STRICT;
 
 create index media_User_mediaHash_idx
@@ -44,7 +45,9 @@ create table note
     tags             TEXT    not null,
     subscribersCount INTEGER not null default '0',
     commentsCount    INTEGER not null default '0',
-    ankiId           INTEGER null
+    ankiId           INTEGER null,
+    foreign key (templateId) references template(id),
+    foreign key (authorId) references user(id)
 ) STRICT;
 
 create index note_ankiId_idx
@@ -67,7 +70,9 @@ create table noteComment
     authorId TEXT    not null,
     history  TEXT    null,
     votes    TEXT    not null,
-    level    INTEGER not null
+    level    INTEGER not null,
+    foreign key (noteId) references note(id),
+    foreign key (authorId) references user(id)
 ) STRICT;
 
 create index noteComment_authorId_idx
@@ -83,7 +88,9 @@ create table noteHistory
     templateId  BLOB    null,
     fieldValues TEXT    not null,
     tags        TEXT    not null,
-    primary key (noteId, created)
+    primary key (noteId, created),
+    foreign key (noteId) references note(id),
+    foreign key (templateId) references template(id)
 ) STRICT;
 
 create index noteHistory_noteId_idx
@@ -94,7 +101,9 @@ create table noteSubscriber
     noteId BLOB    not null,
     userId TEXT    not null,
     til    INTEGER not null default (cast(strftime('%s','now') as int)),
-    primary key (noteId, userId)
+    primary key (noteId, userId),
+    foreign key (noteId) references note(id),
+    foreign key (userId) references user(id)
 ) STRICT;
 
 create index noteSubscriber_noteId_idx
@@ -109,7 +118,9 @@ create table post
     title    TEXT not null,
     text     TEXT not null,
     nook     TEXT not null,
-    authorId TEXT not null
+    authorId TEXT not null,
+    foreign key (authorId) references user(id),
+    foreign key (nook) references nook(id)
 ) STRICT;
 
 create index post_authorId_idx
@@ -129,7 +140,9 @@ create table postComment
     authorId TEXT    not null,
     history  TEXT    null,
     votes    TEXT    not null,
-    level    INTEGER not null
+    level    INTEGER not null,
+    foreign key (postId) references post(id),
+    foreign key (authorId) references user(id)
 ) STRICT;
 
 create index postComment_authorId_idx
@@ -143,7 +156,9 @@ create table postSubscriber
     postId BLOB    not null,
     userId TEXT    not null,
     til    INTEGER not null default (cast(strftime('%s','now') as int)),
-    primary key (postId, userId)
+    primary key (postId, userId),
+    foreign key (postId) references post(id),
+    foreign key (userId) references user(id)
 ) STRICT;
 
 create index postSubscriber_postId_idx
@@ -165,7 +180,8 @@ create table template
     css              TEXT    not null,
     ankiId           INTEGER null,
     commentsCount    INTEGER default '0'                                 not null,
-    subscribersCount INTEGER default '0'                                 not null
+    subscribersCount INTEGER default '0'                                 not null,
+    foreign key (nook) references nook(id)
 ) STRICT;
 
 create index template_ankiId_idx
@@ -186,7 +202,9 @@ create table templateComment
     authorId   TEXT    not null,
     history    TEXT    null,
     votes      TEXT    not null,
-    level      INTEGER not null
+    level      INTEGER not null,
+    foreign key (templateId) references template(id),
+    foreign key (authorId) references user(id)
 ) STRICT;
 
 create index templateComment_authorId_idx
@@ -204,7 +222,9 @@ create table templateHistory
     type       TEXT    null,
     fields     TEXT    null,
     css        TEXT    null,
-    primary key (templateId, created)
+    primary key (templateId, created),
+    foreign key (templateId) references template(id),
+    foreign key (authorId) references user(id)
 ) STRICT;
 
 create index templateHistory_authorId_idx
@@ -218,7 +238,9 @@ create table templateSubscriber
     templateId BLOB    not null,
     userId     TEXT    not null,
     til        INTEGER not null default (cast(strftime('%s','now') as int)),
-    primary key (templateId, userId)
+    primary key (templateId, userId),
+    foreign key (templateId) references template(id),
+    foreign key (userId) references user(id)
 ) STRICT;
 
 create index templateSubscriber_templateId_idx
@@ -236,4 +258,3 @@ create table user
     constraint user_email_key
         unique (email)
 ) STRICT;
-
