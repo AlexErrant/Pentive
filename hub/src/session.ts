@@ -8,11 +8,11 @@ import {
 } from 'shared'
 import { base64ToArray } from 'shared-edge'
 import { redirect } from '@solidjs/router'
-import { CookieManager } from '~/cookieManager'
+import { CookieManager, EncryptedCookieManager } from '~/cookieManager'
 import { getRequestEvent } from 'solid-js/web'
 import { type EnvVars } from './env'
 
-const sessionCookie = new CookieManager(hubSessionCookieName, {
+const sessionCM = new CookieManager(hubSessionCookieName, {
 	secure: true,
 	// nextTODO
 	// secrets: [], // intentionally empty. This cookie should only store a signed JWT!
@@ -23,7 +23,7 @@ const sessionCookie = new CookieManager(hubSessionCookieName, {
 	domain: import.meta.env.VITE_HUB_DOMAIN, // sadly, making cookies target specific subdomains from the main domain seems very hacky
 })
 // lowTODO store this on the client in a cross-domain compatible way - it need not be a cookie https://stackoverflow.com/q/34790887
-const csrfSignatureCookie = new CookieManager(csrfSignatureCookieName, {
+const csrfSignatureCM = new CookieManager(csrfSignatureCookieName, {
 	secure: true,
 	// nextTODO
 	// secrets: [], // intentionally empty. This cookie only stores an HMACed CSRF token.
@@ -34,7 +34,7 @@ const csrfSignatureCookie = new CookieManager(csrfSignatureCookieName, {
 	domain: import.meta.env.VITE_HUB_DOMAIN, // sadly, making cookies target specific subdomains from the main domain seems very hacky
 })
 
-const oauthStateCookie = new CookieManager('__Host-oauthState', {
+const oauthStateCM = new EncryptedCookieManager('__Host-oauthState', {
 	secure: true,
 	// nextTODO
 	// secrets: [x.oauthStateSecret], // encrypted due to https://security.stackexchange.com/a/140889
@@ -45,18 +45,21 @@ const oauthStateCookie = new CookieManager('__Host-oauthState', {
 	// domain: "", // intentionally missing to exclude subdomains
 })
 
-const oauthCodeVerifierCookie = new CookieManager('__Host-oauthCodeVerifier', {
-	secure: true,
-	// nextTODO
-	// secrets: [x.oauthCodeVerifierSecret], // encrypted due to https://stackoverflow.com/a/67520418 https://stackoverflow.com/a/67979777
-	sameSite: 'lax',
-	path: '/',
-	maxAge: 60 * 60 * 24, // 1 day
-	httpOnly: true,
-	// domain: "", // intentionally missing to exclude subdomains
-})
+const oauthCodeVerifierCM = new EncryptedCookieManager(
+	'__Host-oauthCodeVerifier',
+	{
+		secure: true,
+		// nextTODO
+		// secrets: [x.oauthCodeVerifierSecret], // encrypted due to https://stackoverflow.com/a/67520418 https://stackoverflow.com/a/67979777
+		sameSite: 'lax',
+		path: '/',
+		maxAge: 60 * 60 * 24, // 1 day
+		httpOnly: true,
+		// domain: "", // intentionally missing to exclude subdomains
+	},
+)
 
-const hubInfoCookie = new CookieManager('__Host-hubInfo', {
+const hubInfoCM = new CookieManager('__Host-hubInfo', {
 	secure: true,
 	// nextTODO
 	// secrets: [], // intentionally empty. This cookie only stores an HMACed JWT.
@@ -89,29 +92,21 @@ export const env = () => {
 
 export function getCsrfSignature() {
 	const cookie = getRequestEvent()!.request.headers.get('Cookie')
-	const csrfSignature = csrfSignatureCookie.parse(cookie)
+	const csrfSignature = csrfSignatureCM.parse(cookie)
 	if (typeof csrfSignature !== 'string' || csrfSignature.length === 0) {
 		return null
 	}
 	return csrfSignature
 }
 
-export function getOauthState(request: Request) {
-	const state = oauthStateCookie.parse(request.headers.get('Cookie')) as unknown
-	if (typeof state !== 'string' || state.length === 0) {
-		throw new Error('oauth state is empty or not a string')
-	}
-	return state
+export async function getOauthState(request: Request) {
+	const cookie = request.headers.get('Cookie')
+	return await oauthStateCM.parse(cookie, env().oauthStateSecret)
 }
 
-export function getOauthCodeVerifier(request: Request) {
-	const codeVerifier = oauthCodeVerifierCookie.parse(
-		request.headers.get('Cookie'),
-	) as unknown
-	if (typeof codeVerifier !== 'string' || codeVerifier.length === 0) {
-		throw new Error('oauth codeVerifier is empty or not a string')
-	}
-	return codeVerifier
+export async function getOauthCodeVerifier(request: Request) {
+	const cookie = request.headers.get('Cookie')
+	return await oauthCodeVerifierCM.parse(cookie, env().oauthCodeVerifierSecret)
 }
 
 export interface HubSession {
@@ -121,7 +116,7 @@ export interface HubSession {
 
 export async function getSession() {
 	const cookie = getRequestEvent()!.request.headers.get('Cookie')
-	const rawSession = sessionCookie.parse(cookie)
+	const rawSession = sessionCM.parse(cookie)
 	if (rawSession == null) return null
 	let session: JWTVerifyResult | null = null
 	try {
@@ -172,8 +167,8 @@ export async function requireSession(redirectTo?: string) {
 
 export function logout() {
 	const headers = new Headers()
-	headers.append('Set-Cookie', sessionCookie.clear())
-	headers.append('Set-Cookie', csrfSignatureCookie.clear())
+	headers.append('Set-Cookie', sessionCM.clear())
+	headers.append('Set-Cookie', csrfSignatureCM.clear())
 	return redirect('/login', {
 		headers,
 	})
@@ -186,22 +181,29 @@ export async function createUserSession(
 	const [csrf, csrfSignature] = await generateCsrf()
 	const headers = new Headers()
 	const session = await generateSession(userId, csrf)
-	headers.append('Set-Cookie', sessionCookie.serialize(session)) // lowTODO parallelize
+	headers.append('Set-Cookie', sessionCM.serialize(session)) // lowTODO parallelize
 	// https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html#double-submit-cookie
 	// If you ever separate csrf from the session cookie https://security.stackexchange.com/a/220810 https://security.stackexchange.com/a/248434
 	// REST endpoints may need csrf https://security.stackexchange.com/q/166724
-	headers.append('Set-Cookie', csrfSignatureCookie.serialize(csrfSignature))
-	headers.append('Set-Cookie', oauthStateCookie.clear())
-	headers.append('Set-Cookie', oauthCodeVerifierCookie.clear())
+	headers.append('Set-Cookie', csrfSignatureCM.serialize(csrfSignature))
+	headers.append('Set-Cookie', oauthStateCM.clear())
+	headers.append('Set-Cookie', oauthCodeVerifierCM.clear())
 	return redirect(redirectTo, {
 		headers,
 	})
 }
 
-export function createLoginHeaders(state: string, codeVerifier: string) {
+export async function createLoginHeaders(
+	oauthState: string,
+	codeVerifier: string,
+) {
 	const headers = new Headers()
-	headers.append('Set-Cookie', oauthStateCookie.serialize(state))
-	headers.append('Set-Cookie', oauthCodeVerifierCookie.serialize(codeVerifier))
+	const [oauthStateCookie, codeVerifierCookie] = await Promise.all([
+		oauthStateCM.serialize(oauthState, env().oauthStateSecret),
+		oauthCodeVerifierCM.serialize(codeVerifier, env().oauthCodeVerifierSecret),
+	])
+	headers.append('Set-Cookie', oauthStateCookie)
+	headers.append('Set-Cookie', codeVerifierCookie)
 	return headers
 }
 
@@ -212,12 +214,12 @@ export async function createInfoHeaders(info: string) {
 		.setExpirationTime('2h')
 		.sign(await getHubInfoKey())
 	const headers = new Headers()
-	headers.append('Set-Cookie', hubInfoCookie.serialize(infoJwt))
+	headers.append('Set-Cookie', hubInfoCM.serialize(infoJwt))
 	return headers
 }
 
 export async function getInfo(request: Request) {
-	const rawInfoJwt = hubInfoCookie.parse(request.headers.get('Cookie'))
+	const rawInfoJwt = hubInfoCM.parse(request.headers.get('Cookie'))
 	if (typeof rawInfoJwt !== 'string' || rawInfoJwt.length === 0) {
 		return null
 	}

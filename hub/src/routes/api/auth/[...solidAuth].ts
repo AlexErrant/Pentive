@@ -66,7 +66,7 @@ async function handleLogin() {
 	)
 	authorizationUrl.searchParams.set('code_challenge_method', 'S256')
 	authorizationUrl.searchParams.set('state', state)
-	const headers = createLoginHeaders(state, codeVerifier)
+	const headers = await createLoginHeaders(state, codeVerifier)
 	return redirect(authorizationUrl.toString(), { headers })
 }
 
@@ -85,7 +85,7 @@ async function handleCallback(request: Request) {
 		as,
 		client,
 		new URL(request.url).searchParams,
-		getOauthState(request),
+		await getOauthState(request),
 	)
 	if (isOAuth2Error(parameters)) {
 		console.error(parameters)
@@ -96,7 +96,7 @@ async function handleCallback(request: Request) {
 		client,
 		parameters,
 		import.meta.env.VITE_HUB_ORIGIN + '/api/auth/callback/github',
-		getOauthCodeVerifier(request),
+		await getOauthCodeVerifier(request),
 	)
 
 	let challenges: WWWAuthenticateChallenge[] | undefined

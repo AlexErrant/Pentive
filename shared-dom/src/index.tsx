@@ -19,3 +19,4 @@ export {
 } from './language/query.highlight.js'
 export * as queryTerms from './language/queryParser.terms.js'
 export * from './language/stringLabels.js'
+export * from './utility.js'
