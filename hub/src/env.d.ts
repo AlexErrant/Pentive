@@ -8,7 +8,8 @@ import type {
 import { type Base64 } from 'shared'
 
 export interface EnvVars {
-	planetscaleDbUrl: string
+	tursoDbUrl: string
+	tursoAuthToken: string
 	hubSessionSecret: Base64
 	csrfSecret: Base64
 	alphaKey: string

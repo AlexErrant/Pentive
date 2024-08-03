@@ -13,7 +13,8 @@ if (rawConfig.error !== undefined) {
 
 const envZ = z.object({
 	/* eslint-disable @typescript-eslint/naming-convention */
-	planetscaleDbUrl: z.string(),
+	tursoDbUrl: z.string(),
+	tursoAuthToken: z.string(),
 	hubSessionSecret: z.string(),
 	IS_OFFLINE: z.literal('true').or(z.undefined()),
 	/* eslint-enable @typescript-eslint/naming-convention */

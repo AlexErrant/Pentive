@@ -3,7 +3,7 @@
 
 datasource db {
   provider     = "mysql"
-  url          = env("planetscaleDbUrl")
+  url          = env("tursoDbUrl")
   relationMode = "prisma"
 }
 

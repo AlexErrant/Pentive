@@ -1,8 +1,10 @@
 export developmentAlphaKey=
 export productionAlphaKey=
 export cloudflareAccountId=
-export developmentPlanetscaleDbUrl=
-export productionPlanetscaleDbUrl=
+export developmentTursoDbUrl=http://127.0.0.1:3020
+export developmentTursoAuthToken='optional if running locally'
+export productionTursoDbUrl=
+export productionTursoAuthToken=
 
 # the following secrets may be generated as follows:
 #     openssl rand -base64 32 | head -c -1 | pbcopy

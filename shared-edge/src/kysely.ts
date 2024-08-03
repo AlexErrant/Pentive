@@ -8,7 +8,7 @@ import {
 	type ExpressionWrapper,
 	type SqlBool,
 } from 'kysely'
-import { PlanetScaleDialect } from 'kysely-planetscale'
+import { LibsqlDialect } from '@libsql/kysely-libsql'
 import { type DB } from './dbSchema.js'
 import {
 	type Base64,
@@ -41,18 +41,12 @@ export type * from 'kysely'
 // @ts-expect-error db calls should throw null error if not setup
 export let db: Kysely<DB> = null as Kysely<DB>
 
-export function setKysely(url: string): void {
+export function setKysely(url: string, authToken: string): void {
 	if (db == null) {
 		db = new Kysely<DB>({
-			dialect: new PlanetScaleDialect({
+			dialect: new LibsqlDialect({
 				url,
-				// eslint-disable-next-line @typescript-eslint/no-explicit-any -- medtodo remove https://github.com/planetscale/database-js/pull/102#issuecomment-1508219636
-				fetch: async (url: string, init: any) => {
-					// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-					delete init.cache
-					// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-					return await fetch(url, init)
-				},
+				authToken,
 			}),
 		})
 	}

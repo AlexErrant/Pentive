@@ -23,7 +23,8 @@ export type Env = {
 	mediaBucket: R2Bucket
 	hubSessionSecret: string
 	mediaTokenSecret: MediaTokenSecretBase64
-	planetscaleDbUrl: string
+	tursoDbUrl: string
+	tursoAuthToken: string
 	appOrigin: string
 	hubOrigin: string
 	peerSyncPublicKey: string

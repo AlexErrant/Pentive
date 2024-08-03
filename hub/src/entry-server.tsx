@@ -6,7 +6,7 @@ import { createHandler, StartServer } from '@solidjs/start/server'
 
 export default createHandler(() => {
 	// nextTODO
-	// setKysely(event.env.planetscaleDbUrl)
+	// setKysely(event.env.tursoDbUrl, event.env.tursoAuthToken)
 	// event.responseHeaders.set(hstsName, hstsValue)
 	return (
 		<StartServer

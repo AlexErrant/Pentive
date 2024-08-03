@@ -16,7 +16,8 @@ export type Env = {
 	//
 	// Example binding to R2. Learn more at https://developers.cloudflare.com/workers/runtime-apis/r2/
 	mediaBucket: R2Bucket
-	planetscaleDbUrl: string
+	tursoDbUrl: string
+	tursoAuthToken: string
 	appOrigin: string
 	hubOrigin: string
 	hubSessionSecret: string

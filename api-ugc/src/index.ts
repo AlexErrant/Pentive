@@ -42,7 +42,7 @@ app
 	})
 	.use('/trpc/*', async (c) => {
 		const user = await getUserId(c)
-		setKysely(c.env.planetscaleDbUrl)
+		setKysely(c.env.tursoDbUrl, c.env.tursoAuthToken)
 		return await fetchRequestHandler({
 			endpoint: '/trpc',
 			req: c.req.raw,
@@ -52,7 +52,7 @@ app
 	})
 	.get('/', (c) => c.text('Hono!!'))
 	.get('/i/:token', async (c) => {
-		setKysely(c.env.planetscaleDbUrl)
+		setKysely(c.env.tursoDbUrl, c.env.tursoAuthToken)
 		const [entityId, i] = parsePublicToken(c.req.param('token'))
 		const entityIdBase64 = binary16fromBase64URL(entityId)
 		const mediaHash = await lookupMediaHash(entityIdBase64, i)
