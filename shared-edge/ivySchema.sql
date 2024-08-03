@@ -17,9 +17,6 @@ create table media_User
     foreign key (userId) references user(id)
 ) STRICT;
 
-create index media_User_mediaHash_idx
-    on media_User (mediaHash);
-
 create table nook
 (
     id          TEXT    not null
@@ -93,9 +90,6 @@ create table noteHistory
     foreign key (templateId) references template(id)
 ) STRICT;
 
-create index noteHistory_noteId_idx
-    on noteHistory (noteId);
-
 create table noteSubscriber
 (
     noteId BLOB    not null,
@@ -105,9 +99,6 @@ create table noteSubscriber
     foreign key (noteId) references note(id),
     foreign key (userId) references user(id)
 ) STRICT;
-
-create index noteSubscriber_noteId_idx
-    on noteSubscriber (noteId);
 
 create index noteSubscriber_userId_idx
     on noteSubscriber (userId);
@@ -160,9 +151,6 @@ create table postSubscriber
     foreign key (postId) references post(id),
     foreign key (userId) references user(id)
 ) STRICT;
-
-create index postSubscriber_postId_idx
-    on postSubscriber (postId);
 
 create index postSubscriber_userId_idx
     on postSubscriber (userId);
@@ -230,9 +218,6 @@ create table templateHistory
 create index templateHistory_authorId_idx
     on templateHistory (authorId);
 
-create index templateHistory_templateId_idx
-    on templateHistory (templateId);
-
 create table templateSubscriber
 (
     templateId BLOB    not null,
@@ -242,9 +227,6 @@ create table templateSubscriber
     foreign key (templateId) references template(id),
     foreign key (userId) references user(id)
 ) STRICT;
-
-create index templateSubscriber_templateId_idx
-    on templateSubscriber (templateId);
 
 create index templateSubscriber_userId_idx
     on templateSubscriber (userId);
