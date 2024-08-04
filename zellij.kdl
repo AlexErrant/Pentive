@@ -43,11 +43,18 @@ layout {
                 args "generateSql"
               }
             }
-            pane {
-              name "cwa"
-              cwd "cwa"
-              command "pnpm"
-              args "dev"
+            pane split_direction="horizontal" {
+              pane {
+                name "turso"
+                command "pnpm"
+                args "turso"
+              }
+              pane {
+                name "cwa"
+                cwd "cwa"
+                command "pnpm"
+                args "dev"
+              }
             }
         }
     }
