@@ -16,10 +16,12 @@ _All commands below should be run from the repo's root directory._
 
 These steps assume you've installed these or made the requisite accounts. If you deviate, you'll need to find workarounds.
 
-- [PlanetScale account](https://auth.planetscale.com/sign-up)
-  - Required if you want to run `hub`. They have a [_stupidly_ good free tier](https://planetscale.com/pricing) that doesn't need a credit card and doesn't expire like AWS's 12 month free tier.
+- [Turso CLI](https://github.com/tursodatabase/turso-cli) or [`sqld` for libSQL](https://github.com/tursodatabase/libsql/tree/main/libsql-server)
+  - Required if you want to run `hub` or  `cwa`.
+  - The Turso CLI requires a [Turso account](https://api.turso.tech/auth).
+  - This repo's scripts assume you're using the Turso CLI, but you can use `sqld` by making appropriate substitutions.
 - [Cloudflare account](https://dash.cloudflare.com/sign-up)
-  - Required if you want to deploy stuff or run Wrangler locally. They also have a [stupidly good free tier](https://developers.cloudflare.com/workers/platform/pricing/).
+  - Required if you want to deploy stuff or run Wrangler locally.
 - [mkcert](https://github.com/FiloSottile/mkcert)
   - `app-ugc` uses a service worker to intercept and return assets (e.g. images). Service workers require HTTPS. We also use `__Secure-` prefixed cookies for auth.
   - If you're on WSL2, [do this](https://github.com/FiloSottile/mkcert/issues/357#issuecomment-1466762021).
@@ -81,10 +83,10 @@ Secrets are stored outside the repo so [`git clean -fdx`](https://tysonwilliams.
 
 > [More info.](https://github.com/cloudflare/workers-sdk/issues/1908#issuecomment-1416901172) Note that `NODE_EXTRA_CA_CERTS` isn't helpful since it specifies a [CA cert](https://discord.com/channels/595317990191398933/799437470004412476/1039744087672238110) and we need to trust domains remapped in our `hosts` file.
 
-## 6. Update PlanetScale schema
+## 6. Update Ivy's schema
 
 ```bash
-pnpm --filter lrpc dbpush
+pnpm --filter shared-edge initIvy
 ```
 
 ## 7. Run!
