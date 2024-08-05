@@ -32,6 +32,7 @@
 		"typescript": "~5.4.5"
 	},
 	"dependencies": {
+		"@libsql/client": "^0.8.1",
 		"@libsql/kysely-libsql": "^0.4.1",
 		"@scure/base": "^1.1.1",
 		"hono": "^3.7.2",
