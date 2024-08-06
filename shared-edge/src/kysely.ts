@@ -36,6 +36,7 @@ import {
 import { binary16fromBase64URL, ulidAsHex, ulidAsRaw } from './convertBinary.js'
 import { nullMap, parseMap, stringifyMap, throwExp, undefinedMap } from 'shared'
 import { base16, base64url } from '@scure/base'
+import { createClient } from '@libsql/client/web'
 export type * from 'kysely'
 
 // @ts-expect-error db calls should throw null error if not setup
@@ -45,8 +46,10 @@ export function setKysely(url: string, authToken: string): void {
 	if (db == null) {
 		db = new Kysely<DB>({
 			dialect: new LibsqlDialect({
-				url,
-				authToken,
+				client: createClient({
+					url,
+					authToken,
+				}),
 			}),
 		})
 	}
