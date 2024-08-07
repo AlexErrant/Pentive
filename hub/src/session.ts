@@ -11,6 +11,7 @@ import { redirect } from '@solidjs/router'
 import { CookieManager, EncryptedCookieManager } from '~/cookieManager'
 import { getRequestEvent } from 'solid-js/web'
 import { type EnvVars } from './env'
+import type { FetchEvent } from '@solidjs/start/server'
 
 const sessionCM = new CookieManager(hubSessionCookieName, {
 	secure: true,
@@ -77,10 +78,10 @@ type ParsedEnv = Omit<EnvVars, 'hubSessionSecret' | 'hubInfoSecret'> & {
 
 let envCache: ParsedEnv | undefined
 
-export const env = () => {
+export const env = (event?: FetchEvent) => {
 	if (envCache != null) return envCache
 	const env =
-		getRequestEvent()!.nativeEvent.context.cloudflare?.env ??
+		(event ?? getRequestEvent()!).nativeEvent.context.cloudflare?.env ??
 		(process.env as unknown as EnvVars)
 	envCache = {
 		...env,

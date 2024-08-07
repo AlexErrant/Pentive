@@ -2,6 +2,7 @@ import { defineConfig } from '@solidjs/start/config'
 import checker from 'vite-plugin-checker'
 
 export default defineConfig({
+	middleware: './src/middleware.ts',
 	server: {
 		preset: 'cloudflare-module',
 		rollupConfig: {
