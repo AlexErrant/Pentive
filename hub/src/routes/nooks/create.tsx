@@ -1,4 +1,4 @@
-import { For } from 'solid-js'
+import { For, Show } from 'solid-js'
 import { createNook } from 'shared-edge'
 import {
 	requireCsrfSignature,
@@ -43,6 +43,15 @@ function validateNook(nook: unknown): string | undefined {
 	}
 }
 
+interface ValidationError {
+	message: string
+	fieldErrors?: {
+		sidebar?: string
+		description?: string
+		nook?: string
+	}
+}
+
 const submitting = action(async (form: FormData) => {
 	'use server'
 	const sidebar = form.get('sidebar')
@@ -56,9 +65,9 @@ const submitting = action(async (form: FormData) => {
 		typeof nook !== 'string' ||
 		typeof csrfSignature !== 'string'
 	) {
-		throw new Error(
-			`Sidebar, description, nook, and csrfSignature should be strings.`,
-		)
+		throw {
+			message: `Sidebar, description, nook, and csrfSignature should be strings.`,
+		} satisfies ValidationError as unknown
 	}
 	const fieldErrors = {
 		sidebar: validateSidebar(sidebar),
@@ -66,7 +75,10 @@ const submitting = action(async (form: FormData) => {
 		nook: validateNook(nook),
 	}
 	if (Object.values(fieldErrors).some(Boolean)) {
-		throw { message: 'Some fields are invalid', fieldErrors } as unknown
+		throw {
+			message: 'Some fields are invalid',
+			fieldErrors,
+		} satisfies ValidationError as unknown
 	}
 	const userId = await requireUserId()
 	const session = await requireSession()
@@ -90,7 +102,7 @@ const submitting = action(async (form: FormData) => {
 export default function Submit(props: RouteSectionProps) {
 	const csrfSignature = createAsync(async () => await getCsrfSignatureCached())
 	const isSubmitting = useSubmission(submitting)
-	// const error = () => submitting.error as undefined | Error // nextTODO
+	const error = () => isSubmitting.error as undefined | ValidationError
 
 	// highTODO idempotency token
 
@@ -111,9 +123,9 @@ export default function Submit(props: RouteSectionProps) {
 					<label for='sidebar-input'>Sidebar</label>
 					<input id='sidebar-input' name='sidebar' />
 				</div>
-				{/* <Show when={error()?.fieldErrors?.sidebar}>
-					<p>{error()!.fieldErrors!.sidebar}</p> 
-				</Show> */}
+				<Show when={error()?.fieldErrors?.sidebar}>
+					<p>{error()!.fieldErrors!.sidebar}</p>
+				</Show>
 				<div>
 					<label for='description-input'>Description</label>
 					<textarea
@@ -123,12 +135,12 @@ export default function Submit(props: RouteSectionProps) {
 						cols='50'
 					/>
 				</div>
-				{/* <Show when={error()?.fieldErrors?.description}>
+				<Show when={error()?.fieldErrors?.description}>
 					<p>{error()!.fieldErrors!.description}</p>
 				</Show>
 				<Show when={error()}>
 					<p>{error()!.message}</p>
-				</Show> */}
+				</Show>
 				<RadioGroup.Root class='radio-group' name='nookType'>
 					<RadioGroup.Label class='radio-group__label'>
 						Nook Type
