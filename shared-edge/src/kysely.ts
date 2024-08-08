@@ -156,7 +156,7 @@ export async function getUserIdByEmail(email: string) {
 	return await db
 		.selectFrom('user')
 		// Emails are case sensitive, so lookups are case sensitive for max security
-		.where(sql`binary \`email\``, '=', email)
+		.where('email', '=', email)
 		.select(['id'])
 		.executeTakeFirst()
 }
