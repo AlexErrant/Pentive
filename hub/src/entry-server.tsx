@@ -1,13 +1,7 @@
 // @refresh reload
-// import { hstsName, hstsValue } from 'shared'
-// import { setKysely } from 'shared-edge'
 import { createHandler, StartServer } from '@solidjs/start/server'
-// import { setSessionStorage } from './session'
 
 export default createHandler(() => {
-	// nextTODO
-	// setKysely(event.env.tursoDbUrl, event.env.tursoAuthToken)
-	// event.responseHeaders.set(hstsName, hstsValue)
 	return (
 		<StartServer
 			document={({ assets, children, scripts }) => (
