@@ -1,3 +1,4 @@
+import { Show } from 'solid-js'
 import { insertPost, ulidAsHex } from 'shared-edge'
 import { requireCsrfSignature, requireSession, isInvalidCsrf } from '~/session'
 import {
@@ -34,6 +35,15 @@ const getCsrfSignatureCached = cache(async () => {
 	return requireCsrfSignature()
 }, 'csrfSignature')
 
+interface ValidationError {
+	message: string
+	fieldErrors?: {
+		title?: string
+		text?: string
+		nook?: string
+	}
+}
+
 const submitting = action(async (form: FormData) => {
 	const title = form.get('title')
 	const text = form.get('text')
@@ -45,16 +55,20 @@ const submitting = action(async (form: FormData) => {
 		typeof nook !== 'string' ||
 		typeof csrfSignature !== 'string'
 	) {
-		throw new Error(`Title, text, nook, and csrfSignature should be strings.`)
+		throw {
+			message: `Title, text, nook, and csrfSignature should be strings.`,
+		} satisfies ValidationError as unknown
 	}
-	const fields = { title, text, nook }
 	const fieldErrors = {
 		title: validateTitle(title),
 		text: validateText(text),
 		nook: validateNook(nook),
 	}
 	if (Object.values(fieldErrors).some(Boolean)) {
-		throw { message: 'Some fields are invalid', fieldErrors, fields } as unknown
+		throw {
+			message: 'Some fields are invalid',
+			fieldErrors,
+		} satisfies ValidationError as unknown
 	}
 	const session = await requireSession()
 	if (await isInvalidCsrf(csrfSignature, session.jti)) {
@@ -77,8 +91,7 @@ const submitting = action(async (form: FormData) => {
 export default function Thread(props: RouteSectionProps) {
 	const isSubmitting = useSubmission(submitting)
 	const csrfSignature = createAsync(async () => await getCsrfSignatureCached())
-
-	// const error = () => submitting.error as undefined | Error // nextTODO
+	const error = () => isSubmitting.error as undefined | ValidationError
 
 	// highTODO idempotency token
 
@@ -96,19 +109,19 @@ export default function Thread(props: RouteSectionProps) {
 					<label for='title-input'>Title</label>
 					<input id='title-input' name='title' />
 				</div>
-				{/* <Show when={error()?.fieldErrors?.title}> */}
-				{/* 	<p>{error()!.fieldErrors!.title}</p> */}
-				{/* </Show> */}
+				<Show when={error()?.fieldErrors?.title}>
+					<p>{error()!.fieldErrors!.title}</p>
+				</Show>
 				<div>
 					<label for='text-input'>Text</label>
 					<textarea id='text-input' name='text' rows='4' cols='50' />
 				</div>
-				{/* <Show when={error()?.fieldErrors?.text}> */}
-				{/* 	<p>{error()!.fieldErrors!.text}</p> */}
-				{/* </Show> */}
-				{/* <Show when={error()}> */}
-				{/* 	<p>{error()!.message}</p> */}
-				{/* </Show> */}
+				<Show when={error()?.fieldErrors?.text}>
+					<p>{error()!.fieldErrors!.text}</p>
+				</Show>
+				<Show when={error()}>
+					<p>{error()!.message}</p>
+				</Show>
 				<button type='submit' disabled={isSubmitting.pending}>
 					Submit
 				</button>
