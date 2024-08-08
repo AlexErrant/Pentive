@@ -1,4 +1,4 @@
-import { createEffect } from 'solid-js'
+import { Show } from 'solid-js'
 import { createUserSession, getInfo, getUserId } from '~/session'
 import { getCasedUserId, registerUser } from 'shared-edge'
 import {
@@ -55,6 +55,13 @@ export const route = {
 	},
 } satisfies RouteDefinition
 
+interface ValidationError {
+	message: string
+	fieldErrors?: {
+		username?: string
+	}
+}
+
 const registering = action(async (form: FormData) => {
 	'use server'
 	const username = form.get('username')
@@ -62,12 +69,14 @@ const registering = action(async (form: FormData) => {
 	if (typeof username !== 'string' || typeof redirectTo !== 'string') {
 		throw new Error(`Form not submitted correctly.`)
 	}
-	const fields = { username }
 	const fieldErrors = {
 		username: await validateUsername(username),
 	}
 	if (Object.values(fieldErrors).some(Boolean)) {
-		throw { fieldErrors, fields } as unknown
+		throw {
+			message: `Username is invalid`,
+			fieldErrors,
+		} satisfies ValidationError as unknown
 	}
 	const request = getRequestEvent()?.request
 	if (request == null) return redirect('/error') // medTODO needs a page
@@ -79,10 +88,7 @@ const registering = action(async (form: FormData) => {
 
 export default function RegisterUsername(props: RouteSectionProps) {
 	const isRegistering = useSubmission(registering)
-	createEffect(() => {
-		console.log('Error!', isRegistering.error) // nextTODO
-	})
-	// const error = () => registering.error as undefined | FormError
+	const error = () => isRegistering.error as undefined | ValidationError
 	return (
 		<main>
 			<h1>Register Username</h1>
@@ -96,14 +102,14 @@ export default function RegisterUsername(props: RouteSectionProps) {
 					<label for='username-input'>Username</label>
 					<input id='username-input' name='username' />
 				</div>
-				{/* <Show when={error()?.fieldErrors?.username}> */}
-				{/* 	<p role='alert'>{error()!.fieldErrors!.username}</p> */}
-				{/* </Show> */}
-				{/* <Show when={error()}> */}
-				{/* 	<p role='alert' id='error-message'> */}
-				{/* 		{error()!.message} */}
-				{/* 	</p> */}
-				{/* </Show> */}
+				<Show when={error()?.fieldErrors?.username}>
+					<p role='alert'>{error()!.fieldErrors!.username}</p>
+				</Show>
+				<Show when={error()}>
+					<p role='alert' id='error-message'>
+						{error()!.message}
+					</p>
+				</Show>
 				<button disabled={isRegistering.pending} type='submit'>
 					Register
 				</button>
