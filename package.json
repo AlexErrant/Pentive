@@ -32,8 +32,8 @@
 		"tsc-build": "tsc --build",
 		"tsc-clean": "rm -rf **/tsconfig.tsbuildinfo",
 		"//ci": "simulate cicd locally",
-		"ci": "git clean -xdf && (cd solid-toast; git clean -xdf) && ./mkenv.sh && ./rmcert.sh && ./mkcert.sh && pnpm i && pnpm build-deps && pnpm tsc-build && pnpm eslint+test && pnpm build",
-		"cf": "git clean -xdf && (cd solid-toast; git clean -xdf) && ./mkenv.sh && ./rmcert.sh && ./mkcert.sh && pnpm i && pnpm build-deps && pnpm tsc-build && pnpm build"
+		"ci": "git clean -xdf && (cd solid-toast; git clean -xdf) && ./mkenv.sh && ./rmcert.sh && ./mkcert.sh && pnpm i && pnpm build-deps && pnpm tsc-build && pnpm eslint+test && pnpm build && ./initIvy.sh",
+		"cf": "git clean -xdf && (cd solid-toast; git clean -xdf) && ./mkenv.sh && ./rmcert.sh && ./mkcert.sh && pnpm i && pnpm build-deps && pnpm tsc-build && pnpm build && ./initIvy.sh"
 	},
 	"pnpm": {
 		"patchedDependencies": {

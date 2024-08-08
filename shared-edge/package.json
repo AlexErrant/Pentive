@@ -12,10 +12,13 @@
 		"eslint": "eslint . --ignore-path .gitignore",
 		"eslint:fix": "eslint . --fix --ignore-path .gitignore",
 		"format:check": "prettier --ignore-path .gitignore --check .",
-		"format": "prettier --ignore-path .gitignore --write ."
+		"format": "prettier --ignore-path .gitignore --write .",
+		"//initIvy": "in the code below, the first `.` means `source` in shell",
+		"initIvy": ". ../../PentiveSecrets/secrets.sh && npx tsx --tsconfig ./tsconfig.node.json initIvy.ts"
 	},
 	"devDependencies": {
 		"@cloudflare/workers-types": "^4.20240725.0",
+		"@types/node": "20.14.11",
 		"@typescript-eslint/eslint-plugin": "^6.21.0",
 		"@typescript-eslint/parser": "^6.21.0",
 		"eslint": "^8.57.0",
@@ -29,6 +32,7 @@
 		"mysql2": "^3.6.1",
 		"prettier": "^3.3.3",
 		"standard": "^17.1.0",
+		"tsx": "^4.16.2",
 		"typescript": "~5.4.5"
 	},
 	"dependencies": {

@@ -10,6 +10,7 @@ const project = [
 	path.join(__dirname, 'shared/tsconfig.json'),
 	path.join(__dirname, 'shared-dom/tsconfig.json'),
 	path.join(__dirname, 'shared-edge/tsconfig.json'),
+	path.join(__dirname, 'shared-edge/tsconfig.node.json'),
 	path.join(__dirname, 'cwa/tsconfig.json'),
 	path.join(__dirname, 'api-ugc/tsconfig.json'),
 	path.join(__dirname, 'peer/tsconfig.json'),
