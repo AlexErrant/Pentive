@@ -24,13 +24,18 @@ const project = [
 /* eslint-env node */
 module.exports = {
 	root: true,
+	ignorePatterns: [
+		'**/public/assets/*.js',
+		'**/build.js',
+		'**/sw.js',
+		'**/*.config.js',
+	],
 	env: {
 		browser: true,
 		es2021: true,
 	},
 	reportUnusedDisableDirectives: true,
 	extends: [
-		'standard',
 		'eslint:recommended',
 		'plugin:prettier/recommended', // Last to disable conflicting rules
 	],

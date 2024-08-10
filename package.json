@@ -8,8 +8,18 @@
 	"packageManager": "pnpm@9.5.0",
 	"type": "module",
 	"devDependencies": {
+		"@typescript-eslint/eslint-plugin": "^6.21.0",
+		"@typescript-eslint/parser": "^6.21.0",
 		"concurrently": "^8.2.1",
+		"eslint": "^8.57.0",
+		"eslint-config-standard-with-typescript": "^39.1.1",
+		"eslint-plugin-import": "^2.29.1",
+		"eslint-plugin-n": "^16.6.2",
+		"eslint-plugin-prettier": "^5.2.1",
+		"eslint-plugin-promise": "^6.1.1",
+		"eslint-plugin-solid": "^0.14.0",
 		"kill-port": "^2.0.1",
+		"prettier-plugin-tailwindcss": "^0.6.5",
 		"typescript": "~5.4.5",
 		"wrangler": "^3.67.0"
 	},
