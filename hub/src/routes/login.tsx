@@ -38,7 +38,9 @@ export default function Login(): JSX.Element {
 						onInput={(e) => setAlphaKey(e.currentTarget.value)}
 					/>
 					<div>
-						<a href={githubLoginUrl(alphaKey())}>Sign in via Github</a>
+						<a target='_self' href={githubLoginUrl(alphaKey())}>
+							Sign in via Github
+						</a>
 					</div>
 				</div>
 				{import.meta.env.DEV && (
