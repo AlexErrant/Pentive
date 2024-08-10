@@ -1,4 +1,5 @@
-import { parse, serialize } from 'cookie-es'
+import { type CookieParseOptions, parse, serialize } from 'cookie-es'
+import { type JWTVerifyResult, type SignJWT, jwtVerify } from 'jose'
 import { type WithRequired, type Brand, concat } from 'shared'
 import { arrayBufferToBase64 } from 'shared-dom'
 import { base64ToArray } from 'shared-edge'
@@ -22,9 +23,9 @@ export class CookieManager {
 	name: string
 	cookieOptions: CookieSerializeOptions
 
-	parse(cookieHeader: string | undefined | null) {
+	parse(cookieHeader: string | undefined | null, options?: CookieParseOptions) {
 		if (cookieHeader == null) return null
-		const cookies = parse(cookieHeader)
+		const cookies = parse(cookieHeader, options)
 		return cookies[this.name]
 	}
 
@@ -112,4 +113,49 @@ async function decrypt(ivCipher: IvCipherBase64, key: CryptoKey) {
 		cipher,
 	)
 	return decoder.decode(decrypted)
+}
+
+export class SignedCookieManager {
+	constructor(name: string, cookieOptions: MaxAgeOverExpires) {
+		this.cm = new CookieManager(name, { ...cookieOptions, encode: (x) => x })
+	}
+
+	cm: CookieManager
+
+	async serialize(signJWT: SignJWT, secret: string) {
+		if (this.key == null) await this.setKey(secret) // avoiding an `await` when the key is cached, hence the ! assertion below
+		const jwt = await signJWT
+			.setProtectedHeader({ alg: 'HS256' }) // No reason to go asymmetric yet https://crypto.stackexchange.com/a/30660
+			.setExpirationTime('2h')
+			.sign(this.key!)
+		return this.cm.serialize(jwt)
+	}
+
+	async parse(cookie: string | null | undefined, secret: string) {
+		const jwt = this.cm.parse(cookie, { decode: (x) => x })
+		if (typeof jwt !== 'string' || jwt.length === 0) {
+			return null
+		}
+		if (this.key == null) await this.setKey(secret) // avoiding an `await` when the key is cached, hence the ! assertion in the line below
+		let result: JWTVerifyResult | null = null
+		try {
+			result = await jwtVerify(jwt, this.key!)
+		} catch {}
+		return result == null ? null : result.payload
+	}
+
+	clear() {
+		return this.cm.clear()
+	}
+
+	key: CryptoKey | undefined
+	async setKey(secret: string) {
+		this.key = await crypto.subtle.importKey(
+			'raw',
+			base64ToArray(secret),
+			{ name: 'HMAC', hash: 'SHA-256' },
+			false,
+			['sign', 'verify'],
+		)
+	}
 }

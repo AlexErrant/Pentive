@@ -1,4 +1,4 @@
-import { jwtVerify, type JWTVerifyResult, SignJWT } from 'jose'
+import { SignJWT } from 'jose'
 import {
 	base64url,
 	csrfSignatureCookieName,
@@ -8,15 +8,17 @@ import {
 } from 'shared'
 import { base64ToArray } from 'shared-edge'
 import { redirect } from '@solidjs/router'
-import { CookieManager, EncryptedCookieManager } from '~/cookieManager'
+import {
+	CookieManager,
+	EncryptedCookieManager,
+	SignedCookieManager,
+} from '~/cookieManager'
 import { getRequestEvent } from 'solid-js/web'
 import { type EnvVars } from './env'
 import type { FetchEvent } from '@solidjs/start/server'
 
-const sessionCM = new CookieManager(hubSessionCookieName, {
+const sessionCM = new SignedCookieManager(hubSessionCookieName, {
 	secure: true,
-	// nextTODO
-	// secrets: [], // intentionally empty. This cookie should only store a signed JWT!
 	sameSite: 'strict',
 	path: '/',
 	maxAge: 60 * 60 * 24 * 30, // 30 days
@@ -35,10 +37,9 @@ const csrfSignatureCM = new CookieManager(csrfSignatureCookieName, {
 	domain: import.meta.env.VITE_HUB_DOMAIN, // sadly, making cookies target specific subdomains from the main domain seems very hacky
 })
 
+// encrypted due to https://security.stackexchange.com/a/140889
 const oauthStateCM = new EncryptedCookieManager('__Host-oauthState', {
 	secure: true,
-	// nextTODO
-	// secrets: [x.oauthStateSecret], // encrypted due to https://security.stackexchange.com/a/140889
 	sameSite: 'lax',
 	path: '/',
 	maxAge: 60 * 60 * 24, // 1 day
@@ -46,12 +47,11 @@ const oauthStateCM = new EncryptedCookieManager('__Host-oauthState', {
 	// domain: "", // intentionally missing to exclude subdomains
 })
 
+// encrypted due to https://stackoverflow.com/a/67520418 https://stackoverflow.com/a/67979777
 const oauthCodeVerifierCM = new EncryptedCookieManager(
 	'__Host-oauthCodeVerifier',
 	{
 		secure: true,
-		// nextTODO
-		// secrets: [x.oauthCodeVerifierSecret], // encrypted due to https://stackoverflow.com/a/67520418 https://stackoverflow.com/a/67979777
 		sameSite: 'lax',
 		path: '/',
 		maxAge: 60 * 60 * 24, // 1 day
@@ -60,10 +60,8 @@ const oauthCodeVerifierCM = new EncryptedCookieManager(
 	},
 )
 
-const hubInfoCM = new CookieManager('__Host-hubInfo', {
+const hubInfoCM = new SignedCookieManager('__Host-hubInfo', {
 	secure: true,
-	// nextTODO
-	// secrets: [], // intentionally empty. This cookie only stores an HMACed JWT.
 	sameSite: 'strict',
 	path: '/',
 	maxAge: 60 * 60 * 2, // 2 hours
@@ -71,23 +69,13 @@ const hubInfoCM = new CookieManager('__Host-hubInfo', {
 	// domain: "", // intentionally missing to exclude subdomains
 })
 
-type ParsedEnv = Omit<EnvVars, 'hubSessionSecret' | 'hubInfoSecret'> & {
-	hubSessionSecret: Uint8Array
-	hubInfoSecret: Uint8Array
-}
-
-let envCache: ParsedEnv | undefined
+let envCache: Env | undefined
 
 export const env = (event?: FetchEvent) => {
 	if (envCache != null) return envCache
-	const env =
+	envCache =
 		(event ?? getRequestEvent()!).nativeEvent.context.cloudflare?.env ??
 		(process.env as unknown as EnvVars)
-	envCache = {
-		...env,
-		hubSessionSecret: base64ToArray(env.hubSessionSecret),
-		hubInfoSecret: base64ToArray(env.hubInfoSecret),
-	}
 	return envCache
 }
 
@@ -117,18 +105,12 @@ export interface HubSession {
 
 export async function getSession() {
 	const cookie = getRequestEvent()!.request.headers.get('Cookie')
-	const rawSession = sessionCM.parse(cookie)
-	if (rawSession == null) return null
-	let session: JWTVerifyResult | null = null
-	try {
-		session = await jwtVerify(rawSession, env().hubSessionSecret)
-	} catch {}
-	return session == null
-		? null
-		: {
-				sub: (session.payload.sub as UserId) ?? throwExp('`sub` is empty'),
-				jti: session.payload.jti ?? throwExp('`jti` is empty'),
-			}
+	const payload = await sessionCM.parse(cookie, env().hubSessionSecret)
+	if (payload == null) return null
+	return {
+		sub: (payload.sub as UserId) ?? throwExp('`sub` is empty'),
+		jti: payload.jti ?? throwExp('`jti` is empty'),
+	}
 }
 
 export async function getUserId() {
@@ -181,8 +163,19 @@ export async function createUserSession(
 ): Promise<Response> {
 	const [csrf, csrfSignature] = await generateCsrf()
 	const headers = new Headers()
-	const session = await generateSession(userId, csrf)
-	headers.append('Set-Cookie', sessionCM.serialize(session)) // lowTODO parallelize
+	const cookie = await sessionCM.serialize(
+		new SignJWT({})
+			.setSubject(userId)
+			// use 256-bit csrf as JTI https://www.rfc-editor.org/rfc/rfc7519#section-4.1.7 https://security.stackexchange.com/a/220810 https://security.stackexchange.com/a/248434
+			.setJti(csrf),
+		// .setNotBefore() // highTODO
+		// .setIssuedAt()
+		// .setIssuer("urn:example:issuer")
+		// .setAudience("urn:example:audience")
+		// .setExpirationTime("2h")
+		env().hubSessionSecret,
+	)
+	headers.append('Set-Cookie', cookie)
 	// https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html#double-submit-cookie
 	// If you ever separate csrf from the session cookie https://security.stackexchange.com/a/220810 https://security.stackexchange.com/a/248434
 	// REST endpoints may need csrf https://security.stackexchange.com/q/166724
@@ -209,41 +202,22 @@ export async function createLoginHeaders(
 }
 
 export async function createInfoHeaders(info: string) {
-	// could use crypto.subtle instead of a JWT for less overhead, but I'm tired of subtle and thinking in binary
-	const infoJwt = await new SignJWT({ info })
-		.setProtectedHeader({ alg })
-		.setExpirationTime('2h')
-		.sign(await getHubInfoKey())
+	const infoJwt = new SignJWT({ info }).setExpirationTime('2h')
 	const headers = new Headers()
-	headers.append('Set-Cookie', hubInfoCM.serialize(infoJwt))
+	headers.append(
+		'Set-Cookie',
+		await hubInfoCM.serialize(infoJwt, env().hubInfoSecret),
+	)
 	return headers
 }
 
 export async function getInfo(request: Request) {
-	const rawInfoJwt = hubInfoCM.parse(request.headers.get('Cookie'))
-	if (typeof rawInfoJwt !== 'string' || rawInfoJwt.length === 0) {
-		return null
-	}
-	let jwt: JWTVerifyResult | null = null
-	try {
-		jwt = await jwtVerify(rawInfoJwt, env().hubInfoSecret)
-	} catch {}
-	return jwt == null
-		? null
-		: ((jwt.payload.info as string) ?? throwExp('`info` is empty'))
-}
-
-async function generateSession(userId: string, csrf: string): Promise<string> {
-	return await new SignJWT({})
-		.setProtectedHeader({ alg })
-		.setSubject(userId)
-		.setJti(csrf) // use 256-bit csrf as JTI https://www.rfc-editor.org/rfc/rfc7519#section-4.1.7 https://security.stackexchange.com/a/220810 https://security.stackexchange.com/a/248434
-		// .setNotBefore() // highTODO
-		// .setIssuedAt()
-		// .setIssuer("urn:example:issuer")
-		// .setAudience("urn:example:audience")
-		// .setExpirationTime("2h")
-		.sign(env().hubSessionSecret)
+	const payload = await hubInfoCM.parse(
+		request.headers.get('Cookie'),
+		env().hubInfoSecret,
+	)
+	if (payload == null) return null
+	return (payload.info as string) ?? throwExp('`info` is empty')
 }
 
 let maybeCsrfKey: CryptoKey | null = null
@@ -258,20 +232,6 @@ async function getCsrfKey(): Promise<CryptoKey> {
 		)
 	}
 	return maybeCsrfKey
-}
-
-let maybeHubInfoKey: CryptoKey | null = null
-async function getHubInfoKey(): Promise<CryptoKey> {
-	if (maybeHubInfoKey == null) {
-		maybeHubInfoKey = await crypto.subtle.importKey(
-			'raw',
-			env().hubInfoSecret,
-			{ name: 'HMAC', hash: 'SHA-256' },
-			false,
-			['sign', 'verify'],
-		)
-	}
-	return maybeHubInfoKey
 }
 
 async function generateCsrf(): Promise<[string, string]> {
@@ -294,5 +254,3 @@ export async function isInvalidCsrf(
 	const isValid = await crypto.subtle.verify('HMAC', csrfKey, signature, data)
 	return !isValid
 }
-
-const alg = 'HS256'
