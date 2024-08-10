@@ -20,18 +20,17 @@ import type { FetchEvent } from '@solidjs/start/server'
 const sessionMaxAgeSeconds = 60 * 60 * 24 * 30 // 30 days
 const sessionCM = new SignedCookieManager(hubSessionCookieName, {
 	secure: true,
-	sameSite: 'strict',
+	sameSite: 'lax',
 	path: '/',
 	maxAge: sessionMaxAgeSeconds,
 	httpOnly: true,
 	domain: import.meta.env.VITE_HUB_DOMAIN, // sadly, making cookies target specific subdomains from the main domain seems very hacky
 })
 // lowTODO store this on the client in a cross-domain compatible way - it need not be a cookie https://stackoverflow.com/q/34790887
+// intentionally not encrypted or signed. This cookie only stores an HMACed CSRF token.
 const csrfSignatureCM = new CookieManager(csrfSignatureCookieName, {
 	secure: true,
-	// nextTODO
-	// secrets: [], // intentionally empty. This cookie only stores an HMACed CSRF token.
-	sameSite: 'strict',
+	sameSite: 'lax',
 	path: '/',
 	maxAge: 60 * 60 * 24 * 30, // 30 days
 	httpOnly: false,
@@ -64,7 +63,7 @@ const oauthCodeVerifierCM = new EncryptedCookieManager(
 const hubInfoMaxAgeSeconds = 60 * 60 * 24 * 30 // 30 days
 const hubInfoCM = new SignedCookieManager('__Host-hubInfo', {
 	secure: true,
-	sameSite: 'strict',
+	sameSite: 'lax',
 	path: '/',
 	maxAge: hubInfoMaxAgeSeconds,
 	httpOnly: true,
