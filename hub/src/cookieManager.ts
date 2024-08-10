@@ -126,7 +126,6 @@ export class SignedCookieManager {
 		if (this.key == null) await this.setKey(secret) // avoiding an `await` when the key is cached, hence the ! assertion below
 		const jwt = await signJWT
 			.setProtectedHeader({ alg: 'HS256' }) // No reason to go asymmetric yet https://crypto.stackexchange.com/a/30660
-			.setExpirationTime('2h')
 			.sign(this.key!)
 		return this.cm.serialize(jwt)
 	}

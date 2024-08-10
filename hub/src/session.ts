@@ -17,11 +17,12 @@ import { getRequestEvent } from 'solid-js/web'
 import { type EnvVars } from './env'
 import type { FetchEvent } from '@solidjs/start/server'
 
+const sessionMaxAgeSeconds = 60 * 60 * 24 * 30 // 30 days
 const sessionCM = new SignedCookieManager(hubSessionCookieName, {
 	secure: true,
 	sameSite: 'strict',
 	path: '/',
-	maxAge: 60 * 60 * 24 * 30, // 30 days
+	maxAge: sessionMaxAgeSeconds,
 	httpOnly: true,
 	domain: import.meta.env.VITE_HUB_DOMAIN, // sadly, making cookies target specific subdomains from the main domain seems very hacky
 })
@@ -60,11 +61,12 @@ const oauthCodeVerifierCM = new EncryptedCookieManager(
 	},
 )
 
+const hubInfoMaxAgeSeconds = 60 * 60 * 24 * 30 // 30 days
 const hubInfoCM = new SignedCookieManager('__Host-hubInfo', {
 	secure: true,
 	sameSite: 'strict',
 	path: '/',
-	maxAge: 60 * 60 * 2, // 2 hours
+	maxAge: hubInfoMaxAgeSeconds,
 	httpOnly: true,
 	// domain: "", // intentionally missing to exclude subdomains
 })
@@ -163,16 +165,17 @@ export async function createUserSession(
 ): Promise<Response> {
 	const [csrf, csrfSignature] = await generateCsrf()
 	const headers = new Headers()
+	const expires = new Date(new Date().getTime() + sessionMaxAgeSeconds * 1000)
 	const cookie = await sessionCM.serialize(
 		new SignJWT({})
 			.setSubject(userId)
 			// use 256-bit csrf as JTI https://www.rfc-editor.org/rfc/rfc7519#section-4.1.7 https://security.stackexchange.com/a/220810 https://security.stackexchange.com/a/248434
-			.setJti(csrf),
-		// .setNotBefore() // highTODO
-		// .setIssuedAt()
-		// .setIssuer("urn:example:issuer")
-		// .setAudience("urn:example:audience")
-		// .setExpirationTime("2h")
+			.setJti(csrf)
+			// .setNotBefore() // highTODO
+			// .setIssuedAt()
+			// .setIssuer("urn:example:issuer")
+			// .setAudience("urn:example:audience")
+			.setExpirationTime(expires),
 		env().hubSessionSecret,
 	)
 	headers.append('Set-Cookie', cookie)
@@ -202,7 +205,8 @@ export async function createLoginHeaders(
 }
 
 export async function createInfoHeaders(info: string) {
-	const infoJwt = new SignJWT({ info }).setExpirationTime('2h')
+	const expires = new Date(new Date().getTime() + hubInfoMaxAgeSeconds * 1000)
+	const infoJwt = new SignJWT({ info }).setExpirationTime(expires)
 	const headers = new Headers()
 	headers.append(
 		'Set-Cookie',
