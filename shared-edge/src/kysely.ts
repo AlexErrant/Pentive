@@ -1105,16 +1105,14 @@ export function fromBase64Url(id: Base64Url): RawBuilder<DbId> {
 function mapIdToBase64Url<T>(t: T & { id: DbId }): T & {
 	id: Base64Url
 } {
-	const array = Uint8Array.from(t.id.split('').map((b) => b.charCodeAt(0))) // https://github.com/planetscale/database-js/issues/78#issuecomment-1376435565
 	return {
 		...t,
-		id: base64url.encode(array).substring(0, 22) as Base64Url,
+		id: base64url.encode(new Uint8Array(t.id)).substring(0, 22) as Base64Url,
 	}
 }
 
 export function dbIdToBase64Url(dbId: DbId): Base64Url {
-	const array = Uint8Array.from(dbId.split('').map((b) => b.charCodeAt(0))) // https://github.com/planetscale/database-js/issues/78#issuecomment-1376435565
-	return base64url.encode(array).substring(0, 22) as Base64Url
+	return base64url.encode(new Uint8Array(dbId)).substring(0, 22) as Base64Url
 }
 
 // use with .$call(log)
