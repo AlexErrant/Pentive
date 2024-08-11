@@ -71,12 +71,20 @@ export async function getPosts({ nook }: { nook: string }): Promise<
 		.then((ps) => ps.map(mapIdToBase64Url))
 }
 
+export function epochToDate(epoch: number) {
+	return new Date(epoch * 1000)
+}
+function maybeEpochToDate(epoch: number | null | undefined) {
+	if (epoch == null) return null
+	return epochToDate(epoch)
+}
+
 function toTemplate(
 	x: {
 		templateId: DbId
 		templateName: string
-		templateCreated: Date
-		templateEdited: Date
+		templateCreated: number
+		templateEdited: number
 		nook: string
 		css: string
 		type: string
@@ -88,8 +96,8 @@ function toTemplate(
 		id: templateId,
 		name: x.templateName,
 		nook: x.nook as NookId,
-		created: x.templateCreated,
-		edited: x.templateEdited,
+		created: epochToDate(x.templateCreated),
+		edited: epochToDate(x.templateEdited),
 		fields: deserializeFields(x.fields),
 		css: x.css,
 		templateType: deserializeTemplateType(x.type),
@@ -100,10 +108,10 @@ function noteToNookView(x: {
 	id: DbId
 	templateId: DbId
 	templateName: string
-	templateCreated: Date
-	templateEdited: Date
-	noteCreated: Date
-	noteEdited: Date
+	templateCreated: number
+	templateEdited: number
+	noteCreated: number
+	noteEdited: number
 	tags: string
 	nook: string
 	fieldValues: string
@@ -112,7 +120,7 @@ function noteToNookView(x: {
 	fields: string
 	subscribers: number
 	comments: number
-	til?: Date | null
+	til?: number | null
 }) {
 	const noteId = dbIdToBase64Url(x.id) as RemoteNoteId
 	const templateId = dbIdToBase64Url(x.templateId) as RemoteTemplateId
@@ -120,7 +128,7 @@ function noteToNookView(x: {
 		id: noteId,
 		subscribers: x.subscribers,
 		comments: x.comments,
-		til: x.til,
+		til: maybeEpochToDate(x.til),
 		note: toNote(x, noteId, templateId),
 		template: toTemplate(x, templateId),
 	}
@@ -133,8 +141,8 @@ function toNote(
 		id: DbId
 		templateId: DbId
 		ankiNoteId?: number
-		noteCreated: Date
-		noteEdited: Date
+		noteCreated: number
+		noteEdited: number
 		tags: string
 	},
 	noteId: RemoteNoteId,
@@ -145,8 +153,8 @@ function toNote(
 		fieldValues: deserializeFieldValues(x.fieldValues),
 		id: noteId,
 		templateId,
-		created: x.noteCreated,
-		edited: x.noteEdited,
+		created: epochToDate(x.noteCreated),
+		edited: epochToDate(x.noteEdited),
 		tags: deserializeTags(x.tags),
 		ankiId: x.ankiNoteId,
 	}
@@ -246,13 +254,13 @@ export async function getNote(noteId: RemoteNoteId, userId: UserId | null) {
 	return {
 		id: noteId,
 		templateId: dbIdToBase64Url(r.templateId) as RemoteTemplateId,
-		created: r.created,
-		edited: r.edited,
+		created: epochToDate(r.created),
+		edited: epochToDate(r.edited),
 		authorId: r.authorId as UserId,
 		fieldValues: deserializeFieldValues(r.fieldValues),
 		tags: deserializeTags(r.tags),
 		ankiId: r.ankiId ?? undefined,
-		til: r.til,
+		til: maybeEpochToDate(r.til),
 		nook: r.nook,
 		template: toTemplate(r, dbIdToBase64Url(r.templateId) as TemplateId),
 	}
@@ -355,8 +363,8 @@ export async function getTemplateComments(templateId: RemoteTemplateId) {
 			id: dbIdToBase64Url(c.id) as CommentId,
 			parentId: nullMap(c.parentId, dbIdToBase64Url) as CommentId | null,
 			entityId: templateId,
-			created: c.created,
-			edited: c.edited,
+			created: epochToDate(c.created),
+			edited: epochToDate(c.edited),
 			text: c.text,
 			authorId: c.authorId as UserId,
 			votes: c.votes,
@@ -390,8 +398,8 @@ export async function getNoteComments(noteId: RemoteNoteId) {
 			id: dbIdToBase64Url(c.id) as CommentId,
 			parentId: nullMap(c.parentId, dbIdToBase64Url) as CommentId | null,
 			entityId: noteId,
-			created: c.created,
-			edited: c.edited,
+			created: epochToDate(c.created),
+			edited: epochToDate(c.edited),
 			text: c.text,
 			authorId: c.authorId as UserId,
 			votes: c.votes,
@@ -464,8 +472,8 @@ export async function getTemplates(nook: NookId, userId?: UserId) {
 
 function templateEntityToDomain(t: {
 	id: DbId
-	created: Date
-	edited: Date
+	created: number
+	edited: number
 	name: string
 	nook: NookId
 	type: string
@@ -474,7 +482,7 @@ function templateEntityToDomain(t: {
 	ankiId: number | null
 	subscribersCount: number
 	commentsCount: number
-	til?: Date | null
+	til?: number | null
 }) {
 	const r = {
 		id: dbIdToBase64Url(t.id) as RemoteTemplateId,
@@ -482,12 +490,12 @@ function templateEntityToDomain(t: {
 		nook: t.nook,
 		css: t.css,
 		fields: deserializeFields(t.fields),
-		created: t.created,
-		edited: t.edited,
+		created: epochToDate(t.created),
+		edited: epochToDate(t.edited),
 		templateType: deserializeTemplateType(t.type),
 		subscribers: t.subscribersCount,
 		comments: t.commentsCount,
-		til: t.til,
+		til: maybeEpochToDate(t.til),
 	} satisfies RemoteTemplate & Record<string, unknown>
 	return r
 }
@@ -891,7 +899,7 @@ function toNoteCreate(
 	n: EditRemoteNote | CreateRemoteNote,
 	authorId: UserId,
 ) {
-	const edited = 'remoteId' in n ? new Date() : undefined
+	const edited = 'remoteId' in n ? new Date().getTime() / 1000 : undefined
 	const remoteIdHex = base16.encode(remoteNoteId) as Hex
 	const remoteIdBase64url = base64url
 		.encode(remoteNoteId)
@@ -938,7 +946,7 @@ function toTemplateCreate(
 	remoteId: Uint8Array,
 	nook: NookId,
 ) {
-	const edited = 'remoteId' in n ? new Date() : undefined
+	const edited = 'remoteId' in n ? new Date().getTime() / 1000 : undefined
 	const remoteIdHex = base16.encode(remoteId) as Hex
 	const remoteIdBase64url = base64url
 		.encode(remoteId)

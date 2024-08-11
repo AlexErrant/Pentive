@@ -6,7 +6,7 @@ import {
 	type NookType,
 	assertNever,
 } from 'shared'
-import { db } from './kysely'
+import { db, epochToDate } from './kysely'
 
 export async function getNook(nook: NookId) {
 	const r = await db
@@ -15,7 +15,7 @@ export async function getNook(nook: NookId) {
 		.where('id', '=', nook)
 		.executeTakeFirst()
 	return undefinedMap(r, (nook) => ({
-		...nook,
+		created: epochToDate(nook.created),
 		moderators: deserializeModerators(nook.moderators),
 	}))
 }

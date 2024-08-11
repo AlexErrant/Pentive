@@ -20,7 +20,7 @@ export interface MediaEntity {
 
 export interface Nook {
 	id: string
-	created: Generated<Date>
+	created: Generated<number>
 	moderators: string
 	sidebar: string
 	description: string
@@ -31,8 +31,8 @@ export interface Nook {
 export interface Note {
 	id: DbId
 	templateId: DbId
-	created: Generated<Date>
-	edited: Generated<Date>
+	created: Generated<number>
+	edited: Generated<number>
 	authorId: string
 	fieldValues: string
 	fts: string
@@ -46,8 +46,8 @@ export interface NoteComment {
 	id: DbId
 	parentId: DbId | null
 	noteId: DbId
-	created: Generated<Date>
-	edited: Generated<Date>
+	created: Generated<number>
+	edited: Generated<number>
 	text: string
 	authorId: string
 	history: string | null
@@ -57,7 +57,7 @@ export interface NoteComment {
 
 export interface NoteHistory {
 	noteId: DbId
-	created: Generated<Date>
+	created: Generated<number>
 	templateId: DbId | null
 	fieldValues: string
 	tags: string
@@ -66,7 +66,7 @@ export interface NoteHistory {
 export interface NoteSubscriber {
 	noteId: DbId
 	userId: string
-	til: Generated<Date>
+	til: Generated<number>
 }
 
 export interface Post {
@@ -81,8 +81,8 @@ export interface PostComment {
 	id: DbId
 	parentId: DbId | null
 	postId: DbId
-	created: Generated<Date>
-	edited: Generated<Date>
+	created: Generated<number>
+	edited: Generated<number>
 	text: string
 	authorId: string
 	history: string | null
@@ -93,13 +93,13 @@ export interface PostComment {
 export interface PostSubscriber {
 	postId: DbId
 	userId: string
-	til: Generated<Date>
+	til: Generated<number>
 }
 
 export interface Template {
 	id: DbId
-	created: Generated<Date>
-	edited: Generated<Date>
+	created: Generated<number>
+	edited: Generated<number>
 	name: string
 	nook: NookId
 	type: string
@@ -114,8 +114,8 @@ export interface TemplateComment {
 	id: DbId
 	parentId: DbId | null
 	templateId: DbId
-	created: Generated<Date>
-	edited: Generated<Date>
+	created: Generated<number>
+	edited: Generated<number>
 	text: string
 	authorId: string
 	history: string | null
@@ -125,7 +125,7 @@ export interface TemplateComment {
 
 export interface TemplateHistory {
 	templateId: DbId
-	created: Generated<Date>
+	created: Generated<number>
 	name: string | null
 	authorId: string | null
 	type: string | null
@@ -136,14 +136,14 @@ export interface TemplateHistory {
 export interface TemplateSubscriber {
 	templateId: DbId
 	userId: string
-	til: Generated<Date>
+	til: Generated<number>
 }
 
 export interface User {
 	id: string
 	email: string
 	peer: PeerValidator | null
-	created: Generated<Date>
+	created: Generated<number>
 }
 
 export interface DB {
