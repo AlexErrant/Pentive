@@ -33,7 +33,7 @@ export const route = {
 	},
 } satisfies RouteDefinition
 
-export function Thread(props: RouteSectionProps) {
+export default function Nook(props: RouteSectionProps) {
 	const posts = createAsync(
 		async () => await getPostsCached(props.params.nook!),
 	)
