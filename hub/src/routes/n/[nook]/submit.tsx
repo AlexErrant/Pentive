@@ -2,6 +2,7 @@ import { Show } from 'solid-js'
 import { insertPost, ulidAsHex } from 'shared-edge'
 import { requireCsrfSignature, requireSession, isInvalidCsrf } from '~/session'
 import {
+	type RouteDefinition,
 	action,
 	cache,
 	createAsync,
@@ -45,6 +46,7 @@ interface ValidationError {
 }
 
 const submitting = action(async (form: FormData) => {
+	'use server'
 	const title = form.get('title')
 	const text = form.get('text')
 	const nook = form.get('nook')
@@ -87,6 +89,12 @@ const submitting = action(async (form: FormData) => {
 	})
 	// highTODO return redirect to post
 })
+
+export const route = {
+	preload() {
+		void getCsrfSignatureCached()
+	},
+} satisfies RouteDefinition
 
 export default function Thread(props: RouteSectionProps) {
 	const isSubmitting = useSubmission(submitting)

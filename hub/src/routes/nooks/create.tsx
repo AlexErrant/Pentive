@@ -10,6 +10,7 @@ import { type NookType, type NookId, nookTypes } from 'shared'
 import { RadioGroup } from '@kobalte/core'
 import '../../radio.css'
 import {
+	type RouteDefinition,
 	action,
 	cache,
 	createAsync,
@@ -98,6 +99,12 @@ const submitting = action(async (form: FormData) => {
 	})
 	return redirect(`/n/${nook}`)
 })
+
+export const route = {
+	preload() {
+		void getCsrfSignatureCached()
+	},
+} satisfies RouteDefinition
 
 export default function Submit(props: RouteSectionProps) {
 	const csrfSignature = createAsync(async () => await getCsrfSignatureCached())
