@@ -14,10 +14,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check out
-        uses: actions/checkout@v4
-        with:
-          submodules: true
+      - name: Checkout
+        uses: actions/checkout@v3
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -30,9 +28,6 @@ jobs:
 
       - name: pnpm install
         run: pnpm install
-
-      - name: build-deps
-        run: pnpm build-deps
 
       - name: tsc-build
         run: pnpm tsc-build
