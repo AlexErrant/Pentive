@@ -34,7 +34,7 @@ model user {
 model template {
   id               Bytes                @id @db.Binary(16)
   created          DateTime             @default(now())
-  updated          DateTime             @default(now())
+  edited           DateTime             @default(now())
   name             String               @db.VarChar(255)
   nook             String               @db.VarChar(21)
   nookRef          nook                 @relation(fields: [nook], references: [id])
@@ -59,7 +59,7 @@ model templateComment {
   templateId Bytes    @db.Binary(16)
   template   template @relation(fields: [templateId], references: [id])
   created    DateTime @default(now())
-  updated    DateTime @default(now())
+  edited     DateTime @default(now())
   text       String   @db.Text
   author     user     @relation(fields: [authorId], references: [id])
   authorId   String   @db.VarChar(21)
@@ -105,7 +105,7 @@ model note {
   templateId       Bytes    @db.Binary(16)
   template         template @relation(fields: [templateId], references: [id])
   created          DateTime @default(now())
-  updated          DateTime @default(now())
+  edited           DateTime @default(now())
   author           user     @relation(fields: [authorId], references: [id])
   authorId         String   @db.VarChar(21)
   fieldValues      String   @db.Text // medTODO compress
@@ -131,7 +131,7 @@ model noteComment {
   noteId   Bytes    @db.Binary(16)
   note     note     @relation(fields: [noteId], references: [id])
   created  DateTime @default(now())
-  updated  DateTime @default(now())
+  edited   DateTime @default(now())
   text     String   @db.Text
   author   user     @relation(fields: [authorId], references: [id])
   authorId String   @db.VarChar(21)
@@ -218,7 +218,7 @@ model postComment {
   postId   Bytes    @db.Binary(16)
   post     post     @relation(fields: [postId], references: [id])
   created  DateTime @default(now())
-  updated  DateTime @default(now())
+  edited   DateTime @default(now())
   text     String   @db.Text
   author   user     @relation(fields: [authorId], references: [id])
   authorId String   @db.VarChar(21)

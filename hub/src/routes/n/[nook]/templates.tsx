@@ -2,11 +2,8 @@ import { For, Show } from 'solid-js'
 import { type NookId } from 'shared'
 import { getTemplates } from 'shared-edge'
 import ResizingIframe from '~/components/resizingIframe'
-import { getAppMessenger } from '~/entry-client'
 import { remoteToTemplate } from '~/lib/utility'
-import { unwrap } from 'solid-js/store'
 import { getUserId } from '~/session'
-import { cwaClient } from 'app/src/trpcClient'
 import RelativeDate from '~/components/relativeDate'
 import {
 	A,
@@ -15,6 +12,11 @@ import {
 	type RouteDefinition,
 	type RouteSectionProps,
 } from '@solidjs/router'
+import { clientOnly } from '@solidjs/start'
+
+const DownloadTemplate = clientOnly(
+	async () => await import('~/components/downloadTemplate'),
+)
 
 const getTemplatesCached = cache(async (nook: NookId) => {
 	'use server'
@@ -43,15 +45,7 @@ export default function Thread(props: RouteSectionProps) {
 								<li>
 									<h1>{template.name}</h1>
 									<div>
-										<button
-											onClick={async () => {
-												await getAppMessenger().addTemplate(unwrap(template))
-												await cwaClient.subscribeToTemplate.mutate(template.id)
-											}}
-											disabled={template.til != null}
-										>
-											Download
-										</button>
+										<DownloadTemplate template={template} />
 										<div>
 											{template.til == null ? (
 												''
