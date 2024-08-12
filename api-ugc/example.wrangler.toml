@@ -1,6 +1,6 @@
 name = "api-ugc"
 main = "src/index.ts"
-compatibility_date = "2023-03-21"
+compatibility_date = "2024-08-12"
 
 account_id = "$cloudflareAccountId"
 
@@ -11,4 +11,5 @@ preview_bucket_name = 'media-dev'
 
 [dev]
 port = 3019
-local_protocol="https"
+local_protocol = "https"
+

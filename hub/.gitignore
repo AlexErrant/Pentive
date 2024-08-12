@@ -30,3 +30,4 @@ wrangler.toml
 .env.development
 .env.production
 .cert
+.dev.vars
