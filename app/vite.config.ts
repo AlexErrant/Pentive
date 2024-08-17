@@ -36,6 +36,8 @@ export default defineConfig(({ mode }: UserConfig) => {
 			'Cross-Origin-Opener-Policy': 'same-origin',
 			// eslint-disable-next-line @typescript-eslint/naming-convention
 			'Cross-Origin-Embedder-Policy': 'require-corp',
+			// eslint-disable-next-line @typescript-eslint/naming-convention
+			'Cross-Origin-Resource-Policy': 'cross-origin',
 		},
 	}
 	return {
