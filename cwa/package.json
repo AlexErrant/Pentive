@@ -23,6 +23,7 @@
 	},
 	"dependencies": {
 		"@planetscale/database": "^1.11.0",
+		"@scure/base": "^1.1.1",
 		"@trpc/server": "^10.38.5",
 		"hono": "^3.7.2",
 		"jose": "^5.6.3",
