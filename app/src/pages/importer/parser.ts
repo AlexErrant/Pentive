@@ -28,7 +28,7 @@ import {
 	type Decks,
 	dconfSingle,
 } from './typeChecker'
-import { zip } from 'lodash'
+import { zip } from 'lodash-es'
 import { z } from 'zod'
 import { C } from '../../topLevelAwait'
 

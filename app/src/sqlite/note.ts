@@ -18,7 +18,7 @@ import {
 	type OnConflictTables,
 	type InsertObject,
 } from 'kysely'
-import { chunk } from 'lodash'
+import { chunk } from 'lodash-es'
 import { C, ky, tx } from '../topLevelAwait'
 import {
 	noteEntityToDomain,

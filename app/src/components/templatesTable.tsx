@@ -11,7 +11,7 @@ import {
 } from 'ag-grid-community'
 import { LicenseManager } from 'ag-grid-enterprise'
 import { objEntries, type Template, type TemplateId } from 'shared'
-import { startCase } from 'lodash'
+import { startCase } from 'lodash-es'
 import '@github/relative-time-element'
 import { db } from '../db'
 import { agGridTheme } from '../globalState'

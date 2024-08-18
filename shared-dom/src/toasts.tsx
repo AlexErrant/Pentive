@@ -7,8 +7,8 @@ import {
 	Show,
 } from 'solid-js'
 import toast from 'solid-toast'
-import memoize from 'lodash/memoize'
-import throttle from 'lodash/throttle'
+import memoize from 'lodash-es/memoize'
+import throttle from 'lodash-es/throttle'
 
 // https://github.com/lodash/lodash/issues/2403#issuecomment-1706130395
 function memoizeThrottle<F extends (...args: Parameters<F>) => ReturnType<F>>(

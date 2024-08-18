@@ -10,7 +10,7 @@ import {
 import { GoldenLayout, LayoutConfig } from 'golden-layout'
 import { render } from 'solid-js/web'
 import EditCardSetting from '../components/editCardSetting'
-import { cloneDeep } from 'lodash'
+import { cloneDeep } from 'lodash-es'
 import { ulidAsBase64Url } from '../domain/utility'
 
 export default function Settings(): JSX.Element {

@@ -1,5 +1,5 @@
 import { type JSX } from 'solid-js/jsx-runtime'
-import { isEqual } from 'lodash'
+import { isEqual } from 'lodash-es'
 import { db } from './../db'
 
 import { createResource, Match, Switch } from 'solid-js'

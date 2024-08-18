@@ -1,4 +1,4 @@
-import { isEqual, uniqWith } from 'lodash'
+import { isEqual, uniqWith } from 'lodash-es'
 import { getClozeFields } from './language/template2clozeFields.js'
 import {
 	type Error,

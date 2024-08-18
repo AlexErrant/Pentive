@@ -14,7 +14,7 @@ import {
 	Brace,
 } from './templateParser.terms'
 import { type RenderContainer } from '../renderContainer'
-import { isEqual, uniqWith } from 'lodash'
+import { isEqual, uniqWith } from 'lodash-es'
 
 // make a DU if there's a second Error
 export interface Error {

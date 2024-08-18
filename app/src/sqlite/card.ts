@@ -29,7 +29,7 @@ import {
 	type SelectQueryBuilder,
 	type QueryCreator,
 } from 'kysely'
-import { chunk } from 'lodash'
+import { chunk } from 'lodash-es'
 import { md5 } from '../domain/utility'
 import { noteEntityToDomain, parseTags, templateEntityToDomain } from './util'
 import { type convert } from 'shared-dom'

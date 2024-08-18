@@ -8,7 +8,7 @@ import {
 	type OnConflictDatabase,
 	type OnConflictTables,
 } from 'kysely'
-import { chunk } from 'lodash'
+import { chunk } from 'lodash-es'
 import { C, ky } from '../topLevelAwait'
 
 export const cardSettingsCollectionMethods = {

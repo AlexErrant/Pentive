@@ -1,6 +1,6 @@
 import { type Kind, assertNever, type CardId, type Review } from 'shared'
 import { type Review as ReviewEntity } from '../sqlite/database'
-import { chunk } from 'lodash'
+import { chunk } from 'lodash-es'
 import { C, ky } from '../topLevelAwait'
 
 function serializeKind(s: Kind): number {

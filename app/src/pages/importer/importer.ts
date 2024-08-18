@@ -41,7 +41,7 @@ import {
 	type TemplateId,
 } from 'shared'
 import { db } from './../../db'
-import { chunk } from 'lodash'
+import { chunk } from 'lodash-es'
 import sqliteUrl from '../../assets/sql-wasm.wasm?url'
 import { C } from '../../topLevelAwait'
 
