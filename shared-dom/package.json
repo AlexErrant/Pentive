@@ -55,7 +55,7 @@
 		"@lezer/lr": "^1.4.2",
 		"immer": "^10.0.2",
 		"kysely": "^0.27.3",
-		"lodash": "^4.17.21",
+		"lodash-es": "^4.17.21",
 		"nightwind": "^1.1.13",
 		"shared": "workspace:*",
 		"solid-js": "^1.8.18",
