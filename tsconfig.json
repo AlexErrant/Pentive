@@ -47,9 +47,6 @@
 		},
 		{
 			"path": "prosemirror-image-plugin"
-		},
-		{
-			"path": "solid-toast"
 		}
 		// if adding or removing a project, also update the `./eslintrc.cjs`!
 	]
