@@ -2,7 +2,8 @@
 
 import fc, { type Arbitrary, type RecordConstraints } from 'fast-check'
 import { Ulid } from 'id128'
-import { type Brand, base64url, hex } from 'shared'
+import { type Brand } from 'shared'
+import { base64url, hex } from '@scure/base'
 
 // https://stackoverflow.com/a/72760489
 type OptionalKeys<T> = Required<{

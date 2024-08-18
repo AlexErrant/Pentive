@@ -14,7 +14,6 @@ import { type Env, type MediaHash, type CwaContext } from './util'
 import {
 	hstsName,
 	hstsValue,
-	base64,
 	type Base64,
 	type Base64Url,
 	type NoteId,
@@ -35,6 +34,7 @@ import { connect } from '@planetscale/database'
 import { buildPrivateToken } from './privateToken'
 import { appRouter } from './router'
 import { fetchRequestHandler } from '@trpc/server/adapters/fetch'
+import { base64 } from '@scure/base'
 export type * from '@trpc/server'
 
 // eslint-disable-next-line @typescript-eslint/naming-convention

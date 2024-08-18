@@ -1,4 +1,5 @@
-import { base64, type Base64Url, base64url, type Brand, concat } from 'shared'
+import { type Base64Url, type Brand, concat } from 'shared'
+import { base64, base64url } from '@scure/base'
 import { type MediaHash } from './util'
 
 export type UserId = Brand<string, 'userId'>
