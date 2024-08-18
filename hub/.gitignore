@@ -30,5 +30,6 @@ wrangler.toml
 .env
 .env.development
 .env.production
+.env.production.local
 .cert
 .dev.vars
