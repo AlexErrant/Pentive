@@ -16,6 +16,7 @@
 		"stylelintw": "stylelint **/*.css --fix"
 	},
 	"type": "module",
+	"sideEffects": false,
 	"main": "./dist/index.js",
 	"devDependencies": {
 		"@cloudflare/kv-asset-handler": "^0.3.0",

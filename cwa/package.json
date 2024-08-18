@@ -3,6 +3,7 @@
 	"version": "0.0.0",
 	"main": "src/index.ts",
 	"type": "module",
+	"sideEffects": false,
 	"devDependencies": {
 		"@cloudflare/workers-types": "^4.20240725.0",
 		"eslint": "^8.57.0",
