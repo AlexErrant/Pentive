@@ -8,7 +8,7 @@ import {
 	type OnConflictDatabase,
 	type OnConflictTables,
 } from 'kysely'
-import _ from 'lodash'
+import { chunk } from 'lodash'
 import { C, ky } from '../topLevelAwait'
 
 export const cardSettingsCollectionMethods = {
@@ -21,7 +21,7 @@ export const cardSettingsCollectionMethods = {
 					details: stringifyDetails(r),
 				}) satisfies CardSettingEntity,
 		)
-		const batches = _.chunk(entities, 1000)
+		const batches = chunk(entities, 1000)
 		for (let i = 0; i < batches.length; i++) {
 			C.toastInfo('cardSetting batch ' + (i + 1) + '/' + batches.length)
 			await ky

@@ -18,7 +18,7 @@ import {
 	type OnConflictTables,
 	type InsertObject,
 } from 'kysely'
-import _ from 'lodash'
+import { chunk } from 'lodash'
 import { C, ky, tx } from '../topLevelAwait'
 import {
 	noteEntityToDomain,
@@ -109,7 +109,7 @@ export const noteCollectionMethods = {
 		await this.bulkUpsertNotes([note])
 	},
 	bulkUpsertNotes: async function (notes: Note[]) {
-		const batches = _.chunk(notes.map(noteToDocType), 1000)
+		const batches = chunk(notes.map(noteToDocType), 1000)
 		await tx(async (db) => {
 			try {
 				await sql`drop trigger noteFieldValue_after_insert`.execute(db)

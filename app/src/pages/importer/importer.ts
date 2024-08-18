@@ -41,7 +41,7 @@ import {
 	type TemplateId,
 } from 'shared'
 import { db } from './../../db'
-import _ from 'lodash'
+import { chunk } from 'lodash'
 import sqliteUrl from '../../assets/sql-wasm.wasm?url'
 import { C } from '../../topLevelAwait'
 
@@ -80,7 +80,7 @@ async function importAnkiMedia(ankiEntries: Entry[]): Promise<void> {
 			"Impossible since we're using `getEntries` https://github.com/gildas-lormeau/zip.js/issues/371",
 		)
 	const parsed = checkMedia(JSON.parse(mediaText))
-	const entryChunks = _.chunk(ankiEntries, 1000)
+	const entryChunks = chunk(ankiEntries, 1000)
 	for (let i = 0; i < entryChunks.length; i++) {
 		C.toastInfo(`Media ${i}/${entryChunks.length}`)
 		await addMediaBatch(entryChunks[i]!, parsed)

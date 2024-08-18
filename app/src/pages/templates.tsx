@@ -8,7 +8,7 @@ import ResizingIframe from '../components/resizingIframe'
 import { GoldenLayout, LayoutConfig } from 'golden-layout'
 import { render } from 'solid-js/web'
 import EditTemplate from '../components/editTemplate'
-import _ from 'lodash'
+import { cloneDeep } from 'lodash'
 import { ulidAsBase64Url } from '../domain/utility'
 import { C } from '../topLevelAwait'
 import TemplateSync from '../components/templateSync'
@@ -30,7 +30,7 @@ export default function Templates(): JSX.Element {
 						<TemplatesTable
 							templates={templates()}
 							onSelectionChanged={(templates) => {
-								const t = _.cloneDeep(templates.at(0)) // some fns mutate the selectedTemplate, so clone to avoid issues
+								const t = cloneDeep(templates.at(0)) // some fns mutate the selectedTemplate, so clone to avoid issues
 								setSelected('template', t)
 							}}
 						/>

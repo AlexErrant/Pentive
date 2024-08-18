@@ -1,5 +1,5 @@
 import { type JSX } from 'solid-js/jsx-runtime'
-import _ from 'lodash'
+import { isEqual } from 'lodash'
 import { db } from './../db'
 
 import { createResource, Match, Switch } from 'solid-js'
@@ -13,7 +13,7 @@ async function testTemplate(): Promise<boolean> {
 		fc.asyncProperty(arbitraryTemplate, async (expected) => {
 			await db.upsertTemplate(expected)
 			const actual = await db.getTemplate(expected.id)
-			const r = _.isEqual(expected, actual)
+			const r = isEqual(expected, actual)
 			console.assert(r, { expected, actual })
 			return r
 		}),
@@ -27,7 +27,7 @@ async function testNote(): Promise<boolean> {
 		fc.asyncProperty(arbitraryNote, async (expected) => {
 			await db.upsertNote(expected)
 			const actual = await db.getNote(expected.id)
-			const r = _.isEqual(expected, actual)
+			const r = isEqual(expected, actual)
 			console.assert(r, { expected, actual })
 			return r
 		}),
@@ -41,7 +41,7 @@ async function testCard(): Promise<boolean> {
 		fc.asyncProperty(arbitraryCard, async (expected) => {
 			await db.upsertCard(expected)
 			const actual = await db.getCard(expected.id)
-			const r = _.isEqual(expected, actual)
+			const r = isEqual(expected, actual)
 			console.assert(r, { expected, actual })
 			return r
 		}),

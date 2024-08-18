@@ -11,7 +11,7 @@ import {
 } from 'ag-grid-community'
 import { LicenseManager } from 'ag-grid-enterprise'
 import { objEntries, type Template, type TemplateId } from 'shared'
-import _ from 'lodash'
+import { startCase } from 'lodash'
 import '@github/relative-time-element'
 import { db } from '../db'
 import { agGridTheme } from '../globalState'
@@ -28,7 +28,7 @@ const columnDefs: Array<ColDef<Template>> = [
 	},
 	{
 		headerName: 'Type',
-		valueGetter: (row) => _.startCase(row?.data?.templateType.tag),
+		valueGetter: (row) => startCase(row?.data?.templateType.tag),
 	},
 	{
 		headerName: 'Remotes',

@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import { isEqual, uniqWith } from 'lodash'
 import { getClozeFields } from './language/template2clozeFields.js'
 import {
 	type Error,
@@ -89,7 +89,7 @@ export function body(
 		warnings.push(...r.warnings)
 		return r.html
 	}
-	const getWarnings = () => _.uniqWith(warnings, (x, y) => _.isEqual(x, y))
+	const getWarnings = () => uniqWith(warnings, (x, y) => isEqual(x, y))
 	const frontSide = c.call(this, front, frontTree, true)
 	if (frontSide === front || frontSide === '') {
 		return { tag: 'Ok', ok: null, warnings: getWarnings() }

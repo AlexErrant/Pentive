@@ -28,7 +28,7 @@ import {
 	type Decks,
 	dconfSingle,
 } from './typeChecker'
-import _ from 'lodash'
+import { zip } from 'lodash'
 import { z } from 'zod'
 import { C } from '../../topLevelAwait'
 
@@ -123,7 +123,7 @@ export function parseNote(
 		edited: newDate(note.mod),
 		ankiNoteId: note.id,
 		templateId,
-		fieldValues: new Map(_.zip(fields, values) as Array<[string, string]>),
+		fieldValues: new Map(zip(fields, values) as Array<[string, string]>),
 		tags: new Set(
 			note.tags
 				.split(' ')

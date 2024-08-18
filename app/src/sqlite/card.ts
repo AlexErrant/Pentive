@@ -29,7 +29,7 @@ import {
 	type SelectQueryBuilder,
 	type QueryCreator,
 } from 'kysely'
-import _ from 'lodash'
+import { chunk } from 'lodash'
 import { md5 } from '../domain/utility'
 import { noteEntityToDomain, parseTags, templateEntityToDomain } from './util'
 import { type convert } from 'shared-dom'
@@ -559,7 +559,7 @@ export const cardCollectionMethods = {
 	},
 	bulkUpsertCards: async function (cards: Card[]) {
 		// highTODO make this a transaction
-		const batches = _.chunk(cards.map(cardToDocType), 1000)
+		const batches = chunk(cards.map(cardToDocType), 1000)
 		for (let i = 0; i < batches.length; i++) {
 			C.toastInfo('card batch ' + i)
 			const cardsTags = batches[i]!

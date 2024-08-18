@@ -14,7 +14,7 @@ import {
 	Brace,
 } from './templateParser.terms'
 import { type RenderContainer } from '../renderContainer'
-import _ from 'lodash'
+import { isEqual, uniqWith } from 'lodash'
 
 // make a DU if there's a second Error
 export interface Error {
@@ -55,9 +55,7 @@ export function validate(this: RenderContainer, input: string) {
 			return false
 		}
 	})
-	return errors.length === 0
-		? tree
-		: _.uniqWith(errors, (x, y) => _.isEqual(x, y))
+	return errors.length === 0 ? tree : uniqWith(errors, (x, y) => isEqual(x, y))
 }
 
 export function convert(

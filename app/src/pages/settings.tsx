@@ -10,7 +10,7 @@ import {
 import { GoldenLayout, LayoutConfig } from 'golden-layout'
 import { render } from 'solid-js/web'
 import EditCardSetting from '../components/editCardSetting'
-import _ from 'lodash'
+import { cloneDeep } from 'lodash'
 import { ulidAsBase64Url } from '../domain/utility'
 
 export default function Settings(): JSX.Element {
@@ -40,7 +40,7 @@ export default function Settings(): JSX.Element {
 										<button
 											type='button'
 											onClick={() => {
-												const setting = _.cloneDeep(
+												const setting = cloneDeep(
 													settings.cardSettings.find((c) => c.id === s.id),
 												) // some fns mutate the selectedSetting, so clone to avoid issues... I think. Just copy pasting for now, maybe I don't need to clone.
 												setSelected('setting', setting)
