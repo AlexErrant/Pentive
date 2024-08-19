@@ -11,7 +11,7 @@ import {
 import { LicenseManager } from 'ag-grid-enterprise'
 import '@github/relative-time-element'
 import { notEmpty, type PeerDisplayName, type PeerJsId } from 'shared'
-import { agGridTheme } from '../globalState'
+import { agGridTheme } from '../topLevelAwait'
 import { type WholeDbRtcPublic } from '../sqlite/wholeDbRtc'
 
 export interface Peer {

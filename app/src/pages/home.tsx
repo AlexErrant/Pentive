@@ -8,10 +8,9 @@ import { type MediaId } from 'shared'
 import { db } from '../db'
 import { importAnki } from './importer/importer'
 import { augcClient } from '../trpcClient'
-import { C, rd } from '../topLevelAwait'
+import { C, initFsrsTrainThreadPool, rd } from '../topLevelAwait'
 import EditSql from '../components/editSql'
 import init, { Fsrs } from 'fsrs-browser'
-import { initFsrsTrainThreadPool } from '../globalState'
 
 async function searchNotes(search: string): Promise<void> {
 	const searchBatch = await augcClient.searchNotes.query(search)

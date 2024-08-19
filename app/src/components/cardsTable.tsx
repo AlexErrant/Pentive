@@ -23,7 +23,6 @@ import {
 import { LicenseManager } from 'ag-grid-enterprise'
 import { db } from '../db'
 import { assertNever } from 'shared'
-import { agGridTheme } from '../globalState'
 import {
 	type FieldValueHighlight,
 	Upload,
@@ -32,7 +31,7 @@ import {
 	unique,
 	Hamburger,
 } from 'shared-dom'
-import { C } from '../topLevelAwait'
+import { C, agGridTheme } from '../topLevelAwait'
 import FiltersTable from './filtersTable'
 import './cardsTable.css'
 import QueryEditor from './queryEditor'

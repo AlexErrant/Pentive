@@ -37,11 +37,10 @@ import {
 	type VoidComponent,
 } from 'solid-js'
 import { oneDark } from '@codemirror/theme-one-dark'
-import { theme } from '../globalState'
 import ResizingIframe from './resizingIframe'
 import { format } from 'prettier'
 import * as prettierPluginHtml from 'prettier/plugins/html'
-import { C } from '../topLevelAwait'
+import { C, theme } from '../topLevelAwait'
 
 let view: EditorView
 const FieldHtmlEditor: VoidComponent<{

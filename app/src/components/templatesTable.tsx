@@ -14,7 +14,7 @@ import { objEntries, type Template, type TemplateId } from 'shared'
 import { startCase } from 'lodash-es'
 import '@github/relative-time-element'
 import { db } from '../db'
-import { agGridTheme } from '../globalState'
+import { agGridTheme } from '../topLevelAwait'
 import { Upload } from 'shared-dom'
 
 LicenseManager.setLicenseKey(import.meta.env.VITE_AG_GRID_LICENSE)

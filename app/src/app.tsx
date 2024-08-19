@@ -1,10 +1,9 @@
 import { type JSX, createEffect } from 'solid-js'
 import { Router } from '@solidjs/router'
 import { navLinks, routes } from './routes'
-import { C } from './topLevelAwait'
+import { C, theme } from './topLevelAwait'
 import { Toaster } from 'solid-toast'
 import 'golden-layout/dist/css/goldenlayout-base.css'
-import { theme } from './globalState'
 
 export default function App(): JSX.Element {
 	createEffect(() => {

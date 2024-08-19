@@ -36,7 +36,6 @@ import {
 	type VoidComponent,
 } from 'solid-js'
 import { oneDark } from '@codemirror/theme-one-dark'
-import { theme } from '../globalState'
 import {
 	queryLightHighlightStyle,
 	queryDarkHighlightStyle,
@@ -53,7 +52,7 @@ import {
 } from 'shared-dom'
 import { queryDecorations } from './queryDecorations'
 import { db } from '../db'
-import { C } from '../topLevelAwait'
+import { C, theme } from '../topLevelAwait'
 import { notEmpty } from 'shared'
 
 let view: EditorView

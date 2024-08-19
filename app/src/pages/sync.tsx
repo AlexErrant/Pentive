@@ -8,8 +8,7 @@ import {
 	csrfHeaderName,
 } from 'shared'
 import { cwaClient } from '../trpcClient'
-import { whoAmI } from '../globalState'
-import { C, rd } from '../topLevelAwait'
+import { C, rd, whoAmI } from '../topLevelAwait'
 
 async function postMedia(
 	type: 'note' | 'template',

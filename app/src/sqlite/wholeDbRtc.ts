@@ -10,11 +10,10 @@ import { type DBAsync } from '@vlcn.io/xplat-api'
 import Peer, { type PeerJSOption, type DataConnection } from 'peerjs'
 import { untrack } from 'solid-js/web'
 import { stringify as uuidStringify } from 'uuid'
-import { whoAmI } from '../globalState.js'
 import { cwaClient } from '../trpcClient.js'
 import { type JWTVerifyResult, jwtVerify, importSPKI } from 'jose'
 import { alg } from 'cwa/src/peerSync.js'
-import { C } from '../topLevelAwait.js'
+import { C, whoAmI } from '../topLevelAwait.js'
 
 type Msg = PokeMsg | ChangesMsg | RequestChangesMsg
 /**

@@ -37,7 +37,7 @@ import {
 	type VoidComponent,
 } from 'solid-js'
 import { oneDark } from '@codemirror/theme-one-dark'
-import { theme } from '../globalState'
+import { theme } from '../topLevelAwait'
 
 const EditSql: VoidComponent<{
 	run: (sql: string) => Promise<void>

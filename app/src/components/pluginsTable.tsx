@@ -7,12 +7,11 @@ import {
 } from 'ag-grid-community'
 import { LicenseManager } from 'ag-grid-enterprise'
 import '@github/relative-time-element'
-import { agGridTheme } from '../globalState'
 import { type Plugin } from 'shared-dom'
 import { db } from '../db'
 import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-alpine.css'
-import { C } from '../topLevelAwait'
+import { C, agGridTheme } from '../topLevelAwait'
 
 LicenseManager.setLicenseKey(import.meta.env.VITE_AG_GRID_LICENSE)
 

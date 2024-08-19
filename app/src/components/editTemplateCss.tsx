@@ -39,7 +39,7 @@ import {
 import { type Template } from 'shared'
 import { type SetStoreFunction } from 'solid-js/store'
 import { oneDark } from '@codemirror/theme-one-dark'
-import { theme } from '../globalState'
+import { theme } from '../topLevelAwait'
 
 const EditTemplateCss: VoidComponent<{
 	template: Template

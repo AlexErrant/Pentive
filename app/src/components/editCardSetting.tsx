@@ -39,7 +39,6 @@ import {
 } from 'solid-js'
 import { type CardSetting } from 'shared'
 import { oneDark } from '@codemirror/theme-one-dark'
-import { theme } from '../globalState'
 import {
 	jsonSchemaLinter,
 	jsonSchemaHover,
@@ -49,7 +48,7 @@ import {
 } from 'codemirror-json-schema'
 import Ajv from 'ajv'
 import { db } from '../db'
-import { C } from '../topLevelAwait'
+import { C, theme } from '../topLevelAwait'
 
 const EditCardSetting: VoidComponent<{
 	cardSetting: CardSetting

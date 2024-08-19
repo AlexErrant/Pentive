@@ -5,7 +5,7 @@ import 'ag-grid-community/styles/ag-theme-alpine.css'
 import { type ColDef } from 'ag-grid-community'
 import { LicenseManager } from 'ag-grid-enterprise'
 import '@github/relative-time-element'
-import { agGridTheme } from '../globalState'
+import { agGridTheme } from '../topLevelAwait'
 import { db } from '../db'
 import { type TemplateId } from 'shared'
 
