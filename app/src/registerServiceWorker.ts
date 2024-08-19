@@ -33,9 +33,7 @@ export type Expose = typeof expose
 
 async function register() {
 	await navigator.serviceWorker.register(
-		import.meta.env.MODE === 'production'
-			? '/serviceWorker.js'
-			: '/dev-sw.js?dev-sw',
+		import.meta.env.PROD ? '/serviceWorker.js' : '/dev-sw.js?dev-sw',
 		{ type: import.meta.env.MODE === 'production' ? 'classic' : 'module' },
 	)
 	const registration = await navigator.serviceWorker.ready
