@@ -26,6 +26,9 @@ export default defineConfig({
 					},
 				}),
 			],
+			esbuild: {
+				legalComments: 'none' as const, // we include sourcemaps which have the legal stuff
+			},
 			build: {
 				sourcemap: true,
 			},

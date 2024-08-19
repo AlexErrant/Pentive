@@ -42,6 +42,9 @@ export default defineConfig(({ mode }: UserConfig) => {
 	}
 	return {
 		define,
+		esbuild: {
+			legalComments: 'none' as const, // we include sourcemaps which have the legal stuff
+		},
 		plugins: [
 			solidPlugin(),
 			// if we ever move off this plugin https://github.com/vitejs/vite/issues/2248
