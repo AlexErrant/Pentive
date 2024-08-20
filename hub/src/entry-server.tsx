@@ -92,7 +92,9 @@ export default createHandler(
 		event.response.headers.set(
 			'Content-Security-Policy',
 			`default-src 'none';` + // many values here come from https://content-security-policy.com/#:~:text=ajax.googleapis.com%3B-,Starter%20Policy,-This%20policy%20allows https://cheatsheetseries.owasp.org/cheatsheets/Content_Security_Policy_Cheat_Sheet.html#:~:text=form%2Daction%20%27self%27%3B-,To%20tighten%20further,-%2C%20one%20can%20apply
-				`script-src 'self' 'nonce-${event.locals.cspNonce}' 'unsafe-inline';` + // 'unsafe-inline' due to "Consider adding 'unsafe-inline' (ignored by browsers supporting nonces/hashes) to be backward compatible with older browsers" https://csp-evaluator.withgoogle.com/
+				`script-src 'self' 'nonce-${event.locals.cspNonce}'` +
+				` 'unsafe-eval'` + // due to https://github.com/lxsmnsyc/seroval/issues/44
+				` 'unsafe-inline';` + // 'unsafe-inline' due to "Consider adding 'unsafe-inline' (ignored by browsers supporting nonces/hashes) to be backward compatible with older browsers" https://csp-evaluator.withgoogle.com/
 				`connect-src 'self'` +
 				(import.meta.env.DEV
 					? ` wss://${import.meta.env.VITE_HUB_DOMAIN}:*;`
