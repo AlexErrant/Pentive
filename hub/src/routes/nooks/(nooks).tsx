@@ -2,7 +2,7 @@ import { Show, type JSX, For } from 'solid-js'
 import { getNooks } from 'shared-edge'
 import { cache, createAsync, type RouteDefinition } from '@solidjs/router'
 
-export const getNooksCached = cache(async () => {
+const getNooksCached = cache(async () => {
 	'use server'
 	return await getNooks()
 }, 'nooks')

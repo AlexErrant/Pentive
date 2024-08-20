@@ -47,13 +47,19 @@ export default function Login(): JSX.Element {
 					<>
 						<h2>Dev Login</h2>
 						<div>
-							<a href={devLoginUrl('Griddle')}>Sign in as Griddle</a>
+							<a target='_self' href={devLoginUrl('Griddle')}>
+								Sign in as Griddle
+							</a>
 						</div>
 						<div>
-							<a href={devLoginUrl('Harry')}>Sign in as Harry</a>
+							<a target='_self' href={devLoginUrl('Harry')}>
+								Sign in as Harry
+							</a>
 						</div>
 						<div>
-							<a href={devLoginUrl('Campal')}>Sign in as Campal</a>
+							<a target='_self' href={devLoginUrl('Campal')}>
+								Sign in as Campal
+							</a>
 						</div>
 					</>
 				)}
