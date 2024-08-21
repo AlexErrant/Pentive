@@ -23,12 +23,12 @@ const Comment: Component<{
 			<div class='text'>{props.comment.text}</div>
 			<button
 				type='button'
-				style={{ display: showReply() ? 'none' : 'block' }}
+				classList={{ hidden: showReply(), block: !showReply() }}
 				onClick={() => setShowReply((o) => !o)}
 			>
 				Reply
 			</button>
-			<div style={{ display: showReply() ? 'block' : 'none' }}>
+			<div classList={{ block: showReply(), hidden: !showReply() }}>
 				<SubmitComment
 					// eslint-disable-next-line solid/reactivity -- doesn't need to be reactive
 					onSubmit={async (text) => {

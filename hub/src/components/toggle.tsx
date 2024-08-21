@@ -12,7 +12,7 @@ export default function Toggle(props: { children: JSX.Element }): JSX.Element {
 			</div>
 			<ul
 				class='comment-children'
-				style={{ display: open() ? 'block' : 'none' }}
+				classList={{ block: open(), hidden: !open() }}
 			>
 				{props.children}
 			</ul>
