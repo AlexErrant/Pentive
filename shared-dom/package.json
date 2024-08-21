@@ -48,7 +48,7 @@
 		"@codemirror/language": "^6.10.2",
 		"@codemirror/lint": "^6.8.1",
 		"@codemirror/state": "^6.4.1",
-		"@kobalte/core": "^0.11.0",
+		"@kobalte/core": "^0.13.4",
 		"@kobalte/tailwindcss": "^0.9.0",
 		"@lezer/common": "^1.2.1",
 		"@lezer/highlight": "^1.2.0",
