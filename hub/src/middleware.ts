@@ -16,7 +16,10 @@ export default createMiddleware({
 			event.response.headers.set(hstsName, hstsValue)
 			event.response.headers.set('X-Frame-Options', 'DENY')
 			event.response.headers.set('X-Content-Type-Options', 'nosniff')
-			event.response.headers.set('Referrer-Policy', 'no-referrer') // maybe 'strict-origin-when-cross-origin' someday
+			event.response.headers.set(
+				'Referrer-Policy',
+				'strict-origin-when-cross-origin',
+			) // can't be `no-referrer` due to single-flight-mutations
 			// event.response.headers.set('Permissions-Policy', '') // ignored because denying everything adds a bunch of noise to the header for something the browser already prompts the user for
 			// https://owasp.org/www-project-secure-headers/
 			event.response.headers.set('X-Permitted-Cross-Domain-Policies', 'none')
