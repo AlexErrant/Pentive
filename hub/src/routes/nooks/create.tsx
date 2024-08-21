@@ -7,8 +7,6 @@ import {
 	requireUserId,
 } from '~/session'
 import { type NookType, type NookId, nookTypes } from 'shared'
-import { RadioGroup } from '@kobalte/core'
-import '../../radio.css'
 import {
 	type RouteDefinition,
 	action,
@@ -148,26 +146,22 @@ export default function Submit(props: RouteSectionProps) {
 				<Show when={error()}>
 					<p>{error()!.message}</p>
 				</Show>
-				<RadioGroup.Root class='radio-group' name='nookType'>
-					<RadioGroup.Label class='radio-group__label'>
-						Nook Type
-					</RadioGroup.Label>
-					<div class='radio-group__items'>
-						<For each={nookTypes}>
-							{(nookType) => (
-								<RadioGroup.Item value={nookType} class='radio'>
-									<RadioGroup.ItemInput class='radio__input' />
-									<RadioGroup.ItemControl class='radio__control'>
-										<RadioGroup.ItemIndicator class='radio__indicator' />
-									</RadioGroup.ItemControl>
-									<RadioGroup.ItemLabel class='radio__label'>
-										{nookType}
-									</RadioGroup.ItemLabel>
-								</RadioGroup.Item>
-							)}
-						</For>
-					</div>
-				</RadioGroup.Root>
+				<fieldset>
+					<legend>Nook Type</legend>
+					<For each={nookTypes}>
+						{(nookType) => (
+							<div>
+								<input
+									type='radio'
+									id={nookType}
+									name='nookType'
+									value={nookType}
+								/>
+								<label for={nookType}>{nookType}</label>
+							</div>
+						)}
+					</For>
+				</fieldset>
 				<button type='submit' disabled={isSubmitting.pending}>
 					Create Nook
 				</button>
