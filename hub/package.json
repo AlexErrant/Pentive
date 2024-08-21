@@ -47,7 +47,7 @@
 		"tailwindcss": "^3.4.3",
 		"typescript": "~5.4.5",
 		"ulid-workers": "^2.1.0 || See comment on html-to-text",
-		"vite": "^5.4.1",
+		"vite": "^5.4.2",
 		"vite-plugin-checker": "^0.7.2",
 		"wrangler": "^3.70.0"
 	},

@@ -40,7 +40,7 @@
 		"test": "link:@lezer/generator/test",
 		"typescript": "~5.4.5",
 		"vite-plugin-solid": "^2.10.2",
-		"vitest": "^2.0.4"
+		"vitest": "^2.0.5"
 	},
 	"dependencies": {
 		"@codemirror/autocomplete": "^6.18.0",
