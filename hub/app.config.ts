@@ -31,6 +31,7 @@ export default defineConfig({
 			},
 			build: {
 				sourcemap: true,
+				assetsInlineLimit: 0,
 			},
 		}
 	},
