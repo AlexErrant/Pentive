@@ -10,29 +10,30 @@ import {
 } from '@solidjs/router'
 import RelativeDate from '~/components/relativeDate'
 
-const getNookDetailsCached = cache(async (nook: string) => {
+const getNookDetailsCached = cache(async (nook?: string) => {
 	'use server'
+	if (nook == null) return null // nook may be null when doing a redirect after nook creation; not sure why
 	return await getNook(nook as NookId)
 }, 'nookDetails')
 
 export const route = {
 	preload({ params }) {
-		void getNookDetailsCached(params.nook!)
+		void getNookDetailsCached(params.nook)
 	},
 } satisfies RouteDefinition
 
 export default function NookLayout(props: RouteSectionProps) {
 	const nookDetails = createAsync(
-		async () => await getNookDetailsCached(props.params.nook!),
+		async () => await getNookDetailsCached(props.params.nook),
 	)
 	return (
 		<Show
-			when={nookDetails() === undefined}
+			when={nookDetails() == null}
 			fallback={
 				<div class='flex'>
 					<div class='grow'>{props.children}</div>
 					<aside class='basis-40'>
-						<Sidebar nook={props.params.nook!} nookDetails={nookDetails()} />
+						<Sidebar nook={props.params.nook!} nookDetails={nookDetails()!} />
 					</aside>
 				</div>
 			}
