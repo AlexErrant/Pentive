@@ -91,3 +91,9 @@ export function concat(a1: Uint8Array, a2: ArrayBuffer): Uint8Array {
 	tmp.set(new Uint8Array(a2), a1.byteLength)
 	return tmp
 }
+export function concatAB(a1: ArrayBuffer, a2: ArrayBuffer): Uint8Array {
+	const tmp = new Uint8Array(a1.byteLength + a2.byteLength)
+	tmp.set(new Uint8Array(a1), 0)
+	tmp.set(new Uint8Array(a2), a1.byteLength)
+	return tmp
+}

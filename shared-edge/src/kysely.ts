@@ -32,11 +32,13 @@ import {
 	imgPlaceholder,
 	relativeChar,
 	ftsNormalize,
+	type MediaHash,
 } from 'shared'
 import { binary16fromBase64URL, ulidAsHex, ulidAsRaw } from './convertBinary.js'
 import { nullMap, parseMap, stringifyMap, throwExp, undefinedMap } from 'shared'
-import { base16, base64url } from '@scure/base'
+import { base16, base64, base64url } from '@scure/base'
 import { createClient } from '@libsql/client/web'
+import { base64ToArray } from './utility.js'
 export type * from 'kysely'
 
 // @ts-expect-error db calls should throw null error if not setup
@@ -572,11 +574,10 @@ export async function insertTemplateChildComment(
 	const parentCommentDbId = fromBase64Url(parentCommentId)
 	const parent = await db
 		.selectFrom('templateComment')
-		.select(['level', sql<Base64>`TO_BASE64(templateId)`.as('templateId')])
+		.select(['level', 'templateId'])
 		.where('id', '=', parentCommentDbId)
 		.executeTakeFirst()
 	if (parent == null) throwExp(`Comment ${parentCommentId} not found.`)
-	const templateId = fromBase64(parent.templateId)
 	await db.transaction().execute(
 		async (tx) =>
 			await Promise.all([
@@ -585,7 +586,7 @@ export async function insertTemplateChildComment(
 					.set({
 						commentsCount: (x) => sql`${x.ref('commentsCount')} + 1`,
 					})
-					.where('template.id', '=', templateId)
+					.where('template.id', '=', parent.templateId)
 					.execute(),
 				await tx
 					.insertInto('templateComment')
@@ -593,7 +594,7 @@ export async function insertTemplateChildComment(
 						id: unhex(ulidAsHex()),
 						authorId,
 						level: parent.level + 1,
-						templateId,
+						templateId: parent.templateId,
 						votes: '',
 						text,
 						parentId: parentCommentDbId,
@@ -650,11 +651,10 @@ export async function insertNoteChildComment(
 	const parentCommentDbId = fromBase64Url(parentCommentId)
 	const parent = await db
 		.selectFrom('noteComment')
-		.select(['level', sql<Base64>`TO_BASE64(noteId)`.as('noteId')])
+		.select(['level', 'noteId'])
 		.where('id', '=', parentCommentDbId)
 		.executeTakeFirst()
 	if (parent == null) throwExp(`Comment ${parentCommentId} not found.`)
-	const noteId = fromBase64(parent.noteId)
 	await db.transaction().execute(
 		async (tx) =>
 			await Promise.all([
@@ -663,7 +663,7 @@ export async function insertNoteChildComment(
 					.set({
 						commentsCount: (x) => sql`${x.ref('commentsCount')} + 1`,
 					})
-					.where('note.id', '=', noteId)
+					.where('note.id', '=', parent.noteId)
 					.execute(),
 				await tx
 					.insertInto('noteComment')
@@ -671,7 +671,7 @@ export async function insertNoteChildComment(
 						id: unhex(ulidAsHex()),
 						authorId,
 						level: parent.level + 1,
-						noteId,
+						noteId: parent.noteId,
 						votes: '',
 						text,
 						parentId: parentCommentDbId,
@@ -684,7 +684,7 @@ export async function insertNoteChildComment(
 export async function userOwnsNoteAndHasMedia(
 	ids: NoteId[],
 	authorId: UserId,
-	id: Base64,
+	id: MediaHash,
 ): Promise<{
 	userOwns: boolean
 	hasMedia: boolean
@@ -700,7 +700,7 @@ export async function userOwnsNoteAndHasMedia(
 			db
 				.selectFrom('media_Entity')
 				.select(db.fn.count('mediaHash').as('hasMedia'))
-				.where('mediaHash', '=', fromBase64(id))
+				.where('mediaHash', '=', id)
 				.as('hasMedia'),
 		])
 		.selectAll()
@@ -714,7 +714,7 @@ export async function userOwnsNoteAndHasMedia(
 export async function userOwnsTemplateAndHasMedia(
 	ids: TemplateId[],
 	authorId: UserId,
-	id: Base64,
+	id: MediaHash,
 ): Promise<{
 	userOwns: boolean
 	hasMedia: boolean
@@ -730,7 +730,7 @@ export async function userOwnsTemplateAndHasMedia(
 			db
 				.selectFrom('media_Entity')
 				.select(db.fn.count('mediaHash').as('hasMedia'))
-				.where('mediaHash', '=', fromBase64(id))
+				.where('mediaHash', '=', id)
 				.as('hasMedia'),
 		])
 		.selectAll()
@@ -741,13 +741,10 @@ export async function userOwnsTemplateAndHasMedia(
 	}
 }
 
-export async function lookupMediaHash(
-	entityId: Base64,
-	i: number,
-): Promise<Base64 | undefined> {
+export async function lookupMediaHash(entityId: Base64, i: number) {
 	const mediaHash = await db
 		.selectFrom('media_Entity')
-		.select(sql<Base64>`TO_BASE64(mediaHash)`.as('mediaHash'))
+		.select('mediaHash')
 		.where('entityId', '=', fromBase64(entityId))
 		.where('i', '=', i)
 		.executeTakeFirst()
@@ -1095,7 +1092,7 @@ function unhex(id: Hex): RawBuilder<DbId> {
 }
 
 export function fromBase64(id: Base64): RawBuilder<DbId> {
-	return sql<DbId>`FROM_BASE64(${id})`
+	return sql<DbId>`${base64ToArray(id)}`
 }
 
 export function fromBase64Url(id: Base64Url): RawBuilder<DbId> {
@@ -1111,8 +1108,16 @@ function mapIdToBase64Url<T>(t: T & { id: DbId }): T & {
 	}
 }
 
-export function dbIdToBase64Url(dbId: DbId): Base64Url {
+export function dbIdToBase64Url(dbId: DbId) {
 	return base64url.encode(new Uint8Array(dbId)).substring(0, 22) as Base64Url
+}
+
+export function dbIdToBase64(dbId: DbId) {
+	return toBase64(new Uint8Array(dbId))
+}
+
+export function toBase64(array: Uint8Array) {
+	return base64.encode(array).substring(0, 22) as Base64
 }
 
 // use with .$call(log)

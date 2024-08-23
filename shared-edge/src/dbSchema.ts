@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import type { ColumnType } from 'kysely'
-import type { DbId, NookId, PeerValidator } from 'shared'
+import type { DbId, MediaHash, NookId, PeerValidator } from 'shared'
 
 export type Generated<T> =
 	T extends ColumnType<infer S, infer I, infer U>
@@ -13,7 +13,7 @@ export interface MediaUser {
 }
 
 export interface MediaEntity {
-	mediaHash: DbId
+	mediaHash: MediaHash
 	i: number
 	entityId: DbId
 }

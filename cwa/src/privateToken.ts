@@ -1,6 +1,11 @@
-import { type Base64Url, type Brand, concat } from 'shared'
+import {
+	type Base64Url,
+	type Brand,
+	concat,
+	concatAB,
+	type MediaHash,
+} from 'shared'
 import { base64, base64url } from '@scure/base'
-import { type MediaHash } from './util'
 
 export type UserId = Brand<string, 'userId'>
 export type MediaTokenSecretBase64 = Brand<
@@ -41,7 +46,7 @@ export async function buildPrivateToken(
 	userId: UserId,
 ): Promise<Base64Url> {
 	const signature = await signMessage(mediaTokenSecret, mediaHash, userId)
-	const token = concat(mediaHash, signature)
+	const token = concatAB(mediaHash, signature)
 	return base64url.encode(token) as Base64Url
 }
 

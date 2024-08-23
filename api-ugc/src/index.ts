@@ -11,12 +11,13 @@
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import { type Env, type ApiUgcContext } from './util'
-import { hstsName, hstsValue, type Base64, parsePublicToken } from 'shared'
+import { type MediaHash, hstsName, hstsValue, parsePublicToken } from 'shared'
 import {
 	setKysely,
 	lookupMediaHash,
 	binary16fromBase64URL,
 	getUserId,
+	dbIdToBase64,
 } from 'shared-edge'
 import { appRouter } from './router'
 import { fetchRequestHandler } from '@trpc/server/adapters/fetch'
@@ -77,10 +78,10 @@ export default app
 
 async function getMedia(
 	c: ApiUgcContext,
-	mediaIdBase64: Base64,
+	mediaHash: MediaHash,
 	cacheControl: 'public' | 'private',
-): Promise<Response> {
-	const file = await c.env.mediaBucket.get(mediaIdBase64)
+) {
+	const file = await c.env.mediaBucket.get(dbIdToBase64(mediaHash))
 	if (file === null) {
 		return await c.notFound()
 	}

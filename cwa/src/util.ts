@@ -1,9 +1,5 @@
 import { type Context } from 'hono'
-import { type Brand } from 'shared'
 import { type MediaTokenSecretBase64 } from './privateToken'
-
-export type MediaHash = Brand<Uint8Array, 'mediaHash'>
-export type UserId = Brand<string, 'userId'>
 
 export type CwaContext = Context<{
 	// eslint-disable-next-line @typescript-eslint/naming-convention

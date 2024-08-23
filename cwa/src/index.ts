@@ -10,31 +10,30 @@
 
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
-import { type Env, type MediaHash, type CwaContext } from './util'
+import { type Env, type CwaContext } from './util'
 import {
 	hstsName,
 	hstsValue,
-	type Base64,
 	type Base64Url,
 	type NoteId,
 	type UserId,
 	type TemplateId,
 	iByEntityIdsValidator,
+	type MediaHash,
 } from 'shared'
 import {
 	setKysely,
 	db,
 	fromBase64Url,
-	fromBase64,
 	userOwnsNoteAndHasMedia,
 	userOwnsTemplateAndHasMedia,
 	getUserId,
+	dbIdToBase64,
 } from 'shared-edge'
 import { connect } from '@planetscale/database'
 import { buildPrivateToken } from './privateToken'
 import { appRouter } from './router'
 import { fetchRequestHandler } from '@trpc/server/adapters/fetch'
-import { base64 } from '@scure/base'
 export type * from '@trpc/server'
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -74,7 +73,7 @@ app
 		const buildToken = async (mediaHash: MediaHash): Promise<Base64Url> =>
 			await buildPrivateToken(c.env.mediaTokenSecret, mediaHash, userId)
 		const persistDbAndBucket = async ({
-			mediaHashBase64,
+			mediaHash,
 			readable,
 			headers,
 		}: PersistParams): Promise<undefined> => {
@@ -93,19 +92,20 @@ app
 				// Just means we could PUT something into the mediaBucket and have no record of it in PlanetScale. Not great, but _fine_.
 				// Grep BC34B055-ECB7-496D-9E71-58EE899A11D1 for details.
 				const countResponse = await tx.execute(
-					`SELECT (SELECT COUNT(*) FROM Media_User WHERE mediaHash=FROM_BASE64(?) AND userId=?),
-                  (SELECT COUNT(*) FROM Media_User WHERE mediaHash=FROM_BASE64(?))`,
-					[mediaHashBase64, userId, mediaHashBase64],
+					`SELECT (SELECT COUNT(*) FROM Media_User WHERE mediaHash=? AND userId=?),
+                  (SELECT COUNT(*) FROM Media_User WHERE mediaHash=?)`,
+					[mediaHash, userId, mediaHash],
 					{ as: 'array' },
 				)
 				const userCount = (countResponse.rows[0] as string[])[0]
 				const mediaCount = (countResponse.rows[0] as string[])[1]
 				if (userCount === '0') {
 					await tx.execute(
-						'INSERT INTO Media_User (mediaHash, userId) VALUES (FROM_BASE64(?), ?)',
-						[mediaHashBase64, userId],
+						'INSERT INTO Media_User (mediaHash, userId) VALUES (?, ?)',
+						[mediaHash, userId],
 					)
 					if (mediaCount === '0') {
+						const mediaHashBase64 = dbIdToBase64(mediaHash)
 						const object = await c.env.mediaBucket.put(
 							mediaHashBase64,
 							readable,
@@ -131,7 +131,7 @@ app
 		return await postPublicMedia(
 			c,
 			'note',
-			async (authorId: UserId, mediaHash: Base64) =>
+			async (authorId: UserId, mediaHash: MediaHash) =>
 				await userOwnsNoteAndHasMedia(noteIds, authorId, mediaHash),
 			iByEntityIds,
 		)
@@ -147,7 +147,7 @@ app
 		return await postPublicMedia(
 			c,
 			'template',
-			async (authorId: UserId, mediaHash: Base64) =>
+			async (authorId: UserId, mediaHash: MediaHash) =>
 				await userOwnsTemplateAndHasMedia(templateIds, authorId, mediaHash),
 			iByEntityIds,
 		)
@@ -160,7 +160,7 @@ async function postPublicMedia(
 	type: 'note' | 'template',
 	userOwnsAndHasMedia: (
 		authorId: UserId,
-		id: Base64,
+		id: MediaHash,
 	) => Promise<{
 		userOwns: boolean
 		hasMedia: boolean
@@ -172,20 +172,16 @@ async function postPublicMedia(
 	const userId = authResult.ok
 	setKysely(c.env.tursoDbUrl, c.env.tursoAuthToken)
 	const persistDbAndBucket = async ({
-		mediaHashBase64,
+		mediaHash,
 		readable,
 		headers,
 	}: PersistParams): Promise<undefined | Response> => {
-		const mediaHash = fromBase64(mediaHashBase64)
 		const insertValues = Object.entries(iByEntityIds).map(([entityId, i]) => ({
 			mediaHash,
 			i,
 			entityId: fromBase64Url(entityId as Base64Url),
 		}))
-		const { userOwns, hasMedia } = await userOwnsAndHasMedia(
-			userId,
-			mediaHashBase64,
-		)
+		const { userOwns, hasMedia } = await userOwnsAndHasMedia(userId, mediaHash)
 		if (!userOwns)
 			return c.text(`You don't own one (or more) of these ${type}s.`, 401)
 		await db
@@ -201,7 +197,7 @@ async function postPublicMedia(
 					.execute()
 				if (!hasMedia) {
 					const object = await c.env.mediaBucket.put(
-						mediaHashBase64,
+						dbIdToBase64(mediaHash),
 						readable,
 						{
 							httpMetadata: headers,
@@ -249,12 +245,11 @@ async function postMedia(
 
 	const digestStream = new crypto.DigestStream('SHA-256') // https://developers.cloudflare.com/workers/runtime-apis/web-crypto/#constructors
 	void hashBody.pipeTo(digestStream)
-	const mediaHash = new Uint8Array(await digestStream.digest) as MediaHash
-	const mediaHashBase64 = base64.encode(mediaHash) as Base64
+	const mediaHash = (await digestStream.digest) as MediaHash
 
 	const response = await buildResponse(mediaHash)
 	const r = await persistDbAndBucket({
-		mediaHashBase64,
+		mediaHash,
 		readable,
 		headers,
 	})
@@ -263,7 +258,7 @@ async function postMedia(
 }
 
 interface PersistParams {
-	mediaHashBase64: Base64
+	mediaHash: MediaHash
 	readable: ReadableStream<Uint8Array>
 	headers: Headers
 }
