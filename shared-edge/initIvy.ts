@@ -1,5 +1,9 @@
 import * as fs from 'fs'
 import { createClient } from '@libsql/client'
+import { Kysely } from 'kysely'
+import { LibsqlDialect } from '@libsql/kysely-libsql'
+import { type DB } from './src/dbSchema'
+import { type MediaHash, type DbId } from 'shared'
 
 const ivySchema = fs.readFileSync('./ivySchema.sql').toString()
 const ivySchemaSplit = ivySchema
@@ -23,4 +27,34 @@ const tableCount = await client
 if (tableCount === 0) {
 	const result = await client.batch(ivySchemaSplit, 'write')
 	console.log(JSON.stringify(result, null, 4))
+}
+
+// Kysely Playground
+
+// eslint-disable-next-line no-constant-condition
+if (false) {
+	const db = new Kysely<DB>({
+		dialect: new LibsqlDialect({
+			client,
+		}),
+	})
+
+	const mediaHash = crypto.getRandomValues(new Uint8Array(8))
+		.buffer as MediaHash
+	const entityId = crypto.getRandomValues(new Uint8Array(8)).buffer as DbId
+	console.log('mediaHash', mediaHash)
+	console.log('entityId', entityId)
+
+	const inserted = await db
+		.insertInto('media_Entity')
+		.values({ mediaHash, i: 13, entityId })
+		.execute()
+	console.log('inserted', inserted)
+
+	const queried = await db
+		.selectFrom('media_Entity')
+		.where('mediaHash', '=', mediaHash)
+		.selectAll()
+		.execute()
+	console.log('queried', queried)
 }

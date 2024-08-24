@@ -24,37 +24,39 @@ layout {
             }
         }
         pane split_direction="horizontal" {
-            pane {
+            pane borderless=true {
               name "ugc"
               command "pnpm"
               args "ugc"
             }
-            pane split_direction="horizontal" {
-              pane {
-                name "peer"
-                cwd "peer"
-                command "pnpm"
-                args "dev"
-              }
-              pane {
-                name "generateSql"
-                cwd "shared"
-                command "pnpm"
-                args "generateSql"
-              }
+            pane {
+              name "api-ugc"
+              cwd "api-ugc"
+              command "pnpm"
+              args "dev"
             }
-            pane split_direction="horizontal" {
-              pane {
-                name "turso"
-                command "pnpm"
-                args "turso"
-              }
-              pane {
-                name "cwa"
-                cwd "cwa"
-                command "pnpm"
-                args "dev"
-              }
+            pane {
+              name "peer"
+              cwd "peer"
+              command "pnpm"
+              args "dev"
+            }
+            pane {
+              name "generateSql"
+              cwd "shared"
+              command "pnpm"
+              args "generateSql"
+            }
+            pane {
+              name "turso"
+              command "pnpm"
+              args "turso"
+            }
+            pane {
+              name "cwa"
+              cwd "cwa"
+              command "pnpm"
+              args "dev"
             }
         }
     }
