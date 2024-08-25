@@ -436,7 +436,7 @@ export async function getTemplate(
 ) {
 	const t = await db
 		.selectFrom('template')
-		.selectAll()
+		.selectAll('template')
 		.where('id', '=', fromBase64Url(id))
 		.$if(opts?.nook != null, (db) => db.where('nook', '=', opts!.nook!))
 		.$if(opts?.userId != null, (a) =>
@@ -456,7 +456,7 @@ export async function getTemplate(
 export async function getTemplates(nook: NookId, userId?: UserId) {
 	const ts = await db
 		.selectFrom('template')
-		.selectAll()
+		.selectAll('template')
 		.where('nook', '=', nook)
 		.$if(userId != null, (a) =>
 			a.select((b) =>

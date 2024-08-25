@@ -202,7 +202,7 @@ JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field
 			.execute()
 		const note = await ky
 			.selectFrom('note')
-			.selectAll()
+			.selectAll('note')
 			.innerJoin('template', 'note.templateId', 'template.id')
 			.select('template.fields as templateFields')
 			.where('note.id', '=', noteId)
@@ -217,7 +217,7 @@ JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field
 			.execute()
 		const notes = await ky
 			.selectFrom('note')
-			.selectAll()
+			.selectAll('note')
 			.innerJoin('template', 'note.templateId', 'template.id')
 			.select('template.fields as templateFields')
 			.where('note.id', 'in', noteIds)
@@ -243,7 +243,7 @@ JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field
 			.execute()
 		const notesAndStuff = await ky
 			.selectFrom('note')
-			.selectAll()
+			.selectAll('note')
 			.innerJoin('template', 'note.templateId', 'template.id')
 			.select('template.fields as templateFields')
 			.where('note.id', 'in', localIds)
@@ -293,7 +293,7 @@ JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field
 			.execute()
 		const notesAndStuff = await ky
 			.selectFrom('note')
-			.selectAll()
+			.selectAll('note')
 			.innerJoin('template', 'note.templateId', 'template.id')
 			.select('template.fields as templateFields')
 			.where('note.id', 'in', localIds)
@@ -401,7 +401,7 @@ JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field
 				.execute()
 			const note = await db
 				.selectFrom('note')
-				.selectAll()
+				.selectAll('note')
 				.innerJoin('template', 'note.templateId', 'template.id')
 				.select('template.fields as templateFields')
 				.where('note.id', '=', noteId)
