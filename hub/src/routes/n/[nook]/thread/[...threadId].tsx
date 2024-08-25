@@ -19,7 +19,7 @@ export const route = {
 	},
 } satisfies RouteDefinition
 
-export function Thread(props: RouteSectionProps) {
+export default function Thread(props: RouteSectionProps) {
 	const thread = createAsync(
 		async () => await getPostCached(props.params.threadId as Base64Url),
 	)
@@ -32,5 +32,3 @@ export function Thread(props: RouteSectionProps) {
 		</Suspense>
 	)
 }
-
-export default Thread

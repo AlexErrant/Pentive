@@ -34,7 +34,7 @@ export const route = {
 	},
 } satisfies RouteDefinition
 
-export function Thread(props: RouteSectionProps) {
+export default function Note(props: RouteSectionProps) {
 	const remoteNote = createAsync(
 		async () => await getNoteCached(props.params.noteId as RemoteNoteId),
 	)
