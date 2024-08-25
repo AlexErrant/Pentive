@@ -117,11 +117,10 @@ const ResizingIframe: VoidComponent<{
 		debouncePostMessage()
 	})
 	return (
-		<div class='flex flex-col'>
+		<div class={'flex flex-col ' + (props.class ?? 'w-full')}>
 			<RenderDiagnostics heading='Error' diagnostics={diagnostics.errors} />
 			<RenderDiagnostics heading='Warning' diagnostics={diagnostics.warnings} />
 			<iframe
-				class={props.class ?? 'w-full'}
 				ref={(x) => (iframeReference = x as IFrameComponent)}
 				onLoad={() => {
 					const resize = () => {
