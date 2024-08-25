@@ -36,6 +36,7 @@ module.exports = {
 	},
 	reportUnusedDisableDirectives: true,
 	extends: [
+		'plugin:deprecation/recommended',
 		'eslint:recommended',
 		'plugin:prettier/recommended', // Last to disable conflicting rules
 	],
