@@ -1060,12 +1060,12 @@ importers:
       eslint:
         specifier: ^8.57.0
         version: 8.57.0
-      nodemon:
-        specifier: ^3.0.1
-        version: 3.0.1
       ts-node:
         specifier: ^10.9.1
         version: 10.9.1(@types/node@20.14.11)(typescript@5.4.5)
+      tsx:
+        specifier: ^4.18.0
+        version: 4.18.0
       typescript:
         specifier: ~5.4.5
         version: 5.4.5
