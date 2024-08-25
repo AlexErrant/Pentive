@@ -1,7 +1,4 @@
 layout {
-    pane size=1 borderless=true {
-        plugin location="zellij:tab-bar"
-    }
     pane split_direction="vertical" {
         pane split_direction="horizontal" {
             pane {
@@ -26,37 +23,34 @@ layout {
         pane split_direction="horizontal" {
             pane borderless=true {
               name "ugc"
-              command "pnpm"
-              args "ugc"
+              command "bash"
+              args "-c" "npx concurrently --kill-others -p \"[{name}]\" -n \"app-ugc,hub-ugc,turso\" -c \"bgBlue.bold,bgMagenta.bold,bgGreen.bold\" \"pnpm --filter app-ugc build --mode development && pnpm --filter app-ugc serve\" \"pnpm --filter hub-ugc build --mode development && pnpm --filter hub-ugc serve\" \"pnpm turso\""
             }
             pane {
               name "api-ugc"
               cwd "api-ugc"
-              command "pnpm"
-              args "dev"
+              command "bash"
+              args "-c" "echo '[b open a browser,[d] open Devtools,[l] turn off local mode[c] clear console,[x] to exit' && pnpm dev --show-interactive-dev-session false"
             }
-            pane {
-              name "peer"
-              cwd "peer"
-              command "pnpm"
-              args "dev"
-            }
-            pane {
-              name "generateSql"
-              cwd "shared"
-              command "pnpm"
-              args "generateSql"
-            }
-            pane {
-              name "turso"
-              command "pnpm"
-              args "turso"
+            pane split_direction="vertical" {
+                pane {
+                  name "peer"
+                  cwd "peer"
+                  command "pnpm"
+                  args "dev"
+                }
+                pane {
+                  name "generateSql"
+                  cwd "shared"
+                  command "pnpm"
+                  args "generateSql"
+                }
             }
             pane {
               name "cwa"
               cwd "cwa"
-              command "pnpm"
-              args "dev"
+              command "bash"
+              args "-c" "echo '[b open a browser,[d] open Devtools,[l] turn off local mode[c] clear console,[x] to exit' && pnpm dev --show-interactive-dev-session false"
             }
         }
     }
