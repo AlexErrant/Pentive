@@ -19,7 +19,7 @@ import {
 	getOauthCodeVerifier,
 	getOauthState,
 } from '~/session'
-import { getUserIdByEmail } from 'shared-edge'
+import { getCasedUserId, getUserIdByEmail, registerUser } from 'shared-edge'
 import { type PageEvent } from '@solidjs/start/server'
 import { redirect } from '@solidjs/router'
 
@@ -36,6 +36,9 @@ export const GET = async ({ request }: PageEvent) => {
 		const url = new URL(request.url)
 		const username = url.searchParams.get('username')
 		if (url.pathname === '/api/auth/login/dev' && username != null) {
+			if ((await getCasedUserId(username)) == null) {
+				await registerUser(username, username + '@pentive.com')
+			}
 			return await createUserSession(username, '/')
 		}
 	}
