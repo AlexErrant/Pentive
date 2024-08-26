@@ -71,6 +71,24 @@ const ResizingIframe: VoidComponent<{
 	class?: string
 	resize?: false
 }> = (props) => {
+	// eslint-disable-next-line solid/reactivity
+	const resize = (iframeReference?: IFrameComponent) => () => {
+		if (props.resize === false) return
+		iframeReference?.iFrameResizer?.resize()
+	}
+	const html = (setDiagnostics: SetStoreFunction<Diagnostics>) =>
+		buildHtml(unwrap(props.i), setDiagnostics) satisfies RawRenderBodyInput
+	const appExpose = (
+		setDiagnostics: SetStoreFunction<Diagnostics>,
+		iframeReference: IFrameComponent | undefined,
+	): AppExpose =>
+		({
+			renderTemplate: (x) => C.renderTemplate(x), // do not eta-reduce. `C`'s `this` binding apparently doesn't work across Comlink
+			html: (x, y, z) => C.html(x, y, z), // do not eta-reduce. `C`'s `this` binding apparently doesn't work across Comlink
+			getLocalMedia,
+			rawRenderBodyInput: html(setDiagnostics),
+			resize: resize(iframeReference),
+		}) satisfies AppExpose
 	let iframeReference: IFrameComponent | undefined
 	onCleanup(() => {
 		iframeReference?.iFrameResizer?.close()
@@ -87,10 +105,7 @@ const ResizingIframe: VoidComponent<{
 				iframeReference?.contentWindow?.postMessage(
 					{
 						type: 'pleaseRerender',
-						i: buildHtml(
-							unwrap(props.i),
-							setDiagnostics,
-						) satisfies RawRenderBodyInput,
+						i: html(setDiagnostics),
 					},
 					targetOrigin,
 				)
@@ -123,30 +138,19 @@ const ResizingIframe: VoidComponent<{
 			<iframe
 				ref={(x) => (iframeReference = x as IFrameComponent)}
 				onLoad={() => {
-					const resize = () => {
-						if (props.resize === false) return
-						iframeReference?.iFrameResizer?.resize()
-					}
-					const appExpose: AppExpose = {
-						renderTemplate: (x) => C.renderTemplate(x), // do not eta-reduce. `C`'s `this` binding apparently doesn't work across Comlink
-						html: (x, y, z) => C.html(x, y, z), // do not eta-reduce. `C`'s `this` binding apparently doesn't work across Comlink
-						getLocalMedia,
-						rawRenderBodyInput: buildHtml(unwrap(props.i), setDiagnostics),
-						resize,
-					}
 					const { port1, port2 } = new MessageChannel()
 					const comlinkInit: ComlinkInit = {
 						type: 'ComlinkInit',
 						port: port1,
 					}
-					Comlink.expose(appExpose, port2)
+					Comlink.expose(appExpose(setDiagnostics, iframeReference), port2)
 					iframeReference!.contentWindow!.postMessage(
 						comlinkInit,
 						targetOrigin,
 						[port1],
 					)
 					Comlink.expose(
-						appExpose,
+						appExpose(setDiagnostics, iframeReference),
 						Comlink.windowEndpoint(
 							iframeReference!.contentWindow!,
 							self,
@@ -165,9 +169,11 @@ const ResizingIframe: VoidComponent<{
 							iframeReference!,
 						)
 					}
-					new IntersectionObserver(resize).observe(iframeReference!) // Resize when the iframe becomes visible, e.g. after the "Add Template" tab is clicked when we're looking at another tab. The resizing script behaves poorly when the iframe isn't visible.
+					new IntersectionObserver(resize(iframeReference)).observe(
+						iframeReference!,
+					) // Resize when the iframe becomes visible, e.g. after the "Add Template" tab is clicked when we're looking at another tab. The resizing script behaves poorly when the iframe isn't visible.
 					debouncePostMessage()
-					resize()
+					resize(iframeReference)()
 				}}
 				sandbox='allow-scripts allow-same-origin' // Changing this has security ramifications! https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe#attr-sandbox
 				// "When the embedded document has the same origin as the embedding page, it is strongly discouraged to use both allow-scripts and allow-same-origin"
