@@ -12,14 +12,12 @@ import {
 	type Card,
 	type Note,
 	type Side,
-	type MediaId,
 	assertNever,
 } from 'shared'
-import { type SetStoreFunction, createStore, unwrap } from 'solid-js/store'
-import { db } from '../db'
-import { C } from '../topLevelAwait'
+import { type SetStoreFunction, createStore } from 'solid-js/store'
 import { debounce, leadingAndTrailing } from '@solid-primitives/scheduled'
-import { type Error, type Warning, type HtmlResult } from 'shared-dom'
+import { type Error, type Warning } from './language/template2html'
+import { type RenderContainer } from './renderContainer'
 
 const targetOrigin = '*' // highTODO make more limiting. Also implement https://stackoverflow.com/q/8169582
 
@@ -48,47 +46,25 @@ export interface RawRenderBodyInput {
 	readonly css?: string
 }
 
-async function getLocalMedia(id: MediaId): Promise<ArrayBuffer | null> {
-	const media = await db.getMedia(id)
-	return media?.data ?? null
-}
-
-export interface AppExpose {
-	renderTemplate: typeof C.renderTemplate
-	html: typeof C.html
-	getLocalMedia: typeof getLocalMedia
-	rawRenderBodyInput: RawRenderBodyInput
-	resize: () => void
-}
-
-interface Diagnostics {
+export interface Diagnostics {
 	errors: Error[]
 	warnings: Warning[]
 }
 
-const ResizingIframe: VoidComponent<{
+export const ResizingIframe: VoidComponent<{
+	// eslint-disable-next-line @typescript-eslint/naming-convention
+	C: RenderContainer
 	readonly i: RenderBodyInput
 	class?: string
 	resize?: false
-}> = (props) => {
-	// eslint-disable-next-line solid/reactivity
-	const resize = (iframeReference?: IFrameComponent) => () => {
-		if (props.resize === false) return
-		iframeReference?.iFrameResizer?.resize()
-	}
-	const html = (setDiagnostics: SetStoreFunction<Diagnostics>) =>
-		buildHtml(unwrap(props.i), setDiagnostics) satisfies RawRenderBodyInput
-	const appExpose = (
+	resizeFn: (_?: IFrameComponent) => () => void
+	html: (setDiagnostics: SetStoreFunction<Diagnostics>) => RawRenderBodyInput
+	expose: (
 		setDiagnostics: SetStoreFunction<Diagnostics>,
 		iframeReference: IFrameComponent | undefined,
-	): AppExpose =>
-		({
-			renderTemplate: (x) => C.renderTemplate(x), // do not eta-reduce. `C`'s `this` binding apparently doesn't work across Comlink
-			html: (x, y, z) => C.html(x, y, z), // do not eta-reduce. `C`'s `this` binding apparently doesn't work across Comlink
-			getLocalMedia,
-			rawRenderBodyInput: html(setDiagnostics),
-			resize: resize(iframeReference),
-		}) satisfies AppExpose
+	) => Record<string, unknown>
+	origin: string
+}> = (props) => {
 	let iframeReference: IFrameComponent | undefined
 	onCleanup(() => {
 		iframeReference?.iFrameResizer?.close()
@@ -105,12 +81,12 @@ const ResizingIframe: VoidComponent<{
 				iframeReference?.contentWindow?.postMessage(
 					{
 						type: 'pleaseRerender',
-						i: html(setDiagnostics),
+						i: props.html(setDiagnostics),
 					},
 					targetOrigin,
 				)
 			} catch (error) {
-				C.toastError('Error communicating with iframe.', error)
+				props.C.toastError('Error communicating with iframe.', error)
 			}
 		},
 		200,
@@ -143,14 +119,14 @@ const ResizingIframe: VoidComponent<{
 						type: 'ComlinkInit',
 						port: port1,
 					}
-					Comlink.expose(appExpose(setDiagnostics, iframeReference), port2)
+					Comlink.expose(props.expose(setDiagnostics, iframeReference), port2)
 					iframeReference!.contentWindow!.postMessage(
 						comlinkInit,
 						targetOrigin,
 						[port1],
 					)
 					Comlink.expose(
-						appExpose(setDiagnostics, iframeReference),
+						props.expose(setDiagnostics, iframeReference),
 						Comlink.windowEndpoint(
 							iframeReference!.contentWindow!,
 							self,
@@ -164,83 +140,29 @@ const ResizingIframe: VoidComponent<{
 
 								// If perf becomes an issue consider debouncing https://github.com/davidjbradshaw/iframe-resizer/issues/816
 
-								checkOrigin: [import.meta.env.VITE_APP_UGC_ORIGIN],
+								checkOrigin: [props.origin],
 							},
 							iframeReference!,
 						)
 					}
-					new IntersectionObserver(resize(iframeReference)).observe(
+					new IntersectionObserver(props.resizeFn(iframeReference)).observe(
 						iframeReference!,
 					) // Resize when the iframe becomes visible, e.g. after the "Add Template" tab is clicked when we're looking at another tab. The resizing script behaves poorly when the iframe isn't visible.
 					debouncePostMessage()
-					resize(iframeReference)()
+					props.resizeFn(iframeReference)()
 				}}
 				sandbox='allow-scripts allow-same-origin' // Changing this has security ramifications! https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe#attr-sandbox
 				// "When the embedded document has the same origin as the embedding page, it is strongly discouraged to use both allow-scripts and allow-same-origin"
 				// Since this iframe is hosted on `app-user-generated-content` and this component is hosted on `app`, resulting in different origins, we should be safe. https://web.dev/sandboxed-iframes/ https://stackoverflow.com/q/35208161
-				src={import.meta.env.VITE_APP_UGC_ORIGIN}
+				src={props.origin}
 			/>
 		</div>
 	)
 }
 
-export default ResizingIframe
-
 export interface ComlinkInit {
 	type: 'ComlinkInit'
 	port: MessagePort
-}
-
-function getOk(
-	htmlResult: HtmlResult | null | undefined,
-	setDiagnostics: SetStoreFunction<Diagnostics>,
-) {
-	if (htmlResult?.tag === 'Ok') {
-		setDiagnostics({ warnings: htmlResult.warnings, errors: [] })
-		return htmlResult.ok
-	} else if (htmlResult?.tag === 'Error') {
-		setDiagnostics({ errors: htmlResult?.errors, warnings: [] })
-	}
-	return null
-}
-
-function buildHtml(
-	i: RenderBodyInput,
-	setDiagnostics: SetStoreFunction<Diagnostics>,
-): RawRenderBodyInput {
-	switch (i.tag) {
-		case 'template': {
-			const template = i.template
-			const result = getOk(C.renderTemplate(template)[i.index], setDiagnostics)
-			if (result == null) {
-				return {
-					body: `Error rendering Template #${i.index}".`,
-					css: template.css,
-				}
-			} else {
-				return {
-					body: i.side === 'front' ? result[0] : result[1],
-					css: template.css,
-				}
-			}
-		}
-		case 'card': {
-			const frontBack = getOk(
-				C.html(i.card, i.note, i.template),
-				setDiagnostics,
-			)
-			if (frontBack == null) {
-				return { body: 'Card is invalid!' }
-			}
-			const body = i.side === 'front' ? frontBack[0] : frontBack[1]
-			return { body }
-		}
-		case 'raw': {
-			return { body: i.html, css: i.css }
-		}
-		default:
-			return assertNever(i)
-	}
 }
 
 const RenderDiagnostics: VoidComponent<{
