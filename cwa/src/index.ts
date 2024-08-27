@@ -29,11 +29,18 @@ import {
 	userOwnsTemplateAndHasMedia,
 	getUserId,
 	dbIdToBase64,
+	type MediaEntity,
+	type DB,
 } from 'shared-edge'
 import { connect } from '@planetscale/database'
 import { buildPrivateToken } from './privateToken'
 import { appRouter } from './router'
 import { fetchRequestHandler } from '@trpc/server/adapters/fetch'
+import {
+	type ExpressionBuilder,
+	type OnConflictDatabase,
+	type OnConflictTables,
+} from 'kysely'
 export type * from '@trpc/server'
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -155,6 +162,18 @@ app
 
 export default app
 
+// The point of this type is to cause an error if something is added to MediaEntity
+// If that happens, you probably want to update the `doUpdateSet` call.
+// If not, you an add an exception to the Exclude below.
+type OnConflictUpdateMediaEntitySet = {
+	[K in keyof MediaEntity as Exclude<K, 'entityId' | 'i'>]: (
+		x: ExpressionBuilder<
+			OnConflictDatabase<DB, 'media_Entity'>,
+			OnConflictTables<'media_Entity'>
+		>,
+	) => unknown
+}
+
 async function postPublicMedia(
 	c: CwaContext,
 	type: 'note' | 'template',
@@ -193,7 +212,11 @@ async function postPublicMedia(
 				await trx
 					.insertInto('media_Entity')
 					.values(insertValues)
-					.onDuplicateKeyUpdate({ mediaHash })
+					.onConflict((db) =>
+						db.doUpdateSet({
+							mediaHash: (x) => x.ref('excluded.mediaHash'),
+						} satisfies OnConflictUpdateMediaEntitySet),
+					)
 					.execute()
 				if (!hasMedia) {
 					const object = await c.env.mediaBucket.put(

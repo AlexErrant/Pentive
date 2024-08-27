@@ -13,9 +13,9 @@ export interface MediaUser {
 }
 
 export interface MediaEntity {
+	entityId: DbId // composite pk
+	i: number //      composite pk
 	mediaHash: MediaHash
-	i: number
-	entityId: DbId
 }
 
 export interface Nook {

@@ -5,11 +5,13 @@ import {
 	type RawBuilder,
 	type InsertObject,
 	type Compilable,
-	type ExpressionWrapper,
 	type SqlBool,
+	type OnConflictTables,
+	type OnConflictDatabase,
+	type ExpressionBuilder,
 } from 'kysely'
 import { LibsqlDialect } from '@libsql/kysely-libsql'
-import { type DB } from './dbSchema.js'
+import { type Note, type DB, type Template } from './dbSchema.js'
 import {
 	type Base64,
 	type Base64Url,
@@ -706,8 +708,8 @@ export async function userOwnsNoteAndHasMedia(
 		.selectAll()
 		.executeTakeFirstOrThrow()
 	return {
-		userOwns: userOwns === ids.length.toString(),
-		hasMedia: hasMedia !== '0',
+		userOwns: userOwns === ids.length,
+		hasMedia: hasMedia !== 0,
 	}
 }
 
@@ -1010,6 +1012,36 @@ function deserializeTags(tags: string) {
 	return JSON.parse(tags) as string[]
 }
 
+// The point of this type is to cause an error if something is added to Note
+// If that happens, you probably want to update the `doUpdateSet` call.
+// If not, you an add an exception to the Exclude below.
+type OnConflictUpdateNoteSet = {
+	[K in keyof Note as Exclude<
+		K,
+		'id' | 'created' | 'subscribersCount' | 'commentsCount'
+	>]: (
+		x: ExpressionBuilder<
+			OnConflictDatabase<DB, 'note'>,
+			OnConflictTables<'note'>
+		>,
+	) => unknown
+}
+
+// The point of this type is to cause an error if something is added to Template
+// If that happens, you probably want to update the `doUpdateSet` call.
+// If not, you an add an exception to the Exclude below.
+type OnConflictUpdateTemplateSet = {
+	[K in keyof Template as Exclude<
+		K,
+		'id' | 'created' | 'subscribersCount' | 'commentsCount' | 'nook'
+	>]: (
+		x: ExpressionBuilder<
+			OnConflictDatabase<DB, 'template'>,
+			OnConflictTables<'template'>
+		>,
+	) => unknown
+}
+
 export async function editNotes(authorId: UserId, notes: EditRemoteNote[]) {
 	const editNoteIds = notes
 		.flatMap((t) => Array.from(t.remoteIds.keys()))
@@ -1031,17 +1063,17 @@ export async function editNotes(authorId: UserId, notes: EditRemoteNote[]) {
 	await db
 		.insertInto('note')
 		.values(noteCreates.flat())
-		// https://stackoverflow.com/a/34866431
-		.onDuplicateKeyUpdate({
-			templateId: (x) => values(x.ref('templateId')),
-			// created: (x) => values(x.ref("created")),
-			edited: (x) => values(x.ref('edited')),
-			authorId: (x) => values(x.ref('authorId')),
-			fieldValues: (x) => values(x.ref('fieldValues')),
-			fts: (x) => values(x.ref('fts')),
-			tags: (x) => values(x.ref('tags')),
-			ankiId: (x) => values(x.ref('ankiId')),
-		})
+		.onConflict((db) =>
+			db.doUpdateSet({
+				templateId: (x) => x.ref('excluded.templateId'),
+				edited: (x) => x.ref('excluded.edited'),
+				authorId: (x) => x.ref('excluded.authorId'),
+				fieldValues: (x) => x.ref('excluded.fieldValues'),
+				fts: (x) => x.ref('excluded.fts'),
+				tags: (x) => x.ref('excluded.tags'),
+				ankiId: (x) => x.ref('excluded.ankiId'),
+			} satisfies OnConflictUpdateNoteSet),
+		)
 		.execute()
 }
 
@@ -1067,24 +1099,17 @@ export async function editTemplates(
 		.insertInto('template')
 		.values(templateCreates.flat())
 		// https://stackoverflow.com/a/34866431
-		.onDuplicateKeyUpdate({
-			ankiId: (x) => values(x.ref('ankiId')),
-			// created: (x) => values(x.ref("created")),
-			edited: (x) => values(x.ref('edited')),
-			name: (x) => values(x.ref('name')),
-			// nook: (x) => values(x.ref("nook")), do not update Nook!
-			type: (x) => values(x.ref('type')),
-			fields: (x) => values(x.ref('fields')),
-			css: (x) => values(x.ref('css')),
-		})
+		.onConflict((db) =>
+			db.doUpdateSet({
+				ankiId: (x) => x.ref('excluded.ankiId'),
+				edited: (x) => x.ref('excluded.edited'),
+				name: (x) => x.ref('excluded.name'),
+				type: (x) => x.ref('excluded.type'),
+				fields: (x) => x.ref('excluded.fields'),
+				css: (x) => x.ref('excluded.css'),
+			} satisfies OnConflictUpdateTemplateSet),
+		)
 		.execute()
-}
-
-// nix upon resolution of https://github.com/koskimas/kysely/issues/251
-function values<Table extends keyof DB, Value>(
-	x: ExpressionWrapper<DB, Table, Value>,
-) {
-	return sql<Value>`values(${x})`
 }
 
 function unhex(id: Hex): RawBuilder<DbId> {
