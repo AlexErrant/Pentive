@@ -215,10 +215,10 @@ async function postMedia(
 	persistDbAndBucket: (_: PersistParams) => Promise<undefined | Response>,
 	buildResponse: (mediaHash: MediaHash) => string | Promise<string>,
 ): Promise<Response> {
-	if (c.req.body === null) {
+	if (c.req.raw.body === null) {
 		return c.text('Missing body', 400)
 	}
-	const contentLength = c.req.headers.get('content-length')
+	const contentLength = c.req.raw.headers.get('content-length')
 	if (contentLength === null) {
 		return c.text('Missing `content-length` header', 400)
 	}
@@ -234,13 +234,13 @@ async function postMedia(
 		)
 	}
 
-	const [responseBody, hashBody] = c.req.body.tee()
+	const [responseBody, hashBody] = c.req.raw.body.tee()
 	const { readable, writable } = new FixedLengthStream(parseInt(contentLength)) // validates length
 	void responseBody.pipeTo(writable) // https://developers.cloudflare.com/workers/learning/using-streams
 	const headers = new Headers()
-	const ct = c.req.headers.get('Content-Type')
+	const ct = c.req.raw.headers.get('Content-Type')
 	if (ct != null) headers.set('Content-Type', ct)
-	const ce = c.req.headers.get('Content-Encoding')
+	const ce = c.req.raw.headers.get('Content-Encoding')
 	if (ce != null) headers.set('Content-Encoding', ce)
 
 	const digestStream = new crypto.DigestStream('SHA-256') // https://developers.cloudflare.com/workers/runtime-apis/web-crypto/#constructors

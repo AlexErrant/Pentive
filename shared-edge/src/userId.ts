@@ -7,6 +7,7 @@ import {
 	toOk,
 } from 'shared'
 import { type Context } from 'hono'
+import { getCookie } from 'hono/cookie'
 import { base64ToArray } from './utility'
 
 export async function getUserId<T extends { hubSessionSecret: string }>(
@@ -19,7 +20,7 @@ export async function getUserId<T extends { hubSessionSecret: string }>(
 	if (c.req.header(csrfHeaderName) == null) {
 		return toError(`Missing '${csrfHeaderName}' header`)
 	}
-	const hubSession = c.req.cookie(hubSessionCookieName)
+	const hubSession = getCookie(c, hubSessionCookieName)
 	if (hubSession == null) {
 		return toError(
 			`Missing '${hubSessionCookieName}' cookie. (You're not logged into Hub.)`,
