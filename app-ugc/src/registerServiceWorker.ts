@@ -34,13 +34,22 @@ const exposed = {
 
 export type Exposed = typeof exposed
 
+async function register() {
+	await navigator.serviceWorker.register(
+		import.meta.env.PROD ? '/serviceWorker.js' : '/dev-sw.js?dev-sw',
+		{ type: import.meta.env.MODE === 'production' ? 'classic' : 'module' },
+	)
+	const registration = await navigator.serviceWorker.ready
+	initComlink(registration.active)
+}
+
 if ('serviceWorker' in navigator) {
-	// delay registration so it doesn't interfere with initial page render https://web.dev/articles/service-workers-registration#:~:text=Improving%20the%20boilerplate
-	window.addEventListener('load', async () => {
-		await navigator.serviceWorker.register('/serviceWorker.js')
-		const registration = await navigator.serviceWorker.ready
-		initComlink(registration.active)
-	})
+	if (document.readyState === 'complete') {
+		await register()
+	} else {
+		// delay registration so it doesn't interfere with initial page render https://web.dev/articles/service-workers-registration#:~:text=Improving%20the%20boilerplate
+		window.addEventListener('load', register)
+	}
 } else {
 	// unnecessary due to 7A0559B7-44B3-4674-B71C-100DAA30D45C
 	// alert("Your browser doesn't support Service Workers. Pentive won't work properly without them.")

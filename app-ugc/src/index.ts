@@ -1,1 +1,2 @@
-import './registerServiceWorker'
+export {}
+await import('./registerServiceWorker')
