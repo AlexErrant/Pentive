@@ -54,7 +54,6 @@ jobs:
           envsubst <   ./api-ugc/example.wrangler.toml > ./api-ugc/wrangler.toml
           envsubst <       ./hub/example.wrangler.toml >     ./hub/wrangler.toml
           envsubst <     ./hub/.example.env.production >     ./hub/.env.production
-          envsubst < ./hub-ugc/.example.env.production > ./hub-ugc/.env.production
           envsubst <     ./app/.example.env.production >     ./app/.env.production
 
       - name: build

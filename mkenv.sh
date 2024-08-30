@@ -52,8 +52,6 @@ envsubst < ./hub/example.wrangler.toml        > ./hub/wrangler.toml
 envsubst < ./lrpc/.example.env                > ./lrpc/.env
 envsubst < ./app-ugc/example.env.sh           > ./app-ugc/env.sh
 envsubst < ./hub-ugc/example.env.sh           > ./hub-ugc/env.sh
-envsubst < ./hub-ugc/.example.env.development > ./hub-ugc/.env.development
-envsubst < ./hub-ugc/.example.env.production  > ./hub-ugc/.env.production
 envsubst < ./app/example.env.sh               > ./app/env.sh
 envsubst < ./app/.example.env.development     > ./app/.env.development
 envsubst < ./app/.example.env.production      > ./app/.env.production
