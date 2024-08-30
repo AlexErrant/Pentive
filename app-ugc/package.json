@@ -49,7 +49,6 @@
 		"comlink": "^4.4.1",
 		"iframe-resizer": "^4.3.7",
 		"micromorph": "^0.4.5",
-		"shared": "workspace:*",
-		"shared-dom": "workspace:*"
+		"shared": "workspace:*"
 	}
 }
