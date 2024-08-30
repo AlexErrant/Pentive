@@ -86,6 +86,7 @@ async function getMedia(
 		return await c.notFound()
 	}
 	c.header('ETag', file.httpEtag)
+	c.header('Cross-Origin-Resource-Policy', 'cross-origin')
 	const maxAge =
 		cacheControl === 'public'
 			? 1814400 // 21 days
