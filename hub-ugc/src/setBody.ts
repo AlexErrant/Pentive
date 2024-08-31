@@ -1,40 +1,30 @@
 import contentWindowJs from 'iframe-resizer/js/iframeResizer.contentWindow.js?raw' // https://vitejs.dev/guide/assets.html#importing-asset-as-string https://github.com/davidjbradshaw/iframe-resizer/issues/513
-import { type RenderBodyInput } from 'hub/src/components/resizingIframe'
-import { assertNever, relativeChar } from 'shared'
-import { getOk, registerPluginServices } from 'shared-dom'
+import { setHubMessengerPort } from './hubMessenger'
+import {
+	type ComlinkInit,
+	type RawRenderBodyInput,
+} from 'hub/src/components/resizingIframe'
+import { resizeIframe } from './registerServiceWorker'
+import diff from 'micromorph'
 
-const C = await registerPluginServices([])
-
-self.addEventListener('message', (event) => {
+self.addEventListener('message', async (event) => {
 	const data = event.data as unknown
-	if (
-		typeof data === 'object' &&
-		data != null &&
-		'type' in data &&
-		data.type === 'pleaseRerender'
-	) {
-		// @ts-expect-error i exists; grep pleaseRerender
-		const i = data.i as RenderBodyInput
-		setBody(i)
+	if (typeof data === 'object' && data != null && 'type' in data) {
+		if (data.type === 'pleaseRerender') {
+			// @ts-expect-error i exists; grep pleaseRerender
+			const i = data.i as RawRenderBodyInput
+			await setBody(i)
+			await resizeIframe()
+		} else if (data?.type === 'ComlinkInit') {
+			setHubMessengerPort((data as ComlinkInit).port)
+		}
 	}
 })
 
-function relativeImgSrcQueriesCWA(body: string) {
-	const doc = new DOMParser().parseFromString(body, 'text/html')
-	for (const i of doc.images) {
-		const src = i.getAttribute('src')
-		if (src != null && src.startsWith(relativeChar)) {
-			i.setAttribute('src', import.meta.env.VITE_AUGC_URL + 'i' + src)
-		}
-	}
-	return doc.body.innerHTML
-}
+const domParser = new DOMParser()
 
-export function setBody(i: RenderBodyInput) {
-	const { body, css } = buildHtml(i)
-
-	document.getElementsByTagName('body')[0]!.innerHTML =
-		relativeImgSrcQueriesCWA(body)
+export async function setBody({ body, css }: RawRenderBodyInput) {
+	await diff(document, domParser.parseFromString(body, 'text/html'))
 	const resizeScript = document.createElement('script')
 	resizeScript.type = 'text/javascript'
 	resizeScript.text = contentWindowJs
@@ -43,35 +33,5 @@ export function setBody(i: RenderBodyInput) {
 		const style = document.createElement('style')
 		style.textContent = css
 		document.head.appendChild(style)
-	}
-}
-
-function buildHtml(i: RenderBodyInput): { body: string; css?: string } {
-	switch (i.tag) {
-		case 'template': {
-			const template = i.template
-			const result = getOk(C.renderTemplate(template)[i.index])
-			if (result == null) {
-				return {
-					body: `Error rendering Template #${i.index}".`,
-					css: template.css,
-				}
-			} else {
-				return {
-					body: i.side === 'front' ? result[0] : result[1],
-					css: template.css,
-				}
-			}
-		}
-		case 'card': {
-			const frontBack = getOk(C.html(i.card, i.note, i.template))
-			if (frontBack == null) {
-				return { body: 'Card is invalid!' }
-			}
-			const body = i.side === 'front' ? frontBack[0] : frontBack[1]
-			return { body }
-		}
-		default:
-			return assertNever(i)
 	}
 }

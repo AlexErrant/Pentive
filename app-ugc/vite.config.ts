@@ -68,6 +68,9 @@ export default defineConfig(({ mode }) => {
 				injectRegister: null,
 				srcDir: 'src',
 				filename: 'serviceWorker.ts',
+				injectManifest: {
+					maximumFileSizeToCacheInBytes: 999999999999999,
+				},
 			}),
 			checker({
 				overlay: {
