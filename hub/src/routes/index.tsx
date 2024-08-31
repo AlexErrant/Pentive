@@ -1,7 +1,7 @@
 import { type TemplateId, type Ord, type Template } from 'shared'
 import { toSampleCard, toSampleNote } from 'shared-dom'
 import { type JSX, createSignal } from 'solid-js'
-import ResizingIframe from '~/components/resizingIframe'
+import { ResizingIframe } from '~/components/clientOnly'
 
 export default function Home(): JSX.Element {
 	const [template, setTemplate] = createSignal<Template>({

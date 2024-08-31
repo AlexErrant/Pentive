@@ -1,7 +1,7 @@
 import { For, Show } from 'solid-js'
 import { type NookId } from 'shared'
 import { getTemplates } from 'shared-edge'
-import ResizingIframe from '~/components/resizingIframe'
+import { ResizingIframe } from '~/components/clientOnly'
 import { remoteToTemplate } from '~/lib/utility'
 import { getUserId } from '~/session'
 import RelativeDate from '~/components/relativeDate'

@@ -11,12 +11,20 @@ import {
 	type RenderContainer,
 } from 'shared-dom'
 import { ResizingIframe as CoreResizingIframe } from 'shared-dom'
+import { type MediaId } from 'shared'
 
 export type { RenderBodyInput, RawRenderBodyInput, ComlinkInit }
+
+// lowTODO dedupe requests
+async function getLocalMedia(id: MediaId): Promise<ArrayBuffer | null> {
+	const response = await fetch(import.meta.env.VITE_AUGC_URL + 'i/' + id)
+	return await response.arrayBuffer()
+}
 
 export interface HubExpose {
 	renderTemplate: RenderContainer['renderTemplate']
 	html: RenderContainer['html']
+	getLocalMedia: typeof getLocalMedia
 	rawRenderBodyInput: RawRenderBodyInput
 	resize: () => void
 }
@@ -41,6 +49,7 @@ const ResizingIframe: VoidComponent<{
 		({
 			renderTemplate: (x) => C.renderTemplate(x), // do not eta-reduce. `C`'s `this` binding apparently doesn't work across Comlink
 			html: (x, y, z) => C.html(x, y, z), // do not eta-reduce. `C`'s `this` binding apparently doesn't work across Comlink
+			getLocalMedia,
 			rawRenderBodyInput: html(setDiagnostics),
 			resize: resize(iframeReference),
 		}) satisfies HubExpose as Record<string, unknown>

@@ -1,7 +1,7 @@
 import { For, Show, Suspense } from 'solid-js'
 import { type NookId, type RemoteTemplateId } from 'shared'
 import { getTemplate, getTemplateComments } from 'shared-edge'
-import ResizingIframe from '~/components/resizingIframe'
+import { ResizingIframe } from '~/components/clientOnly'
 import Comment from '~/components/comment'
 import SubmitComment from '~/components/submitComment'
 import { cwaClient } from '~/routes/cwaClient'

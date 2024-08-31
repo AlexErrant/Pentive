@@ -95,7 +95,7 @@ export default createHandler(
 				`script-src 'self' 'nonce-${event.locals.cspNonce}'` +
 				` 'unsafe-eval'` + // due to https://github.com/lxsmnsyc/seroval/issues/44
 				` 'unsafe-inline';` + // 'unsafe-inline' due to "Consider adding 'unsafe-inline' (ignored by browsers supporting nonces/hashes) to be backward compatible with older browsers" https://csp-evaluator.withgoogle.com/
-				`connect-src 'self' ${import.meta.env.VITE_CWA_URL}` +
+				`connect-src 'self' ${import.meta.env.VITE_CWA_URL} ${import.meta.env.VITE_AUGC_URL}` +
 				(import.meta.env.DEV
 					? ` wss://${import.meta.env.VITE_HUB_DOMAIN}:*;`
 					: `;`) +
