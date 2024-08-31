@@ -18,6 +18,7 @@ import { type SetStoreFunction, createStore } from 'solid-js/store'
 import { debounce, leadingAndTrailing } from '@solid-primitives/scheduled'
 import { type Error, type Warning } from './language/template2html'
 import { type RenderContainer } from './renderContainer'
+import { type HtmlResult } from './cardHtml'
 
 const targetOrigin = '*' // highTODO make more limiting. Also implement https://stackoverflow.com/q/8169582
 
@@ -205,4 +206,58 @@ function throwaway(d: Warning | Error) {
 		return ''
 	}
 	assertNever(d)
+}
+
+function getOk(
+	htmlResult: HtmlResult | null | undefined,
+	setDiagnostics: SetStoreFunction<Diagnostics>,
+) {
+	if (htmlResult?.tag === 'Ok') {
+		setDiagnostics({ warnings: htmlResult.warnings, errors: [] })
+		return htmlResult.ok
+	} else if (htmlResult?.tag === 'Error') {
+		setDiagnostics({ errors: htmlResult?.errors, warnings: [] })
+	}
+	return null
+}
+
+export function buildHtml(
+	// eslint-disable-next-line @typescript-eslint/naming-convention
+	C: RenderContainer,
+	i: RenderBodyInput,
+	setDiagnostics: SetStoreFunction<Diagnostics>,
+): RawRenderBodyInput {
+	switch (i.tag) {
+		case 'template': {
+			const template = i.template
+			const result = getOk(C.renderTemplate(template)[i.index], setDiagnostics)
+			if (result == null) {
+				return {
+					body: `Error rendering Template #${i.index}".`,
+					css: template.css,
+				}
+			} else {
+				return {
+					body: i.side === 'front' ? result[0] : result[1],
+					css: template.css,
+				}
+			}
+		}
+		case 'card': {
+			const frontBack = getOk(
+				C.html(i.card, i.note, i.template),
+				setDiagnostics,
+			)
+			if (frontBack == null) {
+				return { body: 'Card is invalid!' }
+			}
+			const body = i.side === 'front' ? frontBack[0] : frontBack[1]
+			return { body }
+		}
+		case 'raw': {
+			return { body: i.html, css: i.css }
+		}
+		default:
+			return assertNever(i)
+	}
 }
