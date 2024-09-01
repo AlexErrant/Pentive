@@ -82,6 +82,38 @@ function testBody(
 	expect(back).toBe(expectedBack)
 }
 
+function testBody2(
+	fieldValues: Array<readonly [string, string]>,
+	frontTemplate: [string, string],
+	backTemplate: [string, string],
+	type: 'standard' | 'cloze',
+	expectedFront: [string, string],
+	expectedBack: [string, string],
+): void {
+	const template = buildTemplate(
+		fieldValues,
+		frontTemplate[0],
+		backTemplate[0],
+		type,
+	)
+	template.templateType.templates?.push({
+		name: '',
+		front: frontTemplate[1],
+		back: backTemplate[1],
+		id: 1 as Ord,
+	})
+	for (let index = 0; index < 2; index++) {
+		const r = defaultRenderContainer.body(
+			toSampleCard(index as Ord),
+			toSampleNote(new Map(fieldValues)),
+			template,
+		)
+		const [front, back] = getOk(r)
+		expect(front).toBe(expectedFront[index])
+		expect(back).toBe(expectedBack[index])
+	}
+}
+
 function testStrippedBody(
 	fieldValues: Array<readonly [string, string]>,
 	frontTemplate: string,
@@ -159,44 +191,24 @@ test('CardHtml generates empty string when Front field is missing', () => {
 })
 
 test('CardHtml generates proper basic with optional reversed custom card template', () => {
-	testBody(
+	testBody2(
 		[
 			['Back', 'Ottawa'],
 			['Front', 'What is the capital of Canada?'],
 			['Back2', 'Canada'],
 			['Front2', 'What is Ottawa the capital of?'],
 		],
-		'{{#Front2}}{{Front2}}{{/Front2}}',
-		`{{FrontSide}}
-    <hr id=answer>
-    {{Back2}}`,
-		0,
-		'standard',
-		'What is Ottawa the capital of?',
-		`What is Ottawa the capital of?
-    <hr id=answer>
-    Canada`,
-	)
-})
-
-test('CardHtml generates proper basic with optional reversed custom card template, but for {{Front}}', () => {
-	testBody(
+		['{{#Front}}{{Front}}{{/Front}}', '{{#Front2}}{{Front2}}{{/Front2}}'],
 		[
-			['Back', 'Ottawa'],
-			['Front', 'What is the capital of Canada?'],
-			['Back2', 'Canada'],
-			['Front2', 'What is Ottawa the capital of?'],
+			`{{FrontSide}}<hr id=answer>{{Back}}`,
+			`{{FrontSide}}<hr id=answer>{{Back2}}`,
 		],
-		'{{Front}}',
-		`{{FrontSide}}
-    <hr id=answer>
-    {{Back}}`,
-		0,
 		'standard',
-		'What is the capital of Canada?',
-		`What is the capital of Canada?
-    <hr id=answer>
-    Ottawa`,
+		['What is the capital of Canada?', 'What is Ottawa the capital of?'],
+		[
+			`What is the capital of Canada?<hr id=answer>Ottawa`,
+			`What is Ottawa the capital of?<hr id=answer>Canada`,
+		],
 	)
 })
 
