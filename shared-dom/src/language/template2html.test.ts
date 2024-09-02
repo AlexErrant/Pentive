@@ -5,7 +5,7 @@ import { toSampleCard, toSampleNote } from '../cardHtml'
 import { getDefaultTemplate, throwExp, type Ord } from 'shared'
 
 test('can handle opening (and closing) brace', () => {
-	const input = `x{y{z{{}}`
+	const input = `x{y{z{{}}{{Front}}`
 	const tree = validate.call(defaultRenderContainer, input)
 	if (Array.isArray(tree)) throwExp('ya goofed')
 	const r = convert.call(
@@ -14,9 +14,9 @@ test('can handle opening (and closing) brace', () => {
 		tree,
 		true,
 		toSampleCard(0 as Ord),
-		toSampleNote(new Map()),
+		toSampleNote(new Map([['Front', 'Foo']])),
 		// @ts-expect-error whatever
 		getDefaultTemplate(null),
 	)
-	expect(input).toEqual(r.html)
+	expect(`x{y{z{{}}Foo`).toEqual(r.html)
 })

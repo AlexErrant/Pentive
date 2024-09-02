@@ -33,10 +33,12 @@ class Context {
 		this.html = ''
 		this.hideTagName = null
 		this.warnings = []
+		this.hasContent = false
 	}
 
 	html: string
 	hideTagName: string | null
+	hasContent: boolean // used to return empty string when there's no content, e.g. when Field is empty and the template is <div>{{#Field}}{{Field}}{{/Field}}</div> like at grep 541E2B56-BC18-48B1-9CC8-6A731A97CD03
 	warnings: Warning[]
 }
 
@@ -76,7 +78,10 @@ export function convert(
 			astLeave(input, node, context)
 		},
 	)
-	return { html: context.html.trim(), warnings: context.warnings }
+	return {
+		html: context.hasContent ? context.html.trim() : '', // grep 541E2B56-BC18-48B1-9CC8-6A731A97CD03
+		warnings: context.warnings,
+	}
 }
 
 function isEmpty(input: string | null | undefined) {
@@ -131,7 +136,10 @@ function astEnter(
 					template,
 				})
 			}
-			context.html += value
+			if (!isEmpty(value)) {
+				context.html += value
+				context.hasContent = true
+			}
 		}
 	} else if (
 		node.type.is(StartTag) &&

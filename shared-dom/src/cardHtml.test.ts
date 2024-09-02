@@ -87,8 +87,8 @@ function testBody2(
 	frontTemplate: [string, string],
 	backTemplate: [string, string],
 	type: 'standard' | 'cloze',
-	expectedFront: [string, string],
-	expectedBack: [string, string],
+	expectedFront: [string | null, string | null],
+	expectedBack: [string | null, string | null],
 ): void {
 	const template = buildTemplate(
 		fieldValues,
@@ -108,7 +108,7 @@ function testBody2(
 			toSampleNote(new Map(fieldValues)),
 			template,
 		)
-		const [front, back] = getOk(r)
+		const [front, back] = getOkSafe(r) ?? [null, null]
 		expect(front).toBe(expectedFront[index])
 		expect(back).toBe(expectedBack[index])
 	}
@@ -211,6 +211,95 @@ test('CardHtml generates proper basic with optional reversed custom card templat
 		],
 	)
 })
+
+test('CardHtml generates proper basic with optional reversed custom card template, with outer div', () => {
+	testBody2(
+		[
+			['Back', 'Ottawa'],
+			['Front', 'What is the capital of Canada?'],
+			['Back2', 'Canada'],
+			['Front2', 'What is Ottawa the capital of?'],
+		],
+		[
+			'<div>{{#Front}}{{Front}}{{/Front}}</div>',
+			'<div>{{#Front2}}{{Front2}}{{/Front2}}</div>',
+		],
+		[
+			`<div>{{FrontSide}}<hr id=answer>{{Back}}</div>`,
+			`<div>{{FrontSide}}<hr id=answer>{{Back2}}</div>`,
+		],
+		'standard',
+		[
+			'<div>What is the capital of Canada?</div>',
+			'<div>What is Ottawa the capital of?</div>',
+		],
+		[
+			`<div><div>What is the capital of Canada?</div><hr id=answer>Ottawa</div>`,
+			`<div><div>What is Ottawa the capital of?</div><hr id=answer>Canada</div>`,
+		],
+	)
+})
+
+test.each([
+	{ name: 'empty string', value: '' },
+	{ name: 'space', value: ' ' },
+	{ name: 'newline', value: '\r\n' },
+])(
+	'CardHtml generates proper basic with optional reversed custom card template, with outer div, and using optional reversed - $name',
+	({ value }) => {
+		testBody2(
+			[
+				['Back', 'Ottawa'],
+				['Front', 'What is the capital of Canada?'],
+				['Back2', value], // grep 541E2B56-BC18-48B1-9CC8-6A731A97CD03
+				['Front2', value],
+			],
+			[
+				'<div>{{#Front}}{{Front}}{{/Front}}</div>',
+				'<div>{{#Front2}}{{Front2}}{{/Front2}}</div>',
+			],
+			[
+				`<div>{{FrontSide}}<hr id=answer>{{Back}}</div>`,
+				`<div>{{FrontSide}}<hr id=answer>{{Back2}}</div>`,
+			],
+			'standard',
+			['<div>What is the capital of Canada?</div>', null],
+			[
+				`<div><div>What is the capital of Canada?</div><hr id=answer>Ottawa</div>`,
+				null,
+			],
+		)
+	},
+)
+
+test.each([
+	{ name: 'empty string', value: '' },
+	{ name: 'space', value: ' ' },
+	{ name: 'newline', value: '\r\n' },
+])(
+	'CardHtml generates proper basic with optional reversed custom card template, with outer div, and using inverted optional reversed for contrived reasons - $name',
+	({ value }) => {
+		testBody2(
+			[
+				['Back', 'Ottawa'],
+				['Front', 'What is the capital of Canada?'],
+				['Back2', value], // grep 541E2B56-BC18-48B1-9CC8-6A731A97CD03
+				['Front2', value],
+			],
+			[
+				'<div>{{^Front}}{{Front}}{{/Front}}</div>',
+				'<div>{{^Front2}}{{Front2}}{{/Front2}}</div>',
+			],
+			[
+				`<div>{{FrontSide}}<hr id=answer>{{Back}}</div>`,
+				`<div>{{FrontSide}}<hr id=answer>{{Back2}}</div>`,
+			],
+			'standard',
+			[null, null],
+			[null, null],
+		)
+	},
+)
 
 test('CardHtml generates proper basic card template, but with (empty) conditional Category', () => {
 	testBody(
