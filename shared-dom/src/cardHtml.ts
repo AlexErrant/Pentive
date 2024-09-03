@@ -344,7 +344,7 @@ export function noteOrds(
 		const ords = template.templateType.templates
 			.map((_, i) => {
 				const body = this.body(toSampleCard(i as Ord), note, template)
-				if (body == null) return null
+				if (body.tag === 'Error' || body.ok == null) return null
 				return i as Ord
 			})
 			.filter(notEmpty)

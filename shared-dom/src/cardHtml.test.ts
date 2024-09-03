@@ -497,6 +497,57 @@ test('CardHtml renders {{cloze:FieldName}} properly', () => {
 	)
 })
 
+function ordsOfStandard(
+	fieldAndValues: Array<readonly [string, string]>,
+	frontTemplates: [string, string],
+	backTemplates: [string, string],
+) {
+	const template = buildTemplate(
+		fieldAndValues,
+		frontTemplates[0],
+		backTemplates[0],
+		'standard',
+	)
+	template.templateType.templates?.push({
+		name: '',
+		front: frontTemplates[1],
+		back: backTemplates[1],
+		id: 1 as Ord,
+	})
+	return noteOrds.bind(defaultRenderContainer)(
+		toSampleNote(new Map(fieldAndValues)),
+		template,
+	)
+}
+
+test.each([
+	{ name: 'empty string', value: '', expected: [0] },
+	{ name: 'space', value: ' ', expected: [0] },
+	{ name: 'newline', value: '\r\n', expected: [0] },
+	{ name: 'foo', value: 'foo', expected: [0, 1] },
+])(
+	'noteOrd handles standard template with optional - $name',
+	({ value, expected }) => {
+		const ords = ordsOfStandard(
+			[
+				['Back', 'Ottawa'],
+				['Front', 'What is the capital of Canada?'],
+				['Back2', value],
+				['Front2', value],
+			],
+			[
+				'<div>{{#Front}}{{Front}}{{/Front}}</div>',
+				'<div>{{#Front2}}{{Front2}}{{/Front2}}</div>',
+			],
+			[
+				`<div>{{FrontSide}}<hr id=answer>{{Back}}</div>`,
+				`<div>{{FrontSide}}<hr id=answer>{{Back2}}</div>`,
+			],
+		)
+		expect(ords).toStrictEqual(expected)
+	},
+)
+
 function ordsOfClozeNote(
 	fieldsAndValues: Array<[string, string]>,
 	front: string,
