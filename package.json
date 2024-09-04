@@ -21,6 +21,7 @@
 		"eslint-plugin-solid": "^0.14.0",
 		"kill-port": "^2.0.1",
 		"prettier-plugin-tailwindcss": "^0.6.5",
+		"turbo": "^2.1.1",
 		"typescript": "~5.4.5",
 		"wrangler": "^3.72.2"
 	},
