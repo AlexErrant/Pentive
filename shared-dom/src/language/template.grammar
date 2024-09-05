@@ -29,9 +29,9 @@ MismatchedCloseTag[isolate] {
   mismatchedStartCloseTag TagName EndTag
 }
 
-@context elementContext from "./template.tokens.ts"
+@context elementContext from "./template.tokens.js"
 
-@external tokens startTag from "./template.tokens.ts" {
+@external tokens startTag from "./template.tokens.js" {
   StartTag[closedBy="EndTag"]
   StartCloseTag
   MissingCloseTag
@@ -51,6 +51,6 @@ Transformer { TagName* TransformerDelimiter }
   Brace[@name=Text] { "{" }
 }
 
-@external propSource xmlHighlighting from "./template.highlight.ts"
+@external propSource xmlHighlighting from "./template.highlight.js"
 
 @detectDelim
