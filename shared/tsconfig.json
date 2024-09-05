@@ -11,7 +11,7 @@
 		"skipLibCheck": true,
 		"composite": true,
 		"declaration": true,
-		"outDir": "dist",
+		"outDir": "lib",
 		"lib": ["ES2022"]
 	},
 	"include": ["src/**/*", "sql/generateSql.ts", "src/sql.json"]

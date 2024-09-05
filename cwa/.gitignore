@@ -2,3 +2,4 @@ wrangler.toml
 .wrangler/*
 .dev.vars
 dist
+lib

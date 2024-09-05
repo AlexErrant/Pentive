@@ -4,7 +4,7 @@
 	"files": [],
 	"references": [
 		{
-			"path": "app/tsconfig.lib.json"
+			"path": "app"
 		},
 		{
 			"path": "app-ugc"

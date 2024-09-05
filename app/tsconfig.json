@@ -15,7 +15,7 @@
 		"lib": ["WebWorker", "DOM", "ES2022"],
 		"composite": true,
 		"declaration": true,
-		"outDir": "dist"
+		"outDir": "lib"
 	},
 	"references": [
 		{

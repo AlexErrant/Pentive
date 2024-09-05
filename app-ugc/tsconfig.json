@@ -1,7 +1,7 @@
 {
 	"extends": "../tsconfig.options.json",
 	"compilerOptions": {
-		"outDir": "dist",
+		"outDir": "lib",
 		"strict": true,
 		"target": "ES2022",
 		"module": "ESNext",
@@ -17,7 +17,7 @@
 	},
 	"references": [
 		{
-			"path": "../app/tsconfig.lib.json"
+			"path": "../app"
 		},
 		{
 			"path": "../shared"

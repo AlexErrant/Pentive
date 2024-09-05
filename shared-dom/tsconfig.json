@@ -13,7 +13,7 @@
 		"declaration": true,
 		"jsx": "preserve",
 		"jsxImportSource": "solid-js",
-		"outDir": "dist",
+		"outDir": "lib",
 		"lib": ["ES2022", "DOM"]
 	},
 	"include": ["src/**/*", "*.ts"]

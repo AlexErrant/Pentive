@@ -1,4 +1,5 @@
 wrangler.toml
 .dev.vars
 dist
+lib
 .wrangler

@@ -17,7 +17,7 @@
 	},
 	"references": [
 		{
-			"path": "../../app/tsconfig.lib.json"
+			"path": "../../app"
 		}
 	],
 	"include": ["src/**/*", "*.ts"]
