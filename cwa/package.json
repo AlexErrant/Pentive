@@ -15,7 +15,7 @@
 		"start": "wrangler dev --persist-to ../.wrangler/state",
 		"dev": "wrangler dev --persist-to ../.wrangler/state",
 		"deploy": "wrangler deploy",
-		"build": "wrangler deploy ./src/index.ts --dry-run --outdir dist",
+		"build": "wrangler deploy --dry-run --outdir dist",
 		"tsc-build": "tsc --build",
 		"format:check": "prettier --ignore-path .gitignore --check .",
 		"format": "prettier --ignore-path .gitignore --write .",

@@ -4,6 +4,17 @@
     "tsc-build": {
       "dependsOn": ["^tsc-build"],
       "outputs": ["lib/**"]
+    },
+    "build": {
+      "dependsOn": [],
+      "outputs": ["dist/**", ".vinxi/**"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        ".env.development",
+        ".env.production",
+        ".env.production.local",
+        ".env"
+      ]
     }
   }
 }

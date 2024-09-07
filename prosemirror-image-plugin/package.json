@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "prebuild": "rimraf dist",
-    "build": "rollup -c --bundleConfigAsCjs",
+    "buildx": "rollup -c --bundleConfigAsCjs",
     "dev": "rollup -c -w --bundleConfigAsCjs",
     "format:ignorefornow": "eslint src --ext .ts --fix",
     "prepublishOnly": "npm run build && npm test && npm run lint",
