@@ -40,8 +40,14 @@ jobs:
       - name: tsc-build
         run: pnpm tsc-build
 
-      - name: eslint + test
-        run: pnpm eslint+test
+      - name: eslint
+        run: pnpm eslint
+
+      - name: test
+        run: pnpm test
+
+      - name: check
+        run: pnpm check
 
       - name: envsubst
         env:
