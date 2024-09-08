@@ -14,8 +14,6 @@ const project = [
 	path.join(__dirname, 'cwa/tsconfig.json'),
 	path.join(__dirname, 'api-ugc/tsconfig.json'),
 	path.join(__dirname, 'peer/tsconfig.json'),
-	path.join(__dirname, 'workers-test/tsconfig.json'),
-	path.join(__dirname, 'workers-test/test/tsconfig.json'),
 	path.join(__dirname, 'example-plugins/solid/tsconfig.json'),
 	path.join(__dirname, 'example-plugins/svelte/tsconfig.json'),
 	path.join(__dirname, 'prosemirror-image-plugin/tsconfig.json'),

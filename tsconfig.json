@@ -37,9 +37,6 @@
 			"path": "peer"
 		},
 		{
-			"path": "workers-test"
-		},
-		{
 			"path": "example-plugins/solid"
 		},
 		{

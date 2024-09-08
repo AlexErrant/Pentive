@@ -11,5 +11,4 @@ packages:
   - 'api-ugc/'
   - 'peer/'
   - 'prosemirror-image-plugin/'
-  - 'workers-test/'
   - 'example-plugins/*'

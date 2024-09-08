@@ -9,7 +9,6 @@ shared-edge
 cwa
 api-ugc
 peer
-workers-test
 example-plugins/solid
 example-plugins/svelte
 prosemirror-image-plugin
