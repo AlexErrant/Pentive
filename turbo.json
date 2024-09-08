@@ -2,15 +2,26 @@
   "$schema": "https://turbo.build/schema.json",
   "tasks": {
     "tsc-build": {
-      "dependsOn": ["^tsc-build"],
-      "outputs": ["lib/**"]
+      "dependsOn": [
+        "^tsc-build"
+      ],
+      "outputs": [
+        "lib/**"
+      ]
     },
     "eslint": {
-      "dependsOn": ["^tsc-build"]
+      "dependsOn": [
+        "^tsc-build"
+      ]
     },
     "build": {
-      "dependsOn": ["^tsc-build"],
-      "outputs": ["dist/**", ".vinxi/**"],
+      "dependsOn": [
+        "^tsc-build"
+      ],
+      "outputs": [
+        "dist/**",
+        ".vinxi/**"
+      ],
       "inputs": [
         "$TURBO_DEFAULT$",
         ".env.development",
