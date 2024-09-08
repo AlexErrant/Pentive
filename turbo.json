@@ -3,22 +3,33 @@
   "tasks": {
     "tsc-build": {
       "dependsOn": [
-        // https://github.com/vercel/turborepo/discussions/9067#discussioncomment-10573684
-        "^tsc-build"
+        "transit"
       ],
       "outputs": [
         "lib/**"
       ]
     },
+    "transit": {
+      "dependsOn": [
+        "^transit"
+      ]
+    },
     "eslint": {
       "dependsOn": [
         // "By using typed linting in your config, you incur the performance penalty of asking TypeScript to do a build of your project before ESLint can do its linting" https://typescript-eslint.io/getting-started/typed-linting#how-is-performance
-        "^tsc-build"
+        "tsc-build"
+      ]
+    },
+    "hub#build": {
+      "dependsOn": [
+        // I don't think hub's eslint and build can run concurrently. Without this we get an error in Github Actions like
+        // Error: ENOENT: no such file or directory, open '/home/runner/work/Pentive/Pentive/hub/app.config.timestamp_1725915755421.js'
+        "hub#eslint"
       ]
     },
     "check": {
       "dependsOn": [
-        "^tsc-build"
+        "tsc-build"
       ]
     },
     "test": {
@@ -26,9 +37,14 @@
       "persistent": true
     },
     "test:run": {},
+    "shared-dom#test:run": { // grep AD3A801F-81D4-4C83-80A3-94ED10F05608
+      "dependsOn": [
+        "shared-dom#tsc-build"
+      ]
+    },
     "deploy": {
       "dependsOn": [
-        // "build"
+        "build"
       ],
       "env": [
         "CLOUDFLARE_ACCOUNT_ID",
@@ -37,7 +53,7 @@
     },
     "build": {
       "dependsOn": [
-        "^tsc-build"
+        "tsc-build"
       ],
       "outputs": [
         "dist/**",

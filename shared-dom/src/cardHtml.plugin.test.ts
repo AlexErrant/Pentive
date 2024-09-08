@@ -60,6 +60,8 @@ function expectTemplate(
 	expectStrippedToBe(back, expectedBack)
 }
 
+// the tests below require `tsc-build` to have been run - grep AD3A801F-81D4-4C83-80A3-94ED10F05608
+
 test('renderTemplate works with plugin that requires `edit` syntax', async () => {
 	const pluginText = await readFile(
 		path.join(__dirname, '..', 'lib', 'src', 'cardHtml.plugin.testinput.js'),
