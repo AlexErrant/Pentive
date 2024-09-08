@@ -44,7 +44,7 @@ jobs:
         run: pnpm eslint
 
       - name: test
-        run: pnpm test
+        run: pnpm test:run
 
       - name: check
         run: pnpm check
