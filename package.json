@@ -1,6 +1,7 @@
 {
 	"name": "pentive",
 	"version": "0.0.0",
+	"//": "# if you change node's version from 20.14.0, also update `@types/node`",
 	"engines": {
 		"node": "20.14.0",
 		"pnpm": "9.5.0"
