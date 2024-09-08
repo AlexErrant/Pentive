@@ -10,8 +10,8 @@
 	"exports": "./src/index.ts",
 	"scripts": {
 		"tsc-build": "tsc --build",
-		"eslint": "eslint . --ignore-path .gitignore",
-		"eslint:fix": "eslint . --fix --ignore-path .gitignore",
+		"eslint": "eslint . --ignore-path .gitignore --max-warnings 0",
+		"eslint:fix": "eslint . --fix --ignore-path .gitignore --max-warnings 0",
 		"format:check": "prettier --ignore-path .gitignore --check .",
 		"format": "prettier --ignore-path .gitignore --write .",
 		"//initIvy": "in the code below, the first `.` means `source` in shell",
