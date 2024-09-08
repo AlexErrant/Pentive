@@ -59,7 +59,7 @@ jobs:
         run: pnpm install
 
       - name: turbo
-        run: pnpm tsc-build eslint test:run check build
+        run: npx turbo run tsc-build eslint check test:run build
 
       - name: deploy
         run: pnpm run deploy-only

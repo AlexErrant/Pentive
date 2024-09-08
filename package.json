@@ -46,8 +46,8 @@
 		"tsc-build": "turbo tsc-build",
 		"tsc-clean": "rm -rf **/tsconfig.tsbuildinfo",
 		"//ci": "simulate cicd locally",
-		"ci": "git clean -xdf && ./mkenv.sh && ./rmcert.sh && ./mkcert.sh && pnpm i && pnpm tsc-build && pnpm eslint && pnpm check && pnpm test && pnpm build && ./initIvy.sh",
-		"cf": "git clean -xdf && ./mkenv.sh && ./rmcert.sh && ./mkcert.sh && pnpm i && pnpm tsc-build && pnpm build && ./initIvy.sh"
+		"ci": "git clean -xdf && ./mkenv.sh && ./rmcert.sh && ./mkcert.sh && pnpm i && npx turbo run tsc-build eslint check test:run build && ./initIvy.sh",
+		"cf": "git clean -xdf && ./mkenv.sh && ./rmcert.sh && ./mkcert.sh && pnpm i && npx turbo run tsc-build build && ./initIvy.sh"
 	},
 	"pnpm": {
 		"patchedDependencies": {
