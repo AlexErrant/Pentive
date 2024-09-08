@@ -34,21 +34,6 @@ jobs:
           cache: pnpm
           node-version-file: '.nvmrc'
 
-      - name: pnpm install
-        run: pnpm install
-
-      - name: tsc-build
-        run: pnpm tsc-build
-
-      - name: eslint
-        run: pnpm eslint
-
-      - name: test
-        run: pnpm test:run
-
-      - name: check
-        run: pnpm check
-
       - name: envsubst
         env:
           cloudflareAccountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -70,11 +55,14 @@ jobs:
           envsubst <     ./hub/.example.env.production >     ./hub/.env.production
           envsubst <     ./app/.example.env.production >     ./app/.env.production
 
-      - name: build
-        run: pnpm build
+      - name: pnpm install
+        run: pnpm install
+
+      - name: turbo
+        run: pnpm tsc-build eslint test:run check build
 
       - name: deploy
-        run: pnpm run deploy
+        run: pnpm run deploy-only
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

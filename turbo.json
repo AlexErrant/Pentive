@@ -22,10 +22,19 @@
       ]
     },
     "test": {
-      "cache": false, 
+      "cache": false,
       "persistent": true
     },
     "test:run": {},
+    "deploy": {
+      "dependsOn": [
+        // "build"
+      ],
+      "env": [
+        "CLOUDFLARE_ACCOUNT_ID",
+        "CLOUDFLARE_API_TOKEN"
+      ]
+    },
     "build": {
       "dependsOn": [
         "^tsc-build"
