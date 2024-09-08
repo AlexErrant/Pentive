@@ -5,8 +5,11 @@
       "dependsOn": ["^tsc-build"],
       "outputs": ["lib/**"]
     },
+    "eslint": {
+      "dependsOn": ["^tsc-build"]
+    },
     "build": {
-      "dependsOn": [],
+      "dependsOn": ["^tsc-build"],
       "outputs": ["dist/**", ".vinxi/**"],
       "inputs": [
         "$TURBO_DEFAULT$",
