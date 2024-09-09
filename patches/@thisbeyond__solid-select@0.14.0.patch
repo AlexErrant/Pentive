@@ -41,3 +41,15 @@ index da8907d3b1b447bf06d7d2be1a78789198baebb2..94fcf186dc3149628433290e6c714f4a
                      break;
                  }
                  return;
+diff --git a/package.json b/package.json
+index c2efef7d9a7b8fd2427f9605568f26a1a96e3adb..e8771dc568c85a8fda861a6de7286a80237c844c 100755
+--- a/package.json
++++ b/package.json
+@@ -31,6 +31,7 @@
+   "exports": {
+     ".": {
+       "solid": "./dist/source/index.jsx",
++      "types": "./dist/types/index.d.ts",
+       "default": "./dist/esm/index.js"
+     },
+     "./style.css": "./dist/esm/style.css"

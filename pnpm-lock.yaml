@@ -17,7 +17,7 @@ overrides:
 
 patchedDependencies:
   '@thisbeyond/solid-select@0.14.0':
-    hash: qeiswxfh5pakpmjau3jeoyzwxm
+    hash: 2qumt5mumsrcampzzb47wbecmy
     path: patches/@thisbeyond__solid-select@0.14.0.patch
   nightwind@1.1.13:
     hash: 3i6ghclomd7vkkb2jwgexhbq3i
@@ -180,7 +180,7 @@ importers:
         version: 8.10.3(solid-js@1.8.18)
       '@thisbeyond/solid-select':
         specifier: ^0.14.0
-        version: 0.14.0(patch_hash=qeiswxfh5pakpmjau3jeoyzwxm)(solid-js@1.8.18)
+        version: 0.14.0(patch_hash=2qumt5mumsrcampzzb47wbecmy)(solid-js@1.8.18)
       '@trpc/client':
         specifier: ^10.38.5
         version: 10.38.5(@trpc/server@10.38.5)
@@ -16344,7 +16344,7 @@ snapshots:
 
   '@tanstack/table-core@8.10.3': {}
 
-  '@thisbeyond/solid-select@0.14.0(patch_hash=qeiswxfh5pakpmjau3jeoyzwxm)(solid-js@1.8.18)':
+  '@thisbeyond/solid-select@0.14.0(patch_hash=2qumt5mumsrcampzzb47wbecmy)(solid-js@1.8.18)':
     dependencies:
       solid-js: 1.8.18
 
