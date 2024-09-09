@@ -1,0 +1,27 @@
+diff --git a/package.json b/package.json
+index 3251a6ca39f860b6aeb377afff63b57339a4f24c..28f7649f09f8f23122b0accbb4f2a7dc7795deb9 100644
+--- a/package.json
++++ b/package.json
+@@ -4,10 +4,18 @@
+   "main": "./index.mjs",
+   "types": "./types.d.ts",
+   "exports": {
+-    ".": "./index.mjs",
+-    "./spa": "./dist/spa.js",
+-    "./nav": "./dist/nav.js"
+-  },
++    ".": {
++      "import": "./index.mjs",
++      "types": "./index.d.ts"
++    },
++    "./spa": {
++      "import": "./dist/spa.js",
++      "types": "./spa.d.ts"
++    },
++    "./nav": {
++      "import": "./dist/nav.js",
++      "types": "./nav.d.ts"
++    }  },
+   "files": [
+     "index.mjs",
+     "index.d.ts",
