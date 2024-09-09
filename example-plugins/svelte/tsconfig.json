@@ -13,7 +13,7 @@
        enable source maps by default.
       */
 		"sourceMap": true,
-		"moduleResolution": "node",
+		"moduleResolution": "bundler",
 		"esModuleInterop": true,
 		"forceConsistentCasingInFileNames": true,
 		"strict": true,

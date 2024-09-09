@@ -3,7 +3,7 @@
     "target": "es6",
     "lib": ["es6", "es2015", "dom", "es2017"],
     "module": "esnext",
-    "moduleResolution": "Node",
+    "moduleResolution": "bundler",
     "declaration": true,
     "declarationDir": "./dist",
     "outDir": "./dist",
