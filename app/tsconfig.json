@@ -13,7 +13,6 @@
 		"jsxImportSource": "solid-js",
 		"types": ["@cloudflare/workers-types", "vite/client"],
 		"lib": ["WebWorker", "DOM", "ES2022"],
-		"composite": true,
 		"declaration": true,
 		"outDir": "lib"
 	},

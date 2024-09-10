@@ -9,7 +9,6 @@
 		"esModuleInterop": true,
 		"forceConsistentCasingInFileNames": true,
 		"skipLibCheck": true,
-		"composite": true,
 		"declaration": true,
 		"outDir": "lib",
 		"lib": ["ES2022"]
