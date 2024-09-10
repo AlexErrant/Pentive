@@ -3,15 +3,12 @@
   "tasks": {
     "tsc-build": {
       "dependsOn": [
-        "transit"
+        // Don't use "transit nodes"! https://turbo.build/repo/docs/core-concepts/package-and-task-graph#transit-nodes
+        // tsc-build, build, eslint, and check all require their parents' tsc-build runs to succeed.
+        "^tsc-build"
       ],
       "outputs": [
         "lib/**"
-      ]
-    },
-    "transit": {
-      "dependsOn": [
-        "^transit"
       ]
     },
     "eslint": {
