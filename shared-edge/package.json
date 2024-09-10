@@ -9,7 +9,7 @@
 	"main": "src/index.ts",
 	"exports": "./src/index.ts",
 	"scripts": {
-		"tsc-build": "tsc --build",
+		"tsc-build": "tsc",
 		"eslint": "eslint . --ignore-path .gitignore --max-warnings 0",
 		"eslint:fix": "eslint . --fix --ignore-path .gitignore --max-warnings 0",
 		"format:check": "prettier --ignore-path .gitignore --check .",

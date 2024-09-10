@@ -7,7 +7,7 @@
 		"start": "vinxi start",
 		"preview": "wrangler pages dev dist/ --https-cert-path ./.cert/cert.pem --https-key-path ./.cert/key.pem",
 		"deploy": "wrangler pages deploy dist/",
-		"tsc-build": "tsc --build",
+		"tsc-build": "tsc",
 		"eslint": "eslint . --ignore-path .gitignore --max-warnings 0",
 		"eslint:fix": "eslint . --fix --ignore-path .gitignore --max-warnings 0",
 		"format:check": "prettier --ignore-path .gitignore --check .",
