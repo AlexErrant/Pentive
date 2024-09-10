@@ -15,10 +15,5 @@
 		"jsxImportSource": "solid-js",
 		"types": ["vite/client"]
 	},
-	"references": [
-		{
-			"path": "../../app"
-		}
-	],
 	"include": ["src/**/*", "*.ts"]
 }

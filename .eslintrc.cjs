@@ -1,7 +1,6 @@
 const path = require('path')
 
 const project = [
-	'./tsconfig.json',
 	path.join(__dirname, 'app/tsconfig.json'),
 	path.join(__dirname, 'app-ugc/tsconfig.json'),
 	path.join(__dirname, 'hub/tsconfig.json'),

@@ -24,9 +24,4 @@
 	"ts-node": {
 		"esm": true
 	},
-	"references": [
-		{
-			"path": "../shared"
-		}
-	]
 }

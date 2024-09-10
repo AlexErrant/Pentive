@@ -15,13 +15,5 @@
 		"lib": ["WebWorker", "DOM", "DOM.Iterable", "ES2022"],
 		"types": ["@cloudflare/workers-types", "vite/client"]
 	},
-	"references": [
-		{
-			"path": "../hub"
-		},
-		{
-			"path": "../shared"
-		}
-	],
 	"include": ["src/**/*", "*.ts"]
 }

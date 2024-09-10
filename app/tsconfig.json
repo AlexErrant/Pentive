@@ -17,26 +17,6 @@
 		"declaration": true,
 		"outDir": "lib"
 	},
-	"references": [
-		{
-			"path": "../api-ugc"
-		},
-		{
-			"path": "../cwa"
-		},
-		{
-			"path": "../lrpc"
-		},
-		{
-			"path": "../shared"
-		},
-		{
-			"path": "../shared-dom"
-		},
-		{
-			"path": "../shared-edge"
-		}
-	],
 	"exclude": ["lib", "dist"],
 	"include": ["src/**/*", "tests/**/*", "tests-examples/**/*", "*.ts"]
 }

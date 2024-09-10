@@ -15,10 +15,5 @@
 		"outDir": "lib",
 		"lib": ["ES2022"]
 	},
-	"references": [
-		{
-			"path": "../shared"
-		}
-	],
 	"include": ["src/**/*"]
 }
