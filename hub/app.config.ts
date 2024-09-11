@@ -12,6 +12,7 @@ export default defineConfig({
 			key: './.cert/key.pem',
 			cert: './.cert/cert.pem',
 		},
+		// analyze: { filename: 'visualizeBundle.html' },
 	},
 	vite: () => {
 		return {

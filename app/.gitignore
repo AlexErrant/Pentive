@@ -13,3 +13,4 @@ src/assets/sql-wasm.wasm
 public/assets/solid*.js
 public/assets/solidWeb*.js
 public/assets/solidRouter*.js
+visualizeBundle.html

@@ -33,3 +33,4 @@ wrangler.toml
 .env.production.local
 .cert
 .dev.vars
+visualizeBundle.html
