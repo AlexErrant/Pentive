@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import type { PluginVersion, PluginName } from 'shared'
-import { TarReader } from './tar.js'
+import { TarReader } from './tar'
 import { throwExp } from 'shared'
 
 export interface Plugin {

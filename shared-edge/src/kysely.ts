@@ -11,7 +11,7 @@ import {
 	type ExpressionBuilder,
 } from 'kysely'
 import { LibsqlDialect } from '@libsql/kysely-libsql'
-import { type Note, type DB, type Template } from './dbSchema.js'
+import { type Note, type DB, type Template } from './dbSchema'
 import {
 	type Base64,
 	type Base64Url,
@@ -36,11 +36,11 @@ import {
 	ftsNormalize,
 	type MediaHash,
 } from 'shared'
-import { binary16fromBase64URL, ulidAsHex, ulidAsRaw } from './convertBinary.js'
+import { binary16fromBase64URL, ulidAsHex, ulidAsRaw } from './convertBinary'
 import { nullMap, parseMap, stringifyMap, throwExp, undefinedMap } from 'shared'
 import { base16, base64, base64url } from '@scure/base'
 import { createClient } from '@libsql/client/web'
-import { base64ToArray } from './utility.js'
+import { base64ToArray } from './utility'
 export type * from 'kysely'
 
 // @ts-expect-error db calls should throw null error if not setup

@@ -3,8 +3,8 @@ import {
 	type RemoteTemplateId,
 	type TemplateId,
 	type NookId,
-} from '../brand.js'
-import { type TemplateType } from '../schema.js'
+} from '../brand'
+import { type TemplateType } from '../schema'
 
 export interface Field {
 	name: string

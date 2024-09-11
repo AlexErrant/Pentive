@@ -4,9 +4,9 @@
 import { awsLambdaRequestHandler } from '@trpc/server/adapters/aws-lambda'
 import type { CreateAWSLambdaContextOptions } from '@trpc/server/adapters/aws-lambda'
 import type { APIGatewayProxyEventV2 } from 'aws-lambda'
-import { appRouter } from './appRouter.js'
-import { getUser } from './core.js'
-import { type Context } from './trpc.js'
+import { appRouter } from './appRouter'
+import { getUser } from './core'
+import { type Context } from './trpc'
 
 // highTODO https://github.com/trpc/trpc/discussions/2371
 

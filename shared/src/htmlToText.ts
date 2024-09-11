@@ -1,5 +1,5 @@
 import { compile } from 'html-to-text'
-import { caseFold } from './caseFold.js'
+import { caseFold } from './caseFold'
 
 const ftsNormalizeHelper = compile({
 	selectors: [

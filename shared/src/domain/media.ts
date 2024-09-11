@@ -1,4 +1,4 @@
-import { type MediaId } from '../brand.js'
+import { type MediaId } from '../brand'
 
 export interface Media {
 	id: MediaId

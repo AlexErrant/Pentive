@@ -4,7 +4,7 @@ import {
 	defaultRenderContainer,
 	type RenderContainer,
 	type RenderPluginExports,
-} from './renderContainer.js'
+} from './renderContainer'
 
 // https://stackoverflow.com/a/18650249
 export async function blobToBase64(blob: Blob): Promise<string> {

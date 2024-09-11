@@ -1,12 +1,12 @@
 import { isEqual, uniqWith } from 'lodash-es'
-import { getClozeFields } from './language/template2clozeFields.js'
+import { getClozeFields } from './language/template2clozeFields'
 import {
 	type Error,
 	type Warning,
 	convert,
 	validate,
-} from './language/template2html.js'
-import type { RenderContainer } from './renderContainer.js'
+} from './language/template2html'
+import type { RenderContainer } from './renderContainer'
 import {
 	type NoteId,
 	type TemplateId,

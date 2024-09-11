@@ -2,11 +2,11 @@
 // @ts-nocheck medTODO needs rearchitecturing. Do we need AWS?
 
 import { z } from 'zod'
-import { authedProcedure, publicProcedure, router } from './trpc.js'
+import { authedProcedure, publicProcedure, router } from './trpc'
 import aio from '@vlcn.io/crsqlite-allinone'
 import { initSql } from 'shared'
 import { stringify as uuidStringify } from 'uuid'
-import { wholeDbReplicatorSync } from './wholeDbReplicatorSync.js'
+import { wholeDbReplicatorSync } from './wholeDbReplicatorSync'
 
 const tableName = z.string()
 const quoteConcatedPKs = z.string().or(z.number())

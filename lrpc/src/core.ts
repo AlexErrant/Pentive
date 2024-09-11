@@ -1,5 +1,5 @@
 import { jwtVerify } from 'jose'
-import { hubSessionSecret } from './config.js'
+import { hubSessionSecret } from './config'
 import { parse } from 'cookie-es'
 import { csrfHeaderName, hubSessionCookieName } from 'shared'
 import { type IncomingHttpHeaders } from 'http'

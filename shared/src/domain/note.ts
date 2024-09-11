@@ -3,7 +3,7 @@ import {
 	type RemoteNoteId,
 	type TemplateId,
 	type NoteId,
-} from '../brand.js'
+} from '../brand'
 
 export interface Note {
 	id: NoteId

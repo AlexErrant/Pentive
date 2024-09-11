@@ -12,7 +12,7 @@ import {
 	rawQuoted2Close,
 	rawHtmlClose,
 } from './query.tokens'
-import { queryHighlighting } from './query.highlight.js'
+import { queryHighlighting } from './query.highlight'
 const spec_SimpleString = {
 	__proto__: null,
 	tag: 97,

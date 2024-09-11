@@ -5,15 +5,15 @@ import WDB, {
 	type SiteIDLocal,
 	type SiteIDWire,
 	type WholeDbReplicator,
-} from './wholeDbReplicator.js'
+} from './wholeDbReplicator'
 import { type DBAsync } from '@vlcn.io/xplat-api'
 import Peer, { type PeerJSOption, type DataConnection } from 'peerjs'
 import { untrack } from 'solid-js/web'
 import { stringify as uuidStringify } from 'uuid'
-import { cwaClient } from '../trpcClient.js'
+import { cwaClient } from '../trpcClient'
 import { type JWTVerifyResult, jwtVerify, importSPKI } from 'jose'
-import { alg } from 'cwa/src/peerSync.js'
-import { C, whoAmI } from '../topLevelAwait.js'
+import { alg } from 'cwa/src/peerSync'
+import { C, whoAmI } from '../topLevelAwait'
 
 type Msg = PokeMsg | ChangesMsg | RequestChangesMsg
 /**

@@ -3,7 +3,7 @@ import {
 	type NoteId,
 	type Ord,
 	type CardSettingId,
-} from '../brand.js'
+} from '../brand'
 import { type Note } from './note'
 import { type Template } from './template'
 

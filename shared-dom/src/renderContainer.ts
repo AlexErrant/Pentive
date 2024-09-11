@@ -6,14 +6,14 @@ import {
 	transformers,
 	noteOrds,
 	templateIndexes,
-} from './cardHtml.js'
+} from './cardHtml'
 import {
 	toastError,
 	toastFatal,
 	toastImpossible,
 	toastInfo,
 	toastWarn,
-} from './toasts.jsx'
+} from './toasts'
 
 export const defaultRenderContainer = {
 	transformers,

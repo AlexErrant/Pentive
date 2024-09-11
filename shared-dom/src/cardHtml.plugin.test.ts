@@ -8,10 +8,10 @@ import {
 	type PluginVersion,
 	type Template,
 } from 'shared'
-import { type Plugin } from './plugin.js'
-import { registerPluginServices } from './pluginManager.js'
+import { type Plugin } from './plugin'
+import { registerPluginServices } from './pluginManager'
 import { strip } from './cardHtml'
-import { getOk } from './cardHtml.test.js'
+import { getOk } from './cardHtml.test'
 
 function expectStrippedToBe(html: string, expected: string): void {
 	const newline = /[\r\n]/g
