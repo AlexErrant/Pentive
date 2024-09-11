@@ -115,6 +115,9 @@ importers:
       '@cloudflare/workers-types':
         specifier: ^4.20240725.0
         version: 4.20240725.0
+      config:
+        specifier: workspace:*
+        version: link:../config
       eslint:
         specifier: ^8.57.0
         version: 8.57.0
@@ -377,6 +380,9 @@ importers:
       better-sqlite3:
         specifier: ^8.6.0
         version: 8.6.0
+      config:
+        specifier: workspace:*
+        version: link:../config
       eslint:
         specifier: ^8.57.0
         version: 8.57.0
@@ -510,6 +516,9 @@ importers:
       '@typescript-eslint/parser':
         specifier: ^6.21.0
         version: 6.21.0(eslint@8.57.0)(typescript@5.4.5)
+      config:
+        specifier: workspace:*
+        version: link:../config
       eslint:
         specifier: ^8.57.0
         version: 8.57.0
@@ -568,6 +577,8 @@ importers:
         specifier: ^3.72.2
         version: 3.72.2(@cloudflare/workers-types@4.20240725.0)
 
+  config: {}
+
   cwa:
     dependencies:
       '@planetscale/database':
@@ -604,6 +615,9 @@ importers:
       '@cloudflare/workers-types':
         specifier: ^4.20240725.0
         version: 4.20240725.0
+      config:
+        specifier: workspace:*
+        version: link:../config
       eslint:
         specifier: ^8.57.0
         version: 8.57.0
@@ -626,6 +640,9 @@ importers:
       '@solidjs/router':
         specifier: ^0.14.1
         version: 0.14.1(solid-js@1.8.18)
+      config:
+        specifier: workspace:*
+        version: link:../../config
       eslint:
         specifier: ^8.57.0
         version: 8.57.0
@@ -654,6 +671,9 @@ importers:
       '@tsconfig/svelte':
         specifier: ^3.0.0
         version: 3.0.0
+      config:
+        specifier: workspace:*
+        version: link:../../config
       eslint:
         specifier: ^8.57.0
         version: 8.57.0
@@ -799,6 +819,9 @@ importers:
       autoprefixer:
         specifier: ^10.4.16
         version: 10.4.16(postcss@8.4.45)
+      config:
+        specifier: workspace:*
+        version: link:../config
       eslint:
         specifier: ^8.57.0
         version: 8.57.0
@@ -902,6 +925,9 @@ importers:
       '@typescript-eslint/parser':
         specifier: ^6.21.0
         version: 6.21.0(eslint@8.57.0)(typescript@5.4.5)
+      config:
+        specifier: workspace:*
+        version: link:../config
       eslint:
         specifier: ^8.57.0
         version: 8.57.0
@@ -1026,6 +1052,9 @@ importers:
       '@types/uuid':
         specifier: ^9.0.4
         version: 9.0.4
+      config:
+        specifier: workspace:*
+        version: link:../config
       eslint:
         specifier: ^8.57.0
         version: 8.57.0
@@ -1066,6 +1095,9 @@ importers:
       '@types/node':
         specifier: 20.14.11
         version: 20.14.11
+      config:
+        specifier: workspace:*
+        version: link:../config
       eslint:
         specifier: ^8.57.0
         version: 8.57.0
@@ -1160,6 +1192,9 @@ importers:
       '@scure/base':
         specifier: ^1.1.1
         version: 1.1.1
+      config:
+        specifier: workspace:*
+        version: link:../config
       html-to-text:
         specifier: ^9.0.5
         version: 9.0.5
@@ -1321,6 +1356,9 @@ importers:
       '@vlcn.io/xplat-api':
         specifier: 0.11.0
         version: 0.11.0
+      config:
+        specifier: workspace:*
+        version: link:../config
       eslint:
         specifier: ^8.57.0
         version: 8.57.0
@@ -1403,6 +1441,9 @@ importers:
       '@typescript-eslint/parser':
         specifier: ^6.21.0
         version: 6.21.0(eslint@8.57.0)(typescript@5.4.5)
+      config:
+        specifier: workspace:*
+        version: link:../config
       eslint:
         specifier: ^8.57.0
         version: 8.57.0

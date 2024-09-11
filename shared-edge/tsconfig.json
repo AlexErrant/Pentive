@@ -1,18 +1,24 @@
 {
-	"extends": "../tsconfig.options.json",
+	"extends": "config/tsconfig.json",
 	"compilerOptions": {
 		"strict": true,
 		"target": "ES2022",
 		"module": "ESNext",
 		"moduleResolution": "bundler",
-		"types": ["@cloudflare/workers-types"],
+		"types": [
+			"@cloudflare/workers-types"
+		],
 		"allowSyntheticDefaultImports": true,
 		"esModuleInterop": true,
 		"forceConsistentCasingInFileNames": true,
 		"skipLibCheck": true,
 		"declaration": true,
 		"outDir": "lib",
-		"lib": ["ES2022"]
+		"lib": [
+			"ES2022"
+		]
 	},
-	"include": ["src/**/*"]
+	"include": [
+		"src/**/*"
+	]
 }

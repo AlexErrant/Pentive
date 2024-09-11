@@ -42,6 +42,7 @@
 		"@typescript-eslint/parser": "^6.21.0",
 		"autoprefixer": "^10.4.16",
 		"better-sqlite3": "^8.6.0",
+		"config": "workspace:*",
 		"eslint": "^8.57.0",
 		"eslint-config-prettier": "^9.1.0",
 		"eslint-config-standard-with-typescript": "^39.1.1",

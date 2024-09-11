@@ -1,5 +1,5 @@
 {
-	"extends": "../tsconfig.options.json",
+	"extends": "config/tsconfig.json",
 	"compilerOptions": {
 		"outDir": "lib",
 		"allowSyntheticDefaultImports": true,

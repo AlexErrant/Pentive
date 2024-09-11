@@ -24,6 +24,7 @@
 	"license": "MIT",
 	"devDependencies": {
 		"@solidjs/router": "^0.14.1",
+		"config": "workspace:*",
 		"eslint": "^8.57.0",
 		"typescript": "~5.4.5",
 		"vite": "^5.4.3",

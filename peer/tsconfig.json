@@ -1,5 +1,5 @@
 {
-	"extends": "../tsconfig.options.json",
+	"extends": "config/tsconfig.json",
 	"compilerOptions": {
 		"emitDeclarationOnly": false,
 		"noEmit": true,
@@ -11,10 +11,14 @@
 		"esModuleInterop": true,
 		"forceConsistentCasingInFileNames": true,
 		"skipLibCheck": true,
-		"types": ["node"]
+		"types": [
+			"node"
+		]
 	},
 	"ts-node": {
 		"esm": true
 	},
-	"include": ["server.ts"]
+	"include": [
+		"server.ts"
+	]
 }

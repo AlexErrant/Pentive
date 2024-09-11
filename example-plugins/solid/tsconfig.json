@@ -1,5 +1,5 @@
 {
-	"extends": "../../tsconfig.options.json",
+	"extends": "config/tsconfig.json",
 	"compilerOptions": {
 		"emitDeclarationOnly": false,
 		"noEmit": true,
@@ -13,7 +13,12 @@
 		"skipLibCheck": true,
 		"jsx": "preserve",
 		"jsxImportSource": "solid-js",
-		"types": ["vite/client"]
+		"types": [
+			"vite/client"
+		]
 	},
-	"include": ["src/**/*", "*.ts"]
+	"include": [
+		"src/**/*",
+		"*.ts"
+	]
 }

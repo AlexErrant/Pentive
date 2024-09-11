@@ -1,6 +1,7 @@
 packages:
   - 'app/'
   - 'app-ugc/'
+  - 'config/'
   - 'hub/'
   - 'hub-ugc/'
   - 'lrpc/'

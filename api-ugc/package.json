@@ -5,6 +5,7 @@
 	"sideEffects": false,
 	"devDependencies": {
 		"@cloudflare/workers-types": "^4.20240725.0",
+		"config": "workspace:*",
 		"eslint": "^8.57.0",
 		"typescript": "~5.4.5",
 		"wrangler": "^3.72.2"
