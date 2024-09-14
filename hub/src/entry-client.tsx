@@ -1,6 +1,6 @@
 // @refresh reload
 import { mount, StartClient } from '@solidjs/start/client'
-import type { appExpose } from 'app/src/hubMessenger'
+import type { appExpose } from 'app/hubMessenger'
 import * as Comlink from 'comlink'
 import { throwExp } from 'shared'
 

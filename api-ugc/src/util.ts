@@ -1,4 +1,5 @@
 import { type Context } from 'hono'
+import { type R2Bucket } from '@cloudflare/workers-types'
 
 export type ApiUgcContext = Context<{
 	// eslint-disable-next-line @typescript-eslint/naming-convention

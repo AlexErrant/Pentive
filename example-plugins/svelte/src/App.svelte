@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { NavLinkData } from "app/lib/src/components/contracts"
+  import type { NavLinkData } from "app/components/contracts"
   import NavItem from "./NavItem.svelte"
   export let navLinks: NavLinkData[]
 </script>

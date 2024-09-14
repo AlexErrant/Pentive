@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { NavLinkData } from "app/lib/src/components/contracts"
+  import type { NavLinkData } from "app/components/contracts"
   import type { Accessor } from "solid-js"
   import { Dynamic } from "solid-js/web"
   import { A } from "@solidjs/router"

@@ -1,4 +1,4 @@
-import type { Container, PluginExports } from 'app/lib/src/services'
+import type { Container, PluginExports } from 'app/services'
 import App from './App.svelte'
 import { createEffect, type Setter, type VoidComponent } from 'solid-js'
 import ExamplePlugin from './ExamplePlugin.svelte'

@@ -1,7 +1,7 @@
 import { type getTemplates } from 'shared-edge'
 import { getAppMessenger } from '~/entry-client'
 import { unwrap } from 'solid-js/store'
-import { cwaClient } from 'app/src/trpcClient'
+import { cwaClient } from 'app/trpcClient'
 import { type Component } from 'solid-js'
 
 type Template = Awaited<ReturnType<typeof getTemplates>>[0]

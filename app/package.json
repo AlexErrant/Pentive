@@ -144,5 +144,27 @@
 		"superjson": "^1.13.3",
 		"uuid": "^9.0.1",
 		"zod": ">=3.22.3"
+	},
+	"exports": {
+		"./services": {
+			"types": "./src/services.ts",
+			"default": "./lib/src/services.js"
+		},
+		"./components/resizingIframe": {
+			"types": "./src/components/resizingIframe.tsx",
+			"default": "./lib/src/components/resizingIframe.jsx"
+		},
+		"./components/contracts": {
+			"types": "./src/components/contracts.ts",
+			"default": "./lib/src/components/contracts.js"
+		},
+		"./hubMessenger": {
+			"types": "./src/hubMessenger.ts",
+			"default": "./lib/src/hubMessenger.js"
+		},
+		"./trpcClient": {
+			"types": "./src/trpcClient.ts",
+			"default": "./lib/src/trpcClient.js"
+		}
 	}
 }

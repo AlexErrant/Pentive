@@ -14,8 +14,6 @@ import {
 	subscribeToTemplate,
 	insertTemplateChildComment,
 } from 'shared-edge'
-// eslint-disable-next-line @typescript-eslint/no-unused-vars -- needed for the emitted types
-import type * as edge from 'shared-edge'
 
 // When writing a `procedure.query`, ensure it doesn't return HTML!
 // That code belongs in api-ugc

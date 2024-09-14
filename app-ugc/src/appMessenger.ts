@@ -1,5 +1,5 @@
 import * as Comlink from 'comlink'
-import type { AppExpose } from 'app/src/components/resizingIframe'
+import type { AppExpose } from 'app/components/resizingIframe'
 
 export let appMessenger = Comlink.wrap<AppExpose>(
 	Comlink.windowEndpoint(self.parent),

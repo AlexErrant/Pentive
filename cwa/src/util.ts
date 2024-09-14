@@ -1,5 +1,6 @@
 import { type Context } from 'hono'
 import { type MediaTokenSecretBase64 } from './privateToken'
+import { type R2Bucket } from '@cloudflare/workers-types'
 
 export type CwaContext = Context<{
 	// eslint-disable-next-line @typescript-eslint/naming-convention

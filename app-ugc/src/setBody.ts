@@ -3,7 +3,7 @@ import { setAppMessengerPort } from './appMessenger'
 import {
 	type ComlinkInit,
 	type RawRenderBodyInput,
-} from 'app/src/components/resizingIframe'
+} from 'app/components/resizingIframe'
 import { resizeIframe } from './registerServiceWorker'
 import diff from 'micromorph'
 
