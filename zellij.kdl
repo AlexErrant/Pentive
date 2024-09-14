@@ -16,8 +16,8 @@ layout {
             }
             pane {
               name "tsc"
-              command "npx"
-              args "tsc" "--watch"
+              command "pnpm"
+              args "tsc-watch"
             }
         }
         pane split_direction="horizontal" {

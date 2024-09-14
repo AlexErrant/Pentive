@@ -44,6 +44,7 @@
 		"test": "turbo test",
 		"test:run": "turbo test:run",
 		"tsc-build": "turbo tsc-build",
+		"tsc-watch": "cd dev && npx tsc --build --watch",
 		"tsc-clean": "rm -rf **/tsconfig.tsbuildinfo",
 		"//ci": "simulate cicd locally",
 		"ci": "git clean -xdf && ./mkenv.sh && ./rmcert.sh && ./mkcert.sh && pnpm i && npx turbo run tsc-build eslint check test:run build && ./initIvy.sh",

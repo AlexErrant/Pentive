@@ -1,0 +1,54 @@
+// This file is used by `npx tsc --build --watch`
+// I go against the advice of Turborepo here https://github.com/microsoft/TypeScript/issues/53116#issuecomment-1868601842
+// and use projects for dev mode because running umpteen tsc processes leads to multiple logs for the same error.
+// Also it's difficult to know when all the projects have finished typechecking, while it's obvious with just one tsc.
+// This is in the /dev folder because "any changes in the Workspace root will cause all tasks to miss cache". https://turbo.build/repo/docs/guides/tools/typescript#you-likely-dont-need-a-tsconfigjson-file-in-the-root-of-your-project
+{
+	"extends": "../config/tsconfig.json",
+	"files": [],
+	"references": [
+		{
+			"path": "../app"
+		},
+		{
+			"path": "../app-ugc"
+		},
+		{
+			"path": "../hub"
+		},
+		{
+			"path": "../hub-ugc"
+		},
+		{
+			"path": "../lrpc"
+		},
+		{
+			"path": "../shared"
+		},
+		{
+			"path": "../shared-dom"
+		},
+		{
+			"path": "../shared-edge"
+		},
+		{
+			"path": "../cwa"
+		},
+		{
+			"path": "../api-ugc"
+		},
+		{
+			"path": "../peer"
+		},
+		{
+			"path": "../example-plugins/solid"
+		},
+		{
+			"path": "../example-plugins/svelte"
+		},
+		{
+			"path": "../prosemirror-image-plugin"
+		}
+		// if adding or removing a project, also update the `./eslintrc.cjs`!
+	]
+}
