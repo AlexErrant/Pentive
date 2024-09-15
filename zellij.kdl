@@ -29,8 +29,8 @@ layout {
             pane {
               name "api-ugc"
               cwd "api-ugc"
-              command "bash"
-              args "-c" "echo '[b open a browser,[d] open Devtools,[l] turn off local mode[c] clear console,[x] to exit' && pnpm dev --show-interactive-dev-session false"
+              command "pnpm"
+              args "dev" "--show-interactive-dev-session" "false"
             }
             pane split_direction="vertical" {
                 pane {
@@ -49,8 +49,8 @@ layout {
             pane {
               name "cwa"
               cwd "cwa"
-              command "bash"
-              args "-c" "echo '[b open a browser,[d] open Devtools,[l] turn off local mode[c] clear console,[x] to exit' && pnpm dev --show-interactive-dev-session false"
+              command "pnpm"
+              args "dev" "--show-interactive-dev-session" "false"
             }
         }
     }
