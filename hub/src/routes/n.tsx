@@ -1,8 +1,7 @@
 import { type NookId } from 'shared'
 import { getNook } from 'shared-edge'
-import { Show, type VoidComponent } from 'solid-js'
+import { For, Show, type VoidComponent } from 'solid-js'
 import {
-	A,
 	cache,
 	createAsync,
 	type RouteDefinition,
@@ -51,12 +50,25 @@ const Sidebar: VoidComponent<{
 		<Show when={props.nookDetails}>
 			{(nd) => (
 				<>
-					<h1 class='text-lg font-bold'>/n/{props.nook}</h1>
-					<A href={`/n/${props.nook}/templates`}>Templates</A>
+					<a href={`/n/${props.nook}`} class='block text-lg font-bold'>
+						/n/{props.nook}
+					</a>
+					<a href={`/n/${props.nook}/templates`}>Templates</a>
 					<div>
 						Est. <RelativeDate date={nd().created} />
 					</div>
-					<div>mods:{nd().moderators}</div>
+					<div>
+						mods:
+						<ol>
+							<For each={nd().moderators}>
+								{(mod) => (
+									<li>
+										<a href={`/u/${mod}`}>{mod}</a>
+									</li>
+								)}
+							</For>
+						</ol>
+					</div>
 				</>
 			)}
 		</Show>
