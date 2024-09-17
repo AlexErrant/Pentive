@@ -2,7 +2,7 @@
 // of normalization. I'm not 100% sure this is the correct move, but whatever. grep 7D669B43-CEA7-45E6-AB82-D2B18C20D633
 // https://github.com/node-unicode/unicode-15.1.0/blob/main/Binary_Property/Changes_When_Casefolded/regex.js
 const changesWhenCasefolded =
-	// I'm intentionlly ignoring Unicode character class escape /\p{Changes_When_Casefolded}/ https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Regular_expressions/Unicode_character_class_escape
+	// I'm intentionally ignoring Unicode character class escape /\p{Changes_When_Casefolded}/ https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Regular_expressions/Unicode_character_class_escape
 	// since "full" case folding may change the number of characters, and I think I need the `v` flag for that https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/unicodeSets
 	// That flag has mediocre browser support https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/unicodeSets
 	// eslint-disable-next-line no-misleading-character-class

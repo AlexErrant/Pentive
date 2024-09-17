@@ -1,5 +1,5 @@
 /* eslint-disable */
-// @ts-nocheck medTODO needs rearchitecturing. Do we need AWS?
+// @ts-nocheck medTODO needs rearchitecting. Do we need AWS?
 
 import { z } from 'zod'
 import { authedProcedure, publicProcedure, router } from './trpc'

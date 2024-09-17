@@ -2,6 +2,7 @@ import { sql } from 'kysely'
 import { type UserId, type PeerJsId, type PeerDisplayName } from 'shared'
 import { db } from './kysely'
 
+// cSpell:ignore IFNULL
 export async function setUserPeer(
 	userId: UserId,
 	peerId: PeerJsId,

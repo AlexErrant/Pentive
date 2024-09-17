@@ -13,7 +13,7 @@
 		"format:check": "prettier --ignore-path .gitignore --check .",
 		"format": "prettier --ignore-path .gitignore --write .",
 		"stylelint": "stylelint **/*.css",
-		"stylelintw": "stylelint **/*.css --fix"
+		"stylelint:write": "stylelint **/*.css --fix"
 	},
 	"type": "module",
 	"sideEffects": false,

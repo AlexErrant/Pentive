@@ -84,6 +84,7 @@ export function md5(inputString: string) {
 	) {
 		return cm(c ^ (b | ~d), a, b, x, s, t)
 	}
+	// cSpell:disable
 	function sb(x: string) {
 		let i
 		const nblk = ((x.length + 8) >> 6) + 1

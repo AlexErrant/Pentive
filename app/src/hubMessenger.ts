@@ -153,7 +153,7 @@ async function downloadImages(imgSrcs: Map<MediaId, string>) {
 				})
 			} else {
 				return C.toastFatal(
-					`Error occured while downloading ${imgSrc}.`,
+					`Error occurred while downloading ${imgSrc}.`,
 					`Fetching ${imgSrc} got a status code of ${response.status}`,
 					response,
 				)

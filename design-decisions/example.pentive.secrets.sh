@@ -36,11 +36,13 @@ export productionGithubId=
 export developmentGithubSecret=
 export productionGithubSecret=
 
+# cSpell:disable
 # generate via:
 #     openssl ecparam -name secp521r1 -genkey -noout -out private.ec.key
 #     openssl pkcs8 -topk8 -nocrypt -in private.ec.key -out private.pem
 #     openssl ec -in private.pem -pubout -out public.pem
 # use public.pem and private.pem
+# cSpell:enable
 export developmentPeerSyncPublicKey="-----BEGIN PUBLIC KEY-----
 foo
 -----END PUBLIC KEY-----"

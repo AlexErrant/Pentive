@@ -4,11 +4,13 @@
 	"dictionaryDefinitions": [
 		{
 			"name": "importer",
-			"path": "./importer.txt"
+			"path": "./importer.txt",
+			"addWords": true
 		},
 		{
 			"name": "dictionary",
-			"path": "../../../../.vscode/dictionary.txt"
+			"path": "../../../../.vscode/dictionary.txt",
+			"addWords": true
 		}
 	],
 	"dictionaries": ["importer", "dictionary"]

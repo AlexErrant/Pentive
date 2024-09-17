@@ -64,7 +64,7 @@ function expectTemplate(
 
 test('renderTemplate works with plugin that requires `edit` syntax', async () => {
 	const pluginText = await readFile(
-		path.join(__dirname, '..', 'lib', 'src', 'cardHtml.plugin.testinput.js'),
+		path.join(__dirname, '..', 'lib', 'src', 'cardHtml.plugin.testInput.js'),
 		'utf8',
 	)
 	const plugin = buildPlugin(
@@ -83,7 +83,7 @@ test('renderTemplate works with plugin that requires `edit` syntax', async () =>
 
 test('renderTemplate works with plugin that requires `.bind(this)` because it indirectly calls its custom `edit` syntax', async () => {
 	const pluginText = await readFile(
-		path.join(__dirname, '..', 'lib', 'src', 'cardHtml.plugin.testinput.js'),
+		path.join(__dirname, '..', 'lib', 'src', 'cardHtml.plugin.testInput.js'),
 		'utf8',
 	)
 	const plugin = buildPlugin(pluginText)
@@ -100,7 +100,7 @@ test('renderTemplate works with plugin that requires `.bind(this)` because it in
 
 test('[EDITABLE] is missing since no `bind(this)`', async () => {
 	const pluginText = await readFile(
-		path.join(__dirname, '..', 'lib', 'src', 'cardHtml.plugin.testinput.js'),
+		path.join(__dirname, '..', 'lib', 'src', 'cardHtml.plugin.testInput.js'),
 		'utf8',
 	)
 	const plugin = buildPlugin(pluginText.replace('.bind(this)', ''))

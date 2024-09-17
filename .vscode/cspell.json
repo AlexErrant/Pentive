@@ -4,8 +4,19 @@
 	"dictionaryDefinitions": [
 		{
 			"name": "dictionary",
-			"path": "./dictionary.txt"
+			"path": "./dictionary.txt",
+			"addWords": true
 		}
 	],
-	"dictionaries": ["dictionary"]
+	"dictionaries": ["dictionary"],
+	"ignorePaths": [
+		"node_modules/**",
+		"**/dist/**",
+		"**/lib/**",
+		"tsconfig.tsbuildinfo",
+		"pnpm-lock.yaml",
+		"*.excalidraw",
+		"prosemirror-image-plugin/**",
+		"**/public/assets/*"
+	]
 }

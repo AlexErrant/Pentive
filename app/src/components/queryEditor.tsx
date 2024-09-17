@@ -59,8 +59,8 @@ let view: EditorView
 const QueryEditor: VoidComponent<{
 	value: string
 	setValue: (value: string) => void
-	// This exists so exernal callers can set the value.
-	// We usually ignore changes to `value` to prevent unecessary `view.setState` calls
+	// This exists so external callers can set the value.
+	// We usually ignore changes to `value` to prevent unnecessary `view.setState` calls
 	externalValue: string
 }> = (props) => {
 	let ref: HTMLDivElement | undefined
@@ -120,7 +120,7 @@ const basicSetup = [
 				lastChar === '<' ||
 				isDateValuedLabel(x) ||
 				isNumberValuedLabel(x) ||
-				type === 'uglyhack' // grep 3D3FADF2-7338-49F8-9CAF-9CBC2E9C5137
+				type === 'uglyHack' // grep 3D3FADF2-7338-49F8-9CAF-9CBC2E9C5137
 			)
 		},
 	}),
@@ -290,11 +290,11 @@ function getTooltip(state: EditorState): readonly Tooltip[] {
 			}
 			if (inLabels(nodeBefore, dateValuedLabels)) {
 				const firstChar = state.sliceDoc(nodeBefore.from, nodeBefore.from + 1)
-				const threeSibslingsBefore =
+				const threeSiblingsBefore =
 					nodeBefore.prevSibling?.prevSibling?.prevSibling?.type.name
 				const isRatingEum =
-					threeSibslingsBefore === firstReviewed ||
-					threeSibslingsBefore === reviewed
+					threeSiblingsBefore === firstReviewed ||
+					threeSiblingsBefore === reviewed
 				const textContent =
 					firstChar === '<'
 						? isRatingEum

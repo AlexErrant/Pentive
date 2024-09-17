@@ -52,10 +52,11 @@ interface SearchText {
 }
 const segmenter = new Intl.Segmenter(undefined, { granularity: 'word' })
 
+// cSpell:ignore fvhs imsx mindfuck
 const regexCtor = (fvhs: FieldValueHighlight[] | undefined, global?: true) => {
 	if (fvhs == null || fvhs.length === 0) return null
 	return new RegExp(
-		fvhs.map((fvh) => fvh.pattern).join('|'), // pipe has lowest prescedence so this *should* work
+		fvhs.map((fvh) => fvh.pattern).join('|'), // pipe has lowest precedence so this *should* work
 		// The `g` flag introduces state to methods like `test` which WILL mindfuck you.
 		// Only `regex()` needs `g` for `matchAll`, but be forewarned in case you make changes.
 		unique(fvhs.map((x) => x.flags).join('') + (global ? 'g' : '')), // regex flag 31C731B0-41F5-46A5-93B4-D00D9A6064EA
@@ -413,6 +414,7 @@ const dataSource = {
 			.then(async (x) => {
 				const end = performance.now()
 				console.log(`GetCards ${end - start} ms`, cleanedQuery)
+				// cSpell:ignore countish
 				const countish = x.noteCards.length
 				const countishWrong = countish === cacheBlockSize
 				p.successCallback(

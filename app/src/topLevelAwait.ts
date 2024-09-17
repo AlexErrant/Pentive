@@ -38,6 +38,7 @@ export const [whoAmI] = createResource(async () => {
 	return r?.tag === 'Ok' ? r.ok : undefined
 })
 
+// cSpell:ignore initted
 let isInitted = false
 export async function initFsrsTrainThreadPool() {
 	if (!isInitted) {

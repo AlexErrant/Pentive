@@ -114,7 +114,7 @@ const FieldValue: VoidComponent<{
 				<Show when={isOpen()}>
 					<ToggleButton.Root
 						class='h-5 w-5 rounded-md focus-visible:outline-offset-1'
-						aria-label='code and wysiswg toggle'
+						aria-label='code and wysiwyg toggle'
 						pressed={isDev()}
 						onChange={setDev}
 					>

@@ -98,7 +98,7 @@ type OnConflictUpdateNoteValueSet = {
 	) => unknown
 }
 
-// eslint-disable-next-line @typescript-eslint/consistent-type-definitions -- interface deesn't work with `withTables`
+// eslint-disable-next-line @typescript-eslint/consistent-type-definitions -- interface doesn't work with `withTables`
 type NoteFieldValueRowid = {
 	// I'm not adding rowid to the official type definition because it adds noise to Insert/Update/Conflict resolution types
 	noteFieldValue: NoteFieldValue & { rowid: number }

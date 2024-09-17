@@ -236,6 +236,7 @@ describe('regex', () => {
 		)
 	})
 
+	// cSpell:ignore suuvvyys suvy
 	test('flags are deduped', async () => {
 		await assertEqual(
 			String.raw`/foo/suuvvyys`,
@@ -247,7 +248,7 @@ describe('regex', () => {
 		)
 	})
 
-	test('two are anded', async () => {
+	test('two regexes are ANDed', async () => {
 		await assertEqual(
 			String.raw`/foo/ /bar/`,
 			String.raw`x1.z IS NOT NULL AND x2.z IS NOT NULL`,

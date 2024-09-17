@@ -18,7 +18,7 @@
 		"format:check": "prettier --ignore-path .gitignore --check .",
 		"format": "prettier --ignore-path .gitignore --write .",
 		"stylelint": "stylelint **/*.css",
-		"stylelintw": "stylelint **/*.css --fix",
+		"stylelint:write": "stylelint **/*.css --fix",
 		"test": "vitest",
 		"test:ui": "vitest --ui",
 		"test:run": "vitest run",

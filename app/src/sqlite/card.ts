@@ -133,7 +133,7 @@ type JoinFts = typeof joinFtsConst
 const searchCacheConst = 'searchCache' as const
 type SearchCache = typeof searchCacheConst
 
-// eslint-disable-next-line @typescript-eslint/consistent-type-definitions -- interface deesn't work with `withTables`
+// eslint-disable-next-line @typescript-eslint/consistent-type-definitions -- interface doesn't work with `withTables`
 type WithCache = {
 	[joinFtsConst]: Record<string, never>
 	[searchCacheConst]: {
@@ -156,7 +156,7 @@ type WithCache = {
 
 // We cache the query's `card.id`s in a temp table. We use the temp table's rowids as a hack to get cursor pagination.
 // We use `PRAGMA temp_store=MEMORY;` despite a lack of perf improvement because... well, there *should* be better perf.
-// Doing 10 runs of alternating `FILE`/`MEMORY` showed no significant advantage to `MEMORY` (techncially a 2ms average improvement, which is just noise.)
+// Doing 10 runs of alternating `FILE`/`MEMORY` showed no significant advantage to `MEMORY` (technically a 2ms average improvement, which is just noise.)
 // Grep 2790D3E0-F98B-4A95-8910-AC3E87F4F2D3
 //
 // medTODO Consider building the cache upon first OFFSET != 0, instead of after the initial load.
@@ -238,7 +238,7 @@ async function getCards(
 		db1: QueryCreator<DB & WithCache & CardTagRowid & NoteTagRowid> = db,
 	) => {
 		// `cardWithTagCount` and `noteWithTagCount` exist because `join`ing in the tag table (like further below) forces us to use `HAVING` (instead of `WHERE`).
-		// A separate `HAVING` clause screws up our nonexistant boolean logic, since we use SQLite's query engine/`WHERE` for that.
+		// A separate `HAVING` clause screws up our nonexistent boolean logic, since we use SQLite's query engine/`WHERE` for that.
 		const card = conversionResult.cardTagCount
 			? ('cardWithTagCount as card' as 'card')
 			: 'card'
@@ -290,7 +290,7 @@ async function getCards(
 									(eb) =>
 										eb
 											.selectFrom('noteFieldValue')
-											.select('noteFieldValue.noteId as z') // z to make typescript happy; otherwise `noteId` gets consoliated with `card.noteId` and made nullable
+											.select('noteFieldValue.noteId as z') // z to make typescript happy; otherwise `noteId` gets consolidated with `card.noteId` and made nullable
 											.where(t.sql)
 											.as(name),
 									(join) => join.onRef(`${name}.z`, '=', 'note.id'),
@@ -326,7 +326,7 @@ async function getCards(
 										eb
 											.selectFrom('noteTagFts')
 											.innerJoin('noteTag', 'noteTag.tag', 'noteTagFts.tag')
-											.select(['noteTag.tag', 'noteTag.noteId as z']) // z to make typescript happy; otherwise `noteId` gets consoliated with `card.noteId` and made nullable
+											.select(['noteTag.tag', 'noteTag.noteId as z']) // z to make typescript happy; otherwise `noteId` gets consolidated with `card.noteId` and made nullable
 											.where(t.sql)
 											.as(name),
 									(join) => join.onRef(`${name}.z`, '=', 'note.id'),
@@ -360,7 +360,7 @@ async function getCards(
 									(eb) =>
 										eb
 											.selectFrom('noteTag')
-											.select(['noteTag.tag', 'noteTag.noteId as z']) // z to make typescript happy; otherwise `noteId` gets consoliated with `card.noteId` and made nullable
+											.select(['noteTag.tag', 'noteTag.noteId as z']) // z to make typescript happy; otherwise `noteId` gets consolidated with `card.noteId` and made nullable
 											.where(t.sql)
 											.as(name),
 									(join) => join.onRef(`${name}.z`, '=', 'note.id'),

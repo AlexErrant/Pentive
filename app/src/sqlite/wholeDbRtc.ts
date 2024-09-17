@@ -300,7 +300,7 @@ export class WholeDbRtcPublic {
 			try {
 				l([...pending.keys()], [...established.keys()])
 			} catch (e) {
-				C.toastError('Error occured while connecting to peers', e)
+				C.toastError('Error occurred while connecting to peers', e)
 			}
 		}
 	}

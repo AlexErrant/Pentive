@@ -4,10 +4,16 @@ bqfmt
 csum
 dconf
 flds
+latexsvg
+mult
 odid
 odue
 qfmt
+replayq
 revlog
+revlogs
+sched
 sfld
+sortf
 tmpl
 tmpls

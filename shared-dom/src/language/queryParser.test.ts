@@ -133,7 +133,7 @@ Content,Close))`
 		testTree(tree, spec)
 	})
 
-	test(`2 squareds`, () => {
+	test(`two Squared's`, () => {
 		const tree = parser.parse(`'a[b]c[d]e'`)
 		const spec = `Program(Quoted1(
   Open,

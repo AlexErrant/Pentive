@@ -22,14 +22,14 @@ test('adding tags to 1 works', () => {
 	expect(actual).toEqual('(tag:"a","b")')
 })
 
-test('adding tag to emptyish works', () => {
+test('adding tag to empty-ish works', () => {
 	const actual = alterQuery(' ', {
 		tags: ['a'],
 	})
 	expect(actual).toEqual('(tag:"a")')
 })
 
-test('adding tags to emptyish works', () => {
+test('adding tags to empty-ish works', () => {
 	const actual = alterQuery(' ', {
 		tags: ['a', 'b'],
 	})

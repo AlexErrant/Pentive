@@ -187,7 +187,7 @@ export const FieldEditor: VoidComponent<{
   1. Prefix all <img> srcs with a well known value (`ugm/` - "user generated media") and use app's service worker to intercept all `ugm/` requests
   2. Put ProseMirror in an iframe and give it a dedicated service worker, similar to app-ugc
      Cons: Complexity with iframe sizing.
-  3. Rewrite all <img> srcs to use data URLs for display and convert back to the standard URL upon persistance
+  3. Rewrite all <img> srcs to use data URLs for display and convert back to the standard URL upon persistence
      Cons: When ProseMirror sets an <img> src attribute in `serializeFragment`, it makes a network request, filling console with 404s.
            Also can't use browser's cache, so we hit sqlite more.
 

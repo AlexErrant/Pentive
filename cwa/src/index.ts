@@ -87,7 +87,7 @@ app
 			await connect({
 				// nextTODO
 				url: c.env.tursoDbUrl,
-				// eslint-disable-next-line @typescript-eslint/no-explicit-any -- medtodo remove https://github.com/planetscale/database-js/pull/102#issuecomment-1508219636
+				// eslint-disable-next-line @typescript-eslint/no-explicit-any -- medTODO remove https://github.com/planetscale/database-js/pull/102#issuecomment-1508219636
 				fetch: async (url: string, init: any) => {
 					// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
 					delete init.cache

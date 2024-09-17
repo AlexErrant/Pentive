@@ -9,7 +9,7 @@ CREATE VIEW IF NOT EXISTS note AS
   SELECT
     rowid,
     *,
-    (SELECT json_group_array(tag) FROM notetag WHERE noteId = noteBase.id) AS tags,
+    (SELECT json_group_array(tag) FROM noteTag WHERE noteId = noteBase.id) AS tags,
     (SELECT json_group_object(field, value) FROM noteFieldValue WHERE noteId = noteBase.id) AS fieldValues
   FROM noteBase;
 CREATE VIEW IF NOT EXISTS noteWithTagCount AS

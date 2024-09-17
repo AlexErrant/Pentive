@@ -243,7 +243,7 @@ export const queryCompletion: (
 				) {
 					const datesCompletion = buildDates(getDate(), from)
 					for (const option of datesCompletion.options) {
-						option.type = 'uglyhack' // grep 3D3FADF2-7338-49F8-9CAF-9CBC2E9C5137 We use this to tell `activateOnCompletion` that there's another autocomplete available
+						option.type = 'uglyHack' // grep 3D3FADF2-7338-49F8-9CAF-9CBC2E9C5137 We use this to tell `activateOnCompletion` that there's another autocomplete available
 					}
 					return datesCompletion
 				} else {

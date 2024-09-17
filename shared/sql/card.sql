@@ -14,7 +14,7 @@ CREATE VIEW IF NOT EXISTS card AS
   SELECT
     rowid,
     *,
-    (SELECT json_group_array(tag) FROM cardtag WHERE cardId = cardBase.id) AS tags
+    (SELECT json_group_array(tag) FROM cardTag WHERE cardId = cardBase.id) AS tags
   FROM cardBase;
 CREATE VIEW IF NOT EXISTS cardWithTagCount AS
   SELECT

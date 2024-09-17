@@ -276,7 +276,7 @@ export class WholeDbReplicator {
 					)
 				}
 			} catch (e) {
-				return C.toastFatal('Error occured while syncing.', e)
+				return C.toastFatal('Error occurred while syncing.', e)
 			} finally {
 				await stmt.finalize(tx)
 			}
