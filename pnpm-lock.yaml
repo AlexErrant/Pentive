@@ -1271,6 +1271,12 @@ importers:
       '@codemirror/autocomplete':
         specifier: ^6.18.0
         version: 6.18.0(@codemirror/language@6.10.2)(@codemirror/state@6.4.1)(@codemirror/view@6.33.0)(@lezer/common@1.2.1)
+      '@codemirror/commands':
+        specifier: ^6.6.0
+        version: 6.6.0
+      '@codemirror/lang-css':
+        specifier: ^6.2.1
+        version: 6.2.1(@codemirror/view@6.33.0)
       '@codemirror/lang-html':
         specifier: ^6.4.9
         version: 6.4.9
@@ -1280,9 +1286,18 @@ importers:
       '@codemirror/lint':
         specifier: ^6.8.1
         version: 6.8.1
+      '@codemirror/search':
+        specifier: ^6.5.6
+        version: 6.5.6
       '@codemirror/state':
         specifier: ^6.4.1
         version: 6.4.1
+      '@codemirror/theme-one-dark':
+        specifier: ^6.1.2
+        version: 6.1.2
+      '@codemirror/view':
+        specifier: ^6.33.0
+        version: 6.33.0
       '@kobalte/core':
         specifier: ^0.13.4
         version: 0.13.4(solid-js@1.8.18)
@@ -1301,6 +1316,9 @@ importers:
       '@solid-primitives/scheduled':
         specifier: ^1.4.3
         version: 1.4.3(solid-js@1.8.18)
+      '@thisbeyond/solid-select':
+        specifier: ^0.14.0
+        version: 0.14.0(patch_hash=2qumt5mumsrcampzzb47wbecmy)(solid-js@1.8.18)
       comlink:
         specifier: ^4.4.1
         version: 4.4.1
