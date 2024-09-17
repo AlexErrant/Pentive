@@ -1,7 +1,7 @@
 import { type Base64, type Base64Url, type Hex } from 'shared'
 
 import { ulidFactory } from 'ulid-workers'
-import { base16, base32crockford, base64url } from '@scure/base'
+import { base16, base32crockford } from '@scure/base'
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export function toBase64URL_0(base64: Base64): Base64Url {
@@ -32,9 +32,4 @@ export function ulidAsHex(): Hex {
 export function ulidAsRaw(): Uint8Array {
 	const ulid = ulidFactory()()
 	return base32crockford.decode('000000' + ulid).slice(4) // https://github.com/ulid/spec/issues/73#issuecomment-1247320475
-}
-
-export function ulidAsBase64Url(): Base64Url {
-	const raw = ulidAsRaw()
-	return base64url.encode(raw).slice(0, 22) as Base64Url
 }
