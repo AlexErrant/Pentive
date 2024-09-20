@@ -1,4 +1,4 @@
-import { ThemeSelector } from 'shared-dom'
+import { ThemeSelector } from 'shared-dom/themeSelector'
 import { For, type VoidComponent, Show } from 'solid-js'
 import { A, useLocation } from '@solidjs/router'
 import { type NavLinkData } from './contracts'

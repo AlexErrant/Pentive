@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest'
-import { convert as actualConvert } from 'shared-dom'
+import { convert as actualConvert } from 'shared-dom/language/query2sql'
 import {
 	type CompiledQuery,
 	Kysely,

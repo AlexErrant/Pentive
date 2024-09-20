@@ -1,16 +1,18 @@
 import { type IFrameComponent } from 'iframe-resizer'
 import { type SetStoreFunction, unwrap } from 'solid-js/store'
 import {
-	type Diagnostics,
-	ResizingIframe as CoreResizingIframe,
+	type RenderContainer,
+	type CommonResizingIframe,
 	defaultRenderContainer,
+} from 'shared-dom/renderContainer'
+import {
 	type RenderBodyInput,
 	type RawRenderBodyInput,
 	type ComlinkInit,
+	type Diagnostics,
+	ResizingIframe as CoreResizingIframe,
 	buildHtml,
-	type RenderContainer,
-	type CommonResizingIframe,
-} from 'shared-dom'
+} from 'shared-dom/resizingIframe'
 import { type MediaId } from 'shared'
 
 export type { RenderBodyInput, RawRenderBodyInput, ComlinkInit }

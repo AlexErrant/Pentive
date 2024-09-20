@@ -7,7 +7,7 @@ import SubmitComment from '~/components/submitComment'
 import { cwaClient } from '~/routes/cwaClient'
 import { getUserId } from '~/session'
 import { getAppMessenger } from '~/entry-client'
-import { noteOrds, toSampleCard } from 'shared-dom'
+import { noteOrds, toSampleCard } from 'shared-dom/cardHtml'
 import {
 	noteOrdsRenderContainer,
 	remoteToNote,

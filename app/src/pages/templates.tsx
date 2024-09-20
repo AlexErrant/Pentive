@@ -11,7 +11,7 @@ import {
 import ResizingIframe from '../components/resizingIframe'
 import { GoldenLayout, LayoutConfig } from 'golden-layout'
 import { render } from 'solid-js/web'
-import { EditTemplate } from 'shared-dom'
+import { EditTemplate } from 'shared-dom/editTemplate'
 import { cloneDeep } from 'lodash-es'
 import { ulidAsBase64Url } from '../domain/utility'
 import { C, theme } from '../topLevelAwait'

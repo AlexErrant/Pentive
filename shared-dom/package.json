@@ -7,9 +7,8 @@
 	"type": "module",
 	"sideEffects": false,
 	"main": "src/index.tsx",
-	"exports": "./src/index.tsx",
 	"scripts": {
-		"tsc-build": "tsc",
+		"tsc-build": "tsc && cp ./src/solidSelect.css ./lib/src/solidSelect.css",
 		"eslint": "eslint . --ignore-path .gitignore --max-warnings 0",
 		"eslint:fix": "eslint . --fix --ignore-path .gitignore --max-warnings 0",
 		"format:check": "prettier --ignore-path .gitignore --check .",
@@ -73,5 +72,102 @@
 		"solid-toast": "^0.5.0",
 		"uuid": "^9.0.1",
 		"zod": ">=3.22.3"
+	},
+	"exports": {
+		"./plugin": {
+			"types": "./src/plugin.ts",
+			"default": "./lib/src/plugin.js"
+		},
+		"./cardHtml": {
+			"types": "./src/cardHtml.ts",
+			"default": "./lib/src/cardHtml.js"
+		},
+		"./renderContainer": {
+			"types": "./src/renderContainer.ts",
+			"default": "./lib/src/renderContainer.js"
+		},
+		"./pluginManager": {
+			"types": "./src/pluginManager.ts",
+			"default": "./lib/src/pluginManager.js"
+		},
+		"./wholeDbReplicator": {
+			"types": "./src/wholeDbReplicator.ts",
+			"default": "./lib/src/wholeDbReplicator.js"
+		},
+		"./themeSelector": {
+			"types": "./src/themeSelector.tsx",
+			"default": "./lib/src/themeSelector.jsx"
+		},
+		"./icons": {
+			"types": "./src/icons.tsx",
+			"default": "./lib/src/icons.jsx"
+		},
+		"./utility": {
+			"types": "./src/utility.ts",
+			"default": "./lib/src/utility.js"
+		},
+		"./editTemplate": {
+			"types": "./src/editTemplate.tsx",
+			"default": "./lib/src/editTemplate.jsx"
+		},
+		"./editTemplateCss": {
+			"types": "./src/editTemplateCss.tsx",
+			"default": "./lib/src/editTemplateCss.jsx"
+		},
+		"./editChildTemplate": {
+			"types": "./src/editChildTemplate.tsx",
+			"default": "./lib/src/editChildTemplate.jsx"
+		},
+		"./resizingIframe": {
+			"types": "./src/resizingIframe.tsx",
+			"default": "./lib/src/resizingIframe.jsx"
+		},
+		"./toasts": {
+			"types": "./src/toasts.tsx",
+			"default": "./lib/src/toasts.jsx"
+		},
+		"./language/htmlTemplateParser": {
+			"types": "./src/language/htmlTemplateParser.ts",
+			"default": "./lib/src/language/htmlTemplateParser.js"
+		},
+		"./language/templateLinter": {
+			"types": "./src/language/templateLinter.ts",
+			"default": "./lib/src/language/templateLinter.js"
+		},
+		"./language/queryLinter": {
+			"types": "./src/language/queryLinter.ts",
+			"default": "./lib/src/language/queryLinter.js"
+		},
+		"./language/query2sql": {
+			"types": "./src/language/query2sql.ts",
+			"default": "./lib/src/language/query2sql.js"
+		},
+		"./language/globQuery": {
+			"types": "./src/language/globQuery.ts",
+			"default": "./lib/src/language/globQuery.js"
+		},
+		"./language/queryCompletion": {
+			"types": "./src/language/queryCompletion.ts",
+			"default": "./lib/src/language/queryCompletion.js"
+		},
+		"./language/stringLabels": {
+			"types": "./src/language/stringLabels.ts",
+			"default": "./lib/src/language/stringLabels.js"
+		},
+		"./language/query.highlight": {
+			"types": "./src/language/query.highlight.ts",
+			"default": "./lib/src/language/query.highlight.js"
+		},
+		"./language/template2html": {
+			"types": "./src/language/template2html.ts",
+			"default": "./lib/src/language/template2html.js"
+		},
+		"./language/queryParser.terms": {
+			"types": "./src/language/queryParser.terms.ts",
+			"default": "./lib/src/language/queryParser.terms.js"
+		},
+		"./solidSelect.css": {
+			"default": "./lib/src/solidSelect.css"
+		}
 	}
 }

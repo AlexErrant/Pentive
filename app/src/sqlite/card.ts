@@ -32,7 +32,7 @@ import {
 import { chunk } from 'lodash-es'
 import { md5 } from '../domain/utility'
 import { noteEntityToDomain, parseTags, templateEntityToDomain } from './util'
-import { type convert } from 'shared-dom'
+import { type convert } from 'shared-dom/language/query2sql'
 import { type CardTagRowid, type NoteTagRowid } from './tag'
 
 function serializeState(s?: State): number | null {

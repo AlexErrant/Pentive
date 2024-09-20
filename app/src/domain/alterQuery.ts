@@ -1,4 +1,6 @@
-import { escapedQuoted2, globQuery, queryTerms } from 'shared-dom'
+import { globQuery } from 'shared-dom/language/globQuery'
+import { escapedQuoted2 } from 'shared-dom/language/query2sql'
+import * as queryTerms from 'shared-dom/language/queryParser.terms'
 
 // https://stackoverflow.com/a/21350614
 function spliceSlice(

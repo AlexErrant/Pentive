@@ -6,7 +6,7 @@ import { type MediaId } from 'shared'
 import { ulidAsBase64Url } from '../domain/utility'
 import FieldHtmlEditor from './fieldHtmlEditor'
 import { ToggleButton } from '@kobalte/core'
-import { ChevronDown, Code, Quote } from 'shared-dom'
+import { ChevronDown, Code, Quote } from 'shared-dom/icons'
 import { C, tx } from '../topLevelAwait'
 import { toNoteCards, type NoteCardView } from '../uiLogic/cards'
 

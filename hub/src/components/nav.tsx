@@ -1,4 +1,4 @@
-import { ThemeSelector } from 'shared-dom'
+import { ThemeSelector } from 'shared-dom/themeSelector'
 import { type JSX, Show } from 'solid-js'
 import {
 	A,

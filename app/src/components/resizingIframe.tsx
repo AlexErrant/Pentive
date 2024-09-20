@@ -3,14 +3,14 @@ import { type MediaId } from 'shared'
 import { type SetStoreFunction, unwrap } from 'solid-js/store'
 import { db } from '../db'
 import { C } from '../topLevelAwait'
+import { type CommonResizingIframe } from 'shared-dom/renderContainer'
 import {
-	type CommonResizingIframe,
 	type RawRenderBodyInput,
 	ResizingIframe as CoreResizingIframe,
 	type Diagnostics,
 	type ComlinkInit,
 	buildHtml,
-} from 'shared-dom'
+} from 'shared-dom/resizingIframe'
 
 export type { RawRenderBodyInput, ComlinkInit }
 

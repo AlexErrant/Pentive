@@ -1,4 +1,7 @@
-import { type RenderContainerArgs, defaultRenderContainer } from 'shared-dom'
+import {
+	type RenderContainerArgs,
+	defaultRenderContainer,
+} from 'shared-dom/renderContainer'
 import Nav from './components/nav'
 import ExamplePlugin from './components/examplePlugin'
 

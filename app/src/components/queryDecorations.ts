@@ -1,7 +1,7 @@
 import { Decoration, type DecorationSet, EditorView } from '@codemirror/view'
 import { type Range, StateField, type EditorState } from '@codemirror/state'
 import { syntaxTree } from '@codemirror/language'
-import { queryTerms } from 'shared-dom'
+import * as queryTerms from 'shared-dom/language/queryParser.terms'
 
 const activeDecorator = Decoration.mark({ class: 'query-active' })
 

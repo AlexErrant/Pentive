@@ -7,7 +7,7 @@ import {
 import {
 	defaultRenderContainer as defaultRenderContainerOg,
 	noteOrdsRenderContainer as noteOrdsRenderContainerOg,
-} from 'shared-dom'
+} from 'shared-dom/renderContainer'
 import ResizingIframe from '~/components/resizingIframe'
 
 export function remoteToTemplate(remote: RemoteTemplate): Template {

@@ -1,6 +1,6 @@
 import { For, Show, type VoidComponent } from 'solid-js'
 import { getPosts, getNotes } from 'shared-edge'
-import { noteOrds, toSampleCard } from 'shared-dom'
+import { noteOrds, toSampleCard } from 'shared-dom/cardHtml'
 import { type NookId, type Ord } from 'shared'
 import { ResizingIframe } from '~/components/clientOnly'
 import { getUserId } from '~/session'

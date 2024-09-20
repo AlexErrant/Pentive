@@ -39,17 +39,18 @@ import { oneDark } from '@codemirror/theme-one-dark'
 import {
 	queryLightHighlightStyle,
 	queryDarkHighlightStyle,
-	globQuery,
-	queryLinter,
-	queryCompletion,
-	isDateValuedLabel,
-	isNumberValuedLabel,
-	inLabels,
-	dateValuedLabels,
+} from 'shared-dom/language/query.highlight'
+import {
 	firstReviewed,
 	reviewed,
-	queryTerms as qt,
-} from 'shared-dom'
+	isDateValuedLabel,
+	isNumberValuedLabel,
+	dateValuedLabels,
+} from 'shared-dom/language/stringLabels'
+import { queryCompletion, inLabels } from 'shared-dom/language/queryCompletion'
+import { queryLinter } from 'shared-dom/language/queryLinter'
+import { globQuery } from 'shared-dom/language/globQuery'
+import * as qt from 'shared-dom/language/queryParser.terms'
 import { queryDecorations } from './queryDecorations'
 import { db } from '../db'
 import { C, theme } from '../topLevelAwait'

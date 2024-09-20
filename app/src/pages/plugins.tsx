@@ -1,7 +1,7 @@
 import { type JSX } from 'solid-js'
 import PluginsTable from '../components/pluginsTable'
 import { db } from '../db'
-import { parsePluginNpmPackage } from 'shared-dom'
+import { parsePluginNpmPackage } from 'shared-dom/plugin'
 import { C } from '../topLevelAwait'
 
 export default function Plugins(): JSX.Element {

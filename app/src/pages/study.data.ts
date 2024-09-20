@@ -1,5 +1,5 @@
 import { db } from '../db'
-import { convert } from 'shared-dom'
+import { convert } from 'shared-dom/language/query2sql'
 import { C } from '../topLevelAwait'
 import { cache } from '@solidjs/router'
 

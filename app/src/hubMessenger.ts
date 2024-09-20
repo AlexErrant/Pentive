@@ -13,7 +13,7 @@ import {
 	type Card,
 } from 'shared'
 import { ulidAsBase64Url } from './domain/utility'
-import { noteOrds } from 'shared-dom'
+import { noteOrds } from 'shared-dom/cardHtml'
 import { C, tx } from './topLevelAwait'
 
 export const appExpose = {

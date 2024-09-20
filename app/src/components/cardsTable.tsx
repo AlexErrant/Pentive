@@ -23,14 +23,13 @@ import {
 import { LicenseManager } from 'ag-grid-enterprise'
 import { db } from '../db'
 import { assertNever } from 'shared'
+import { Upload, Hamburger } from 'shared-dom/icons'
+import { getOk } from 'shared-dom/cardHtml'
 import {
-	type FieldValueHighlight,
-	Upload,
 	convert,
-	getOk,
 	unique,
-	Hamburger,
-} from 'shared-dom'
+	type FieldValueHighlight,
+} from 'shared-dom/language/query2sql'
 import { C, agGridTheme } from '../topLevelAwait'
 import FiltersTable from './filtersTable'
 import './cardsTable.css'

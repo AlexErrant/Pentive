@@ -1,7 +1,7 @@
 import { type CookieParseOptions, parse, serialize } from 'cookie-es'
 import { type JWTVerifyResult, type SignJWT, jwtVerify } from 'jose'
 import { type WithRequired, type Brand, concat } from 'shared'
-import { arrayBufferToBase64 } from 'shared-dom'
+import { arrayBufferToBase64 } from 'shared-dom/utility'
 import { base64ToArray } from 'shared-edge'
 import { type CookieSerializeOptions } from 'vinxi/http'
 

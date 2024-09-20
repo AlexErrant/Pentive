@@ -1,4 +1,4 @@
-import { type Plugin } from 'shared-dom'
+import { type Plugin } from 'shared-dom/plugin'
 import { rd, ky } from '../topLevelAwait'
 import { type PluginName } from 'shared'
 import { pluginEntityToDomain } from './util'

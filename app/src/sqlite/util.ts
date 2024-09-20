@@ -1,4 +1,4 @@
-import { type Plugin } from 'shared-dom'
+import { type Plugin } from 'shared-dom/plugin'
 import {
 	type Plugin as PluginEntity,
 	type Note as NoteEntity,

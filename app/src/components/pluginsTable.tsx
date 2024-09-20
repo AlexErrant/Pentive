@@ -7,7 +7,7 @@ import {
 } from 'ag-grid-community'
 import { LicenseManager } from 'ag-grid-enterprise'
 import '@github/relative-time-element'
-import { type Plugin } from 'shared-dom'
+import { type Plugin } from 'shared-dom/plugin'
 import { db } from '../db'
 import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-alpine.css'

@@ -7,7 +7,7 @@ import { type CRDatabase, CRDialect } from './dialect'
 import { Kysely } from 'kysely'
 import crsqliteUrl from '@vlcn.io/crsqlite-wasm/crsqlite.wasm?url'
 import wdbRtc from './wholeDbRtc'
-import { wholeDbReplicator } from 'shared-dom'
+import { wholeDbReplicator } from 'shared-dom/wholeDbReplicator'
 import { C } from '../topLevelAwait'
 import { SQLITE_DETERMINISTIC, SQLITE_UTF8 } from '@vlcn.io/wa-sqlite'
 
