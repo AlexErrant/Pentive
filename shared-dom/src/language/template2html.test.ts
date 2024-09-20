@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest'
 import { convert, validate } from './template2html'
-import { defaultRenderContainer } from '../renderContainer'
+import { defaultRenderContainer } from '../testUtil'
 import { toSampleCard, toSampleNote } from '../cardHtml'
 import { getDefaultTemplate, throwExp, type Ord } from 'shared'
 

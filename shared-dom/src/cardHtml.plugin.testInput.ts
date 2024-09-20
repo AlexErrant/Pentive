@@ -1,12 +1,9 @@
 import {
-	type defaultRenderContainer,
 	type RenderContainer,
 	type RenderPluginExports,
 } from './renderContainer'
 
-function renderTemplate(
-	c: RenderContainer,
-): typeof defaultRenderContainer.renderTemplate {
+function renderTemplate(c: RenderContainer): RenderContainer['renderTemplate'] {
 	return function (template) {
 		const original = c.renderTemplate.bind(this)(template)
 		return original.map((r) => {

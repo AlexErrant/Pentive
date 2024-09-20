@@ -7,8 +7,7 @@ import SubmitComment from '~/components/submitComment'
 import { cwaClient } from '~/routes/cwaClient'
 import { getUserId } from '~/session'
 import { getAppMessenger } from '~/entry-client'
-import { defaultRenderContainer } from 'shared-dom'
-import { remoteToTemplate } from '~/lib/utility'
+import { defaultRenderContainer, remoteToTemplate } from '~/lib/utility'
 import { unwrap } from 'solid-js/store'
 import {
 	cache,

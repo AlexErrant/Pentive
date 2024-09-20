@@ -12,6 +12,7 @@ import { type Plugin } from './plugin'
 import { registerPluginServices } from './pluginManager'
 import { strip } from './cardHtml'
 import { getOk } from './cardHtml.test'
+import { testRenderContainerArgs } from './testUtil'
 
 function expectStrippedToBe(html: string, expected: string): void {
 	const newline = /[\r\n]/g
@@ -70,7 +71,7 @@ test('renderTemplate works with plugin that requires `edit` syntax', async () =>
 	const plugin = buildPlugin(
 		pluginText.replace('renderTemplate: renderTemplate(c),', ''),
 	)
-	const c = await registerPluginServices([plugin])
+	const c = await registerPluginServices([plugin], testRenderContainerArgs)
 	const templates = c.renderTemplate(clozeWithRequiredEdit)
 	expect(templates.length).toBe(1)
 	const template = getOk(templates[0]!)
@@ -87,7 +88,7 @@ test('renderTemplate works with plugin that requires `.bind(this)` because it in
 		'utf8',
 	)
 	const plugin = buildPlugin(pluginText)
-	const c = await registerPluginServices([plugin])
+	const c = await registerPluginServices([plugin], testRenderContainerArgs)
 	const templates = c.renderTemplate(clozeWithRequiredEdit)
 	expect(templates.length).toBe(1)
 	const template = getOk(templates[0]!)
@@ -104,7 +105,7 @@ test('[EDITABLE] is missing since no `bind(this)`', async () => {
 		'utf8',
 	)
 	const plugin = buildPlugin(pluginText.replace('.bind(this)', ''))
-	const c = await registerPluginServices([plugin])
+	const c = await registerPluginServices([plugin], testRenderContainerArgs)
 	const templates = c.renderTemplate(clozeWithRequiredEdit)
 	expect(templates.length).toBe(1)
 	const template = getOk(templates[0]!)

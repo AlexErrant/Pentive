@@ -39,13 +39,13 @@ import {
 import { type Template } from 'shared'
 import { type SetStoreFunction } from 'solid-js/store'
 import { oneDark } from '@codemirror/theme-one-dark'
-import { theme } from '../topLevelAwait'
 
-const EditTemplateCss: VoidComponent<{
+export const EditTemplateCss: VoidComponent<{
 	template: Template
 	setTemplate: SetStoreFunction<{
 		template: Template
 	}>
+	theme: 'light' | 'dark'
 }> = (props) => {
 	let ref: HTMLDivElement | undefined
 	let view: EditorView
@@ -55,21 +55,27 @@ const EditTemplateCss: VoidComponent<{
 			dispatch: (tr) => {
 				dispatch(tr, view, props.setTemplate)
 			},
-			state: createEditorState(props.template.css, theme()),
+			state: createEditorState(props.template.css, props.theme),
 		})
 	})
 	createEffect(
 		on(
 			() => props.template.id,
 			() => {
-				view.setState(createEditorState(props.template.css, theme()))
+				view.setState(createEditorState(props.template.css, props.theme))
 			},
 		),
 	)
 	createEffect(
-		on(theme, (t) => {
-			view.setState(createEditorState(props.template.css, t))
-		}),
+		on(
+			// Only run this effect when the theme changes!
+			// i.e. Don't run when childTemplate.front/back changes - it resets the cursor position.
+			() => props.theme,
+			(t) => {
+				view.setState(createEditorState(props.template.css, t))
+			},
+			{ defer: true },
+		),
 	)
 	onCleanup(() => {
 		view?.destroy()
@@ -83,8 +89,6 @@ const EditTemplateCss: VoidComponent<{
 		</fieldset>
 	)
 }
-
-export default EditTemplateCss
 
 // from https://github.com/codemirror/basic-setup/blob/main/src/codemirror.ts
 const basicSetup = [

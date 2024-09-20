@@ -1,10 +1,14 @@
 import { For, Show, type VoidComponent } from 'solid-js'
 import { getPosts, getNotes } from 'shared-edge'
-import { noteOrdsRenderContainer, noteOrds, toSampleCard } from 'shared-dom'
+import { noteOrds, toSampleCard } from 'shared-dom'
 import { type NookId, type Ord } from 'shared'
 import { ResizingIframe } from '~/components/clientOnly'
 import { getUserId } from '~/session'
-import { remoteToNote, remoteToTemplate } from '~/lib/utility'
+import {
+	noteOrdsRenderContainer,
+	remoteToNote,
+	remoteToTemplate,
+} from '~/lib/utility'
 import RelativeDate from '~/components/relativeDate'
 import {
 	A,

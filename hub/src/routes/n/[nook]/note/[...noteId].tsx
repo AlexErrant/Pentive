@@ -7,8 +7,12 @@ import SubmitComment from '~/components/submitComment'
 import { cwaClient } from '~/routes/cwaClient'
 import { getUserId } from '~/session'
 import { getAppMessenger } from '~/entry-client'
-import { noteOrds, noteOrdsRenderContainer, toSampleCard } from 'shared-dom'
-import { remoteToNote, remoteToTemplate } from '~/lib/utility'
+import { noteOrds, toSampleCard } from 'shared-dom'
+import {
+	noteOrdsRenderContainer,
+	remoteToNote,
+	remoteToTemplate,
+} from '~/lib/utility'
 import { unwrap } from 'solid-js/store'
 import {
 	cache,

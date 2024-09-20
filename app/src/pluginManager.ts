@@ -5,6 +5,7 @@ import {
 	type Container,
 	type PluginExports,
 } from './services'
+import ResizingIframe from './components/resizingIframe'
 
 async function registerPluginService(
 	c: Container,
@@ -34,7 +35,7 @@ function getC(c: Container, exports: PluginExports): Container {
 }
 
 export async function registerPluginServices(plugins: Plugin[]) {
-	const seed = defaultContainer
+	const seed = defaultContainer({ resizingIframe: ResizingIframe })
 	return await plugins.reduce(async (prior, plugin) => {
 		return await registerPluginService(await prior, plugin)
 	}, Promise.resolve(seed))

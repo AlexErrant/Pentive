@@ -1,6 +1,7 @@
 import { freeze } from 'immer'
 import type { Plugin } from './plugin'
 import {
+	type RenderContainerArgs,
 	defaultRenderContainer,
 	type RenderContainer,
 	type RenderPluginExports,
@@ -44,8 +45,9 @@ function getC(
 
 export async function registerPluginServices(
 	plugins: Plugin[],
+	args: RenderContainerArgs,
 ): Promise<RenderContainer> {
-	const seed: RenderContainer = defaultRenderContainer
+	const seed: RenderContainer = defaultRenderContainer(args)
 	const c = await plugins.reduce(async (prior, plugin) => {
 		return await registerPluginService(await prior, plugin)
 	}, Promise.resolve(seed))

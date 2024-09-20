@@ -1,4 +1,4 @@
-import { defaultRenderContainer } from './renderContainer'
+import { defaultRenderContainer } from './testUtil'
 import { describe, expect, test } from 'vitest'
 import {
 	type TemplateId,

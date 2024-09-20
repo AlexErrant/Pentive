@@ -1,12 +1,11 @@
 import { type IFrameComponent } from 'iframe-resizer'
-import { type VoidComponent } from 'solid-js'
 import { type MediaId } from 'shared'
 import { type SetStoreFunction, unwrap } from 'solid-js/store'
 import { db } from '../db'
 import { C } from '../topLevelAwait'
 import {
+	type CommonResizingIframe,
 	type RawRenderBodyInput,
-	type RenderBodyInput,
 	ResizingIframe as CoreResizingIframe,
 	type Diagnostics,
 	type ComlinkInit,
@@ -28,11 +27,7 @@ export interface AppExpose {
 	resize: () => void
 }
 
-const ResizingIframe: VoidComponent<{
-	readonly i: RenderBodyInput
-	class?: string
-	resize?: false
-}> = (props) => {
+const ResizingIframe: CommonResizingIframe = (props) => {
 	// eslint-disable-next-line solid/reactivity
 	const resize = (iframeReference?: IFrameComponent) => () => {
 		if (props.resize === false) return

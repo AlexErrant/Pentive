@@ -1,3 +1,4 @@
+import { type VoidComponent } from 'solid-js'
 import {
 	body,
 	html,
@@ -7,6 +8,7 @@ import {
 	noteOrds,
 	templateIndexes,
 } from './cardHtml'
+import { type RenderBodyInput } from './resizingIframe'
 import {
 	toastError,
 	toastFatal,
@@ -15,7 +17,16 @@ import {
 	toastWarn,
 } from './toasts'
 
-export const defaultRenderContainer = {
+export type CommonResizingIframe = VoidComponent<{
+	readonly i: RenderBodyInput
+	class?: string
+	resize?: false
+}>
+
+export const defaultRenderContainer = (args: {
+	resizingIframe: CommonResizingIframe
+}) => ({
+	...args,
 	transformers,
 	body,
 	renderTemplate,
@@ -28,14 +39,15 @@ export const defaultRenderContainer = {
 	toastImpossible,
 	toastInfo,
 	toastWarn,
-}
+})
 
-export const noteOrdsRenderContainer = {
-	...defaultRenderContainer,
+export type RenderContainer = ReturnType<typeof defaultRenderContainer>
+export type RenderContainerArgs = Parameters<typeof defaultRenderContainer>[0]
+
+export const noteOrdsRenderContainer = (args: RenderContainerArgs) => ({
+	...defaultRenderContainer(args),
 	strip: (x: string) => x,
-}
-
-export type RenderContainer = typeof defaultRenderContainer
+})
 
 export interface RenderPluginExports {
 	services?: (c: RenderContainer) => Partial<RenderContainer>

@@ -36,11 +36,12 @@ import {
 	type VoidComponent,
 } from 'solid-js'
 import { type Template, type ChildTemplate } from 'shared'
-import ResizingIframe from './resizingIframe'
-import { C, theme } from '../topLevelAwait'
 import { oneDark } from '@codemirror/theme-one-dark'
-import { getOk, htmlTemplateLanguage, templateLinter } from 'shared-dom'
 import { html } from '@codemirror/lang-html'
+import { getOk } from './cardHtml'
+import { htmlTemplateLanguage } from './language/htmlTemplateParser'
+import { templateLinter } from './language/templateLinter'
+import { type RenderContainer } from './renderContainer'
 
 const EditChildTemplate: VoidComponent<{
 	template: Template
@@ -50,26 +51,27 @@ const EditChildTemplate: VoidComponent<{
 		key: keyof ChildTemplate,
 		val: ChildTemplate[keyof ChildTemplate],
 	) => void
+	renderContainer: RenderContainer
+	theme: 'light' | 'dark'
 }> = (props) => {
 	let frontRef: HTMLDivElement | undefined
 	let backRef: HTMLDivElement | undefined
 	let frontView: EditorView
 	let backView: EditorView
 	onMount(() => {
-		const t = theme()
 		frontView = new EditorView({
 			parent: frontRef,
 			dispatch: (tr) => {
 				dispatch('front', tr, frontView, props.setTemplate)
 			},
-			state: createEditorState(props.childTemplate.front, t),
+			state: createEditorState(props.childTemplate.front, props.theme),
 		})
 		backView = new EditorView({
 			parent: backRef,
 			dispatch: (tr) => {
 				dispatch('back', tr, backView, props.setTemplate)
 			},
-			state: createEditorState(props.childTemplate.back, t),
+			state: createEditorState(props.childTemplate.back, props.theme),
 		})
 		new ResizeObserver(() => {
 			frontView.requestMeasure()
@@ -79,16 +81,23 @@ const EditChildTemplate: VoidComponent<{
 		}).observe(backRef!)
 	})
 	createEffect(
-		on(theme, (t) => {
-			frontView.setState(createEditorState(props.childTemplate.front, t))
-			backView.setState(createEditorState(props.childTemplate.back, t))
-		}),
+		on(
+			// Only run this effect when the theme changes!
+			// i.e. Don't run when childTemplate.front/back changes - it resets the cursor position.
+			() => props.theme,
+			(t) => {
+				frontView.setState(createEditorState(props.childTemplate.front, t))
+				backView.setState(createEditorState(props.childTemplate.back, t))
+			},
+			{ defer: true },
+		),
 	)
 	onCleanup(() => {
 		frontView?.destroy()
 		backView?.destroy()
 	})
-	const short = () => getOk(C.renderTemplate(props.template, true)[props.i])
+	const short = () =>
+		getOk(props.renderContainer.renderTemplate(props.template, true)[props.i])
 	return (
 		<fieldset class='border-black border p-2'>
 			<legend>
@@ -107,7 +116,7 @@ const EditChildTemplate: VoidComponent<{
 						class='max-h-[500px] flex-1 resize-y overflow-auto focus-within:border-black focus-within:border'
 						ref={frontRef}
 					/>
-					<ResizingIframe
+					<props.renderContainer.resizingIframe
 						class='flex-1'
 						i={{
 							tag: 'template',
@@ -122,7 +131,7 @@ const EditChildTemplate: VoidComponent<{
 						class='max-h-[500px] flex-1 resize-y overflow-auto focus-within:border-black focus-within:border'
 						ref={backRef}
 					/>
-					<ResizingIframe
+					<props.renderContainer.resizingIframe
 						class='flex-1'
 						i={{
 							tag: 'template',

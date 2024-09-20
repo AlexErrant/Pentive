@@ -4,6 +4,11 @@ import {
 	type RemoteTemplate,
 	type Template,
 } from 'shared'
+import {
+	defaultRenderContainer as defaultRenderContainerOg,
+	noteOrdsRenderContainer as noteOrdsRenderContainerOg,
+} from 'shared-dom'
+import ResizingIframe from '~/components/resizingIframe'
 
 export function remoteToTemplate(remote: RemoteTemplate): Template {
 	return {
@@ -24,3 +29,11 @@ export function remoteToNote(remote: RemoteNote): Note {
 		tags: new Set(remote.tags),
 	}
 }
+
+export const noteOrdsRenderContainer = noteOrdsRenderContainerOg({
+	resizingIframe: ResizingIframe,
+})
+
+export const defaultRenderContainer = defaultRenderContainerOg({
+	resizingIframe: ResizingIframe,
+})

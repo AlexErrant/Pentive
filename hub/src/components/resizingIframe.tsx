@@ -1,16 +1,16 @@
 import { type IFrameComponent } from 'iframe-resizer'
-import { type VoidComponent } from 'solid-js'
 import { type SetStoreFunction, unwrap } from 'solid-js/store'
 import {
 	type Diagnostics,
+	ResizingIframe as CoreResizingIframe,
 	defaultRenderContainer,
 	type RenderBodyInput,
 	type RawRenderBodyInput,
 	type ComlinkInit,
 	buildHtml,
 	type RenderContainer,
+	type CommonResizingIframe,
 } from 'shared-dom'
-import { ResizingIframe as CoreResizingIframe } from 'shared-dom'
 import { type MediaId } from 'shared'
 
 export type { RenderBodyInput, RawRenderBodyInput, ComlinkInit }
@@ -29,12 +29,11 @@ export interface HubExpose {
 	resize: () => void
 }
 
-const ResizingIframe: VoidComponent<{
-	readonly i: RenderBodyInput
-	class?: string
-	resize?: false
-}> = (props) => {
-	const C = defaultRenderContainer
+const ResizingIframe: CommonResizingIframe = (props) => {
+	const C = defaultRenderContainer({
+		// @ts-expect-error don't recurse
+		resizingIframe: null,
+	})
 	// eslint-disable-next-line solid/reactivity
 	const resize = (iframeReference?: IFrameComponent) => () => {
 		if (props.resize === false) return

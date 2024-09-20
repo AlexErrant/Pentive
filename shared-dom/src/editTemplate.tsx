@@ -4,21 +4,18 @@ import {
 	type ChildTemplate,
 	type Template,
 	getDefaultClozeTemplate,
-	type TemplateId,
 	type NookId,
 	objEntries,
 	type Ord,
 } from 'shared'
 import { type SetStoreFunction, createStore } from 'solid-js/store'
 import { Select } from '@thisbeyond/solid-select'
-import { type ClozeTemplate, type StandardTemplate } from 'shared-dom'
+import { type ClozeTemplate, type StandardTemplate } from './cardHtml'
 import EditChildTemplate from './editChildTemplate'
-import { ulidAsBase64Url } from '../domain/utility'
-import { db } from '../db'
-
 import '@thisbeyond/solid-select/style.css'
 import './solidSelect.css'
-import EditTemplateCss from './editTemplateCss'
+import { EditTemplateCss } from './editTemplateCss'
+import { type RenderContainer } from './renderContainer'
 
 interface ClozeTemplateStore {
 	template: ClozeTemplate
@@ -91,9 +88,18 @@ function remoteCell(
 	)
 }
 
-const EditTemplate: VoidComponent<{ template: Template }> = (props) => {
+export const EditTemplate: VoidComponent<{
+	template: Template
+	theme: 'light' | 'dark'
+	renderContainer: RenderContainer
+	saveButton: VoidComponent<{
+		template: Template
+	}>
+	getDefaultTemplate: () => Template
+}> = (props) => {
 	const [template, setTemplate] = createStore<{ template: Template }>({
-		template: getDefaultTemplate(ulidAsBase64Url() as TemplateId),
+		// eslint-disable-next-line solid/reactivity
+		template: props.getDefaultTemplate(),
 	})
 	createEffect(() => {
 		// eslint-disable-next-line @typescript-eslint/no-unused-expressions -- touch template.id so we setTemplate if template changes
@@ -162,21 +168,17 @@ const EditTemplate: VoidComponent<{ template: Template }> = (props) => {
 					}}
 				</For>
 			</fieldset>
-			{childTemplates(template, setTemplate)}
-			<EditTemplateCss template={template.template} setTemplate={setTemplate} />
+			{childTemplates(template, setTemplate, props)}
+			<EditTemplateCss
+				template={template.template}
+				setTemplate={setTemplate}
+				theme={props.theme}
+			/>
 			{remoteCell(template.template, setTemplate)}
-			<button
-				onClick={async () => {
-					await db.upsertTemplate(template.template)
-				}}
-			>
-				Save
-			</button>
+			<props.saveButton template={template.template} />
 		</>
 	)
 }
-
-export default EditTemplate
 
 function childTemplates(
 	template: {
@@ -185,6 +187,7 @@ function childTemplates(
 	setTemplate: SetStoreFunction<{
 		template: Template
 	}>,
+	props: Parameters<typeof EditTemplate>[0],
 ) {
 	return (
 		<fieldset class='border-black border p-2'>
@@ -224,6 +227,8 @@ function childTemplates(
 				when={template.template.templateType.tag === 'standard'}
 				fallback={
 					<EditChildTemplate
+						renderContainer={props.renderContainer}
+						theme={props.theme}
 						template={template.template}
 						childTemplate={
 							(template.template as ClozeTemplate).templateType.template
@@ -250,6 +255,8 @@ function childTemplates(
 					{(childTemplate, i) => {
 						return (
 							<EditChildTemplate
+								renderContainer={props.renderContainer}
+								theme={props.theme}
 								template={template.template}
 								childTemplate={childTemplate}
 								i={i()}

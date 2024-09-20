@@ -20,5 +20,8 @@ export {
 export * as queryTerms from './language/queryParser.terms'
 export * from './language/stringLabels'
 export * from './utility'
+export * from './editTemplate'
+export * from './editTemplateCss'
+export * from './editChildTemplate'
 export * from './resizingIframe'
 export * from './toasts'
