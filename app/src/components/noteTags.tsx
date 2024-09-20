@@ -2,7 +2,7 @@ import { createResource, createSignal, type VoidComponent } from 'solid-js'
 import { db } from '../db'
 import { createOptions, Select } from '@thisbeyond/solid-select'
 import '@thisbeyond/solid-select/style.css'
-import './solidSelect.css'
+import 'shared-dom/solidSelect.css'
 import { type NoteCardView } from '../uiLogic/cards'
 
 const NoteTags: VoidComponent<{

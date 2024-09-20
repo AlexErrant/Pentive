@@ -1,6 +1,6 @@
 import { Select } from '@thisbeyond/solid-select'
 import '@thisbeyond/solid-select/style.css'
-import './solidSelect.css'
+import 'shared-dom/solidSelect.css'
 import {
 	Show,
 	Suspense,
