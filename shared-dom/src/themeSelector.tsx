@@ -1,7 +1,12 @@
 // mostly copied from https://github.com/kobaltedev/kobalte/blob/5dd86f7f557fcb9f00b7b004aa0686ee61769330/apps/docs/src/components/theme-selector.tsx
 
 import { Select } from '@kobalte/core'
-import { createSignal, onMount, type JSX, createEffect } from 'solid-js'
+import {
+	createSignal,
+	onMount,
+	createEffect,
+	type VoidComponent,
+} from 'solid-js'
 import { Dynamic } from 'solid-js/web'
 import nightwind from 'nightwind/helper'
 import { DesktopIcon, MoonIcon, SunIcon } from './icons'
@@ -11,24 +16,24 @@ type Themes = 'light' | 'dark' | 'system'
 interface ThemeOption {
 	value: Themes
 	label: string
-	icon: () => JSX.Element
+	icon: VoidComponent<{ class: string }>
 }
 
 const THEME_OPTIONS: ThemeOption[] = [
 	{
 		value: 'light',
 		label: 'Light',
-		icon: () => <SunIcon class='h-4 w-4' />,
+		icon: (props) => <SunIcon class={props.class} />,
 	},
 	{
 		value: 'dark',
 		label: 'Dark',
-		icon: () => <MoonIcon class='h-4 w-4' />,
+		icon: (props) => <MoonIcon class={props.class} />,
 	},
 	{
 		value: 'system',
 		label: 'System',
-		icon: () => <DesktopIcon class='h-4 w-4' />,
+		icon: (props) => <DesktopIcon class={props.class} />,
 	},
 ]
 
@@ -59,21 +64,20 @@ export function ThemeSelector() {
 			options={THEME_OPTIONS}
 			optionValue='value'
 			optionTextValue='label'
-			defaultValue={THEME_OPTIONS.find(
-				(option) => option.value === colorMode(),
-			)}
+			value={THEME_OPTIONS.find((option) => option.value === colorMode())}
 			onChange={(option) => {
 				setColorMode(option.value)
 			}}
 			gutter={8}
 			sameWidth={false}
 			placement='bottom'
+			disallowEmptySelection={true}
 			itemComponent={(props) => (
 				<Select.Item
 					item={props.item}
 					class='flex items-center space-x-2 px-3 py-1 text-sm outline-none ui-selected:text-sky-700 ui-highlighted:bg-zinc-100 transition-colors cursor-pointer hover:bg-zinc-100'
 				>
-					{props.item.rawValue.icon()}
+					{props.item.rawValue.icon({ class: 'h-4 w-4' })}
 					<Select.ItemLabel>{props.item.rawValue.label}</Select.ItemLabel>
 				</Select.Item>
 			)}
@@ -83,13 +87,8 @@ export function ThemeSelector() {
 				class='flex p-2.5 rounded-md cursor-pointer items-center justify-center transition text-zinc-700 hover:text-zinc-800 hover:bg-zinc-100'
 			>
 				<Select.Value<ThemeOption>>
-					{({ selectedOptions }) => (
-						<Dynamic
-							component={
-								selectedOptions()[0]!.value === 'dark' ? MoonIcon : SunIcon
-							}
-							class='h-5 w-5'
-						/>
+					{({ selectedOption }) => (
+						<Dynamic component={selectedOption().icon} class='h-5 w-5' />
 					)}
 				</Select.Value>
 			</Select.Trigger>
