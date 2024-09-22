@@ -1,6 +1,7 @@
 
 dist
 lib
+!src/lib
 .solid
 .output
 .vercel
