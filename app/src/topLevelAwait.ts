@@ -1,7 +1,7 @@
 import { registerPluginServices } from './pluginManager'
 import { createDb, createKysely, createTx } from './sqlite/crsqlite'
 import { pluginEntityToDomain } from './sqlite/util'
-import { createResource, createSignal, untrack } from 'solid-js'
+import { createResource } from 'solid-js'
 import { cwaClient } from './trpcClient'
 import { initThreadPool } from 'fsrs-browser'
 
@@ -47,21 +47,4 @@ export async function initFsrsTrainThreadPool() {
 	}
 }
 
-const currentTheme = () =>
-	document.documentElement.className.includes('dark')
-		? ('dark' as const)
-		: ('light' as const)
-
-export const [theme, setTheme] = createSignal<'light' | 'dark'>(currentTheme())
-
-new MutationObserver((_: MutationRecord[]) => {
-	const current = currentTheme()
-	if (current !== untrack(theme)) {
-		setTheme(current)
-	}
-}).observe(document.documentElement, {
-	attributes: true,
-})
-
-export const agGridTheme = () =>
-	theme() === 'light' ? 'ag-theme-alpine' : 'ag-theme-alpine-dark'
+export { theme, setTheme, agGridTheme } from 'shared-dom/themeSelector'

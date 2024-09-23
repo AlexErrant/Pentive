@@ -8,6 +8,7 @@ import {
 	type VoidComponent,
 } from 'solid-js'
 import { Dynamic } from 'solid-js/web'
+import { untrack } from 'solid-js'
 import nightwind from 'nightwind/helper'
 import { DesktopIcon, MoonIcon, SunIcon } from './icons'
 
@@ -41,6 +42,18 @@ export function ThemeSelector() {
 	const [colorMode, setColorMode] = createSignal<Themes>('system')
 
 	onMount(() => {
+		const currentTheme = () =>
+			document.documentElement.className.includes('dark')
+				? ('dark' as const)
+				: ('light' as const)
+		new MutationObserver((_: MutationRecord[]) => {
+			const current = currentTheme()
+			if (current !== untrack(theme)) {
+				setTheme(current)
+			}
+		}).observe(document.documentElement, {
+			attributes: true,
+		})
 		const mode = window.localStorage.getItem('nightwind-mode')
 		if (mode === 'light' || mode === 'dark') {
 			setColorMode(mode)
@@ -100,3 +113,8 @@ export function ThemeSelector() {
 		</Select.Root>
 	)
 }
+
+export const [theme, setTheme] = createSignal<'light' | 'dark'>('light')
+
+export const agGridTheme = () =>
+	theme() === 'light' ? 'ag-theme-alpine' : 'ag-theme-alpine-dark'
