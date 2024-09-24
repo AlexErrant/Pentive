@@ -11,8 +11,8 @@ import {
 import { LicenseManager } from 'ag-grid-enterprise'
 import '@github/relative-time-element'
 import { notEmpty, type PeerDisplayName, type PeerJsId } from 'shared'
-import { agGridTheme } from '../topLevelAwait'
 import { type WholeDbRtcPublic } from '../sqlite/wholeDbRtc'
+import { agGridTheme, useThemeContext } from 'shared-dom/themeSelector'
 
 export interface Peer {
 	id: PeerJsId
@@ -81,8 +81,9 @@ const PeersTable: VoidComponent<{
 			},
 		),
 	)
+	const [theme] = useThemeContext()
 	return (
-		<div class={agGridTheme()}>
+		<div class={agGridTheme(theme)}>
 			<AgGridSolid
 				sideBar={{
 					position: 'left',

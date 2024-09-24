@@ -1,11 +1,13 @@
 import { type JSX, createEffect } from 'solid-js'
 import { Router } from '@solidjs/router'
 import { navLinks, routes } from './routes'
-import { C, theme } from './topLevelAwait'
+import { C } from './topLevelAwait'
 import { Toaster } from 'solid-toast'
 import 'golden-layout/dist/css/goldenlayout-base.css'
+import { useThemeContext } from 'shared-dom/themeSelector'
 
 export default function App(): JSX.Element {
+	const [theme] = useThemeContext()
 	createEffect(() => {
 		if (theme() === 'light') {
 			import('golden-layout/dist/css/themes/goldenlayout-light-theme.css')

@@ -48,7 +48,8 @@ import {
 } from 'codemirror-json-schema'
 import Ajv from 'ajv'
 import { db } from '../db'
-import { C, theme } from '../topLevelAwait'
+import { C } from '../topLevelAwait'
+import { useThemeContext } from 'shared-dom/themeSelector'
 
 const EditCardSetting: VoidComponent<{
 	cardSetting: CardSetting
@@ -58,6 +59,7 @@ const EditCardSetting: VoidComponent<{
 	let view: EditorView
 	const stringifiedCardSetting = () =>
 		JSON.stringify(props.cardSetting, null, 2)
+	const [theme] = useThemeContext()
 	onMount(() => {
 		view = new EditorView({
 			parent: ref,

@@ -53,8 +53,9 @@ import { globQuery } from 'shared-dom/language/globQuery'
 import * as qt from 'shared-dom/language/queryParser.terms'
 import { queryDecorations } from './queryDecorations'
 import { db } from '../db'
-import { C, theme } from '../topLevelAwait'
+import { C } from '../topLevelAwait'
 import { notEmpty } from 'shared'
+import { useThemeContext } from 'shared-dom/themeSelector'
 
 let view: EditorView
 const QueryEditor: VoidComponent<{
@@ -73,6 +74,7 @@ const QueryEditor: VoidComponent<{
 			view.requestMeasure()
 		}).observe(ref!)
 	})
+	const [theme] = useThemeContext()
 	createEffect(
 		on(theme, (t) => {
 			view.setState(createEditorState(props.value, t, props.setValue))

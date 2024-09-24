@@ -46,5 +46,3 @@ export async function initFsrsTrainThreadPool() {
 		isInitted = true
 	}
 }
-
-export { theme, setTheme, agGridTheme } from 'shared-dom/themeSelector'

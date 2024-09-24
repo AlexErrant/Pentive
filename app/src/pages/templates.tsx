@@ -14,9 +14,10 @@ import { render } from 'solid-js/web'
 import { EditTemplate } from 'shared-dom/editTemplate'
 import { cloneDeep } from 'lodash-es'
 import { ulidAsBase64Url } from '../domain/utility'
-import { C, theme } from '../topLevelAwait'
+import { C } from '../topLevelAwait'
 import TemplateSync from '../components/templateSync'
 import { db } from '../db'
+import { useThemeContext } from 'shared-dom/themeSelector'
 
 const getDefaultTemplate = () =>
 	getDefaultTemplateOg(ulidAsBase64Url() as TemplateId)
@@ -37,6 +38,7 @@ export default function Templates(): JSX.Element {
 	})
 	const [selected, setSelected] = createStore<{ template?: Template }>({})
 	let glRoot: HTMLDivElement
+	const [theme] = useThemeContext()
 	onMount(() => {
 		const goldenLayout = new GoldenLayout(glRoot)
 		goldenLayout.resizeWithContainerAutomatically = true

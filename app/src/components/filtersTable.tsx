@@ -5,9 +5,9 @@ import 'ag-grid-community/styles/ag-theme-alpine.css'
 import { type ColDef } from 'ag-grid-community'
 import { LicenseManager } from 'ag-grid-enterprise'
 import '@github/relative-time-element'
-import { agGridTheme } from '../topLevelAwait'
 import { db } from '../db'
 import { type TemplateId } from 'shared'
+import { agGridTheme, useThemeContext } from 'shared-dom/themeSelector'
 
 LicenseManager.setLicenseKey(import.meta.env.VITE_AG_GRID_LICENSE)
 
@@ -48,8 +48,9 @@ const FiltersTable: VoidComponent<{
 		)
 		return [...(await tags), ...(await templates)]
 	})
+	const [theme] = useThemeContext()
 	return (
-		<div class={agGridTheme() + ' h-full'}>
+		<div class={agGridTheme(theme) + ' h-full'}>
 			<AgGridSolid
 				autoGroupColumnDef={{
 					headerName: 'Filters',

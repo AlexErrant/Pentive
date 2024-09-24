@@ -14,8 +14,8 @@ import { objEntries, type Template, type TemplateId } from 'shared'
 import { startCase } from 'lodash-es'
 import '@github/relative-time-element'
 import { db } from '../db'
-import { agGridTheme } from '../topLevelAwait'
 import { Upload } from 'shared-dom/icons'
+import { agGridTheme, useThemeContext } from 'shared-dom/themeSelector'
 
 LicenseManager.setLicenseKey(import.meta.env.VITE_AG_GRID_LICENSE)
 
@@ -100,8 +100,9 @@ const TemplatesTable: VoidComponent<{
 	readonly templates: Template[]
 	readonly onSelectionChanged: (templates: Template[]) => void
 }> = (props) => {
+	const [theme] = useThemeContext()
 	return (
-		<div class={`${agGridTheme()} h-full`}>
+		<div class={`${agGridTheme(theme)} h-full`}>
 			<AgGridSolid
 				sideBar={{
 					position: 'left',

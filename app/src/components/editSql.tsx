@@ -37,13 +37,14 @@ import {
 	type VoidComponent,
 } from 'solid-js'
 import { oneDark } from '@codemirror/theme-one-dark'
-import { theme } from '../topLevelAwait'
+import { useThemeContext } from 'shared-dom/themeSelector'
 
 const EditSql: VoidComponent<{
 	run: (sql: string) => Promise<void>
 }> = (props) => {
 	let ref: HTMLDivElement | undefined
 	let view: EditorView
+	const [theme] = useThemeContext()
 	onMount(() => {
 		view = new EditorView({
 			parent: ref,

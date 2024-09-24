@@ -40,7 +40,8 @@ import { oneDark } from '@codemirror/theme-one-dark'
 import ResizingIframe from './resizingIframe'
 import { format } from 'prettier'
 import * as prettierPluginHtml from 'prettier/plugins/html'
-import { C, theme } from '../topLevelAwait'
+import { C } from '../topLevelAwait'
+import { useThemeContext } from 'shared-dom/themeSelector'
 
 let view: EditorView
 const FieldHtmlEditor: VoidComponent<{
@@ -49,6 +50,7 @@ const FieldHtmlEditor: VoidComponent<{
 	css: string
 }> = (props) => {
 	let ref: HTMLDivElement | undefined
+	const [theme] = useThemeContext()
 	onMount(async () => {
 		view = new EditorView({
 			parent: ref,

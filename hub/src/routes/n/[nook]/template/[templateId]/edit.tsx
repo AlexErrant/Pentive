@@ -16,17 +16,13 @@ import {
 } from '@solidjs/router'
 import { getTemplate } from 'shared-edge'
 import { getUserId } from '~/session'
+import { useThemeContext } from 'shared-dom/themeSelector'
 
 const getDefaultTemplate = () =>
 	getDefaultTemplateOg(crypto.randomUUID() as TemplateId) // highTODO
 
 const saveButton = (template: { template: Template }) => (
-	<button
-		onClick={async () => {
-		}}
-	>
-		Save
-	</button>
+	<button onClick={async () => {}}>Save</button>
 )
 
 const getTemplateCached = cache(
@@ -60,6 +56,7 @@ export default function Edit(props: RouteSectionProps): JSX.Element {
 				props.params.nook as NookId,
 			),
 	)
+	const [theme] = useThemeContext()
 	return (
 		<main>
 			<h1>Edit Template</h1>
@@ -67,7 +64,7 @@ export default function Edit(props: RouteSectionProps): JSX.Element {
 				<EditTemplate
 					getDefaultTemplate={getDefaultTemplate}
 					saveButton={saveButton}
-					theme={'light'} // nextTODO
+					theme={theme()}
 					renderContainer={defaultRenderContainer}
 					template={{
 						...template()!,

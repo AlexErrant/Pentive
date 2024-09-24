@@ -6,9 +6,14 @@ import {
 	onMount,
 	createEffect,
 	type VoidComponent,
+	createContext,
+	untrack,
+	type JSX,
+	useContext,
+	type Signal,
+	type Accessor,
 } from 'solid-js'
 import { Dynamic } from 'solid-js/web'
-import { untrack } from 'solid-js'
 import nightwind from 'nightwind/helper'
 import { DesktopIcon, MoonIcon, SunIcon } from './icons'
 
@@ -42,6 +47,7 @@ export function ThemeSelector() {
 	const [colorMode, setColorMode] = createSignal<Themes>('system')
 
 	onMount(() => {
+		const [theme, setTheme] = useThemeContext()
 		const currentTheme = () =>
 			document.documentElement.className.includes('dark')
 				? ('dark' as const)
@@ -114,7 +120,24 @@ export function ThemeSelector() {
 	)
 }
 
-export const [theme, setTheme] = createSignal<'light' | 'dark'>('light')
-
-export const agGridTheme = () =>
+export const agGridTheme = (theme: Accessor<'light' | 'dark'>) =>
 	theme() === 'light' ? 'ag-theme-alpine' : 'ag-theme-alpine-dark'
+
+const ThemeContext = createContext<Signal<'light' | 'dark'>>()
+
+export function ThemeProvider(props: { children: JSX.Element }) {
+	const [theme, setTheme] = createSignal<'light' | 'dark'>('light')
+	return (
+		<ThemeContext.Provider value={[theme, setTheme]}>
+			{props.children}
+		</ThemeContext.Provider>
+	)
+}
+
+export function useThemeContext() {
+	const context = useContext(ThemeContext)
+	if (context == null) {
+		throw new Error('useThemeContext: cannot find a ThemeContext')
+	}
+	return context
+}

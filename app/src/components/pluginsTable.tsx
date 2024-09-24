@@ -11,7 +11,8 @@ import { type Plugin } from 'shared-dom/plugin'
 import { db } from '../db'
 import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-alpine.css'
-import { C, agGridTheme } from '../topLevelAwait'
+import { C } from '../topLevelAwait'
+import { agGridTheme, useThemeContext } from 'shared-dom/themeSelector'
 
 LicenseManager.setLicenseKey(import.meta.env.VITE_AG_GRID_LICENSE)
 
@@ -70,9 +71,10 @@ const PluginsTable: VoidComponent = () => {
 	const [plugins] = createResource(db.getPlugins, {
 		initialValue: [],
 	})
+	const [theme] = useThemeContext()
 	return (
 		<Suspense fallback={<span>Loading...</span>}>
-			<div class={agGridTheme()}>
+			<div class={agGridTheme(theme)}>
 				<AgGridSolid
 					sideBar={{
 						position: 'left',

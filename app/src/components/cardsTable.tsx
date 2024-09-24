@@ -30,13 +30,14 @@ import {
 	unique,
 	type FieldValueHighlight,
 } from 'shared-dom/language/query2sql'
-import { C, agGridTheme } from '../topLevelAwait'
+import { C } from '../topLevelAwait'
 import FiltersTable from './filtersTable'
 import './cardsTable.css'
 import QueryEditor from './queryEditor'
 import { alterQuery } from '../domain/alterQuery'
 import CardsTableHelp from './cardsTableHelp'
 import { type Sort } from '../sqlite/card'
+import { agGridTheme, useThemeContext } from 'shared-dom/themeSelector'
 
 LicenseManager.setLicenseKey(import.meta.env.VITE_AG_GRID_LICENSE)
 
@@ -288,6 +289,7 @@ const CardsTable: VoidComponent<{
 		regexRight,
 		regexBoth,
 	} satisfies Regexes
+	const [theme] = useThemeContext()
 	return (
 		<div class='flex h-full flex-col'>
 			{showHelp() && <CardsTableHelp />}
@@ -303,7 +305,7 @@ const CardsTable: VoidComponent<{
 				{count() ?? '⏳'}
 				<Hamburger class='w-6' onclick={() => setHelp((x) => !x)} />
 			</div>
-			<div class={`${agGridTheme()} h-full`}>
+			<div class={`${agGridTheme(theme)} h-full`}>
 				<AgGridSolid
 					context={regexes}
 					sideBar={{
