@@ -97,11 +97,10 @@ export default createHandler(
 				` 'unsafe-inline';` + // 'unsafe-inline' due to "Consider adding 'unsafe-inline' (ignored by browsers supporting nonces/hashes) to be backward compatible with older browsers" https://csp-evaluator.withgoogle.com/
 				`connect-src 'self' ${import.meta.env.VITE_CWA_URL} ${import.meta.env.VITE_AUGC_URL}` +
 				(import.meta.env.DEV
-					? ` wss://${import.meta.env.VITE_HUB_DOMAIN}:*;`
+					? `data: wss://${import.meta.env.VITE_HUB_DOMAIN}:*;` // `data:` is useful for loading sourcemaps
 					: `;`) +
 				`img-src 'self';` +
-				`style-src 'self'` +
-				(import.meta.env.DEV ? ` 'nonce-${event.locals.cspNonce}';` : `;`) +
+				`style-src 'self' 'unsafe-inline';` + // unsafe-inline needed for codemirror
 				`frame-ancestors 'none';` +
 				`form-action 'self';` +
 				`base-uri 'self';` +
