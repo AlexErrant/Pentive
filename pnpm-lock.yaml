@@ -807,6 +807,9 @@ importers:
       '@tailwindcss/forms':
         specifier: ^0.5.7
         version: 0.5.7(tailwindcss@3.4.3(ts-node@10.9.2(@types/node@22.5.4)(typescript@5.4.5)))
+      '@thisbeyond/solid-select':
+        specifier: ^0.14.0 || See comment on html-to-text
+        version: 0.14.0(patch_hash=2qumt5mumsrcampzzb47wbecmy)(solid-js@1.8.18)
       '@types/iframe-resizer':
         specifier: ^3.5.10
         version: 3.5.10
