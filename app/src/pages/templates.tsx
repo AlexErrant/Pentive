@@ -3,34 +3,15 @@ import { type JSX, Show, onMount, For } from 'solid-js'
 import TemplatesTable from '../components/templatesTable'
 import { getTemplates } from './templates.data'
 import { createAsync } from '@solidjs/router'
-import {
-	type TemplateId,
-	type Template,
-	getDefaultTemplate as getDefaultTemplateOg,
-} from 'shared'
+import { type Template } from 'shared'
+import { getDefaultTemplate } from '../domain/utility'
 import ResizingIframe from '../components/resizingIframe'
 import { GoldenLayout, LayoutConfig } from 'golden-layout'
 import { render } from 'solid-js/web'
-import { EditTemplate } from 'shared-dom/editTemplate'
+import { EditTemplate } from '../components/editTemplate'
 import { cloneDeep } from 'lodash-es'
-import { ulidAsBase64Url } from '../domain/utility'
 import { C } from '../topLevelAwait'
 import TemplateSync from '../components/templateSync'
-import { db } from '../db'
-import { useThemeContext } from 'shared-dom/themeSelector'
-
-const getDefaultTemplate = () =>
-	getDefaultTemplateOg(ulidAsBase64Url() as TemplateId)
-
-const saveButton = (template: { template: Template }) => (
-	<button
-		onClick={async () => {
-			await db.upsertTemplate(template.template)
-		}}
-	>
-		Save
-	</button>
-)
 
 export default function Templates(): JSX.Element {
 	const templates = createAsync(async () => await getTemplates(), {
@@ -38,7 +19,6 @@ export default function Templates(): JSX.Element {
 	})
 	const [selected, setSelected] = createStore<{ template?: Template }>({})
 	let glRoot: HTMLDivElement
-	const [theme] = useThemeContext()
 	onMount(() => {
 		const goldenLayout = new GoldenLayout(glRoot)
 		goldenLayout.resizeWithContainerAutomatically = true
@@ -66,13 +46,7 @@ export default function Templates(): JSX.Element {
 				render(
 					() => (
 						<Show when={selected.template != null}>
-							<EditTemplate
-								getDefaultTemplate={getDefaultTemplate}
-								saveButton={saveButton}
-								theme={theme()}
-								renderContainer={C}
-								template={selected.template!}
-							/>
+							<EditTemplate template={selected.template!} />
 						</Show>
 					),
 					container.element,
@@ -98,15 +72,7 @@ export default function Templates(): JSX.Element {
 			(container) => {
 				container.element.style.overflow = 'auto'
 				render(
-					() => (
-						<EditTemplate
-							getDefaultTemplate={getDefaultTemplate}
-							saveButton={saveButton}
-							theme={theme()}
-							renderContainer={C}
-							template={getDefaultTemplate()}
-						/>
-					),
+					() => <EditTemplate template={getDefaultTemplate()} />,
 					container.element,
 				)
 			},

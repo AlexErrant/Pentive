@@ -1,11 +1,9 @@
-import { type VoidComponent, For, Show, createEffect, type JSX } from 'solid-js'
+import { type VoidComponent, For, Show, createEffect } from 'solid-js'
 import {
 	getDefaultTemplate,
 	type ChildTemplate,
 	type Template,
 	getDefaultClozeTemplate,
-	type NookId,
-	objEntries,
 	type Ord,
 } from 'shared'
 import { type SetStoreFunction, createStore } from 'solid-js/store'
@@ -24,70 +22,6 @@ interface StandardTemplateStore {
 	template: StandardTemplate
 }
 
-function removeNook(
-	nook: NookId,
-	setTemplate: SetStoreFunction<{
-		template: Template
-	}>,
-) {
-	return (
-		<button
-			type='button'
-			onClick={() => {
-				setTemplate('template', 'remotes', (x) => ({ ...x, [nook]: undefined }))
-			}}
-		>
-			❌
-		</button>
-	)
-}
-
-function remoteCell(
-	template: Template,
-	setTemplate: SetStoreFunction<{
-		template: Template
-	}>,
-): JSX.Element {
-	return (
-		<fieldset class='border-black border p-2'>
-			<legend>
-				<span class='p-2 px-2 font-bold'>Nooks</span>
-			</legend>
-			<ul>
-				<For each={objEntries(template.remotes)}>
-					{([nookId, remoteTemplate]) => (
-						<li class='px-4 py-2'>
-							<Show when={remoteTemplate != null} fallback={nookId}>
-								<a
-									href={`${import.meta.env.VITE_HUB_ORIGIN}/t/${
-										remoteTemplate!.remoteTemplateId
-									}`}
-								>
-									{nookId}
-								</a>
-							</Show>
-							{removeNook(nookId, setTemplate)}
-						</li>
-					)}
-				</For>
-			</ul>
-			<input
-				name='newNookId'
-				class='w-75px form-input rounded-lg border p-1 text-sm'
-				type='text'
-				onChange={(e) => {
-					setTemplate(
-						'template',
-						'remotes',
-						e.currentTarget.value as NookId,
-						null,
-					)
-				}}
-			/>
-		</fieldset>
-	)
-}
-
 export const EditTemplate: VoidComponent<{
 	template: Template
 	theme: 'light' | 'dark'
@@ -96,6 +30,12 @@ export const EditTemplate: VoidComponent<{
 		template: Template
 	}>
 	getDefaultTemplate: () => Template
+	remoteCell?: VoidComponent<{
+		template: Template
+		setTemplate: SetStoreFunction<{
+			template: Template
+		}>
+	}>
 }> = (props) => {
 	const [template, setTemplate] = createStore<{ template: Template }>({
 		// eslint-disable-next-line solid/reactivity
@@ -174,7 +114,12 @@ export const EditTemplate: VoidComponent<{
 				setTemplate={setTemplate}
 				theme={props.theme}
 			/>
-			{remoteCell(template.template, setTemplate)}
+			<Show when={props.remoteCell}>
+				{props.remoteCell!({
+					template: template.template,
+					setTemplate,
+				})}
+			</Show>
 			<props.saveButton template={template.template} />
 		</>
 	)

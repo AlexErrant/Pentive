@@ -68,7 +68,7 @@ export default function Edit(props: RouteSectionProps): JSX.Element {
 					renderContainer={defaultRenderContainer}
 					template={{
 						...template()!,
-						remotes: {}, // nextTODO
+						remotes: {}, // unused
 						fields: template()!.fields.map((f) => ({ name: f })),
 					}}
 				/>
