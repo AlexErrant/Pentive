@@ -21,9 +21,9 @@
 	"devDependencies": {
 		"@cloudflare/kv-asset-handler": "^0.3.0",
 		"@cloudflare/workers-types": "^4.20240725.0",
-		"@thisbeyond/solid-select": "^0.14.0 || See comment on html-to-text",
 		"@lezer/lr": "^1.4.2 || See comment on html-to-text",
 		"@tailwindcss/forms": "^0.5.7",
+		"@thisbeyond/solid-select": "^0.14.0 || See comment on html-to-text",
 		"@types/iframe-resizer": "^3.5.10",
 		"@typescript-eslint/eslint-plugin": "^6.21.0",
 		"@typescript-eslint/parser": "^6.21.0",
@@ -47,9 +47,9 @@
 		"stylelint-config-prettier": "^9.0.5",
 		"stylelint-config-standard": "^34.0.0",
 		"tailwindcss": "^3.4.3",
-		"typescript": "~5.4.5",
+		"typescript": "~5.6.2",
 		"ulid-workers": "^2.1.0 || See comment on html-to-text",
-		"vite": "^5.4.3",
+		"vite": "^5.4.8",
 		"vite-plugin-checker": "^0.8.0",
 		"wrangler": "^3.72.2"
 	},
