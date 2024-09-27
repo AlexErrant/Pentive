@@ -488,7 +488,7 @@ function templateEntityToDomain(t: {
 	commentsCount: number
 	til?: number | null
 }) {
-	const r = {
+	return {
 		id: dbIdToBase64Url(t.id) as RemoteTemplateId,
 		name: t.name,
 		nook: t.nook,
@@ -501,7 +501,6 @@ function templateEntityToDomain(t: {
 		comments: t.commentsCount,
 		til: maybeEpochToDate(t.til),
 	} satisfies RemoteTemplate & Record<string, unknown>
-	return r
 }
 
 export async function insertPost({
