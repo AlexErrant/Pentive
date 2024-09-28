@@ -3,6 +3,7 @@ import { getUserId } from '~/session'
 import { devLoginUrl, githubLoginUrl } from './api/auth/[...solidAuth]'
 import {
 	type RouteDefinition,
+	type RouteSectionProps,
 	cache,
 	createAsync,
 	redirect,
@@ -22,7 +23,7 @@ export const route = {
 	},
 } satisfies RouteDefinition
 
-export default function Login(): JSX.Element {
+export default function Login(props: RouteSectionProps): JSX.Element {
 	const emptyString = createAsync(async () => await getUserIdCached())
 	const [alphaKey, setAlphaKey] = createSignal('')
 	return (
@@ -47,17 +48,26 @@ export default function Login(): JSX.Element {
 					<>
 						<h2>Dev Login</h2>
 						<div>
-							<a target='_self' href={devLoginUrl('Griddle')}>
+							<a
+								target='_self'
+								href={devLoginUrl('Griddle', props.location.query)}
+							>
 								Sign in as Griddle
 							</a>
 						</div>
 						<div>
-							<a target='_self' href={devLoginUrl('Harry')}>
+							<a
+								target='_self'
+								href={devLoginUrl('Harry', props.location.query)}
+							>
 								Sign in as Harry
 							</a>
 						</div>
 						<div>
-							<a target='_self' href={devLoginUrl('Campal')}>
+							<a
+								target='_self'
+								href={devLoginUrl('Campal', props.location.query)}
+							>
 								Sign in as Campal
 							</a>
 						</div>
