@@ -1,10 +1,13 @@
 import { Show } from 'solid-js'
 import { insertPost, ulidAsHex } from 'shared-edge'
-import { requireCsrfSignature, requireSession, isInvalidCsrf } from '~/session'
+import {
+	requireSession,
+	isInvalidCsrf,
+	getCsrfSignatureCached,
+} from '~/session'
 import {
 	type RouteDefinition,
 	action,
-	cache,
 	createAsync,
 	redirect,
 	useSubmission,
@@ -29,12 +32,6 @@ function validateNook(nook: unknown): string | undefined {
 		return `Nook must be at least 1 character long.`
 	}
 }
-
-// eslint-disable-next-line @typescript-eslint/require-await
-const getCsrfSignatureCached = cache(async () => {
-	'use server'
-	return requireCsrfSignature()
-}, 'csrfSignature')
 
 interface ValidationError {
 	message: string
@@ -91,14 +88,16 @@ const submitting = action(async (form: FormData) => {
 })
 
 export const route = {
-	preload() {
-		void getCsrfSignatureCached()
+	preload({ location }) {
+		void getCsrfSignatureCached(location.pathname)
 	},
 } satisfies RouteDefinition
 
 export default function Thread(props: RouteSectionProps) {
 	const isSubmitting = useSubmission(submitting)
-	const csrfSignature = createAsync(async () => await getCsrfSignatureCached())
+	const csrfSignature = createAsync(
+		async () => await getCsrfSignatureCached(props.location.pathname),
+	)
 	const error = () => isSubmitting.error as undefined | ValidationError
 
 	// highTODO idempotency token

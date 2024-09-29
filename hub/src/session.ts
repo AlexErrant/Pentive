@@ -6,7 +6,7 @@ import {
 	type UserId,
 } from 'shared'
 import { base64ToArray } from 'shared-edge'
-import { redirect } from '@solidjs/router'
+import { cache, redirect } from '@solidjs/router'
 import {
 	CookieManager,
 	EncryptedCookieManager,
@@ -129,15 +129,20 @@ export async function requireUserId(redirectTo?: string) {
 	return r
 }
 
-export function requireCsrfSignature(redirectTo?: string) {
+function requireCsrfSignature(redirectTo: string) {
 	const csrfSignature = getCsrfSignature()
 	if (csrfSignature == null) {
-		redirectTo ??= new URL(getRequestEvent()!.request.url).pathname
 		const searchParams = new URLSearchParams([['redirectTo', redirectTo]])
 		throw redirect(`/login?${searchParams.toString()}`) as unknown
 	}
 	return csrfSignature
 }
+
+// eslint-disable-next-line @typescript-eslint/require-await
+export const getCsrfSignatureCached = cache(async (pathname: string) => {
+	'use server'
+	return requireCsrfSignature(pathname)
+}, 'csrfSignature')
 
 export async function requireSession(redirectTo?: string) {
 	const session = await getSession()

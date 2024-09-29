@@ -1,28 +1,21 @@
 import { For, Show } from 'solid-js'
 import { createNook } from 'shared-edge'
 import {
-	requireCsrfSignature,
 	requireSession,
 	isInvalidCsrf,
 	requireUserId,
+	getCsrfSignatureCached,
 } from '~/session'
 import { type NookType, type NookId, nookTypes } from 'shared'
 import {
 	type RouteDefinition,
 	action,
-	cache,
 	createAsync,
 	redirect,
 	useSubmission,
 	type RouteSectionProps,
 } from '@solidjs/router'
 import { getRequestEvent } from 'solid-js/web'
-
-// eslint-disable-next-line @typescript-eslint/require-await
-const getCsrfSignatureCached = cache(async () => {
-	'use server'
-	return requireCsrfSignature()
-}, 'csrfSignature')
 
 function validateSidebar(sidebar: unknown): string | undefined {
 	if (typeof sidebar !== 'string' || sidebar.length < 3) {
@@ -99,13 +92,15 @@ const submitting = action(async (form: FormData) => {
 })
 
 export const route = {
-	preload() {
-		void getCsrfSignatureCached()
+	preload({ location }) {
+		void getCsrfSignatureCached(location.pathname)
 	},
 } satisfies RouteDefinition
 
 export default function Submit(props: RouteSectionProps) {
-	const csrfSignature = createAsync(async () => await getCsrfSignatureCached())
+	const csrfSignature = createAsync(
+		async () => await getCsrfSignatureCached(props.location.pathname),
+	)
 	const isSubmitting = useSubmission(submitting)
 	const error = () => isSubmitting.error as undefined | ValidationError
 
