@@ -53,7 +53,12 @@ const Sidebar: VoidComponent<{
 					<a href={`/n/${props.nook}`} class='block text-lg font-bold'>
 						/n/{props.nook}
 					</a>
-					<a href={`/n/${props.nook}/templates`}>Templates</a>
+					<a href={`/n/${props.nook}/templates`} class='block'>
+						Templates
+					</a>
+					<a href={`/n/${props.nook}/submit`} class='block'>
+						Submit
+					</a>
 					<div>
 						Est. <RelativeDate date={nd().created} />
 					</div>

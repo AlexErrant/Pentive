@@ -22,6 +22,7 @@ import {
 import { getCasedUserId, getUserIdByEmail, registerUser } from 'shared-edge'
 import { type PageEvent } from '@solidjs/start/server'
 import { type Params, redirect } from '@solidjs/router'
+import { throwExp } from 'shared'
 
 export const githubLoginUrl = (alphaKey: string) =>
 	import.meta.env.VITE_HUB_ORIGIN +
@@ -42,10 +43,15 @@ export const GET = async ({ request }: PageEvent) => {
 			if ((await getCasedUserId(username)) == null) {
 				await registerUser(username, username + '@pentive.com')
 			}
-			return await createUserSession(
-				username,
-				url.searchParams.get('redirectTo') ?? '/',
-			)
+			const redirectTo = url.searchParams.get('redirectTo')
+			if (redirectTo === '/_server/') {
+				if (import.meta.env.PROD) {
+					return await createUserSession(username, '/')
+				} else {
+					throwExp('redirectTo needs fixing')
+				}
+			}
+			return await createUserSession(username, redirectTo ?? '/')
 		}
 	}
 	const url = new URL(request.url)
