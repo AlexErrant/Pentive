@@ -8,6 +8,7 @@ import {
 	type RouteSectionProps,
 } from '@solidjs/router'
 import RelativeDate from '~/components/relativeDate'
+import { IsModProvider } from '~/components/isModContext'
 
 const getNookDetailsCached = cache(async (nook?: string) => {
 	'use server'
@@ -29,12 +30,14 @@ export default function NookLayout(props: RouteSectionProps) {
 		<Show
 			when={nookDetails() == null}
 			fallback={
-				<div class='flex'>
-					<div class='grow'>{props.children}</div>
-					<aside class='basis-40'>
-						<Sidebar nook={props.params.nook!} nookDetails={nookDetails()!} />
-					</aside>
-				</div>
+				<IsModProvider moderators={nookDetails()!.moderators}>
+					<div class='flex'>
+						<div class='grow'>{props.children}</div>
+						<aside class='basis-40'>
+							<Sidebar nook={props.params.nook!} nookDetails={nookDetails()!} />
+						</aside>
+					</div>
+				</IsModProvider>
 			}
 		>
 			<a href={`/nooks/create?nook=${props.params.nook ?? ''}`}>Create Nook</a>

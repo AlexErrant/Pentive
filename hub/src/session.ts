@@ -105,7 +105,9 @@ export interface HubSession {
 }
 
 export async function getSession() {
-	const cookie = getRequestEvent()!.request.headers.get('Cookie')
+	const event = getRequestEvent()
+	if (event == null) return null
+	const cookie = event.request.headers.get('Cookie')
 	const payload = await sessionCM.parse(cookie, env().hubSessionSecret)
 	if (payload == null) return null
 	return {
