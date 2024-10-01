@@ -1,13 +1,8 @@
 import { ThemeSelector } from 'shared-dom/themeSelector'
 import { type JSX, Show } from 'solid-js'
-import {
-	A,
-	action,
-	cache,
-	createAsync,
-	type RouteDefinition,
-} from '@solidjs/router'
-import { getUserId, logout } from '~/session'
+import { A, action } from '@solidjs/router'
+import { logout } from '~/session'
+import { useUserIdContext } from './userIdContext'
 
 // eslint-disable-next-line @typescript-eslint/require-await
 const logoutAction = action(async () => {
@@ -15,19 +10,8 @@ const logoutAction = action(async () => {
 	return logout()
 })
 
-const getUserIdCached = cache(async () => {
-	'use server'
-	return await getUserId()
-}, 'userId')
-
-export const route = {
-	preload() {
-		void getUserIdCached()
-	},
-} satisfies RouteDefinition
-
 function Nav(): JSX.Element {
-	const userId = createAsync(async () => await getUserIdCached())
+	const userId = useUserIdContext()
 	return (
 		<header class='header'>
 			<nav class='inner flex'>

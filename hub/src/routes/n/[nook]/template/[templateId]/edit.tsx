@@ -50,7 +50,7 @@ export const route = {
 } satisfies RouteDefinition
 
 export default function Edit(props: RouteSectionProps): JSX.Element {
-	const [isMod] = useIsModContext()
+	const isMod = useIsModContext()
 	const template = createAsync(
 		async () =>
 			await getTemplateCached(

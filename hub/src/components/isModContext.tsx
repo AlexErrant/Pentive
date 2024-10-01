@@ -1,27 +1,16 @@
-import { createAsync } from '@solidjs/router'
-import {
-	createContext,
-	type Signal,
-	type JSX,
-	createSignal,
-	useContext,
-	createEffect,
-} from 'solid-js'
-import { getUserId } from '~/session'
+import { createContext, type JSX, useContext, type Accessor } from 'solid-js'
+import { useUserIdContext } from './userIdContext'
 
-const IsModContext = createContext<Signal<boolean>>()
+const IsModContext = createContext<Accessor<boolean>>()
 
 export function IsModProvider(props: {
 	moderators: string[]
 	children: JSX.Element
 }) {
-	const userId = createAsync(async () => await getUserId())
-	const [isMod, setIsMod] = createSignal<boolean>(false)
-	createEffect(() => {
-		if (props.moderators.includes(userId() as string)) setIsMod(true)
-	})
+	const userId = useUserIdContext()
+	const isMod = () => props.moderators.includes(userId() as string)
 	return (
-		<IsModContext.Provider value={[isMod, setIsMod]}>
+		<IsModContext.Provider value={isMod}>
 			{props.children}
 		</IsModContext.Provider>
 	)
