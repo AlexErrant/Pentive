@@ -18,12 +18,27 @@ import { getTemplate } from 'shared-edge'
 import { getUserId } from '~/session'
 import { useThemeContext } from 'shared-dom/themeSelector'
 import { useIsModContext } from '~/components/isModContext'
+import { cwaClient } from 'app/trpcClient'
 
 const getDefaultTemplate = () =>
 	getDefaultTemplateOg(crypto.randomUUID() as TemplateId) // highTODO
 
 const saveButton = (template: { template: Template }) => (
-	<button onClick={async () => {}}>Save</button>
+	<button
+		onClick={async () => {
+			await cwaClient.editTemplates.mutate([
+				{
+					name: template.template.name,
+					css: template.template.css,
+					templateType: template.template.templateType,
+					remoteIds: [template.template.id],
+					fields: template.template.fields.map((x) => x.name),
+				},
+			])
+		}}
+	>
+		Save
+	</button>
 )
 
 const getTemplateCached = cache(
