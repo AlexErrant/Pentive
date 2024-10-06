@@ -68,6 +68,10 @@ async function uploadNotes(): Promise<void> {
 }
 
 async function uploadTemplates(): Promise<void> {
+	const media = await db.getTemplateMediaToUpload()
+	for (const [mediaId, { data, ids }] of media) {
+		await postMedia('template', mediaId, ids, data)
+	}
 	const newTemplates = await db.getNewTemplatesToUpload()
 	if (newTemplates.length > 0) {
 		const remoteIdByLocal = await cwaClient.createTemplates.mutate(newTemplates)
@@ -77,10 +81,6 @@ async function uploadTemplates(): Promise<void> {
 	if (editedTemplates.length > 0) {
 		await cwaClient.editTemplates.mutate(editedTemplates)
 		await db.markTemplateAsPushed(editedTemplates.flatMap((n) => n.remoteIds))
-	}
-	const media = await db.getTemplateMediaToUpload()
-	for (const [mediaId, { data, ids }] of media) {
-		await postMedia('template', mediaId, ids, data)
 	}
 	if (
 		editedTemplates.length === 0 &&
