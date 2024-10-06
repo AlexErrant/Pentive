@@ -154,11 +154,7 @@ reviewed {
 }
 
 RatingEnum[@dynamicPrecedence=1] {
-    enumNum<"1">
-  | enumNum<"2">
-  | enumNum<"3">
-  | enumNum<"4">
-  | enum<"again">
+    enum<"again">
   | enum<"hard">
   | enum<"good">
   | enum<"easy">
