@@ -221,7 +221,8 @@ export function toastInfo(userMsg: string, duration: number = 6000) {
 					<div class='relative pt-4'>
 						<div class='bg-cyan-100 h-1 w-full rounded-full' />
 						<div
-							class={`bg-cyan-800 absolute top-4 h-1 rounded-full w-[${life()}%]`}
+							class='bg-cyan-800 absolute top-4 h-1 rounded-full'
+							style={{ width: `${life()}%` }}
 						/>
 					</div>
 				</div>
