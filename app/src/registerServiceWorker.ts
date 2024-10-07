@@ -69,7 +69,7 @@ function initComlink(serviceWorker: ServiceWorker | null): void {
 }
 
 // https://stackoverflow.com/a/39710575
-addEventListener('unload', closeComlink)
+addEventListener('beforeunload', closeComlink)
 
 function closeComlink(): void {
 	const close: ComlinkClose = {
