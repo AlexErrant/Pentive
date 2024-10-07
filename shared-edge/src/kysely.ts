@@ -769,7 +769,7 @@ export async function insertNotes(authorId: UserId, notes: CreateRemoteNote[]) {
 		return ncs.map(({ noteCreate, remoteIdBase64url, remoteTemplateId }) => {
 			const t =
 				templates.find((t) => dbIdToBase64Url(t.id) === remoteTemplateId) ??
-				throwExp(`Template not found - should be impossible.`)
+				throwExp()
 			return [noteCreate, [[n.localId, t.nook], remoteIdBase64url]] as const
 		})
 	})
@@ -884,8 +884,7 @@ function toNoteCreates(n: EditRemoteNote | CreateRemoteNote, authorId: UserId) {
 			? new Map(
 					Array.from(n.remoteIds).map(([remoteNoteId, remoteTemplateId]) => [
 						base64url.decode(remoteNoteId + '=='),
-						remoteTemplateId ??
-							throwExp('grep E7F24704-8D0B-460A-BF2C-A97344C535E0'),
+						remoteTemplateId,
 					]),
 				)
 			: new Map(n.remoteTemplateIds.map((rt) => [ulidAsRaw(), rt]))

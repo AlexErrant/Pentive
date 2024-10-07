@@ -5,7 +5,7 @@ import {
 } from 'workbox-precaching'
 import * as Comlink from 'comlink'
 import type { Expose, PostMessageTypes } from './registerServiceWorker'
-import type { MediaId } from 'shared'
+import { throwExp, type MediaId } from 'shared'
 import { NavigationRoute, registerRoute } from 'workbox-routing'
 
 declare let self: ServiceWorkerGlobalScope
@@ -112,12 +112,7 @@ async function getMessenger(clientId: string) {
 			console.warn(
 				`Client '${clientId}' not found. Defaulting to '${firstClientId}'. This message is expected if you open a resource by itself, i.e. "right click > Open image in new tab".`,
 			)
-			return (
-				messengers.get(firstClientId) ??
-				throwExp(
-					'Impossible because we got it from the `messengers` map above.',
-				)
-			)
+			return messengers.get(firstClientId) ?? throwExp()
 		}
 		i++
 		// console.info("messenger is null - loop ", i)
@@ -143,13 +138,6 @@ self.addEventListener('fetch', (fetch) => {
 		fetch.respondWith(getLocalMediaResponse(mediaId, fetch.clientId))
 	}
 })
-
-// same as `throwExp` in `shared`, but for some reason adding it causes
-//     Circular dependency: ../node_modules/.pnpm/kysely@0.23.5/node_modules/kysely/dist/esm/parser/table-parser.js -> ../node_modules/.pnpm/kysely@0.23.5/node_modules/kysely/dist/esm/parser/expression-parser.js -> ../node_modules/.pnpm/kysely@0.23.5/node_modules/kysely/dist/esm/parser/parse-utils.js -> ../node_modules/.pnpm/kysely@0.23.5/node_modules/kysely/dist/esm/query-builder/expression-builder.js -> ../node_modules/.pnpm/kysely@0.23.5/node_modules/kysely/dist/esm/query-builder/select-query-builder.js -> ../node_modules/.pnpm/kysely@0.23.5/node_modules/kysely/dist/esm/parser/join-parser.js -> ../node_modules/.pnpm/kysely@0.23.5/node_modules/kysely/dist/esm/parser/table-parser.js
-// with `pnpm build` which I've no idea how to fix
-function throwExp(errorMessage: string): never {
-	throw new Error(errorMessage)
-}
 
 // From https://developer.mozilla.org/en-US/docs/Web/JavaScript/Memory_management#weakrefs_and_finalizationregistry in particular
 // https://github.com/mdn/content/blob/50a5ce565b2fa0b988b3f5ff90ea4b24b13e4b9d/files/en-us/web/javascript/memory_management/index.md?plain=1#L270-L293

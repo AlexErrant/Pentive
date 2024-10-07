@@ -27,11 +27,19 @@ export function nullMap<T, R>(t: T | null, f: (_: T) => R): R | null {
 }
 
 // https://stackoverflow.com/a/65666402
-export function throwExp(error: unknown): never {
+export function throwExp(error?: unknown): never {
+	// eslint-disable-next-line no-debugger
+	debugger
+	if (error == null) {
+		console.trace()
+		throw new Error(
+			'This error should never occur - please open an issue if you see this!',
+		)
+	}
 	if (typeof error === 'string') {
 		throw new Error(error)
 	}
-	throw error
+	throw error as unknown
 }
 
 // https://stackoverflow.com/a/46700791/

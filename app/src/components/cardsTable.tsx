@@ -103,7 +103,7 @@ const shortRenderer = (index: number, props: ICellRendererParams<NoteCard>) => {
 					} else if (rr?.test(text) === true) {
 						r.push({ isHighlight: right, text })
 					} else {
-						throwExp('impossible')
+						throwExp()
 					}
 				}
 				i = match.index + text.length

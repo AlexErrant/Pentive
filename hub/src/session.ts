@@ -111,8 +111,8 @@ export async function getSession() {
 	const payload = await sessionCM.parse(cookie, env().hubSessionSecret)
 	if (payload == null) return null
 	return {
-		sub: (payload.sub as UserId) ?? throwExp('`sub` is empty'),
-		jti: payload.jti ?? throwExp('`jti` is empty'),
+		sub: (payload.sub as UserId) ?? throwExp(),
+		jti: payload.jti ?? throwExp(),
 	}
 }
 
@@ -227,7 +227,7 @@ export async function getInfo(request: Request) {
 		env().hubInfoSecret,
 	)
 	if (payload == null) return null
-	return (payload.info as string) ?? throwExp('`info` is empty')
+	return (payload.info as string) ?? throwExp()
 }
 
 let maybeCsrfKey: CryptoKey | null = null

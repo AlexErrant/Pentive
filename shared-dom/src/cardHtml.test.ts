@@ -59,7 +59,7 @@ function buildTemplate(
 }
 
 export function getOk(result: HtmlResult) {
-	return getOkSafe(result) ?? throwExp('ya goofed')
+	return getOkSafe(result) ?? throwExp()
 }
 
 function testBody(
@@ -926,7 +926,7 @@ describe('standardTemplate tags', () => {
     {{Back}}`,
 					'standard',
 				),
-			) ?? throwExp('should never happen')
+			) ?? throwExp()
 		expect(front).toBe('What is the capital of Canada?')
 		expect(back).toBe(`What is the capital of Canada?
     <hr id=answer>
@@ -946,7 +946,7 @@ describe('standardTemplate tags', () => {
     {{Back}}`,
 					'standard',
 				),
-			) ?? throwExp('should never happen')
+			) ?? throwExp()
 		expect(front).toBe('What is the capital of Canada?Geography')
 		expect(back).toBe(`What is the capital of Canada?Geography
     <hr id=answer>
@@ -968,7 +968,7 @@ describe('standardTemplate tags', () => {
     {{Back}}`,
 					'standard',
 				),
-			) ?? throwExp('should never happen')
+			) ?? throwExp()
 		expect(front).toBe('What is the capital of Canada?Geography, Capital')
 		expect(back).toBe(`What is the capital of Canada?Geography, Capital
     <hr id=answer>
@@ -988,7 +988,7 @@ describe('standardTemplate tags', () => {
     {{Back}}`,
 					'standard',
 				),
-			) ?? throwExp('should never happen')
+			) ?? throwExp()
 		expect(front).toBe('What is the capital of Canada?')
 		expect(back).toBe(`What is the capital of Canada?
     <hr id=answer>
@@ -1008,7 +1008,7 @@ describe('standardTemplate tags', () => {
     {{Back}}`,
 					'standard',
 				),
-			) ?? throwExp('should never happen')
+			) ?? throwExp()
 		expect(front).toBe('What is the capital of Canada?Tags: Geography')
 		expect(back).toBe(`What is the capital of Canada?Tags: Geography
     <hr id=answer>
@@ -1030,7 +1030,7 @@ describe('standardTemplate tags', () => {
     {{Back}}`,
 					'standard',
 				),
-			) ?? throwExp('should never happen')
+			) ?? throwExp()
 		expect(front).toBe('What is the capital of Canada?Tags: Geography, Capital')
 		expect(back).toBe(`What is the capital of Canada?Tags: Geography, Capital
     <hr id=answer>
@@ -1050,7 +1050,7 @@ describe('standardTemplate tags', () => {
     {{Back}}`,
 					'standard',
 				),
-			) ?? throwExp('should never happen')
+			) ?? throwExp()
 		expect(front).toBe('What is the capital of Canada?Tags:')
 		expect(back).toBe(`What is the capital of Canada?Tags:
     <hr id=answer>
@@ -1070,7 +1070,7 @@ describe('standardTemplate tags', () => {
     {{Back}}`,
 					'standard',
 				),
-			) ?? throwExp('should never happen')
+			) ?? throwExp()
 		expect(front).toBe('What is the capital of Canada?')
 		expect(back).toBe(`What is the capital of Canada?
     <hr id=answer>
@@ -1092,7 +1092,7 @@ describe('standardTemplate tags', () => {
     {{Back}}`,
 					'standard',
 				),
-			) ?? throwExp('should never happen')
+			) ?? throwExp()
 		expect(front).toBe('What is the capital of Canada?')
 		expect(back).toBe(`What is the capital of Canada?
     <hr id=answer>

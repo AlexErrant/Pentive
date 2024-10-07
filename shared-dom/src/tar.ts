@@ -22,9 +22,11 @@ export class TarReader {
 		return await new Promise((resolve, reject) => {
 			const reader = new FileReader()
 			reader.onload = (event) => {
-				if (event.target?.result == null) throwExp('unexpected null')
-				if (typeof event.target.result === 'string')
-					throwExp('unexpected string')
+				if (
+					event.target?.result == null ||
+					typeof event.target.result === 'string'
+				)
+					throwExp()
 				this.buffer = event.target.result
 				this.fileInfo = []
 				this._readFileInfo()

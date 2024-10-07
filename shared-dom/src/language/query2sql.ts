@@ -176,7 +176,7 @@ function buildContent(node: SyntaxNodeRef, input: string, negate: boolean) {
 	let valueFrom
 	let valueTo
 	const regex: string[] = []
-	if (node.node.firstChild == null) throwExp('How did you get this error?')
+	if (node.node.firstChild == null) throwExp()
 	let child = node.node.firstChild.nextSibling
 	let close = null
 	while (child != null) {
@@ -361,7 +361,7 @@ function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
 					  node.type.is(qt.RawHtml) ||
 					  node.type.is(qt.RawQuoted)
 					? buildContent(node, input, negate)
-					: throwExp('You missed ' + node.type.name)
+					: throwExp()
 		attachQuery(node, label, context, {
 			type:
 				node.type.is(qt.Quoted1) ||
@@ -442,7 +442,7 @@ function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
 								? 3
 								: rating === 'easy'
 									? 4
-									: throwExp('Impossible')
+									: throwExp()
 				child.ratingComparison = comparison
 			}
 		}
@@ -544,7 +544,7 @@ function handleField(
 	valueSql: RawBuilder<SqlBool>,
 ) {
 	if (node.label === field) {
-		if (node.field === undefined) throwExp('impossible')
+		if (node.field === undefined) throwExp()
 		const fieldSql =
 			node.field.type === 'Regex'
 				? regexpWithFlags(node.field, `noteFieldValue.field`, true)
@@ -646,15 +646,15 @@ function handleLabel(node: QueryString | QueryRegex, context: Context) {
 			context.like(node, 'templateNameFts', 'name')
 		}
 	} else if (node.label === templateId) {
-		if (node.type === 'Regex') throwExp("you can't regex templateId")
+		if (node.type === 'Regex') throwExp()
 		const equals = sql.raw(node.negate ? '!=' : '=')
 		context.parameterizeSql(sql`note.templateId ${equals} ${node.value}`)
 	} else if (node.label === cardId) {
-		if (node.type === 'Regex') throwExp("you can't regex cardId")
+		if (node.type === 'Regex') throwExp()
 		const equals = sql.raw(node.negate ? '!=' : '=')
 		context.parameterizeSql(sql`card.id ${equals} ${node.value}`)
 	} else if (node.label === noteId) {
-		if (node.type === 'Regex') throwExp("you can't regex noteId")
+		if (node.type === 'Regex') throwExp()
 		const equals = sql.raw(node.negate ? '!=' : '=')
 		context.parameterizeSql(sql`note.id ${equals} ${node.value}`)
 	} else if (node.label === setting) {
@@ -665,11 +665,11 @@ function handleLabel(node: QueryString | QueryRegex, context: Context) {
 			context.like(node, 'cardSettingNameFts', 'name')
 		}
 	} else if (node.label === settingId) {
-		if (node.type === 'Regex') throwExp("you can't regex settingId")
+		if (node.type === 'Regex') throwExp()
 		const equals = sql.raw(node.negate ? '!=' : '=')
 		context.parameterizeSql(sql`card.cardSettingId ${equals} ${node.value}`)
 	} else if (node.label === kind) {
-		if (node.type === 'Regex') throwExp("you can't regex kind")
+		if (node.type === 'Regex') throwExp()
 		context.joinLatestReview = true
 		const value = node.value as (typeof kindEnums)[number]
 		const n =
@@ -685,7 +685,7 @@ function handleLabel(node: QueryString | QueryRegex, context: Context) {
 		const equals = sql.raw(node.negate ? 'IS NOT' : 'IS')
 		context.parameterizeSql(sql`latestReview.kind ${equals} ${n}`)
 	} else if (node.label === state) {
-		if (node.type === 'Regex') throwExp("you can't regex state")
+		if (node.type === 'Regex') throwExp()
 		const value = node.value as (typeof stateEnums)[number]
 		const n =
 			value === 'normal'
@@ -708,7 +708,7 @@ function handleLabel(node: QueryString | QueryRegex, context: Context) {
 			context.parameterizeSql(sql`card.state ${equals} ${n}`)
 		}
 	} else if (node.label === reviewed) {
-		if (node.type === 'Regex') throwExp("you can't regex reviewed")
+		if (node.type === 'Regex') throwExp()
 		context.joinReview = true
 		context.trustedSql('(')
 		handleCreatedEditedDue(node, context, 'review', 'created')
@@ -721,7 +721,7 @@ function handleLabel(node: QueryString | QueryRegex, context: Context) {
 		}
 		context.trustedSql(')')
 	} else if (node.label === firstReviewed) {
-		if (node.type === 'Regex') throwExp("you can't regex reviewed")
+		if (node.type === 'Regex') throwExp()
 		context.joinFirstReview = true
 		context.trustedSql('(')
 		handleCreatedEditedDue(node, context, 'firstReview', 'created')
@@ -750,12 +750,12 @@ function handleLabel(node: QueryString | QueryRegex, context: Context) {
 	} else if (node.label === field) {
 		serialize(node, context)
 	} else if (node.label === lapses) {
-		if (node.type === 'Regex' || node.comparison == null) throwExp('impossible')
+		if (node.type === 'Regex' || node.comparison == null) throwExp()
 		context.parameterizeSql(
 			sql`card.lapses ${sql.raw(node.comparison)} ${parseInt(node.value)}`,
 		)
 	} else if (node.label === reps) {
-		if (node.type === 'Regex' || node.comparison == null) throwExp('impossible')
+		if (node.type === 'Regex' || node.comparison == null) throwExp()
 		context.parameterizeSql(
 			sql`card.repCount ${sql.raw(node.comparison)} ${parseInt(node.value)}`,
 		)
@@ -770,7 +770,7 @@ function handleLabel(node: QueryString | QueryRegex, context: Context) {
 		context.noteTagCount = true
 		handleTagCount(context, node, sql`note.tagCount`)
 	} else if (node.label == null) {
-		throwExp('Label is null')
+		throwExp()
 	} else assertNever(node.label)
 }
 
@@ -779,7 +779,7 @@ function handleTagCount(
 	node: QueryString | QueryRegex,
 	col: RawBuilder<unknown>,
 ) {
-	if (node.type === 'Regex' || node.comparison == null) throwExp('impossible')
+	if (node.type === 'Regex' || node.comparison == null) throwExp()
 	context.parameterizeSql(
 		sql`${col} ${sql.raw(node.comparison)} ${parseInt(node.value)}`,
 	)
@@ -796,19 +796,15 @@ function handleCreatedEditedDue(
 		handleComparison(val, context, table, column, node)
 	} else if (node.type === simpleString) {
 		const comp =
-			node.value === 'true'
-				? '<='
-				: node.value === 'false'
-					? '>'
-					: throwExp('impossible')
+			node.value === 'true' ? '<=' : node.value === 'false' ? '>' : throwExp()
 		handleOneComparison(context.now.getTime(), context, table, column, comp)
 	} else if (node.type === date) {
 		const [year, month, day] = node.value.split('-')
-		if (year == null || month == null || day == null) throwExp('impossible')
+		if (year == null || month == null || day == null) throwExp()
 		const local = new Date(parseInt(year), parseInt(month) - 1, parseInt(day)) // `new Date("2009-01-01") != new Date("2009-1-1")` so I parseInt
 		handleComparison(local.getTime(), context, table, column, node)
 	} else {
-		throwExp('impossible: ' + node.type)
+		throwExp()
 	}
 	node.fieldValueHighlight = undefined
 }
@@ -838,7 +834,7 @@ function handleOneComparison(
 	column: 'created' | 'edited' | 'due',
 	comparison: Comparison | undefined,
 ) {
-	if (comparison == null) throwExp('Comparison is null')
+	if (comparison == null) throwExp()
 	const comp = sql.raw(comparison)
 	if (table == null) {
 		const col = sql.raw(column)
