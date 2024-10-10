@@ -1,4 +1,4 @@
-import { type MediaId } from 'shared'
+import { throwExp, type MediaId } from 'shared'
 import * as Comlink from 'comlink' // https://github.com/GoogleChromeLabs/comlink/tree/main/docs/examples/05-serviceworker-example
 import { db } from './db'
 import { C } from './topLevelAwait'
@@ -12,7 +12,11 @@ export interface ComlinkClose {
 	type: 'ComlinkClose'
 }
 
-export type PostMessageTypes = ComlinkInit | ComlinkClose
+export interface ClaimRequest {
+	type: 'ClaimRequest'
+}
+
+export type PostMessageTypes = ComlinkInit | ComlinkClose | ClaimRequest
 
 // explicit because Comlink can't clone functions
 async function getLocalMedia(id: MediaId): Promise<ArrayBuffer | null> {
@@ -37,6 +41,18 @@ async function register() {
 		{ type: import.meta.env.MODE === 'production' ? 'classic' : 'module' },
 	)
 	const registration = await navigator.serviceWorker.ready
+	if (registration.active == null) throwExp()
+	if (navigator.serviceWorker.controller === null) {
+		// This conditional checks if the page has been force refreshed, which typically disables the service worker. This breaks images in prosemirror, so we manually claim the client.
+		// "If you force-reload the page (shift-reload) it bypasses the service worker entirely. It'll be uncontrolled. This feature is in the spec, so it works in other service-worker-supporting browsers."
+		// https://web.dev/articles/service-worker-lifecycle#shift-reload
+		// "navigator.serviceWorker.controller returns null if the request is a force refresh (shift+refresh)."
+		// https://www.w3.org/TR/service-workers/#dom-serviceworkercontainer-controller
+		// https://stackoverflow.com/a/60133005
+		registration.active.postMessage({
+			type: 'ClaimRequest',
+		} satisfies ClaimRequest)
+	}
 	initComlink(registration.active)
 }
 
@@ -54,11 +70,7 @@ if ('serviceWorker' in navigator) {
 	)
 }
 
-function initComlink(serviceWorker: ServiceWorker | null): void {
-	if (serviceWorker == null)
-		throw new Error(
-			"navigator.serviceWorker.ready's `.active` is null - how did this happen?",
-		)
+function initComlink(serviceWorker: ServiceWorker): void {
 	const { port1, port2 } = new MessageChannel()
 	const comlinkInit: ComlinkInit = {
 		type: 'ComlinkInit',
