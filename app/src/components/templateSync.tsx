@@ -19,24 +19,29 @@ import { augcClient } from '../trpcClient'
 import Diff from './diff'
 import { zip } from '../domain/utility'
 import DiffHtml from './diffHtml'
+import { DiffModeToggleGroup } from './diffModeContext'
+import './templateSync.css'
 
 const TemplateSync: VoidComponent<{ template: Template }> = (props) => {
 	return (
-		<ul>
-			<For each={objEntries(props.template.remotes)}>
-				{([nookId, remoteTemplate]) => (
-					<li>
-						<h2>/n/{nookId}</h2>
-						<Show when={remoteTemplate} fallback={`Not yet uploaded.`}>
-							<TemplateNookSync
-								template={props.template}
-								remoteTemplate={remoteTemplate!}
-							/>
-						</Show>
-					</li>
-				)}
-			</For>
-		</ul>
+		<>
+			<DiffModeToggleGroup />
+			<ul>
+				<For each={objEntries(props.template.remotes)}>
+					{([nookId, remoteTemplate]) => (
+						<li>
+							<h2>/n/{nookId}</h2>
+							<Show when={remoteTemplate} fallback={`Not yet uploaded.`}>
+								<TemplateNookSync
+									template={props.template}
+									remoteTemplate={remoteTemplate!}
+								/>
+							</Show>
+						</li>
+					)}
+				</For>
+			</ul>
+		</>
 	)
 }
 

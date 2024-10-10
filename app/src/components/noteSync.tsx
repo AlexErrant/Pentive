@@ -11,6 +11,7 @@ import { augcClient } from '../trpcClient'
 import DiffHtml from './diffHtml'
 import ResizingIframe from './resizingIframe'
 import { type NoteCardView } from '../uiLogic/cards'
+import { DiffModeToggleGroup } from './diffModeContext'
 
 const NoteSync: VoidComponent<{ note: NoteCardView }> = (props) => (
 	<ul>
@@ -42,6 +43,7 @@ const NoteNookSync: VoidComponent<{
 	)
 	return (
 		<Show when={remoteNote()}>
+			<DiffModeToggleGroup />
 			<ul>
 				<For
 					each={Array.from(

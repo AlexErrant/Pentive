@@ -1,10 +1,13 @@
+import { ToggleGroup } from '@kobalte/core/toggle-group'
 import {
 	createContext,
 	type JSX,
 	useContext,
 	createSignal,
 	type Signal,
+	type VoidComponent,
 } from 'solid-js'
+import './templateSync.css'
 
 type Mode = 'pretty' | 'split'
 
@@ -25,4 +28,26 @@ export function useDiffModeContext() {
 		throw new Error('useDiffModeContext: cannot find a DiffModeContext')
 	}
 	return context
+}
+
+export const DiffModeToggleGroup: VoidComponent = () => {
+	const [diffMode, setDiffMode] = useDiffModeContext()
+	return (
+		<ToggleGroup
+			value={diffMode()}
+			onChange={(x) => {
+				if (x != null) {
+					setDiffMode(x as Mode)
+				}
+			}}
+			class='toggle-group'
+		>
+			<ToggleGroup.Item class='toggle-group__item' value='pretty'>
+				Pretty
+			</ToggleGroup.Item>
+			<ToggleGroup.Item class='toggle-group__item' value='split'>
+				Split
+			</ToggleGroup.Item>
+		</ToggleGroup>
+	)
 }
