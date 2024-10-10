@@ -154,6 +154,9 @@ importers:
       '@codemirror/lint':
         specifier: ^6.8.1
         version: 6.8.1
+      '@codemirror/merge':
+        specifier: ^6.7.2
+        version: 6.7.2
       '@codemirror/search':
         specifier: ^6.5.6
         version: 6.5.6
@@ -463,7 +466,7 @@ importers:
         version: 1.2.1(rollup@2.79.2)
       vite-plugin-checker:
         specifier: ^0.8.0
-        version: 0.8.0(eslint@8.57.0)(meow@13.2.0)(optionator@0.9.4)(stylelint@15.10.3(typescript@5.6.2))(typescript@5.6.2)(vite@5.4.8(@types/node@20.14.11)(sass@1.79.3)(terser@5.34.0))
+        version: 0.8.0(eslint@8.57.0)(meow@9.0.0)(optionator@0.9.4)(stylelint@15.10.3(typescript@5.6.2))(typescript@5.6.2)(vite@5.4.8(@types/node@20.14.11)(sass@1.79.3)(terser@5.34.0))
       vite-plugin-pwa:
         specifier: ^0.20.5
         version: 0.20.5(vite@5.4.8(@types/node@20.14.11)(sass@1.79.3)(terser@5.34.0))(workbox-build@7.1.1(@types/babel__core@7.20.5))(workbox-window@7.1.0)
@@ -566,7 +569,7 @@ importers:
         version: 5.4.8(@types/node@20.14.11)(sass@1.79.3)(terser@5.34.0)
       vite-plugin-checker:
         specifier: ^0.8.0
-        version: 0.8.0(eslint@8.57.0)(meow@13.2.0)(optionator@0.9.4)(stylelint@15.10.3(typescript@5.6.2))(typescript@5.6.2)(vite@5.4.8(@types/node@20.14.11)(sass@1.79.3)(terser@5.34.0))
+        version: 0.8.0(eslint@8.57.0)(meow@9.0.0)(optionator@0.9.4)(stylelint@15.10.3(typescript@5.6.2))(typescript@5.6.2)(vite@5.4.8(@types/node@20.14.11)(sass@1.79.3)(terser@5.34.0))
       vite-plugin-pwa:
         specifier: ^0.20.5
         version: 0.20.5(vite@5.4.8(@types/node@20.14.11)(sass@1.79.3)(terser@5.34.0))(workbox-build@7.1.1(@types/babel__core@7.20.5))(workbox-window@7.1.0)
@@ -685,10 +688,10 @@ importers:
         version: 3.59.2
       svelte-check:
         specifier: ^3.5.2
-        version: 3.5.2(@babel/core@7.25.2)(postcss-load-config@6.0.1(postcss@8.4.47))(postcss@8.4.47)(sass@1.79.3)(svelte@3.59.2)
+        version: 3.5.2(@babel/core@7.25.2)(postcss-load-config@4.0.2(postcss@8.4.47))(postcss@8.4.47)(sass@1.79.3)(svelte@3.59.2)
       svelte-preprocess:
         specifier: ^5.0.4
-        version: 5.0.4(@babel/core@7.25.2)(postcss-load-config@6.0.1(postcss@8.4.47))(postcss@8.4.47)(sass@1.79.3)(svelte@3.59.2)(typescript@5.6.2)
+        version: 5.0.4(@babel/core@7.25.2)(postcss-load-config@4.0.2(postcss@8.4.47))(postcss@8.4.47)(sass@1.79.3)(svelte@3.59.2)(typescript@5.6.2)
       tslib:
         specifier: ^2.6.2
         version: 2.6.2
@@ -860,7 +863,7 @@ importers:
         version: 0.5.14(prettier@3.3.3)
       solid-start-cloudflare-workers:
         specifier: ^0.3.6
-        version: 0.3.11(cron-schedule@5.0.4)(ioredis@5.4.1)(solid-start@0.3.11)(vite@5.4.8(@types/node@22.7.4)(sass@1.79.3)(terser@5.34.0))
+        version: 0.3.11(cron-schedule@3.0.6)(ioredis@5.4.1)(solid-start@0.3.11)(vite@5.4.8(@types/node@22.7.4)(sass@1.79.3)(terser@5.34.0))
       solid-start-node:
         specifier: ^0.3.6
         version: 0.3.11(solid-start@0.3.11)(vite@5.4.8(@types/node@22.7.4)(sass@1.79.3)(terser@5.34.0))
@@ -890,7 +893,7 @@ importers:
         version: 5.4.8(@types/node@22.7.4)(sass@1.79.3)(terser@5.34.0)
       vite-plugin-checker:
         specifier: ^0.8.0
-        version: 0.8.0(eslint@8.57.0)(meow@13.2.0)(optionator@0.9.4)(stylelint@15.10.3(typescript@5.6.2))(typescript@5.6.2)(vite@5.4.8(@types/node@22.7.4)(sass@1.79.3)(terser@5.34.0))
+        version: 0.8.0(eslint@8.57.0)(meow@9.0.0)(optionator@0.9.4)(stylelint@15.10.3(typescript@5.6.2))(typescript@5.6.2)(vite@5.4.8(@types/node@22.7.4)(sass@1.79.3)(terser@5.34.0))
       wrangler:
         specifier: ^3.72.2
         version: 3.72.2(@cloudflare/workers-types@4.20240725.0)
@@ -978,7 +981,7 @@ importers:
         version: 5.4.8(@types/node@20.14.11)(sass@1.79.3)(terser@5.34.0)
       vite-plugin-checker:
         specifier: ^0.8.0
-        version: 0.8.0(eslint@8.57.0)(meow@13.2.0)(optionator@0.9.4)(stylelint@15.10.3(typescript@5.6.2))(typescript@5.6.2)(vite@5.4.8(@types/node@20.14.11)(sass@1.79.3)(terser@5.34.0))
+        version: 0.8.0(eslint@8.57.0)(meow@9.0.0)(optionator@0.9.4)(stylelint@15.10.3(typescript@5.6.2))(typescript@5.6.2)(vite@5.4.8(@types/node@20.14.11)(sass@1.79.3)(terser@5.34.0))
       vite-plugin-pwa:
         specifier: ^0.20.5
         version: 0.20.5(vite@5.4.8(@types/node@20.14.11)(sass@1.79.3)(terser@5.34.0))(workbox-build@7.1.1(@types/babel__core@7.20.5))(workbox-window@7.1.0)
@@ -2590,6 +2593,9 @@ packages:
   '@codemirror/lint@6.8.1':
     resolution: {integrity: sha512-IZ0Y7S4/bpaunwggW2jYqwLuHj0QtESf5xcROewY6+lDNwZ/NzvR4t+vpYgg9m7V8UXLPYqG+lu3DF470E5Oxg==}
 
+  '@codemirror/merge@6.7.2':
+    resolution: {integrity: sha512-HSzuWoV4E+F0DROOSwGZMYIDXh+y4iA64ffRADXPBbKKSwx9bsYNM4i7qN8t0mc8H0PYNBoehOvsW2Nitmnx9g==}
+
   '@codemirror/search@6.5.6':
     resolution: {integrity: sha512-rpMgcsh7o0GuCDUXKPvww+muLA1pDJaFrpq/CCHtpQJYz8xopu4D1hPcKRoDD0YlF8gZaqTNIRa4VRBWyhyy7Q==}
 
@@ -3809,6 +3815,7 @@ packages:
   '@playwright/test@1.38.1':
     resolution: {integrity: sha512-NqRp8XMwj3AK+zKLbZShl0r/9wKgzqI/527bkptKXomtuo+dOjU9NdMASQ8DNC9z9zLOMbG53T4eihYr3XR+BQ==}
     engines: {node: '>=16'}
+    deprecated: Please update to the latest version of Playwright to test up-to-date browsers.
     hasBin: true
 
   '@pnpm/config.env-replace@1.1.0':
@@ -6040,10 +6047,6 @@ packages:
 
   cron-schedule@3.0.6:
     resolution: {integrity: sha512-izfGgKyzzIyLaeb1EtZ3KbglkS6AKp9cv7LxmiyoOu+fXfol1tQDC0Cof0enVZGNtudTHW+3lfuW9ZkLQss4Wg==}
-
-  cron-schedule@5.0.4:
-    resolution: {integrity: sha512-nH0a49E/kSVk6BeFgKZy4uUsy6D2A16p120h5bYD9ILBhQu7o2sJFH+WI4R731TSBQ0dB1Ik7inB/dRAB4C8QQ==}
-    engines: {node: '>=18'}
 
   croner@8.1.0:
     resolution: {integrity: sha512-sz990XOUPR8dG/r5BRKMBd15MYDDUu8oeSaxFD5DqvNgHSZw8Psd1s689/IGET7ezxRMiNlCIyGeY1Gvxp/MLg==}
@@ -8698,6 +8701,7 @@ packages:
 
   libsql@0.3.19:
     resolution: {integrity: sha512-Aj5cQ5uk/6fHdmeW0TiXK42FqUlwx7ytmMLPSaUQPin5HKKKuUPD62MAbN4OEweGBBI7q1BekoEN4gPUEL6MZA==}
+    cpu: [x64, arm64, wasm32]
     os: [darwin, linux, win32]
 
   lie@3.3.0:
@@ -8709,10 +8713,6 @@ packages:
 
   lilconfig@3.1.1:
     resolution: {integrity: sha512-O18pf7nyvHTckunPWCV1XUNXU1piu01y2b7ATJ0ppkUkk8ocqVWBrYjJBCwHDjD/ZWcfyrA0P4gKhzWGi5EINQ==}
-    engines: {node: '>=14'}
-
-  lilconfig@3.1.2:
-    resolution: {integrity: sha512-eop+wDAvpItUys0FWkHIKeC9ybYrTGbU41U5K7+bttZZeohvnY7M9dZ5kB21GNWiFT2q1OoPTvncPCgSOVO5ow==}
     engines: {node: '>=14'}
 
   lines-and-columns@1.2.4:
@@ -8979,10 +8979,6 @@ packages:
   meow@12.1.1:
     resolution: {integrity: sha512-BhXM0Au22RwUneMPwSCnyhTOizdWoIEPU9sp0Aqa1PnDMR5Wv2FGXYDjuzJEIX+Eo2Rb8xuYe5jrnm5QowQFkw==}
     engines: {node: '>=16.10'}
-
-  meow@13.2.0:
-    resolution: {integrity: sha512-pxQJQzB6djGPXh08dacEloMFopsOqGVRKFPYvPOt9XDZ1HasbgDZA74CJGreSU4G3Ak7EFJGoiH2auq+yXISgA==}
-    engines: {node: '>=18'}
 
   meow@9.0.0:
     resolution: {integrity: sha512-+obSblOQmRhcyBt62furQqRAQpNyWXo8BuQ5bN7dG8wmwQ+vwHKp/rCFD4CrTP8CsDQD1sjoZ94K417XEUk8IQ==}
@@ -9891,24 +9887,6 @@ packages:
       postcss:
         optional: true
       ts-node:
-        optional: true
-
-  postcss-load-config@6.0.1:
-    resolution: {integrity: sha512-oPtTM4oerL+UXmx+93ytZVN82RrlY/wPUV8IeDxFrzIjXOLF1pN+EmKPLbubvKHT2HC20xXsCAH2Z+CKV6Oz/g==}
-    engines: {node: '>= 18'}
-    peerDependencies:
-      jiti: '>=1.21.0'
-      postcss: '>=8.4.31'
-      tsx: ^4.8.1
-      yaml: ^2.4.2
-    peerDependenciesMeta:
-      jiti:
-        optional: true
-      postcss:
-        optional: true
-      tsx:
-        optional: true
-      yaml:
         optional: true
 
   postcss-nested@6.0.1:
@@ -14483,6 +14461,14 @@ snapshots:
       '@codemirror/view': 6.33.0
       crelt: 1.0.6
 
+  '@codemirror/merge@6.7.2':
+    dependencies:
+      '@codemirror/language': 6.10.2
+      '@codemirror/state': 6.4.1
+      '@codemirror/view': 6.33.0
+      '@lezer/highlight': 1.2.1
+      style-mod: 4.1.2
+
   '@codemirror/search@6.5.6':
     dependencies:
       '@codemirror/state': 6.4.1
@@ -15092,7 +15078,7 @@ snapshots:
   '@jest/console@29.7.0':
     dependencies:
       '@jest/types': 29.6.3
-      '@types/node': 22.7.4
+      '@types/node': 20.14.11
       chalk: 4.1.2
       jest-message-util: 29.7.0
       jest-util: 29.7.0
@@ -15106,14 +15092,14 @@ snapshots:
       '@jest/test-result': 29.7.0
       '@jest/transform': 29.7.0
       '@jest/types': 29.6.3
-      '@types/node': 22.7.4
+      '@types/node': 20.14.11
       ansi-escapes: 4.3.2
       chalk: 4.1.2
       ci-info: 3.9.0
       exit: 0.1.2
       graceful-fs: 4.2.11
       jest-changed-files: 29.7.0
-      jest-config: 29.7.0(@types/node@22.7.4)
+      jest-config: 29.7.0(@types/node@20.14.11)
       jest-haste-map: 29.7.0
       jest-message-util: 29.7.0
       jest-regex-util: 29.6.3
@@ -15139,7 +15125,7 @@ snapshots:
     dependencies:
       '@jest/fake-timers': 29.7.0
       '@jest/types': 29.6.3
-      '@types/node': 22.7.4
+      '@types/node': 20.14.11
       jest-mock: 29.7.0
     optional: true
 
@@ -15160,7 +15146,7 @@ snapshots:
     dependencies:
       '@jest/types': 29.6.3
       '@sinonjs/fake-timers': 10.3.0
-      '@types/node': 22.7.4
+      '@types/node': 20.14.11
       jest-message-util: 29.7.0
       jest-mock: 29.7.0
       jest-util: 29.7.0
@@ -15184,7 +15170,7 @@ snapshots:
       '@jest/transform': 29.7.0
       '@jest/types': 29.6.3
       '@jridgewell/trace-mapping': 0.3.25
-      '@types/node': 22.7.4
+      '@types/node': 20.14.11
       chalk: 4.1.2
       collect-v8-coverage: 1.0.2
       exit: 0.1.2
@@ -15259,7 +15245,7 @@ snapshots:
       '@jest/schemas': 29.6.3
       '@types/istanbul-lib-coverage': 2.0.6
       '@types/istanbul-reports': 3.0.4
-      '@types/node': 22.7.4
+      '@types/node': 20.14.11
       '@types/yargs': 17.0.33
       chalk: 4.1.2
     optional: true
@@ -16675,7 +16661,7 @@ snapshots:
 
   '@types/graceful-fs@4.1.9':
     dependencies:
-      '@types/node': 22.7.4
+      '@types/node': 20.14.11
     optional: true
 
   '@types/hast@3.0.4':
@@ -18519,7 +18505,7 @@ snapshots:
       chalk: 4.1.2
       exit: 0.1.2
       graceful-fs: 4.2.11
-      jest-config: 29.7.0(@types/node@22.7.4)
+      jest-config: 29.7.0(@types/node@20.14.11)
       jest-util: 29.7.0
       prompts: 2.4.2
     transitivePeerDependencies:
@@ -18540,9 +18526,6 @@ snapshots:
       luxon: 3.4.3
 
   cron-schedule@3.0.6: {}
-
-  cron-schedule@5.0.4:
-    optional: true
 
   croner@8.1.0: {}
 
@@ -21275,7 +21258,7 @@ snapshots:
       '@jest/expect': 29.7.0
       '@jest/test-result': 29.7.0
       '@jest/types': 29.6.3
-      '@types/node': 22.7.4
+      '@types/node': 20.14.11
       chalk: 4.1.2
       co: 4.6.0
       dedent: 1.5.3
@@ -21305,7 +21288,7 @@ snapshots:
       create-jest: 29.7.0
       exit: 0.1.2
       import-local: 3.2.0
-      jest-config: 29.7.0(@types/node@22.7.4)
+      jest-config: 29.7.0(@types/node@20.14.11)
       jest-util: 29.7.0
       jest-validate: 29.7.0
       yargs: 17.7.2
@@ -21316,7 +21299,7 @@ snapshots:
       - ts-node
     optional: true
 
-  jest-config@29.7.0(@types/node@22.7.4):
+  jest-config@29.7.0(@types/node@20.14.11):
     dependencies:
       '@babel/core': 7.25.2
       '@jest/test-sequencer': 29.7.0
@@ -21341,7 +21324,7 @@ snapshots:
       slash: 3.0.0
       strip-json-comments: 3.1.1
     optionalDependencies:
-      '@types/node': 22.7.4
+      '@types/node': 20.14.11
     transitivePeerDependencies:
       - babel-plugin-macros
       - supports-color
@@ -21373,7 +21356,7 @@ snapshots:
       '@jest/environment': 29.7.0
       '@jest/fake-timers': 29.7.0
       '@jest/types': 29.6.3
-      '@types/node': 22.7.4
+      '@types/node': 20.14.11
       jest-mock: 29.7.0
       jest-util: 29.7.0
     optional: true
@@ -21384,7 +21367,7 @@ snapshots:
     dependencies:
       '@jest/types': 29.6.3
       '@types/graceful-fs': 4.1.9
-      '@types/node': 22.7.4
+      '@types/node': 20.14.11
       anymatch: 3.1.3
       fb-watchman: 2.0.2
       graceful-fs: 4.2.11
@@ -21427,7 +21410,7 @@ snapshots:
   jest-mock@29.7.0:
     dependencies:
       '@jest/types': 29.6.3
-      '@types/node': 22.7.4
+      '@types/node': 20.14.11
       jest-util: 29.7.0
     optional: true
 
@@ -21467,7 +21450,7 @@ snapshots:
       '@jest/test-result': 29.7.0
       '@jest/transform': 29.7.0
       '@jest/types': 29.6.3
-      '@types/node': 22.7.4
+      '@types/node': 20.14.11
       chalk: 4.1.2
       emittery: 0.13.1
       graceful-fs: 4.2.11
@@ -21496,7 +21479,7 @@ snapshots:
       '@jest/test-result': 29.7.0
       '@jest/transform': 29.7.0
       '@jest/types': 29.6.3
-      '@types/node': 22.7.4
+      '@types/node': 20.14.11
       chalk: 4.1.2
       cjs-module-lexer: 1.4.1
       collect-v8-coverage: 1.0.2
@@ -21544,7 +21527,7 @@ snapshots:
   jest-util@29.7.0:
     dependencies:
       '@jest/types': 29.6.3
-      '@types/node': 22.7.4
+      '@types/node': 20.14.11
       chalk: 4.1.2
       ci-info: 3.9.0
       graceful-fs: 4.2.11
@@ -21565,7 +21548,7 @@ snapshots:
     dependencies:
       '@jest/test-result': 29.7.0
       '@jest/types': 29.6.3
-      '@types/node': 22.7.4
+      '@types/node': 20.14.11
       ansi-escapes: 4.3.2
       chalk: 4.1.2
       emittery: 0.13.1
@@ -21575,7 +21558,7 @@ snapshots:
 
   jest-worker@29.7.0:
     dependencies:
-      '@types/node': 22.7.4
+      '@types/node': 20.14.11
       jest-util: 29.7.0
       merge-stream: 2.0.0
       supports-color: 8.1.1
@@ -21884,9 +21867,6 @@ snapshots:
   lilconfig@2.1.0: {}
 
   lilconfig@3.1.1: {}
-
-  lilconfig@3.1.2:
-    optional: true
 
   lines-and-columns@1.2.4: {}
 
@@ -22229,9 +22209,6 @@ snapshots:
 
   meow@12.1.1: {}
 
-  meow@13.2.0:
-    optional: true
-
   meow@9.0.0:
     dependencies:
       '@types/minimist': 1.2.3
@@ -22308,7 +22285,7 @@ snapshots:
 
   mini-svg-data-uri@1.4.4: {}
 
-  miniflare@2.14.1(cron-schedule@5.0.4)(ioredis@5.4.1):
+  miniflare@2.14.1(cron-schedule@3.0.6)(ioredis@5.4.1):
     dependencies:
       '@miniflare/cache': 2.14.1
       '@miniflare/cli-parser': 2.14.1
@@ -22332,7 +22309,7 @@ snapshots:
       source-map-support: 0.5.21
       undici: 5.26.3
     optionalDependencies:
-      cron-schedule: 5.0.4
+      cron-schedule: 3.0.6
       ioredis: 5.4.1
     transitivePeerDependencies:
       - bufferutil
@@ -23354,13 +23331,6 @@ snapshots:
     optionalDependencies:
       postcss: 8.4.47
       ts-node: 10.9.2(@types/node@22.7.4)(typescript@5.6.2)
-
-  postcss-load-config@6.0.1(postcss@8.4.47):
-    dependencies:
-      lilconfig: 3.1.2
-    optionalDependencies:
-      postcss: 8.4.47
-    optional: true
 
   postcss-nested@6.0.1(postcss@8.4.38):
     dependencies:
@@ -24611,7 +24581,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  solid-start-cloudflare-workers@0.3.11(cron-schedule@5.0.4)(ioredis@5.4.1)(solid-start@0.3.11)(vite@5.4.8(@types/node@22.7.4)(sass@1.79.3)(terser@5.34.0)):
+  solid-start-cloudflare-workers@0.3.11(cron-schedule@3.0.6)(ioredis@5.4.1)(solid-start@0.3.11)(vite@5.4.8(@types/node@22.7.4)(sass@1.79.3)(terser@5.34.0)):
     dependencies:
       '@cloudflare/kv-asset-handler': 0.2.0
       '@cloudflare/workers-types': 3.19.0
@@ -24623,7 +24593,7 @@ snapshots:
       '@rollup/plugin-json': 6.0.0(rollup@3.29.3)
       '@rollup/plugin-node-resolve': 15.2.3(rollup@3.29.3)
       '@types/ws': 8.5.5
-      miniflare: 2.14.1(cron-schedule@5.0.4)(ioredis@5.4.1)
+      miniflare: 2.14.1(cron-schedule@3.0.6)(ioredis@5.4.1)
       rollup: 3.29.3
       solid-start: 0.3.11(@solidjs/meta@0.29.4(solid-js@1.8.18))(@solidjs/router@0.14.1(solid-js@1.8.18))(solid-js@1.8.18)(solid-start-cloudflare-workers@0.3.11)(solid-start-node@0.3.11)(vite@5.4.8(@types/node@22.7.4)(sass@1.79.3)(terser@5.34.0))
       terser: 5.31.3
@@ -24691,7 +24661,7 @@ snapshots:
       vite-plugin-solid: 2.10.2(solid-js@1.8.18)(vite@5.4.8(@types/node@22.7.4)(sass@1.79.3)(terser@5.34.0))
       wait-on: 6.0.1(debug@4.3.7)
     optionalDependencies:
-      solid-start-cloudflare-workers: 0.3.11(cron-schedule@5.0.4)(ioredis@5.4.1)(solid-start@0.3.11)(vite@5.4.8(@types/node@22.7.4)(sass@1.79.3)(terser@5.34.0))
+      solid-start-cloudflare-workers: 0.3.11(cron-schedule@3.0.6)(ioredis@5.4.1)(solid-start@0.3.11)(vite@5.4.8(@types/node@22.7.4)(sass@1.79.3)(terser@5.34.0))
       solid-start-node: 0.3.11(solid-start@0.3.11)(vite@5.4.8(@types/node@22.7.4)(sass@1.79.3)(terser@5.34.0))
     transitivePeerDependencies:
       - '@nuxt/kit'
@@ -25150,7 +25120,7 @@ snapshots:
 
   supports-preserve-symlinks-flag@1.0.0: {}
 
-  svelte-check@3.5.2(@babel/core@7.25.2)(postcss-load-config@6.0.1(postcss@8.4.47))(postcss@8.4.47)(sass@1.79.3)(svelte@3.59.2):
+  svelte-check@3.5.2(@babel/core@7.25.2)(postcss-load-config@4.0.2(postcss@8.4.47))(postcss@8.4.47)(sass@1.79.3)(svelte@3.59.2):
     dependencies:
       '@jridgewell/trace-mapping': 0.3.18
       chokidar: 3.6.0
@@ -25159,7 +25129,7 @@ snapshots:
       picocolors: 1.0.0
       sade: 1.8.1
       svelte: 3.59.2
-      svelte-preprocess: 5.0.4(@babel/core@7.25.2)(postcss-load-config@6.0.1(postcss@8.4.47))(postcss@8.4.47)(sass@1.79.3)(svelte@3.59.2)(typescript@5.6.2)
+      svelte-preprocess: 5.0.4(@babel/core@7.25.2)(postcss-load-config@4.0.2(postcss@8.4.47))(postcss@8.4.47)(sass@1.79.3)(svelte@3.59.2)(typescript@5.6.2)
       typescript: 5.6.2
     transitivePeerDependencies:
       - '@babel/core'
@@ -25176,7 +25146,7 @@ snapshots:
     dependencies:
       svelte: 3.59.2
 
-  svelte-preprocess@5.0.4(@babel/core@7.25.2)(postcss-load-config@6.0.1(postcss@8.4.47))(postcss@8.4.47)(sass@1.79.3)(svelte@3.59.2)(typescript@5.6.2):
+  svelte-preprocess@5.0.4(@babel/core@7.25.2)(postcss-load-config@4.0.2(postcss@8.4.47))(postcss@8.4.47)(sass@1.79.3)(svelte@3.59.2)(typescript@5.6.2):
     dependencies:
       '@types/pug': 2.0.6
       detect-indent: 6.1.0
@@ -25187,7 +25157,7 @@ snapshots:
     optionalDependencies:
       '@babel/core': 7.25.2
       postcss: 8.4.47
-      postcss-load-config: 6.0.1(postcss@8.4.47)
+      postcss-load-config: 4.0.2(postcss@8.4.47)(ts-node@10.9.2(@types/node@22.7.4)(typescript@5.6.2))
       sass: 1.79.3
       typescript: 5.6.2
 
@@ -26170,7 +26140,7 @@ snapshots:
       - supports-color
       - terser
 
-  vite-plugin-checker@0.8.0(eslint@8.57.0)(meow@13.2.0)(optionator@0.9.4)(stylelint@15.10.3(typescript@5.6.2))(typescript@5.6.2)(vite@5.4.8(@types/node@20.14.11)(sass@1.79.3)(terser@5.34.0)):
+  vite-plugin-checker@0.8.0(eslint@8.57.0)(meow@9.0.0)(optionator@0.9.4)(stylelint@15.10.3(typescript@5.6.2))(typescript@5.6.2)(vite@5.4.8(@types/node@20.14.11)(sass@1.79.3)(terser@5.34.0)):
     dependencies:
       '@babel/code-frame': 7.24.7
       ansi-escapes: 4.3.2
@@ -26189,12 +26159,12 @@ snapshots:
       vscode-uri: 3.0.8
     optionalDependencies:
       eslint: 8.57.0
-      meow: 13.2.0
+      meow: 9.0.0
       optionator: 0.9.4
       stylelint: 15.10.3(typescript@5.6.2)
       typescript: 5.6.2
 
-  vite-plugin-checker@0.8.0(eslint@8.57.0)(meow@13.2.0)(optionator@0.9.4)(stylelint@15.10.3(typescript@5.6.2))(typescript@5.6.2)(vite@5.4.8(@types/node@22.7.4)(sass@1.79.3)(terser@5.34.0)):
+  vite-plugin-checker@0.8.0(eslint@8.57.0)(meow@9.0.0)(optionator@0.9.4)(stylelint@15.10.3(typescript@5.6.2))(typescript@5.6.2)(vite@5.4.8(@types/node@22.7.4)(sass@1.79.3)(terser@5.34.0)):
     dependencies:
       '@babel/code-frame': 7.24.7
       ansi-escapes: 4.3.2
@@ -26213,7 +26183,7 @@ snapshots:
       vscode-uri: 3.0.8
     optionalDependencies:
       eslint: 8.57.0
-      meow: 13.2.0
+      meow: 9.0.0
       optionator: 0.9.4
       stylelint: 15.10.3(typescript@5.6.2)
       typescript: 5.6.2
