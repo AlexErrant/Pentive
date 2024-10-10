@@ -47,7 +47,7 @@
 		"tsc-watch": "cd dev && npx tsc --build --watch",
 		"tsc-clean": "rm -rf **/tsconfig.tsbuildinfo",
 		"//ci": "simulate cicd locally",
-		"ci": "git clean -xdf && ./mkenv.sh && ./rmcert.sh && ./mkcert.sh && pnpm i && pnpm turbo:all && ./initIvy.sh",
+		"ci": "git clean -xdf && ./mkenv.sh && ./rmcert.sh && ./mkcert.sh && pnpm i && pnpm turbo:all --force && ./initIvy.sh",
 		"cf": "git clean -xdf && ./mkenv.sh && ./rmcert.sh && ./mkcert.sh && pnpm i && npx turbo run tsc-build build && ./initIvy.sh",
 		"turbo:all": "turbo run tsc-build eslint check test:run build"
 	},
