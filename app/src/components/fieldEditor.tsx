@@ -1,4 +1,4 @@
-import { onMount, type VoidComponent } from 'solid-js'
+import { onCleanup, onMount, type VoidComponent } from 'solid-js'
 import { EditorState } from 'prosemirror-state'
 import { EditorView } from 'prosemirror-view'
 import {
@@ -136,12 +136,12 @@ export const FieldEditor: VoidComponent<{
 		noteCard?: NoteCardView
 	}>
 }> = (props) => {
-	let editor: HTMLDivElement | undefined
+	let editor: HTMLDivElement
+	let view: EditorView
 	onMount(async () => {
 		const doc = domParser.parseFromString(props.value, 'text/html')
 		await Promise.all(Array.from(doc.images).map(updateImgSrc))
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars -- not sure wtf to do with editorView
-		const editorView = new EditorView(editor!, {
+		view = new EditorView(editor, {
 			state: EditorState.create({
 				doc: proseMirrorDOMParser.parse(doc),
 				plugins: [
@@ -177,7 +177,10 @@ export const FieldEditor: VoidComponent<{
 			},
 		})
 	})
-	return <div ref={editor} />
+	onCleanup(() => {
+		view?.destroy()
+	})
+	return <div ref={editor!} />
 }
 
 /*

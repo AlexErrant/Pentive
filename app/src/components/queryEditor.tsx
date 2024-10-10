@@ -57,7 +57,6 @@ import { C } from '../topLevelAwait'
 import { notEmpty } from 'shared'
 import { useThemeContext } from 'shared-dom/themeSelector'
 
-let view: EditorView
 const QueryEditor: VoidComponent<{
 	value: string
 	setValue: (value: string) => void
@@ -65,26 +64,27 @@ const QueryEditor: VoidComponent<{
 	// We usually ignore changes to `value` to prevent unnecessary `view.setState` calls
 	externalValue: string
 }> = (props) => {
-	let ref: HTMLDivElement | undefined
+	let view: EditorView
+	let ref: HTMLDivElement
 	onMount(() => {
 		view = new EditorView({
 			parent: ref,
 		})
 		new ResizeObserver(() => {
 			view.requestMeasure()
-		}).observe(ref!)
+		}).observe(ref)
 	})
 	const [theme] = useThemeContext()
 	createEffect(
 		on(theme, (t) => {
-			view.setState(createEditorState(props.value, t, props.setValue))
+			view.setState(createEditorState(view, props.value, t, props.setValue))
 		}),
 	)
 	createEffect(
 		on(
 			() => props.externalValue,
 			(v) => {
-				view.setState(createEditorState(v, theme(), props.setValue))
+				view.setState(createEditorState(view, v, theme(), props.setValue))
 			},
 		),
 	)
@@ -93,7 +93,7 @@ const QueryEditor: VoidComponent<{
 	})
 	return (
 		<>
-			<div class='query-editor max-h-40 flex-1 overflow-auto' ref={ref} />
+			<div class='query-editor max-h-40 flex-1 overflow-auto' ref={ref!} />
 		</>
 	)
 }
@@ -140,6 +140,7 @@ const basicSetup = [
 ]
 
 function createEditorState(
+	view: EditorView,
 	doc: string,
 	theme: 'light' | 'dark',
 	setValue: (value: string) => void,

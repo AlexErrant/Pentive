@@ -55,7 +55,7 @@ const EditCardSetting: VoidComponent<{
 	cardSetting: CardSetting
 	setCardSetting: (_: CardSetting) => void
 }> = (props) => {
-	let ref: HTMLDivElement | undefined
+	let ref: HTMLDivElement
 	let view: EditorView
 	const stringifiedCardSetting = () =>
 		JSON.stringify(props.cardSetting, null, 2)
@@ -88,7 +88,7 @@ const EditCardSetting: VoidComponent<{
 				<legend>
 					<span class='p-2 px-4 font-bold'>JSON</span>
 				</legend>
-				<div class='h-full resize-y overflow-auto' ref={ref} />
+				<div class='h-full resize-y overflow-auto' ref={ref!} />
 			</fieldset>
 			<button
 				type='button'

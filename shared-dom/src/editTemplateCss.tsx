@@ -47,7 +47,7 @@ export const EditTemplateCss: VoidComponent<{
 	}>
 	theme: 'light' | 'dark'
 }> = (props) => {
-	let ref: HTMLDivElement | undefined
+	let ref: HTMLDivElement
 	let view: EditorView
 	onMount(() => {
 		view = new EditorView({
@@ -85,7 +85,7 @@ export const EditTemplateCss: VoidComponent<{
 			<legend>
 				<span class='p-2 px-4 font-bold'>CSS</span>
 			</legend>
-			<div class='max-h-[500px] resize-y overflow-auto' ref={ref} />
+			<div class='max-h-[500px] resize-y overflow-auto' ref={ref!} />
 		</fieldset>
 	)
 }

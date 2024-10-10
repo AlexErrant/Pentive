@@ -54,8 +54,8 @@ const EditChildTemplate: VoidComponent<{
 	renderContainer: RenderContainer
 	theme: 'light' | 'dark'
 }> = (props) => {
-	let frontRef: HTMLDivElement | undefined
-	let backRef: HTMLDivElement | undefined
+	let frontRef: HTMLDivElement
+	let backRef: HTMLDivElement
 	let frontView: EditorView
 	let backView: EditorView
 	onMount(() => {
@@ -114,7 +114,7 @@ const EditChildTemplate: VoidComponent<{
 				<div class='flex h-fit'>
 					<div
 						class='max-h-[500px] flex-1 resize-y overflow-auto focus-within:border-black focus-within:border'
-						ref={frontRef}
+						ref={frontRef!}
 					/>
 					<props.renderContainer.resizingIframe
 						class='flex-1'
@@ -129,7 +129,7 @@ const EditChildTemplate: VoidComponent<{
 				<div class='flex h-fit'>
 					<div
 						class='max-h-[500px] flex-1 resize-y overflow-auto focus-within:border-black focus-within:border'
-						ref={backRef}
+						ref={backRef!}
 					/>
 					<props.renderContainer.resizingIframe
 						class='flex-1'

@@ -43,13 +43,13 @@ import * as prettierPluginHtml from 'prettier/plugins/html'
 import { C } from '../topLevelAwait'
 import { useThemeContext } from 'shared-dom/themeSelector'
 
-let view: EditorView
 const FieldHtmlEditor: VoidComponent<{
 	value: string
 	setValue: (value: string) => void
 	css: string
 }> = (props) => {
-	let ref: HTMLDivElement | undefined
+	let ref: HTMLDivElement
+	let view: EditorView
 	const [theme] = useThemeContext()
 	onMount(async () => {
 		view = new EditorView({
@@ -60,9 +60,10 @@ const FieldHtmlEditor: VoidComponent<{
 		})
 		new ResizeObserver(() => {
 			view.requestMeasure()
-		}).observe(ref!)
+		}).observe(ref)
 		view.setState(
 			createEditorState(
+				view,
 				// https://prettier.io/blog/2018/11/07/1.15.0#whitespace-sensitive-formatting https://prettier.io/docs/en/options.html#html-whitespace-sensitivity
 				await format(props.value, htmlFormatOpts),
 				theme(),
@@ -71,7 +72,7 @@ const FieldHtmlEditor: VoidComponent<{
 	})
 	createEffect(
 		on(theme, (t) => {
-			view.setState(createEditorState(props.value, t))
+			view.setState(createEditorState(view, props.value, t))
 		}),
 	)
 	onCleanup(() => {
@@ -82,7 +83,7 @@ const FieldHtmlEditor: VoidComponent<{
 			<ResizingIframe i={{ tag: 'raw', css: props.css, html: props.value }} />
 			<div
 				class='flex-1 resize-y overflow-auto focus-within:border-black focus-within:border'
-				ref={ref}
+				ref={ref!}
 			/>
 		</>
 	)
@@ -134,7 +135,11 @@ function dispatch(
 	}
 }
 
-function createEditorState(doc: string, theme: 'light' | 'dark') {
+function createEditorState(
+	view: EditorView,
+	doc: string,
+	theme: 'light' | 'dark',
+) {
 	const maybeDark = theme === 'dark' ? [oneDark] : []
 	return EditorState.create({
 		doc,
@@ -145,7 +150,7 @@ function createEditorState(doc: string, theme: 'light' | 'dark') {
 					run: (x) => {
 						format(x.state.doc.toString(), htmlFormatOpts)
 							.then((v) => {
-								view.setState(createEditorState(v, theme))
+								view.setState(createEditorState(view, v, theme))
 							})
 							.catch((e) => {
 								C.toastError('Error while formatting.', e)
