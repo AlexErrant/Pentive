@@ -74,6 +74,11 @@
 		"zod": ">=3.22.3"
 	},
 	"exports": {
+		"./codemirror": {
+			"types": "./src/codemirror.ts",
+			"development": "./src/codemirror.ts",
+			"default": "./lib/src/codemirror.js"
+		},
 		"./plugin": {
 			"types": "./src/plugin.ts",
 			"development": "./src/plugin.ts",

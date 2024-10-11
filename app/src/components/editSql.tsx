@@ -1,33 +1,5 @@
 import { EditorState } from '@codemirror/state'
-import {
-	EditorView,
-	keymap,
-	highlightSpecialChars,
-	drawSelection,
-	highlightActiveLine,
-	dropCursor,
-	rectangularSelection,
-	crosshairCursor,
-	lineNumbers,
-	highlightActiveLineGutter,
-} from '@codemirror/view'
-import {
-	defaultHighlightStyle,
-	syntaxHighlighting,
-	indentOnInput,
-	bracketMatching,
-	foldGutter,
-	foldKeymap,
-} from '@codemirror/language'
-import { defaultKeymap, history, historyKeymap } from '@codemirror/commands'
-import { searchKeymap, highlightSelectionMatches } from '@codemirror/search'
-import {
-	autocompletion,
-	completionKeymap,
-	closeBrackets,
-	closeBracketsKeymap,
-} from '@codemirror/autocomplete'
-import { lintKeymap } from '@codemirror/lint'
+import { EditorView, keymap } from '@codemirror/view'
 import { sql, SQLite } from '@codemirror/lang-sql'
 import {
 	createEffect,
@@ -38,6 +10,7 @@ import {
 } from 'solid-js'
 import { oneDark } from '@codemirror/theme-one-dark'
 import { useThemeContext } from 'shared-dom/themeSelector'
+import { basicSetup } from 'shared-dom/codemirror'
 
 const EditSql: VoidComponent<{
 	run: (sql: string) => Promise<void>
@@ -74,37 +47,6 @@ const EditSql: VoidComponent<{
 }
 
 export default EditSql
-
-// from https://github.com/codemirror/basic-setup/blob/main/src/codemirror.ts
-const basicSetup = [
-	lineNumbers(),
-	highlightActiveLineGutter(),
-	highlightSpecialChars(),
-	history(),
-	foldGutter(),
-	drawSelection(),
-	dropCursor(),
-	EditorState.allowMultipleSelections.of(true),
-	EditorView.lineWrapping,
-	indentOnInput(),
-	syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
-	bracketMatching(),
-	closeBrackets(),
-	autocompletion(),
-	rectangularSelection(),
-	crosshairCursor(),
-	highlightActiveLine(),
-	highlightSelectionMatches(),
-	keymap.of([
-		...closeBracketsKeymap,
-		...defaultKeymap,
-		...searchKeymap,
-		...historyKeymap,
-		...foldKeymap,
-		...completionKeymap,
-		...lintKeymap,
-	]),
-]
 
 function createEditorState(
 	doc: string,

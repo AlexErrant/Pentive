@@ -1,33 +1,5 @@
 import { EditorState, type Transaction } from '@codemirror/state'
-import {
-	EditorView,
-	keymap,
-	highlightSpecialChars,
-	drawSelection,
-	highlightActiveLine,
-	dropCursor,
-	rectangularSelection,
-	crosshairCursor,
-	lineNumbers,
-	highlightActiveLineGutter,
-} from '@codemirror/view'
-import {
-	defaultHighlightStyle,
-	syntaxHighlighting,
-	indentOnInput,
-	bracketMatching,
-	foldGutter,
-	foldKeymap,
-} from '@codemirror/language'
-import { defaultKeymap, history, historyKeymap } from '@codemirror/commands'
-import { searchKeymap, highlightSelectionMatches } from '@codemirror/search'
-import {
-	autocompletion,
-	completionKeymap,
-	closeBrackets,
-	closeBracketsKeymap,
-} from '@codemirror/autocomplete'
-import { lintKeymap } from '@codemirror/lint'
+import { EditorView } from '@codemirror/view'
 import { css } from '@codemirror/lang-css'
 import {
 	createEffect,
@@ -39,6 +11,7 @@ import {
 import { type Template } from 'shared'
 import { type SetStoreFunction } from 'solid-js/store'
 import { oneDark } from '@codemirror/theme-one-dark'
+import { basicSetup } from './codemirror'
 
 export const EditTemplateCss: VoidComponent<{
 	template: Template
@@ -89,37 +62,6 @@ export const EditTemplateCss: VoidComponent<{
 		</fieldset>
 	)
 }
-
-// from https://github.com/codemirror/basic-setup/blob/main/src/codemirror.ts
-const basicSetup = [
-	lineNumbers(),
-	highlightActiveLineGutter(),
-	highlightSpecialChars(),
-	history(),
-	foldGutter(),
-	drawSelection(),
-	dropCursor(),
-	EditorState.allowMultipleSelections.of(true),
-	EditorView.lineWrapping,
-	indentOnInput(),
-	syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
-	bracketMatching(),
-	closeBrackets(),
-	autocompletion(),
-	rectangularSelection(),
-	crosshairCursor(),
-	highlightActiveLine(),
-	highlightSelectionMatches(),
-	keymap.of([
-		...closeBracketsKeymap,
-		...defaultKeymap,
-		...searchKeymap,
-		...historyKeymap,
-		...foldKeymap,
-		...completionKeymap,
-		...lintKeymap,
-	]),
-]
 
 function dispatch(
 	tr: Transaction,

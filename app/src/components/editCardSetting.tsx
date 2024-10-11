@@ -1,34 +1,6 @@
 import { EditorState } from '@codemirror/state'
-import {
-	EditorView,
-	keymap,
-	highlightSpecialChars,
-	drawSelection,
-	highlightActiveLine,
-	dropCursor,
-	rectangularSelection,
-	crosshairCursor,
-	lineNumbers,
-	highlightActiveLineGutter,
-	hoverTooltip,
-} from '@codemirror/view'
-import {
-	defaultHighlightStyle,
-	syntaxHighlighting,
-	indentOnInput,
-	bracketMatching,
-	foldGutter,
-	foldKeymap,
-} from '@codemirror/language'
-import { defaultKeymap, history, historyKeymap } from '@codemirror/commands'
-import { searchKeymap, highlightSelectionMatches } from '@codemirror/search'
-import {
-	autocompletion,
-	completionKeymap,
-	closeBrackets,
-	closeBracketsKeymap,
-} from '@codemirror/autocomplete'
-import { lintKeymap, linter, lintGutter } from '@codemirror/lint'
+import { EditorView, hoverTooltip } from '@codemirror/view'
+import { linter, lintGutter } from '@codemirror/lint'
 import { json, jsonLanguage, jsonParseLinter } from '@codemirror/lang-json'
 import {
 	createEffect,
@@ -50,6 +22,7 @@ import Ajv from 'ajv'
 import { db } from '../db'
 import { C } from '../topLevelAwait'
 import { useThemeContext } from 'shared-dom/themeSelector'
+import { basicSetup } from 'shared-dom/codemirror'
 
 const EditCardSetting: VoidComponent<{
 	cardSetting: CardSetting
@@ -121,37 +94,6 @@ const EditCardSetting: VoidComponent<{
 }
 
 export default EditCardSetting
-
-// from https://github.com/codemirror/basic-setup/blob/main/src/codemirror.ts
-const basicSetup = [
-	lineNumbers(),
-	highlightActiveLineGutter(),
-	highlightSpecialChars(),
-	history(),
-	foldGutter(),
-	drawSelection(),
-	dropCursor(),
-	EditorState.allowMultipleSelections.of(true),
-	EditorView.lineWrapping,
-	indentOnInput(),
-	syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
-	bracketMatching(),
-	closeBrackets(),
-	autocompletion(),
-	rectangularSelection(),
-	crosshairCursor(),
-	highlightActiveLine(),
-	highlightSelectionMatches(),
-	keymap.of([
-		...closeBracketsKeymap,
-		...defaultKeymap,
-		...searchKeymap,
-		...historyKeymap,
-		...foldKeymap,
-		...completionKeymap,
-		...lintKeymap,
-	]),
-]
 
 const schema = {
 	type: 'object' as const,
