@@ -19,6 +19,9 @@ import { augcClient } from '../trpcClient'
 import Diff from './diff'
 import { zip } from '../domain/utility'
 import DiffHtml from './diffHtml'
+import { htmlTemplateLanguage } from 'shared-dom/language/htmlTemplateParser'
+import { html } from '@codemirror/lang-html'
+import { templateLinter } from 'shared-dom/language/templateLinter'
 import { DiffModeToggleGroup } from './diffModeContext'
 import './templateSync.css'
 
@@ -133,6 +136,7 @@ const ChildTemplateNookSync: VoidComponent<{
 	local?: ChildTemplate
 	remote?: ChildTemplate
 }> = (props) => {
+	const extensions = [htmlTemplateLanguage, html().support, templateLinter]
 	return (
 		<Switch
 			fallback={
@@ -142,12 +146,14 @@ const ChildTemplateNookSync: VoidComponent<{
 						changes={diffChars(props.remote!.name, props.local!.name)}
 					/>
 					<DiffHtml
+						extensions={extensions}
 						before={props.remote!.front}
 						after={props.local!.front}
 						css={props.css}
 						title='Front'
 					/>
 					<DiffHtml
+						extensions={extensions}
 						before={props.remote!.back}
 						after={props.local!.back}
 						css={props.css}

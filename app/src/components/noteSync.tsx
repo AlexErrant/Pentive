@@ -11,6 +11,7 @@ import { augcClient } from '../trpcClient'
 import DiffHtml from './diffHtml'
 import ResizingIframe from './resizingIframe'
 import { type NoteCardView } from '../uiLogic/cards'
+import { html } from '@codemirror/lang-html'
 import { DiffModeToggleGroup } from './diffModeContext'
 
 const NoteSync: VoidComponent<{ note: NoteCardView }> = (props) => (
@@ -67,6 +68,7 @@ const NoteNookSync: VoidComponent<{
 							<Switch
 								fallback={
 									<DiffHtml
+										extensions={[html()]}
 										before={remote!}
 										after={local!}
 										css={props.note.template.css}
