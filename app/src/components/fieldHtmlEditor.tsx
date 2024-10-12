@@ -15,6 +15,7 @@ import * as prettierPluginHtml from 'prettier/plugins/html'
 import { C } from '../topLevelAwait'
 import { useThemeContext } from 'shared-dom/themeSelector'
 import { basicSetup } from 'shared-dom/codemirror'
+import { disposeResizeObserver } from 'shared-dom/utility'
 
 const FieldHtmlEditor: VoidComponent<{
 	value: string
@@ -23,6 +24,7 @@ const FieldHtmlEditor: VoidComponent<{
 }> = (props) => {
 	let ref: HTMLDivElement
 	let view: EditorView
+	let ro: ResizeObserver
 	const [theme] = useThemeContext()
 	onMount(async () => {
 		view = new EditorView({
@@ -31,9 +33,10 @@ const FieldHtmlEditor: VoidComponent<{
 				dispatch(tr, view, props.setValue)
 			},
 		})
-		new ResizeObserver(() => {
+		ro = new ResizeObserver(() => {
 			view.requestMeasure()
-		}).observe(ref)
+		})
+		ro.observe(ref)
 		view.setState(
 			createEditorState(
 				view,
@@ -50,6 +53,7 @@ const FieldHtmlEditor: VoidComponent<{
 	)
 	onCleanup(() => {
 		view?.destroy()
+		disposeResizeObserver(ro, ref)
 	})
 	return (
 		<>

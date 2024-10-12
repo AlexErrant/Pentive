@@ -56,6 +56,7 @@ import { db } from '../db'
 import { C } from '../topLevelAwait'
 import { notEmpty } from 'shared'
 import { useThemeContext } from 'shared-dom/themeSelector'
+import { disposeResizeObserver } from 'shared-dom/utility'
 
 const QueryEditor: VoidComponent<{
 	value: string
@@ -66,13 +67,15 @@ const QueryEditor: VoidComponent<{
 }> = (props) => {
 	let view: EditorView
 	let ref: HTMLDivElement
+	let ro: ResizeObserver
 	onMount(() => {
 		view = new EditorView({
 			parent: ref,
 		})
-		new ResizeObserver(() => {
+		ro = new ResizeObserver(() => {
 			view.requestMeasure()
-		}).observe(ref)
+		})
+		ro.observe(ref)
 	})
 	const [theme] = useThemeContext()
 	createEffect(
@@ -90,6 +93,7 @@ const QueryEditor: VoidComponent<{
 	)
 	onCleanup(() => {
 		view?.destroy()
+		disposeResizeObserver(ro, ref)
 	})
 	return (
 		<>

@@ -25,3 +25,12 @@ export function base64ToArray(base64: string): Uint8Array {
 	}
 	return bytes
 }
+
+// https://stackoverflow.com/a/71542987
+export function disposeResizeObserver(ro: ResizeObserver, ref: Element) {
+	if (ref != null) {
+		ro.unobserve(ref)
+	} else {
+		ro.disconnect()
+	}
+}

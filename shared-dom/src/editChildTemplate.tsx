@@ -15,6 +15,7 @@ import { htmlTemplateLanguage } from './language/htmlTemplateParser'
 import { templateLinter } from './language/templateLinter'
 import { type RenderContainer } from './renderContainer'
 import { basicSetup } from './codemirror'
+import { disposeResizeObserver } from './utility'
 
 const EditChildTemplate: VoidComponent<{
 	template: Template
@@ -31,6 +32,8 @@ const EditChildTemplate: VoidComponent<{
 	let backRef: HTMLDivElement
 	let frontView: EditorView
 	let backView: EditorView
+	let frontRo: ResizeObserver
+	let backRo: ResizeObserver
 	onMount(() => {
 		frontView = new EditorView({
 			parent: frontRef,
@@ -46,12 +49,14 @@ const EditChildTemplate: VoidComponent<{
 			},
 			state: createEditorState(props.childTemplate.back, props.theme),
 		})
-		new ResizeObserver(() => {
+		frontRo = new ResizeObserver(() => {
 			frontView.requestMeasure()
-		}).observe(frontRef!)
-		new ResizeObserver(() => {
+		})
+		frontRo.observe(frontRef!)
+		backRo = new ResizeObserver(() => {
 			backView.requestMeasure()
-		}).observe(backRef!)
+		})
+		backRo.observe(backRef!)
 	})
 	createEffect(
 		on(
@@ -68,6 +73,8 @@ const EditChildTemplate: VoidComponent<{
 	onCleanup(() => {
 		frontView?.destroy()
 		backView?.destroy()
+		disposeResizeObserver(frontRo, frontRef)
+		disposeResizeObserver(backRo, backRef)
 	})
 	const short = () =>
 		getOk(props.renderContainer.renderTemplate(props.template, true)[props.i])
