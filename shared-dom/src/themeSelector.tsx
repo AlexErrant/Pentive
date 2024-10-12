@@ -12,6 +12,7 @@ import {
 	useContext,
 	type Signal,
 	type Accessor,
+	onCleanup,
 } from 'solid-js'
 import { Dynamic } from 'solid-js/web'
 import nightwind from 'nightwind/helper'
@@ -44,6 +45,7 @@ const THEME_OPTIONS: ThemeOption[] = [
 ]
 
 export function ThemeSelector() {
+	let mo: MutationObserver
 	const [colorMode, setColorMode] = createSignal<Themes>('system')
 
 	onMount(() => {
@@ -52,12 +54,13 @@ export function ThemeSelector() {
 			document.documentElement.className.includes('dark')
 				? ('dark' as const)
 				: ('light' as const)
-		new MutationObserver((_: MutationRecord[]) => {
+		mo = new MutationObserver((_: MutationRecord[]) => {
 			const current = currentTheme()
 			if (current !== untrack(theme)) {
 				setTheme(current)
 			}
-		}).observe(document.documentElement, {
+		})
+		mo.observe(document.documentElement, {
 			attributes: true,
 		})
 		const mode = window.localStorage.getItem('nightwind-mode')
@@ -66,6 +69,9 @@ export function ThemeSelector() {
 		} else {
 			setColorMode('system')
 		}
+	})
+	onCleanup(() => {
+		mo.disconnect()
 	})
 	createEffect(() => {
 		if (colorMode() === 'system') {

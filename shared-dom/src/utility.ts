@@ -27,7 +27,11 @@ export function base64ToArray(base64: string): Uint8Array {
 }
 
 // https://stackoverflow.com/a/71542987
-export function disposeResizeObserver(ro: ResizeObserver, ref: Element) {
+export function disposeResizeObserver(
+	ro: ResizeObserver | undefined,
+	ref: Element,
+) {
+	if (ro == null) return
 	if (ref != null) {
 		ro.unobserve(ref)
 	} else {

@@ -19,6 +19,7 @@ import { debounce, leadingAndTrailing } from '@solid-primitives/scheduled'
 import { type Error, type Warning } from './language/template2html'
 import { type RenderContainer } from './renderContainer'
 import { type HtmlResult } from './cardHtml'
+import { disposeResizeObserver } from './utility'
 
 const targetOrigin = '*' // highTODO make more limiting. Also implement https://stackoverflow.com/q/8169582
 
@@ -67,8 +68,10 @@ export const ResizingIframe: VoidComponent<{
 	origin: string
 }> = (props) => {
 	let iframeReference: IFrameComponent
+	let intersectionObserver: IntersectionObserver
 	onCleanup(() => {
 		iframeReference?.iFrameResizer?.close()
+		disposeResizeObserver(intersectionObserver, iframeReference)
 	})
 	const [diagnostics, setDiagnostics] = createStore<Diagnostics>({
 		errors: [],
@@ -146,9 +149,10 @@ export const ResizingIframe: VoidComponent<{
 							iframeReference,
 						)
 					}
-					new IntersectionObserver(props.resizeFn(iframeReference)).observe(
-						iframeReference,
-					) // Resize when the iframe becomes visible, e.g. after the "Add Template" tab is clicked when we're looking at another tab. The resizing script behaves poorly when the iframe isn't visible.
+					intersectionObserver = new IntersectionObserver(
+						props.resizeFn(iframeReference),
+					)
+					intersectionObserver.observe(iframeReference) // Resize when the iframe becomes visible, e.g. after the "Add Template" tab is clicked when we're looking at another tab. The resizing script behaves poorly when the iframe isn't visible.
 					debouncePostMessage()
 					props.resizeFn(iframeReference)()
 				}}
