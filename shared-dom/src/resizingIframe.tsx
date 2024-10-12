@@ -62,11 +62,11 @@ export const ResizingIframe: VoidComponent<{
 	html: (setDiagnostics: SetStoreFunction<Diagnostics>) => RawRenderBodyInput
 	expose: (
 		setDiagnostics: SetStoreFunction<Diagnostics>,
-		iframeReference: IFrameComponent | undefined,
+		iframeReference: IFrameComponent,
 	) => Record<string, unknown>
 	origin: string
 }> = (props) => {
-	let iframeReference: IFrameComponent | undefined
+	let iframeReference: IFrameComponent
 	onCleanup(() => {
 		iframeReference?.iFrameResizer?.close()
 	})
@@ -121,7 +121,7 @@ export const ResizingIframe: VoidComponent<{
 						port: port1,
 					}
 					Comlink.expose(props.expose(setDiagnostics, iframeReference), port2)
-					iframeReference!.contentWindow!.postMessage(
+					iframeReference.contentWindow!.postMessage(
 						comlinkInit,
 						targetOrigin,
 						[port1],
@@ -129,7 +129,7 @@ export const ResizingIframe: VoidComponent<{
 					Comlink.expose(
 						props.expose(setDiagnostics, iframeReference),
 						Comlink.windowEndpoint(
-							iframeReference!.contentWindow!,
+							iframeReference.contentWindow!,
 							self,
 							targetOrigin,
 						),
@@ -143,11 +143,11 @@ export const ResizingIframe: VoidComponent<{
 
 								checkOrigin: [props.origin],
 							},
-							iframeReference!,
+							iframeReference,
 						)
 					}
 					new IntersectionObserver(props.resizeFn(iframeReference)).observe(
-						iframeReference!,
+						iframeReference,
 					) // Resize when the iframe becomes visible, e.g. after the "Add Template" tab is clicked when we're looking at another tab. The resizing script behaves poorly when the iframe isn't visible.
 					debouncePostMessage()
 					props.resizeFn(iframeReference)()

@@ -45,7 +45,7 @@ const ResizingIframe: CommonResizingIframe = (props) => {
 		buildHtml(C, unwrap(props.i), setDiagnostics) satisfies RawRenderBodyInput
 	const appExpose = (
 		setDiagnostics: SetStoreFunction<Diagnostics>,
-		iframeReference: IFrameComponent | undefined,
+		iframeReference: IFrameComponent,
 	) =>
 		({
 			renderTemplate: (x) => C.renderTemplate(x), // do not eta-reduce. `C`'s `this` binding apparently doesn't work across Comlink
