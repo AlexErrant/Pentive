@@ -56,7 +56,7 @@ import { db } from '../db'
 import { C } from '../topLevelAwait'
 import { notEmpty } from 'shared'
 import { useThemeContext } from 'shared-dom/themeSelector'
-import { disposeResizeObserver } from 'shared-dom/utility'
+import { disposeObserver } from 'shared-dom/utility'
 
 const QueryEditor: VoidComponent<{
 	value: string
@@ -93,7 +93,7 @@ const QueryEditor: VoidComponent<{
 	)
 	onCleanup(() => {
 		view?.destroy()
-		disposeResizeObserver(ro, ref)
+		disposeObserver(ro, ref)
 	})
 	return (
 		<>

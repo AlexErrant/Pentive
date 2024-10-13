@@ -15,7 +15,7 @@ import * as prettierPluginHtml from 'prettier/plugins/html'
 import { C } from '../topLevelAwait'
 import { useThemeContext } from 'shared-dom/themeSelector'
 import { basicSetup } from 'shared-dom/codemirror'
-import { disposeResizeObserver } from 'shared-dom/utility'
+import { disposeObserver } from 'shared-dom/utility'
 
 const FieldHtmlEditor: VoidComponent<{
 	value: string
@@ -53,7 +53,7 @@ const FieldHtmlEditor: VoidComponent<{
 	)
 	onCleanup(() => {
 		view?.destroy()
-		disposeResizeObserver(ro, ref)
+		disposeObserver(ro, ref)
 	})
 	return (
 		<>

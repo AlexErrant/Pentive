@@ -18,7 +18,7 @@ import { basicSetup } from 'shared-dom/codemirror'
 import { oneDark } from '@codemirror/theme-one-dark'
 import { EditorView } from '@codemirror/view'
 import { type LRLanguage } from '@codemirror/language'
-import { disposeResizeObserver } from 'shared-dom/utility'
+import { disposeObserver } from 'shared-dom/utility'
 
 const DiffHtml: VoidComponent<{
 	extensions: Array<Extension | LRLanguage>
@@ -102,7 +102,7 @@ const MergeComp: VoidComponent<{
 	)
 	onCleanup(() => {
 		view?.destroy()
-		disposeResizeObserver(ro, ref)
+		disposeObserver(ro, ref)
 	})
 	return <div class='max-h-[500px] resize-y overflow-auto' ref={ref!} />
 }

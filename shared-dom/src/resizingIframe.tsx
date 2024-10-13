@@ -19,7 +19,7 @@ import { debounce, leadingAndTrailing } from '@solid-primitives/scheduled'
 import { type Error, type Warning } from './language/template2html'
 import { type RenderContainer } from './renderContainer'
 import { type HtmlResult } from './cardHtml'
-import { disposeResizeObserver } from './utility'
+import { disposeObserver } from './utility'
 
 const targetOrigin = '*' // highTODO make more limiting. Also implement https://stackoverflow.com/q/8169582
 
@@ -71,7 +71,7 @@ export const ResizingIframe: VoidComponent<{
 	let intersectionObserver: IntersectionObserver
 	onCleanup(() => {
 		iframeReference?.iFrameResizer?.close()
-		disposeResizeObserver(intersectionObserver, iframeReference)
+		disposeObserver(intersectionObserver, iframeReference)
 	})
 	const [diagnostics, setDiagnostics] = createStore<Diagnostics>({
 		errors: [],

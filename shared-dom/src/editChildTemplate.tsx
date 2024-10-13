@@ -15,7 +15,7 @@ import { htmlTemplateLanguage } from './language/htmlTemplateParser'
 import { templateLinter } from './language/templateLinter'
 import { type RenderContainer } from './renderContainer'
 import { basicSetup } from './codemirror'
-import { disposeResizeObserver } from './utility'
+import { disposeObserver } from './utility'
 
 const EditChildTemplate: VoidComponent<{
 	template: Template
@@ -73,8 +73,8 @@ const EditChildTemplate: VoidComponent<{
 	onCleanup(() => {
 		frontView?.destroy()
 		backView?.destroy()
-		disposeResizeObserver(frontRo, frontRef)
-		disposeResizeObserver(backRo, backRef)
+		disposeObserver(frontRo, frontRef)
+		disposeObserver(backRo, backRef)
 	})
 	const short = () =>
 		getOk(props.renderContainer.renderTemplate(props.template, true)[props.i])
