@@ -97,37 +97,43 @@ export default function Sync(): JSX.Element {
 			when={whoAmI()}
 			fallback={"You can only upload/download/sync when you're logged in."}
 		>
-			<section class='text-gray-700 bg-gray-100 p-8'>
-				<div class='mt-4'>
-					<button
-						class='border-gray-900 rounded-lg border px-2'
-						onClick={async () => {
-							await uploadTemplates()
-						}}
-					>
-						upload Templates
-					</button>
-					<button
-						class='border-gray-900 rounded-lg border px-2'
-						onClick={async () => {
-							await uploadNotes()
-						}}
-					>
-						upload Notes
-					</button>
-					<button
-						class='border-gray-900 rounded-lg border px-2'
-						onClick={async () => {
-							await db.sync(rd)
-						}}
-					>
-						p2p sync
-					</button>
-				</div>
-				<div class='mt-4'>
-					<Peers />
-				</div>
-			</section>
+			<Content />
 		</Show>
+	)
+}
+
+function Content(): JSX.Element {
+	return (
+		<section class='text-gray-700 bg-gray-100 p-8'>
+			<div class='mt-4'>
+				<button
+					class='border-gray-900 rounded-lg border px-2'
+					onClick={async () => {
+						await uploadTemplates()
+					}}
+				>
+					upload Templates
+				</button>
+				<button
+					class='border-gray-900 rounded-lg border px-2'
+					onClick={async () => {
+						await uploadNotes()
+					}}
+				>
+					upload Notes
+				</button>
+				<button
+					class='border-gray-900 rounded-lg border px-2'
+					onClick={async () => {
+						await db.sync(rd)
+					}}
+				>
+					p2p sync
+				</button>
+			</div>
+			<div class='mt-4'>
+				<Peers />
+			</div>
+		</section>
 	)
 }
