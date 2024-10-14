@@ -30,9 +30,12 @@ import {
 	createGrid,
 	type ICellRendererComp,
 	type GridApi,
+	type IHeaderComp,
+	type IHeaderParams,
 } from 'ag-grid-community2'
 import 'ag-grid-community2/styles/ag-grid.css'
 import 'ag-grid-community2/styles/ag-theme-alpine.css'
+import { DiffModeToggleGroup } from '../components/diffModeContext'
 
 async function postMedia(
 	type: 'note' | 'template',
@@ -184,6 +187,35 @@ class CellRenderer implements ICellRendererComp<Row> {
 	}
 }
 
+class HeaderRenderer implements IHeaderComp {
+	eGui = document.createElement('div')
+	dispose!: () => void
+
+	init(params: IHeaderParams) {
+		this.dispose = render(
+			() =>
+				runWithOwner(
+					// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+					params.context.owner as Owner,
+					() => <DiffModeToggleGroup />,
+				),
+			this.eGui,
+		)
+	}
+
+	getGui() {
+		return this.eGui
+	}
+
+	refresh() {
+		return false
+	}
+
+	destroy() {
+		this.dispose()
+	}
+}
+
 type Type = 'new' | 'edited'
 
 interface Row {
@@ -207,6 +239,7 @@ function Content(): JSX.Element {
 				{ field: 'type' },
 				{
 					headerName: 'Diff',
+					headerComponent: HeaderRenderer,
 					cellRenderer: CellRenderer,
 					autoHeight: true,
 					flex: 1,
