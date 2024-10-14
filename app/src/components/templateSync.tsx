@@ -34,12 +34,10 @@ const TemplateSync: VoidComponent<{ template: Template }> = (props) => {
 					{([nookId, remoteTemplate]) => (
 						<li>
 							<h2>/n/{nookId}</h2>
-							<Show when={remoteTemplate} fallback={`Not yet uploaded.`}>
-								<TemplateNookSync
-									template={props.template}
-									remoteTemplate={remoteTemplate!}
-								/>
-							</Show>
+							<TemplateNookSync
+								template={props.template}
+								remoteTemplate={remoteTemplate}
+							/>
 						</li>
 					)}
 				</For>
@@ -51,6 +49,26 @@ const TemplateSync: VoidComponent<{ template: Template }> = (props) => {
 export default TemplateSync
 
 export const TemplateNookSync: VoidComponent<{
+	template: Template
+	remoteTemplate:
+		| {
+				remoteTemplateId: RemoteTemplateId
+				uploadDate: Date
+		  }
+		| null
+		| undefined
+}> = (props) => {
+	return (
+		<Show when={props.remoteTemplate} fallback={`Not yet uploaded.`}>
+			<TemplateNookSyncActual
+				template={props.template}
+				remoteTemplate={props.remoteTemplate!}
+			/>
+		</Show>
+	)
+}
+
+const TemplateNookSyncActual: VoidComponent<{
 	template: Template
 	remoteTemplate: {
 		remoteTemplateId: RemoteTemplateId

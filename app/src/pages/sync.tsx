@@ -19,7 +19,6 @@ import {
 	type NookId,
 	type Template,
 	objKeys,
-	throwExp,
 } from 'shared'
 import { cwaClient } from '../trpcClient'
 import { C, rd, whoAmI } from '../topLevelAwait'
@@ -157,8 +156,7 @@ class CellRenderer implements ICellRendererComp<Row> {
 			this.eGui.textContent = 'N/A'
 			return
 		}
-		const remoteTemplate =
-			params.data.template.remotes[params.data.nook] ?? throwExp()
+		const remoteTemplate = params.data.template.remotes[params.data.nook]
 		this.dispose = render(
 			() =>
 				runWithOwner(params.context.owner, () => (
