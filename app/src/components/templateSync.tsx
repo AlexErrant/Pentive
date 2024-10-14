@@ -50,7 +50,7 @@ const TemplateSync: VoidComponent<{ template: Template }> = (props) => {
 
 export default TemplateSync
 
-const TemplateNookSync: VoidComponent<{
+export const TemplateNookSync: VoidComponent<{
 	template: Template
 	remoteTemplate: {
 		remoteTemplateId: RemoteTemplateId

@@ -69,14 +69,13 @@ function domainToEditRemote(template: Template) {
 		.filter(notEmpty)
 	if (remoteIds.length === 0)
 		C.toastImpossible(`Zero remoteIds - is something wrong with the SQL query?`)
-	const r: EditRemoteTemplate = {
+	return {
 		name: template.name,
 		css: template.css,
 		templateType: template.templateType,
 		remoteIds,
 		fields: template.fields.map((x) => x.name),
-	}
-	return r
+	} satisfies EditRemoteTemplate
 }
 
 export const templateCollectionMethods = {
@@ -189,6 +188,15 @@ export const templateCollectionMethods = {
 	},
 	getNewTemplatesToUpload: async function () {
 		const dp = new DOMParser()
+		const templatesAndStuff = await this.getNewTemplatesToUploadDom().then(
+			(n) =>
+				n
+					.map(domainToCreateRemote)
+					.map((n) => withLocalMediaIdByRemoteMediaId(dp, n)),
+		)
+		return templatesAndStuff.map((n) => n.template)
+	},
+	getNewTemplatesToUploadDom: async function () {
 		const templatesAndStuff = await ky
 			.selectFrom('template')
 			.leftJoin('remoteTemplate', 'template.id', 'remoteTemplate.localId')
@@ -196,15 +204,19 @@ export const templateCollectionMethods = {
 			.where('remoteTemplate.remoteId', 'is', null)
 			.where('remoteTemplate.nook', 'is not', null)
 			.execute()
-			.then((n) =>
-				toTemplates(n)
-					.map(domainToCreateRemote)
-					.map((n) => withLocalMediaIdByRemoteMediaId(dp, n)),
-			)
-		return templatesAndStuff.map((n) => n.template)
+		return toTemplates(templatesAndStuff)
 	},
 	getEditedTemplatesToUpload: async function () {
 		const dp = new DOMParser()
+		const templatesAndStuff = await this.getEditedTemplatesToUploadDom().then(
+			(n) =>
+				n
+					.map(domainToEditRemote)
+					.map((n) => withLocalMediaIdByRemoteMediaId(dp, n)),
+		)
+		return templatesAndStuff.map((n) => n.template)
+	},
+	getEditedTemplatesToUploadDom: async function () {
 		const templatesAndStuff = await ky
 			.selectFrom('template')
 			.leftJoin('remoteTemplate', 'template.id', 'remoteTemplate.localId')
@@ -212,12 +224,7 @@ export const templateCollectionMethods = {
 			.whereRef('remoteTemplate.uploadDate', '<', 'template.edited')
 			.selectAll()
 			.execute()
-			.then((n) =>
-				toTemplates(n)
-					.map(domainToEditRemote)
-					.map((n) => withLocalMediaIdByRemoteMediaId(dp, n)),
-			)
-		return templatesAndStuff.map((n) => n.template)
+		return toTemplates(templatesAndStuff)
 	},
 	getTemplateMediaToUpload: async function () {
 		const mediaBinaries = await ky
