@@ -35,7 +35,10 @@ import {
 } from 'ag-grid-community2'
 import 'ag-grid-community2/styles/ag-grid.css'
 import 'ag-grid-community2/styles/ag-theme-alpine.css'
+import { LicenseManager } from 'ag-grid-enterprise2'
 import { DiffModeToggleGroup } from '../components/diffModeContext'
+
+LicenseManager.setLicenseKey(import.meta.env.VITE_AG_GRID_LICENSE)
 
 async function postMedia(
 	type: 'note' | 'template',
@@ -156,7 +159,6 @@ class CellRenderer implements ICellRendererComp<Row> {
 
 	init(params: ICellRendererParams<Row, unknown, Context>) {
 		if (params.data == null) {
-			this.eGui.textContent = 'N/A'
 			return
 		}
 		const remoteTemplate = params.data.template.remotes[params.data.nook]
@@ -235,8 +237,8 @@ function Content(): JSX.Element {
 	onMount(() => {
 		const gridOptions = {
 			columnDefs: [
-				{ field: 'nook' },
-				{ field: 'type' },
+				{ field: 'nook', enableRowGroup: true },
+				{ field: 'type', enableRowGroup: true },
 				{
 					headerName: 'Diff',
 					headerComponent: HeaderRenderer,
@@ -254,6 +256,7 @@ function Content(): JSX.Element {
 			},
 			suppressRowHoverHighlight: true,
 			enableCellTextSelection: true,
+			rowGroupPanelShow: 'onlyWhenGrouping',
 		} satisfies GridOptions<Row> as GridOptions<Row>
 		gridApi = createGrid(ref, gridOptions)
 	})
