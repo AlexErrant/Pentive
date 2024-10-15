@@ -11,15 +11,7 @@ import {
 import { render } from 'solid-js/web'
 import { db } from '../db'
 import Peers from './peers'
-import {
-	type MediaId,
-	type Base64Url,
-	type RemoteMediaNum,
-	csrfHeaderName,
-	type NookId,
-	type Template,
-	objKeys,
-} from 'shared'
+import { type NookId, type Template, objKeys } from 'shared'
 import { cwaClient } from '../trpcClient'
 import { C, rd, whoAmI } from '../topLevelAwait'
 import { TemplateNookSync } from '../components/templateSync'
@@ -37,43 +29,9 @@ import 'ag-grid-community2/styles/ag-grid.css'
 import 'ag-grid-community2/styles/ag-theme-alpine.css'
 import { LicenseManager } from 'ag-grid-enterprise2'
 import { DiffModeToggleGroup } from '../components/diffModeContext'
+import { postMedia } from '../domain/sync'
 
 LicenseManager.setLicenseKey(import.meta.env.VITE_AG_GRID_LICENSE)
-
-async function postMedia(
-	type: 'note' | 'template',
-	mediaId: MediaId,
-	ids: Array<[Base64Url, Base64Url, RemoteMediaNum]>, // localId, remoteId, i
-	data: ArrayBuffer,
-): Promise<void> {
-	const remoteEntityIdAndRemoteMediaNum = ids.map(
-		([, remoteEntityId, remoteMediaNum]) => [
-			remoteEntityId,
-			remoteMediaNum.toString(),
-		],
-	)
-	const response = await fetch(
-		import.meta.env.VITE_CWA_URL +
-			`media/${type}?` +
-			new URLSearchParams(remoteEntityIdAndRemoteMediaNum).toString(),
-		{
-			method: 'POST',
-			body: data,
-			credentials: 'include',
-			headers: new Headers({
-				[csrfHeaderName]: '',
-			}),
-		},
-	)
-	// eslint-disable-next-line yoda
-	if (200 <= response.status && response.status <= 299) {
-		await db.updateUploadDate(ids)
-	} else {
-		C.toastError(
-			`'${response.status}' HTTP status while uploading media with id ${mediaId}.`,
-		)
-	}
-}
 
 async function uploadNotes(): Promise<void> {
 	const newNotes = await db.getNewNotesToUpload()
