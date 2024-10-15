@@ -29,7 +29,7 @@ import 'ag-grid-community2/styles/ag-grid.css'
 import 'ag-grid-community2/styles/ag-theme-alpine.css'
 import { LicenseManager } from 'ag-grid-enterprise2'
 import { DiffModeToggleGroup } from '../components/diffModeContext'
-import { postMedia } from '../domain/sync'
+import { postMedia, uploadTemplates } from '../domain/sync'
 
 LicenseManager.setLicenseKey(import.meta.env.VITE_AG_GRID_LICENSE)
 
@@ -51,30 +51,6 @@ async function uploadNotes(): Promise<void> {
 		await postMedia('note', mediaId, ids, data)
 	}
 	if (editedNotes.length === 0 && newNotes.length === 0 && media.size === 0) {
-		C.toastInfo('Nothing to upload!')
-	}
-}
-
-async function uploadTemplates(): Promise<void> {
-	const media = await db.getTemplateMediaToUpload()
-	for (const [mediaId, { data, ids }] of media) {
-		await postMedia('template', mediaId, ids, data)
-	}
-	const newTemplates = await db.getNewTemplatesToUpload()
-	if (newTemplates.length > 0) {
-		const remoteIdByLocal = await cwaClient.createTemplates.mutate(newTemplates)
-		await db.updateTemplateRemoteIds(remoteIdByLocal)
-	}
-	const editedTemplates = await db.getEditedTemplatesToUpload()
-	if (editedTemplates.length > 0) {
-		await cwaClient.editTemplates.mutate(editedTemplates)
-		await db.markTemplateAsPushed(editedTemplates.flatMap((n) => n.remoteIds))
-	}
-	if (
-		editedTemplates.length === 0 &&
-		newTemplates.length === 0 &&
-		media.size === 0
-	) {
 		C.toastInfo('Nothing to upload!')
 	}
 }

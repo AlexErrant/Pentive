@@ -3,9 +3,11 @@ import {
 	type Base64Url,
 	type RemoteMediaNum,
 	csrfHeaderName,
+	type TemplateId,
 } from 'shared'
 import { db } from '../db'
 import { C } from '../topLevelAwait'
+import { cwaClient } from '../trpcClient'
 
 export async function postMedia(
 	type: 'note' | 'template',
@@ -39,5 +41,29 @@ export async function postMedia(
 		C.toastError(
 			`'${response.status}' HTTP status while uploading media with id ${mediaId}.`,
 		)
+	}
+}
+
+export async function uploadTemplates(templateId?: TemplateId): Promise<void> {
+	const media = await db.getTemplateMediaToUpload(templateId)
+	for (const [mediaId, { data, ids }] of media) {
+		await postMedia('template', mediaId, ids, data)
+	}
+	const newTemplates = await db.getNewTemplatesToUpload(templateId)
+	if (newTemplates.length > 0) {
+		const remoteIdByLocal = await cwaClient.createTemplates.mutate(newTemplates)
+		await db.updateTemplateRemoteIds(remoteIdByLocal)
+	}
+	const editedTemplates = await db.getEditedTemplatesToUpload(templateId)
+	if (editedTemplates.length > 0) {
+		await cwaClient.editTemplates.mutate(editedTemplates)
+		await db.markTemplateAsPushed(editedTemplates.flatMap((n) => n.remoteIds))
+	}
+	if (
+		editedTemplates.length === 0 &&
+		newTemplates.length === 0 &&
+		media.size === 0
+	) {
+		C.toastInfo('Nothing to upload!')
 	}
 }

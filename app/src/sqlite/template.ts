@@ -186,47 +186,50 @@ export const templateCollectionMethods = {
 			.executeTakeFirstOrThrow()
 		return { templates, count }
 	},
-	getNewTemplatesToUpload: async function () {
+	getNewTemplatesToUpload: async function (templateId?: TemplateId) {
 		const dp = new DOMParser()
-		const templatesAndStuff = await this.getNewTemplatesToUploadDom().then(
-			(n) =>
-				n
-					.map(domainToCreateRemote)
-					.map((n) => withLocalMediaIdByRemoteMediaId(dp, n)),
-		)
-		return templatesAndStuff.map((n) => n.template)
+		const templatesAndStuff = await this.getNewTemplatesToUploadDom(templateId)
+		return templatesAndStuff
+			.map(domainToCreateRemote)
+			.map((n) => withLocalMediaIdByRemoteMediaId(dp, n))
+			.map((n) => n.template)
 	},
-	getNewTemplatesToUploadDom: async function () {
+	getNewTemplatesToUploadDom: async function (templateId?: TemplateId) {
 		const templatesAndStuff = await ky
 			.selectFrom('template')
 			.leftJoin('remoteTemplate', 'template.id', 'remoteTemplate.localId')
 			.selectAll()
 			.where('remoteTemplate.remoteId', 'is', null)
 			.where('remoteTemplate.nook', 'is not', null)
+			.$if(templateId != null, (db) =>
+				db.where('template.id', '=', templateId!),
+			)
 			.execute()
 		return toTemplates(templatesAndStuff)
 	},
-	getEditedTemplatesToUpload: async function () {
+	getEditedTemplatesToUpload: async function (templateId?: TemplateId) {
 		const dp = new DOMParser()
-		const templatesAndStuff = await this.getEditedTemplatesToUploadDom().then(
-			(n) =>
-				n
-					.map(domainToEditRemote)
-					.map((n) => withLocalMediaIdByRemoteMediaId(dp, n)),
-		)
-		return templatesAndStuff.map((n) => n.template)
+		const templatesAndStuff =
+			await this.getEditedTemplatesToUploadDom(templateId)
+		return templatesAndStuff
+			.map(domainToEditRemote)
+			.map((n) => withLocalMediaIdByRemoteMediaId(dp, n))
+			.map((n) => n.template)
 	},
-	getEditedTemplatesToUploadDom: async function () {
+	getEditedTemplatesToUploadDom: async function (templateId?: TemplateId) {
 		const templatesAndStuff = await ky
 			.selectFrom('template')
 			.leftJoin('remoteTemplate', 'template.id', 'remoteTemplate.localId')
 			.where('remoteId', 'is not', null)
 			.whereRef('remoteTemplate.uploadDate', '<', 'template.edited')
+			.$if(templateId != null, (db) =>
+				db.where('template.id', '=', templateId!),
+			)
 			.selectAll()
 			.execute()
 		return toTemplates(templatesAndStuff)
 	},
-	getTemplateMediaToUpload: async function () {
+	getTemplateMediaToUpload: async function (templateId?: TemplateId) {
 		const mediaBinaries = await ky
 			.selectFrom('remoteMedia')
 			.innerJoin('media', 'remoteMedia.localMediaId', 'media.id')
@@ -244,6 +247,9 @@ export const templateCollectionMethods = {
 					eb('remoteMedia.uploadDate', 'is', null),
 					eb('media.edited', '>', ref('remoteMedia.uploadDate')),
 				]),
+			)
+			.$if(templateId != null, (db) =>
+				db.where('template.id', '=', templateId!),
 			)
 			.execute()
 		const media = new Map<
