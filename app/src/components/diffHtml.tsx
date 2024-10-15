@@ -29,36 +29,33 @@ const DiffHtml: VoidComponent<{
 }> = (props) => {
 	const [diffMode] = useDiffModeContext()
 	return (
-		<div class='border-black m-2 border p-1'>
-			<h3>
-				{props.title}
-				<Show when={props.before === props.after}>
-					{' '}
-					- <em>No changes</em>
-				</Show>
-			</h3>
-			<Switch>
-				<Match when={props.before === props.after}>
-					<></>
-				</Match>
-				<Match when={diffMode() === 'pretty'}>
-					<ResizingIframe
-						i={{
-							tag: 'raw',
-							html: diffHtml(props.before, props.after),
-							css: props.css + 'ins{background:palegreen}del{background:pink}',
-						}}
-					/>
-				</Match>
-				<Match when={diffMode() === 'split'}>
-					<MergeComp
-						before={props.before}
-						after={props.after}
-						extensions={props.extensions}
-					/>
-				</Match>
-			</Switch>
-		</div>
+		<Show when={props.before !== props.after}>
+			<div class='border-black m-2 border p-1'>
+				<h3>{props.title}</h3>
+				<Switch>
+					<Match when={props.before === props.after}>
+						<></>
+					</Match>
+					<Match when={diffMode() === 'pretty'}>
+						<ResizingIframe
+							i={{
+								tag: 'raw',
+								html: diffHtml(props.before, props.after),
+								css:
+									props.css + 'ins{background:palegreen}del{background:pink}',
+							}}
+						/>
+					</Match>
+					<Match when={diffMode() === 'split'}>
+						<MergeComp
+							before={props.before}
+							after={props.after}
+							extensions={props.extensions}
+						/>
+					</Match>
+				</Switch>
+			</div>
+		</Show>
 	)
 }
 
