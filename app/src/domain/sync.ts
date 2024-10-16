@@ -68,3 +68,5 @@ export async function uploadTemplates(templateId?: TemplateId, nook?: NookId) {
 		C.toastInfo('Nothing to upload!')
 	}
 }
+
+export type SyncState = 'different' | 'uploaded' | 'uploading' | 'errored'

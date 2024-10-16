@@ -16,6 +16,7 @@ export const cwaClient = createTRPCProxyClient<CwaAppRouter>({
 				[csrfHeaderName]: '',
 			},
 			async fetch(url, options) {
+				// medTODO wrap with error handling. Also wrap ALL our fetches with error handling.
 				return await fetch(url, {
 					...options,
 					credentials: 'include',

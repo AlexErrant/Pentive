@@ -5,6 +5,7 @@ import {
 	createResource,
 	Switch,
 	Match,
+	createSignal,
 } from 'solid-js'
 import {
 	type Template,
@@ -13,6 +14,7 @@ import {
 	type Standard,
 	type Cloze,
 	type ChildTemplate,
+	type NookId,
 } from 'shared'
 import { diffChars, diffCss, diffJson, diffWords } from 'diff'
 import { augcClient } from '../trpcClient'
@@ -24,6 +26,7 @@ import { html } from '@codemirror/lang-html'
 import { templateLinter } from 'shared-dom/language/templateLinter'
 import { DiffModeToggleGroup } from './diffModeContext'
 import './templateSync.css'
+import { type SyncState, uploadTemplates } from '../domain/sync'
 
 const TemplateSync: VoidComponent<{ template: Template }> = (props) => {
 	return (
@@ -57,14 +60,54 @@ export const TemplateNookSync: VoidComponent<{
 		  }
 		| null
 		| undefined
+	nook?: NookId
 }> = (props) => {
+	const [state, setState] = createSignal<SyncState>('different')
 	return (
-		<Show when={props.remoteTemplate} fallback={`Not yet uploaded.`}>
-			<TemplateNookSyncActual
-				template={props.template}
-				remoteTemplate={props.remoteTemplate!}
-			/>
-		</Show>
+		<>
+			{state() === 'uploaded' ? (
+				<div class='flex justify-end'>Uploaded</div>
+			) : (
+				<div class='pt-2 leading-normal'>
+					<div class='flex justify-end'>
+						<Switch>
+							<Match when={state() === 'uploading'}>Uploading...</Match>
+							<Match when={state() === 'different' || state() === 'errored'}>
+								<>
+									<Show when={state() === 'errored'}>
+										<span class='pr-2'>Errored, try again?</span>
+									</Show>
+									<button
+										class='border-gray-900 rounded-lg border px-2'
+										onClick={async () => {
+											setState('uploading')
+											try {
+												await uploadTemplates(props.template.id, props.nook)
+											} catch (error) {
+												setState('errored')
+												throw error
+											}
+											setState('uploaded')
+										}}
+									>
+										Upload
+									</button>
+								</>
+							</Match>
+						</Switch>
+					</div>
+					<Show
+						when={props.remoteTemplate}
+						fallback={<div>Not yet uploaded.</div>}
+					>
+						<TemplateNookSyncActual
+							template={props.template}
+							remoteTemplate={props.remoteTemplate!}
+						/>
+					</Show>
+				</div>
+			)}
+		</>
 	)
 }
 
@@ -96,7 +139,7 @@ const TemplateNookSyncActual: VoidComponent<{
 					props.template.fields.map((f) => f.name).join(', '),
 				)}
 			/>
-			<div class='border-black m-2 border p-1'>
+			<div class='border-black border p-1'>
 				<h3>Child Templates</h3>
 				<Switch>
 					<Match
@@ -149,12 +192,13 @@ const TemplateNookSyncActual: VoidComponent<{
 	)
 }
 
+const extensions = [htmlTemplateLanguage, html().support, templateLinter]
+
 const ChildTemplateNookSync: VoidComponent<{
 	css: string
 	local?: ChildTemplate
 	remote?: ChildTemplate
 }> = (props) => {
-	const extensions = [htmlTemplateLanguage, html().support, templateLinter]
 	return (
 		<Switch
 			fallback={
