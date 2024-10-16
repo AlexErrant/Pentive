@@ -102,6 +102,7 @@ class CellRenderer implements ICellRendererComp<Row> {
 					<TemplateNookSync
 						template={params.data!.template}
 						remoteTemplate={remoteTemplate}
+						nook={params.data!.nook}
 					/>
 				)),
 			this.eGui,

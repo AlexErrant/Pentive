@@ -4,6 +4,7 @@ import {
 	type RemoteMediaNum,
 	csrfHeaderName,
 	type TemplateId,
+	type NookId,
 } from 'shared'
 import { db } from '../db'
 import { C } from '../topLevelAwait'
@@ -44,17 +45,17 @@ export async function postMedia(
 	}
 }
 
-export async function uploadTemplates(templateId?: TemplateId): Promise<void> {
+export async function uploadTemplates(templateId?: TemplateId, nook?: NookId) {
 	const media = await db.getTemplateMediaToUpload(templateId)
 	for (const [mediaId, { data, ids }] of media) {
 		await postMedia('template', mediaId, ids, data)
 	}
-	const newTemplates = await db.getNewTemplatesToUpload(templateId)
+	const newTemplates = await db.getNewTemplatesToUpload(templateId, nook)
 	if (newTemplates.length > 0) {
 		const remoteIdByLocal = await cwaClient.createTemplates.mutate(newTemplates)
 		await db.updateTemplateRemoteIds(remoteIdByLocal)
 	}
-	const editedTemplates = await db.getEditedTemplatesToUpload(templateId)
+	const editedTemplates = await db.getEditedTemplatesToUpload(templateId, nook)
 	if (editedTemplates.length > 0) {
 		await cwaClient.editTemplates.mutate(editedTemplates)
 		await db.markTemplateAsPushed(editedTemplates.flatMap((n) => n.remoteIds))

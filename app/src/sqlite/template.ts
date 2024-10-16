@@ -51,21 +51,25 @@ function templateToDocType(template: Template) {
 	return { insertTemplate, remoteTemplates }
 }
 
-function domainToCreateRemote(t: Template) {
+function domainToCreateRemote(t: Template, nook?: NookId) {
+	const nooks = nook == null ? objKeys(t.remotes) : [nook]
 	const r: CreateRemoteTemplate = {
 		localId: t.id,
 		name: t.name,
 		css: t.css,
-		nooks: objKeys(t.remotes),
+		nooks,
 		templateType: t.templateType,
 		fields: t.fields.map((x) => x.name),
 	}
 	return r
 }
 
-function domainToEditRemote(template: Template) {
-	const remoteIds = Object.entries(template.remotes)
-		.map(([, v]) => v?.remoteTemplateId)
+function domainToEditRemote(template: Template, nook?: NookId) {
+	const remoteIds = objEntries(template.remotes)
+		.map(([k, v]) => {
+			if (nook == null || k === nook) return v?.remoteTemplateId
+			return null
+		})
 		.filter(notEmpty)
 	if (remoteIds.length === 0)
 		C.toastImpossible(`Zero remoteIds - is something wrong with the SQL query?`)
@@ -186,11 +190,14 @@ export const templateCollectionMethods = {
 			.executeTakeFirstOrThrow()
 		return { templates, count }
 	},
-	getNewTemplatesToUpload: async function (templateId?: TemplateId) {
+	getNewTemplatesToUpload: async function (
+		templateId?: TemplateId,
+		nook?: NookId,
+	) {
 		const dp = new DOMParser()
 		const templatesAndStuff = await this.getNewTemplatesToUploadDom(templateId)
 		return templatesAndStuff
-			.map(domainToCreateRemote)
+			.map((n) => domainToCreateRemote(n, nook))
 			.map((n) => withLocalMediaIdByRemoteMediaId(dp, n))
 			.map((n) => n.template)
 	},
@@ -207,12 +214,15 @@ export const templateCollectionMethods = {
 			.execute()
 		return toTemplates(templatesAndStuff)
 	},
-	getEditedTemplatesToUpload: async function (templateId?: TemplateId) {
+	getEditedTemplatesToUpload: async function (
+		templateId?: TemplateId,
+		nook?: NookId,
+	) {
 		const dp = new DOMParser()
 		const templatesAndStuff =
 			await this.getEditedTemplatesToUploadDom(templateId)
 		return templatesAndStuff
-			.map(domainToEditRemote)
+			.map((n) => domainToEditRemote(n, nook))
 			.map((n) => withLocalMediaIdByRemoteMediaId(dp, n))
 			.map((n) => n.template)
 	},
