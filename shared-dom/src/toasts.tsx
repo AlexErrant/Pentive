@@ -1,4 +1,4 @@
-import { throwExp } from 'shared'
+import { throwExp } from 'shared/utility'
 import {
 	type JSXElement,
 	createEffect,

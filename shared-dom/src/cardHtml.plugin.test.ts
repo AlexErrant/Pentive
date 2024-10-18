@@ -6,8 +6,8 @@ import {
 	type Ord,
 	type PluginName,
 	type PluginVersion,
-	type Template,
-} from 'shared'
+} from 'shared/brand'
+import { type Template } from 'shared/domain/template'
 import { type Plugin } from './plugin'
 import { registerPluginServices } from './pluginManager'
 import { strip } from './cardHtml'

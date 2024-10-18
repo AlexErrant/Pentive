@@ -1,5 +1,4 @@
 import sqliteWasm, { type DB as crDB } from '@vlcn.io/crsqlite-wasm'
-import { initSql, ftsNormalize } from 'shared'
 import { lrpc } from '../lrpcClient'
 import { stringify as uuidStringify } from 'uuid'
 import { type DB } from './database'
@@ -10,6 +9,8 @@ import wdbRtc from './wholeDbRtc'
 import { wholeDbReplicator } from 'shared-dom/wholeDbReplicator'
 import { C } from '../topLevelAwait'
 import { SQLITE_DETERMINISTIC, SQLITE_UTF8 } from '@vlcn.io/wa-sqlite'
+import initSql from 'shared/sql.json'
+import { ftsNormalize } from 'shared/htmlToText'
 
 // const dp = new DOMParser()
 

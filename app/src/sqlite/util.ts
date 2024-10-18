@@ -7,19 +7,17 @@ import {
 	type Template as TemplateEntity,
 } from './database'
 import {
-	parseMap,
-	type NoteId,
 	type MediaId,
 	type RemoteMediaNum,
-	type RemoteTemplateId,
-	type Note,
-	type TemplateType,
 	type TemplateId,
-	type Template,
-	imgPlaceholder,
-	type Field,
-	parseSet,
-} from 'shared'
+	type RemoteTemplateId,
+	type NoteId,
+} from 'shared/brand'
+import { type Field, type Template } from 'shared/domain/template'
+import { imgPlaceholder } from 'shared/image'
+import { type TemplateType } from 'shared/schema'
+import { parseSet, parseMap } from 'shared/utility'
+import { type Note } from 'shared/domain/note'
 import { C } from '../topLevelAwait'
 
 export function parseTags(rawTags: string) {

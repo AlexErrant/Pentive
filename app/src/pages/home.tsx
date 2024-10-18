@@ -4,7 +4,7 @@ import {
 	type JSX,
 	type Setter,
 } from 'solid-js'
-import { type MediaId } from 'shared'
+import { type MediaId } from 'shared/brand'
 import { db } from '../db'
 import { importAnki } from './importer/importer'
 import { augcClient } from '../trpcClient'

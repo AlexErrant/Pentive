@@ -1,10 +1,4 @@
 import { SignJWT } from 'jose'
-import {
-	csrfSignatureCookieName,
-	hubSessionCookieName,
-	throwExp,
-	type UserId,
-} from 'shared'
 import { base64ToArray } from 'shared-edge'
 import { cache, redirect } from '@solidjs/router'
 import {
@@ -16,6 +10,9 @@ import { getRequestEvent } from 'solid-js/web'
 import { type EnvVars } from './env'
 import type { FetchEvent } from '@solidjs/start/server'
 import { base64url } from '@scure/base'
+import { type UserId } from 'shared/brand'
+import { hubSessionCookieName, csrfSignatureCookieName } from 'shared/headers'
+import { throwExp } from 'shared/utility'
 
 const sessionMaxAgeSeconds = 60 * 60 * 24 * 30 // 30 days
 const sessionCM = new SignedCookieManager(hubSessionCookieName, {

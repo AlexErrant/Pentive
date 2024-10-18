@@ -13,31 +13,38 @@ import {
 import { LibsqlDialect } from '@libsql/kysely-libsql'
 import { type Note, type DB, type Template } from './dbSchema'
 import {
-	type Base64,
 	type Base64Url,
 	type DbId,
-	type Hex,
+	type RemoteTemplateId,
 	type NookId,
+	type RemoteNoteId,
+	type UserId,
+	type TemplateId,
 	type CommentId,
 	type NoteId,
-	type RemoteNoteId,
-	type RemoteTemplateId,
-	type TemplateId,
-	type UserId,
+	type Hex,
+	type MediaHash,
+	type Base64,
+} from 'shared/brand'
+import { ftsNormalize } from 'shared/htmlToText'
+import { imgPlaceholder, relativeChar } from 'shared/image'
+import {
+	type RemoteTemplate,
 	type RemoteNote,
 	type CreateRemoteNote,
 	type CreateRemoteTemplate,
 	type EditRemoteNote,
 	type EditRemoteTemplate,
-	type RemoteTemplate,
 	type TemplateType,
-	imgPlaceholder,
-	relativeChar,
-	ftsNormalize,
-	type MediaHash,
-} from 'shared'
+} from 'shared/schema'
+import {
+	nullMap,
+	undefinedMap,
+	throwExp,
+	stringifyMap,
+	parseMap,
+} from 'shared/utility'
 import { binary16fromBase64URL, ulidAsHex, ulidAsRaw } from './convertBinary'
-import { nullMap, parseMap, stringifyMap, throwExp, undefinedMap } from 'shared'
 import { base16, base64, base64url } from '@scure/base'
 import { createClient } from '@libsql/client/web'
 import { base64ToArray } from './utility'

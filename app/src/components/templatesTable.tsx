@@ -10,12 +10,14 @@ import {
 	type IGetRowsParams,
 } from 'ag-grid-community'
 import { LicenseManager } from 'ag-grid-enterprise'
-import { objEntries, type Template, type TemplateId } from 'shared'
 import { startCase } from 'lodash-es'
 import '@github/relative-time-element'
 import { db } from '../db'
 import { Upload } from 'shared-dom/icons'
 import { agGridTheme, useThemeContext } from 'shared-dom/themeSelector'
+import { type TemplateId } from 'shared/brand'
+import { objEntries } from 'shared/utility'
+import { type Template } from 'shared/domain/template'
 
 LicenseManager.setLicenseKey(import.meta.env.VITE_AG_GRID_LICENSE)
 

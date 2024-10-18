@@ -1,4 +1,6 @@
-import { type Card, type NoteCard, type Override, type Template } from 'shared'
+import { type Template } from 'shared/domain/template'
+import { type NoteCard, type Card } from 'shared/domain/card'
+import { type Override } from 'shared/utility'
 
 export interface NoteCardView {
 	template: Template

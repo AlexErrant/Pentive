@@ -2,16 +2,16 @@ import { createStore } from 'solid-js/store'
 import { type JSX, Show, onMount, For, createEffect } from 'solid-js'
 import { getCardSettings } from './settings.data'
 import { createAsync } from '@solidjs/router'
-import {
-	type CardSettingId,
-	type CardSetting,
-	getDefaultCardSetting,
-} from 'shared'
 import { GoldenLayout, LayoutConfig } from 'golden-layout'
 import { render } from 'solid-js/web'
 import EditCardSetting from '../components/editCardSetting'
 import { cloneDeep } from 'lodash-es'
 import { ulidAsBase64Url } from '../domain/utility'
+import { type CardSettingId } from 'shared/brand'
+import {
+	type CardSetting,
+	getDefaultCardSetting,
+} from 'shared/domain/cardSetting'
 
 export default function Settings(): JSX.Element {
 	const initialSettings = createAsync(async () => await getCardSettings(), {

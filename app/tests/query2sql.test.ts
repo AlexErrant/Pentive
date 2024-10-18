@@ -10,7 +10,7 @@ import { CRDialect } from '../src/sqlite/dialect'
 import { format as actualFormat } from 'prettier'
 import * as plugin from 'prettier-plugin-sql-cst'
 import { type DB } from '../src/sqlite/database'
-import { throwExp } from 'shared'
+import { throwExp } from 'shared/utility'
 
 async function format(sql: string) {
 	return await actualFormat('select * from x where ' + sql, {

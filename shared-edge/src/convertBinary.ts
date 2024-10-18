@@ -1,5 +1,4 @@
-import { type Base64, type Base64Url, type Hex } from 'shared'
-
+import { type Base64, type Base64Url, type Hex } from 'shared/brand'
 import { ulidFactory } from 'ulid-workers'
 import { base16, base32crockford } from '@scure/base'
 

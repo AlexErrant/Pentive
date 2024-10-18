@@ -1,8 +1,8 @@
 import { For, Show, type VoidComponent } from 'solid-js'
 import ResizingIframe from './resizingIframe'
-import { type NoteCard } from 'shared'
 import { toNoteCards, type NoteCardView } from '../uiLogic/cards'
 import { C } from '../topLevelAwait'
+import { type NoteCard } from 'shared/domain/card'
 
 function toMainNoteCards(noteCardView: NoteCardView): NoteCard {
 	return {

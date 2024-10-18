@@ -3,19 +3,14 @@ import {
 	type Ord,
 	type NoteId,
 	type TemplateId,
-	type ChildTemplate,
-	type TemplateType,
 	type CardSettingId,
-	type Field,
-	type Template,
-	type Card as PCard,
-	type Note as PNote,
-	type Review,
 	type ReviewId,
-	type Kind,
-	throwExp,
-	dayInMs,
-} from 'shared'
+} from 'shared/brand'
+import { throwExp, dayInMs } from 'shared/utility'
+import { type Field, type Template } from 'shared/domain/template'
+import { type Kind, type Review } from 'shared/domain/review'
+import { type Note as PNote } from 'shared/domain/note'
+import { type Card as PCard } from 'shared/domain/card'
 import {
 	type Card as ACard,
 	type Fld,
@@ -31,6 +26,7 @@ import {
 import { zip } from 'lodash-es'
 import { z } from 'zod'
 import { C } from '../../topLevelAwait'
+import { type ChildTemplate, type TemplateType } from 'shared/schema'
 
 function parseField(fld: Fld): Field {
 	return {

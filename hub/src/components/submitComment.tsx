@@ -1,4 +1,4 @@
-import { commentText } from 'shared'
+import { commentText } from 'shared/schema'
 
 export default function SubmitComment(props: {
 	onSubmit: (text: string) => Promise<void>

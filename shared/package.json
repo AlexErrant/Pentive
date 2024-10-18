@@ -7,7 +7,6 @@
 	"type": "module",
 	"sideEffects": false,
 	"main": "src/index.ts",
-	"exports": "./src/index.ts",
 	"scripts": {
 		"tsc-build": "tsc",
 		"generateSql": "tsx watch ./sql/generateSql.ts",
@@ -44,5 +43,95 @@
 		"lodash-es": "^4.17.21",
 		"uuid": "^9.0.1",
 		"zod": ">=3.22.3"
+	},
+	"exports": {
+		"./image": {
+			"types": "./src/image.ts",
+			"development": "./src/image.ts",
+			"default": "./lib/src/image.js"
+		},
+		"./brand": {
+			"types": "./src/brand.ts",
+			"development": "./src/brand.ts",
+			"default": "./lib/src/brand.js"
+		},
+		"./schema": {
+			"types": "./src/schema.ts",
+			"development": "./src/schema.ts",
+			"default": "./lib/src/schema.js"
+		},
+		"./htmlToText": {
+			"types": "./src/htmlToText.ts",
+			"development": "./src/htmlToText.ts",
+			"default": "./lib/src/htmlToText.js"
+		},
+		"./utility": {
+			"types": "./src/utility.ts",
+			"development": "./src/utility.ts",
+			"default": "./lib/src/utility.js"
+		},
+		"./headers": {
+			"types": "./src/headers.ts",
+			"development": "./src/headers.ts",
+			"default": "./lib/src/headers.js"
+		},
+		"./publicToken": {
+			"types": "./src/publicToken.ts",
+			"development": "./src/publicToken.ts",
+			"default": "./lib/src/publicToken.js"
+		},
+		"./domain/card": {
+			"types": "./src/domain/card.ts",
+			"development": "./src/domain/card.ts",
+			"default": "./lib/src/domain/card.js"
+		},
+		"./domain/note": {
+			"types": "./src/domain/note.ts",
+			"development": "./src/domain/note.ts",
+			"default": "./lib/src/domain/note.js"
+		},
+		"./domain/nook": {
+			"types": "./src/domain/nook.ts",
+			"development": "./src/domain/nook.ts",
+			"default": "./lib/src/domain/nook.js"
+		},
+		"./domain/template": {
+			"types": "./src/domain/template.ts",
+			"development": "./src/domain/template.ts",
+			"default": "./lib/src/domain/template.js"
+		},
+		"./domain/media": {
+			"types": "./src/domain/media.ts",
+			"development": "./src/domain/media.ts",
+			"default": "./lib/src/domain/media.js"
+		},
+		"./domain/user": {
+			"types": "./src/domain/user.ts",
+			"development": "./src/domain/user.ts",
+			"default": "./lib/src/domain/user.js"
+		},
+		"./domain/review": {
+			"types": "./src/domain/review.ts",
+			"development": "./src/domain/review.ts",
+			"default": "./lib/src/domain/review.js"
+		},
+		"./domain/cardSetting": {
+			"types": "./src/domain/cardSetting.ts",
+			"development": "./src/domain/cardSetting.ts",
+			"default": "./lib/src/domain/cardSetting.js"
+		},
+		"./result": {
+			"types": "./src/result.ts",
+			"development": "./src/result.ts",
+			"default": "./lib/src/result.js"
+		},
+		"./caseFold": {
+			"types": "./src/caseFold.ts",
+			"development": "./src/caseFold.ts",
+			"default": "./lib/src/caseFold.js"
+		},
+		"./sql.json": {
+			"default": "./lib/src/sql.json"
+		}
 	}
 }

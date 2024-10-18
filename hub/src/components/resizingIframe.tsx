@@ -13,7 +13,7 @@ import {
 	ResizingIframe as CoreResizingIframe,
 	buildHtml,
 } from 'shared-dom/resizingIframe'
-import { type MediaId } from 'shared'
+import { type MediaId } from 'shared/brand'
 
 export type { RenderBodyInput, RawRenderBodyInput, ComlinkInit }
 

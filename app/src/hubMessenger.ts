@@ -1,20 +1,18 @@
 import { db } from './db'
 import * as Comlink from 'comlink'
-import {
-	type CardId,
-	type ChildTemplate,
-	type MediaId,
-	type NookId,
-	type RemoteNote,
-	type RemoteTemplate,
-	relativeChar,
-	type Template,
-	type Note,
-	type Card,
-} from 'shared'
 import { ulidAsBase64Url } from './domain/utility'
 import { noteOrds } from 'shared-dom/cardHtml'
 import { C, tx } from './topLevelAwait'
+import {
+	type ChildTemplate,
+	type RemoteNote,
+	type RemoteTemplate,
+} from 'shared/schema'
+import { type NookId, type CardId, type MediaId } from 'shared/brand'
+import { relativeChar } from 'shared/image'
+import { type Template } from 'shared/domain/template'
+import { type Note } from 'shared/domain/note'
+import { type Card } from 'shared/domain/card'
 
 export const appExpose = {
 	addTemplate: async (rt: RemoteTemplate) => {

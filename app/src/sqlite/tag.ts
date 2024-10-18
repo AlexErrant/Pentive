@@ -1,4 +1,4 @@
-import { type NoteId } from 'shared'
+import { type NoteId } from 'shared/brand'
 import { ky, tx } from '../topLevelAwait'
 import { type InsertObject, sql } from 'kysely'
 import { type CardTag, type DB, type NoteTag } from './database'

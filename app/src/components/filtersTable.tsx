@@ -6,7 +6,7 @@ import { type ColDef } from 'ag-grid-community'
 import { LicenseManager } from 'ag-grid-enterprise'
 import '@github/relative-time-element'
 import { db } from '../db'
-import { type TemplateId } from 'shared'
+import { type TemplateId } from 'shared/brand'
 import { agGridTheme, useThemeContext } from 'shared-dom/themeSelector'
 
 LicenseManager.setLicenseKey(import.meta.env.VITE_AG_GRID_LICENSE)

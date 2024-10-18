@@ -1,6 +1,5 @@
 import { type Tree, type SyntaxNodeRef } from '@lezer/common'
 import { parser } from './templateParser'
-import { type Card, type Note, type Template } from 'shared'
 
 import {
 	StartTag,
@@ -15,6 +14,9 @@ import {
 } from './templateParser.terms'
 import { type RenderContainer } from '../renderContainer'
 import { isEqual, uniqWith } from 'lodash-es'
+import { type Card } from 'shared/domain/card'
+import { type Note } from 'shared/domain/note'
+import { type Template } from 'shared/domain/template'
 
 // make a DU if there's a second Error
 export interface Error {

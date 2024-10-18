@@ -15,7 +15,7 @@ import {
 	Uint8ArrayWriter,
 	ZipReader,
 } from '@zip.js/zip.js'
-import { notEmpty, throwExp } from 'shared'
+import { notEmpty, throwExp } from 'shared/utility'
 import initSqlJs, { type Database } from 'sql.js'
 import {
 	checkCard,
@@ -32,14 +32,11 @@ import {
 	parseRevlog,
 	parseCardSetting,
 } from './parser'
-import {
-	type Card as PCard,
-	type Note as PNote,
-	type Review,
-	type Template,
-	type MediaId,
-	type TemplateId,
-} from 'shared'
+import { type Review } from 'shared/domain/review'
+import { type Card as PCard } from 'shared/domain/card'
+import { type Note as PNote } from 'shared/domain/note'
+import { type Template } from 'shared/domain/template'
+import { type MediaId, type TemplateId } from 'shared/brand'
 import { db } from './../../db'
 import { chunk } from 'lodash-es'
 import sqliteUrl from '../../assets/sql-wasm.wasm?url'

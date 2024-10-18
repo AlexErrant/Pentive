@@ -12,7 +12,7 @@ import ResizingIframe from '../components/resizingIframe'
 import { db } from '../db'
 import { cardSetting as cardSettingParser } from './importer/parser'
 import init, { Fsrs } from 'fsrs-browser'
-import { type ReviewId, type CardSettingId } from 'shared'
+import { type ReviewId, type CardSettingId } from 'shared/brand'
 import { ulidAsBase64Url } from '../domain/utility'
 import { C } from '../topLevelAwait'
 

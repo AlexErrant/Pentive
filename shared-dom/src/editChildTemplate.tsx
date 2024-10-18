@@ -7,7 +7,7 @@ import {
 	onMount,
 	type VoidComponent,
 } from 'solid-js'
-import { type Template, type ChildTemplate } from 'shared'
+import { type Template } from 'shared/domain/template'
 import { oneDark } from '@codemirror/theme-one-dark'
 import { html } from '@codemirror/lang-html'
 import { getOk } from './cardHtml'
@@ -16,6 +16,7 @@ import { templateLinter } from './language/templateLinter'
 import { type RenderContainer } from './renderContainer'
 import { basicSetup } from './codemirror'
 import { disposeObserver } from './utility'
+import { type ChildTemplate } from 'shared/schema'
 
 const EditChildTemplate: VoidComponent<{
 	template: Template

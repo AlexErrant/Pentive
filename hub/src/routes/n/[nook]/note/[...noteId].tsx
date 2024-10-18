@@ -1,5 +1,5 @@
 import { For, Show, Suspense } from 'solid-js'
-import { type NookId, type RemoteNoteId } from 'shared'
+import { type NookId, type RemoteNoteId } from 'shared/brand'
 import { getNote, getNoteComments } from 'shared-edge'
 import { ResizingIframe } from '~/components/clientOnly'
 import Comment from '~/components/comment'

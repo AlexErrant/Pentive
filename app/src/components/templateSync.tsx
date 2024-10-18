@@ -7,15 +7,6 @@ import {
 	Match,
 	createSignal,
 } from 'solid-js'
-import {
-	type Template,
-	objEntries,
-	type RemoteTemplateId,
-	type Standard,
-	type Cloze,
-	type ChildTemplate,
-	type NookId,
-} from 'shared'
 import { diffChars, diffCss, diffJson, diffWords } from 'diff'
 import { augcClient } from '../trpcClient'
 import Diff from './diff'
@@ -27,6 +18,10 @@ import { templateLinter } from 'shared-dom/language/templateLinter'
 import { DiffModeToggleGroup } from './diffModeContext'
 import './templateSync.css'
 import { type SyncState, uploadTemplates } from '../domain/sync'
+import { type Template } from 'shared/domain/template'
+import { type RemoteTemplateId, type NookId } from 'shared/brand'
+import { type Standard, type Cloze, type ChildTemplate } from 'shared/schema'
+import { objEntries } from 'shared/utility'
 
 const TemplateSync: VoidComponent<{ template: Template }> = (props) => {
 	return (

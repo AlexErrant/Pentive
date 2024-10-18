@@ -5,8 +5,8 @@ import {
 } from '@trpc/client'
 import type { AppRouter as CwaAppRouter } from 'cwa/src/router'
 import type { AppRouter as AugcAppRouter } from 'api-ugc/src/router'
-import { csrfHeaderName } from 'shared'
 import superjson from 'superjson'
+import { csrfHeaderName } from 'shared/headers'
 
 export const cwaClient = createTRPCProxyClient<CwaAppRouter>({
 	links: [

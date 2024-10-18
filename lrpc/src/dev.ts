@@ -8,7 +8,7 @@ import { getUser } from './core'
 import { type Context } from './trpc'
 import fs from 'fs'
 import https from 'https'
-import { csrfHeaderName, hstsName, hstsValue } from 'shared'
+import { csrfHeaderName, hstsName, hstsValue } from 'shared/headers'
 
 // run with `npm run dev`
 

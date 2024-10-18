@@ -1,8 +1,8 @@
 import { jwtVerify } from 'jose'
 import { hubSessionSecret } from './config'
 import { parse } from 'cookie-es'
-import { csrfHeaderName, hubSessionCookieName } from 'shared'
 import { type IncomingHttpHeaders } from 'http'
+import { hubSessionCookieName, csrfHeaderName } from 'shared/headers'
 
 export async function getUser(
 	headers: IncomingHttpHeaders,

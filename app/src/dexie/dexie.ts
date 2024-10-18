@@ -1,7 +1,8 @@
 import { Dexie } from 'dexie'
-import { type MediaId, type Media } from 'shared'
 import type { Plugin } from 'shared-dom/plugin'
 import * as Comlink from 'comlink'
+import { type MediaId } from 'shared/brand'
+import { type Media } from 'shared/domain/media'
 
 class DexieDb extends Dexie {
 	media!: Dexie.Table<Media, string>

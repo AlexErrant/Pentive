@@ -6,7 +6,7 @@ import {
 	requireUserId,
 	getCsrfSignatureCached,
 } from '~/session'
-import { type NookType, type NookId, nookTypes } from 'shared'
+import { type NookId } from 'shared/brand'
 import {
 	type RouteDefinition,
 	action,
@@ -16,6 +16,7 @@ import {
 	type RouteSectionProps,
 } from '@solidjs/router'
 import { getRequestEvent } from 'solid-js/web'
+import { type NookType, nookTypes } from 'shared/domain/nook'
 
 function validateSidebar(sidebar: unknown): string | undefined {
 	if (typeof sidebar !== 'string' || sidebar.length < 3) {

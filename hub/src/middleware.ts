@@ -1,7 +1,7 @@
 import { createMiddleware } from '@solidjs/start/middleware'
 import { setKysely } from 'shared-edge'
 import { env } from './session'
-import { hstsName, hstsValue } from 'shared'
+import { hstsName, hstsValue } from 'shared/headers'
 
 export default createMiddleware({
 	onRequest: [

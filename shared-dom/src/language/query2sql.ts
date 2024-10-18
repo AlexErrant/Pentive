@@ -1,13 +1,8 @@
 import { type SyntaxNodeRef, type SyntaxNode } from '@lezer/common'
 import { parser } from './queryParser'
-import {
-	assertNever,
-	dayInMs,
-	escapeRegExp,
-	ftsNormalize,
-	throwExp,
-} from 'shared'
+import { assertNever, dayInMs, escapeRegExp, throwExp } from 'shared/utility'
 import { sql, type RawBuilder, type SqlBool } from 'kysely'
+import { ftsNormalize } from 'shared/htmlToText'
 import * as qt from './queryParser.terms'
 import {
 	stringLabels,

@@ -1,19 +1,12 @@
 import fc from 'fast-check'
-
-import {
-	type Ord,
-	type RemoteTemplateId,
-	type TemplateId,
-	type ChildTemplate,
-	type TemplateType,
-	type Field,
-	type Template,
-} from 'shared'
 import {
 	arbitraryUlid,
 	reasonableDates,
 	recordWithOptionalFields,
 } from './arbitrary'
+import { type Ord, type TemplateId, type RemoteTemplateId } from 'shared/brand'
+import { type Field, type Template } from 'shared/domain/template'
+import { type ChildTemplate, type TemplateType } from 'shared/schema'
 
 const field = recordWithOptionalFields<Field>(
 	{

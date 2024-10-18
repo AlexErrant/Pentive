@@ -7,19 +7,17 @@ import {
 	For,
 } from 'solid-js'
 import * as Comlink from 'comlink'
-import {
-	type Template,
-	type Card,
-	type Note,
-	type Side,
-	assertNever,
-} from 'shared'
 import { type SetStoreFunction, createStore } from 'solid-js/store'
 import { debounce, leadingAndTrailing } from '@solid-primitives/scheduled'
 import { type Error, type Warning } from './language/template2html'
 import { type RenderContainer } from './renderContainer'
 import { type HtmlResult } from './cardHtml'
 import { disposeObserver } from './utility'
+import { type Side } from 'shared/brand'
+import { type Card } from 'shared/domain/card'
+import { type Note } from 'shared/domain/note'
+import { type Template } from 'shared/domain/template'
+import { assertNever } from 'shared/utility'
 
 const targetOrigin = '*' // highTODO make more limiting. Also implement https://stackoverflow.com/q/8169582
 

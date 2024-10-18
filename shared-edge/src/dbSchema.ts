@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import type { ColumnType } from 'kysely'
-import type { DbId, MediaHash, NookId, PeerValidator } from 'shared'
+import { type DbId, type MediaHash, type NookId } from 'shared/brand'
+import { type PeerValidator } from 'shared/domain/user'
 
 export type Generated<T> =
 	T extends ColumnType<infer S, infer I, infer U>

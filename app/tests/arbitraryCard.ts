@@ -1,14 +1,12 @@
 import fc from 'fast-check'
 import {
-	type Card,
-	states,
 	type CardId,
 	type Ord,
 	type NoteId,
 	type CardSettingId,
-} from 'shared'
-
+} from 'shared/brand'
 import { reasonableDates, recordWithOptionalFields } from './arbitrary'
+import { type Card, states } from 'shared/domain/card'
 
 export const card = recordWithOptionalFields<Card>(
 	{

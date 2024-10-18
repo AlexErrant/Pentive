@@ -1,7 +1,9 @@
-import { type Kind, assertNever, type CardId, type Review } from 'shared'
 import { type Review as ReviewEntity } from '../sqlite/database'
 import { chunk } from 'lodash-es'
 import { C, ky } from '../topLevelAwait'
+import { type CardId } from 'shared/brand'
+import { type Review, type Kind } from 'shared/domain/review'
+import { assertNever } from 'shared/utility'
 
 function serializeKind(s: Kind): number {
 	switch (s) {

@@ -1,13 +1,10 @@
 import {
-	type RemoteNote,
-	type Note,
-	type RemoteTemplate,
-	type Template,
-} from 'shared'
-import {
 	defaultRenderContainer as defaultRenderContainerOg,
 	noteOrdsRenderContainer as noteOrdsRenderContainerOg,
 } from 'shared-dom/renderContainer'
+import { type Note } from 'shared/domain/note'
+import { type Template } from 'shared/domain/template'
+import { type RemoteTemplate, type RemoteNote } from 'shared/schema'
 import ResizingIframe from '~/components/resizingIframe'
 
 export function remoteToTemplate(remote: RemoteTemplate): Template {

@@ -1,4 +1,3 @@
-import { type NookId, type Template, objEntries } from 'shared'
 import { EditTemplate as EditTemplateOg } from 'shared-dom/editTemplate'
 import { For, Show, type VoidComponent } from 'solid-js'
 import { type SetStoreFunction } from 'solid-js/store'
@@ -6,6 +5,9 @@ import { db } from '../db'
 import { useThemeContext } from 'shared-dom/themeSelector'
 import { C } from '../topLevelAwait'
 import { getDefaultTemplate } from '../domain/utility'
+import { type Template } from 'shared/domain/template'
+import { type NookId } from 'shared/brand'
+import { objEntries } from 'shared/utility'
 
 const saveButton = (template: { template: Template }) => (
 	<button

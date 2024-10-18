@@ -1,7 +1,7 @@
 import { type Plugin } from 'shared-dom/plugin'
 import { rd, ky } from '../topLevelAwait'
-import { type PluginName } from 'shared'
 import { pluginEntityToDomain } from './util'
+import { type PluginName } from 'shared/brand'
 
 export const pluginCollectionMethods = {
 	upsertPlugin: async function (plugin: Plugin) {

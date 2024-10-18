@@ -1,5 +1,5 @@
-import { hstsName, hstsValue } from 'shared'
 import * as fs from 'fs'
+import { hstsName, hstsValue } from 'shared/headers'
 
 const contents = `/*
   Cross-Origin-Embedder-Policy: require-corp

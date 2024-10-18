@@ -1,4 +1,4 @@
-import { type Base64Url, type LDbId, type RemoteMediaNum } from 'shared'
+import { type Base64Url, type LDbId, type RemoteMediaNum } from 'shared/brand'
 import { C, ky } from '../topLevelAwait'
 
 export const remoteMediaCollectionMethods = {

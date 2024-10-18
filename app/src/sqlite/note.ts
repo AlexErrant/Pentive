@@ -1,15 +1,3 @@
-import {
-	type CreateRemoteNote,
-	type EditRemoteNote,
-	type NookId,
-	type RemoteNoteId,
-	type NoteId,
-	type MediaId,
-	type RemoteMediaNum,
-	type RemoteTemplateId,
-	type Note,
-	notEmpty,
-} from 'shared'
 import { type NoteBase, type DB, type NoteFieldValue } from './database'
 import {
 	sql,
@@ -25,7 +13,18 @@ import {
 	updateLocalMediaIdByRemoteMediaIdAndGetNewDoc,
 } from './util'
 import { saveTags } from './tag'
-import { initSql } from 'shared'
+import { type Note } from 'shared/domain/note'
+import {
+	type RemoteTemplateId,
+	type RemoteNoteId,
+	type NoteId,
+	type MediaId,
+	type RemoteMediaNum,
+	type NookId,
+} from 'shared/brand'
+import { type CreateRemoteNote, type EditRemoteNote } from 'shared/schema'
+import { notEmpty } from 'shared/utility'
+import initSql from 'shared/sql.json'
 
 function noteToDocType(note: Note) {
 	const now = C.getDate().getTime()

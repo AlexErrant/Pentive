@@ -8,7 +8,7 @@ import {
 	type RemoteMediaNum,
 	type PluginName,
 	type PluginVersion,
-} from 'shared'
+} from 'shared/brand'
 
 export interface CardBase {
 	id: LDbId

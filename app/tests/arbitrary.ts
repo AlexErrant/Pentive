@@ -2,7 +2,7 @@
 
 import fc, { type Arbitrary, type RecordConstraints } from 'fast-check'
 import { Ulid } from 'id128'
-import { type Brand } from 'shared'
+import { type Brand } from 'shared/brand'
 import { base64url, hex } from '@scure/base'
 
 // https://stackoverflow.com/a/72760489

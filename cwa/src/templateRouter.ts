@@ -6,7 +6,7 @@ import {
 	createRemoteTemplate,
 	editRemoteTemplate,
 	remoteTemplateId,
-} from 'shared'
+} from 'shared/schema'
 import {
 	editTemplates,
 	insertTemplates,

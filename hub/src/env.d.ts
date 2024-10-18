@@ -5,7 +5,7 @@ import type {
 	Request as CfRequest,
 	ExecutionContext,
 } from '@cloudflare/workers-types'
-import { type Base64 } from 'shared'
+import { type Base64 } from 'shared/brand'
 
 export interface EnvVars {
 	tursoDbUrl: string

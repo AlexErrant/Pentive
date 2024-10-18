@@ -1,7 +1,8 @@
 import { initTRPC, TRPCError } from '@trpc/server'
 import superjson from 'superjson'
 import { type Env } from './util'
-import { type Result, type UserId } from 'shared'
+import { type Result } from 'shared/result'
+import { type UserId } from 'shared/brand'
 
 export interface Context {
 	user: Result<UserId, string>

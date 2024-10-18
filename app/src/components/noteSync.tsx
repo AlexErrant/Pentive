@@ -6,7 +6,7 @@ import {
 	Switch,
 	Match,
 } from 'solid-js'
-import { type RemoteNoteId } from 'shared'
+import { type RemoteNoteId } from 'shared/brand'
 import { augcClient } from '../trpcClient'
 import DiffHtml from './diffHtml'
 import ResizingIframe from './resizingIframe'

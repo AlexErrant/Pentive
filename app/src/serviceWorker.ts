@@ -5,8 +5,9 @@ import {
 } from 'workbox-precaching'
 import * as Comlink from 'comlink'
 import type { Expose, PostMessageTypes } from './registerServiceWorker'
-import { throwExp, type MediaId } from 'shared'
 import { NavigationRoute, registerRoute } from 'workbox-routing'
+import { type MediaId } from 'shared/brand'
+import { throwExp } from 'shared/utility'
 
 declare let self: ServiceWorkerGlobalScope
 

@@ -3,7 +3,7 @@ import { type Comment as CommentType } from 'shared-edge'
 import Toggle from './toggle'
 import SubmitComment from './submitComment'
 import { cwaClient } from '~/routes/cwaClient'
-import { type Base64Url } from 'shared'
+import { type Base64Url } from 'shared/brand'
 import RelativeDate from './relativeDate'
 import { A } from '@solidjs/router'
 

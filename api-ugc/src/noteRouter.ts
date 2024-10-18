@@ -1,7 +1,9 @@
-import { type Result, type UserId, remoteNoteId } from 'shared'
 import { getNote, searchNotes } from 'shared-edge'
 import { z } from 'zod'
 import { publicProcedure } from './trpc'
+import { type UserId } from 'shared/brand'
+import { remoteNoteId } from 'shared/schema'
+import { type Result } from 'shared/result'
 
 function getUser(result: Result<UserId, string>) {
 	return result.tag === 'Ok' ? result.ok : null

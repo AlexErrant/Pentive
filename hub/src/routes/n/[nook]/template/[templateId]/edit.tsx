@@ -4,10 +4,12 @@ import { defaultRenderContainer } from '~/lib/utility'
 import {
 	type NookId,
 	type RemoteTemplateId,
-	getDefaultTemplate as getDefaultTemplateOg,
-	type Template,
 	type TemplateId,
-} from 'shared'
+} from 'shared/brand'
+import {
+	type Template,
+	getDefaultTemplate as getDefaultTemplateOg,
+} from 'shared/domain/template'
 import {
 	type RouteDefinition,
 	cache,

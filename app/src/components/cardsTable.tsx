@@ -8,7 +8,6 @@ import {
 	createMemo,
 	type Accessor,
 } from 'solid-js'
-import { type NoteCard, type CardId, throwExp } from 'shared'
 import '@github/relative-time-element'
 import AgGridSolid, { type AgGridSolidRef } from 'ag-grid-solid'
 import 'ag-grid-community/styles/ag-grid.css'
@@ -22,7 +21,6 @@ import {
 } from 'ag-grid-community'
 import { LicenseManager } from 'ag-grid-enterprise'
 import { db } from '../db'
-import { assertNever } from 'shared'
 import { Upload, Hamburger } from 'shared-dom/icons'
 import { getOk } from 'shared-dom/cardHtml'
 import {
@@ -38,6 +36,9 @@ import { alterQuery } from '../domain/alterQuery'
 import CardsTableHelp from './cardsTableHelp'
 import { type Sort } from '../sqlite/card'
 import { agGridTheme, useThemeContext } from 'shared-dom/themeSelector'
+import { type CardId } from 'shared/brand'
+import { type NoteCard } from 'shared/domain/card'
+import { throwExp, assertNever } from 'shared/utility'
 
 LicenseManager.setLicenseKey(import.meta.env.VITE_AG_GRID_LICENSE)
 

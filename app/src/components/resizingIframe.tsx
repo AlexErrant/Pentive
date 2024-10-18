@@ -1,5 +1,5 @@
 import { type IFrameComponent } from 'iframe-resizer'
-import { type MediaId } from 'shared'
+import { type MediaId } from 'shared/brand'
 import { type SetStoreFunction, unwrap } from 'solid-js/store'
 import { db } from '../db'
 import { C } from '../topLevelAwait'

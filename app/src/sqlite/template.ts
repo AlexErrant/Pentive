@@ -1,18 +1,4 @@
 import {
-	type RemoteMediaNum,
-	type RemoteTemplateId,
-	type CreateRemoteTemplate,
-	type EditRemoteTemplate,
-	type NookId,
-	notEmpty,
-	undefinedMap,
-	type TemplateId,
-	type MediaId,
-	type Template,
-	objKeys,
-	objEntries,
-} from 'shared'
-import {
 	type DB,
 	type RemoteTemplate,
 	type Template as TemplateEntity,
@@ -28,6 +14,19 @@ import {
 	updateLocalMediaIdByRemoteMediaIdAndGetNewDoc,
 } from './util'
 import { tx, C, ky } from '../topLevelAwait'
+import { type Template } from 'shared/domain/template'
+import {
+	type NookId,
+	type TemplateId,
+	type RemoteTemplateId,
+	type MediaId,
+	type RemoteMediaNum,
+} from 'shared/brand'
+import {
+	type CreateRemoteTemplate,
+	type EditRemoteTemplate,
+} from 'shared/schema'
+import { objEntries, objKeys, notEmpty, undefinedMap } from 'shared/utility'
 
 function templateToDocType(template: Template) {
 	const now = C.getDate().getTime()

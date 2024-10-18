@@ -7,12 +7,12 @@ import {
 	createSignal,
 } from 'solid-js'
 import {
-	objEntries,
 	type NookId,
-	type NoteId,
-	type RemoteNoteId,
 	type RemoteTemplateId,
-} from 'shared'
+	type RemoteNoteId,
+	type NoteId,
+} from 'shared/brand'
+import { objEntries } from 'shared/utility'
 import { db } from '../db'
 import { type NoteCardView } from '../uiLogic/cards'
 

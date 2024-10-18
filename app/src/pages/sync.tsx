@@ -11,7 +11,6 @@ import {
 import { render } from 'solid-js/web'
 import { db } from '../db'
 import Peers from './peers'
-import { type NookId, type Template, objKeys } from 'shared'
 import { cwaClient } from '../trpcClient'
 import { C, rd, whoAmI } from '../topLevelAwait'
 import { TemplateNookSync } from '../components/templateSync'
@@ -30,6 +29,9 @@ import 'ag-grid-community2/styles/ag-theme-alpine.css'
 import { LicenseManager } from 'ag-grid-enterprise2'
 import { DiffModeToggleGroup } from '../components/diffModeContext'
 import { postMedia, uploadTemplates } from '../domain/sync'
+import { type NookId } from 'shared/brand'
+import { type Template } from 'shared/domain/template'
+import { objKeys } from 'shared/utility'
 
 LicenseManager.setLicenseKey(import.meta.env.VITE_AG_GRID_LICENSE)
 

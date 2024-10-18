@@ -1,4 +1,3 @@
-import { type CardSettingId, type CardSetting } from 'shared'
 import {
 	type DB,
 	type CardSetting as CardSettingEntity,
@@ -10,6 +9,8 @@ import {
 } from 'kysely'
 import { chunk } from 'lodash-es'
 import { C, ky } from '../topLevelAwait'
+import { type CardSettingId } from 'shared/brand'
+import { type CardSetting } from 'shared/domain/cardSetting'
 
 export const cardSettingsCollectionMethods = {
 	bulkUploadCardSettings: async function (cardSetting: CardSetting[]) {
@@ -44,10 +45,10 @@ export const cardSettingsCollectionMethods = {
 		return cardSettings.map((s) => {
 			const details = parseDetails(s.details)
 			return {
-				id: s.id satisfies CardSettingId as CardSettingId,
+				id: s.id satisfies CardSettingId,
 				name: s.name,
 				...details,
-			} satisfies CardSetting as CardSetting
+			} satisfies CardSetting
 		})
 	},
 }

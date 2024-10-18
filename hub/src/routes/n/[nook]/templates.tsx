@@ -1,5 +1,5 @@
 import { For, Show } from 'solid-js'
-import { type NookId } from 'shared'
+import { type NookId } from 'shared/brand'
 import { getTemplates } from 'shared-edge'
 import { ResizingIframe } from '~/components/clientOnly'
 import { remoteToTemplate } from '~/lib/utility'

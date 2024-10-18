@@ -54,7 +54,7 @@ import * as qt from 'shared-dom/language/queryParser.terms'
 import { queryDecorations } from './queryDecorations'
 import { db } from '../db'
 import { C } from '../topLevelAwait'
-import { notEmpty } from 'shared'
+import { notEmpty } from 'shared/utility'
 import { useThemeContext } from 'shared-dom/themeSelector'
 import { disposeObserver } from 'shared-dom/utility'
 

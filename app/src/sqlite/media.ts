@@ -1,8 +1,9 @@
-import { undefinedMap } from 'shared'
-import { type MediaId, type Media } from 'shared'
+import { undefinedMap } from 'shared/utility'
+import { type Media } from 'shared/domain/media'
 import * as Comlink from 'comlink'
 import { ky, rd } from '../topLevelAwait'
 import { type Media as MediaEntity } from './database'
+import { type MediaId } from 'shared/brand'
 
 function entityToDomain(entity: MediaEntity): Media {
 	return {

@@ -1,8 +1,8 @@
-import { peerDisplayNameValidator, peerIdValidator } from 'shared'
 import { z } from 'zod'
 import { authedProcedure, publicProcedure } from './trpc'
 import { getUserPeer, setUserPeer } from 'shared-edge'
 import { getPeerToken } from './peerSync'
+import { peerDisplayNameValidator, peerIdValidator } from 'shared/domain/user'
 
 export const userRouter = {
 	getPeer: authedProcedure.query(

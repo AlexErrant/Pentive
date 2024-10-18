@@ -10,19 +10,16 @@ import {
 	on,
 } from 'solid-js'
 import { FieldsEditor } from '../components/fieldsEditor'
-import {
-	type Note,
-	type Card,
-	type CardId,
-	type NoteId,
-	type Template,
-} from 'shared'
 import { ulidAsBase64Url } from '../domain/utility'
 import { createStore } from 'solid-js/store'
 import { C } from '../topLevelAwait'
 import { CardsPreview } from '../components/cardsPreview'
 import { db } from '../db'
 import { type NoteCardView } from '../uiLogic/cards'
+import { type Template } from 'shared/domain/template'
+import { type Note } from 'shared/domain/note'
+import { type Card } from 'shared/domain/card'
+import { type NoteId, type CardId } from 'shared/brand'
 
 function toView(template: Template): NoteCardView {
 	const now = C.getDate()

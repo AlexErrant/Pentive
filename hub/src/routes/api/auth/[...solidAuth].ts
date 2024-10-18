@@ -22,7 +22,7 @@ import {
 import { getCasedUserId, getUserIdByEmail, registerUser } from 'shared-edge'
 import { type PageEvent } from '@solidjs/start/server'
 import { type Params, redirect } from '@solidjs/router'
-import { throwExp } from 'shared'
+import { throwExp } from 'shared/utility'
 
 export const githubLoginUrl = (alphaKey: string) =>
 	import.meta.env.VITE_HUB_ORIGIN +

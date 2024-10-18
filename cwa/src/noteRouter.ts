@@ -4,7 +4,7 @@ import {
 	editRemoteNote,
 	commentId,
 	remoteNoteId,
-} from 'shared'
+} from 'shared/schema'
 import { z } from 'zod'
 import { authedProcedure } from './trpc'
 import {

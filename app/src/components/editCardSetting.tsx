@@ -9,7 +9,6 @@ import {
 	onMount,
 	type VoidComponent,
 } from 'solid-js'
-import { type CardSetting } from 'shared'
 import { oneDark } from '@codemirror/theme-one-dark'
 import {
 	jsonSchemaLinter,
@@ -23,6 +22,7 @@ import { db } from '../db'
 import { C } from '../topLevelAwait'
 import { useThemeContext } from 'shared-dom/themeSelector'
 import { basicSetup } from 'shared-dom/codemirror'
+import { type CardSetting } from 'shared/domain/cardSetting'
 
 const EditCardSetting: VoidComponent<{
 	cardSetting: CardSetting

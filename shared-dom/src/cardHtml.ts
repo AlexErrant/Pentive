@@ -7,6 +7,10 @@ import {
 	validate,
 } from './language/template2html'
 import type { RenderContainer } from './renderContainer'
+import { assertNever, notEmpty, throwExp } from 'shared/utility'
+import { type Field, type Template } from 'shared/domain/template'
+import { type Card } from 'shared/domain/card'
+import { type Note } from 'shared/domain/note'
 import {
 	type NoteId,
 	type TemplateId,
@@ -15,18 +19,10 @@ import {
 	type RemoteNoteId,
 	type CardId,
 	type CardSettingId,
-	type Cloze,
-	type Standard,
-	type Field,
-	type Template,
-	type Card,
-	type Note,
-	assertNever,
-	notEmpty,
-	throwExp,
-	toOneLine,
-} from 'shared'
+} from 'shared/brand'
 import { type Tree } from '@lezer/common'
+import { type Standard, type Cloze } from 'shared/schema'
+import { toOneLine } from 'shared/htmlToText'
 
 export type StandardTemplate = Omit<Template, 'templateType'> & {
 	templateType: Standard

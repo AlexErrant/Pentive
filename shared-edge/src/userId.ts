@@ -1,14 +1,10 @@
 import { type JWTVerifyResult, jwtVerify } from 'jose'
-import {
-	type UserId,
-	csrfHeaderName,
-	toError,
-	hubSessionCookieName,
-	toOk,
-} from 'shared'
 import { type Context } from 'hono'
 import { getCookie } from 'hono/cookie'
 import { base64ToArray } from './utility'
+import { type UserId } from 'shared/brand'
+import { csrfHeaderName, hubSessionCookieName } from 'shared/headers'
+import { toError, toOk } from 'shared/result'
 
 export async function getUserId<T extends { hubSessionSecret: string }>(
 	c: Context<{

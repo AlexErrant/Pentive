@@ -1,4 +1,4 @@
-import { type NookId } from 'shared'
+import { type NookId } from 'shared/brand'
 import { getNook } from 'shared-edge'
 import { For, Show, type VoidComponent } from 'solid-js'
 import {

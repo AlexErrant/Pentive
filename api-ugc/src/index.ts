@@ -11,7 +11,6 @@
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import { type Env, type ApiUgcContext } from './util'
-import { type MediaHash, hstsName, hstsValue, parsePublicToken } from 'shared'
 import {
 	setKysely,
 	lookupMediaHash,
@@ -21,6 +20,9 @@ import {
 } from 'shared-edge'
 import { appRouter } from './router'
 import { fetchRequestHandler } from '@trpc/server/adapters/fetch'
+import { type MediaHash } from 'shared/brand'
+import { hstsName, hstsValue } from 'shared/headers'
+import { parsePublicToken } from 'shared/publicToken'
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const app = new Hono<{ Bindings: Env }>()

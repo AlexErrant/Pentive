@@ -1,6 +1,6 @@
 import { sql } from 'kysely'
-import { type UserId, type PeerJsId, type PeerDisplayName } from 'shared'
 import { db } from './kysely'
+import { type UserId, type PeerJsId, type PeerDisplayName } from 'shared/brand'
 
 // cSpell:ignore IFNULL
 export async function setUserPeer(

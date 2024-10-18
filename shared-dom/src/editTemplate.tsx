@@ -1,11 +1,4 @@
 import { type VoidComponent, For, Show, createEffect } from 'solid-js'
-import {
-	getDefaultTemplate,
-	type ChildTemplate,
-	type Template,
-	getDefaultClozeTemplate,
-	type Ord,
-} from 'shared'
 import { type SetStoreFunction, createStore } from 'solid-js/store'
 import { Select } from '@thisbeyond/solid-select'
 import { type ClozeTemplate, type StandardTemplate } from './cardHtml'
@@ -14,6 +7,13 @@ import '@thisbeyond/solid-select/style.css'
 import './solidSelect.css'
 import { EditTemplateCss } from './editTemplateCss'
 import { type RenderContainer } from './renderContainer'
+import { type Ord } from 'shared/brand'
+import {
+	type Template,
+	getDefaultTemplate,
+	getDefaultClozeTemplate,
+} from 'shared/domain/template'
+import { type ChildTemplate } from 'shared/schema'
 
 interface ClozeTemplateStore {
 	template: ClozeTemplate

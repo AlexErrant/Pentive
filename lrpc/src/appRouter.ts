@@ -4,7 +4,6 @@
 import { z } from 'zod'
 import { authedProcedure, publicProcedure, router } from './trpc'
 import aio from '@vlcn.io/crsqlite-allinone'
-import { initSql } from 'shared'
 import { stringify as uuidStringify } from 'uuid'
 import { wholeDbReplicatorSync } from './wholeDbReplicatorSync'
 

@@ -8,7 +8,7 @@ import {
 	onMount,
 	type VoidComponent,
 } from 'solid-js'
-import { type Template } from 'shared'
+import { type Template } from 'shared/domain/template'
 import { type SetStoreFunction } from 'solid-js/store'
 import { oneDark } from '@codemirror/theme-one-dark'
 import { basicSetup } from './codemirror'

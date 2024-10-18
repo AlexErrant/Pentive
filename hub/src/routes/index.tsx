@@ -1,4 +1,5 @@
-import { type TemplateId, type Ord, type Template } from 'shared'
+import { type TemplateId, type Ord } from 'shared/brand'
+import { type Template } from 'shared/domain/template'
 import { toSampleCard, toSampleNote } from 'shared-dom/cardHtml'
 import { type JSX, createSignal } from 'solid-js'
 import { ResizingIframe } from '~/components/clientOnly'

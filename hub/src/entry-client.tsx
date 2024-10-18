@@ -2,7 +2,7 @@
 import { mount, StartClient } from '@solidjs/start/client'
 import type { appExpose } from 'app/hubMessenger'
 import * as Comlink from 'comlink'
-import { throwExp } from 'shared'
+import { throwExp } from 'shared/utility'
 
 let appMessenger: Comlink.Remote<typeof appExpose> | null
 

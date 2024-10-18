@@ -7,15 +7,12 @@ import {
 } from 'solid-js'
 import { stringify as uuidStringify } from 'uuid'
 import { cwaClient, isTrpcClientError } from '../trpcClient'
-import {
-	type PeerJsId,
-	peerDisplayNameValidator,
-	peerIdValidator,
-} from 'shared'
 import PeersTable, { type Peer } from '../components/peersTable'
 import { createWdbRtc } from '../sqlite/crsqlite'
 import { rd } from '../topLevelAwait'
 import { type WholeDbRtcPublic } from '../sqlite/wholeDbRtc'
+import { type PeerJsId } from 'shared/brand'
+import { peerIdValidator, peerDisplayNameValidator } from 'shared/domain/user'
 
 export default function Peers() {
 	const [pending, setPending] = createSignal<string[]>([])

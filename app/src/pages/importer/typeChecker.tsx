@@ -1,6 +1,6 @@
-import { type Ord } from 'shared'
 import { z, type SafeParseReturnType } from 'zod'
 import { C } from '../../topLevelAwait'
+import { type Ord } from 'shared/brand'
 
 const tmpl = z.object({
 	name: z.string(),

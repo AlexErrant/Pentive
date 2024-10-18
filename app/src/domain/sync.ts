@@ -2,10 +2,10 @@ import {
 	type MediaId,
 	type Base64Url,
 	type RemoteMediaNum,
-	csrfHeaderName,
 	type TemplateId,
 	type NookId,
-} from 'shared'
+} from 'shared/brand'
+import { csrfHeaderName } from 'shared/headers'
 import { db } from '../db'
 import { C } from '../topLevelAwait'
 import { cwaClient } from '../trpcClient'

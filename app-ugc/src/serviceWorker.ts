@@ -5,7 +5,8 @@ import type {
 	Exposed,
 	PostMessageTypes,
 } from './registerServiceWorker'
-import { throwExp, type MediaId } from 'shared'
+import { type MediaId } from 'shared/brand'
+import { throwExp } from 'shared/utility'
 
 declare let self: ServiceWorkerGlobalScope
 

@@ -2,13 +2,13 @@ import { For, createSignal, type VoidComponent, Show } from 'solid-js'
 import { FieldEditor } from './fieldEditor'
 import { type SetStoreFunction } from 'solid-js/store'
 import { db } from '../db'
-import { type MediaId } from 'shared'
 import { ulidAsBase64Url } from '../domain/utility'
 import FieldHtmlEditor from './fieldHtmlEditor'
 import { ToggleButton } from '@kobalte/core'
 import { ChevronDown, Code, Quote } from 'shared-dom/icons'
 import { C, tx } from '../topLevelAwait'
 import { toNoteCards, type NoteCardView } from '../uiLogic/cards'
+import { type MediaId } from 'shared/brand'
 
 export const FieldsEditor: VoidComponent<{
 	readonly noteCard: NoteCardView
