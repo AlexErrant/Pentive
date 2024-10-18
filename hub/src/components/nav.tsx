@@ -1,4 +1,4 @@
-import { ThemeSelector } from 'shared-dom/themeSelector'
+import { ThemeSelector } from './clientOnly'
 import { type JSX, Show } from 'solid-js'
 import { A, action } from '@solidjs/router'
 import { logout } from '~/session'
