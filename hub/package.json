@@ -51,7 +51,7 @@
 		"ulid-workers": "^2.1.0 || See comment on html-to-text",
 		"vite": "^5.4.8",
 		"vite-plugin-checker": "^0.8.0",
-		"wrangler": "^3.72.2"
+		"wrangler": "^3.81.0"
 	},
 	"dependencies": {
 		"@codemirror/autocomplete": "^6.18.0",

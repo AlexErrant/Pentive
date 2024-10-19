@@ -43,7 +43,7 @@
 		"vite-plugin-checker": "^0.8.0",
 		"vite-plugin-pwa": "^0.20.5",
 		"workbox-precaching": "^7.0.0",
-		"wrangler": "^3.72.2"
+		"wrangler": "^3.81.0"
 	},
 	"dependencies": {
 		"app": "workspace:*",

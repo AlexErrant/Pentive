@@ -24,7 +24,7 @@
 		"prettier-plugin-tailwindcss": "^0.6.5",
 		"turbo": "^2.1.1",
 		"typescript": "~5.6.2",
-		"wrangler": "^3.72.2"
+		"wrangler": "^3.81.0"
 	},
 	"scripts": {
 		"kill": "kill-port 3012 3013 3014 3015 3016 3017 3018 3019 3020",

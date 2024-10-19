@@ -75,7 +75,7 @@
 		"vitest": "^2.0.5",
 		"workbox-precaching": "^7.0.0",
 		"workbox-routing": "^7.0.0",
-		"wrangler": "^3.72.2"
+		"wrangler": "^3.81.0"
 	},
 	"dependencies": {
 		"@codemirror/autocomplete": "^6.18.0",
