@@ -68,6 +68,7 @@
 		"./utility": {
 			"types": "./src/utility.ts",
 			"development": "./src/utility.ts",
+			"workerd": "./lib/src/utility.workerd.js",
 			"default": "./lib/src/utility.js"
 		},
 		"./headers": {
