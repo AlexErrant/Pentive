@@ -45,6 +45,13 @@ export type * from '@trpc/server'
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const app = new Hono<{ Bindings: Env }>()
 
+declare global {
+	// eslint-disable-next-line no-var
+	var HUB_ORIGIN: string
+	// eslint-disable-next-line no-var
+	var APP_ORIGIN: string
+}
+
 app
 	.use('*', async (c, next) => {
 		await next()
@@ -52,8 +59,7 @@ app
 	})
 	.use('/*', async (c, next) => {
 		return await cors({
-			origin: (x) =>
-				c.env.hubOrigin === x || c.env.appOrigin === x ? x : null, // lowTODO replace at build time (doesn't need to be a secret)
+			origin: (x) => (HUB_ORIGIN === x || APP_ORIGIN === x ? x : null),
 			allowMethods: ['POST', 'GET', 'OPTIONS'],
 			allowHeaders: [],
 			maxAge: 86400, // 24hrs - browsers don't support longer https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Max-Age

@@ -14,7 +14,7 @@
 	"scripts": {
 		"start": "wrangler dev --persist-to ../.wrangler/state",
 		"dev": "wrangler dev --persist-to ../.wrangler/state",
-		"deploy": "wrangler deploy",
+		"deploy": "wrangler deploy --env production",
 		"build": "wrangler deploy ./src/index.ts --dry-run --outdir dist",
 		"tsc-build": "tsc",
 		"format:check": "prettier --ignore-path .gitignore --check .",

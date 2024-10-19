@@ -15,14 +15,10 @@ source ../PentiveSecrets/secrets.sh
 # echo $productionTursoDbUrl              | npx wrangler       secret put tursoDbUrl              --name cwa
 # echo $productionTursoAuthToken          | npx wrangler       secret put tursoAuthToken          --name cwa
 # echo $productionMediaTokenSecret        | npx wrangler       secret put mediaTokenSecret        --name cwa
-# echo $productionAppOrigin               | npx wrangler       secret put appOrigin               --name cwa
-# echo $productionHubOrigin               | npx wrangler       secret put hubOrigin               --name cwa
 # echo $productionPeerSyncPublicKey       | npx wrangler       secret put peerSyncPublicKey       --name cwa
 # echo $productionPeerSyncPrivateKey      | npx wrangler       secret put peerSyncPrivateKey      --name cwa
 # echo $productionTursoDbUrl              | npx wrangler       secret put tursoDbUrl              --name api-ugc
 # echo $productionTursoAuthToken          | npx wrangler       secret put tursoAuthToken          --name api-ugc
-# echo $productionAppOrigin               | npx wrangler       secret put appOrigin               --name api-ugc
-# echo $productionHubOrigin               | npx wrangler       secret put hubOrigin               --name api-ugc
 # echo $productionHubSessionSecret        | npx wrangler       secret put hubSessionSecret        --name api-ugc
 # echo $productionHubSessionSecret        | npx wrangler pages secret put hubSessionSecret        --project-name hub
 # echo $productionAlphaKey                | npx wrangler pages secret put alphaKey                --project-name hub

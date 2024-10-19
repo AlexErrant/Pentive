@@ -22,8 +22,6 @@ export type Env = {
 	mediaTokenSecret: MediaTokenSecretBase64
 	tursoDbUrl: string
 	tursoAuthToken: string
-	appOrigin: string
-	hubOrigin: string
 	peerSyncPublicKey: string
 	peerSyncPrivateKey: string
 }

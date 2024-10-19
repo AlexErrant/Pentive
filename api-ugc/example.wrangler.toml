@@ -4,12 +4,28 @@ compatibility_date = "2024-08-12"
 
 account_id = "$cloudflareAccountId"
 
+[dev]
+port = 3019
+local_protocol = "https"
+
+[define]
+HUB_ORIGIN = "'$developmentHubOrigin'"
+APP_ORIGIN = "'$developmentAppOrigin'"
+
 [[r2_buckets]]
 binding = 'mediaBucket'
 bucket_name = 'media'
 preview_bucket_name = 'media-dev'
 
-[dev]
-port = 3019
-local_protocol = "https"
 
+# =====================================
+# 🚨 PRODUCTION CONFIG 🚨
+# =====================================
+
+[env.production.define]
+HUB_ORIGIN = "'$productionHubOrigin'"
+APP_ORIGIN = "'$productionAppOrigin'"
+
+[[env.production.r2_buckets]]
+binding = 'mediaBucket'
+bucket_name = 'media'

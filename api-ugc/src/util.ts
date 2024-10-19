@@ -19,7 +19,5 @@ export type Env = {
 	mediaBucket: R2Bucket
 	tursoDbUrl: string
 	tursoAuthToken: string
-	appOrigin: string
-	hubOrigin: string
 	hubSessionSecret: string
 }
