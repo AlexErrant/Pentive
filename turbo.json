@@ -22,6 +22,10 @@
         // I don't think hub's eslint and build can run concurrently. Without this we get an error in Github Actions like
         // Error: ENOENT: no such file or directory, open '/home/runner/work/Pentive/Pentive/hub/app.config.timestamp_1725915755421.js'
         "hub#eslint"
+      ],
+      "outputs": [
+        "dist/**",
+        ".vinxi/**"
       ]
     },
     "check": {
@@ -53,8 +57,7 @@
         "tsc-build"
       ],
       "outputs": [
-        "dist/**",
-        ".vinxi/**"
+        "dist/**"
       ],
       "inputs": [
         "$TURBO_DEFAULT$",
