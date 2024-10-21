@@ -4,6 +4,12 @@ compatibility_date = "2024-08-12"
 
 compatibility_flags = ["nodejs_als"]
 
+[placement]
+mode = "smart"
+
+[observability]
+enabled = true
+
 [dev]
 port = 3014
 local_protocol = "https"
