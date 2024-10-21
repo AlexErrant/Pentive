@@ -43,6 +43,7 @@ import {
 	throwExp,
 	stringifyMap,
 	parseMap,
+	type SqliteCount,
 } from 'shared/utility'
 import { binary16fromBase64URL, ulidAsHex, ulidAsRaw } from './convertBinary'
 import { base16, base64, base64url } from '@scure/base'
@@ -701,13 +702,13 @@ export async function userOwnsNoteAndHasMedia(
 		.selectFrom([
 			db
 				.selectFrom('note')
-				.select(db.fn.count('id').as('userOwns'))
+				.select(db.fn.count<SqliteCount>('id').as('userOwns'))
 				.where('id', 'in', ids.map(fromBase64Url))
 				.where('authorId', '=', authorId)
 				.as('userOwns'),
 			db
 				.selectFrom('media_Entity')
-				.select(db.fn.count('mediaHash').as('hasMedia'))
+				.select(db.fn.count<SqliteCount>('mediaHash').as('hasMedia'))
 				.where('mediaHash', '=', id)
 				.as('hasMedia'),
 		])
@@ -731,21 +732,21 @@ export async function userOwnsTemplateAndHasMedia(
 		.selectFrom([
 			db
 				.selectFrom('template')
-				.select(db.fn.count('id').as('userOwns'))
+				.select(db.fn.count<SqliteCount>('id').as('userOwns'))
 				.where('id', 'in', ids.map(fromBase64Url))
 				// .where("authorId", "=", authorId) // highTODO
 				.as('userOwns'),
 			db
 				.selectFrom('media_Entity')
-				.select(db.fn.count('mediaHash').as('hasMedia'))
+				.select(db.fn.count<SqliteCount>('mediaHash').as('hasMedia'))
 				.where('mediaHash', '=', id)
 				.as('hasMedia'),
 		])
 		.selectAll()
 		.executeTakeFirstOrThrow()
 	return {
-		userOwns: userOwns === ids.length.toString(),
-		hasMedia: hasMedia !== '0',
+		userOwns: userOwns === ids.length,
+		hasMedia: hasMedia !== 0,
 	}
 }
 
@@ -1053,10 +1054,10 @@ export async function editNotes(authorId: UserId, notes: EditRemoteNote[]) {
 		.map(fromBase64Url)
 	const count = await db
 		.selectFrom('note')
-		.select(db.fn.count('id').as('c'))
+		.select(db.fn.count<SqliteCount>('id').as('c'))
 		.where('id', 'in', editNoteIds)
 		.executeTakeFirstOrThrow()
-	if (count.c !== notes.length.toString())
+	if (count.c !== notes.length)
 		throwExp("At least one of these notes doesn't exist.")
 	const noteCreates = notes.map((n) => {
 		const tcs = toNoteCreates(n, authorId)
@@ -1091,10 +1092,10 @@ export async function editTemplates(
 		.map(fromBase64Url)
 	const count = await db
 		.selectFrom('template')
-		.select(db.fn.count('id').as('c'))
+		.select(db.fn.count<SqliteCount>('id').as('c'))
 		.where('id', 'in', editTemplateIds)
 		.executeTakeFirstOrThrow()
-	if (count.c !== editTemplateIds.length.toString())
+	if (count.c !== editTemplateIds.length)
 		throwExp("At least one of these templates doesn't exist.")
 	const templateCreates = templates.map((n) => {
 		const tcs = toTemplateCreates(n, authorId)

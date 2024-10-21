@@ -27,7 +27,7 @@ import { type convert } from 'shared-dom/language/query2sql'
 import { type CardTagRowid, type NoteTagRowid } from './tag'
 import { type CardId, type NoteId } from 'shared/brand'
 import { type NoteCard, type State, type Card } from 'shared/domain/card'
-import { assertNever, undefinedMap } from 'shared/utility'
+import { assertNever, type SqliteCount, undefinedMap } from 'shared/utility'
 
 function serializeState(s?: State): number | null {
 	switch (s) {
@@ -174,7 +174,7 @@ async function buildCache(
 	const cacheExists = await ky
 		.selectFrom('sqlite_temp_master')
 		.where('name', '=', cacheName)
-		.select(ky.fn.count<number>('name').as('c'))
+		.select(ky.fn.count<SqliteCount>('name').as('c'))
 		.executeTakeFirstOrThrow()
 		.then((x) => x.c === 1)
 	if (!cacheExists) {
@@ -210,7 +210,7 @@ async function getCardsCount(
 			: db
 					.with('cardRowids', baseQuery)
 					.selectFrom('cardRowids')
-					.select(db.fn.countAll<number>().as('c'))
+					.select(db.fn.countAll<SqliteCount>().as('c'))
 					.executeTakeFirstOrThrow()
 	return await count
 }

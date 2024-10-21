@@ -26,7 +26,13 @@ import {
 	type CreateRemoteTemplate,
 	type EditRemoteTemplate,
 } from 'shared/schema'
-import { objEntries, objKeys, notEmpty, undefinedMap } from 'shared/utility'
+import {
+	objEntries,
+	objKeys,
+	notEmpty,
+	undefinedMap,
+	type SqliteCount,
+} from 'shared/utility'
 
 function templateToDocType(template: Template) {
 	const now = C.getDate().getTime()
@@ -185,7 +191,7 @@ export const templateCollectionMethods = {
 		const templates = toTemplates(allTemplates)
 		const { count } = await ky
 			.selectFrom('template')
-			.select(ky.fn.count<number>('id').as('count'))
+			.select(ky.fn.count<SqliteCount>('id').as('count'))
 			.executeTakeFirstOrThrow()
 		return { templates, count }
 	},

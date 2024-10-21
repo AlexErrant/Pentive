@@ -1,6 +1,8 @@
 // https://stackoverflow.com/a/69328045
 export type WithRequired<T, K extends keyof T> = T & { [P in K]-?: T[P] }
 
+export type SqliteCount = number
+
 // https://basarat.gitbook.io/typescript/type-system/discriminated-unions#throw-in-exhaustive-checks
 export function assertNever(x: never): never {
 	throw new Error(
