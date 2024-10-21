@@ -54,7 +54,7 @@ async function closeRemaining(): Promise<void> {
 	})
 }
 
-self.addEventListener('message', async (event) => {
+self.onmessage = async (event) => {
 	const data = event.data as PostMessageTypes | null // force a null check in case some other message occurs
 	if (data?.type === 'ComlinkInit') {
 		const id = getId(event)
@@ -77,7 +77,7 @@ self.addEventListener('message', async (event) => {
 	} else if (data?.type === 'ClaimRequest') {
 		await self.clients.claim()
 	}
-})
+}
 
 async function sleep(ms: number): Promise<void> {
 	await new Promise((resolve) => setTimeout(resolve, ms))

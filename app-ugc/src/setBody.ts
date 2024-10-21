@@ -7,7 +7,7 @@ import {
 import { resizeIframe } from './registerServiceWorker'
 import diff from 'micromorph'
 
-self.addEventListener('message', async (event) => {
+self.onmessage = async (event) => {
 	const data = event.data as unknown
 	if (typeof data === 'object' && data != null && 'type' in data) {
 		if (data.type === 'pleaseRerender') {
@@ -19,7 +19,7 @@ self.addEventListener('message', async (event) => {
 			setAppMessengerPort((data as ComlinkInit).port)
 		}
 	}
-})
+}
 
 const domParser = new DOMParser()
 
