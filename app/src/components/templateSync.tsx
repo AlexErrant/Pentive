@@ -134,28 +134,28 @@ const TemplateNookSyncActual: VoidComponent<{
 					props.template.fields.map((f) => f.name).join(', '),
 				)}
 			/>
-			<div class='border-black border p-1'>
+			<div class='ctContainer border-black border p-1'>
 				<h3>Child Templates</h3>
-				<Switch>
-					<Match
-						when={
-							props.template.templateType.tag !==
-							remoteTemplate()!.templateType.tag
-						}
-					>
-						Your template is a {props.template.templateType.tag}, but the remote
-						is a {remoteTemplate()!.templateType.tag}. I sure hope you know what
-						you're doing...
-						<Diff
-							title='Child Template(s)'
-							changes={diffJson(
-								JSON.stringify(remoteTemplate()!.templateType),
-								JSON.stringify(props.template.templateType),
-							)}
-						/>
-					</Match>
-					<Match when={props.template.templateType.tag === 'standard'}>
-						<ul>
+				<div class='ctResults'>
+					<Switch>
+						<Match
+							when={
+								props.template.templateType.tag !==
+								remoteTemplate()!.templateType.tag
+							}
+						>
+							Your template is a {props.template.templateType.tag}, but the
+							remote is a {remoteTemplate()!.templateType.tag}. I sure hope you
+							know what you're doing...
+							<Diff
+								title='Child Template(s)'
+								changes={diffJson(
+									JSON.stringify(remoteTemplate()!.templateType),
+									JSON.stringify(props.template.templateType),
+								)}
+							/>
+						</Match>
+						<Match when={props.template.templateType.tag === 'standard'}>
 							<For
 								each={zip(
 									(props.template.templateType as Standard).templates,
@@ -163,25 +163,23 @@ const TemplateNookSyncActual: VoidComponent<{
 								)}
 							>
 								{([localTemplate, remoteTemplate]) => (
-									<li>
-										<ChildTemplateNookSync
-											css={props.template.css}
-											local={localTemplate}
-											remote={remoteTemplate}
-										/>
-									</li>
+									<ChildTemplateNookSync
+										css={props.template.css}
+										local={localTemplate}
+										remote={remoteTemplate}
+									/>
 								)}
 							</For>
-						</ul>
-					</Match>
-					<Match when={props.template.templateType.tag === 'cloze'}>
-						<ChildTemplateNookSync
-							css={props.template.css}
-							local={(props.template.templateType as Cloze).template}
-							remote={(remoteTemplate()!.templateType as Cloze).template}
-						/>
-					</Match>
-				</Switch>
+						</Match>
+						<Match when={props.template.templateType.tag === 'cloze'}>
+							<ChildTemplateNookSync
+								css={props.template.css}
+								local={(props.template.templateType as Cloze).template}
+								remote={(remoteTemplate()!.templateType as Cloze).template}
+							/>
+						</Match>
+					</Switch>
+				</div>
 			</div>
 		</Show>
 	)
