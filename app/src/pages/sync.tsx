@@ -59,8 +59,11 @@ async function uploadNotes(): Promise<void> {
 }
 
 async function getUploadableTemplates() {
-	const news = await db.getNewTemplatesToUploadDom()
-	const news2 = news.flatMap((template) =>
+	const [newTemplates, editedTemplates] = await Promise.all([
+		db.getNewTemplatesToUploadDom(),
+		db.getEditedTemplatesToUploadDom(),
+	])
+	const newTemplates2 = newTemplates.flatMap((template) =>
 		objKeys(template.remotes).map(
 			(nook) =>
 				({
@@ -71,8 +74,7 @@ async function getUploadableTemplates() {
 				}) satisfies Row,
 		),
 	)
-	const editeds = await db.getEditedTemplatesToUploadDom()
-	const editeds2 = editeds.flatMap((template) =>
+	const editedTemplates2 = editedTemplates.flatMap((template) =>
 		objKeys(template.remotes).map(
 			(nook) =>
 				({
@@ -83,8 +85,8 @@ async function getUploadableTemplates() {
 				}) satisfies Row,
 		),
 	)
-	news2.push(...editeds2)
-	return news2
+	newTemplates2.push(...editedTemplates2)
+	return newTemplates2
 }
 
 export default function Sync(): JSX.Element {
