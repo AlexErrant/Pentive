@@ -32,6 +32,7 @@ import { postMedia, uploadTemplates } from '../domain/sync'
 import { type NookId } from 'shared/brand'
 import { type Template } from 'shared/domain/template'
 import { objKeys } from 'shared/utility'
+import { type Note } from 'shared/domain/note'
 
 LicenseManager.setLicenseKey(import.meta.env.VITE_AG_GRID_LICENSE)
 
@@ -60,19 +61,27 @@ async function uploadNotes(): Promise<void> {
 async function getUploadableTemplates() {
 	const news = await db.getNewTemplatesToUploadDom()
 	const news2 = news.flatMap((template) =>
-		objKeys(template.remotes).map((nook) => ({
-			nook,
-			type: 'new' as Type,
-			template,
-		})),
+		objKeys(template.remotes).map(
+			(nook) =>
+				({
+					nook,
+					type: 'new' as Type,
+					template,
+					tag: 'template',
+				}) satisfies Row,
+		),
 	)
 	const editeds = await db.getEditedTemplatesToUploadDom()
 	const editeds2 = editeds.flatMap((template) =>
-		objKeys(template.remotes).map((nook) => ({
-			nook,
-			type: 'edited' as Type,
-			template,
-		})),
+		objKeys(template.remotes).map(
+			(nook) =>
+				({
+					nook,
+					type: 'edited' as Type,
+					template,
+					tag: 'template',
+				}) satisfies Row,
+		),
 	)
 	news2.push(...editeds2)
 	return news2
@@ -97,18 +106,20 @@ class CellRenderer implements ICellRendererComp<Row> {
 		if (params.data == null) {
 			return
 		}
-		const remoteTemplate = params.data.template.remotes[params.data.nook]
-		this.dispose = render(
-			() =>
-				runWithOwner(params.context.owner, () => (
-					<TemplateNookSync
-						template={params.data!.template}
-						remoteTemplate={remoteTemplate}
-						nook={params.data!.nook}
-					/>
-				)),
-			this.eGui,
-		)
+		if (params.data.tag === 'template') {
+			const remoteTemplate = params.data.template.remotes[params.data.nook]
+			this.dispose = render(
+				() =>
+					runWithOwner(params.context.owner, () => (
+						<TemplateNookSync
+							template={(params.data as RowTemplate).template}
+							remoteTemplate={remoteTemplate}
+							nook={params.data!.nook}
+						/>
+					)),
+				this.eGui,
+			)
+		}
 	}
 
 	getGui() {
@@ -157,11 +168,16 @@ class HeaderRenderer implements IHeaderComp {
 
 type Type = 'new' | 'edited'
 
-interface Row {
-	nook: NookId
-	type: Type
+interface RowTemplate {
 	template: Template
+	tag: 'template'
 }
+interface RowNote {
+	note: Note
+	tag: 'note'
+}
+
+type Row = { nook: NookId; type: Type } & (RowTemplate | RowNote)
 
 interface Context {
 	owner: Owner
