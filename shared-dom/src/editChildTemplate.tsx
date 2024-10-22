@@ -53,11 +53,11 @@ const EditChildTemplate: VoidComponent<{
 		frontRo = new ResizeObserver(() => {
 			frontView.requestMeasure()
 		})
-		frontRo.observe(frontRef!)
+		frontRo.observe(frontRef)
 		backRo = new ResizeObserver(() => {
 			backView.requestMeasure()
 		})
-		backRo.observe(backRef!)
+		backRo.observe(backRef)
 	})
 	createEffect(
 		on(

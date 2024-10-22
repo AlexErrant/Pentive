@@ -80,7 +80,7 @@ const MergeComp: VoidComponent<{
 			view.a.requestMeasure()
 			view.b.requestMeasure()
 		})
-		ro.observe(ref!)
+		ro.observe(ref)
 	})
 	createEffect(
 		on(
