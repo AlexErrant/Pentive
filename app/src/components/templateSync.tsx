@@ -63,7 +63,7 @@ export const TemplateNookSync: VoidComponent<{
 			{state() === 'uploaded' ? (
 				<div class='flex justify-end'>Uploaded</div>
 			) : (
-				<div class='pt-2 leading-normal'>
+				<div class='flex flex-col gap-2 py-2 leading-normal'>
 					<div class='flex justify-end'>
 						<Switch>
 							<Match when={state() === 'uploading'}>Uploading...</Match>

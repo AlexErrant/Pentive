@@ -14,7 +14,7 @@ const Diff: VoidComponent<{
 			)
 		}
 	>
-		<div class='border-black m-2 border p-1'>
+		<div class='border-black border p-1'>
 			<h3>{props.title}</h3>
 			<For each={props.changes}>
 				{({ added, removed, value }) => (
