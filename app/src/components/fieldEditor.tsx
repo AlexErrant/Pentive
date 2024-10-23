@@ -132,7 +132,6 @@ const proseMirrorDOMParser = ProseMirrorDOMParser.fromSchema(mySchema)
 export const FieldEditor: VoidComponent<{
 	readonly field: string
 	readonly value: string
-	readonly i: number
 	readonly setNoteCard: SetStoreFunction<{
 		noteCard?: NoteCardView
 	}>
@@ -170,8 +169,7 @@ export const FieldEditor: VoidComponent<{
 						'noteCard',
 						'note',
 						'fieldValues',
-						props.i,
-						1,
+						props.field,
 						value,
 					)
 				}

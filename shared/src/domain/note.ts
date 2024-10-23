@@ -12,6 +12,9 @@ export interface Note {
 	created: Date
 	edited: Date
 	tags: Set<string>
-	fieldValues: Map<string, string>
-	remotes: Map<NookId, { remoteNoteId: RemoteNoteId; uploadDate: Date } | null>
+	fieldValues: Record<string, string>
+	remotes: Record<
+		NookId,
+		{ remoteNoteId: RemoteNoteId; uploadDate: Date } | null
+	>
 }

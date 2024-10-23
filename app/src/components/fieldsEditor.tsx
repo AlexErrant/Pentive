@@ -9,6 +9,7 @@ import { ChevronDown, Code, Quote } from 'shared-dom/icons'
 import { C, tx } from '../topLevelAwait'
 import { toNoteCards, type NoteCardView } from '../uiLogic/cards'
 import { type MediaId } from 'shared/brand'
+import { objEntries } from 'shared/utility'
 
 export const FieldsEditor: VoidComponent<{
 	readonly noteCard: NoteCardView
@@ -18,13 +19,12 @@ export const FieldsEditor: VoidComponent<{
 }> = (props) => {
 	return (
 		<>
-			<For each={props.noteCard.note.fieldValues}>
-				{(fv, i) => (
+			<For each={objEntries(props.noteCard.note.fieldValues)}>
+				{(fv) => (
 					<FieldValue
 						css={props.noteCard.template.css}
 						setNoteCard={props.setNoteCard}
 						fieldValue={fv}
-						i={i()}
 					/>
 				)}
 			</For>
@@ -38,19 +38,24 @@ export const FieldsEditor: VoidComponent<{
 						// eslint-disable-next-line solid/reactivity -- the fn isn't reactive
 						await tx(async () => {
 							const fieldValues = await Promise.all(
-								props.noteCard.note.fieldValues.map(async ([f, v]) => {
-									const doc = dp.parseFromString(v, 'text/html')
-									await Promise.all(
-										Array.from(doc.images).map(async (i) => {
-											await mutate(i)
-										}),
-									)
-									return [f, doc.body.innerHTML] satisfies [string, string]
-								}),
+								objEntries(props.noteCard.note.fieldValues).map(
+									async ([f, v]) => {
+										const doc = dp.parseFromString(v, 'text/html')
+										await Promise.all(
+											Array.from(doc.images).map(async (i) => {
+												await mutate(i)
+											}),
+										)
+										return [f, doc.body.innerHTML] satisfies [string, string]
+									},
+								),
 							)
 							const noteCards = toNoteCards({
 								...props.noteCard,
-								note: { ...props.noteCard.note, fieldValues },
+								note: {
+									...props.noteCard.note,
+									fieldValues: Object.fromEntries(fieldValues),
+								},
 							})
 							await db.upsertNote(noteCards[0]!.note)
 							await db.bulkUpsertCards(noteCards.map((nc) => nc.card))
@@ -90,7 +95,6 @@ const FieldValue: VoidComponent<{
 	setNoteCard: SetStoreFunction<{
 		noteCard?: NoteCardView
 	}>
-	i: number
 }> = (props) => {
 	const [isDev, setDev] = createSignal(false)
 	const [isOpen, setOpen] = createSignal(true)
@@ -130,7 +134,6 @@ const FieldValue: VoidComponent<{
 							field={props.fieldValue[0]}
 							value={props.fieldValue[1]}
 							setNoteCard={props.setNoteCard}
-							i={props.i}
 						/>
 					}
 				>
@@ -142,8 +145,7 @@ const FieldValue: VoidComponent<{
 								'noteCard',
 								'note',
 								'fieldValues',
-								props.i,
-								1,
+								props.fieldValue[0],
 								v,
 							)
 						}}

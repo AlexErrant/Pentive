@@ -71,7 +71,7 @@ function testBody(
 	const template = buildTemplate(fieldValues, frontTemplate, backTemplate, type)
 	const r = defaultRenderContainer.body(
 		toSampleCard(ord as Ord),
-		toSampleNote(new Map(fieldValues)),
+		toSampleNote(Object.fromEntries(fieldValues)),
 		template,
 	)
 	const [front, back] = getOk(r)
@@ -102,7 +102,7 @@ function testBody2(
 	for (let index = 0; index < 2; index++) {
 		const r = defaultRenderContainer.body(
 			toSampleCard(index as Ord),
-			toSampleNote(new Map(fieldValues)),
+			toSampleNote(Object.fromEntries(fieldValues)),
 			template,
 		)
 		const [front, back] = getOkSafe(r) ?? [null, null]
@@ -124,7 +124,7 @@ function testStrippedBody(
 	const [front, back] = getOk(
 		defaultRenderContainer.body(
 			toSampleCard(ord as Ord),
-			toSampleNote(new Map(fieldValues)),
+			toSampleNote(Object.fromEntries(fieldValues)),
 			template,
 		),
 	)
@@ -147,7 +147,7 @@ function testBodyIsNull(
 	const template = buildTemplate(fieldValues, frontTemplate, backTemplate, type)
 	const result = defaultRenderContainer.body(
 		toSampleCard(ord as Ord),
-		toSampleNote(new Map(fieldValues)),
+		toSampleNote(Object.fromEntries(fieldValues)),
 		template,
 	)
 	expect(getOkSafe(result)).toBeNull()
@@ -512,7 +512,7 @@ function ordsOfStandard(
 		id: 1 as Ord,
 	})
 	return noteOrds.bind(defaultRenderContainer)(
-		toSampleNote(new Map(fieldAndValues)),
+		toSampleNote(Object.fromEntries(fieldAndValues)),
 		template,
 	)
 }
@@ -551,7 +551,7 @@ function ordsOfClozeNote(
 	back: string,
 ) {
 	return noteOrds.bind(defaultRenderContainer)(
-		toSampleNote(new Map(fieldsAndValues)),
+		toSampleNote(Object.fromEntries(fieldsAndValues)),
 		buildTemplate(fieldsAndValues, front, back, 'cloze'),
 	)
 }
@@ -885,7 +885,7 @@ test('renderTemplate works for standard with 2 child templates', () => {
 })
 
 function toTestNote(
-	fieldValues: Map<string, string>,
+	fieldValues: Record<string, string>,
 	note: Partial<Note>,
 ): Note {
 	const sampleNote = toSampleNote(fieldValues)
@@ -914,7 +914,7 @@ describe('standardTemplate tags', () => {
 		const [front, back] =
 			toBody(
 				toSampleCard(0 as Ord),
-				toTestNote(new Map(fieldValues), { tags: new Set() }),
+				toTestNote(Object.fromEntries(fieldValues), { tags: new Set() }),
 				buildTemplate(
 					fieldValues,
 					'{{Front}}{{Tags}}',
@@ -934,7 +934,9 @@ describe('standardTemplate tags', () => {
 		const [front, back] =
 			toBody(
 				toSampleCard(0 as Ord),
-				toTestNote(new Map(fieldValues), { tags: new Set(['Geography']) }),
+				toTestNote(Object.fromEntries(fieldValues), {
+					tags: new Set(['Geography']),
+				}),
 				buildTemplate(
 					fieldValues,
 					'{{Front}}{{Tags}}',
@@ -954,7 +956,7 @@ describe('standardTemplate tags', () => {
 		const [front, back] =
 			toBody(
 				toSampleCard(0 as Ord),
-				toTestNote(new Map(fieldValues), {
+				toTestNote(Object.fromEntries(fieldValues), {
 					tags: new Set(['Geography', 'Capital']),
 				}),
 				buildTemplate(
@@ -976,7 +978,7 @@ describe('standardTemplate tags', () => {
 		const [front, back] =
 			toBody(
 				toSampleCard(0 as Ord),
-				toTestNote(new Map(fieldValues), { tags: new Set() }),
+				toTestNote(Object.fromEntries(fieldValues), { tags: new Set() }),
 				buildTemplate(
 					fieldValues,
 					'{{Front}}{{#Tags}}Tags: {{Tags}}{{/Tags}}',
@@ -996,7 +998,9 @@ describe('standardTemplate tags', () => {
 		const [front, back] =
 			toBody(
 				toSampleCard(0 as Ord),
-				toTestNote(new Map(fieldValues), { tags: new Set(['Geography']) }),
+				toTestNote(Object.fromEntries(fieldValues), {
+					tags: new Set(['Geography']),
+				}),
 				buildTemplate(
 					fieldValues,
 					'{{Front}}{{#Tags}}Tags: {{Tags}}{{/Tags}}',
@@ -1016,7 +1020,7 @@ describe('standardTemplate tags', () => {
 		const [front, back] =
 			toBody(
 				toSampleCard(0 as Ord),
-				toTestNote(new Map(fieldValues), {
+				toTestNote(Object.fromEntries(fieldValues), {
 					tags: new Set(['Geography', 'Capital']),
 				}),
 				buildTemplate(
@@ -1038,7 +1042,7 @@ describe('standardTemplate tags', () => {
 		const [front, back] =
 			toBody(
 				toSampleCard(0 as Ord),
-				toTestNote(new Map(fieldValues), { tags: new Set() }),
+				toTestNote(Object.fromEntries(fieldValues), { tags: new Set() }),
 				buildTemplate(
 					fieldValues,
 					'{{Front}}{{^Tags}}Tags: {{Tags}}{{/Tags}}',
@@ -1058,7 +1062,9 @@ describe('standardTemplate tags', () => {
 		const [front, back] =
 			toBody(
 				toSampleCard(0 as Ord),
-				toTestNote(new Map(fieldValues), { tags: new Set(['Geography']) }),
+				toTestNote(Object.fromEntries(fieldValues), {
+					tags: new Set(['Geography']),
+				}),
 				buildTemplate(
 					fieldValues,
 					'{{Front}}{{^Tags}}Tags: {{Tags}}{{/Tags}}',
@@ -1078,7 +1084,7 @@ describe('standardTemplate tags', () => {
 		const [front, back] =
 			toBody(
 				toSampleCard(0 as Ord),
-				toTestNote(new Map(fieldValues), {
+				toTestNote(Object.fromEntries(fieldValues), {
 					tags: new Set(['Geography', 'Capital']),
 				}),
 				buildTemplate(

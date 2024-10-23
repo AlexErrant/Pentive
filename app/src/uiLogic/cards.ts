@@ -1,10 +1,10 @@
 import { type Template } from 'shared/domain/template'
 import { type NoteCard, type Card } from 'shared/domain/card'
-import { type Override } from 'shared/utility'
+import { type Note } from 'shared/domain/note'
 
 export interface NoteCardView {
 	template: Template
-	note: Override<NoteCard['note'], { fieldValues: Array<[string, string]> }>
+	note: Note
 	mainCard?: Card
 	cards: Card[]
 }
@@ -12,10 +12,7 @@ export interface NoteCardView {
 export function toNoteCards(noteCardView: NoteCardView): NoteCard[] {
 	return noteCardView.cards.map((card) => ({
 		template: noteCardView.template,
-		note: {
-			...noteCardView.note,
-			fieldValues: new Map(noteCardView.note.fieldValues),
-		},
+		note: noteCardView.note,
 		card,
 	}))
 }

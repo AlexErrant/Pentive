@@ -7,7 +7,7 @@ import {
 	validate,
 } from './language/template2html'
 import type { RenderContainer } from './renderContainer'
-import { assertNever, notEmpty, throwExp } from 'shared/utility'
+import { assertNever, notEmpty, objEntries, throwExp } from 'shared/utility'
 import { type Field, type Template } from 'shared/domain/template'
 import { type Card } from 'shared/domain/card'
 import { type Note } from 'shared/domain/note'
@@ -247,7 +247,7 @@ export function html(
 	}
 }
 
-export function toSampleNote(fieldValues: Map<string, string>): Note {
+export function toSampleNote(fieldValues: Record<string, string>): Note {
 	return {
 		id: 'SampleNoteId' as NoteId,
 		templateId: 'SampleTemplateId' as TemplateId,
@@ -255,15 +255,12 @@ export function toSampleNote(fieldValues: Map<string, string>): Note {
 		edited: new Date(),
 		tags: new Set(['SampleTag']),
 		fieldValues,
-		remotes: new Map([
-			[
-				'SampleNookId' as NookId,
-				{
-					remoteNoteId: 'SampleRemoteNoteId' as RemoteNoteId,
-					uploadDate: new Date(),
-				},
-			],
-		]),
+		remotes: {
+			['SampleNookId' as NookId]: {
+				remoteNoteId: 'SampleRemoteNoteId' as RemoteNoteId,
+				uploadDate: new Date(),
+			},
+		},
 	}
 }
 
@@ -290,7 +287,9 @@ export function renderTemplate(
 	template: Template,
 	short: boolean = false,
 ): readonly HtmlResult[] {
-	const fieldsAndValues = new Map(template.fields.map(getStandardFieldAndValue)) // medTODO consider adding escape characters so you can do e.g. {{Front}}. Apparently Anki doesn't have escape characters - now would be a good time to introduce this feature.
+	const fieldsAndValues = Object.fromEntries(
+		template.fields.map(getStandardFieldAndValue),
+	) // medTODO consider adding escape characters so you can do e.g. {{Front}}. Apparently Anki doesn't have escape characters - now would be a good time to introduce this feature.
 	if (template.templateType.tag === 'standard') {
 		const note = toSampleNote(fieldsAndValues)
 		return template.templateType.templates.map(({ id }) =>
@@ -315,7 +314,7 @@ export function renderTemplate(
 			.map((clozeField, i) =>
 				this.body(
 					toSampleCard(i as Ord),
-					toSampleNote(new Map(getFieldsAndValues(clozeField, i))),
+					toSampleNote(Object.fromEntries(getFieldsAndValues(clozeField, i))),
 					template,
 					short,
 				),
@@ -346,7 +345,7 @@ export function noteOrds(
 			.filter(notEmpty)
 		return distinctAndOrder(ords)
 	} else if (template.templateType.tag === 'cloze') {
-		const ords = Array.from(note.fieldValues.entries()).flatMap(([, value]) =>
+		const ords = objEntries(note.fieldValues).flatMap(([, value]) =>
 			Array.from(value.matchAll(clozeRegex)).map((x) => {
 				const clozeIndex =
 					x.groups?.clozeIndex ??

@@ -45,12 +45,12 @@ export default function Home(): JSX.Element {
 					side: 'back',
 					template: template(),
 					card: toSampleCard(0 as Ord),
-					note: toSampleNote(
-						new Map([
-							['Front', 'q'],
-							['Back', 'a'],
-						]),
-					),
+					note: toSampleNote({
+						// eslint-disable-next-line @typescript-eslint/naming-convention
+						Front: 'q',
+						// eslint-disable-next-line @typescript-eslint/naming-convention
+						Back: 'a',
+					}),
 				}}
 			/>
 			<button

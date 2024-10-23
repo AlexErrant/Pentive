@@ -41,9 +41,8 @@ import {
 	nullMap,
 	undefinedMap,
 	throwExp,
-	stringifyMap,
-	parseMap,
 	type SqliteCount,
+	objEntries,
 } from 'shared/utility'
 import { binary16fromBase64URL, ulidAsHex, ulidAsRaw } from './convertBinary'
 import { base16, base64, base64url } from '@scure/base'
@@ -909,8 +908,8 @@ function toNoteCreate(
 	const remoteIdBase64url = base64url
 		.encode(remoteNoteId)
 		.substring(0, 22) as RemoteNoteId
-	for (const [field, value] of n.fieldValues) {
-		n.fieldValues.set(field, replaceImgSrcs(value, remoteIdBase64url))
+	for (const [field, value] of objEntries(n.fieldValues)) {
+		n.fieldValues[field] = replaceImgSrcs(value, remoteIdBase64url)
 	}
 	const noteCreate: InsertObject<DB, 'note'> = {
 		id: unhex(remoteIdHex),
@@ -918,7 +917,7 @@ function toNoteCreate(
 		authorId,
 		edited,
 		fieldValues: serializeFieldValues(n.fieldValues),
-		fts: Array.from(n.fieldValues)
+		fts: objEntries(n.fieldValues)
 			.map(([, v]) => ftsNormalize(v, true, true, false))
 			.concat(n.tags)
 			.join(' '),
@@ -994,8 +993,8 @@ function serializeFields(tt: string[]) {
 	return JSON.stringify(tt)
 }
 
-function serializeFieldValues(fvs: Map<string, string>) {
-	return stringifyMap(fvs)
+function serializeFieldValues(fvs: Record<string, string>) {
+	return JSON.stringify(fvs)
 }
 
 function serializeTags(tags: string[]) {
@@ -1011,7 +1010,7 @@ function deserializeFields(tt: string) {
 }
 
 function deserializeFieldValues(fvs: string) {
-	return parseMap<string, string>(fvs)
+	return JSON.parse(fvs) as Record<string, string>
 }
 
 function deserializeTags(tags: string) {

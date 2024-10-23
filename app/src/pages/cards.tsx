@@ -36,15 +36,11 @@ export default function Cards(): JSX.Element {
 						onSelectionChanged={(ncs) => {
 							const nc = ncs[0]
 							if (nc != null) {
-								const selected: NoteCardView = {
+								const selected = {
 									...nc,
-									note: {
-										...nc.note,
-										fieldValues: Array.from(nc.note.fieldValues.entries()),
-									},
 									mainCard: nc.card,
 									cards: [],
-								}
+								} satisfies NoteCardView
 								setSelected('noteCard', selected)
 							} else {
 								setSelected('noteCard', undefined)

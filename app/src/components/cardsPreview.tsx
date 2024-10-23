@@ -7,10 +7,7 @@ import { type NoteCard } from 'shared/domain/card'
 function toMainNoteCards(noteCardView: NoteCardView): NoteCard {
 	return {
 		template: noteCardView.template,
-		note: {
-			...noteCardView.note,
-			fieldValues: new Map(noteCardView.note.fieldValues),
-		},
+		note: noteCardView.note,
 		card:
 			noteCardView.mainCard ?? C.toastImpossible('No main card.', noteCardView),
 	}

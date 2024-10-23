@@ -23,7 +23,7 @@ import {
 	type NookId,
 } from 'shared/brand'
 import { type CreateRemoteNote, type EditRemoteNote } from 'shared/schema'
-import { notEmpty } from 'shared/utility'
+import { notEmpty, objEntries, objKeys, objValues } from 'shared/utility'
 import initSql from 'shared/sql.json'
 
 function noteToDocType(note: Note) {
@@ -37,7 +37,7 @@ function noteToDocType(note: Note) {
 			ankiNoteId: note.ankiNoteId,
 		},
 		Array.from(note.tags).map((tag) => ({ tag, noteId: note.id })),
-		Array.from(note.fieldValues).map(([field, value]) => ({
+		objEntries(note.fieldValues).map(([field, value]) => ({
 			noteId: note.id,
 			field,
 			value,
@@ -254,11 +254,12 @@ JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field
 							noteEntity,
 							remoteNotes.filter((rn) => rn.localId === noteEntity.id),
 						)
-						if (note.remotes.size === 0)
+						const remotesEntries = objEntries(note.remotes)
+						if (remotesEntries.length === 0)
 							C.toastImpossible(
 								'Zero remotes - is something wrong with the SQL query?',
 							)
-						const remoteIds = Array.from(note.remotes)
+						const remoteIds = remotesEntries
 							.map(([nook]) => {
 								const rt =
 									remoteTemplates.find(
@@ -304,12 +305,13 @@ JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field
 							noteEntity,
 							remoteNotes.filter((rn) => rn.localId === noteEntity.id),
 						)
-						if (note.remotes.size === 0)
+						const remotesEntries = objEntries(note.remotes)
+						if (remotesEntries.length === 0)
 							C.toastImpossible(
 								'Zero remotes - is something wrong with the SQL query?',
 							)
 						const remotes = new Map(
-							Array.from(note.remotes).map(([nook, remote]) => {
+							remotesEntries.map(([nook, remote]) => {
 								const rt =
 									remoteTemplates.find(
 										(rt) => rt.localId === note.templateId && nook === rt.nook,
@@ -503,10 +505,10 @@ function withLocalMediaIdByRemoteMediaId<
 	const { docs, remoteMediaIdByLocal } =
 		updateLocalMediaIdByRemoteMediaIdAndGetNewDoc(
 			dp,
-			Array.from(note.fieldValues.values()),
+			objValues(note.fieldValues),
 		)
 	let i = 0
-	for (const [field] of note.fieldValues) {
+	for (const field of objKeys(note.fieldValues)) {
 		fieldValues.set(field, docs[i]!.body.innerHTML)
 		i++
 	}

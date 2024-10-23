@@ -119,14 +119,16 @@ export function parseNote(
 		edited: newDate(note.mod),
 		ankiNoteId: note.id,
 		templateId,
-		fieldValues: new Map(zip(fields, values) as Array<[string, string]>),
+		fieldValues: Object.fromEntries(
+			zip(fields, values) as Array<[string, string]>,
+		),
 		tags: new Set(
 			note.tags
 				.split(' ')
 				.map(normalize)
 				.filter((t) => t !== ''),
 		),
-		remotes: new Map(),
+		remotes: {},
 	}
 }
 

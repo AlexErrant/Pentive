@@ -112,7 +112,7 @@ function astEnter(
 		const fieldNode = node.node.getChildren(TagName)[0]!
 		const field = input.slice(fieldNode.from, fieldNode.to)
 		let value =
-			note.fieldValues.get(field)?.trim() ??
+			note.fieldValues[field]?.trim() ??
 			new Map([['Tags', htmlifyTags(note.tags)]]).get(field)
 		if (value == null) {
 			context.html += input.slice(node.from, node.to)
@@ -152,7 +152,7 @@ function astEnter(
 		const value =
 			field === 'Tags'
 				? htmlifyTags(note.tags).trim()
-				: note.fieldValues.get(field)?.trim()
+				: note.fieldValues[field]?.trim()
 		if (node.node.nextSibling?.type.is(If) === true) {
 			if (isEmpty(value)) {
 				context.hideTagName = field

@@ -98,10 +98,12 @@ export function noteEntityToDomain(
 ): Note {
 	const noteFVs = parseMap<string, string>(note.fieldValues)
 	const tF = parseTemplateFields(note.templateFields).map((f) => f.name)
-	const fieldValues = new Map(tF.map((f) => [f, noteFVs.get(f) ?? '']))
+	const fieldValues = Object.fromEntries(
+		tF.map((f) => [f, noteFVs.get(f) ?? '']),
+	)
 	noteFVs.forEach((v, f) => {
 		if (!tF.includes(f)) {
-			fieldValues.set(f, v)
+			fieldValues[f] = v
 		}
 	})
 	const r: Note = {
@@ -112,7 +114,7 @@ export function noteEntityToDomain(
 		tags: parseTags(note.tags),
 		fieldValues,
 		ankiNoteId: note.ankiNoteId ?? undefined,
-		remotes: new Map(
+		remotes: Object.fromEntries(
 			remotes.map((r) => [
 				r.nook,
 				r.remoteId == null

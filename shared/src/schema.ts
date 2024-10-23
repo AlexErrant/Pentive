@@ -8,6 +8,7 @@ import {
 	type NookId,
 	type CommentId,
 } from './brand'
+import { objKeys } from './utility'
 
 // highTODO are we doing ULIDs, KSUID, or neither?
 
@@ -28,8 +29,8 @@ export const commentId = z
 	.regex(/^[a-zA-Z0-9_-]{22}$/) as unknown as z.Schema<CommentId>
 
 const fieldValues = z
-	.map(z.string().min(1), z.string())
-	.refine((x) => x.size > 0)
+	.record(z.string().min(1), z.string())
+	.refine((x) => objKeys(x).length > 0)
 
 const noteUneditable = {
 	id: true,

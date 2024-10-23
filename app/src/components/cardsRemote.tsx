@@ -60,8 +60,8 @@ export const CardsRemote: VoidComponent<{
 	createEffect(() => {
 		const remotes = objEntries(props.noteCard.template.remotes).map(
 			([nookId, remoteTemplateId]) => {
-				const remote = props.noteCard.note.remotes.get(nookId) ?? null
-				const uploadable = props.noteCard.note.remotes.has(nookId)
+				const remote = props.noteCard.note.remotes[nookId] ?? null
+				const uploadable = props.noteCard.note.remotes[nookId] != null
 				return {
 					nookId,
 					remoteTemplateId,

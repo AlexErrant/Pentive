@@ -17,9 +17,9 @@ import { CardsPreview } from '../components/cardsPreview'
 import { db } from '../db'
 import { type NoteCardView } from '../uiLogic/cards'
 import { type Template } from 'shared/domain/template'
-import { type Note } from 'shared/domain/note'
 import { type Card } from 'shared/domain/card'
 import { type NoteId, type CardId } from 'shared/brand'
+import { objValues } from 'shared/utility'
 
 function toView(template: Template): NoteCardView {
 	const now = C.getDate()
@@ -29,17 +29,12 @@ function toView(template: Template): NoteCardView {
 		created: now,
 		edited: now,
 		tags: new Set(),
-		fieldValues: template.fields.map((f) => [f.name, ''] as const),
-		remotes: new Map(),
+		fieldValues: Object.fromEntries(
+			template.fields.map((f) => [f.name, ''] as const),
+		),
+		remotes: {},
 	}
 	return { template, note, cards: [] }
-}
-
-function toNote(note: NoteCardView['note']) {
-	return {
-		...note,
-		fieldValues: new Map(note.fieldValues),
-	} satisfies Note
 }
 
 export default function AddNote() {
@@ -57,13 +52,13 @@ export default function AddNote() {
 		on(
 			() => [
 				wip.noteCard?.template,
-				wip.noteCard?.note.fieldValues.map((x) => x[1]),
+				objValues(wip.noteCard?.note.fieldValues ?? {}),
 			],
 			() => {
 				const note = wip.noteCard?.note
 				const template = wip.noteCard?.template
 				if (note != null && template != null) {
-					const ords = C.noteOrds(toNote(note), template)
+					const ords = C.noteOrds(note, template)
 					const now = C.getDate()
 					const cards = ords.map((ord) => {
 						return {

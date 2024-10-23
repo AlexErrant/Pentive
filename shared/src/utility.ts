@@ -85,6 +85,10 @@ export const objKeys: <TKey extends string, TVal>(
 	o: Record<TKey, TVal>,
 ) => TKey[] = Object.keys
 
+export const objValues: <TKey extends string, TVal>(
+	o: Record<TKey, TVal>,
+) => TVal[] = Object.values
+
 export const objEntries: <TKey extends string, TVal>(
 	o: Record<TKey, TVal>,
 ) => Array<[TKey, TVal]> = Object.entries

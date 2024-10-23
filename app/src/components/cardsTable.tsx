@@ -38,7 +38,7 @@ import { type Sort } from '../sqlite/card'
 import { agGridTheme, useThemeContext } from 'shared-dom/themeSelector'
 import { type CardId } from 'shared/brand'
 import { type NoteCard } from 'shared/domain/card'
-import { throwExp, assertNever } from 'shared/utility'
+import { throwExp, assertNever, objEntries } from 'shared/utility'
 
 LicenseManager.setLicenseKey(import.meta.env.VITE_AG_GRID_LICENSE)
 
@@ -193,7 +193,7 @@ const columnDefs: Array<ColDef<NoteCard>> = [
 		cellRenderer: (props: ICellRendererParams<NoteCard>) => (
 			<Show when={props.data?.note.remotes}>
 				<ul>
-					<For each={Array.from(props.data!.note.remotes)}>
+					<For each={objEntries(props.data!.note.remotes)}>
 						{([nook, v]) => (
 							<li class='mr-2 inline'>
 								<span>

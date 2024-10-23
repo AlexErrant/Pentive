@@ -13,6 +13,7 @@ import { relativeChar } from 'shared/image'
 import { type Template } from 'shared/domain/template'
 import { type Note } from 'shared/domain/note'
 import { type Card } from 'shared/domain/card'
+import { objEntries } from 'shared/utility'
 
 export const appExpose = {
 	addTemplate: async (rt: RemoteTemplate) => {
@@ -68,7 +69,9 @@ export const appExpose = {
 				edited: rn.edited,
 				tags: new Set(rn.tags),
 				fieldValues: rn.fieldValues,
-				remotes: new Map([[nook, { remoteNoteId: rn.id, uploadDate: now }]]),
+				remotes: Object.fromEntries([
+					[nook, { remoteNoteId: rn.id, uploadDate: now }],
+				]),
 			}
 			await downloadImages(getNoteImages(n.fieldValues, new DOMParser()))
 			await db.upsertNote(n)
@@ -95,14 +98,14 @@ export const appExpose = {
 // highTODO needs security on the origin
 Comlink.expose(appExpose, Comlink.windowEndpoint(self.parent))
 
-function getNoteImages(fieldValues: Map<string, string>, dp: DOMParser) {
+function getNoteImages(fieldValues: Record<string, string>, dp: DOMParser) {
 	const imgSrcs = new Map<MediaId, string>()
-	for (const [f, v] of fieldValues) {
+	for (const [f, v] of objEntries(fieldValues)) {
 		const doc = dp.parseFromString(v, 'text/html')
 		Array.from(doc.images).forEach((i) => {
 			mutate(i, imgSrcs)
 		})
-		fieldValues.set(f, doc.body.innerHTML)
+		fieldValues[f] = doc.body.innerHTML
 	}
 	return imgSrcs
 }

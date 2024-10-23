@@ -13,10 +13,11 @@ import ResizingIframe from './resizingIframe'
 import { type NoteCardView } from '../uiLogic/cards'
 import { html } from '@codemirror/lang-html'
 import { DiffModeToggleGroup } from './diffModeContext'
+import { objEntries } from 'shared/utility'
 
 const NoteSync: VoidComponent<{ note: NoteCardView }> = (props) => (
 	<ul>
-		<For each={Array.from(props.note.note.remotes)}>
+		<For each={objEntries(props.note.note.remotes)}>
 			{([nookId, remoteNote]) => (
 				<li>
 					<h2>/n/{nookId}</h2>
@@ -53,10 +54,14 @@ const NoteNookSync: VoidComponent<{
 								string,
 								[string | undefined, string | undefined]
 							>()
-							for (const [field, value] of props.note.note.fieldValues) {
+							for (const [field, value] of objEntries(
+								props.note.note.fieldValues,
+							)) {
 								m.set(field, [value, undefined])
 							}
-							for (const [field, value] of remoteNote()!.fieldValues) {
+							for (const [field, value] of objEntries(
+								remoteNote()!.fieldValues,
+							)) {
 								m.set(field, [m.get(field)?.at(0), value])
 							}
 							return m
