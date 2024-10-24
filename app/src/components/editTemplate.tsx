@@ -1,5 +1,5 @@
 import { EditTemplate as EditTemplateOg } from 'shared-dom/editTemplate'
-import { For, Show, type VoidComponent } from 'solid-js'
+import { Show, type VoidComponent } from 'solid-js'
 import { type SetStoreFunction } from 'solid-js/store'
 import { db } from '../db'
 import { useThemeContext } from 'shared-dom/themeSelector'
@@ -7,7 +7,7 @@ import { C } from '../topLevelAwait'
 import { getDefaultTemplate } from '../domain/utility'
 import { type Template } from 'shared/domain/template'
 import { type NookId } from 'shared/brand'
-import { objEntries } from 'shared/utility'
+import { Entries } from '@solid-primitives/keyed'
 
 const saveButton = (template: { template: Template }) => (
 	<button
@@ -49,13 +49,13 @@ const remoteCell: VoidComponent<{
 				<span class='p-2 px-2 font-bold'>Nooks</span>
 			</legend>
 			<ul>
-				<For each={objEntries(props.template.remotes)}>
-					{([nookId, remoteTemplate]) => (
+				<Entries of={props.template.remotes}>
+					{(nookId, remoteTemplate) => (
 						<li class='px-4 py-2'>
-							<Show when={remoteTemplate != null} fallback={nookId}>
+							<Show when={remoteTemplate() != null} fallback={nookId}>
 								<a
 									href={`${import.meta.env.VITE_HUB_ORIGIN}/t/${
-										remoteTemplate!.remoteTemplateId
+										remoteTemplate()!.remoteTemplateId
 									}`}
 								>
 									{nookId}
@@ -64,7 +64,7 @@ const remoteCell: VoidComponent<{
 							{removeNook(nookId, props.setTemplate)}
 						</li>
 					)}
-				</For>
+				</Entries>
 			</ul>
 			<input
 				name='newNookId'

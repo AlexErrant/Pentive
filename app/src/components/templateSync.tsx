@@ -21,24 +21,24 @@ import { type SyncState, uploadTemplates } from '../domain/sync'
 import { type Template } from 'shared/domain/template'
 import { type RemoteTemplateId, type NookId } from 'shared/brand'
 import { type Standard, type Cloze, type ChildTemplate } from 'shared/schema'
-import { objEntries } from 'shared/utility'
+import { Entries } from '@solid-primitives/keyed'
 
 const TemplateSync: VoidComponent<{ template: Template }> = (props) => {
 	return (
 		<>
 			<DiffModeToggleGroup />
 			<ul>
-				<For each={objEntries(props.template.remotes)}>
-					{([nookId, remoteTemplate]) => (
+				<Entries of={props.template.remotes}>
+					{(nookId, remoteTemplate) => (
 						<li>
 							<h2>/n/{nookId}</h2>
 							<TemplateNookSync
 								template={props.template}
-								remoteTemplate={remoteTemplate}
+								remoteTemplate={remoteTemplate()}
 							/>
 						</li>
 					)}
-				</For>
+				</Entries>
 			</ul>
 		</>
 	)

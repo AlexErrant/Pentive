@@ -1,4 +1,4 @@
-import { For, createSignal, type VoidComponent, Show } from 'solid-js'
+import { createSignal, type VoidComponent, Show } from 'solid-js'
 import { FieldEditor } from './fieldEditor'
 import { type SetStoreFunction } from 'solid-js/store'
 import { db } from '../db'
@@ -10,6 +10,7 @@ import { C, tx } from '../topLevelAwait'
 import { toNoteCards, type NoteCardView } from '../uiLogic/cards'
 import { type MediaId } from 'shared/brand'
 import { objEntries } from 'shared/utility'
+import { Entries } from '@solid-primitives/keyed'
 
 export const FieldsEditor: VoidComponent<{
 	readonly noteCard: NoteCardView
@@ -19,15 +20,16 @@ export const FieldsEditor: VoidComponent<{
 }> = (props) => {
 	return (
 		<>
-			<For each={objEntries(props.noteCard.note.fieldValues)}>
-				{(fv) => (
+			<Entries of={props.noteCard.note.fieldValues}>
+				{(field, value) => (
 					<FieldValue
 						css={props.noteCard.template.css}
 						setNoteCard={props.setNoteCard}
-						fieldValue={fv}
+						field={field}
+						value={value()}
 					/>
 				)}
-			</For>
+			</Entries>
 			<div>
 				<button
 					class='text-white bg-green-600 rounded p-2 px-4 font-bold hover:bg-green-700'
@@ -90,7 +92,8 @@ async function mutate(img: HTMLImageElement) {
 }
 
 const FieldValue: VoidComponent<{
-	fieldValue: readonly [string, string]
+	field: string
+	value: string
 	css: string
 	setNoteCard: SetStoreFunction<{
 		noteCard?: NoteCardView
@@ -112,7 +115,7 @@ const FieldValue: VoidComponent<{
 							class='h-3 w-3'
 							classList={{ '-rotate-90': !isOpen() }}
 						/>
-						{props.fieldValue[0]}
+						{props.field}
 					</div>
 				</ToggleButton.Root>
 				<Show when={isOpen()}>
@@ -131,21 +134,21 @@ const FieldValue: VoidComponent<{
 					when={isDev()}
 					fallback={
 						<FieldEditor
-							field={props.fieldValue[0]}
-							value={props.fieldValue[1]}
+							field={props.field}
+							value={props.value}
 							setNoteCard={props.setNoteCard}
 						/>
 					}
 				>
 					<FieldHtmlEditor
-						value={props.fieldValue[1]}
+						value={props.value}
 						css={props.css}
 						setValue={(v) => {
 							props.setNoteCard(
 								'noteCard',
 								'note',
 								'fieldValues',
-								props.fieldValue[0],
+								props.field,
 								v,
 							)
 						}}

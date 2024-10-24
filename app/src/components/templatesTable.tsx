@@ -1,4 +1,4 @@
-import { type VoidComponent, Show, For } from 'solid-js'
+import { type VoidComponent, Show } from 'solid-js'
 import AgGridSolid, { type AgGridSolidRef } from 'ag-grid-solid'
 import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-alpine.css'
@@ -16,8 +16,8 @@ import { db } from '../db'
 import { Upload } from 'shared-dom/icons'
 import { agGridTheme, useThemeContext } from 'shared-dom/themeSelector'
 import { type TemplateId } from 'shared/brand'
-import { objEntries } from 'shared/utility'
 import { type Template } from 'shared/domain/template'
+import { Entries } from '@solid-primitives/keyed'
 
 LicenseManager.setLicenseKey(import.meta.env.VITE_AG_GRID_LICENSE)
 
@@ -37,12 +37,12 @@ const columnDefs: Array<ColDef<Template>> = [
 		cellRenderer: (props: ICellRendererParams<Template>) => (
 			<Show when={props.data?.remotes}>
 				<ul>
-					<For each={objEntries(props.data!.remotes)}>
-						{([nook, v]) => (
+					<Entries of={props.data!.remotes}>
+						{(nook, v) => (
 							<li class='mr-2 inline'>
 								<span>
 									<Show
-										when={v}
+										when={v()}
 										fallback={
 											<>
 												<Upload class='inline h-[1em]' />
@@ -52,20 +52,21 @@ const columnDefs: Array<ColDef<Template>> = [
 									>
 										<Show
 											when={
-												v!.uploadDate.getTime() <= props.data!.edited.getTime()
+												v()!.uploadDate.getTime() <=
+												props.data!.edited.getTime()
 											}
 										>
 											<Upload class='inline h-[1em]' />
 										</Show>
 										<a
 											class='text-blue-600 underline visited:text-purple-600 hover:text-blue-800'
-											title={`Last uploaded at ${v!.uploadDate.toLocaleString()}`}
+											title={`Last uploaded at ${v()!.uploadDate.toLocaleString()}`}
 											href={
 												import.meta.env.VITE_HUB_ORIGIN +
 												`/n/` +
 												nook +
 												`/template/` +
-												v!.remoteTemplateId
+												v()!.remoteTemplateId
 											}
 										>
 											/n/{nook}
@@ -74,7 +75,7 @@ const columnDefs: Array<ColDef<Template>> = [
 								</span>
 							</li>
 						)}
-					</For>
+					</Entries>
 				</ul>
 			</Show>
 		),

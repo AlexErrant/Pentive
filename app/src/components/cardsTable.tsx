@@ -38,7 +38,8 @@ import { type Sort } from '../sqlite/card'
 import { agGridTheme, useThemeContext } from 'shared-dom/themeSelector'
 import { type CardId } from 'shared/brand'
 import { type NoteCard } from 'shared/domain/card'
-import { throwExp, assertNever, objEntries } from 'shared/utility'
+import { throwExp, assertNever } from 'shared/utility'
+import { Entries } from '@solid-primitives/keyed'
 
 LicenseManager.setLicenseKey(import.meta.env.VITE_AG_GRID_LICENSE)
 
@@ -193,12 +194,12 @@ const columnDefs: Array<ColDef<NoteCard>> = [
 		cellRenderer: (props: ICellRendererParams<NoteCard>) => (
 			<Show when={props.data?.note.remotes}>
 				<ul>
-					<For each={objEntries(props.data!.note.remotes)}>
-						{([nook, v]) => (
+					<Entries of={props.data!.note.remotes}>
+						{(nook, v) => (
 							<li class='mr-2 inline'>
 								<span>
 									<Show
-										when={v}
+										when={v()}
 										fallback={
 											<>
 												<Upload class='inline h-[1em]' />
@@ -208,7 +209,7 @@ const columnDefs: Array<ColDef<NoteCard>> = [
 									>
 										<Show
 											when={
-												v!.uploadDate.getTime() <=
+												v()!.uploadDate.getTime() <=
 												props.data!.note.edited.getTime()
 											}
 										>
@@ -216,13 +217,13 @@ const columnDefs: Array<ColDef<NoteCard>> = [
 										</Show>
 										<a
 											class='text-blue-600 underline visited:text-purple-600 hover:text-blue-800'
-											title={`Last uploaded at ${v!.uploadDate.toLocaleString()}`}
+											title={`Last uploaded at ${v()!.uploadDate.toLocaleString()}`}
 											href={
 												import.meta.env.VITE_HUB_ORIGIN +
 												`/n/` +
 												nook +
 												`/note/` +
-												v!.remoteNoteId
+												v()!.remoteNoteId
 											}
 										>
 											/n/{nook}
@@ -231,7 +232,7 @@ const columnDefs: Array<ColDef<NoteCard>> = [
 								</span>
 							</li>
 						)}
-					</For>
+					</Entries>
 				</ul>
 			</Show>
 		),
