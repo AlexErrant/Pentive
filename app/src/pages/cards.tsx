@@ -74,7 +74,10 @@ export default function Cards(): JSX.Element {
 				() => (
 					<Show when={selected.noteCard != null}>
 						<div class='h-full overflow-auto'>
-							<NoteSync note={selected.noteCard!} />
+							<NoteSync
+								template={selected.noteCard!.template}
+								note={selected.noteCard!.note}
+							/>
 						</div>
 					</Show>
 				),

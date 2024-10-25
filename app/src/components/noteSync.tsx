@@ -9,20 +9,25 @@ import { type RemoteNoteId } from 'shared/brand'
 import { augcClient } from '../trpcClient'
 import DiffHtml from './diffHtml'
 import ResizingIframe from './resizingIframe'
-import { type NoteCardView } from '../uiLogic/cards'
 import { html } from '@codemirror/lang-html'
 import { DiffModeToggleGroup } from './diffModeContext'
 import { objEntries } from 'shared/utility'
 import { Entries } from '@solid-primitives/keyed'
+import { type Template } from 'shared/domain/template'
+import { type Note } from 'shared/domain/note'
 
-const NoteSync: VoidComponent<{ note: NoteCardView }> = (props) => (
+const NoteSync: VoidComponent<{ template: Template; note: Note }> = (props) => (
 	<ul>
-		<Entries of={props.note.note.remotes}>
+		<Entries of={props.note.remotes}>
 			{(nookId, remoteNote) => (
 				<li>
 					<h2>/n/{nookId}</h2>
 					<Show when={remoteNote()} fallback={`Not yet uploaded.`}>
-						<NoteNookSync note={props.note} remoteNote={remoteNote()!} />
+						<NoteNookSync
+							template={props.template}
+							note={props.note}
+							remoteNote={remoteNote()!}
+						/>
 					</Show>
 				</li>
 			)}
@@ -33,7 +38,8 @@ const NoteSync: VoidComponent<{ note: NoteCardView }> = (props) => (
 export default NoteSync
 
 const NoteNookSync: VoidComponent<{
-	note: NoteCardView
+	template: Template
+	note: Note
 	remoteNote: {
 		remoteNoteId: RemoteNoteId
 		uploadDate: Date
@@ -46,7 +52,7 @@ const NoteNookSync: VoidComponent<{
 	const mergedFieldValues = () => {
 		if (remoteNote() == null) return null
 		const m: Record<string, [string | undefined, string | undefined]> = {}
-		for (const [field, value] of objEntries(props.note.note.fieldValues)) {
+		for (const [field, value] of objEntries(props.note.fieldValues)) {
 			m[field] = [value, undefined]
 		}
 		for (const [field, value] of objEntries(remoteNote()!.fieldValues)) {
@@ -67,7 +73,7 @@ const NoteNookSync: VoidComponent<{
 										extensions={[html()]}
 										before={localRemote()[1]!}
 										after={localRemote()[0]!}
-										css={props.note.template.css}
+										css={props.template.css}
 										title={field}
 									/>
 								}
@@ -78,7 +84,7 @@ const NoteNookSync: VoidComponent<{
 										i={{
 											tag: 'raw',
 											html: localRemote()[1]!,
-											css: props.note.template.css,
+											css: props.template.css,
 										}}
 									/>
 								</Match>
@@ -88,7 +94,7 @@ const NoteNookSync: VoidComponent<{
 										i={{
 											tag: 'raw',
 											html: localRemote()[0]!,
-											css: props.note.template.css,
+											css: props.template.css,
 										}}
 									/>
 								</Match>
