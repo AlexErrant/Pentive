@@ -96,11 +96,12 @@ export function templateEntityToDomain(
 }
 
 export function noteEntityToDomain(
-	note: NoteEntity & { templateFields: string },
+	// eslint-disable-next-line @typescript-eslint/naming-convention
+	note: NoteEntity & { template_fields: string },
 	remotes: RemoteNote[],
 ): Note {
 	const noteFVs = parseMap<string, string>(note.fieldValues)
-	const tF = parseTemplateFields(note.templateFields).map((f) => f.name)
+	const tF = parseTemplateFields(note.template_fields).map((f) => f.name)
 	const fieldValues = Object.fromEntries(
 		tF.map((f) => [f, noteFVs.get(f) ?? '']),
 	)

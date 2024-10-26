@@ -485,7 +485,8 @@ async function getCards(
 				edited: entity.note_edited,
 				tags: entity.note_tags,
 				templateId: entity.note_templateId,
-				templateFields: entity.template_fields,
+				// eslint-disable-next-line @typescript-eslint/naming-convention
+				template_fields: entity.template_fields,
 			},
 			forceParse(entity.remoteNote).map((rn) => ({
 				nook: rn.nook,
