@@ -33,6 +33,7 @@ import { type NookId } from 'shared/brand'
 import { type Template } from 'shared/domain/template'
 import { objKeys } from 'shared/utility'
 import { type Note } from 'shared/domain/note'
+import { NoteNookSync } from '../components/noteSync'
 
 LicenseManager.setLicenseKey(import.meta.env.VITE_AG_GRID_LICENSE)
 
@@ -58,34 +59,63 @@ async function uploadNotes(): Promise<void> {
 	}
 }
 
-async function getUploadableTemplates() {
-	const [newTemplates, editedTemplates] = await Promise.all([
-		db.getNewTemplatesToUploadDom(),
-		db.getEditedTemplatesToUploadDom(),
-	])
+async function getUploadables() {
+	const [newTemplates, editedTemplates, newNotes, editedNotes] =
+		await Promise.all([
+			db.getNewTemplatesToUploadDom(),
+			db.getEditedTemplatesToUploadDom(),
+			db.getNewNotesToUploadDom(),
+			db.getEditedNotesToUploadDom(),
+		])
 	const newTemplates2 = newTemplates.flatMap((template) =>
 		objKeys(template.remotes).map(
 			(nook) =>
 				({
 					nook,
-					type: 'new' as Type,
+					type: 'new' as const,
 					template,
 					tag: 'template',
 				}) satisfies Row,
 		),
-	)
+	) as Row[]
 	const editedTemplates2 = editedTemplates.flatMap((template) =>
 		objKeys(template.remotes).map(
 			(nook) =>
 				({
 					nook,
-					type: 'edited' as Type,
+					type: 'edited' as const,
 					template,
 					tag: 'template',
 				}) satisfies Row,
 		),
 	)
+	const newNotes2 = newNotes.flatMap(([template, note]) =>
+		objKeys(note.remotes).map(
+			(nook) =>
+				({
+					nook,
+					type: 'new' as const,
+					note,
+					template,
+					tag: 'note',
+				}) satisfies Row,
+		),
+	)
+	const editedNotes2 = editedNotes.flatMap(([template, note]) =>
+		objKeys(note.remotes).map(
+			(nook) =>
+				({
+					nook,
+					type: 'edited' as const,
+					note,
+					template,
+					tag: 'note',
+				}) satisfies Row,
+		),
+	)
 	newTemplates2.push(...editedTemplates2)
+	newTemplates2.push(...newNotes2)
+	newTemplates2.push(...editedNotes2)
 	return newTemplates2
 }
 
@@ -117,6 +147,19 @@ class CellRenderer implements ICellRendererComp<Row> {
 							template={(params.data as RowTemplate).template}
 							remoteTemplate={remoteTemplate}
 							nook={params.data!.nook}
+						/>
+					)),
+				this.eGui,
+			)
+		} else if (params.data.tag === 'note') {
+			const remoteNote = params.data.note.remotes[params.data.nook]
+			this.dispose = render(
+				() =>
+					runWithOwner(params.context.owner, () => (
+						<NoteNookSync
+							template={(params.data as RowNote).template}
+							note={(params.data as RowNote).note}
+							remoteNote={remoteNote}
 						/>
 					)),
 				this.eGui,
@@ -176,6 +219,7 @@ interface RowTemplate {
 }
 interface RowNote {
 	note: Note
+	template: Template
 	tag: 'note'
 }
 
@@ -194,6 +238,7 @@ function Content(): JSX.Element {
 			columnDefs: [
 				{ field: 'nook', enableRowGroup: true },
 				{ field: 'type', enableRowGroup: true },
+				{ field: 'tag', enableRowGroup: true },
 				{
 					headerName: 'Diff',
 					headerComponent: HeaderRenderer,
@@ -207,7 +252,7 @@ function Content(): JSX.Element {
 			} satisfies Context,
 			autoSizeStrategy: {
 				type: 'fitCellContents',
-				colIds: ['nook', 'type'],
+				colIds: ['nook', 'type', 'tag'],
 			},
 			suppressRowHoverHighlight: true,
 			enableCellTextSelection: true,
@@ -215,11 +260,11 @@ function Content(): JSX.Element {
 		} satisfies GridOptions<Row> as GridOptions<Row>
 		gridApi = createGrid(ref, gridOptions)
 	})
-	const [remoteTemplate] = createResource(getUploadableTemplates)
+	const [uploadables] = createResource(getUploadables)
 	createEffect(() => {
-		const t = remoteTemplate()
-		if (t != null) {
-			gridApi.setGridOption('rowData', t)
+		const u = uploadables()
+		if (u != null) {
+			gridApi.setGridOption('rowData', u)
 		}
 	})
 	const [theme] = useThemeContext()

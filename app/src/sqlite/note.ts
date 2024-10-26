@@ -9,7 +9,9 @@ import {
 import { chunk } from 'lodash-es'
 import { C, ky, tx } from '../topLevelAwait'
 import {
+	getTemplate,
 	noteEntityToDomain,
+	templateSelection,
 	updateLocalMediaIdByRemoteMediaIdAndGetNewDoc,
 } from './util'
 import { saveTags } from './tag'
@@ -230,55 +232,99 @@ JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field
 	},
 	getNewNotesToUpload: async function () {
 		const dp = new DOMParser()
+		const remoteTemplates = await ky
+			.selectFrom('remoteTemplate')
+			.selectAll()
+			.execute()
+		const notesAndStuff = await this.getNewNotesToUploadDom()
+		return notesAndStuff
+			.map(([, note]) => {
+				const remoteIds = objKeys(note.remotes)
+					.map((nook) => {
+						const rt =
+							remoteTemplates.find(
+								(rt) => rt.localId === note.templateId && nook === rt.nook,
+							) ??
+							C.toastImpossible(
+								`No template found for id '${note.templateId}' with nook '${nook}'.`,
+							)
+						return rt.remoteId as RemoteTemplateId | null
+					})
+					.filter(notEmpty)
+				return domainToCreateRemote(note, remoteIds)
+			})
+			.map((n) => withLocalMediaIdByRemoteMediaId(dp, n).note)
+	},
+	getNewNotesToUploadDom: async function () {
 		const remoteNotes = await ky
 			.selectFrom('remoteNote')
 			.selectAll()
 			.where('remoteId', 'is', null)
 			.execute()
 		const localIds = [...new Set(remoteNotes.map((t) => t.localId))]
-		const remoteTemplates = await ky
-			.selectFrom('remoteTemplate')
-			.selectAll()
-			.execute()
-		const notesAndStuff = await ky
+		return await ky
 			.selectFrom('note')
 			.selectAll('note')
 			.innerJoin('template', 'note.templateId', 'template.id')
 			.select('template.fields as templateFields')
+			.select(templateSelection)
 			.where('note.id', 'in', localIds)
 			.execute()
 			.then((n) =>
-				n
-					.map((noteEntity) => {
-						const note = noteEntityToDomain(
-							noteEntity,
-							remoteNotes.filter((rn) => rn.localId === noteEntity.id),
+				n.map((entity) => {
+					const note = noteEntityToDomain(
+						entity,
+						remoteNotes.filter((rn) => rn.localId === entity.id),
+					)
+					if (objKeys(note.remotes).length === 0)
+						C.toastImpossible(
+							'Zero remotes - is something wrong with the SQL query?',
 						)
-						const remotesEntries = objEntries(note.remotes)
-						if (remotesEntries.length === 0)
-							C.toastImpossible(
-								'Zero remotes - is something wrong with the SQL query?',
-							)
-						const remoteIds = remotesEntries
-							.map(([nook]) => {
-								const rt =
-									remoteTemplates.find(
-										(rt) => rt.localId === note.templateId && nook === rt.nook,
-									) ??
-									C.toastImpossible(
-										`No template found for id '${note.templateId}' with nook '${nook}'.`,
-									)
-								return rt.remoteId as RemoteTemplateId | null
-							})
-							.filter(notEmpty)
-						return domainToCreateRemote(note, remoteIds)
-					})
-					.map((n) => withLocalMediaIdByRemoteMediaId(dp, n)),
+					return [getTemplate(entity), note] as const
+				}),
 			)
-		return notesAndStuff.map((n) => n.note)
 	},
 	getEditedNotesToUpload: async function () {
 		const dp = new DOMParser()
+		const remoteTemplates = await ky
+			.selectFrom('remoteTemplate')
+			.selectAll()
+			.execute()
+		const notesAndStuff = await this.getEditedNotesToUploadDom()
+		return notesAndStuff
+			.map(([, note]) => {
+				const remotes = new Map(
+					objEntries(note.remotes).map(([nook, remote]) => {
+						const rt =
+							remoteTemplates.find(
+								(rt) => rt.localId === note.templateId && nook === rt.nook,
+							) ??
+							C.toastImpossible(
+								`No template found for id '${note.templateId}' with nook '${nook}'.`,
+							)
+						return [
+							remote?.remoteNoteId ??
+								C.toastImpossible(
+									`remoteNoteId for ${JSON.stringify({
+										nook,
+										noteId: note.id,
+									})} is null.`,
+								),
+							rt.remoteId ??
+								C.toastImpossible(
+									`remoteId for ${JSON.stringify({
+										nook,
+										noteId: note.id,
+									})} is null.`,
+								),
+						]
+					}),
+				)
+				return domainToEditRemote(note, remotes)
+			})
+			.map((n) => withLocalMediaIdByRemoteMediaId(dp, n).note)
+	},
+	getEditedNotesToUploadDom: async function () {
 		const remoteNotes = await ky
 			.selectFrom('remoteNote')
 			.leftJoin('noteBase', 'remoteNote.localId', 'noteBase.id')
@@ -287,61 +333,27 @@ JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field
 			.whereRef('remoteNote.uploadDate', '<', 'noteBase.edited')
 			.execute()
 		const localIds = [...new Set(remoteNotes.map((t) => t.localId))]
-		const remoteTemplates = await ky
-			.selectFrom('remoteTemplate')
-			.selectAll()
-			.execute()
-		const notesAndStuff = await ky
+		return await ky
 			.selectFrom('note')
 			.selectAll('note')
 			.innerJoin('template', 'note.templateId', 'template.id')
 			.select('template.fields as templateFields')
+			.select(templateSelection)
 			.where('note.id', 'in', localIds)
 			.execute()
 			.then((n) =>
-				n
-					.map((noteEntity) => {
-						const note = noteEntityToDomain(
-							noteEntity,
-							remoteNotes.filter((rn) => rn.localId === noteEntity.id),
+				n.map((entity) => {
+					const note = noteEntityToDomain(
+						entity,
+						remoteNotes.filter((rn) => rn.localId === entity.id),
+					)
+					if (objKeys(note.remotes).length === 0)
+						C.toastImpossible(
+							'Zero remotes - is something wrong with the SQL query?',
 						)
-						const remotesEntries = objEntries(note.remotes)
-						if (remotesEntries.length === 0)
-							C.toastImpossible(
-								'Zero remotes - is something wrong with the SQL query?',
-							)
-						const remotes = new Map(
-							remotesEntries.map(([nook, remote]) => {
-								const rt =
-									remoteTemplates.find(
-										(rt) => rt.localId === note.templateId && nook === rt.nook,
-									) ??
-									C.toastImpossible(
-										`No template found for id '${note.templateId}' with nook '${nook}'.`,
-									)
-								return [
-									remote?.remoteNoteId ??
-										C.toastImpossible(
-											`remoteNoteId for ${JSON.stringify({
-												nook,
-												noteEntityId: noteEntity.id,
-											})} is null.`,
-										),
-									rt.remoteId ??
-										C.toastImpossible(
-											`remoteId for ${JSON.stringify({
-												nook,
-												noteEntityId: noteEntity.id,
-											})} is null.`,
-										),
-								]
-							}),
-						)
-						return domainToEditRemote(note, remotes)
-					})
-					.map((n) => withLocalMediaIdByRemoteMediaId(dp, n)),
+					return [getTemplate(entity), note] as const
+				}),
 			)
-		return notesAndStuff.map((n) => n.note)
 	},
 	getNoteMediaToUpload: async function () {
 		const mediaBinaries = await ky

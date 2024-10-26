@@ -22,7 +22,13 @@ import {
 } from 'kysely'
 import { chunk } from 'lodash-es'
 import { md5 } from '../domain/utility'
-import { noteEntityToDomain, parseTags, templateEntityToDomain } from './util'
+import {
+	forceParse,
+	getTemplate,
+	noteEntityToDomain,
+	parseTags,
+	templateSelection,
+} from './util'
 import { type convert } from 'shared-dom/language/query2sql'
 import { type CardTagRowid, type NoteTagRowid } from './tag'
 import { type CardId, type NoteId } from 'shared/brand'
@@ -458,21 +464,7 @@ async function getCards(
 			'note.tags as note_tags',
 			'note.templateId as note_templateId',
 
-			'template.ankiId as template_ankiId',
-			'template.created as template_created',
-			'template.css as template_css',
-			'template.fields as template_fields',
-			'template.id as template_id',
-			'template.edited as template_edited',
-			'template.name as template_name',
-			'template.templateType as template_templateType',
-
-			jsonArrayFrom(
-				eb
-					.selectFrom('remoteTemplate')
-					.select(['uploadDate', 'nook', 'remoteId'])
-					.whereRef('note.templateId', '=', 'remoteTemplate.localId'),
-			).as('remoteTemplate'),
+			...templateSelection(eb),
 
 			jsonArrayFrom(
 				eb
@@ -502,24 +494,7 @@ async function getCards(
 				uploadDate: rn.uploadDate,
 			})),
 		)
-		const template = templateEntityToDomain(
-			{
-				ankiId: entity.template_ankiId,
-				created: entity.template_created,
-				css: entity.template_css,
-				fields: entity.template_fields,
-				id: entity.template_id,
-				edited: entity.template_edited,
-				name: entity.template_name,
-				templateType: entity.template_templateType,
-			},
-			forceParse(entity.remoteTemplate).map((rt) => ({
-				nook: rt.nook,
-				localId: entity.template_id,
-				remoteId: rt.remoteId,
-				uploadDate: rt.uploadDate,
-			})),
-		)
+		const template = getTemplate(entity)
 		const card = cardBaseToDomain({
 			cardSettingId: entity.card_cardSettingId,
 			created: entity.card_created,
@@ -541,10 +516,6 @@ async function getCards(
 		noteCards,
 		fieldValueHighlight: conversionResult.fieldValueHighlight,
 	}
-}
-
-function forceParse<T>(x: T): T {
-	return JSON.parse(x as string) as T // I don't want to use ParseJSONResultsPlugin because it parses all columns unconditionally. I parse manually instead.
 }
 
 export const cardCollectionMethods = {

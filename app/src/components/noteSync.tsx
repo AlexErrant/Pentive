@@ -22,13 +22,11 @@ const NoteSync: VoidComponent<{ template: Template; note: Note }> = (props) => (
 			{(nookId, remoteNote) => (
 				<li>
 					<h2>/n/{nookId}</h2>
-					<Show when={remoteNote()} fallback={`Not yet uploaded.`}>
-						<NoteNookSync
-							template={props.template}
-							note={props.note}
-							remoteNote={remoteNote()!}
-						/>
-					</Show>
+					<NoteNookSync
+						template={props.template}
+						note={props.note}
+						remoteNote={remoteNote()}
+					/>
 				</li>
 			)}
 		</Entries>
@@ -37,9 +35,31 @@ const NoteSync: VoidComponent<{ template: Template; note: Note }> = (props) => (
 
 export default NoteSync
 
-const NoteNookSync: VoidComponent<{
-	template: Template
+export const NoteNookSync: VoidComponent<{
 	note: Note
+	template: Template
+	remoteNote:
+		| {
+				remoteNoteId: RemoteNoteId
+				uploadDate: Date
+		  }
+		| null
+		| undefined
+}> = (props) => {
+	return (
+		<Show when={props.remoteNote} fallback={`Not yet uploaded.`}>
+			<NoteNookSyncActual
+				note={props.note}
+				template={props.template}
+				remoteNote={props.remoteNote!}
+			/>
+		</Show>
+	)
+}
+
+const NoteNookSyncActual: VoidComponent<{
+	note: Note
+	template: Template
 	remoteNote: {
 		remoteNoteId: RemoteNoteId
 		uploadDate: Date

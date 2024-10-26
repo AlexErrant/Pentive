@@ -5,6 +5,7 @@ import {
 	type RemoteNote,
 	type RemoteTemplate,
 	type Template as TemplateEntity,
+	type DB,
 } from './database'
 import {
 	type MediaId,
@@ -19,6 +20,8 @@ import { type TemplateType } from 'shared/schema'
 import { parseSet, parseMap } from 'shared/utility'
 import { type Note } from 'shared/domain/note'
 import { C } from '../topLevelAwait'
+import { jsonArrayFrom } from 'kysely/helpers/sqlite'
+import { type AliasedRawBuilder, type ExpressionBuilder } from 'kysely'
 
 export function parseTags(rawTags: string) {
 	return parseSet<string>(rawTags)
@@ -140,4 +143,68 @@ export function pluginEntityToDomain(entity: PluginEntity): Plugin {
 			type: 'text/javascript',
 		}),
 	}
+}
+
+// I don't want to use ParseJSONResultsPlugin because it parses all columns unconditionally. I parse manually instead.
+// @ts-expect-error This means that at runtime we get a string, but Typescript thinks it's a T. Fixed by a parse and cast.
+export const forceParse: <T>(text: T) => T = JSON.parse
+
+type RemoteTemplateSubset = Omit<RemoteTemplate, 'localId'>
+
+type RemoteTemplateJsonArray = AliasedRawBuilder<
+	RemoteTemplateSubset[],
+	'remoteTemplate'
+>
+
+export function templateSelection(
+	eb: ExpressionBuilder<DB, 'note' | 'card' | 'template'>,
+) {
+	return [
+		'template.ankiId as template_ankiId',
+		'template.created as template_created',
+		'template.css as template_css',
+		'template.fields as template_fields',
+		'template.id as template_id',
+		'template.edited as template_edited',
+		'template.name as template_name',
+		'template.templateType as template_templateType',
+
+		jsonArrayFrom(
+			eb
+				.selectFrom('remoteTemplate')
+				.select(['uploadDate', 'nook', 'remoteId'])
+				.whereRef('note.templateId', '=', 'remoteTemplate.localId'),
+		).as(
+			'remoteTemplate',
+		) satisfies RemoteTemplateJsonArray as RemoteTemplateJsonArray,
+	] as const
+}
+
+type TemplatePrefix<T> = {
+	[P in keyof T as `template_${string & P}`]: T[P]
+}
+
+export function getTemplate(
+	entity: TemplatePrefix<TemplateEntity> & {
+		remoteTemplate: RemoteTemplateSubset[]
+	},
+) {
+	return templateEntityToDomain(
+		{
+			ankiId: entity.template_ankiId,
+			created: entity.template_created,
+			css: entity.template_css,
+			fields: entity.template_fields,
+			id: entity.template_id,
+			edited: entity.template_edited,
+			name: entity.template_name,
+			templateType: entity.template_templateType,
+		},
+		forceParse(entity.remoteTemplate).map((rt) => ({
+			nook: rt.nook,
+			localId: entity.template_id,
+			remoteId: rt.remoteId,
+			uploadDate: rt.uploadDate,
+		})),
+	)
 }
