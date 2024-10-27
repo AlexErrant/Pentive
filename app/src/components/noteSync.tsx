@@ -15,22 +15,27 @@ import { objEntries } from 'shared/utility'
 import { Entries } from '@solid-primitives/keyed'
 import { type Template } from 'shared/domain/template'
 import { type Note } from 'shared/domain/note'
+import { UploadEntry } from './uploadEntry'
+import { uploadNotes } from '../domain/sync'
 
 const NoteSync: VoidComponent<{ template: Template; note: Note }> = (props) => (
-	<ul>
-		<Entries of={props.note.remotes}>
-			{(nookId, remoteNote) => (
-				<li>
-					<h2>/n/{nookId}</h2>
-					<NoteNookSync
-						template={props.template}
-						note={props.note}
-						remoteNote={remoteNote()}
-					/>
-				</li>
-			)}
-		</Entries>
-	</ul>
+	<>
+		<DiffModeToggleGroup />
+		<ul>
+			<Entries of={props.note.remotes}>
+				{(nookId, remoteNote) => (
+					<li>
+						<h2>/n/{nookId}</h2>
+						<NoteNookSync
+							template={props.template}
+							note={props.note}
+							remoteNote={remoteNote()}
+						/>
+					</li>
+				)}
+			</Entries>
+		</ul>
+	</>
 )
 
 export default NoteSync
@@ -47,13 +52,19 @@ export const NoteNookSync: VoidComponent<{
 		| undefined
 }> = (props) => {
 	return (
-		<Show when={props.remoteNote} fallback={`Not yet uploaded.`}>
+		<UploadEntry
+			remote={props.remoteNote}
+			// eslint-disable-next-line solid/reactivity
+			upload={async () => {
+				await uploadNotes(props.template.id)
+			}}
+		>
 			<NoteNookSyncActual
 				note={props.note}
 				template={props.template}
 				remoteNote={props.remoteNote!}
 			/>
-		</Show>
+		</UploadEntry>
 	)
 }
 
@@ -82,7 +93,6 @@ const NoteNookSyncActual: VoidComponent<{
 	}
 	return (
 		<Show when={remoteNote()}>
-			<DiffModeToggleGroup />
 			<ul>
 				<Entries of={mergedFieldValues()}>
 					{(field, localRemote) => (
