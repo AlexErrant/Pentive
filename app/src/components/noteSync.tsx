@@ -5,7 +5,7 @@ import {
 	Switch,
 	Match,
 } from 'solid-js'
-import { type RemoteNoteId } from 'shared/brand'
+import { type NookId, type RemoteNoteId } from 'shared/brand'
 import { augcClient } from '../trpcClient'
 import DiffHtml from './diffHtml'
 import ResizingIframe from './resizingIframe'
@@ -43,6 +43,7 @@ export default NoteSync
 export const NoteNookSync: VoidComponent<{
 	note: Note
 	template: Template
+	nook?: NookId
 	remoteNote:
 		| {
 				remoteNoteId: RemoteNoteId
@@ -56,7 +57,7 @@ export const NoteNookSync: VoidComponent<{
 			remote={props.remoteNote}
 			// eslint-disable-next-line solid/reactivity
 			upload={async () => {
-				await uploadNotes(props.template.id)
+				await uploadNotes(props.template.id, props.nook)
 			}}
 		>
 			<NoteNookSyncActual

@@ -136,6 +136,7 @@ class CellRenderer implements ICellRendererComp<Row> {
 						<NoteNookSync
 							template={(params.data as RowNote).template}
 							note={(params.data as RowNote).note}
+							nook={params.data!.nook}
 							remoteNote={remoteNote}
 						/>
 					)),

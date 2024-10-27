@@ -230,7 +230,7 @@ JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field
 			),
 		)
 	},
-	getNewNotesToUpload: async function (noteId?: NoteId) {
+	getNewNotesToUpload: async function (noteId?: NoteId, nook?: NookId) {
 		const dp = new DOMParser()
 		const remoteTemplates = await ky
 			.selectFrom('remoteTemplate')
@@ -240,13 +240,15 @@ JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field
 		return notesAndStuff
 			.map(([, note]) => {
 				const remoteIds = objKeys(note.remotes)
-					.map((nook) => {
+					.map((remoteNook) => {
+						if (nook != null && remoteNook !== nook) return null
 						const rt =
 							remoteTemplates.find(
-								(rt) => rt.localId === note.templateId && nook === rt.nook,
+								(rt) =>
+									rt.localId === note.templateId && remoteNook === rt.nook,
 							) ??
 							C.toastImpossible(
-								`No template found for id '${note.templateId}' with nook '${nook}'.`,
+								`No template found for id '${note.templateId}' with nook '${remoteNook}'.`,
 							)
 						return rt.remoteId as RemoteTemplateId | null
 					})
@@ -284,7 +286,7 @@ JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field
 				}),
 			)
 	},
-	getEditedNotesToUpload: async function (noteId?: NoteId) {
+	getEditedNotesToUpload: async function (noteId?: NoteId, nook?: NookId) {
 		const dp = new DOMParser()
 		const remoteTemplates = await ky
 			.selectFrom('remoteTemplate')
@@ -294,31 +296,35 @@ JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field
 		return notesAndStuff
 			.map(([, note]) => {
 				const remotes = new Map(
-					objEntries(note.remotes).map(([nook, remote]) => {
-						const rt =
-							remoteTemplates.find(
-								(rt) => rt.localId === note.templateId && nook === rt.nook,
-							) ??
-							C.toastImpossible(
-								`No template found for id '${note.templateId}' with nook '${nook}'.`,
-							)
-						return [
-							remote?.remoteNoteId ??
+					objEntries(note.remotes)
+						.map(([remoteNook, remote]) => {
+							if (nook != null && remoteNook !== nook) return null
+							const rt =
+								remoteTemplates.find(
+									(rt) =>
+										rt.localId === note.templateId && remoteNook === rt.nook,
+								) ??
 								C.toastImpossible(
-									`remoteNoteId for ${JSON.stringify({
-										nook,
-										noteId: note.id,
-									})} is null.`,
-								),
-							rt.remoteId ??
-								C.toastImpossible(
-									`remoteId for ${JSON.stringify({
-										nook,
-										noteId: note.id,
-									})} is null.`,
-								),
-						]
-					}),
+									`No template found for id '${note.templateId}' with nook '${remoteNook}'.`,
+								)
+							return [
+								remote?.remoteNoteId ??
+									C.toastImpossible(
+										`remoteNoteId for ${JSON.stringify({
+											nook: remoteNook,
+											noteId: note.id,
+										})} is null.`,
+									),
+								rt.remoteId ??
+									C.toastImpossible(
+										`remoteId for ${JSON.stringify({
+											nook: remoteNook,
+											noteId: note.id,
+										})} is null.`,
+									),
+							] as const
+						})
+						.filter(notEmpty),
 				)
 				return domainToEditRemote(note, remotes)
 			})

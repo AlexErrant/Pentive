@@ -72,17 +72,20 @@ export async function uploadTemplates(templateId?: TemplateId, nook?: NookId) {
 
 export type SyncState = 'different' | 'uploaded' | 'uploading' | 'errored'
 
-export async function uploadNotes(noteId?: NoteId): Promise<void> {
+export async function uploadNotes(
+	noteId?: NoteId,
+	nook?: NookId,
+): Promise<void> {
 	const media = await db.getNoteMediaToUpload(noteId)
 	for (const [mediaId, { data, ids }] of media) {
 		await postMedia('note', mediaId, ids, data)
 	}
-	const newNotes = await db.getNewNotesToUpload(noteId)
+	const newNotes = await db.getNewNotesToUpload(noteId, nook)
 	if (newNotes.length > 0) {
 		const remoteIdByLocal = await cwaClient.createNote.mutate(newNotes)
 		await db.updateNoteRemoteIds(remoteIdByLocal)
 	}
-	const editedNotes = await db.getEditedNotesToUpload()
+	const editedNotes = await db.getEditedNotesToUpload(noteId, nook)
 	if (editedNotes.length > 0) {
 		await cwaClient.editNote.mutate(editedNotes)
 		await db.markNoteAsPushed(
