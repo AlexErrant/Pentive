@@ -22,6 +22,7 @@ import { type Template } from 'shared/domain/template'
 import { type RemoteTemplateId, type NookId } from 'shared/brand'
 import { type Standard, type Cloze, type ChildTemplate } from 'shared/schema'
 import { Entries } from '@solid-primitives/keyed'
+import { UploadButton } from './uploadButton'
 
 const TemplateSync: VoidComponent<{ template: Template }> = (props) => {
 	return (
@@ -64,33 +65,14 @@ export const TemplateNookSync: VoidComponent<{
 				<div class='flex justify-end'>Uploaded</div>
 			) : (
 				<div class='flex flex-col gap-2 py-2 leading-normal'>
-					<div class='flex justify-end'>
-						<Switch>
-							<Match when={state() === 'uploading'}>Uploading...</Match>
-							<Match when={state() === 'different' || state() === 'errored'}>
-								<>
-									<Show when={state() === 'errored'}>
-										<span class='pr-2'>Errored, try again?</span>
-									</Show>
-									<button
-										class='border-gray-900 rounded-lg border px-2'
-										onClick={async () => {
-											setState('uploading')
-											try {
-												await uploadTemplates(props.template.id, props.nook)
-											} catch (error) {
-												setState('errored')
-												throw error
-											}
-											setState('uploaded')
-										}}
-									>
-										Upload
-									</button>
-								</>
-							</Match>
-						</Switch>
-					</div>
+					<UploadButton
+						// eslint-disable-next-line solid/reactivity
+						upload={async () => {
+							await uploadTemplates(props.template.id, props.nook)
+						}}
+						state={state}
+						setState={setState}
+					/>
 					<Show
 						when={props.remoteTemplate}
 						fallback={<div>Not yet uploaded.</div>}
