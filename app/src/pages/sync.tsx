@@ -214,9 +214,9 @@ function Content(): JSX.Element {
 	onMount(() => {
 		const gridOptions = {
 			columnDefs: [
-				{ field: 'nook', enableRowGroup: true },
-				{ field: 'type', enableRowGroup: true },
-				{ field: 'tag', enableRowGroup: true },
+				{ field: 'nook', enableRowGroup: true, filter: true },
+				{ field: 'type', enableRowGroup: true, filter: true },
+				{ field: 'tag', enableRowGroup: true, filter: true },
 				{
 					headerName: 'Diff',
 					headerComponent: HeaderRenderer,
