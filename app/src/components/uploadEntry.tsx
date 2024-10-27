@@ -6,9 +6,36 @@ import {
 	type VoidComponent,
 	type Setter,
 	type Accessor,
+	createSignal,
+	type ParentComponent,
 } from 'solid-js'
 
-export const UploadButton: VoidComponent<{
+export const UploadEntry: ParentComponent<{
+	upload: () => Promise<void>
+	remote: Record<string, unknown> | null | undefined
+}> = (props) => {
+	const [state, setState] = createSignal<SyncState>('different')
+	return (
+		<>
+			{state() === 'uploaded' ? (
+				<div class='flex justify-end'>Uploaded</div>
+			) : (
+				<div class='flex flex-col gap-2 py-2 leading-normal'>
+					<UploadButton
+						upload={props.upload}
+						state={state}
+						setState={setState}
+					/>
+					<Show when={props.remote} fallback={<div>Not yet uploaded.</div>}>
+						{props.children}
+					</Show>
+				</div>
+			)}
+		</>
+	)
+}
+
+const UploadButton: VoidComponent<{
 	upload: () => Promise<void>
 	state: Accessor<SyncState>
 	setState: Setter<SyncState>

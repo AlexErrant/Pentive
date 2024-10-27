@@ -5,7 +5,6 @@ import {
 	createResource,
 	Switch,
 	Match,
-	createSignal,
 } from 'solid-js'
 import { diffChars, diffCss, diffJson, diffWords } from 'diff'
 import { augcClient } from '../trpcClient'
@@ -17,12 +16,12 @@ import { html } from '@codemirror/lang-html'
 import { templateLinter } from 'shared-dom/language/templateLinter'
 import { DiffModeToggleGroup } from './diffModeContext'
 import './templateSync.css'
-import { type SyncState, uploadTemplates } from '../domain/sync'
+import { uploadTemplates } from '../domain/sync'
 import { type Template } from 'shared/domain/template'
 import { type RemoteTemplateId, type NookId } from 'shared/brand'
 import { type Standard, type Cloze, type ChildTemplate } from 'shared/schema'
 import { Entries } from '@solid-primitives/keyed'
-import { UploadButton } from './uploadButton'
+import { UploadEntry } from './uploadEntry'
 
 const TemplateSync: VoidComponent<{ template: Template }> = (props) => {
 	return (
@@ -58,33 +57,19 @@ export const TemplateNookSync: VoidComponent<{
 		| undefined
 	nook?: NookId
 }> = (props) => {
-	const [state, setState] = createSignal<SyncState>('different')
 	return (
-		<>
-			{state() === 'uploaded' ? (
-				<div class='flex justify-end'>Uploaded</div>
-			) : (
-				<div class='flex flex-col gap-2 py-2 leading-normal'>
-					<UploadButton
-						// eslint-disable-next-line solid/reactivity
-						upload={async () => {
-							await uploadTemplates(props.template.id, props.nook)
-						}}
-						state={state}
-						setState={setState}
-					/>
-					<Show
-						when={props.remoteTemplate}
-						fallback={<div>Not yet uploaded.</div>}
-					>
-						<TemplateNookSyncActual
-							template={props.template}
-							remoteTemplate={props.remoteTemplate!}
-						/>
-					</Show>
-				</div>
-			)}
-		</>
+		<UploadEntry
+			remote={props.remoteTemplate}
+			// eslint-disable-next-line solid/reactivity
+			upload={async () => {
+				await uploadTemplates(props.template.id, props.nook)
+			}}
+		>
+			<TemplateNookSyncActual
+				template={props.template}
+				remoteTemplate={props.remoteTemplate!}
+			/>
+		</UploadEntry>
 	)
 }
 
