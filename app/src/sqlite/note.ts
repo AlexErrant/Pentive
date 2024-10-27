@@ -230,13 +230,13 @@ JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field
 			),
 		)
 	},
-	getNewNotesToUpload: async function () {
+	getNewNotesToUpload: async function (noteId?: NoteId) {
 		const dp = new DOMParser()
 		const remoteTemplates = await ky
 			.selectFrom('remoteTemplate')
 			.selectAll()
 			.execute()
-		const notesAndStuff = await this.getNewNotesToUploadDom()
+		const notesAndStuff = await this.getNewNotesToUploadDom(noteId)
 		return notesAndStuff
 			.map(([, note]) => {
 				const remoteIds = objKeys(note.remotes)
@@ -255,7 +255,7 @@ JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field
 			})
 			.map((n) => withLocalMediaIdByRemoteMediaId(dp, n).note)
 	},
-	getNewNotesToUploadDom: async function () {
+	getNewNotesToUploadDom: async function (noteId?: NoteId) {
 		const remoteNotes = await ky
 			.selectFrom('remoteNote')
 			.selectAll()
@@ -268,6 +268,7 @@ JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field
 			.innerJoin('template', 'note.templateId', 'template.id')
 			.select(templateSelection)
 			.where('note.id', 'in', localIds)
+			.$if(noteId != null, (db) => db.where('note.id', '=', noteId!))
 			.execute()
 			.then((n) =>
 				n.map((entity) => {
@@ -283,13 +284,13 @@ JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field
 				}),
 			)
 	},
-	getEditedNotesToUpload: async function () {
+	getEditedNotesToUpload: async function (noteId?: NoteId) {
 		const dp = new DOMParser()
 		const remoteTemplates = await ky
 			.selectFrom('remoteTemplate')
 			.selectAll()
 			.execute()
-		const notesAndStuff = await this.getEditedNotesToUploadDom()
+		const notesAndStuff = await this.getEditedNotesToUploadDom(noteId)
 		return notesAndStuff
 			.map(([, note]) => {
 				const remotes = new Map(
@@ -323,7 +324,7 @@ JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field
 			})
 			.map((n) => withLocalMediaIdByRemoteMediaId(dp, n).note)
 	},
-	getEditedNotesToUploadDom: async function () {
+	getEditedNotesToUploadDom: async function (noteId?: NoteId) {
 		const remoteNotes = await ky
 			.selectFrom('remoteNote')
 			.leftJoin('noteBase', 'remoteNote.localId', 'noteBase.id')
@@ -338,6 +339,7 @@ JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field
 			.innerJoin('template', 'note.templateId', 'template.id')
 			.select(templateSelection)
 			.where('note.id', 'in', localIds)
+			.$if(noteId != null, (db) => db.where('note.id', '=', noteId!))
 			.execute()
 			.then((n) =>
 				n.map((entity) => {
@@ -353,7 +355,7 @@ JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field
 				}),
 			)
 	},
-	getNoteMediaToUpload: async function () {
+	getNoteMediaToUpload: async function (noteId?: NoteId) {
 		const mediaBinaries = await ky
 			.selectFrom('remoteMedia')
 			.innerJoin('media', 'remoteMedia.localMediaId', 'media.id')
@@ -372,6 +374,7 @@ JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field
 					eb('media.edited', '>', ref('remoteMedia.uploadDate')),
 				]),
 			)
+			.$if(noteId != null, (db) => db.where('noteBase.id', '=', noteId!))
 			.execute()
 		const media = new Map<
 			MediaId,

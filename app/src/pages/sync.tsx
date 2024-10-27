@@ -11,8 +11,7 @@ import {
 import { render } from 'solid-js/web'
 import { db } from '../db'
 import Peers from './peers'
-import { cwaClient } from '../trpcClient'
-import { C, rd, whoAmI } from '../topLevelAwait'
+import { rd, whoAmI } from '../topLevelAwait'
 import { TemplateNookSync } from '../components/templateSync'
 import { agGridTheme, useThemeContext } from 'shared-dom/themeSelector'
 import {
@@ -28,7 +27,7 @@ import 'ag-grid-community2/styles/ag-grid.css'
 import 'ag-grid-community2/styles/ag-theme-alpine.css'
 import { LicenseManager } from 'ag-grid-enterprise2'
 import { DiffModeToggleGroup } from '../components/diffModeContext'
-import { postMedia, uploadTemplates } from '../domain/sync'
+import { uploadNotes, uploadTemplates } from '../domain/sync'
 import { type NookId } from 'shared/brand'
 import { type Template } from 'shared/domain/template'
 import { objKeys } from 'shared/utility'
@@ -36,28 +35,6 @@ import { type Note } from 'shared/domain/note'
 import { NoteNookSync } from '../components/noteSync'
 
 LicenseManager.setLicenseKey(import.meta.env.VITE_AG_GRID_LICENSE)
-
-async function uploadNotes(): Promise<void> {
-	const newNotes = await db.getNewNotesToUpload()
-	if (newNotes.length > 0) {
-		const remoteIdByLocal = await cwaClient.createNote.mutate(newNotes)
-		await db.updateNoteRemoteIds(remoteIdByLocal)
-	}
-	const editedNotes = await db.getEditedNotesToUpload()
-	if (editedNotes.length > 0) {
-		await cwaClient.editNote.mutate(editedNotes)
-		await db.markNoteAsPushed(
-			editedNotes.flatMap((n) => Array.from(n.remoteIds.keys())),
-		)
-	}
-	const media = await db.getNoteMediaToUpload()
-	for (const [mediaId, { data, ids }] of media) {
-		await postMedia('note', mediaId, ids, data)
-	}
-	if (editedNotes.length === 0 && newNotes.length === 0 && media.size === 0) {
-		C.toastInfo('Nothing to upload!')
-	}
-}
 
 async function getUploadables() {
 	const [newTemplates, editedTemplates, newNotes, editedNotes] =
