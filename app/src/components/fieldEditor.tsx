@@ -1,4 +1,10 @@
-import { onCleanup, onMount, type VoidComponent } from 'solid-js'
+import {
+	createEffect,
+	on,
+	onCleanup,
+	onMount,
+	type VoidComponent,
+} from 'solid-js'
 import { EditorState } from 'prosemirror-state'
 import { EditorView } from 'prosemirror-view'
 import {
@@ -24,7 +30,7 @@ import 'prosemirror-image-plugin/src/styles/common.css'
 import 'prosemirror-image-plugin/src/styles/withResize.css'
 import { type NoteCardView } from '../uiLogic/cards'
 import { toOneLine } from 'shared/htmlToText'
-import { type MediaId } from 'shared/brand'
+import { type NoteId, type MediaId } from 'shared/brand'
 // import "prosemirror-image-plugin/src/styles/sideResize.css"
 
 // cf. https://gitlab.com/emergence-engineering/prosemirror-image-plugin/-/blob/master/src/updateImageNode.ts
@@ -130,6 +136,7 @@ const domParser = new DOMParser()
 const proseMirrorDOMParser = ProseMirrorDOMParser.fromSchema(mySchema)
 
 export const FieldEditor: VoidComponent<{
+	readonly noteId: NoteId
 	readonly field: string
 	readonly value: string
 	readonly setNoteCard: SetStoreFunction<{
@@ -139,16 +146,8 @@ export const FieldEditor: VoidComponent<{
 	let editor: HTMLDivElement
 	let view: EditorView
 	onMount(async () => {
-		const doc = domParser.parseFromString(props.value, 'text/html')
-		await Promise.all(Array.from(doc.images).map(updateImgSrc))
 		view = new EditorView(editor, {
-			state: EditorState.create({
-				doc: proseMirrorDOMParser.parse(doc),
-				plugins: [
-					...exampleSetup({ schema: mySchema }),
-					imagePlugin(imageSettings),
-				],
-			}),
+			state: await createEditorState(props.value),
 			dispatchTransaction(this: EditorView, tr) {
 				this.updateState(this.state.apply(tr))
 				if (tr.docChanged) {
@@ -176,6 +175,15 @@ export const FieldEditor: VoidComponent<{
 			},
 		})
 	})
+	createEffect(
+		on(
+			() => props.noteId,
+			async () => {
+				view.updateState(await createEditorState(props.value))
+			},
+			{ defer: true },
+		),
+	)
 	onCleanup(() => {
 		view?.destroy()
 	})
@@ -210,4 +218,16 @@ async function updateImgSrc(img: HTMLImageElement) {
 		img.setAttribute('src', 'ugm/' + src)
 		img.setAttribute('srcx', src)
 	}
+}
+
+async function createEditorState(value: string) {
+	const doc = domParser.parseFromString(value, 'text/html')
+	await Promise.all(Array.from(doc.images).map(updateImgSrc))
+	return EditorState.create({
+		doc: proseMirrorDOMParser.parse(doc),
+		plugins: [
+			...exampleSetup({ schema: mySchema }),
+			imagePlugin(imageSettings),
+		],
+	})
 }

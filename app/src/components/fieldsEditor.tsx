@@ -8,7 +8,7 @@ import { ToggleButton } from '@kobalte/core'
 import { ChevronDown, Code, Quote } from 'shared-dom/icons'
 import { C, tx } from '../topLevelAwait'
 import { toNoteCards, type NoteCardView } from '../uiLogic/cards'
-import { type MediaId } from 'shared/brand'
+import { type NoteId, type MediaId } from 'shared/brand'
 import { objEntries } from 'shared/utility'
 import { Entries } from '@solid-primitives/keyed'
 
@@ -27,6 +27,7 @@ export const FieldsEditor: VoidComponent<{
 						setNoteCard={props.setNoteCard}
 						field={field}
 						value={value()}
+						noteId={props.noteCard.note.id}
 					/>
 				)}
 			</Entries>
@@ -95,6 +96,7 @@ const FieldValue: VoidComponent<{
 	field: string
 	value: string
 	css: string
+	noteId: NoteId
 	setNoteCard: SetStoreFunction<{
 		noteCard?: NoteCardView
 	}>
@@ -137,12 +139,14 @@ const FieldValue: VoidComponent<{
 							field={props.field}
 							value={props.value}
 							setNoteCard={props.setNoteCard}
+							noteId={props.noteId}
 						/>
 					}
 				>
 					<FieldHtmlEditor
 						value={props.value}
 						css={props.css}
+						noteId={props.noteId}
 						setValue={(v) => {
 							props.setNoteCard(
 								'noteCard',

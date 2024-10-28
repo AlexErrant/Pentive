@@ -16,8 +16,10 @@ import { C } from '../topLevelAwait'
 import { useThemeContext } from 'shared-dom/themeSelector'
 import { basicSetup } from 'shared-dom/codemirror'
 import { disposeObserver } from 'shared-dom/utility'
+import { type NoteId } from 'shared/brand'
 
 const FieldHtmlEditor: VoidComponent<{
+	noteId: NoteId
 	value: string
 	setValue: (value: string) => void
 	css: string
@@ -50,6 +52,15 @@ const FieldHtmlEditor: VoidComponent<{
 		on(theme, (t) => {
 			view.setState(createEditorState(view, props.value, t))
 		}),
+	)
+	createEffect(
+		on(
+			() => props.noteId,
+			() => {
+				view.setState(createEditorState(view, props.value, theme()))
+			},
+			{ defer: true },
+		),
 	)
 	onCleanup(() => {
 		view?.destroy()
