@@ -18,6 +18,8 @@ import {
 	type GetRowIdParams,
 	type GridReadyEvent,
 	type IGetRowsParams,
+	type GridApi,
+	type NavigateToNextCellParams,
 } from 'ag-grid-community'
 import { LicenseManager } from 'ag-grid-enterprise'
 import { db } from '../db'
@@ -361,6 +363,7 @@ const CardsTable: VoidComponent<{
 						setSelectedCount(ncs.length)
 						props.onSelectionChanged(ncs)
 					}}
+					navigateToNextCell={arrowKeyNavigation}
 					onFirstDataRendered={(params) => {
 						params.api.sizeColumnsToFit()
 					}}
@@ -368,6 +371,65 @@ const CardsTable: VoidComponent<{
 			</div>
 		</div>
 	)
+}
+
+// https://github.com/xh/hoist-react/blob/58ca986275cedfd0b6953ac07a58d1ee937137dd/cmp/grid/impl/RowKeyNavSupport.ts
+function arrowKeyNavigation(
+	agParams: NavigateToNextCellParams<unknown, unknown>,
+) {
+	const agApi = agParams.api
+	const { nextCellPosition, previousCellPosition, event, key } = agParams
+	const shiftKey = event?.shiftKey ?? false
+	const nextIndex = nextCellPosition?.rowIndex ?? null
+	const prevIndex = previousCellPosition?.rowIndex ?? null
+	const prevNode =
+		prevIndex != null ? agApi.getDisplayedRowAtIndex(prevIndex) : null
+
+	switch (key) {
+		case 'ArrowDown':
+		case 'ArrowUp':
+			if (nextIndex != null) {
+				const isUp = key === 'ArrowUp'
+
+				// agGrid can weirdly wrap focus when bottom summary present - prevent that
+				if (isUp !== nextIndex < prevIndex) return previousCellPosition
+
+				const nextNode = findNextSelectable(nextIndex, isUp, agApi)
+				if (nextNode == null) return previousCellPosition
+
+				// nextCellPosition.rowIndex = nextNode.rowIndex
+
+				if (!shiftKey || !(prevNode?.isSelected() ?? false)) {
+					// 0) Simple move of selection
+					nextNode.setSelected(true, true)
+				} else {
+					// 1) Extend or shrink multi-selection.
+					if (!(nextNode.isSelected() ?? false)) {
+						nextNode.setSelected(true, false)
+					} else {
+						prevNode?.setSelected(false, false)
+					}
+				}
+			}
+
+			return nextCellPosition
+		default:
+			return null
+	}
+}
+
+function findNextSelectable(
+	index: number,
+	isUp: boolean,
+	agApi: GridApi<unknown>,
+) {
+	const count = agApi.getDisplayedRowCount()
+	while (index >= 0 && index < count) {
+		const node = agApi.getDisplayedRowAtIndex(index)
+		if (node?.selectable ?? false) return node
+		index = index + (isUp ? -1 : 1)
+	}
+	return null
 }
 
 export default CardsTable
