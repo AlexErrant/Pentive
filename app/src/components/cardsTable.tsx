@@ -380,7 +380,6 @@ function arrowKeyNavigation(
 	const agApi = agParams.api
 	const { nextCellPosition, previousCellPosition, event, key } = agParams
 	const shiftKey = event?.shiftKey ?? false
-	const nextIndex = nextCellPosition?.rowIndex ?? null
 	const prevIndex = previousCellPosition?.rowIndex ?? null
 	const prevNode =
 		prevIndex != null ? agApi.getDisplayedRowAtIndex(prevIndex) : null
@@ -388,16 +387,17 @@ function arrowKeyNavigation(
 	switch (key) {
 		case 'ArrowDown':
 		case 'ArrowUp':
-			if (nextIndex != null) {
+			if (nextCellPosition != null) {
+				const nextIndex = nextCellPosition?.rowIndex ?? null
 				const isUp = key === 'ArrowUp'
 
 				// agGrid can weirdly wrap focus when bottom summary present - prevent that
 				if (isUp !== nextIndex < prevIndex) return previousCellPosition
 
 				const nextNode = findNextSelectable(nextIndex, isUp, agApi)
-				if (nextNode == null) return previousCellPosition
+				if (nextNode?.rowIndex == null) return previousCellPosition
 
-				// nextCellPosition.rowIndex = nextNode.rowIndex
+				nextCellPosition.rowIndex = nextNode.rowIndex
 
 				if (!shiftKey || !(prevNode?.isSelected() ?? false)) {
 					// 0) Simple move of selection
