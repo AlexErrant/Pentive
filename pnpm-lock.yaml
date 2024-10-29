@@ -368,6 +368,9 @@ importers:
       '@types/iframe-resizer':
         specifier: ^3.5.10
         version: 3.5.10
+      '@types/json-schema':
+        specifier: ^7.0.15
+        version: 7.0.15
       '@types/lodash-es':
         specifier: ^4.17.12
         version: 4.17.12
