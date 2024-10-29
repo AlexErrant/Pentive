@@ -107,7 +107,13 @@ function createEditorState(
 					run: (x) => {
 						format(x.state.doc.toString(), htmlFormatOpts)
 							.then((v) => {
-								view.setState(createEditorState(view, v, theme))
+								view.dispatch({
+									changes: {
+										from: 0,
+										to: view.state.doc.length,
+										insert: v,
+									},
+								})
 							})
 							.catch((e) => {
 								C.toastError('Error while formatting.', e)
