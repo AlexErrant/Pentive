@@ -361,22 +361,6 @@ const CardsTable: VoidComponent<{
 						setSelectedCount(ncs.length)
 						props.onSelectionChanged(ncs)
 					}}
-					navigateToNextCell={(p) => {
-						if (p.key === 'ArrowUp' || p.key === 'ArrowDown') {
-							const i = p.previousCellPosition.rowIndex
-							const i2 = p.key === 'ArrowUp' ? i - 1 : i + 1
-							const shift = p.event?.shiftKey ?? false
-							const alt = p.event?.altKey ?? false
-							p.api.forEachNode((node) => {
-								if (i2 === node.rowIndex) {
-									node.setSelected(true, !shift && !alt)
-								} else if (!shift && i === node.rowIndex) {
-									node.setSelected(false)
-								}
-							})
-						}
-						return p.nextCellPosition
-					}}
 					onFirstDataRendered={(params) => {
 						params.api.sizeColumnsToFit()
 					}}
