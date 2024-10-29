@@ -1,3 +1,4 @@
+import { type JSONSchema7 } from 'json-schema'
 import { EditorState } from '@codemirror/state'
 import { EditorView, hoverTooltip } from '@codemirror/view'
 import { linter, lintGutter } from '@codemirror/lint'
@@ -96,7 +97,7 @@ const EditCardSetting: VoidComponent<{
 export default EditCardSetting
 
 const schema = {
-	type: 'object' as const,
+	type: 'object',
 	properties: {
 		id: {
 			type: 'string',
@@ -104,9 +105,9 @@ const schema = {
 		name: {
 			type: 'string',
 		},
-	} as const,
+	},
 	required: ['id', 'name'],
-}
+} satisfies JSONSchema7
 
 const validate = new Ajv({ allErrors: true }).compile(schema)
 
