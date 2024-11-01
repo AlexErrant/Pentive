@@ -4,6 +4,7 @@ import {
 } from 'shared-dom/renderContainer'
 import Nav from './components/nav'
 import ExamplePlugin from './components/examplePlugin'
+import { syncGridOptions } from './pages/sync'
 
 export const domContainer = {
 	nav: Nav,
@@ -15,6 +16,7 @@ export const defaultContainer = (args: RenderContainerArgs) => ({
 	...defaultRenderContainer(args),
 	...domContainer,
 	getDate: () => new Date(),
+	syncGridOptions,
 })
 
 export type Container = ReturnType<typeof defaultContainer>

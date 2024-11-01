@@ -11,7 +11,7 @@ import {
 import { render } from 'solid-js/web'
 import { db } from '../db'
 import Peers from './peers'
-import { rd, whoAmI } from '../topLevelAwait'
+import { C, rd, whoAmI } from '../topLevelAwait'
 import { TemplateNookSync } from '../components/templateSync'
 import { agGridTheme, useThemeContext } from 'shared-dom/themeSelector'
 import {
@@ -30,7 +30,7 @@ import { DiffModeToggleGroup } from '../components/diffModeContext'
 import { uploadNotes, uploadTemplates } from '../domain/sync'
 import { type NookId } from 'shared/brand'
 import { type Template } from 'shared/domain/template'
-import { objKeys } from 'shared/utility'
+import { objKeys, type Override } from 'shared/utility'
 import { type Note } from 'shared/domain/note'
 import { NoteNookSync } from '../components/noteSync'
 
@@ -201,42 +201,47 @@ interface RowNote {
 	tag: 'note'
 }
 
-type Row = { nook: NookId; type: Type } & (RowTemplate | RowNote)
+export type Row = { nook: NookId; type: Type } & (RowTemplate | RowNote)
 
 interface Context {
 	owner: Owner
 }
 
+type SyncGridOptions = Override<
+	GridOptions<Row>,
+	{ context: Record<string, unknown> }
+>
+
+export const syncGridOptions = {
+	columnDefs: [
+		{ field: 'nook', enableRowGroup: true, filter: true },
+		{ field: 'type', enableRowGroup: true, filter: true },
+		{ field: 'tag', enableRowGroup: true, filter: true },
+		{
+			headerName: 'Diff',
+			headerComponent: HeaderRenderer,
+			cellRenderer: CellRenderer,
+			autoHeight: true,
+			flex: 1,
+		},
+	],
+	context: {},
+	autoSizeStrategy: {
+		type: 'fitCellContents',
+		colIds: ['nook', 'type', 'tag'],
+	},
+	suppressRowHoverHighlight: true,
+	enableCellTextSelection: true,
+	rowGroupPanelShow: 'onlyWhenGrouping',
+} satisfies SyncGridOptions as SyncGridOptions
+
 function Content(): JSX.Element {
 	let ref: HTMLDivElement
 	let gridApi: GridApi<Row>
-	const owner = getOwner()!
 	onMount(() => {
-		const gridOptions = {
-			columnDefs: [
-				{ field: 'nook', enableRowGroup: true, filter: true },
-				{ field: 'type', enableRowGroup: true, filter: true },
-				{ field: 'tag', enableRowGroup: true, filter: true },
-				{
-					headerName: 'Diff',
-					headerComponent: HeaderRenderer,
-					cellRenderer: CellRenderer,
-					autoHeight: true,
-					flex: 1,
-				},
-			],
-			context: {
-				owner,
-			} satisfies Context,
-			autoSizeStrategy: {
-				type: 'fitCellContents',
-				colIds: ['nook', 'type', 'tag'],
-			},
-			suppressRowHoverHighlight: true,
-			enableCellTextSelection: true,
-			rowGroupPanelShow: 'onlyWhenGrouping',
-		} satisfies GridOptions<Row> as GridOptions<Row>
-		gridApi = createGrid(ref, gridOptions)
+		const owner = getOwner()!
+		C.syncGridOptions.context.owner = owner
+		gridApi = createGrid(ref, C.syncGridOptions.context)
 	})
 	const [uploadables] = createResource(getUploadables)
 	createEffect(() => {
