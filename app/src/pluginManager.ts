@@ -37,6 +37,11 @@ function getC(c: Container, exports: PluginExports): Container {
 
 export async function registerPluginServices(plugins: Plugin[]) {
 	const seed = defaultContainer({ resizingIframe: ResizingIframe })
+	const urlParams = new URLSearchParams(window.location.search)
+	if (urlParams.get('plugins') === 'none') {
+		seed.toastInfo('Loading without plugins.')
+		return seed
+	}
 	return await plugins.reduce(async (prior, plugin) => {
 		return await registerPluginService(await prior, plugin)
 	}, Promise.resolve(seed))
