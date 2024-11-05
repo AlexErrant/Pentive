@@ -19,6 +19,7 @@ async function registerPluginService(
 	// we should consider storing the npmPackage.tgz in sqlite. However, generating npmPackage.tgz for tests (cardHtml.plugin.test.ts)
 	// is *extremely* annoying, because we use DecompressionStream which only works in browsers,
 	// and jsdom doesn't support streams https://github.com/jsdom/jsdom/pull/3200
+	// Cloudflare's Wrangler discusses a similar issue https://developers.cloudflare.com/workers/wrangler/bundling/
 	// grep 2D96EE4E-61BA-4FCA-93C1-863C80E10A93
 	const exports = (await import(/* @vite-ignore */ script)) as {
 		default: PluginExports
