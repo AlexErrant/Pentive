@@ -14,6 +14,13 @@ In the future, Pentive may try to provide better security by wrapping functional
 
 Plugins are NPM packages. Specify the entry point with [main](https://docs.npmjs.com/cli/v9/configuring-npm/package-json#main). Only _single file_ Javascript packages are supported. In other words, the entry point is the _only_ Javascript file - it doesn't import any Javascript from adjacent files. (If you feel like fixing this limitation, first open an issue with your proposed architecture. Grep the codebase for 2D96EE4E-61BA-4FCA-93C1-863C80E10A93.)
 
+## Plugin Security
+
+https://news.ycombinator.com/item?id=20770105
+https://news.ycombinator.com/item?id=40897658
+https://news.ycombinator.com/item?id=40898641
+https://github.com/endojs/endo
+
 # Security
 
 `app.pentive.com` should contain no secrets. Auth will be managed via `HttpOnly` cookies. IndexedDB/SQLite will be hosted on `app.pentive.com` to allow direct plugin access.
