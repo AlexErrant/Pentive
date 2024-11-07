@@ -23,6 +23,7 @@
 		"@typescript-eslint/eslint-plugin": "^6.21.0",
 		"@typescript-eslint/parser": "^6.21.0",
 		"chokidar": "^3.6.0",
+		"config": "workspace:*",
 		"eslint": "^8.57.0",
 		"eslint-config-prettier": "^9.1.0",
 		"eslint-config-standard-with-typescript": "^39.1.1",
@@ -38,7 +39,6 @@
 	},
 	"dependencies": {
 		"@scure/base": "^1.1.1",
-		"config": "workspace:*",
 		"html-to-text": "^9.0.5",
 		"lodash-es": "^4.17.21",
 		"uuid": "^9.0.1",

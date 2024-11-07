@@ -1,14 +1,15 @@
 {
-  "name": "app-playwright",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {},
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "devDependencies": {
-    "@playwright/test": "^1.38.1",
-    "@types/node": "20.14.11"
-  }
+	"name": "app-playwright",
+	"version": "1.0.0",
+	"description": "",
+	"main": "index.js",
+	"scripts": {},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"devDependencies": {
+		"@playwright/test": "^1.38.1",
+		"@types/node": "20.14.11",
+		"config": "workspace:*"
+	}
 }
