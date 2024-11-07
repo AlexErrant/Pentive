@@ -67,11 +67,23 @@ jobs:
       - name: pnpm install
         run: pnpm install
 
+      - name: Install Playwright Browsers
+        working-directory: ./app-playwright
+        run: npx playwright install --with-deps
+
       - name: turbo
         run: pnpm turbo:all --force $FORCE_TURBO_ALL
         env:
           FORCE_TURBO_ALL: ${{ inputs.forceTurboAll || 'false' }}
           NODE_OPTIONS: '--max_old_space_size=8192' # https://github.com/actions/runner-images/issues/70
+
+      - name: Upload App Playwright report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: app-playwright-report
+          path: app-playwright/playwright-report/
+          retention-days: 30
 
       - name: deploy
         run: pnpm run deploy-only --force $FORCE_DEPLOY
