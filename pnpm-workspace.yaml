@@ -1,6 +1,7 @@
 packages:
   - 'app/'
   - 'app-ugc/'
+  - 'app-playwright/'
   - 'config/'
   - 'hub/'
   - 'hub-ugc/'
