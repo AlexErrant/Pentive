@@ -8,7 +8,7 @@ const TODO_ITEMS = [
 	'buy some cheese',
 	'feed the cat',
 	'book a doctors appointment',
-] as const
+] as [string, string, string]
 
 test.describe('New Todo', () => {
 	test('should allow me to add todo items', async ({ page }) => {
@@ -431,7 +431,7 @@ test.describe('Routing', () => {
 			'selected',
 		)
 
-		//create locators for active and completed links
+		// create locators for active and completed links
 		const activeLink = page.getByRole('link', { name: 'Active' })
 		const completedLink = page.getByRole('link', { name: 'Completed' })
 		await activeLink.click()
@@ -455,9 +455,16 @@ async function createDefaultTodos(page: Page) {
 	}
 }
 
+function todos() {
+	return JSON.parse(localStorage['react-todos'] as string) as Array<{
+		title: string
+		completed: boolean
+	}>
+}
+
 async function checkNumberOfTodosInLocalStorage(page: Page, expected: number) {
 	return await page.waitForFunction((e) => {
-		return JSON.parse(localStorage['react-todos']).length === e
+		return todos().length === e
 	}, expected)
 }
 
@@ -466,18 +473,14 @@ async function checkNumberOfCompletedTodosInLocalStorage(
 	expected: number,
 ) {
 	return await page.waitForFunction((e) => {
-		return (
-			JSON.parse(localStorage['react-todos']).filter(
-				(todo: any) => todo.completed,
-			).length === e
-		)
+		return todos().filter((todo) => todo.completed).length === e
 	}, expected)
 }
 
 async function checkTodosInLocalStorage(page: Page, title: string) {
 	return await page.waitForFunction((t) => {
-		return JSON.parse(localStorage['react-todos'])
-			.map((todo: any) => todo.title)
+		return todos()
+			.map((todo) => todo.title)
 			.includes(t)
 	}, title)
 }
