@@ -5,14 +5,17 @@ import checker from 'vite-plugin-checker'
 import fs from 'fs'
 import { VitePWA } from 'vite-plugin-pwa'
 
+const isCI = Boolean(process.env.CI)
+
 export default defineConfig(({ mode }: UserConfig) => {
 	const keyPath = './.cert/key.pem'
 	const certPath = './.cert/cert.pem'
-	let key
-	let cert
-	if (mode === 'development') {
-		key = fs.readFileSync(keyPath)
-		cert = fs.readFileSync(certPath)
+	let https
+	if (mode === 'development' && !isCI) {
+		https = {
+			key: fs.readFileSync(keyPath),
+			cert: fs.readFileSync(certPath),
+		}
 	}
 	// grep 3FBCE1B6-ABA3-4179-80B3-A965F8D087BC
 	// We're using the version number due to https://developer.chrome.com/docs/workbox/service-worker-deployment/#its-all-in-the-timing:~:text=Problems%20arise%20in%20situations%20when%20unversioned%20static%20assets%20are%20cached
@@ -27,10 +30,7 @@ export default defineConfig(({ mode }: UserConfig) => {
 	const serverOptions = {
 		port: 3013,
 		strictPort: true,
-		https: {
-			key,
-			cert,
-		},
+		https,
 		headers: {
 			// eslint-disable-next-line @typescript-eslint/naming-convention
 			'Cross-Origin-Opener-Policy': 'same-origin',

@@ -9,6 +9,9 @@ import { defineConfig, devices } from '@playwright/test'
 // dotenv.config({ path: path.resolve(__dirname, '.env') });
 
 const isCI = Boolean(process.env.CI)
+const baseURL = isCI
+	? 'http://localhost:3023'
+	: 'https://app.pentive.localhost:3023'
 
 /**
  * See https://playwright.dev/docs/test-configuration.
@@ -28,7 +31,7 @@ export default defineConfig({
 	/* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
 	use: {
 		/* Base URL to use in actions like `await page.goto('/')`. */
-		// baseURL: 'http://127.0.0.1:3000',
+		baseURL,
 
 		/* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
 		trace: 'on-first-retry',
@@ -43,7 +46,7 @@ export default defineConfig({
 
 		{
 			name: 'firefox',
-			use: { ...devices['Desktop Firefox'] },
+			use: { ...devices['Desktop Firefox'], ignoreHTTPSErrors: true },
 		},
 
 		{
@@ -73,9 +76,11 @@ export default defineConfig({
 	],
 
 	/* Run your local dev server before starting the tests */
-	// webServer: {
-	//   command: 'npm run start',
-	//   url: 'http://127.0.0.1:3000',
-	//   reuseExistingServer: !process.env.CI,
-	// },
+	webServer: {
+		command: 'pnpm run preview --port 3023',
+		cwd: '../app',
+		url: baseURL,
+		ignoreHTTPSErrors: true,
+		reuseExistingServer: false, // always use a new server because tests require a prod build due to plugins.
+	},
 })

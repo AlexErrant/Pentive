@@ -43,6 +43,11 @@
         "shared-dom#tsc-build"
       ]
     },
+    "app-playwright#test:run": {
+      "dependsOn": [
+        "app#build"
+      ]
+    },
     "deploy": {
       "dependsOn": [
         "build"
