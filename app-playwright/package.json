@@ -11,7 +11,7 @@
 		"test:run": "playwright test"
 	},
 	"devDependencies": {
-		"@playwright/test": "^1.48.2",
+		"@playwright/test": "1.49.0-alpha-2024-11-09",
 		"@types/node": "20.14.11",
 		"config": "workspace:*",
 		"eslint": "^8.57.0",
