@@ -27,7 +27,7 @@
 		"wrangler": "^3.81.0"
 	},
 	"scripts": {
-		"kill": "kill-port 3012 3013 3014 3015 3016 3017 3018 3019 3020",
+		"kill": "kill-port 3011 3012 3013 3014 3015 3016 3017 3018 3019",
 		"//": "ugc and dev are distinct because you may frequently wish to restart `dev`, whereas `ugc` rarely changes",
 		"ugc": "concurrently --kill-others -p \"[{name}]\" -n \"app-ugc,hub-ugc\" -c \"bgBlue.bold,bgMagenta.bold\" \"pnpm --filter app-ugc build --mode development && pnpm --filter app-ugc serve\" \"pnpm --filter hub-ugc build --mode development && pnpm --filter hub-ugc serve\"",
 		"dev": "concurrently --kill-others -p \"[{name}]\" -n \"app,hub,cwa,peer,api-ugc\" -c \"bgBlue.bold,bgMagenta.bold,bgGreen.bold,bgWhiteBright.bold,bgCyan.bold\" \"pnpm --filter app dev\" \"pnpm --filter hub dev\" \"pnpm --filter cwa dev\" \"pnpm --filter peer dev\" \"pnpm --filter api-ugc dev\"",
@@ -35,7 +35,7 @@
 		"build": "turbo build",
 		"deploy": "turbo deploy",
 		"deploy-only": "turbo deploy --only",
-		"turso": "mkdir -p data.sqld && turso dev --port 3020 --db-file ./data.sqld/ivy.sqlite",
+		"turso": "mkdir -p data.sqld && turso dev --port 3011 --db-file ./data.sqld/ivy.sqlite",
 		"format": "pnpm --parallel --no-bail -r format && prettier --ignore-path .gitignore --ignore-path misc.prettierignore --write .",
 		"format:check": "pnpm --parallel --no-bail -r format:check && prettier --ignore-path .gitignore --ignore-path misc.prettierignore --check .",
 		"eslint": "turbo eslint",

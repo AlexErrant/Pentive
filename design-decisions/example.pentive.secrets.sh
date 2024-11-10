@@ -1,7 +1,7 @@
 export developmentAlphaKey=
 export productionAlphaKey=
 export cloudflareAccountId=
-export developmentTursoDbUrl=http://127.0.0.1:3020
+export developmentTursoDbUrl=http://127.0.0.1:3011
 export developmentTursoAuthToken='optional if running locally'
 export productionTursoDbUrl=
 export productionTursoAuthToken=
