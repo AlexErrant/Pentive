@@ -1,7 +1,7 @@
 # Some notes on writing/debugging Service Workers + iframes
 
 - Use Chrome guest mode. It's easier to try everything with a clean state, and incognito mode has limitations.
-- I couldn't figure out how to get [dev mode](https://vite-pwa-org.netlify.app/guide/development.html) working, so use `npm run build-watch` and `npm run serve` in both app and ugc
+- I couldn't figure out how to get [dev mode](https://vite-pwa-org.netlify.app/guide/development.html) working, so use `npm run build-watch` and `npm run preview` in both app and ugc
 - Make sure your hosts file is updated as per [this doc](run-locally.md).
 - Service workers require `https`, so open
   - https://app.pentive.localhost:3013/

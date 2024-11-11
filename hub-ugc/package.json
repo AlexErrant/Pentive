@@ -9,7 +9,7 @@
 		"deploy": "./deploy.sh",
 		"build": "vite build",
 		"build-watch": "vite build --watch",
-		"serve": "vite preview --mode development",
+		"preview": "vite preview --mode development",
 		"tsc-build": "tsc",
 		"eslint": "eslint . --ignore-path .gitignore --max-warnings 0",
 		"eslint:fix": "eslint . --fix --ignore-path .gitignore --max-warnings 0",
