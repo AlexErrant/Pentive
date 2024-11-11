@@ -2,6 +2,7 @@ export developmentAlphaKey=
 export productionAlphaKey=
 export cloudflareAccountId=
 export developmentTursoDbUrl=http://127.0.0.1:3011
+export testTursoDbUrl=http://127.0.0.1:3041
 export developmentTursoAuthToken='optional if running locally'
 export productionTursoDbUrl=
 export productionTursoAuthToken=
@@ -58,6 +59,8 @@ baz
 
 export developmentAppOrigin=https://app.pentive.localhost:3013
 export developmentHubOrigin=https://pentive.localhost:3014
+export testAppOrigin=https://app.pentive.localhost:3043
+export testHubOrigin=https://pentive.localhost:3044
 
 # If you add any `VITE_PRODUCTION_*` or edit the below, also update `cicd.yml`
 export productionAppOrigin=https://app.pentive.com
@@ -67,18 +70,25 @@ export VITE_PRODUCTION_AG_GRID_LICENSE=
 export VITE_DEVELOPMENT_HUB_DOMAIN=pentive.localhost
 export VITE_PRODUCTION_HUB_DOMAIN=hub.yourusernamehere.workers.dev
 export VITE_DEVELOPMENT_HUB_ORIGIN=https://pentive.localhost:3014
+export VITE_TEST_HUB_ORIGIN=https://pentive.localhost:3044
 export VITE_PRODUCTION_HUB_ORIGIN=https://pentive.com
 export VITE_DEVELOPMENT_CWA_URL=https://cwa.pentive.localhost:3017/
+export VITE_TEST_CWA_URL=https://cwa.pentive.localhost:3047/
 export VITE_PRODUCTION_CWA_URL=https://cwa.yourusernamehere.workers.dev/
 export VITE_DEVELOPMENT_AUGC_URL=https://user-generated-content-pentive.localhost:3019/
+export VITE_TEST_AUGC_URL=https://user-generated-content-pentive.localhost:3049/
 export VITE_PRODUCTION_AUGC_URL=https://user-generated-content-pentive.yourusernamehere.workers.dev/
 export VITE_DEVELOPMENT_APP_ORIGIN=https://app.pentive.localhost:3013
+export VITE_TEST_APP_ORIGIN=https://app.pentive.localhost:3043
 export VITE_PRODUCTION_APP_ORIGIN=https://app.yourusernamehere.workers.dev
 export VITE_DEVELOPMENT_HUB_UGC_ORIGIN=https://hub-user-generated-content-pentive.localhost:3016
+export VITE_TEST_HUB_UGC_ORIGIN=https://hub-user-generated-content-pentive.localhost:3046
 export VITE_PRODUCTION_HUB_UGC_ORIGIN=https://hub-user-generated-content.yourusernamehere.workers.dev
 export VITE_DEVELOPMENT_APP_UGC_ORIGIN=https://app-user-generated-content-pentive.localhost:3015
+export VITE_TEST_APP_UGC_ORIGIN=https://app-user-generated-content-pentive.localhost:3045
 export VITE_PRODUCTION_APP_UGC_ORIGIN=https://app-user-generated-content.yourusernamehere.workers.dev
 export VITE_DEVELOPMENT_PEER_HOST=peer.pentive.localhost
 export VITE_DEVELOPMENT_PEER_PORT="3018"
+export VITE_TEST_PEER_PORT="3048"
 export VITE_PRODUCTION_PEER_HOST="0.peerjs.com"
 export VITE_PRODUCTION_PEER_PORT="443"

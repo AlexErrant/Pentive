@@ -10,8 +10,8 @@ import { defineConfig, devices } from '@playwright/test'
 
 const isCI = Boolean(process.env.CI)
 const baseURL = isCI
-	? 'http://localhost:3023'
-	: 'https://app.pentive.localhost:3023'
+	? 'http://localhost:3043'
+	: 'https://app.pentive.localhost:3043'
 
 /**
  * See https://playwright.dev/docs/test-configuration.
@@ -77,7 +77,7 @@ export default defineConfig({
 
 	/* Run your local dev server before starting the tests */
 	webServer: {
-		command: 'pnpm run preview --port 3023',
+		command: 'pnpm previewTest',
 		cwd: '../app',
 		url: baseURL,
 		ignoreHTTPSErrors: true,

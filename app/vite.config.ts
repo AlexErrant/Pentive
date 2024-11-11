@@ -11,7 +11,7 @@ export default defineConfig(({ mode }: UserConfig) => {
 	const keyPath = './.cert/key.pem'
 	const certPath = './.cert/cert.pem'
 	let https
-	if (mode === 'development' && !isCI) {
+	if (mode !== 'production' && !isCI) {
 		https = {
 			key: fs.readFileSync(keyPath),
 			cert: fs.readFileSync(certPath),

@@ -1,76 +1,88 @@
 {
-  "$schema": "https://turbo.build/schema.json",
-  "tasks": {
-    "tsc-build": {
-      "dependsOn": [
-        // Don't use "transit nodes"! https://turbo.build/repo/docs/core-concepts/package-and-task-graph#transit-nodes
-        // tsc-build, build, eslint, and check all require their parents' tsc-build runs to succeed.
-        "^tsc-build"
-      ],
-      "outputs": [
-        "lib/**"
-      ]
-    },
-    "eslint": {
-      "dependsOn": [
-        // "By using typed linting in your config, you incur the performance penalty of asking TypeScript to do a build of your project before ESLint can do its linting" https://typescript-eslint.io/getting-started/typed-linting#how-is-performance
-        "tsc-build"
-      ]
-    },
-    "hub#build": {
-      "dependsOn": [
-        // I don't think hub's eslint and build can run concurrently. Without this we get an error in Github Actions like
-        // Error: ENOENT: no such file or directory, open '/home/runner/work/Pentive/Pentive/hub/app.config.timestamp_1725915755421.js'
-        "hub#eslint"
-      ],
-      "outputs": [
-        "dist/**",
-        ".vinxi/**"
-      ]
-    },
-    "check": {
-      "dependsOn": [
-        "tsc-build"
-      ]
-    },
-    "test": {
-      "cache": false,
-      "persistent": true
-    },
-    "test:run": {},
-    "shared-dom#test:run": { // grep AD3A801F-81D4-4C83-80A3-94ED10F05608
-      "dependsOn": [
-        "shared-dom#tsc-build"
-      ]
-    },
-    "app-playwright#test:run": {
-      "dependsOn": [
-        "app#build"
-      ]
-    },
-    "deploy": {
-      "dependsOn": [
-        "build"
-      ],
-      "env": [
-        "CLOUDFLARE_ACCOUNT_ID",
-        "CLOUDFLARE_API_TOKEN"
-      ]
-    },
-    "build": {
-      "dependsOn": [
-        "tsc-build"
-      ],
-      "outputs": [
-        "dist/**"
-      ],
-      "inputs": [
-        "$TURBO_DEFAULT$",
-        ".env.development",
-        ".env.production",
-        ".env.production.local",
-        ".env"
-      ]
-    }
-  }
+	"$schema": "https://turbo.build/schema.json",
+	"tasks": {
+		"tsc-build": {
+			"dependsOn": [
+				// Don't use "transit nodes"! https://turbo.build/repo/docs/core-concepts/package-and-task-graph#transit-nodes
+				// tsc-build, build, eslint, and check all require their parents' tsc-build runs to succeed.
+				"^tsc-build"
+			],
+			"outputs": [
+				"lib/**"
+			]
+		},
+		"eslint": {
+			"dependsOn": [
+				// "By using typed linting in your config, you incur the performance penalty of asking TypeScript to do a build of your project before ESLint can do its linting" https://typescript-eslint.io/getting-started/typed-linting#how-is-performance
+				"tsc-build"
+			]
+		},
+		"hub#build": {
+			"dependsOn": [
+				// I don't think hub's eslint and build can run concurrently. Without this we get an error in Github Actions like
+				// Error: ENOENT: no such file or directory, open '/home/runner/work/Pentive/Pentive/hub/app.config.timestamp_1725915755421.js'
+				"hub#eslint"
+			],
+			"outputs": [
+				"dist/**",
+				".vinxi/**"
+			]
+		},
+		"check": {
+			"dependsOn": [
+				"tsc-build"
+			]
+		},
+		"test": {
+			"cache": false,
+			"persistent": true
+		},
+		"test:run": {},
+		"shared-dom#test:run": { // grep AD3A801F-81D4-4C83-80A3-94ED10F05608
+			"dependsOn": [
+				"shared-dom#tsc-build"
+			]
+		},
+		"app-playwright#test:run": {
+			"dependsOn": [
+				"app#buildTest"
+			]
+		},
+		"deploy": {
+			"dependsOn": [
+				"build"
+			],
+			"env": [
+				"CLOUDFLARE_ACCOUNT_ID",
+				"CLOUDFLARE_API_TOKEN"
+			]
+		},
+		"build": {
+			"dependsOn": [
+				"tsc-build"
+			],
+			"outputs": [
+				"dist/**"
+			],
+			"inputs": [
+				"$TURBO_DEFAULT$",
+				".env.development",
+				".env.production",
+				".env.production.local",
+				".env"
+			]
+		},
+		"buildTest": {
+			"dependsOn": [
+				"tsc-build"
+			],
+			"outputs": [
+				"distTest/**"
+			],
+			"inputs": [
+				"$TURBO_DEFAULT$",
+				".env.test"
+			]
+		}
+	}
 }

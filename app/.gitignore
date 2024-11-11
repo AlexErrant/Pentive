@@ -1,12 +1,14 @@
 node_modules
 dev-dist
 dist
+distTest
 lib
 /test-results/
 /playwright-report/
 /playwright/.cache/
 .cert
 env.sh
+.env.test
 .env.development
 .env.production
 src/assets/sql-wasm.wasm
