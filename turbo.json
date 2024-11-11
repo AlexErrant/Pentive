@@ -1,5 +1,8 @@
 {
 	"$schema": "https://turbo.build/schema.json",
+	"globalPassThroughEnv": [
+		"PLAYWRIGHT_HTML_OPEN"
+	],
 	"tasks": {
 		"tsc-build": {
 			"dependsOn": [
