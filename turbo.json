@@ -75,6 +75,25 @@
 				".env"
 			]
 		},
+		"buildDev": {
+			"dependsOn": [
+				"tsc-build"
+			],
+			"outputs": [
+				"distDev/**"
+			]
+		},
+		"previewDev": {
+			"dependsOn": [
+				"buildDev"
+			],
+			"persistent": true,
+			"cache": false
+		},
+		"//#turso": {
+			"persistent": true,
+			"cache": false
+		},
 		"buildTest": {
 			"dependsOn": [
 				"tsc-build"

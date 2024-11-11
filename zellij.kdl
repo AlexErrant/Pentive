@@ -24,7 +24,7 @@ layout {
             pane borderless=true {
               name "ugc"
               command "bash"
-              args "-c" "npx concurrently --kill-others -p \"[{name}]\" -n \"app-ugc,hub-ugc,turso\" -c \"bgBlue.bold,bgMagenta.bold,bgGreen.bold\" \"pnpm --filter app-ugc build --mode development && pnpm --filter app-ugc preview\" \"pnpm --filter hub-ugc build --mode development && pnpm --filter hub-ugc preview\" \"pnpm turso\""
+              args "-c" "turbo turso previewDev --filter app-ugc --filter hub-ugc --filter // --output-logs new-only"
             }
             pane {
               name "api-ugc"
