@@ -1,0 +1,17 @@
+127.0.0.1 app.pentive.localhost
+127.0.0.1 app-user-generated-content-pentive.localhost
+127.0.0.1 pentive.localhost
+127.0.0.1 hub-user-generated-content-pentive.localhost
+127.0.0.1 lrpc.pentive.localhost
+127.0.0.1 cwa.pentive.localhost
+127.0.0.1 peer.pentive.localhost
+127.0.0.1 user-generated-content-pentive.localhost
+::1 app.pentive.localhost
+::1 app-user-generated-content.pentive.localhost
+::1 pentive.localhost
+::1 hub-user-generated-content.pentive.localhost
+::1 lrpc.pentive.localhost
+::1 cwa.pentive.localhost
+::1 peer.pentive.localhost
+::1 user-generated-content-pentive.localhost
+

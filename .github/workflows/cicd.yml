@@ -51,6 +51,10 @@ jobs:
           mkcert -install
           echo "NODE_EXTRA_CA_CERTS="$(mkcert -CAROOT)/rootCA.pem"" >> "$GITHUB_ENV"
 
+      - name: Override license server with local server
+        # run: sudo echo "127.0.0.1 license.automatisch.io" | sudo tee -a /etc/hosts
+        run: sudo tee -a /etc/hosts < appendhosts
+
       - name: envsubst
         env:
           cloudflareAccountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
