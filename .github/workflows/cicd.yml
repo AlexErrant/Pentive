@@ -54,7 +54,9 @@ jobs:
       - name: Override license server with local server
         # run: sudo echo "127.0.0.1 license.automatisch.io" | sudo tee -a /etc/hosts
         run: |
-          sudo tee -a /etc/hosts < appendhosts
+          # sudo tee -a /etc/hosts < appendhosts
+          sudo mv appendhosts /etc/hosts
+          echo "+++++++++++++++++++++++++++++++++++++++++++++++++++"
           sudo cat /etc/hosts
 
       - name: envsubst
