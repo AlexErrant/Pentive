@@ -1,9 +1,10 @@
-import { defineConfig, type UserConfig } from 'vite'
+import { defineConfig, type UserConfig, loadEnv } from 'vite'
 import { resolve } from 'path'
 import solidPlugin from 'vite-plugin-solid'
 import checker from 'vite-plugin-checker'
 import fs from 'fs'
 import { VitePWA } from 'vite-plugin-pwa'
+import { throwExp } from 'shared/utility'
 
 const ci = Boolean(process.env.CI)
 
@@ -18,8 +19,10 @@ export default defineConfig(({ mode }: UserConfig) => {
 				`"/assets/${file}"`,
 			]),
 	) as Record<string, string>
+	const env = loadEnv(mode ?? throwExp(), process.cwd()) as ImportMetaEnv
+	const appOrigin = new URL(env.VITE_APP_ORIGIN)
 	const serverOptions = {
-		port: 3013,
+		port: parseInt(appOrigin.port),
 		strictPort: true,
 		https: ci
 			? undefined // running mkcert in CI is just ulgh
