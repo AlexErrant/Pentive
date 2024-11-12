@@ -19,6 +19,12 @@ console.log('base url is ', env.VITE_APP_ORIGIN)
 console.log('base url is ', env.VITE_APP_ORIGIN)
 console.log('base url is ', env.VITE_APP_ORIGIN)
 console.log('base url is ', env.VITE_APP_ORIGIN)
+console.log('debug is', env.DEBUG)
+console.log('debug is', env.DEBUG)
+console.log('debug is', env.DEBUG)
+console.log('certs are', env.NODE_EXTRA_CA_CERTS)
+console.log('certs are', env.NODE_EXTRA_CA_CERTS)
+console.log('certs are', env.NODE_EXTRA_CA_CERTS)
 
 /**
  * See https://playwright.dev/docs/test-configuration.
