@@ -7,6 +7,7 @@ import { defineConfig, devices } from '@playwright/test'
 import dotenv from 'dotenv'
 import path from 'path'
 import { fileURLToPath } from 'url'
+import fs from 'fs'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -25,6 +26,9 @@ console.log('debug is', env.DEBUG)
 console.log('certs are', env.NODE_EXTRA_CA_CERTS)
 console.log('certs are', env.NODE_EXTRA_CA_CERTS)
 console.log('certs are', env.NODE_EXTRA_CA_CERTS)
+console.log('+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++')
+console.log('certs are', fs.readFileSync(env.NODE_EXTRA_CA_CERTS))
+console.log('+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++')
 
 /**
  * See https://playwright.dev/docs/test-configuration.
