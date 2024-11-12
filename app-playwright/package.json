@@ -8,7 +8,7 @@
 		"eslint:fix": "eslint . --fix --ignore-path .gitignore --max-warnings 0",
 		"format:check": "prettier --ignore-path .gitignore --check .",
 		"format": "prettier --ignore-path .gitignore --write .",
-		"test:run": "playwright test"
+		"test:run": "DEBUG=pw:webserver playwright test"
 	},
 	"devDependencies": {
 		"@playwright/test": "1.49.0-alpha-2024-11-09",
