@@ -73,6 +73,7 @@ jobs:
           VITE_PRODUCTION_PEER_HOST: 0.peerjs.com
           VITE_PRODUCTION_PEER_PORT: 443
         run: |
+          pwd
           ./mkcert.sh
           envsubst <       ./cwa/example.wrangler.toml >     ./cwa/wrangler.toml
           envsubst <   ./api-ugc/example.wrangler.toml > ./api-ugc/wrangler.toml
