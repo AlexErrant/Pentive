@@ -70,6 +70,7 @@ jobs:
           envsubst <       ./hub/example.wrangler.toml >     ./hub/wrangler.toml
           envsubst <     ./hub/.example.env.production >     ./hub/.env.production
           envsubst <     ./app/.example.env.production >     ./app/.env.production
+          envsubst <     ./app-playwright/.example.env >     ./app-playwright/.env
 
       - name: pnpm install
         run: pnpm install
