@@ -15,6 +15,11 @@ const env = process.env as unknown as ExtendedProcessEnv
 
 const isCI = Boolean(process.env.CI)
 
+console.log('base url is ', env.VITE_APP_ORIGIN)
+console.log('base url is ', env.VITE_APP_ORIGIN)
+console.log('base url is ', env.VITE_APP_ORIGIN)
+console.log('base url is ', env.VITE_APP_ORIGIN)
+
 /**
  * See https://playwright.dev/docs/test-configuration.
  */
