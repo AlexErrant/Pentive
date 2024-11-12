@@ -1,3 +1,3 @@
 import ugcViteConfig from 'shared/ugcViteConfig'
 
-export default ugcViteConfig(3015)
+export default ugcViteConfig({ devPort: 3015, testPort: 3045 })

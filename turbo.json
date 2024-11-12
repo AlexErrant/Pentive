@@ -48,7 +48,8 @@
 		},
 		"app-playwright#test:run": {
 			"dependsOn": [
-				"app#buildTest"
+				"app#buildTest",
+				"app-ugc#buildTest"
 			]
 		},
 		"deploy": {
@@ -86,6 +87,13 @@
 		"previewDev": {
 			"dependsOn": [
 				"buildDev"
+			],
+			"persistent": true,
+			"cache": false
+		},
+		"previewTest": {
+			"dependsOn": [
+				"buildTest"
 			],
 			"persistent": true,
 			"cache": false

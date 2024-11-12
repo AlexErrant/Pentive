@@ -2,6 +2,7 @@ node_modules
 dev-dist
 dist
 distDev
+distTest
 lib
 .cert
 env.sh

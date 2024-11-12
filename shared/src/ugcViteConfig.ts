@@ -21,7 +21,15 @@ const betterServiceWorkerDevExperience: BuildOptions = {
 	},
 }
 
-const configBuilder = (port: number) =>
+const ci = Boolean(process.env.CI)
+
+const configBuilder = ({
+	devPort,
+	testPort,
+}: {
+	devPort: number
+	testPort: number
+}) =>
 	defineConfig(({ mode }) => {
 		const baseBuild: BuildOptions = {
 			target: 'ES2022',
@@ -34,14 +42,6 @@ const configBuilder = (port: number) =>
 						...betterServiceWorkerDevExperience,
 						...baseBuild,
 					}
-		const keyPath = './.cert/key.pem'
-		const certPath = './.cert/cert.pem'
-		let key
-		let cert
-		if (mode === 'development') {
-			key = fs.readFileSync(keyPath)
-			cert = fs.readFileSync(certPath)
-		}
 		const serverOptions = {
 			headers: {
 				// eslint-disable-next-line @typescript-eslint/naming-convention
@@ -51,12 +51,14 @@ const configBuilder = (port: number) =>
 				// eslint-disable-next-line @typescript-eslint/naming-convention
 				'Cross-Origin-Resource-Policy': 'cross-origin',
 			},
-			port,
+			port: mode === 'development' ? devPort : testPort,
 			strictPort: true,
-			https: {
-				key,
-				cert,
-			},
+			https: ci
+				? undefined // running mkcert in CI is just ulgh
+				: {
+						key: fs.readFileSync('./.cert/key.pem'),
+						cert: fs.readFileSync('./.cert/cert.pem'),
+					},
 		}
 		return {
 			esbuild: {

@@ -76,11 +76,22 @@ export default defineConfig({
 	],
 
 	/* Run your local dev server before starting the tests */
-	webServer: {
-		command: 'pnpm previewTest',
-		cwd: '../app',
-		url: baseURL,
-		ignoreHTTPSErrors: true,
-		reuseExistingServer: false, // always use a new server because tests require a prod build due to plugins.
-	},
+	webServer: [
+		{
+			command: 'pnpm previewTest',
+			cwd: '../app',
+			url: baseURL,
+			ignoreHTTPSErrors: true,
+			reuseExistingServer: !isCI,
+		},
+		{
+			command: 'pnpm previewTest',
+			cwd: '../app-ugc',
+			url: isCI
+				? 'http://localhost:3045'
+				: 'https://app-user-generated-content-pentive.localhost:3045',
+			ignoreHTTPSErrors: true,
+			reuseExistingServer: !isCI,
+		},
+	],
 })
