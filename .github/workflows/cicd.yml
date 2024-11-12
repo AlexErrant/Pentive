@@ -46,7 +46,8 @@ jobs:
         run: |
           curl -L -o mkcert "https://github.com/FiloSottile/mkcert/releases/download/v1.4.4/mkcert-v1.4.4-linux-amd64"
           chmod +x mkcert
-          ./mkcert -install
+          sudo mv mkcert /usr/local/bin/mkcert
+          mkcert -install
           echo "NODE_EXTRA_CA_CERTS="$(mkcert -CAROOT)/rootCA.pem"" >> "$GITHUB_ENV"
 
       - name: envsubst
@@ -73,7 +74,6 @@ jobs:
           VITE_PRODUCTION_PEER_HOST: 0.peerjs.com
           VITE_PRODUCTION_PEER_PORT: 443
         run: |
-          pwd
           ./mkcert.sh
           envsubst <       ./cwa/example.wrangler.toml >     ./cwa/wrangler.toml
           envsubst <   ./api-ugc/example.wrangler.toml > ./api-ugc/wrangler.toml
