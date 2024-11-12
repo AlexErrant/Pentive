@@ -41,6 +41,14 @@ jobs:
           cache: pnpm
           node-version-file: '.nvmrc'
 
+      - name: Install mkcert
+        shell: bash
+        run: |
+          curl -L -o mkcert "https://github.com/FiloSottile/mkcert/releases/download/v1.4.4/mkcert-v1.4.4-linux-amd64"
+          chmod +x mkcert
+          ./mkcert -install
+          echo "NODE_EXTRA_CA_CERTS="$(mkcert -CAROOT)/rootCA.pem"" >> "$GITHUB_ENV"
+
       - name: envsubst
         env:
           cloudflareAccountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
