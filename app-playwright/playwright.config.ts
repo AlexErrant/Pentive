@@ -4,14 +4,16 @@ import { defineConfig, devices } from '@playwright/test'
  * Read environment variables from file.
  * https://github.com/motdotla/dotenv
  */
-// import dotenv from 'dotenv';
-// import path from 'path';
-// dotenv.config({ path: path.resolve(__dirname, '.env') });
+import dotenv from 'dotenv'
+import path from 'path'
+import { fileURLToPath } from 'url'
+
+const filename = fileURLToPath(import.meta.url)
+const dirname = path.dirname(filename)
+dotenv.config({ path: path.resolve(dirname, '.env') })
+const env = process.env as unknown as ExtendedProcessEnv
 
 const isCI = Boolean(process.env.CI)
-const baseURL = isCI
-	? 'http://localhost:3043'
-	: 'https://app.pentive.localhost:3043'
 
 /**
  * See https://playwright.dev/docs/test-configuration.
@@ -31,7 +33,7 @@ export default defineConfig({
 	/* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
 	use: {
 		/* Base URL to use in actions like `await page.goto('/')`. */
-		baseURL,
+		baseURL: env.VITE_APP_ORIGIN,
 
 		/* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
 		trace: 'on-first-retry',
@@ -80,16 +82,14 @@ export default defineConfig({
 		{
 			command: 'pnpm previewTest',
 			cwd: '../app',
-			url: baseURL,
+			url: env.VITE_APP_ORIGIN,
 			ignoreHTTPSErrors: true,
 			reuseExistingServer: !isCI,
 		},
 		{
 			command: 'pnpm previewTest',
 			cwd: '../app-ugc',
-			url: isCI
-				? 'http://localhost:3045'
-				: 'https://app-user-generated-content-pentive.localhost:3045',
+			url: env.VITE_APP_UGC_ORIGIN,
 			ignoreHTTPSErrors: true,
 			reuseExistingServer: !isCI,
 		},

@@ -47,14 +47,21 @@ jobs:
           productionPeerSyncPublicKey: ${{ secrets.PEER_SYNC_PUBLIC_KEY }}
           VITE_PRODUCTION_AG_GRID_LICENSE: ${{ secrets.AG_GRID_LICENSE }}
           VITE_PRODUCTION_HUB_DOMAIN: pentive.com
+          VITE_TEST_HUB_ORIGIN: https://pentive.localhost:3044
           VITE_PRODUCTION_HUB_ORIGIN: https://pentive.com
           productionHubOrigin: https://pentive.com
+          VITE_TEST_CWA_URL: https://cwa.pentive.localhost:3047/
           VITE_PRODUCTION_CWA_URL: https://cwa.pentive.com/
+          VITE_TEST_AUGC_URL: https://user-generated-content-pentive.localhost:3049/
           VITE_PRODUCTION_AUGC_URL: https://api-ugc-production.alexerrant.workers.dev/
+          VITE_TEST_APP_ORIGIN: https://app.pentive.localhost:3043
           VITE_PRODUCTION_APP_ORIGIN: https://app.pentive.com
           productionAppOrigin: https://app.pentive.com
+          VITE_TEST_HUB_UGC_ORIGIN: https://hub-user-generated-content-pentive.localhost:3046
           VITE_PRODUCTION_HUB_UGC_ORIGIN: https://hub-ugc.pages.dev
+          VITE_TEST_APP_UGC_ORIGIN: https://app-user-generated-content-pentive.localhost:3045
           VITE_PRODUCTION_APP_UGC_ORIGIN: https://app-ugc.pages.dev
+          VITE_TEST_PEER_PORT: 3048
           VITE_PRODUCTION_PEER_HOST: 0.peerjs.com
           VITE_PRODUCTION_PEER_PORT: 443
         run: |
