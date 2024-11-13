@@ -129,7 +129,7 @@ jobs:
       - name: curl1
         if: always()
         run: |
-          npx turbo previewTest
+          npx turbo buildTest
         env:
           NODE_OPTIONS: '--max_old_space_size=8192' # https://github.com/actions/runner-images/issues/70
 
