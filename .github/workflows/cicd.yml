@@ -130,9 +130,13 @@ jobs:
         if: always()
         run: |
           npx turbo previewTest
+        env:
+          NODE_OPTIONS: '--max_old_space_size=8192' # https://github.com/actions/runner-images/issues/70
 
       - name: curl
         if: always()
+        env:
+          NODE_OPTIONS: '--max_old_space_size=8192' # https://github.com/actions/runner-images/issues/70
         run: |
           npx turbo previewTest &
           for i in {1..20}
