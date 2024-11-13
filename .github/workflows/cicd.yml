@@ -130,9 +130,9 @@ jobs:
         if: always()
         run: |
           npx turbo previewTest &
-          for i in {1..10}
+          for i in {1..20}
           do
-            sleep 5
+            sleep 10
             echo $i
             curl https://app-user-generated-content-pentive.localhost:3045/ | wc
             curl https://app.pentive.localhost:3043/ | wc
