@@ -20,6 +20,10 @@ console.log('base url is ', env.VITE_APP_ORIGIN)
 console.log('base url is ', env.VITE_APP_ORIGIN)
 console.log('base url is ', env.VITE_APP_ORIGIN)
 console.log('base url is ', env.VITE_APP_ORIGIN)
+console.log('ugc url is ', env.VITE_APP_UGC_ORIGIN)
+console.log('ugc url is ', env.VITE_APP_UGC_ORIGIN)
+console.log('ugc url is ', env.VITE_APP_UGC_ORIGIN)
+console.log('ugc url is ', env.VITE_APP_UGC_ORIGIN)
 console.log('debug is', env.DEBUG)
 console.log('debug is', env.DEBUG)
 console.log('debug is', env.DEBUG)
@@ -101,12 +105,12 @@ export default defineConfig({
 			ignoreHTTPSErrors: true,
 			reuseExistingServer: !isCI,
 		},
-		{
-			command: 'pnpm previewTest',
-			cwd: '../app-ugc',
-			url: env.VITE_APP_UGC_ORIGIN,
-			ignoreHTTPSErrors: true,
-			reuseExistingServer: !isCI,
-		},
+		// {
+		// 	command: 'pnpm previewTest',
+		// 	cwd: '../app-ugc',
+		// 	url: env.VITE_APP_UGC_ORIGIN,
+		// 	ignoreHTTPSErrors: true,
+		// 	reuseExistingServer: !isCI,
+		// },
 	],
 })
