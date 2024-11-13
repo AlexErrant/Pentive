@@ -120,16 +120,16 @@ jobs:
           envsubst <     ./app/.example.env.production >     ./app/.env.production
           envsubst <     ./app-playwright/.example.env >     ./app-playwright/.env
 
-      - name: turbo
-        run: pnpm turbo:all --force $FORCE_TURBO_ALL
-        env:
-          FORCE_TURBO_ALL: ${{ inputs.forceTurboAll || 'false' }}
-          NODE_OPTIONS: '--max_old_space_size=8192' # https://github.com/actions/runner-images/issues/70
+      # - name: turbo
+      #   run: pnpm turbo:all --force $FORCE_TURBO_ALL
+      #   env:
+      #     FORCE_TURBO_ALL: ${{ inputs.forceTurboAll || 'false' }}
+      #     NODE_OPTIONS: '--max_old_space_size=8192' # https://github.com/actions/runner-images/issues/70
 
       - name: curl
         if: always()
         run: |
-          turbo previewTest &
+          npx turbo previewTest &
           for i in {1..10}
           do
             sleep 5
