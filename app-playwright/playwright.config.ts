@@ -62,7 +62,7 @@ export default defineConfig({
 	projects: [
 		{
 			name: 'chromium',
-			use: { ...devices['Desktop Chrome'], ignoreHTTPSErrors: true },
+			use: { ...devices['Desktop Chrome'] },
 		},
 
 		{
