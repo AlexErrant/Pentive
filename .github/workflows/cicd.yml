@@ -142,7 +142,7 @@ jobs:
           done
 
       - name: turbo
-        run: pnpm turbo:all --force $FORCE_TURBO_ALL
+        run: pnpm turbo:all
         env:
           FORCE_TURBO_ALL: ${{ inputs.forceTurboAll || 'false' }}
           NODE_OPTIONS: '--max_old_space_size=8192' # https://github.com/actions/runner-images/issues/70
