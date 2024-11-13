@@ -97,20 +97,20 @@ export default defineConfig({
 	],
 
 	/* Run your local dev server before starting the tests */
-	webServer: [
-		{
-			command: 'pnpm previewTest',
-			cwd: '../app',
-			url: env.VITE_APP_ORIGIN,
-			ignoreHTTPSErrors: true,
-			reuseExistingServer: true,
-		},
-		// {
-		// 	command: 'pnpm previewTest',
-		// 	cwd: '../app-ugc',
-		// 	url: env.VITE_APP_UGC_ORIGIN,
-		// 	ignoreHTTPSErrors: true,
-		// 	reuseExistingServer: !isCI,
-		// },
-	],
+	// webServer: [
+	// 	{
+	// 		command: 'pnpm previewTest',
+	// 		cwd: '../app',
+	// 		url: env.VITE_APP_ORIGIN,
+	// 		ignoreHTTPSErrors: true,
+	// 		reuseExistingServer: true,
+	// 	},
+	// 	// {
+	// 	// 	command: 'pnpm previewTest',
+	// 	// 	cwd: '../app-ugc',
+	// 	// 	url: env.VITE_APP_UGC_ORIGIN,
+	// 	// 	ignoreHTTPSErrors: true,
+	// 	// 	reuseExistingServer: !isCI,
+	// 	// },
+	// ],
 })
