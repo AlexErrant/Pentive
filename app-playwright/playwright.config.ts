@@ -103,7 +103,7 @@ export default defineConfig({
 			cwd: '../app',
 			url: env.VITE_APP_ORIGIN,
 			ignoreHTTPSErrors: true,
-			reuseExistingServer: !isCI,
+			reuseExistingServer: true,
 		},
 		// {
 		// 	command: 'pnpm previewTest',
