@@ -41,6 +41,35 @@ jobs:
           cache: pnpm
           node-version-file: '.nvmrc'
 
+      - name: pnpm install
+        run: pnpm install
+
+      # https://github.com/microsoft/playwright/issues/7249#issuecomment-1385567519
+      - name: Store Playwright's Version
+        run: |
+          PLAYWRIGHT_VERSION=$(pnpm ls @playwright/test --filter app-playwright --json | jq '.[0].devDependencies["@playwright/test"].version' --raw-output)
+          echo "Playwright's Version: $PLAYWRIGHT_VERSION"
+          echo "PLAYWRIGHT_VERSION=$PLAYWRIGHT_VERSION" >> $GITHUB_ENV
+
+      - name: Cache Playwright Browsers for Playwright's Version
+        id: cache-playwright-browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-browsers-${{ env.PLAYWRIGHT_VERSION }}
+
+      - name: Install Playwright Browsers
+        if: steps.cache-playwright-browsers.outputs.cache-hit != 'true'
+        working-directory: ./app-playwright
+        run: npx playwright install --with-deps
+
+      # https://github.com/microsoft/playwright/issues/30538#issuecomment-2185965508
+      - name: Install system dependencies for WebKit
+        # Some WebKit dependencies seem to lay outside the cache and will need to be installed separately
+        if: ${{ steps.cache-playwright-browsers.outputs.cache-hit == 'true' }}
+        working-directory: ./app-playwright
+        run: npx playwright install-deps webkit
+
       - name: Install mkcert
         shell: bash
         run: |
@@ -90,35 +119,6 @@ jobs:
           envsubst <     ./hub/.example.env.production >     ./hub/.env.production
           envsubst <     ./app/.example.env.production >     ./app/.env.production
           envsubst <     ./app-playwright/.example.env >     ./app-playwright/.env
-
-      - name: pnpm install
-        run: pnpm install
-
-      # https://github.com/microsoft/playwright/issues/7249#issuecomment-1385567519
-      - name: Store Playwright's Version
-        run: |
-          PLAYWRIGHT_VERSION=$(pnpm ls @playwright/test --filter app-playwright --json | jq '.[0].devDependencies["@playwright/test"].version' --raw-output)
-          echo "Playwright's Version: $PLAYWRIGHT_VERSION"
-          echo "PLAYWRIGHT_VERSION=$PLAYWRIGHT_VERSION" >> $GITHUB_ENV
-
-      - name: Cache Playwright Browsers for Playwright's Version
-        id: cache-playwright-browsers
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/ms-playwright
-          key: playwright-browsers-${{ env.PLAYWRIGHT_VERSION }}
-
-      - name: Install Playwright Browsers
-        if: steps.cache-playwright-browsers.outputs.cache-hit != 'true'
-        working-directory: ./app-playwright
-        run: npx playwright install --with-deps
-
-      # https://github.com/microsoft/playwright/issues/30538#issuecomment-2185965508
-      - name: Install system dependencies for WebKit
-        # Some WebKit dependencies seem to lay outside the cache and will need to be installed separately
-        if: ${{ steps.cache-playwright-browsers.outputs.cache-hit == 'true' }}
-        working-directory: ./app-playwright
-        run: npx playwright install-deps webkit
 
       - name: turbo
         run: pnpm turbo:all --force $FORCE_TURBO_ALL
