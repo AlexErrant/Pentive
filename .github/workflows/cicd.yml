@@ -126,6 +126,18 @@ jobs:
           FORCE_TURBO_ALL: ${{ inputs.forceTurboAll || 'false' }}
           NODE_OPTIONS: '--max_old_space_size=8192' # https://github.com/actions/runner-images/issues/70
 
+      - name: curl
+        if: always()
+        run: |
+          turbo previewTest &
+          for i in {1..10}
+          do
+            sleep 5
+            echo $i
+            curl https://app-user-generated-content-pentive.localhost:3045/ | wc
+            curl https://app.pentive.localhost:3043/ | wc
+          done
+
       - name: Upload App Playwright report
         uses: actions/upload-artifact@v4
         if: always()
