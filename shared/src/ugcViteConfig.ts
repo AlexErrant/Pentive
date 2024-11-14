@@ -21,8 +21,6 @@ const betterServiceWorkerDevExperience: BuildOptions = {
 	},
 }
 
-const ci = Boolean(process.env.CI)
-
 const configBuilder = ({
 	devPort,
 	testPort,
@@ -53,12 +51,10 @@ const configBuilder = ({
 			},
 			port: mode === 'development' ? devPort : testPort,
 			strictPort: true,
-			https: ci
-				? undefined // running mkcert in CI is just ulgh
-				: {
-						key: fs.readFileSync('./.cert/key.pem'),
-						cert: fs.readFileSync('./.cert/cert.pem'),
-					},
+			https: {
+				key: fs.readFileSync('./.cert/key.pem'),
+				cert: fs.readFileSync('./.cert/cert.pem'),
+			},
 		}
 		return {
 			esbuild: {

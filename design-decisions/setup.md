@@ -17,7 +17,7 @@ _All commands below should be run from the repo's root directory._
 These steps assume you've installed these or made the requisite accounts. If you deviate, you'll need to find workarounds.
 
 - [Turso CLI](https://github.com/tursodatabase/turso-cli) or [`sqld` for libSQL](https://github.com/tursodatabase/libsql/tree/main/libsql-server)
-  - Required if you want to run `hub` or  `cwa`.
+  - Required if you want to run `hub` or `cwa`.
   - The Turso CLI requires a [Turso account](https://api.turso.tech/auth).
   - This repo's scripts assume you're using the Turso CLI, but you can use `sqld` by making appropriate substitutions.
 - [Cloudflare account](https://dash.cloudflare.com/sign-up)
@@ -35,26 +35,7 @@ pnpm i
 
 ## 3. Update your `hosts` file
 
-Add the following to your [hosts file](https://www.howtogeek.com/howto/27350/beginner-geek-how-to-edit-your-hosts-file/):
-
-```
-127.0.0.1 app.pentive.localhost
-127.0.0.1 app-user-generated-content-pentive.localhost
-127.0.0.1 pentive.localhost
-127.0.0.1 hub-user-generated-content-pentive.localhost
-127.0.0.1 lrpc.pentive.localhost
-127.0.0.1 cwa.pentive.localhost
-127.0.0.1 peer.pentive.localhost
-127.0.0.1 user-generated-content-pentive.localhost
-::1 app.pentive.localhost
-::1 app-user-generated-content.pentive.localhost
-::1 pentive.localhost
-::1 hub-user-generated-content.pentive.localhost
-::1 lrpc.pentive.localhost
-::1 cwa.pentive.localhost
-::1 peer.pentive.localhost
-::1 user-generated-content-pentive.localhost
-```
+Append the contents of `../devhosts` to your [hosts file](https://www.howtogeek.com/howto/27350/beginner-geek-how-to-edit-your-hosts-file/), e.g. `sudo tee -a /etc/hosts < devhosts`.
 
 ## 4. Generate secrets and config
 

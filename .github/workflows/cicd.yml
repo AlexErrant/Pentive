@@ -70,6 +70,21 @@ jobs:
           envsubst <       ./hub/example.wrangler.toml >     ./hub/wrangler.toml
           envsubst <     ./hub/.example.env.production >     ./hub/.env.production
           envsubst <     ./app/.example.env.production >     ./app/.env.production
+          envsubst <     ./app-playwright/.example.env >     ./app-playwright/.env
+          sudo tee -a /etc/hosts < devhosts
+          openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -sha256 -days 3650 -nodes -subj "/C=XX/ST=StateName/L=CityName/O=CompanyName/OU=CompanySectionName/CN=CommonNameOrHostname"
+          rsync -R key.pem  app/.cert/
+          rsync -R cert.pem app/.cert/
+          rsync -R key.pem  app-ugc/.cert/
+          rsync -R cert.pem app-ugc/.cert/
+          rsync -R key.pem  hub/.cert/
+          rsync -R cert.pem hub/.cert/
+          rsync -R key.pem  hub-ugc/.cert/
+          rsync -R cert.pem hub-ugc/.cert/
+          rsync -R key.pem  lrpc/.cert/
+          rsync -R cert.pem lrpc/.cert/
+          rsync -R key.pem  peer/.cert/
+          rsync -R cert.pem peer/.cert/
 
       - name: pnpm install
         run: pnpm install

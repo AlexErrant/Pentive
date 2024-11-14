@@ -50,6 +50,10 @@
 			"dependsOn": [
 				"app#buildTest",
 				"app-ugc#buildTest"
+			],
+			"inputs": [
+				"$TURBO_DEFAULT$",
+				".env"
 			]
 		},
 		"deploy": {
