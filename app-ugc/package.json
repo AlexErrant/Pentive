@@ -9,7 +9,7 @@
 		"build": "vite build",
 		"build-watch": "vite build --watch",
 		"buildDev": "vite build --outDir distDev --mode development",
-		"buildTest": "vite build --outDir distTest",
+		"buildTest": "vite build --outDir distTest --mode test",
 		"previewDev": "vite preview --outDir distDev",
 		"previewTest": "vite preview --outDir distTest",
 		"tsc-build": "tsc",
