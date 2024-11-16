@@ -37,12 +37,13 @@
 <div
   class="border rounded-lg p-1 m-1 border-orange-500"
   style="border-color:orange"
+  data-testid='plugin-count-component'
 >
   <h1>Svelte Plugin</h1>
   <button class="border rounded-lg px-2 mx-2 border-orange-500" on:click={div2}>
     /2
   </button>
-  <output>Count: {count}</output>
+  Count: <output>{count}</output>
   <button
     class="border rounded-lg px-2 mx-2 border-orange-500"
     on:click={times2}

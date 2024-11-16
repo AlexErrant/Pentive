@@ -20,7 +20,7 @@
 		"format": "prettier --ignore-path .gitignore --write .",
 		"stylelint": "stylelint **/*.css",
 		"stylelint:write": "stylelint **/*.css --fix",
-		"prepack": "pnpm build"
+		"pack": "pnpm pack"
 	},
 	"devDependencies": {
 		"@solidjs/router": "^0.14.1",

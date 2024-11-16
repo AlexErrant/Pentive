@@ -49,7 +49,7 @@ export default defineConfig({
 
 		{
 			name: 'firefox',
-			use: { ...devices['Desktop Firefox'], ignoreHTTPSErrors: true },
+			use: { ...devices['Desktop Firefox'] },
 		},
 
 		{

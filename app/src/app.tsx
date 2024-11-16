@@ -20,17 +20,20 @@ export default function App(): JSX.Element {
 		<Router
 			root={(props) => (
 				<>
-					{/* this iframe exists to make ensure app-ugc's service worker is cached, so that app may be taken offline at any time */}
-					<iframe
-						hidden
-						style={{
-							width: '0',
-							height: '0',
-							border: 'none',
-							position: 'absolute',
-						}}
-						src={import.meta.env.VITE_APP_UGC_ORIGIN}
-					/>
+					{/* This iframe exists to make ensure app-ugc's service worker is cached, so that app may be taken offline at any time. */}
+					{/* It is null in `test` mode because Playwright's Firefox can't handle it for some reason. */}
+					{import.meta.env.MODE === 'test' ? null : (
+						<iframe
+							hidden
+							style={{
+								width: '0',
+								height: '0',
+								border: 'none',
+								position: 'absolute',
+							}}
+							src={import.meta.env.VITE_APP_UGC_ORIGIN}
+						/>
+					)}
 					<C.nav navLinks={navLinks} />
 
 					<main class='contents'>{props.children}</main>

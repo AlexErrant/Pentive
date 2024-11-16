@@ -22,7 +22,10 @@ const MyPluginBaby: VoidComponent<{
 	setCount: Setter<number>
 }> = (props) => {
 	return (
-		<div class='border-gray-900 m-1 rounded-lg border p-1'>
+		<div
+			class='border-gray-900 m-1 rounded-lg border p-1'
+			data-testid='child-count-component'
+		>
 			<h1>App's Child Component</h1>
 			<button
 				class='border-gray-900 mx-2 rounded-lg border px-2'
@@ -30,7 +33,7 @@ const MyPluginBaby: VoidComponent<{
 			>
 				-
 			</button>
-			<output>Negative Count: {props.count * -1}</output>
+			Negative Count: <output>{props.count * -1}</output>
 			<button
 				class='border-gray-900 mx-2 rounded-lg border px-2'
 				onClick={() => props.setCount(props.count + 1)}
@@ -49,18 +52,19 @@ export default function Home(): JSX.Element {
 			<h1 class='text-2xl font-bold'>Home</h1>
 			<p class='mt-4'>This is the home page.</p>
 
-			<div class='flex items-center space-x-2'>
+			<div
+				class='flex items-center space-x-2'
+				data-testid='primary-count-component'
+			>
 				<button
-					class='border-gray-900 rounded-lg border px-2'
+					class='border-gray-900 mx-2 rounded-lg border px-2'
 					onClick={() => setCount(count() - 1)}
 				>
 					-
 				</button>
-
-				<output class='p-10px'>Count: {count()}</output>
-
+				Count: <output>{count()}</output>
 				<button
-					class='border-gray-900 rounded-lg border px-2'
+					class='border-gray-900 mx-2 rounded-lg border px-2'
 					onClick={() => setCount(count() + 1)}
 				>
 					+

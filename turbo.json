@@ -49,7 +49,8 @@
 		"app-playwright#test:run": {
 			"dependsOn": [
 				"app#buildTest",
-				"app-ugc#buildTest"
+				"app-ugc#buildTest",
+				"pentive-solid-plugin-example#pack"
 			],
 			"inputs": [
 				"$TURBO_DEFAULT$",
@@ -63,6 +64,14 @@
 			"env": [
 				"CLOUDFLARE_ACCOUNT_ID",
 				"CLOUDFLARE_API_TOKEN"
+			]
+		},
+		"pack": {
+			"dependsOn": [
+				"build"
+			],
+			"outputs": [
+				"pentive-*-plugin-example*.tgz"
 			]
 		},
 		"build": {

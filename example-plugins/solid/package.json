@@ -19,7 +19,7 @@
 		"format": "prettier --ignore-path .gitignore --write .",
 		"stylelint": "stylelint **/*.css",
 		"stylelint:write": "stylelint **/*.css --fix",
-		"prepack": "pnpm build"
+		"pack": "pnpm pack"
 	},
 	"license": "MIT",
 	"devDependencies": {

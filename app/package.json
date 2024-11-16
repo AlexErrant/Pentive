@@ -11,7 +11,7 @@
 		"buildDev": "vite build --outDir distDev --mode development",
 		"buildTest": "vite build --outDir distTest --mode test",
 		"previewDev": "vite preview --outDir distDev",
-		"previewTest": "vite preview --outDir distTest --port 3043",
+		"previewTest": "vite preview --outDir distTest",
 		"postinstall": "./postinstall.sh",
 		"tsc-build": "tsc",
 		"eslint": "eslint . --ignore-path .gitignore --max-warnings 0",
