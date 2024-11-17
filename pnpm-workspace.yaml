@@ -12,5 +12,4 @@ packages:
   - 'cwa/'
   - 'api-ugc/'
   - 'peer/'
-  - 'prosemirror-image-plugin/'
   - 'example-plugins/*'

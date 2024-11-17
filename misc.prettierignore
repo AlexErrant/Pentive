@@ -11,6 +11,5 @@ api-ugc
 peer
 example-plugins/solid
 example-plugins/svelte
-prosemirror-image-plugin
 
 pnpm-lock.yaml

@@ -26,8 +26,8 @@ import {
 	defaultSettings as imageSettings,
 	imagePlugin,
 } from 'prosemirror-image-plugin'
-import 'prosemirror-image-plugin/src/styles/common.css'
-import 'prosemirror-image-plugin/src/styles/withResize.css'
+import 'prosemirror-image-plugin/dist/styles/common.css'
+import 'prosemirror-image-plugin/dist/styles/withResize.css'
 import { type NoteCardView } from '../uiLogic/cards'
 import { toOneLine } from 'shared/htmlToText'
 import { type NoteId, type MediaId } from 'shared/brand'

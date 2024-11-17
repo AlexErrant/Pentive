@@ -48,9 +48,6 @@
 		},
 		{
 			"path": "../example-plugins/svelte"
-		},
-		{
-			"path": "../prosemirror-image-plugin"
 		}
 		// if adding or removing a project, also update the `./eslintrc.cjs`!
 	]

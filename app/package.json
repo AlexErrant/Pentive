@@ -136,7 +136,7 @@
 		"peerjs": "^1.5.1",
 		"prettier": "^3.3.3",
 		"prosemirror-example-setup": "^1.2.2",
-		"prosemirror-image-plugin": "workspace:*",
+		"prosemirror-image-plugin": "^2.10.0",
 		"prosemirror-menu": "^1.2.4",
 		"prosemirror-model": "^1.19.3",
 		"prosemirror-schema-basic": "^1.2.2",
