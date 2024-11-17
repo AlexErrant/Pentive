@@ -2,7 +2,9 @@
 .env.development
 node_modules/
 /lib
+/dist
 /test-results/
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+app-playwright-*.tgz

@@ -522,6 +522,9 @@ importers:
       '@playwright/test':
         specifier: 1.49.0-alpha-2024-11-09
         version: 1.49.0-alpha-2024-11-09
+      '@solidjs/router':
+        specifier: ^0.14.1
+        version: 0.14.1(solid-js@1.8.18)
       '@types/node':
         specifier: 20.14.11
         version: 20.14.11
@@ -537,6 +540,15 @@ importers:
       prettier:
         specifier: ^3.3.3
         version: 3.3.3
+      typescript:
+        specifier: ~5.6.2
+        version: 5.6.2
+      vite:
+        specifier: ^5.4.11
+        version: 5.4.11(@types/node@20.14.11)(sass@1.81.0)(terser@5.36.0)
+      vite-plugin-solid:
+        specifier: ^2.10.2
+        version: 2.10.2(solid-js@1.8.18)(vite@5.4.11(@types/node@20.14.11)(sass@1.81.0)(terser@5.36.0))
 
   app-ugc:
     dependencies:
