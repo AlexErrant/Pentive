@@ -1,4 +1,5 @@
-.env
+.env.test
+.env.development
 node_modules/
 /lib
 /test-results/

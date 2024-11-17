@@ -36,20 +36,21 @@ source ../PentiveSecrets/secrets.sh
 # https://developers.cloudflare.com/workers/wrangler/configuration/#environmental-variables
 # https://developers.cloudflare.com/workers/platform/environment-variables/#adding-secrets-via-wrangler
 
-envsubst < ./cwa/.example.dev.vars            > ./cwa/.dev.vars
-envsubst < ./cwa/example.wrangler.toml        > ./cwa/wrangler.toml
-envsubst < ./api-ugc/.example.dev.vars        > ./api-ugc/.dev.vars
-envsubst < ./api-ugc/example.wrangler.toml    > ./api-ugc/wrangler.toml
-envsubst < ./hub/.example.env                 > ./hub/.env
-envsubst < ./hub/.example.env                 > ./hub/.dev.vars
-envsubst < ./hub/.example.env.development     > ./hub/.env.development
-envsubst < ./hub/.example.env.production      > ./hub/.env.production
-envsubst < ./hub/example.wrangler.toml        > ./hub/wrangler.toml
-envsubst < ./lrpc/.example.env                > ./lrpc/.env
-envsubst < ./app-ugc/example.env.sh           > ./app-ugc/env.sh
-envsubst < ./hub-ugc/example.env.sh           > ./hub-ugc/env.sh
-envsubst < ./app/example.env.sh               > ./app/env.sh
-envsubst < ./app/.example.env.test            > ./app/.env.test
-envsubst < ./app/.example.env.development     > ./app/.env.development
-envsubst < ./app/.example.env.production      > ./app/.env.production
-envsubst < ./app-playwright/.example.env      > ./app-playwright/.env
+envsubst < ./cwa/.example.dev.vars                   > ./cwa/.dev.vars
+envsubst < ./cwa/example.wrangler.toml               > ./cwa/wrangler.toml
+envsubst < ./api-ugc/.example.dev.vars               > ./api-ugc/.dev.vars
+envsubst < ./api-ugc/example.wrangler.toml           > ./api-ugc/wrangler.toml
+envsubst < ./hub/.example.env                        > ./hub/.env
+envsubst < ./hub/.example.env                        > ./hub/.dev.vars
+envsubst < ./hub/.example.env.development            > ./hub/.env.development
+envsubst < ./hub/.example.env.production             > ./hub/.env.production
+envsubst < ./hub/example.wrangler.toml               > ./hub/wrangler.toml
+envsubst < ./lrpc/.example.env                       > ./lrpc/.env
+envsubst < ./app-ugc/example.env.sh                  > ./app-ugc/env.sh
+envsubst < ./hub-ugc/example.env.sh                  > ./hub-ugc/env.sh
+envsubst < ./app/example.env.sh                      > ./app/env.sh
+envsubst < ./app/.example.env.test                   > ./app/.env.test
+envsubst < ./app/.example.env.development            > ./app/.env.development
+envsubst < ./app/.example.env.production             > ./app/.env.production
+envsubst < ./app-playwright/.example.env.test        > ./app-playwright/.env.test
+envsubst < ./app-playwright/.example.env.development > ./app-playwright/.env.development

@@ -8,9 +8,14 @@ import dotenv from 'dotenv'
 import path from 'path'
 import { fileURLToPath } from 'url'
 
+const mode = process.env.MODE
+const isDev = mode === 'development'
+
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
-dotenv.config({ path: path.resolve(dirname, '.env') })
+dotenv.config({
+	path: path.resolve(dirname, `.env.${mode ?? 'test'}`),
+})
 const env = process.env as unknown as ExtendedProcessEnv
 
 const isCI = Boolean(process.env.CI)
@@ -81,14 +86,14 @@ export default defineConfig({
 	/* Run your local dev server before starting the tests */
 	webServer: [
 		{
-			command: 'pnpm previewTest',
+			command: isDev ? 'pnpm dev' : 'pnpm previewTest',
 			cwd: '../app',
 			url: env.VITE_APP_ORIGIN,
 			ignoreHTTPSErrors: true,
 			reuseExistingServer: !isCI,
 		},
 		{
-			command: 'pnpm previewTest',
+			command: isDev ? 'pnpm dev' : 'pnpm previewTest',
 			cwd: '../app-ugc',
 			url: env.VITE_APP_UGC_ORIGIN,
 			ignoreHTTPSErrors: true,
