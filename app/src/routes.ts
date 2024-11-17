@@ -1,9 +1,6 @@
 import { lazy } from 'solid-js'
 import type { RouteDefinition } from '@solidjs/router'
-
-import Home from './pages/home'
 import { type NavLinkData } from './components/contracts'
-import { Upload } from './components/upload'
 
 export const navLinks: NavLinkData[] = [
 	{
@@ -31,7 +28,7 @@ export const navLinks: NavLinkData[] = [
 		href: '/study',
 	},
 	{
-		child: Upload,
+		child: lazy(async () => await import('./components/upload')),
 		href: '/sync',
 	},
 	{
@@ -43,7 +40,7 @@ export const navLinks: NavLinkData[] = [
 export const routes: RouteDefinition[] = [
 	{
 		path: '/',
-		component: Home,
+		component: lazy(async () => await import('./pages/home')),
 	},
 	{
 		path: '/templates',

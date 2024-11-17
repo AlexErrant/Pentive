@@ -1,3 +1,4 @@
+import { routes } from './routes'
 import {
 	type RenderContainerArgs,
 	defaultRenderContainer,
@@ -15,6 +16,7 @@ export const domContainer = {
 export const defaultContainer = (args: RenderContainerArgs) => ({
 	...defaultRenderContainer(args),
 	...domContainer,
+	routes,
 	getDate: () => new Date(),
 	syncGridOptions,
 })

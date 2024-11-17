@@ -14,7 +14,7 @@ async function uploadCount() {
 	)
 }
 
-export function Upload() {
+export default function Upload() {
 	const [count] = createResource(uploadCount, {
 		initialValue: 0,
 	})

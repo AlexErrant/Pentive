@@ -18,6 +18,7 @@ import { agGridTheme, useThemeContext } from 'shared-dom/themeSelector'
 import { type TemplateId } from 'shared/brand'
 import { type Template } from 'shared/domain/template'
 import { Entries } from '@solid-primitives/keyed'
+import './registry'
 
 LicenseManager.setLicenseKey(import.meta.env.VITE_AG_GRID_LICENSE)
 
