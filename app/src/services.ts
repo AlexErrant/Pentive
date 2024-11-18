@@ -6,6 +6,7 @@ import {
 import Nav from './components/nav'
 import ExamplePlugin from './components/examplePlugin'
 import { syncGridOptions } from './pages/sync'
+import { db } from './db'
 
 export const domContainer = {
 	nav: Nav,
@@ -19,6 +20,7 @@ export const defaultContainer = (args: RenderContainerArgs) => ({
 	routes,
 	getDate: () => new Date(),
 	syncGridOptions,
+	db,
 })
 
 export type Container = ReturnType<typeof defaultContainer>

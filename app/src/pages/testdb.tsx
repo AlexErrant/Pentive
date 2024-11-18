@@ -1,17 +1,18 @@
 import { type JSX } from 'solid-js/jsx-runtime'
 import { isEqual } from 'lodash-es'
-import { db } from './../db'
-
 import { createResource, Match, Switch } from 'solid-js'
 import fc from 'fast-check'
 import { template as arbitraryTemplate } from '../../tests/arbitraryTemplate'
 import { card as arbitraryCard } from '../../tests/arbitraryCard'
 import { note as arbitraryNote } from '../../tests/arbitraryNote'
+import { useContainerContext } from '../components/containerContext'
 
 const numRuns = 10 // getting database corruption if we use larger numbers. lowTODO fix by upgrading
 const endOnFailure = true // no shrinking since it makes the db corruption worse
 
-async function testTemplate() {
+type Db = ReturnType<typeof useContainerContext>['db']
+
+async function testTemplate(db: Db) {
 	await fc.assert(
 		fc.asyncProperty(arbitraryTemplate, async (expected) => {
 			await db.upsertTemplate(expected)
@@ -25,7 +26,7 @@ async function testTemplate() {
 	return true
 }
 
-async function testNote() {
+async function testNote(db: Db) {
 	const templates = await db.getTemplates()
 	await fc.assert(
 		fc.asyncProperty(
@@ -43,7 +44,7 @@ async function testNote() {
 	return true
 }
 
-async function testCard() {
+async function testCard(db: Db) {
 	await fc.assert(
 		fc.asyncProperty(arbitraryCard, async (expected) => {
 			await db.upsertCard(expected)
@@ -58,10 +59,11 @@ async function testCard() {
 }
 
 export default function TestDb(): JSX.Element {
+	const db = useContainerContext().db
 	const [testsResult] = createResource(async () => {
-		const template = await testTemplate()
-		const note = await testNote()
-		const card = await testCard()
+		const template = await testTemplate(db)
+		const note = await testNote(db)
+		const card = await testCard(db)
 		const statuses = [template, note, card]
 		if (statuses.some((a) => a === undefined)) {
 			return undefined
