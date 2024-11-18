@@ -4,14 +4,17 @@ import App from './app'
 import { C } from './topLevelAwait'
 import { ThemeProvider } from 'shared-dom/themeSelector'
 import { DiffModeProvider } from './components/diffModeContext'
+import { ContainerProvider } from './components/containerContext'
 
 render(
 	() => (
-		<DiffModeProvider>
-			<ThemeProvider>
-				<App />
-			</ThemeProvider>
-		</DiffModeProvider>
+		<ContainerProvider>
+			<DiffModeProvider>
+				<ThemeProvider>
+					<App />
+				</ThemeProvider>
+			</DiffModeProvider>
+		</ContainerProvider>
 	),
 	document.getElementById('root') as HTMLElement,
 )
