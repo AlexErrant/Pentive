@@ -25,6 +25,7 @@
 	"devDependencies": {
 		"@solidjs/router": "^0.14.1",
 		"@playwright/test": "1.49.0-alpha-2024-11-09",
+		"@types/lodash-es": "^4.17.12",
 		"@types/node": "20.14.11",
 		"config": "workspace:*",
 		"dotenv": "^16.3.1",
