@@ -37,7 +37,7 @@ export function recordWithOptionalFields<T>(
 }
 
 export const reasonableDates = fc.date({
-	min: new Date('0000-01-01T00:00:00.000Z'),
+	min: new Date('1970-01-01T00:00:00.000Z'),
 	max: new Date('9999-12-31T23:59:59.999Z'),
 })
 

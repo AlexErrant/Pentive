@@ -1,4 +1,9 @@
-import { type NoteBase, type DB, type NoteFieldValue } from './database'
+import {
+	type RemoteNote,
+	type NoteBase,
+	type DB,
+	type NoteFieldValue,
+} from './database'
 import {
 	sql,
 	type ExpressionBuilder,
@@ -29,13 +34,12 @@ import { notEmpty, objEntries, objKeys, objValues } from 'shared/utility'
 import initSql from 'shared/sql.json'
 
 function noteToDocType(note: Note) {
-	const now = C.getDate().getTime()
 	return [
 		{
 			id: note.id,
 			templateId: note.templateId,
-			created: now,
-			edited: now,
+			created: note.created.getTime(),
+			edited: note.edited.getTime(),
 			ankiNoteId: note.ankiNoteId,
 		},
 		Array.from(note.tags).map((tag) => ({ tag, noteId: note.id })),
@@ -44,10 +48,17 @@ function noteToDocType(note: Note) {
 			field,
 			value,
 		})),
+		objEntries(note.remotes).map(([nook, remote]) => ({
+			localId: note.id,
+			nook,
+			remoteId: remote?.remoteNoteId,
+			uploadDate: remote?.uploadDate.getTime(),
+		})),
 	] satisfies [
 		InsertObject<DB, 'noteBase'>,
 		Array<InsertObject<DB, 'noteTag'>>,
 		Array<InsertObject<DB, 'noteFieldValue'>>,
+		Array<InsertObject<DB, 'remoteNote'>>,
 	]
 }
 
@@ -99,6 +110,18 @@ type OnConflictUpdateNoteValueSet = {
 	) => unknown
 }
 
+// The point of this type is to cause an error if something is added to RemoteNote
+// If that happens, you probably want to update the `doUpdateSet` call.
+// If not, you an add an exception to the Exclude below.
+type OnConflictUpdateRemoteNoteSet = {
+	[K in keyof RemoteNote as Exclude<K, 'localId' | 'nook'>]: (
+		x: ExpressionBuilder<
+			OnConflictDatabase<DB, 'remoteNote'>,
+			OnConflictTables<'remoteNote'>
+		>,
+	) => unknown
+}
+
 // eslint-disable-next-line @typescript-eslint/consistent-type-definitions -- interface doesn't work with `withTables`
 type NoteFieldValueRowid = {
 	// I'm not adding rowid to the official type definition because it adds noise to Insert/Update/Conflict resolution types
@@ -120,6 +143,7 @@ export const noteCollectionMethods = {
 					const notes = batch.map((ct) => ct[0])
 					const tags = batch.flatMap((ct) => ct[1])
 					const fieldValues = batch.flatMap((ct) => ct[2])
+					const remotes = batch.flatMap((ct) => ct[3])
 					await db
 						.insertInto('noteBase')
 						.values(notes)
@@ -156,29 +180,43 @@ FROM (SELECT noteId, field FROM noteFieldValue where noteId in (${sql.join(
 JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field = x.field)`,
 						)
 						.execute()
-					await db
-						.insertInto('noteFieldValue')
-						.values(fieldValues)
-						.onConflict((x) =>
-							x.doUpdateSet({
-								value: (x) => x.ref('excluded.value'),
-							} satisfies OnConflictUpdateNoteValueSet),
-						)
-						.execute()
-					await db
-						.insertInto('noteValueFts')
-						.columns(['rowid', 'value', 'normalized'])
-						.expression((eb) =>
-							eb
-								.selectFrom('noteFieldValue')
-								.select([
-									'rowid',
-									'value',
-									sql`ftsNormalize(value, 1, 1, 0)`.as('normalized'),
-								])
-								.where('noteId', 'in', noteIds),
-						)
-						.execute()
+					if (fieldValues.length > 0) {
+						await db
+							.insertInto('noteFieldValue')
+							.values(fieldValues)
+							.onConflict((x) =>
+								x.doUpdateSet({
+									value: (x) => x.ref('excluded.value'),
+								} satisfies OnConflictUpdateNoteValueSet),
+							)
+							.execute()
+						await db
+							.insertInto('noteValueFts')
+							.columns(['rowid', 'value', 'normalized'])
+							.expression((eb) =>
+								eb
+									.selectFrom('noteFieldValue')
+									.select([
+										'rowid',
+										'value',
+										sql`ftsNormalize(value, 1, 1, 0)`.as('normalized'),
+									])
+									.where('noteId', 'in', noteIds),
+							)
+							.execute()
+					}
+					if (remotes.length > 0) {
+						await db
+							.insertInto('remoteNote')
+							.values(remotes)
+							.onConflict((x) =>
+								x.doUpdateSet({
+									remoteId: (x) => x.ref('excluded.remoteId'),
+									uploadDate: (x) => x.ref('excluded.uploadDate'),
+								} satisfies OnConflictUpdateRemoteNoteSet),
+							)
+							.execute()
+					}
 				}
 				await sql`INSERT INTO noteFieldFts(noteFieldFts) VALUES('rebuild')`.execute(
 					db,

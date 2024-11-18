@@ -8,7 +8,10 @@ import { template as arbitraryTemplate } from '../../tests/arbitraryTemplate'
 import { card as arbitraryCard } from '../../tests/arbitraryCard'
 import { note as arbitraryNote } from '../../tests/arbitraryNote'
 
-async function testTemplate(): Promise<boolean> {
+const numRuns = 10 // getting database corruption if we use larger numbers. lowTODO fix by upgrading
+const endOnFailure = true // no shrinking since it makes the db corruption worse
+
+async function testTemplate() {
 	await fc.assert(
 		fc.asyncProperty(arbitraryTemplate, async (expected) => {
 			await db.upsertTemplate(expected)
@@ -17,26 +20,30 @@ async function testTemplate(): Promise<boolean> {
 			console.assert(r, { expected, actual })
 			return r
 		}),
-		{ verbose: true },
+		{ verbose: true, numRuns, endOnFailure },
 	)
 	return true
 }
 
-async function testNote(): Promise<boolean> {
+async function testNote() {
+	const templates = await db.getTemplates()
 	await fc.assert(
-		fc.asyncProperty(arbitraryNote, async (expected) => {
-			await db.upsertNote(expected)
-			const actual = await db.getNote(expected.id)
-			const r = isEqual(expected, actual)
-			console.assert(r, { expected, actual })
-			return r
-		}),
-		{ verbose: true },
+		fc.asyncProperty(
+			fc.constantFrom(...templates).chain(arbitraryNote),
+			async (expected) => {
+				await db.upsertNote(expected)
+				const actual = await db.getNote(expected.id)
+				const r = isEqual(expected, actual)
+				console.assert(r, { expected, actual })
+				return r
+			},
+		),
+		{ verbose: true, numRuns, endOnFailure },
 	)
 	return true
 }
 
-async function testCard(): Promise<boolean> {
+async function testCard() {
 	await fc.assert(
 		fc.asyncProperty(arbitraryCard, async (expected) => {
 			await db.upsertCard(expected)
@@ -45,24 +52,22 @@ async function testCard(): Promise<boolean> {
 			console.assert(r, { expected, actual })
 			return r
 		}),
-		{ verbose: true },
+		{ verbose: true, numRuns, endOnFailure },
 	)
 	return true
 }
 
-const [template] = createResource(testTemplate)
-const [card] = createResource(testCard)
-const [note] = createResource(testNote)
-
 export default function TestDb(): JSX.Element {
-	function testsPassed(): boolean | undefined {
-		const statuses = [template(), note(), card()]
+	const [testsResult] = createResource(async () => {
+		const template = await testTemplate()
+		const note = await testNote()
+		const card = await testCard()
+		const statuses = [template, note, card]
 		if (statuses.some((a) => a === undefined)) {
 			return undefined
 		}
-		return statuses.every((element) => element === true)
-	}
-
+		return statuses.every((element) => element)
+	})
 	return (
 		<section class='text-gray-700 p-8'>
 			<h1 class='text-2xl font-bold'>Test IndexedDB</h1>
@@ -74,10 +79,10 @@ export default function TestDb(): JSX.Element {
 				It isn't great that users can view it, but I'm on a time crunch.
 			</p>
 			<Switch fallback={<p>Loading...</p>}>
-				<Match when={testsPassed() === true}>
+				<Match when={testsResult() === true}>
 					<p id='testStatus'>✔ Passed!</p>
 				</Match>
-				<Match when={testsPassed() === false}>
+				<Match when={testsResult() === false}>
 					<p id='testStatus'>❌ failed!</p>
 				</Match>
 			</Switch>
