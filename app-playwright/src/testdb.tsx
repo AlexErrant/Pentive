@@ -2,15 +2,15 @@ import { type JSX } from 'solid-js/jsx-runtime'
 import { isEqual } from 'lodash-es'
 import { createResource, Match, Switch } from 'solid-js'
 import fc from 'fast-check'
-import { template as arbitraryTemplate } from '../../tests/arbitraryTemplate'
-import { card as arbitraryCard } from '../../tests/arbitraryCard'
-import { note as arbitraryNote } from '../../tests/arbitraryNote'
-import { useContainerContext } from '../components/containerContext'
+import { template as arbitraryTemplate } from './arbitraryTemplate'
+import { card as arbitraryCard } from './arbitraryCard'
+import { note as arbitraryNote } from './arbitraryNote'
+import type { Container } from 'app/services'
 
 const numRuns = 10 // getting database corruption if we use larger numbers. lowTODO fix by upgrading
 const endOnFailure = true // no shrinking since it makes the db corruption worse
 
-type Db = ReturnType<typeof useContainerContext>['db']
+type Db = Container['db']
 
 async function testTemplate(db: Db) {
 	await fc.assert(
@@ -58,8 +58,7 @@ async function testCard(db: Db) {
 	return true
 }
 
-export default function TestDb(): JSX.Element {
-	const db = useContainerContext().db
+export default function TestDb(db: Db): JSX.Element {
 	const [testsResult] = createResource(async () => {
 		const template = await testTemplate(db)
 		const note = await testNote(db)

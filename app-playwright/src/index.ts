@@ -1,17 +1,12 @@
 import type { Container, PluginExports } from 'app/services'
-import { Nav } from './nav'
-import ExamplePlugin from './examplePlugin'
+import TestDb from './testdb'
 
 const services = (c: Container): Partial<Container> => {
 	return {
-		transformers: new Map(c.transformers).set(
-			'edit',
-			({ initialValue, isFront, card, note, template }) => {
-				return '[EDITABLE]' + initialValue + '[/EDITABLE]'
-			},
-		),
-		nav: Nav,
-		examplePlugin: ExamplePlugin,
+		routes: c.routes.concat({
+			path: '/testdb',
+			component: () => TestDb(c.db), // lowTODO consider how to make this lazy loaded
+		}),
 	}
 }
 

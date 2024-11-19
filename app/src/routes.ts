@@ -67,10 +67,6 @@ export const routes: RouteDefinition[] = [
 		component: lazy(async () => await import('./pages/sync')),
 	},
 	{
-		path: '/testdb',
-		component: lazy(async () => await import('./pages/testdb')),
-	},
-	{
 		path: '**',
 		component: lazy(async () => await import('./pages/404')),
 	},
