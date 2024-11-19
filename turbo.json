@@ -50,7 +50,8 @@
 			"dependsOn": [
 				"app#buildTest",
 				"app-ugc#buildTest",
-				"pentive-solid-plugin-example#pack"
+				"pentive-solid-plugin-example#pack",
+				"app-playwright#pack"
 			],
 			"inputs": [
 				"$TURBO_DEFAULT$",

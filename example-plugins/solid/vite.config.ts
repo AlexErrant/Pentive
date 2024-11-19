@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite'
 import solidPlugin from 'vite-plugin-solid'
 
+// https://vite.dev/guide/build#library-mode
 export default defineConfig({
 	plugins: [solidPlugin()],
 	server: {
