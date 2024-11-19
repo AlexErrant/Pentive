@@ -20,7 +20,8 @@
 		"test:dev": "MODE=development playwright test --grep-invert @prod",
 		"stylelint": "stylelint **/*.css",
 		"stylelint:write": "stylelint **/*.css --fix",
-		"pack": "pnpm pack"
+		"pack": "pnpm pack",
+		"playwright:init": "playwright install"
 	},
 	"devDependencies": {
 		"@solidjs/router": "^0.14.1",

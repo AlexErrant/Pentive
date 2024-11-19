@@ -24,15 +24,11 @@
 		"test": "vitest",
 		"test:ui": "vitest --ui",
 		"test:run": "vitest run",
-		"playwright": "playwright test",
-		"playwright:debug": "playwright test --debug",
-		"playwright:init": "playwright install",
 		"visualizeBundle": "vite-bundle-visualizer -o visualizeBundle.html"
 	},
 	"devDependencies": {
 		"@babel/core": "^7.23.0",
 		"@cloudflare/workers-types": "^4.20240725.0",
-		"@playwright/test": "^1.48.2",
 		"@tailwindcss/forms": "^0.5.7",
 		"@types/diff": "^5.0.5",
 		"@types/iframe-resizer": "^3.5.10",
