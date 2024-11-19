@@ -71,7 +71,7 @@
 				"build"
 			],
 			"outputs": [
-				"pentive-*-plugin-example*.tgz"
+				"*.tgz"
 			]
 		},
 		"build": {
