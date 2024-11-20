@@ -46,7 +46,7 @@ const templateType = fc.oneof(standardTemplateType, clozeTemplateType)
 
 export const template = recordWithOptionalFields<Template>(
 	{
-		id: fc.uuidV(4).map((x) => x as TemplateId),
+		id: fc.uuid({ version: 4 }).map((x) => x as TemplateId),
 		name: fc.string(),
 		css: fc.string(),
 		fields: fc.array(field),

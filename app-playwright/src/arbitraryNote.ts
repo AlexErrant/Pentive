@@ -11,7 +11,7 @@ import { type Template } from 'shared/domain/template'
 export function note(template: Template) {
 	return recordWithOptionalFields<Note>(
 		{
-			id: fc.uuidV(4).map((x) => x as NoteId),
+			id: fc.uuid({ version: 4 }).map((x) => x as NoteId),
 			templateId: fc.constant(template.id),
 			fieldValues: fc
 				.constant(template)
