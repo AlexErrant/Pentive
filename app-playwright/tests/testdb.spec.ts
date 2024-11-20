@@ -11,9 +11,11 @@ test.beforeEach(({ page }) => {
 		console.log(...args)
 	})
 
-	// page.on('pageerror', (exception) => {
-	// 	throw exception
-	// })
+	// Seems like there's a possible bad seed, but it's not being reported.
+	// Rewrite with check? https://fast-check.dev/docs/core-blocks/runners/#check
+	page.on('pageerror', (exception) => {
+		console.log(exception)
+	})
 })
 
 test(
