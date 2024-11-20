@@ -1,7 +1,6 @@
 import { type IFrameComponent } from 'iframe-resizer'
 import { type MediaId } from 'shared/brand'
 import { type SetStoreFunction, unwrap } from 'solid-js/store'
-import { db } from '../db'
 import { C } from '../topLevelAwait'
 import { type CommonResizingIframe } from 'shared-dom/renderContainer'
 import {
@@ -15,7 +14,7 @@ import {
 export type { RawRenderBodyInput, ComlinkInit }
 
 async function getLocalMedia(id: MediaId): Promise<ArrayBuffer | null> {
-	const media = await db.getMedia(id)
+	const media = await C.db.getMedia(id)
 	return media?.data ?? null
 }
 

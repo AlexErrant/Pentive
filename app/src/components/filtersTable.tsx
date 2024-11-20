@@ -5,9 +5,9 @@ import 'ag-grid-community/styles/ag-theme-alpine.css'
 import { type ColDef } from 'ag-grid-community'
 import { LicenseManager } from 'ag-grid-enterprise'
 import '@github/relative-time-element'
-import { db } from '../db'
 import { type TemplateId } from 'shared/brand'
 import { agGridTheme, useThemeContext } from 'shared-dom/themeSelector'
+import { C } from '../topLevelAwait'
 
 LicenseManager.setLicenseKey(import.meta.env.VITE_AG_GRID_LICENSE)
 
@@ -28,7 +28,7 @@ const FiltersTable: VoidComponent<{
 	templatesChanged: (templates: TemplateId[]) => void
 }> = (props) => {
 	const [nodes] = createResource(async () => {
-		const tags = db.getTags().then((tags) =>
+		const tags = C.db.getTags().then((tags) =>
 			tags.map(
 				(t) =>
 					({
@@ -37,7 +37,7 @@ const FiltersTable: VoidComponent<{
 					}) satisfies FilterNode,
 			),
 		)
-		const templates = db.getTemplates().then((templates) =>
+		const templates = C.db.getTemplates().then((templates) =>
 			templates.map(
 				(t) =>
 					({

@@ -1,6 +1,5 @@
 import { type JSX } from 'solid-js'
 import PluginsTable from '../components/pluginsTable'
-import { db } from '../db'
 import { parsePluginNpmPackage } from 'shared-dom/plugin'
 import { C } from '../topLevelAwait'
 
@@ -31,7 +30,7 @@ async function importPlugin(
 		C.toastImpossible('There should be a file selected')
 	const plugin = await parsePluginNpmPackage(pluginTgz)
 	const now = C.getDate()
-	await db.upsertPlugin({
+	await C.db.upsertPlugin({
 		...plugin,
 		created: now,
 		edited: now,

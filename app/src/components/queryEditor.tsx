@@ -52,7 +52,6 @@ import { queryLinter } from 'shared-dom/language/queryLinter'
 import { globQuery } from 'shared-dom/language/globQuery'
 import * as qt from 'shared-dom/language/queryParser.terms'
 import { queryDecorations } from './queryDecorations'
-import { db } from '../db'
 import { C } from '../topLevelAwait'
 import { notEmpty } from 'shared/utility'
 import { useThemeContext } from 'shared-dom/themeSelector'
@@ -210,12 +209,12 @@ function getLanguageData(isSimpleString?: true) {
 		} satisfies CloseBracketConfig,
 		autocomplete: queryCompletion(
 			{
-				getTags: db.getTags,
+				getTags: C.db.getTags,
 				getTemplates: async () =>
-					await db.getTemplates().then((ts) => ts.map((t) => t.name)),
+					await C.db.getTemplates().then((ts) => ts.map((t) => t.name)),
 				getCardSettings: async () =>
-					await db.getCardSettings().then((css) => css.map((cs) => cs.name)),
-				getFields: db.getFields,
+					await C.db.getCardSettings().then((css) => css.map((cs) => cs.name)),
+				getFields: C.db.getFields,
 				getHistory,
 				getDate: C.getDate,
 			},

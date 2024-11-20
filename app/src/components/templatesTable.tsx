@@ -12,13 +12,13 @@ import {
 import { LicenseManager } from 'ag-grid-enterprise'
 import { startCase } from 'lodash-es'
 import '@github/relative-time-element'
-import { db } from '../db'
 import { Upload } from 'shared-dom/icons'
 import { agGridTheme, useThemeContext } from 'shared-dom/themeSelector'
 import { type TemplateId } from 'shared/brand'
 import { type Template } from 'shared/domain/template'
 import { Entries } from '@solid-primitives/keyed'
 import './registry'
+import { C } from '../topLevelAwait'
 
 LicenseManager.setLicenseKey(import.meta.env.VITE_AG_GRID_LICENSE)
 
@@ -155,7 +155,8 @@ const cacheBlockSize = 100
 const onGridReady = ({ api }: GridReadyEvent) => {
 	api.setDatasource({
 		getRows: (p: IGetRowsParams) => {
-			db.getTemplatesInfinitely(p.startRow, cacheBlockSize)
+			C.db
+				.getTemplatesInfinitely(p.startRow, cacheBlockSize)
 				.then((x) => {
 					p.successCallback(x.templates, x.count)
 				})

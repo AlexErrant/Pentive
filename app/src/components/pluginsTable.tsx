@@ -8,7 +8,6 @@ import {
 import { LicenseManager } from 'ag-grid-enterprise'
 import '@github/relative-time-element'
 import { type Plugin } from 'shared-dom/plugin'
-import { db } from '../db'
 import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-alpine.css'
 import { C } from '../topLevelAwait'
@@ -49,7 +48,7 @@ const columnDefs: Array<ColDef<Plugin>> = [
 			<button
 				onClick={async () => {
 					if (props.data?.name != null) {
-						await db.deletePlugin(props.data.name)
+						await C.db.deletePlugin(props.data.name)
 					} else {
 						C.toastError(
 							'props.data is null, how did this occur?',
@@ -68,7 +67,7 @@ const columnDefs: Array<ColDef<Plugin>> = [
 const getRowId = (params: GetRowIdParams<Plugin>) => params.data.name
 
 const PluginsTable: VoidComponent = () => {
-	const [plugins] = createResource(db.getPlugins, {
+	const [plugins] = createResource(C.db.getPlugins, {
 		initialValue: [],
 	})
 	const [theme] = useThemeContext()

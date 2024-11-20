@@ -1,5 +1,4 @@
 import * as Comlink from 'comlink' // https://github.com/GoogleChromeLabs/comlink/tree/main/docs/examples/05-serviceworker-example
-import { db } from './db'
 import { C } from './topLevelAwait'
 import { type MediaId } from 'shared/brand'
 import { throwExp } from 'shared/utility'
@@ -21,7 +20,7 @@ export type PostMessageTypes = ComlinkInit | ComlinkClose | ClaimRequest
 
 // explicit because Comlink can't clone functions
 async function getLocalMedia(id: MediaId): Promise<ArrayBuffer | null> {
-	const media = await db.getMedia(id)
+	const media = await C.db.getMedia(id)
 	if (media == null) {
 		return null
 	} else {

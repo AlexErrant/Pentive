@@ -1,11 +1,11 @@
-import { db } from '../db'
 import { Show, createResource } from 'solid-js'
+import { C } from '../topLevelAwait'
 
 async function uploadCount() {
-	const newTemplates = await db.getNewTemplatesToUpload()
-	const editedTemplates = await db.getEditedTemplatesToUpload()
-	const newNotes = await db.getNewNotesToUpload()
-	const editedNotes = await db.getEditedNotesToUpload()
+	const newTemplates = await C.db.getNewTemplatesToUpload()
+	const editedTemplates = await C.db.getEditedTemplatesToUpload()
+	const newNotes = await C.db.getNewNotesToUpload()
+	const editedNotes = await C.db.getEditedNotesToUpload()
 	return (
 		newTemplates.length +
 		editedTemplates.length +

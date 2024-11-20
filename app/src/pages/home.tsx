@@ -5,7 +5,6 @@ import {
 	type Setter,
 } from 'solid-js'
 import { type MediaId } from 'shared/brand'
-import { db } from '../db'
 import { importAnki } from './importer/importer'
 import { augcClient } from '../trpcClient'
 import { C, initFsrsTrainThreadPool, rd } from '../topLevelAwait'
@@ -110,7 +109,7 @@ export default function Home(): JSX.Element {
 					class='border-gray-900 rounded-lg border px-2'
 					onClick={async () => {
 						const [{ cids, eases, ids, types }] = await Promise.all([
-							db.getFsrsItems(),
+							C.db.getFsrsItems(),
 							init().then(initFsrsTrainThreadPool),
 						])
 						const f = new Fsrs()
@@ -182,7 +181,7 @@ async function uploadMedia(
 		event.target.files?.item(0) ??
 		C.toastImpossible('There should be a file selected')
 	const now = C.getDate()
-	await db.bulkInsertMedia([
+	await C.db.bulkInsertMedia([
 		{
 			id: file.name as MediaId,
 			created: now,

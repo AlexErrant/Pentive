@@ -9,7 +9,6 @@ import {
 	runWithOwner,
 } from 'solid-js'
 import { render } from 'solid-js/web'
-import { db } from '../db'
 import Peers from './peers'
 import { C, rd, whoAmI } from '../topLevelAwait'
 import { TemplateNookSync } from '../components/templateSync'
@@ -39,10 +38,10 @@ LicenseManager.setLicenseKey(import.meta.env.VITE_AG_GRID_LICENSE)
 async function getUploadables() {
 	const [newTemplates, editedTemplates, newNotes, editedNotes] =
 		await Promise.all([
-			db.getNewTemplatesToUploadDom(),
-			db.getEditedTemplatesToUploadDom(),
-			db.getNewNotesToUploadDom(),
-			db.getEditedNotesToUploadDom(),
+			C.db.getNewTemplatesToUploadDom(),
+			C.db.getEditedTemplatesToUploadDom(),
+			C.db.getNewNotesToUploadDom(),
+			C.db.getEditedNotesToUploadDom(),
 		])
 	const newTemplates2 = newTemplates.flatMap((template) =>
 		objKeys(template.remotes).map(
@@ -274,7 +273,7 @@ function Content(): JSX.Element {
 				<button
 					class='border-gray-900 rounded-lg border px-2'
 					onClick={async () => {
-						await db.sync(rd)
+						await C.db.sync(rd)
 					}}
 				>
 					p2p sync

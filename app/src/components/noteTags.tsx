@@ -1,14 +1,14 @@
 import { createResource, createSignal, type VoidComponent } from 'solid-js'
-import { db } from '../db'
 import { createOptions, Select } from '@thisbeyond/solid-select'
 import '@thisbeyond/solid-select/style.css'
 import 'shared-dom/solidSelect.css'
 import { type NoteCardView } from '../uiLogic/cards'
+import { C } from '../topLevelAwait'
 
 const NoteTags: VoidComponent<{
 	readonly noteCard: NoteCardView
 }> = (props) => {
-	const [dbTags] = createResource(db.getTags, {
+	const [dbTags] = createResource(C.db.getTags, {
 		initialValue: [],
 	})
 	const selectProps = () =>
@@ -29,7 +29,7 @@ const NoteTags: VoidComponent<{
 			/>
 			<button
 				onClick={async () => {
-					await db.saveTags(props.noteCard.note.id, tags())
+					await C.db.saveTags(props.noteCard.note.id, tags())
 				}}
 			>
 				Save

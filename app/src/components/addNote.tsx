@@ -14,7 +14,6 @@ import { ulidAsBase64Url } from '../domain/utility'
 import { createStore } from 'solid-js/store'
 import { C } from '../topLevelAwait'
 import { CardsPreview } from '../components/cardsPreview'
-import { db } from '../db'
 import { type NoteCardView } from '../uiLogic/cards'
 import { type Template } from 'shared/domain/template'
 import { type Card } from 'shared/domain/card'
@@ -38,7 +37,7 @@ function toView(template: Template): NoteCardView {
 }
 
 export default function AddNote() {
-	const [templates] = createResource(db.getTemplates, { initialValue: [] })
+	const [templates] = createResource(C.db.getTemplates, { initialValue: [] })
 	const templateNames = () => templates()?.map((t) => t.name) ?? []
 	const [template, setTemplate] = createSignal<Template>()
 	const [wip, setWip] = createStore<{ noteCard?: NoteCardView }>({})

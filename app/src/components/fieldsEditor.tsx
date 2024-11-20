@@ -1,7 +1,6 @@
 import { createSignal, type VoidComponent, Show } from 'solid-js'
 import { FieldEditor } from './fieldEditor'
 import { type SetStoreFunction } from 'solid-js/store'
-import { db } from '../db'
 import { ulidAsBase64Url } from '../domain/utility'
 import FieldHtmlEditor from './fieldHtmlEditor'
 import { ToggleButton } from '@kobalte/core'
@@ -60,8 +59,8 @@ export const FieldsEditor: VoidComponent<{
 									fieldValues: Object.fromEntries(fieldValues),
 								},
 							})
-							await db.upsertNote(noteCards[0]!.note)
-							await db.bulkUpsertCards(noteCards.map((nc) => nc.card))
+							await C.db.upsertNote(noteCards[0]!.note)
+							await C.db.bulkUpsertCards(noteCards.map((nc) => nc.card))
 						})
 					}}
 				>
@@ -80,7 +79,7 @@ async function mutate(img: HTMLImageElement) {
 		const now = C.getDate()
 		const data = await (await fetch(src)).arrayBuffer()
 		const id = ulidAsBase64Url() as string as MediaId
-		await db.insertMedia({
+		await C.db.insertMedia({
 			id,
 			created: now,
 			edited: now,

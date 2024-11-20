@@ -1,7 +1,6 @@
 import { EditTemplate as EditTemplateOg } from 'shared-dom/editTemplate'
 import { Show, type VoidComponent } from 'solid-js'
 import { type SetStoreFunction } from 'solid-js/store'
-import { db } from '../db'
 import { useThemeContext } from 'shared-dom/themeSelector'
 import { C } from '../topLevelAwait'
 import { getDefaultTemplate } from '../domain/utility'
@@ -12,7 +11,7 @@ import { Entries } from '@solid-primitives/keyed'
 const saveButton = (template: { template: Template }) => (
 	<button
 		onClick={async () => {
-			await db.upsertTemplate(template.template)
+			await C.db.upsertTemplate(template.template)
 		}}
 	>
 		Save

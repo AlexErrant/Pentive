@@ -5,18 +5,18 @@ import CardsTable from '../components/cardsTable'
 import { CardsRemote } from '../components/cardsRemote'
 import { FieldsEditor } from '../components/fieldsEditor'
 import { CardsPreview } from '../components/cardsPreview'
-import { db } from '../db'
 import { render } from 'solid-js/web'
 import AddNote from '../components/addNote'
 import NoteSync from '../components/noteSync'
 import NoteTags from '../components/noteTags'
 import { type NoteCardView } from '../uiLogic/cards'
+import { C } from '../topLevelAwait'
 
 export default function Cards(): JSX.Element {
 	const [selected, setSelected] = createStore<{ noteCard?: NoteCardView }>({})
 	const [cards] = createResource(
 		() => selected.noteCard?.note.id,
-		db.getCardsByNote,
+		C.db.getCardsByNote,
 	)
 	createEffect(() => {
 		if (cards() != null) setSelected('noteCard', 'cards', cards()!)

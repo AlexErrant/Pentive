@@ -22,7 +22,6 @@ import {
 	type NavigateToNextCellParams,
 } from 'ag-grid-community'
 import { LicenseManager } from 'ag-grid-enterprise'
-import { db } from '../db'
 import { Upload, Hamburger } from 'shared-dom/icons'
 import { getOk } from 'shared-dom/cardHtml'
 import {
@@ -453,13 +452,14 @@ const dataSource = {
 		const now = C.getDate()
 		const conversionResult = convert(cleanedQuery, now)
 		const start = performance.now()
-		db.getCards(
-			p.startRow,
-			cacheBlockSize,
-			cleanedQuery,
-			conversionResult,
-			sort,
-		) // medTODO could just cache the Template and mutate the NoteCard obj to add it
+		C.db
+			.getCards(
+				p.startRow,
+				cacheBlockSize,
+				cleanedQuery,
+				conversionResult,
+				sort,
+			) // medTODO could just cache the Template and mutate the NoteCard obj to add it
 			.then(async (x) => {
 				const end = performance.now()
 				console.log(`GetCards ${end - start} ms`, cleanedQuery)
@@ -482,7 +482,7 @@ const dataSource = {
 				setFvHighlight(x.fieldValueHighlight)
 				if (countishWrong && gridRef.api.isLastRowIndexKnown() !== true) {
 					const start = performance.now()
-					const count = await db.getCardsCount(x.searchCache, x.baseQuery)
+					const count = await C.db.getCardsCount(x.searchCache, x.baseQuery)
 					const end = performance.now()
 					console.log(`Count took ${end - start} ms`, cleanedQuery)
 					gridRef.api.setRowCount(count.c, true)
@@ -492,7 +492,7 @@ const dataSource = {
 				}
 				if (countishWrong && x.searchCache == null) {
 					// asynchronously/nonblockingly build the cache
-					db.buildCache(x.baseQuery(), cleanedQuery, sort).catch((e) => {
+					C.db.buildCache(x.baseQuery(), cleanedQuery, sort).catch((e) => {
 						C.toastWarn('Error building cache', e)
 					})
 				}

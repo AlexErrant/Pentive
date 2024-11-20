@@ -13,8 +13,8 @@ import {
 	type NoteId,
 } from 'shared/brand'
 import { objEntries } from 'shared/utility'
-import { db } from '../db'
 import { type NoteCardView } from '../uiLogic/cards'
+import { C } from '../topLevelAwait'
 
 interface Remotes {
 	readonly nookId: NookId
@@ -46,8 +46,8 @@ function toggleNook(
 					rs.map((r) => (r.nookId === nook ? { ...r, uploadable } : r)),
 				)
 				uploadable
-					? await db.makeNoteUploadable(noteId, nook)
-					: await db.makeNoteNotUploadable(noteId, nook)
+					? await C.db.makeNoteUploadable(noteId, nook)
+					: await C.db.makeNoteNotUploadable(noteId, nook)
 			}}
 		/>
 	)

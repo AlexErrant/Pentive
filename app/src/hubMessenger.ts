@@ -1,4 +1,3 @@
-import { db } from './db'
 import * as Comlink from 'comlink'
 import { ulidAsBase64Url } from './domain/utility'
 import { noteOrds } from 'shared-dom/cardHtml'
@@ -52,14 +51,14 @@ export const appExpose = {
 					serializer.serializeToString(front)
 				template.templateType.template.back = serializer.serializeToString(back)
 			}
-			await db.upsertTemplate(template)
+			await C.db.upsertTemplate(template)
 		})
 	},
 	addNote: async (rn: RemoteNote, nook: NookId) => {
 		const now = C.getDate()
 		await tx(async () => {
 			const template =
-				(await db.getTemplateIdByRemoteId(rn.templateId)) ??
+				(await C.db.getTemplateIdByRemoteId(rn.templateId)) ??
 				C.toastFatal(`You don't have the remote template ${rn.templateId}`)
 			const n: Note = {
 				id: rn.id,
@@ -74,7 +73,7 @@ export const appExpose = {
 				]),
 			}
 			await downloadImages(getNoteImages(n.fieldValues, new DOMParser()))
-			await db.upsertNote(n)
+			await C.db.upsertNote(n)
 			const ords = noteOrds.bind(C)(n, template)
 			const cards = ords.map((i) => {
 				const card: Card = {
@@ -90,7 +89,7 @@ export const appExpose = {
 				}
 				return card
 			})
-			await db.bulkUpsertCards(cards)
+			await C.db.bulkUpsertCards(cards)
 		})
 	},
 }
@@ -146,7 +145,7 @@ async function downloadImages(imgSrcs: Map<MediaId, string>) {
 			const response = await fetch(imgSrc)
 			if (response.status === 200) {
 				const now = C.getDate()
-				await db.insertMedia({
+				await C.db.insertMedia({
 					id,
 					created: now,
 					edited: now,

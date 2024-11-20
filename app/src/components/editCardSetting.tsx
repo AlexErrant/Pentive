@@ -19,7 +19,6 @@ import {
 	handleRefresh,
 } from 'codemirror-json-schema'
 import Ajv from 'ajv'
-import { db } from '../db'
 import { C } from '../topLevelAwait'
 import { useThemeContext } from 'shared-dom/themeSelector'
 import { basicSetup } from 'shared-dom/codemirror'
@@ -77,7 +76,7 @@ const EditCardSetting: VoidComponent<{
 					}
 					if (validate(cardSetting)) {
 						props.setCardSetting(cardSetting)
-						await db.bulkUploadCardSettings([cardSetting])
+						await C.db.bulkUploadCardSettings([cardSetting])
 					} else {
 						C.toastError(
 							<>

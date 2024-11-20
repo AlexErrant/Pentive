@@ -19,7 +19,6 @@ import { exampleSetup } from 'prosemirror-example-setup'
 import 'prosemirror-view/style/prosemirror.css'
 import 'prosemirror-menu/style/menu.css'
 import 'prosemirror-example-setup/style/style.css'
-import { db } from '../db'
 import { type SetStoreFunction } from 'solid-js/store'
 import { type ImagePluginSettings } from 'prosemirror-image-plugin'
 import {
@@ -31,6 +30,7 @@ import 'prosemirror-image-plugin/dist/styles/withResize.css'
 import { type NoteCardView } from '../uiLogic/cards'
 import { toOneLine } from 'shared/htmlToText'
 import { type NoteId, type MediaId } from 'shared/brand'
+import { C } from '../topLevelAwait'
 // import "prosemirror-image-plugin/src/styles/sideResize.css"
 
 // cf. https://gitlab.com/emergence-engineering/prosemirror-image-plugin/-/blob/master/src/updateImageNode.ts
@@ -213,7 +213,7 @@ async function updateImgSrc(img: HTMLImageElement) {
 	) {
 		// do nothing
 	} else {
-		const media = await db.getMedia(src as MediaId)
+		const media = await C.db.getMedia(src as MediaId)
 		if (media == null) return
 		img.setAttribute('src', 'ugm/' + src)
 		img.setAttribute('srcx', src)

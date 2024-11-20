@@ -37,7 +37,6 @@ import { type Card as PCard } from 'shared/domain/card'
 import { type Note as PNote } from 'shared/domain/note'
 import { type Template } from 'shared/domain/template'
 import { type MediaId, type TemplateId } from 'shared/brand'
-import { db } from './../../db'
 import { chunk } from 'lodash-es'
 import sqliteUrl from '../../assets/sql-wasm.wasm?url'
 import { C } from '../../topLevelAwait'
@@ -109,7 +108,7 @@ async function addMediaBatch(
 		}),
 	)
 	const media = mediaAndNulls.filter(notEmpty)
-	await db.bulkInsertMedia(media)
+	await C.db.bulkInsertMedia(media)
 }
 
 async function importAnkiDb(sqlite: Entry): Promise<void> {
@@ -128,10 +127,10 @@ async function importAnkiDb(sqlite: Entry): Promise<void> {
 			decks = col.decks
 			colCrtMs = col.crt * 1000
 			const templates = parseTemplates(col.models)
-			await db.bulkInsertTemplate(templates)
+			await C.db.bulkInsertTemplate(templates)
 			templates.forEach((t) => templatesMap.set(t.id, t))
 			const cardSettings = parseCardSetting(col.dconf)
-			await db.bulkUploadCardSettings(cardSettings)
+			await C.db.bulkUploadCardSettings(cardSettings)
 		}
 		cols.free()
 		const notes = ankiDb.prepare('select * from notes') // lowTODO select exact columns
@@ -141,7 +140,7 @@ async function importAnkiDb(sqlite: Entry): Promise<void> {
 			notesMap.set(note.id, parseNote(note, templatesMap))
 		}
 		notes.free()
-		await db.bulkUpsertNotes(Array.from(notesMap.values()))
+		await C.db.bulkUpsertNotes(Array.from(notesMap.values()))
 		const cards = ankiDb.prepare('select * from cards') // lowTODO select exact columns
 		const colCrtMs2 = colCrtMs ?? throwExp('col is null')
 		const decks2 = decks ?? throwExp('decks is null')
@@ -151,7 +150,7 @@ async function importAnkiDb(sqlite: Entry): Promise<void> {
 			cardsList.push(parseCard(card, notesMap, templatesMap, decks2, colCrtMs2))
 		}
 		cards.free()
-		await db.bulkUpsertCards(cardsList)
+		await C.db.bulkUpsertCards(cardsList)
 		const revlogs = ankiDb.prepare('select * from revlog') // lowTODO select exact columns
 		const reviewList: Review[] = []
 		while (revlogs.step()) {
@@ -159,7 +158,7 @@ async function importAnkiDb(sqlite: Entry): Promise<void> {
 			const revlog = checkRevlog(row)
 			reviewList.push(parseRevlog(revlog))
 		}
-		await db.bulkUploadReview(reviewList)
+		await C.db.bulkUploadReview(reviewList)
 		revlogs.free()
 	} finally {
 		ankiDb.close()
