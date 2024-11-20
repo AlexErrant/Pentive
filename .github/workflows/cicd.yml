@@ -86,6 +86,10 @@ jobs:
           rsync -R cert.pem lrpc/.cert/
           rsync -R key.pem  peer/.cert/
           rsync -R cert.pem peer/.cert/
+          rsync -R key.pem  cwa/.cert/
+          rsync -R cert.pem cwa/.cert/
+          rsync -R key.pem  api-ugc/.cert/
+          rsync -R cert.pem api-ugc/.cert/
 
       - name: pnpm install
         run: pnpm install

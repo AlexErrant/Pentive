@@ -14,9 +14,5 @@ rm -rf hub/.cert
 rm -rf hub-ugc/.cert
 rm -rf lrpc/.cert
 rm -rf peer/.cert
-
-# if `~/.wrangler/` exists, delete `key.pem` and `cert.pem` from it, otherwise delete `key.pem` and `cert.pem` from `XDG_CONFIG_HOME` (defaulting to `$HOME/.config`)
-# ref https://github.com/cloudflare/workers-sdk/blob/main/packages/wrangler/src/global-wrangler-config-path.ts#L15
-# Sordid story here https://github.com/cloudflare/workers-sdk/issues/2118#issuecomment-1486184829
-[ -d "${HOME}/.wrangler/" ] && rm -f $HOME/.wrangler/local-cert/key.pem  || rm -f "${XDG_CONFIG_HOME:-$HOME/.config}/.wrangler/local-cert/key.pem"
-[ -d "${HOME}/.wrangler/" ] && rm -f $HOME/.wrangler/local-cert/cert.pem || rm -f "${XDG_CONFIG_HOME:-$HOME/.config}/.wrangler/local-cert/cert.pem"
+rm -rf cwa/.cert
+rm -rf api-ugc/.cert

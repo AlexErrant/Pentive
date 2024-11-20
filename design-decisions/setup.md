@@ -37,7 +37,7 @@ pnpm i
 
 Append the contents of `../devhosts` to your [hosts file](https://www.howtogeek.com/howto/27350/beginner-geek-how-to-edit-your-hosts-file/), e.g. `sudo tee -a /etc/hosts < devhosts`.
 
-## 4. Generate secrets and config
+## 4. Generate secrets, config, and certs
 
 From the the repo's root directory, run
 
@@ -51,26 +51,15 @@ Secrets are stored outside the repo so [`git clean -fdx`](https://tysonwilliams.
 - Update `secrets.sh` with your values.
   - Replace the secrets using `openssl rand -base64 32`.
 - Run `./mkenv.sh`. Rerun this if you ever make changes to `secrets.sh`.
-
-## 5. Generate certs
-
-- Run `pnpm --filter cwa dev`. This ensures that Wrangler has a self-signed certificate - you can kill Wrangler pretty much immediately.
-
 - Run `./rmcert.sh && ./mkcert.sh`.
 
-> **Warning** _Both_ scripts expect the Wrangler key/cert to exist at `~/.wrangler/local-cert/` or `${XDG_CONFIG_HOME:-$HOME/.config}/.wrangler/local-cert/`. If the key/cert doesn't exist in either location, [open an issue!](https://github.com/AlexErrant/Pentive/issues/new)
-
-> [`rmcert.sh`](../rmcert.sh) deletes Wrangler's local-cert's `key.pem` and `cert.pem`. (Then [`mkcert.sh`](../mkcert.sh) generates a new one.) This "regenerate" may be undesirable if you're using Wrangler for HTTPS anywhere else. If this is the case, add your site to `mkcert.sh` before running it, e.g. `mkcert -key-file key.pem -cert-file cert.pem user-generated-content-pentive.localhost cwa.pentive.localhost your-wrangler-worker-here.com`
-
-> [More info.](https://github.com/cloudflare/workers-sdk/issues/1908#issuecomment-1416901172) Note that `NODE_EXTRA_CA_CERTS` isn't helpful since it specifies a [CA cert](https://discord.com/channels/595317990191398933/799437470004412476/1039744087672238110) and we need to trust domains remapped in our `hosts` file.
-
-## 6. Update Ivy's schema
+## 5. Update Ivy's schema
 
 ```bash
 pnpm --filter shared-edge initIvy
 ```
 
-## 7. Run!
+## 6. Run!
 
 ```bash
 pnpm ugc
@@ -84,7 +73,7 @@ pnpm dev
 
 Visit https://pentive.localhost:3014/ and https://app.pentive.localhost:3013/
 
-## 8. Deploy (optional)
+## 7. Deploy (optional)
 
 For the initial deployment, you may need to `cd` to `/app`, `/app-ugc`, and `/hub-ugc`, then deploy each manually with `pnpm run build && wrangler pages deploy ./dist`. This is because `wrangler pages publish` requires that you go through 2 interactive prompts when creating a new project. After that, subsequent deployments may be run with
 

@@ -3,3 +3,4 @@ wrangler.toml
 .dev.vars
 dist
 lib
+.cert
