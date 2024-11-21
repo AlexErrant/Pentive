@@ -21,6 +21,7 @@ async function registerPluginService(
 	// and jsdom doesn't support streams https://github.com/jsdom/jsdom/pull/3200
 	// Cloudflare's Wrangler discusses a similar issue https://developers.cloudflare.com/workers/wrangler/bundling/
 	// grep 2D96EE4E-61BA-4FCA-93C1-863C80E10A93
+	// One solution could be to use the service worker to serve the package's files.
 	const exports = (await import(/* @vite-ignore */ script)) as {
 		default: PluginExports
 	}
