@@ -2,10 +2,11 @@ import { ThemeSelector } from 'shared-dom/themeSelector'
 import { For, type VoidComponent, Show } from 'solid-js'
 import { A, useLocation } from '@solidjs/router'
 import { type NavLinkData } from './contracts'
-import { whoAmI } from '../topLevelAwait'
+import { useWhoAmIContext } from './whoAmIContext'
 
 const Nav: VoidComponent<{ navLinks: NavLinkData[] }> = (props) => {
 	const location = useLocation()
+	const whoAmI = useWhoAmIContext()
 	return (
 		<nav class='text-gray-900 bg-gray-200 px-4'>
 			<ul class='flex items-center'>

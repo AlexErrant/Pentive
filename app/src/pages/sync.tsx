@@ -10,7 +10,7 @@ import {
 } from 'solid-js'
 import { render } from 'solid-js/web'
 import Peers from './peers'
-import { C, rd, whoAmI } from '../topLevelAwait'
+import { C, rd } from '../topLevelAwait'
 import { TemplateNookSync } from '../components/templateSync'
 import { agGridTheme, useThemeContext } from 'shared-dom/themeSelector'
 import {
@@ -32,6 +32,7 @@ import { type Template } from 'shared/domain/template'
 import { objKeys, type Override } from 'shared/utility'
 import { type Note } from 'shared/domain/note'
 import { NoteNookSync } from '../components/noteSync'
+import { useWhoAmIContext } from '../components/whoAmIContext'
 
 LicenseManager.setLicenseKey(import.meta.env.VITE_AG_GRID_LICENSE)
 
@@ -96,6 +97,7 @@ async function getUploadables() {
 }
 
 export default function Sync(): JSX.Element {
+	const whoAmI = useWhoAmIContext()
 	return (
 		<Show
 			when={whoAmI()}

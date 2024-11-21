@@ -8,6 +8,7 @@ import {
 	type VoidComponent,
 } from 'solid-js'
 import './templateSync.css'
+import { throwExp } from 'shared/utility'
 
 type Mode = 'pretty' | 'split'
 
@@ -23,11 +24,10 @@ export function DiffModeProvider(props: { children: JSX.Element }) {
 }
 
 export function useDiffModeContext() {
-	const context = useContext(DiffModeContext)
-	if (context == null) {
-		throw new Error('useDiffModeContext: cannot find a DiffModeContext')
-	}
-	return context
+	return (
+		useContext(DiffModeContext) ??
+		throwExp('useDiffModeContext: cannot find a DiffModeContext')
+	)
 }
 
 export const DiffModeToggleGroup: VoidComponent = () => {

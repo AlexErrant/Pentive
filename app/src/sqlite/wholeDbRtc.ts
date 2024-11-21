@@ -13,7 +13,8 @@ import { stringify as uuidStringify } from 'uuid'
 import { cwaClient } from '../trpcClient'
 import { type JWTVerifyResult, jwtVerify, importSPKI } from 'jose'
 import { alg } from 'cwa/src/peerSync'
-import { C, whoAmI } from '../topLevelAwait'
+import { C } from '../topLevelAwait'
+import { useWhoAmIContext } from '../components/whoAmIContext'
 
 type Msg = PokeMsg | ChangesMsg | RequestChangesMsg
 /**
@@ -343,5 +344,5 @@ async function validateTokenWithKey(publicKeyString: string, token: string) {
 	if (jwt?.payload.sub == null) {
 		return false
 	}
-	return jwt.payload.sub === untrack(whoAmI)
+	return jwt.payload.sub === untrack(useWhoAmIContext())
 }
