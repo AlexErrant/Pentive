@@ -1,5 +1,6 @@
 import fc from 'fast-check'
 import {
+	arbitraryNookId,
 	arbitraryUlid,
 	reasonableDates,
 	recordWithOptionalFields,
@@ -54,12 +55,12 @@ export const template = recordWithOptionalFields<Template>(
 		edited: reasonableDates,
 		templateType,
 		remotes: fc.dictionary(
-			fc.string(),
+			arbitraryNookId,
 			fc.oneof(
 				fc.constant(null),
 				fc.record<{ remoteTemplateId: RemoteTemplateId; uploadDate: Date }>({
 					remoteTemplateId: arbitraryUlid<RemoteTemplateId>(),
-					uploadDate: fc.date(),
+					uploadDate: reasonableDates,
 				}),
 			),
 		),

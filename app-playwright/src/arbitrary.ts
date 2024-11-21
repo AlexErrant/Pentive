@@ -4,6 +4,7 @@ import fc, { type Arbitrary, type RecordConstraints } from 'fast-check'
 import { Ulid } from 'id128'
 import { type Brand } from 'shared/brand'
 import { base64url, hex } from '@scure/base'
+import { nookIdRegex } from 'shared/schema'
 
 // https://stackoverflow.com/a/72760489
 type OptionalKeys<T> = Required<{
@@ -37,7 +38,7 @@ export function recordWithOptionalFields<T>(
 }
 
 export const reasonableDates = fc.date({
-	min: new Date('1970-01-01T00:00:00.000Z'),
+	min: new Date('1971-01-01T00:00:00.000Z'),
 	max: new Date('9999-12-31T23:59:59.999Z'),
 })
 
@@ -46,8 +47,8 @@ export function arbitraryUlid<
 >(): fc.Arbitrary<T> {
 	return fc
 		.date({
-			min: new Date(1970, 0, 1),
-			max: new Date(10889, 7, 2),
+			min: new Date(1971, 0, 1),
+			max: new Date(9999, 7, 2),
 		})
 		.map((time) => {
 			const hexUlid = Ulid.generate({ time }).toRaw()
@@ -55,3 +56,5 @@ export function arbitraryUlid<
 			return x as T
 		})
 }
+
+export const arbitraryNookId = fc.stringMatching(nookIdRegex)

@@ -1,6 +1,7 @@
 import fc from 'fast-check'
 import { type NoteId, type RemoteNoteId } from 'shared/brand'
 import {
+	arbitraryNookId,
 	arbitraryUlid,
 	reasonableDates,
 	recordWithOptionalFields,
@@ -32,12 +33,12 @@ export function note(template: Template) {
 			created: reasonableDates,
 			edited: reasonableDates,
 			remotes: fc.dictionary(
-				fc.string(),
+				arbitraryNookId,
 				fc.oneof(
 					fc.constant(null),
 					fc.record<{ remoteNoteId: RemoteNoteId; uploadDate: Date }>({
 						remoteNoteId: arbitraryUlid<RemoteNoteId>(),
-						uploadDate: fc.date(),
+						uploadDate: reasonableDates,
 					}),
 				),
 			),

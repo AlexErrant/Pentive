@@ -40,9 +40,11 @@ const noteUneditable = {
 	nook: true,
 } as const
 
+export const nookIdRegex = /^[a-z][a-z0-9]{2,21}$/
+
 export const nookId = z
 	.string()
-	.regex(/^[a-z0-9_]{1,22}$/) as unknown as z.Schema<NookId>
+	.regex(nookIdRegex) as unknown as z.Schema<NookId>
 
 export const remoteNote = z.object({
 	id: remoteNoteId,

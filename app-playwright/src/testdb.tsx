@@ -12,13 +12,58 @@ const endOnFailure = true // no shrinking since it makes the db corruption worse
 
 type Db = Container['db']
 
+function customStringify(obj: unknown) {
+	return JSON.stringify(obj, (_key, value) => {
+		if (value instanceof Map) {
+			return {
+				type: 'Map',
+				value: Array.from(value.entries()),
+			}
+		}
+		if (value instanceof Set) {
+			return {
+				type: 'Set',
+				value: Array.from(value),
+			}
+		}
+		if (value instanceof Date) {
+			return {
+				type: 'Date',
+				value: value.toISOString(),
+			}
+		}
+		if (Boolean(value) && typeof value === 'object' && !Array.isArray(value)) {
+			const v = value as Record<string, unknown>
+			return Object.keys(v)
+				.sort()
+				.reduce<Record<string, unknown>>((sortedObj, key) => {
+					sortedObj[key] = v[key]
+					return sortedObj
+				}, {})
+		}
+		return value as unknown
+	})
+}
+
+function log<T>(equal: boolean, expected: T, actual: T) {
+	if (!equal) {
+		// eslint-disable-next-line no-debugger
+		debugger
+		customStringify({ expected, actual })
+		console.log({
+			expected: fc.stringify(expected),
+			actual: fc.stringify(actual),
+		})
+	}
+}
+
 async function testTemplate(db: Db) {
 	await fc.assert(
 		fc.asyncProperty(arbitraryTemplate, async (expected) => {
 			await db.upsertTemplate(expected)
 			const actual = await db.getTemplate(expected.id)
 			const r = isEqual(expected, actual)
-			console.assert(r, { expected, actual })
+			log(r, expected, actual)
 			return r
 		}),
 		{ verbose: true, numRuns, endOnFailure },
@@ -35,7 +80,7 @@ async function testNote(db: Db) {
 				await db.upsertNote(expected)
 				const actual = await db.getNote(expected.id)
 				const r = isEqual(expected, actual)
-				console.assert(r, { expected, actual })
+				log(r, expected, actual)
 				return r
 			},
 		),
@@ -50,7 +95,7 @@ async function testCard(db: Db) {
 			await db.upsertCard(expected)
 			const actual = await db.getCard(expected.id)
 			const r = isEqual(expected, actual)
-			console.assert(r, { expected, actual })
+			log(r, expected, actual)
 			return r
 		}),
 		{ verbose: true, numRuns, endOnFailure },

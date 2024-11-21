@@ -14,6 +14,7 @@ import {
 	type RouteSectionProps,
 } from '@solidjs/router'
 import { getRequestEvent } from 'solid-js/web'
+import { nookIdRegex } from 'shared/schema'
 
 function validateTitle(title: unknown): string | undefined {
 	if (typeof title !== 'string' || title.length < 3) {
@@ -28,8 +29,8 @@ function validateText(text: unknown): string | undefined {
 }
 
 function validateNook(nook: unknown): string | undefined {
-	if (typeof nook !== 'string' || nook.length < 1) {
-		return `Nook must be at least 1 character long.`
+	if (typeof nook !== 'string' || !nookIdRegex.test(nook)) {
+		return `Nook must match this regex: ${nookIdRegex}`
 	}
 }
 
