@@ -6,9 +6,7 @@ import {
 	type Owner,
 	Show,
 	type JSX,
-	runWithOwner,
 } from 'solid-js'
-import { render } from 'solid-js/web'
 import Peers from './peers'
 import { C, rd } from '../topLevelAwait'
 import { TemplateNookSync } from '../components/templateSync'
@@ -33,6 +31,7 @@ import { objKeys, type Override } from 'shared/utility'
 import { type Note } from 'shared/domain/note'
 import { NoteNookSync } from '../components/noteSync'
 import { useWhoAmIContext } from '../components/whoAmIContext'
+import { Renderer } from '../uiLogic/aggrid'
 
 LicenseManager.setLicenseKey(import.meta.env.VITE_AG_GRID_LICENSE)
 
@@ -108,85 +107,37 @@ export default function Sync(): JSX.Element {
 	)
 }
 
-class CellRenderer implements ICellRendererComp<Row> {
-	eGui = document.createElement('div')
-	dispose: (() => void) | undefined
-
+class CellRenderer extends Renderer implements ICellRendererComp<Row> {
 	init(params: ICellRendererParams<Row, unknown, Context>) {
 		if (params.data == null) {
 			return
 		}
 		if (params.data.tag === 'template') {
 			const remoteTemplate = params.data.template.remotes[params.data.nook]
-			this.dispose = render(
-				() =>
-					runWithOwner(params.context.owner, () => (
-						<TemplateNookSync
-							template={(params.data as RowTemplate).template}
-							remoteTemplate={remoteTemplate}
-							nook={params.data!.nook}
-						/>
-					)),
-				this.eGui,
-			)
+			this.render(params.context.owner, () => (
+				<TemplateNookSync
+					template={(params.data as RowTemplate).template}
+					remoteTemplate={remoteTemplate}
+					nook={params.data!.nook}
+				/>
+			))
 		} else if (params.data.tag === 'note') {
 			const remoteNote = params.data.note.remotes[params.data.nook]
-			this.dispose = render(
-				() =>
-					runWithOwner(params.context.owner, () => (
-						<NoteNookSync
-							template={(params.data as RowNote).template}
-							note={(params.data as RowNote).note}
-							nook={params.data!.nook}
-							remoteNote={remoteNote}
-						/>
-					)),
-				this.eGui,
-			)
-		}
-	}
-
-	getGui() {
-		return this.eGui
-	}
-
-	refresh() {
-		return false
-	}
-
-	destroy() {
-		if (this.dispose != null) {
-			this.dispose()
+			this.render(params.context.owner, () => (
+				<NoteNookSync
+					template={(params.data as RowNote).template}
+					note={(params.data as RowNote).note}
+					nook={params.data!.nook}
+					remoteNote={remoteNote}
+				/>
+			))
 		}
 	}
 }
 
-class HeaderRenderer implements IHeaderComp {
-	eGui = document.createElement('div')
-	dispose!: () => void
-
-	init(params: IHeaderParams) {
-		this.dispose = render(
-			() =>
-				runWithOwner(
-					// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-					params.context.owner as Owner,
-					() => <DiffModeToggleGroup />,
-				),
-			this.eGui,
-		)
-	}
-
-	getGui() {
-		return this.eGui
-	}
-
-	refresh() {
-		return false
-	}
-
-	destroy() {
-		this.dispose()
+class HeaderRenderer extends Renderer implements IHeaderComp {
+	init(params: IHeaderParams<Row, Context>) {
+		this.render(params.context.owner, () => <DiffModeToggleGroup />)
 	}
 }
 
