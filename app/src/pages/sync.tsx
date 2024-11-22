@@ -242,7 +242,7 @@ function Content(): JSX.Element {
 	onMount(() => {
 		const owner = getOwner()!
 		C.syncGridOptions.context.owner = owner
-		gridApi = createGrid(ref, C.syncGridOptions.context)
+		gridApi = createGrid(ref, C.syncGridOptions)
 	})
 	const [uploadables] = createResource(getUploadables)
 	createEffect(() => {
