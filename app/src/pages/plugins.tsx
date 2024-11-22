@@ -35,5 +35,6 @@ async function importPlugin(
 		created: now,
 		edited: now,
 	})
+	await C.db.getPluginCount() // hack to ensure that cr-sqlite has finished writing to indexedDB in Firefox/Webkit
 	C.toastInfo('Plugin upserted!')
 }

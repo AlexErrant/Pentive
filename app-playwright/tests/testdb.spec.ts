@@ -30,15 +30,9 @@ test(
 		await page
 			.locator('input[type="file"]')
 			.setInputFiles('./app-playwright-0.0.0.tgz')
-
-		// In Firefox/Webkit the IndexedDB transaction isn't done when the upsert message is shown.
-		// So we wait until the toast disappears before going to /testdb, which seems to be long enough.
-		await expect(page.getByText('Plugin upserted!')).toBeVisible()
 		await expect(page.getByText('Plugin upserted!')).toBeVisible({
-			visible: false,
-			timeout: 10000,
+			timeout: 30_000,
 		})
-
 		await page.goto('/testdb')
 		await expect(page.locator('section')).toContainText('Test IndexedDB')
 		const testStatus = page.locator('#testStatus')

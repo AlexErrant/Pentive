@@ -13,6 +13,9 @@ test(
 			.setInputFiles(
 				'../example-plugins/solid/pentive-solid-plugin-example-0.0.0.tgz',
 			)
+		await expect(page.getByText('Plugin upserted!')).toBeVisible({
+			timeout: 30_000,
+		})
 		await page.getByRole('link', { name: 'Home' }).click()
 		await page.reload()
 

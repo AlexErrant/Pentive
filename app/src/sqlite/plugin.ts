@@ -2,6 +2,7 @@ import { type Plugin } from 'shared-dom/plugin'
 import { rd, ky } from '../topLevelAwait'
 import { pluginEntityToDomain } from './util'
 import { type PluginName } from 'shared/brand'
+import { type SqliteCount } from 'shared/utility'
 
 export const pluginCollectionMethods = {
 	upsertPlugin: async function (plugin: Plugin) {
@@ -27,6 +28,13 @@ export const pluginCollectionMethods = {
 	getPlugins: async function (): Promise<Plugin[]> {
 		const plugins = await ky.selectFrom('plugin').selectAll().execute()
 		return plugins.map(pluginEntityToDomain)
+	},
+	getPluginCount: async function () {
+		const plugins = await ky
+			.selectFrom('plugin')
+			.select(ky.fn.count<SqliteCount>('name').as('c'))
+			.executeTakeFirstOrThrow()
+		return plugins.c
 	},
 	deletePlugin: async function (name: PluginName) {
 		await ky.deleteFrom('plugin').where('name', '=', name).execute()
