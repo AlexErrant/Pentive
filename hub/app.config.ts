@@ -4,6 +4,17 @@ import checker from 'vite-plugin-checker'
 export default defineConfig({
 	middleware: './src/middleware.ts',
 	server: {
+		watchOptions: {
+			ignored: [
+				'**/.cert/**',
+				'**/.turbo/**',
+				'**/.vinxi/**',
+				'**/.vscode/**',
+				'**/dist/**',
+				'**/distTest/**',
+				'**/lib/**',
+			],
+		},
 		preset: 'cloudflare_pages',
 		rollupConfig: {
 			external: ['__STATIC_CONTENT_MANIFEST', 'node:async_hooks'],

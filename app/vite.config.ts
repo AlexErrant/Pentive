@@ -1,4 +1,9 @@
-import { defineConfig, type UserConfig, loadEnv } from 'vite'
+import {
+	defineConfig,
+	type UserConfig,
+	loadEnv,
+	type ServerOptions,
+} from 'vite'
 import { resolve } from 'path'
 import solidPlugin from 'vite-plugin-solid'
 import checker from 'vite-plugin-checker'
@@ -20,6 +25,17 @@ export default defineConfig(({ mode }: UserConfig) => {
 	const env = loadEnv(mode ?? throwExp(), process.cwd()) as ImportMetaEnv
 	const appOrigin = new URL(env.VITE_APP_ORIGIN)
 	const serverOptions = {
+		watch: {
+			ignored: [
+				'**/.cert/**',
+				'**/.turbo/**',
+				'**/.vscode/**',
+				'**/dist/**',
+				'**/distTest/**',
+				'**/lib/**',
+				'**/tests/**',
+			],
+		},
 		port: parseInt(appOrigin.port),
 		strictPort: true,
 		https: {
@@ -34,7 +50,7 @@ export default defineConfig(({ mode }: UserConfig) => {
 			// eslint-disable-next-line @typescript-eslint/naming-convention
 			'Cross-Origin-Resource-Policy': 'cross-origin',
 		},
-	}
+	} satisfies ServerOptions
 	return {
 		define,
 		esbuild: {
