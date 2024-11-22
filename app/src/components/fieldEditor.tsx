@@ -90,7 +90,6 @@ const updateImageNode = (
 			{
 				tag: 'img[src]',
 				getAttrs(dom) {
-					dom = dom as HTMLElement
 					return {
 						src: dom.getAttribute('src'),
 						srcx: dom.getAttribute('srcx'),
