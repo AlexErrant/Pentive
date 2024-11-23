@@ -7,6 +7,7 @@ import Nav from './components/nav'
 import ExamplePlugin from './components/examplePlugin'
 import { syncGridOptions } from './pages/sync'
 import { pluginGridOptions } from './components/pluginsTable'
+import { templateGridOptions } from './components/templatesTable'
 import { db } from './db'
 
 export const domContainer = {
@@ -22,6 +23,7 @@ export const defaultContainer = (args: RenderContainerArgs) => ({
 	getDate: () => new Date(),
 	syncGridOptions,
 	pluginGridOptions,
+	templateGridOptions,
 	db,
 })
 

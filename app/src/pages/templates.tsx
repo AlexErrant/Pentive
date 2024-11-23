@@ -1,8 +1,6 @@
 import { createStore } from 'solid-js/store'
 import { type JSX, Show, onMount, For } from 'solid-js'
 import TemplatesTable from '../components/templatesTable'
-import { getTemplates } from './templates.data'
-import { createAsync } from '@solidjs/router'
 import { type Template } from 'shared/domain/template'
 import { getDefaultTemplate } from '../domain/utility'
 import ResizingIframe from '../components/resizingIframe'
@@ -14,9 +12,6 @@ import { C } from '../topLevelAwait'
 import TemplateSync from '../components/templateSync'
 
 export default function Templates(): JSX.Element {
-	const templates = createAsync(async () => await getTemplates(), {
-		initialValue: [],
-	})
 	const [selected, setSelected] = createStore<{ template?: Template }>({})
 	let glRoot: HTMLDivElement
 	onMount(() => {
@@ -28,7 +23,6 @@ export default function Templates(): JSX.Element {
 				render(
 					() => (
 						<TemplatesTable
-							templates={templates()}
 							onSelectionChanged={(templates) => {
 								const t = cloneDeep(templates.at(0)) // some fns mutate the selectedTemplate, so clone to avoid issues
 								setSelected('template', t)
