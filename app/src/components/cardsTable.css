@@ -1,4 +1,4 @@
-.ag-tool-panel-wrapper > .ag-solid-container {
+.ag-tool-panel-wrapper > div:not([class]) {
 	width: 100%;
 }
 .ag-theme-alpine {
