@@ -51,8 +51,7 @@
 		"patchedDependencies": {
 			"nightwind@1.1.13": "patches/nightwind@1.1.13.patch",
 			"@thisbeyond/solid-select@0.14.0": "patches/@thisbeyond__solid-select@0.14.0.patch",
-			"micromorph@0.4.5": "patches/micromorph@0.4.5.patch",
-			"ag-grid-solid@30.2.0": "patches/ag-grid-solid@30.2.0.patch"
+			"micromorph@0.4.5": "patches/micromorph@0.4.5.patch"
 		},
 		"overrides": {
 			"got@<11.8.5": ">=11.8.5",
