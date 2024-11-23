@@ -5,7 +5,11 @@ import {
 	onMount,
 	type VoidComponent,
 } from 'solid-js'
-import { type GridOptions, type GridApi } from 'ag-grid-community'
+import {
+	type GridOptions,
+	type GridApi,
+	type IGroupCellRendererParams,
+} from 'ag-grid-community'
 import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-alpine.css'
 import { LicenseManager } from 'ag-grid-enterprise'
@@ -35,10 +39,17 @@ export const filterGridOptions = {
 		cellRendererParams: {
 			suppressCount: true,
 			checkbox: true,
-		},
+		} satisfies IGroupCellRendererParams<FilterNode>,
 	},
-	groupSelectsChildren: true,
-	rowSelection: 'multiple',
+	rowSelection: {
+		mode: 'multiRow',
+		groupSelects: 'filteredDescendants',
+		headerCheckbox: false,
+		enableClickSelection: true,
+		checkboxes: false,
+		hideDisabledCheckboxes: true,
+		enableSelectionWithoutKeys: true,
+	},
 	rowModelType: 'clientSide',
 	domLayout: 'autoHeight',
 	groupDefaultExpanded: 2,

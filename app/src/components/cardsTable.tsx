@@ -338,7 +338,12 @@ export const cardGridOptions = {
 	},
 	defaultColDef: { resizable: true },
 	getRowId: (params) => params.data.card.id,
-	rowSelection: 'multiple',
+	rowSelection: {
+		mode: 'multiRow',
+		checkboxes: false,
+		headerCheckbox: false,
+		enableClickSelection: true,
+	},
 	rowModelType: 'infinite',
 	onGridSizeChanged: (event) => {
 		event.api.sizeColumnsToFit()

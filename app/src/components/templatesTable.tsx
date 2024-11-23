@@ -133,8 +133,13 @@ export const templateGridOptions = {
 	},
 	defaultColDef: { resizable: true },
 	getRowId: (params) => params.data.id,
-	rowSelection: 'multiple',
 	rowModelType: 'infinite',
+	rowSelection: {
+		mode: 'multiRow',
+		checkboxes: false,
+		headerCheckbox: false,
+		enableClickSelection: true,
+	},
 	cacheBlockSize,
 	onGridSizeChanged: (event) => {
 		event.api.sizeColumnsToFit()
