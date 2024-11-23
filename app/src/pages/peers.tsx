@@ -7,11 +7,9 @@ import {
 } from 'solid-js'
 import { stringify as uuidStringify } from 'uuid'
 import { cwaClient, isTrpcClientError } from '../trpcClient'
-import PeersTable, { type Peer } from '../components/peersTable'
 import { createWdbRtc } from '../sqlite/crsqlite'
 import { rd } from '../topLevelAwait'
 import { type WholeDbRtcPublic } from '../sqlite/wholeDbRtc'
-import { type PeerJsId } from 'shared/brand'
 import { peerIdValidator, peerDisplayNameValidator } from 'shared/domain/user'
 
 export default function Peers() {
@@ -51,44 +49,9 @@ const RenderPeerControls: VoidComponent<{
 	established: string[]
 }> = (props) => {
 	const siteId = () => peerIdValidator.parse(uuidStringify(props.wdbRtc.siteId))
-	const [peers] = createResource(
-		// eslint-disable-next-line solid/reactivity
-		async () => {
-			const peers = await cwaClient.getPeer.query()
-			if (peers == null) {
-				return []
-			}
-			return Object.entries(peers).map(
-				([peerId, peerName]) =>
-					({
-						id: peerId as PeerJsId,
-						name: peerName,
-						status: siteId() === peerId ? 'self' : 'disconnected',
-					}) satisfies Peer as Peer,
-			)
-		},
-		{
-			initialValue: [],
-		},
-	)
-	const updated = () =>
-		peers().map((p) =>
-			props.established.includes(p.id)
-				? {
-						...p,
-						status: 'connected' as const,
-					}
-				: props.pending.includes(p.id)
-					? {
-							...p,
-							status: 'pending' as const,
-						}
-					: p,
-		)
 	const [name, setName] = createSignal('')
 	return (
 		<>
-			<PeersTable peers={peers()} updated={updated()} wdbRtc={props.wdbRtc} />
 			<input
 				class='w-75px form-input rounded-lg p-1 text-sm'
 				type='text'
