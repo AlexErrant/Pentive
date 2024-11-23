@@ -35,11 +35,13 @@ export function createGrid<TData>(
 		GridOptions<TData>,
 		{ context: Record<string, unknown> }
 	>,
+	context?: Record<string, unknown>,
 ) {
 	return createAgGrid(eGridDiv, {
 		...gridOptions,
 		context: {
 			...gridOptions.context,
+			...context,
 			owner: getOwner()!,
 		},
 	})

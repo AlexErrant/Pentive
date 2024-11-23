@@ -7,21 +7,23 @@ import {
 	For,
 	createMemo,
 	type Accessor,
+	type Owner,
+	onMount,
 } from 'solid-js'
 import '@github/relative-time-element'
-import AgGridSolid, { type AgGridSolidRef } from 'ag-grid-solid'
-import 'ag-grid-community/styles/ag-grid.css'
-import 'ag-grid-community/styles/ag-theme-alpine.css'
 import {
+	type GridOptions,
 	type ICellRendererParams,
-	type ColDef,
-	type GetRowIdParams,
-	type GridReadyEvent,
-	type IGetRowsParams,
+	type ICellRendererComp,
 	type GridApi,
 	type NavigateToNextCellParams,
-} from 'ag-grid-community'
-import { LicenseManager } from 'ag-grid-enterprise'
+	type IGetRowsParams,
+	type IToolPanelComp,
+	type IToolPanelParams,
+} from 'ag-grid-community2'
+import 'ag-grid-community2/styles/ag-grid.css'
+import 'ag-grid-community2/styles/ag-theme-alpine.css'
+import { LicenseManager } from 'ag-grid-enterprise2'
 import { Upload, Hamburger } from 'shared-dom/icons'
 import { getOk } from 'shared-dom/cardHtml'
 import {
@@ -37,14 +39,15 @@ import { alterQuery } from '../domain/alterQuery'
 import CardsTableHelp from './cardsTableHelp'
 import { type Sort } from '../sqlite/card'
 import { agGridTheme, useThemeContext } from 'shared-dom/themeSelector'
-import { type CardId } from 'shared/brand'
 import { type NoteCard } from 'shared/domain/card'
-import { throwExp, assertNever } from 'shared/utility'
+import { throwExp, assertNever, type Override } from 'shared/utility'
 import { Entries } from '@solid-primitives/keyed'
+import { createGrid, Renderer } from '../uiLogic/aggrid'
 
 LicenseManager.setLicenseKey(import.meta.env.VITE_AG_GRID_LICENSE)
 
-let gridRef: AgGridSolidRef
+const cacheBlockSize = 100
+
 const [fvHighlight, setFvHighlight] = createSignal<
 	FieldValueHighlight[] | undefined
 >()
@@ -69,8 +72,11 @@ const regexCtor = (fvhs: FieldValueHighlight[] | undefined, global?: true) => {
 	)
 }
 
-const shortRenderer = (index: number, props: ICellRendererParams<NoteCard>) => {
-	const { regex, regexLeft, regexRight, regexBoth } = props.context as Regexes
+const shortRenderer = (
+	index: number,
+	props: ICellRendererParams<NoteCard, unknown, Context>,
+) => {
+	const { regex, regexLeft, regexRight, regexBoth } = props.context.regexes
 	const short = () => {
 		if (props.data == null) {
 			return ''
@@ -135,131 +141,221 @@ const shortRenderer = (index: number, props: ICellRendererParams<NoteCard>) => {
 	)
 }
 
-const columnDefs: Array<ColDef<NoteCard>> = [
-	{ field: 'card.id', hide: true },
-	{ field: 'note.id', hide: true },
-	{
-		headerName: 'Card',
-		valueGetter: (x) => {
-			if (x.data != null) {
-				switch (x.data.template.templateType.tag) {
-					case 'standard':
-						return x.data.template.templateType.templates.at(x.data.card.ord)
-							?.name
-					case 'cloze':
-						return `Cloze ${x.data.card.ord}`
-					default:
-						return assertNever(x.data.template.templateType)
-				}
-			}
-		},
-	},
-	{
-		headerName: 'Short Front',
-		cellRenderer: (x: ICellRendererParams<NoteCard>) => shortRenderer(0, x),
-		cellClass: ['has-[mark]:bg-yellow-50'],
-	},
-	{
-		headerName: 'Short Back',
-		cellRenderer: (x: ICellRendererParams<NoteCard>) => shortRenderer(1, x),
-		cellClass: ['has-[mark]:bg-yellow-50'],
-	},
-	{
-		headerName: 'Due',
-		valueGetter: (x) => x.data?.card.due,
-		colId: 'card.due',
-		sortable: true,
-		cellRenderer: (
-			props: ICellRendererParams<NoteCard, NoteCard['card']['due']>,
-		) => (
-			<>
-				{typeof props.value === 'number' ? (
-					<>New #{props.value}</>
-				) : (
-					<relative-time date={props.value} />
-				)}
-			</>
-		),
-	},
-	{
-		headerName: 'Created',
-		valueGetter: (x) => x.data?.card.created,
-		colId: 'card.created',
-		sortable: true,
-		cellRenderer: (
-			props: ICellRendererParams<NoteCard, NoteCard['card']['created']>,
-		) => <relative-time date={props.value} />,
-	},
-	{
-		headerName: 'Remotes',
-		cellRenderer: (props: ICellRendererParams<NoteCard>) => (
-			<Show when={props.data?.note.remotes}>
-				<ul>
-					<Entries of={props.data!.note.remotes}>
-						{(nook, v) => (
-							<li class='mr-2 inline'>
-								<span>
-									<Show
-										when={v()}
-										fallback={
-											<>
-												<Upload class='inline h-[1em]' />
-												/n/{nook}
-											</>
-										}
-									>
-										<Show
-											when={
-												v()!.uploadDate.getTime() <=
-												props.data!.note.edited.getTime()
-											}
-										>
-											<Upload class='inline h-[1em]' />
-										</Show>
-										<a
-											class='text-blue-600 underline visited:text-purple-600 hover:text-blue-800'
-											title={`Last uploaded at ${v()!.uploadDate.toLocaleString()}`}
-											href={
-												import.meta.env.VITE_HUB_ORIGIN +
-												`/n/` +
-												nook +
-												`/note/` +
-												v()!.remoteNoteId
-											}
-										>
-											/n/{nook}
-										</a>
-									</Show>
-								</span>
-							</li>
-						)}
-					</Entries>
-				</ul>
-			</Show>
-		),
-	},
-	{
-		headerName: 'Tags',
-		valueGetter: (x) =>
-			Array.from(x.data?.card.tags.keys() ?? [])
-				.concat(Array.from(x.data?.note.tags.keys() ?? []))
-				.join(', '),
-	},
-]
+interface Context {
+	owner: Owner
+	regexes: Regexes
+}
 
-const getRowId = (params: GetRowIdParams<NoteCard>): CardId =>
-	params.data.card.id
+type CardGridOptions = Override<
+	GridOptions<NoteCard>,
+	{ context: Record<string, unknown> }
+>
+
+export const cardGridOptions = {
+	columnDefs: [
+		{ field: 'card.id', hide: true },
+		{ field: 'note.id', hide: true },
+		{
+			headerName: 'Card',
+			valueGetter: (x) => {
+				if (x.data != null) {
+					switch (x.data.template.templateType.tag) {
+						case 'standard':
+							return x.data.template.templateType.templates.at(x.data.card.ord)
+								?.name
+						case 'cloze':
+							return `Cloze ${x.data.card.ord}`
+						default:
+							return assertNever(x.data.template.templateType)
+					}
+				}
+			},
+		},
+		{
+			headerName: 'Short Front',
+			cellRenderer: class
+				extends Renderer
+				implements ICellRendererComp<NoteCard>
+			{
+				init(params: ICellRendererParams<NoteCard, unknown, Context>) {
+					this.render(params.context.owner, () => shortRenderer(0, params))
+				}
+			},
+			cellClass: ['has-[mark]:bg-yellow-50'],
+		},
+		{
+			headerName: 'Short Back',
+			cellRenderer: class
+				extends Renderer
+				implements ICellRendererComp<NoteCard>
+			{
+				init(params: ICellRendererParams<NoteCard, unknown, Context>) {
+					this.render(params.context.owner, () => shortRenderer(1, params))
+				}
+			},
+			cellClass: ['has-[mark]:bg-yellow-50'],
+		},
+		{
+			headerName: 'Due',
+			colId: 'card.due',
+			sortable: true,
+			cellRenderer: class
+				extends Renderer
+				implements ICellRendererComp<NoteCard>
+			{
+				init(params: ICellRendererParams<NoteCard, unknown, Context>) {
+					this.render(params.context.owner, () => (
+						<>
+							{typeof params.data?.card.due === 'number' ? (
+								<>New #{params.data?.card.due}</>
+							) : (
+								<relative-time date={params.data?.card.due} />
+							)}
+						</>
+					))
+				}
+			},
+		},
+		{
+			headerName: 'Created',
+			colId: 'card.created',
+			sortable: true,
+			cellRenderer: class
+				extends Renderer
+				implements ICellRendererComp<NoteCard>
+			{
+				init(params: ICellRendererParams<NoteCard, unknown, Context>) {
+					this.render(params.context.owner, () => (
+						<relative-time date={params.data?.card.created} />
+					))
+				}
+			},
+		},
+		{
+			headerName: 'Remotes',
+			cellRenderer: class
+				extends Renderer
+				implements ICellRendererComp<NoteCard>
+			{
+				init(params: ICellRendererParams<NoteCard, unknown, Context>) {
+					this.render(params.context.owner, () => (
+						<Show when={params.data?.note.remotes}>
+							<ul>
+								<Entries of={params.data!.note.remotes}>
+									{(nook, v) => (
+										<li class='mr-2 inline'>
+											<span>
+												<Show
+													when={v()}
+													fallback={
+														<>
+															<Upload class='inline h-[1em]' />
+															/n/{nook}
+														</>
+													}
+												>
+													<Show
+														when={
+															v()!.uploadDate.getTime() <=
+															params.data!.note.edited.getTime()
+														}
+													>
+														<Upload class='inline h-[1em]' />
+													</Show>
+													<a
+														class='text-blue-600 underline visited:text-purple-600 hover:text-blue-800'
+														title={`Last uploaded at ${v()!.uploadDate.toLocaleString()}`}
+														href={
+															import.meta.env.VITE_HUB_ORIGIN +
+															`/n/` +
+															nook +
+															`/note/` +
+															v()!.remoteNoteId
+														}
+													>
+														/n/{nook}
+													</a>
+												</Show>
+											</span>
+										</li>
+									)}
+								</Entries>
+							</ul>
+						</Show>
+					))
+				}
+			},
+		},
+		{
+			headerName: 'Tags',
+			valueGetter: (x) =>
+				Array.from(x.data?.card.tags.keys() ?? [])
+					.concat(Array.from(x.data?.note.tags.keys() ?? []))
+					.join(', '),
+		},
+	],
+	context: {},
+	sideBar: {
+		position: 'left',
+		defaultToolPanel: 'filters',
+		toolPanels: [
+			{
+				id: 'filters',
+				labelDefault: 'Filters',
+				labelKey: 'filters',
+				iconKey: 'filter',
+				toolPanel: class
+					extends Renderer
+					implements IToolPanelComp<NoteCard, Context>
+				{
+					init(params: IToolPanelParams<NoteCard, Context>) {
+						this.render(params.context.owner, () => (
+							<FiltersTable
+								tagsChanged={(tags) => {
+									const q = alterQuery(query(), { tags })
+									setQuery(q)
+									setExternalQuery(q)
+								}}
+								templatesChanged={() => {}}
+							/>
+						))
+					}
+				},
+			},
+			{
+				id: 'columns',
+				labelDefault: 'Columns',
+				labelKey: 'columns',
+				iconKey: 'columns',
+				toolPanel: 'agColumnsToolPanel',
+				toolPanelParams: {
+					suppressRowGroups: true,
+					suppressValues: true,
+					suppressPivotMode: true,
+				},
+			},
+		],
+	},
+	defaultColDef: { resizable: true },
+	getRowId: (params) => params.data.card.id,
+	rowSelection: 'multiple',
+	rowModelType: 'infinite',
+	onGridSizeChanged: (event) => {
+		event.api.sizeColumnsToFit()
+	},
+	cacheBlockSize,
+	suppressMultiSort: true,
+	navigateToNextCell: arrowKeyNavigation,
+	onFirstDataRendered: (params) => {
+		params.api.sizeColumnsToFit()
+	},
+} satisfies CardGridOptions as CardGridOptions
 
 const [query, setQuery] = createSignal('')
 const [externalQuery, setExternalQuery] = createSignal('')
 const [count, setCount] = createSignal<number>()
 const [selectedCount, setSelectedCount] = createSignal<number>(0)
 const [showHelp, setHelp] = createSignal(false)
-
-function setDatasource() {
-	setCount(undefined)
-	gridRef?.api.setDatasource(dataSource)
-}
 
 interface Regexes {
 	regex: Accessor<RegExp>
@@ -271,11 +367,70 @@ interface Regexes {
 const CardsTable: VoidComponent<{
 	readonly onSelectionChanged: (noteCards: NoteCard[]) => void
 }> = (props) => {
-	createEffect(
-		on([query], setDatasource, {
-			defer: true,
-		}),
-	)
+	const datasource = {
+		getRows: (p: IGetRowsParams) => {
+			const sort =
+				p.sortModel.length === 1
+					? ({
+							col: p.sortModel[0]!.colId as 'card.due' | 'card.created',
+							direction: p.sortModel[0]!.sort,
+						} satisfies Sort)
+					: undefined
+			const cleanedQuery = query().trim()
+			const now = C.getDate()
+			const conversionResult = convert(cleanedQuery, now)
+			const start = performance.now()
+			C.db
+				.getCards(
+					p.startRow,
+					cacheBlockSize,
+					cleanedQuery,
+					conversionResult,
+					sort,
+				) // medTODO could just cache the Template and mutate the NoteCard obj to add it
+				.then(async (x) => {
+					const end = performance.now()
+					console.log(`GetCards ${end - start} ms`, cleanedQuery)
+					// cSpell:ignore countish
+					const countish = x.noteCards.length
+					const countishWrong = countish === cacheBlockSize
+					p.successCallback(
+						x.noteCards,
+						countishWrong || gridApi.isLastRowIndexKnown() === true
+							? undefined
+							: countish,
+					)
+					if (p.startRow === 0) {
+						if (countish === 0) {
+							gridApi.showNoRowsOverlay()
+						} else {
+							gridApi.hideOverlay()
+						}
+					}
+					setFvHighlight(x.fieldValueHighlight)
+					if (countishWrong && gridApi.isLastRowIndexKnown() !== true) {
+						const start = performance.now()
+						const count = await C.db.getCardsCount(x.searchCache, x.baseQuery)
+						const end = performance.now()
+						console.log(`Count took ${end - start} ms`, cleanedQuery)
+						gridApi.setRowCount(count.c, true)
+						setCount(count.c)
+					} else if (!countishWrong) {
+						setCount(countish)
+					}
+					if (countishWrong && x.searchCache == null) {
+						// asynchronously/nonblockingly build the cache
+						C.db.buildCache(x.baseQuery(), cleanedQuery, sort).catch((e) => {
+							C.toastWarn('Error building cache', e)
+						})
+					}
+				})
+				.catch((e) => {
+					C.toastError('Error getting cards.', e)
+					p.failCallback()
+				})
+		},
+	}
 	const regex = createMemo(() => regexCtor(fvHighlight(), true)!)
 	const regexLeft = createMemo(() =>
 		regexCtor(fvHighlight()?.filter((f) => f.boundLeft)),
@@ -286,12 +441,37 @@ const CardsTable: VoidComponent<{
 	const regexBoth = createMemo(() =>
 		regexCtor(fvHighlight()?.filter((f) => f.boundRight && f.boundLeft)),
 	)
-	const regexes = {
-		regex,
-		regexLeft,
-		regexRight,
-		regexBoth,
-	} satisfies Regexes
+	let ref: HTMLDivElement
+	let gridApi: GridApi<NoteCard>
+	onMount(() => {
+		gridApi = createGrid(ref, C.cardGridOptions, {
+			regexes: {
+				regex,
+				regexLeft,
+				regexRight,
+				regexBoth,
+			} satisfies Regexes,
+		})
+		// eslint-disable-next-line solid/reactivity -- onSelectionChanged shouldn't ever update
+		gridApi.setGridOption('onSelectionChanged', (event) => {
+			const ncs = event.api.getSelectedRows()
+			setSelectedCount(ncs.length)
+			props.onSelectionChanged(ncs)
+		})
+		gridApi.setGridOption('datasource', datasource)
+	})
+	createEffect(
+		on(
+			[query],
+			() => {
+				setCount(undefined)
+				gridApi.setGridOption('datasource', datasource)
+			},
+			{
+				defer: true,
+			},
+		),
+	)
 	const [theme] = useThemeContext()
 	return (
 		<div class='flex h-full flex-col'>
@@ -308,73 +488,14 @@ const CardsTable: VoidComponent<{
 				{count() ?? '⏳'}
 				<Hamburger class='w-6' onclick={() => setHelp((x) => !x)} />
 			</div>
-			<div class={`${agGridTheme(theme)} h-full`}>
-				<AgGridSolid
-					context={regexes}
-					sideBar={{
-						position: 'left',
-						defaultToolPanel: 'filters',
-						toolPanels: [
-							{
-								id: 'filters',
-								labelDefault: 'Filters',
-								labelKey: 'filters',
-								iconKey: 'filter',
-								toolPanel: () => (
-									<FiltersTable
-										tagsChanged={(tags) => {
-											const q = alterQuery(query(), { tags })
-											setQuery(q)
-											setExternalQuery(q)
-										}}
-										templatesChanged={() => {}}
-									/>
-								),
-							},
-							{
-								id: 'columns',
-								labelDefault: 'Columns',
-								labelKey: 'columns',
-								iconKey: 'columns',
-								toolPanel: 'agColumnsToolPanel',
-								toolPanelParams: {
-									suppressRowGroups: true,
-									suppressValues: true,
-									suppressPivotMode: true,
-								},
-							},
-						],
-					}}
-					columnDefs={columnDefs}
-					ref={gridRef}
-					defaultColDef={{ resizable: true }}
-					getRowId={getRowId}
-					rowSelection='multiple'
-					rowModelType='infinite'
-					onGridSizeChanged={() => {
-						gridRef?.api.sizeColumnsToFit()
-					}}
-					onGridReady={onGridReady}
-					cacheBlockSize={cacheBlockSize}
-					suppressMultiSort={true}
-					onSelectionChanged={(event) => {
-						const ncs = event.api.getSelectedRows() as NoteCard[]
-						setSelectedCount(ncs.length)
-						props.onSelectionChanged(ncs)
-					}}
-					navigateToNextCell={arrowKeyNavigation}
-					onFirstDataRendered={(params) => {
-						params.api.sizeColumnsToFit()
-					}}
-				/>
-			</div>
+			<div class={`${agGridTheme(theme)} h-full`} ref={ref!} />
 		</div>
 	)
 }
 
 // https://github.com/xh/hoist-react/blob/58ca986275cedfd0b6953ac07a58d1ee937137dd/cmp/grid/impl/RowKeyNavSupport.ts
 function arrowKeyNavigation(
-	agParams: NavigateToNextCellParams<unknown, unknown>,
+	agParams: NavigateToNextCellParams<NoteCard, Context>,
 ) {
 	const agApi = agParams.api
 	const { nextCellPosition, previousCellPosition, event, key } = agParams
@@ -420,7 +541,7 @@ function arrowKeyNavigation(
 function findNextSelectable(
 	index: number,
 	isUp: boolean,
-	agApi: GridApi<unknown>,
+	agApi: GridApi<NoteCard>,
 ) {
 	const count = agApi.getDisplayedRowCount()
 	while (index >= 0 && index < count) {
@@ -432,74 +553,3 @@ function findNextSelectable(
 }
 
 export default CardsTable
-
-const cacheBlockSize = 100
-
-const onGridReady = ({ api }: GridReadyEvent) => {
-	api.setDatasource(dataSource)
-}
-
-const dataSource = {
-	getRows: (p: IGetRowsParams) => {
-		const sort =
-			p.sortModel.length === 1
-				? ({
-						col: p.sortModel[0]!.colId as 'card.due' | 'card.created',
-						direction: p.sortModel[0]!.sort,
-					} satisfies Sort)
-				: undefined
-		const cleanedQuery = query().trim()
-		const now = C.getDate()
-		const conversionResult = convert(cleanedQuery, now)
-		const start = performance.now()
-		C.db
-			.getCards(
-				p.startRow,
-				cacheBlockSize,
-				cleanedQuery,
-				conversionResult,
-				sort,
-			) // medTODO could just cache the Template and mutate the NoteCard obj to add it
-			.then(async (x) => {
-				const end = performance.now()
-				console.log(`GetCards ${end - start} ms`, cleanedQuery)
-				// cSpell:ignore countish
-				const countish = x.noteCards.length
-				const countishWrong = countish === cacheBlockSize
-				p.successCallback(
-					x.noteCards,
-					countishWrong || gridRef.api.isLastRowIndexKnown() === true
-						? undefined
-						: countish,
-				)
-				if (p.startRow === 0) {
-					if (countish === 0) {
-						gridRef.api.showNoRowsOverlay()
-					} else {
-						gridRef.api.hideOverlay()
-					}
-				}
-				setFvHighlight(x.fieldValueHighlight)
-				if (countishWrong && gridRef.api.isLastRowIndexKnown() !== true) {
-					const start = performance.now()
-					const count = await C.db.getCardsCount(x.searchCache, x.baseQuery)
-					const end = performance.now()
-					console.log(`Count took ${end - start} ms`, cleanedQuery)
-					gridRef.api.setRowCount(count.c, true)
-					setCount(count.c)
-				} else if (!countishWrong) {
-					setCount(countish)
-				}
-				if (countishWrong && x.searchCache == null) {
-					// asynchronously/nonblockingly build the cache
-					C.db.buildCache(x.baseQuery(), cleanedQuery, sort).catch((e) => {
-						C.toastWarn('Error building cache', e)
-					})
-				}
-			})
-			.catch((e) => {
-				C.toastError('Error getting cards.', e)
-				p.failCallback()
-			})
-	},
-}

@@ -8,6 +8,7 @@ import ExamplePlugin from './components/examplePlugin'
 import { syncGridOptions } from './pages/sync'
 import { pluginGridOptions } from './components/pluginsTable'
 import { templateGridOptions } from './components/templatesTable'
+import { cardGridOptions } from './components/cardsTable'
 import { db } from './db'
 
 export const domContainer = {
@@ -24,6 +25,7 @@ export const defaultContainer = (args: RenderContainerArgs) => ({
 	syncGridOptions,
 	pluginGridOptions,
 	templateGridOptions,
+	cardGridOptions,
 	db,
 })
 
