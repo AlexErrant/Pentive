@@ -1,7 +1,6 @@
 import {
 	createEffect,
 	createResource,
-	getOwner,
 	onMount,
 	type Owner,
 	Show,
@@ -14,7 +13,6 @@ import { agGridTheme, useThemeContext } from 'shared-dom/themeSelector'
 import {
 	type GridOptions,
 	type ICellRendererParams,
-	createGrid,
 	type ICellRendererComp,
 	type GridApi,
 	type IHeaderComp,
@@ -31,7 +29,7 @@ import { objKeys, type Override } from 'shared/utility'
 import { type Note } from 'shared/domain/note'
 import { NoteNookSync } from '../components/noteSync'
 import { useWhoAmIContext } from '../components/whoAmIContext'
-import { Renderer } from '../uiLogic/aggrid'
+import { createGrid, Renderer } from '../uiLogic/aggrid'
 
 LicenseManager.setLicenseKey(import.meta.env.VITE_AG_GRID_LICENSE)
 
@@ -107,40 +105,6 @@ export default function Sync(): JSX.Element {
 	)
 }
 
-class CellRenderer extends Renderer implements ICellRendererComp<Row> {
-	init(params: ICellRendererParams<Row, unknown, Context>) {
-		if (params.data == null) {
-			return
-		}
-		if (params.data.tag === 'template') {
-			const remoteTemplate = params.data.template.remotes[params.data.nook]
-			this.render(params.context.owner, () => (
-				<TemplateNookSync
-					template={(params.data as RowTemplate).template}
-					remoteTemplate={remoteTemplate}
-					nook={params.data!.nook}
-				/>
-			))
-		} else if (params.data.tag === 'note') {
-			const remoteNote = params.data.note.remotes[params.data.nook]
-			this.render(params.context.owner, () => (
-				<NoteNookSync
-					template={(params.data as RowNote).template}
-					note={(params.data as RowNote).note}
-					nook={params.data!.nook}
-					remoteNote={remoteNote}
-				/>
-			))
-		}
-	}
-}
-
-class HeaderRenderer extends Renderer implements IHeaderComp {
-	init(params: IHeaderParams<Row, Context>) {
-		this.render(params.context.owner, () => <DiffModeToggleGroup />)
-	}
-}
-
 type Type = 'new' | 'edited'
 
 interface RowTemplate {
@@ -171,8 +135,39 @@ export const syncGridOptions = {
 		{ field: 'tag', enableRowGroup: true, filter: true },
 		{
 			headerName: 'Diff',
-			headerComponent: HeaderRenderer,
-			cellRenderer: CellRenderer,
+			headerComponent: class extends Renderer implements IHeaderComp {
+				init(params: IHeaderParams<Row, Context>) {
+					this.render(params.context.owner, () => <DiffModeToggleGroup />)
+				}
+			},
+			cellRenderer: class extends Renderer implements ICellRendererComp<Row> {
+				init(params: ICellRendererParams<Row, unknown, Context>) {
+					if (params.data == null) {
+						return
+					}
+					if (params.data.tag === 'template') {
+						const remoteTemplate =
+							params.data.template.remotes[params.data.nook]
+						this.render(params.context.owner, () => (
+							<TemplateNookSync
+								template={(params.data as RowTemplate).template}
+								remoteTemplate={remoteTemplate}
+								nook={params.data!.nook}
+							/>
+						))
+					} else if (params.data.tag === 'note') {
+						const remoteNote = params.data.note.remotes[params.data.nook]
+						this.render(params.context.owner, () => (
+							<NoteNookSync
+								template={(params.data as RowNote).template}
+								note={(params.data as RowNote).note}
+								nook={params.data!.nook}
+								remoteNote={remoteNote}
+							/>
+						))
+					}
+				}
+			},
 			autoHeight: true,
 			flex: 1,
 		},
@@ -191,16 +186,13 @@ function Content(): JSX.Element {
 	let ref: HTMLDivElement
 	let gridApi: GridApi<Row>
 	onMount(() => {
-		const owner = getOwner()!
-		C.syncGridOptions.context.owner = owner
 		gridApi = createGrid(ref, C.syncGridOptions)
 	})
-	const [uploadables] = createResource(getUploadables)
+	const [uploadables] = createResource(getUploadables, {
+		initialValue: [],
+	})
 	createEffect(() => {
-		const u = uploadables()
-		if (u != null) {
-			gridApi.setGridOption('rowData', u)
-		}
+		gridApi.setGridOption('rowData', uploadables())
 	})
 	const [theme] = useThemeContext()
 	return (
