@@ -20,10 +20,10 @@ import {
 	type IGetRowsParams,
 	type IToolPanelComp,
 	type IToolPanelParams,
-} from 'ag-grid-community2'
-import 'ag-grid-community2/styles/ag-grid.css'
-import 'ag-grid-community2/styles/ag-theme-alpine.css'
-import { LicenseManager } from 'ag-grid-enterprise2'
+} from 'ag-grid-community'
+import 'ag-grid-community/styles/ag-grid.css'
+import 'ag-grid-community/styles/ag-theme-alpine.css'
+import { LicenseManager } from 'ag-grid-enterprise'
 import { Upload, Hamburger } from 'shared-dom/icons'
 import { getOk } from 'shared-dom/cardHtml'
 import {

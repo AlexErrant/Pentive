@@ -5,10 +5,10 @@ import {
 	onMount,
 	type VoidComponent,
 } from 'solid-js'
-import { type GridOptions, type GridApi } from 'ag-grid-community2'
-import 'ag-grid-community2/styles/ag-grid.css'
-import 'ag-grid-community2/styles/ag-theme-alpine.css'
-import { LicenseManager } from 'ag-grid-enterprise2'
+import { type GridOptions, type GridApi } from 'ag-grid-community'
+import 'ag-grid-community/styles/ag-grid.css'
+import 'ag-grid-community/styles/ag-theme-alpine.css'
+import { LicenseManager } from 'ag-grid-enterprise'
 import '@github/relative-time-element'
 import { type TemplateId } from 'shared/brand'
 import { agGridTheme, useThemeContext } from 'shared-dom/themeSelector'

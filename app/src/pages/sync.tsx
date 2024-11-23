@@ -17,10 +17,10 @@ import {
 	type GridApi,
 	type IHeaderComp,
 	type IHeaderParams,
-} from 'ag-grid-community2'
-import 'ag-grid-community2/styles/ag-grid.css'
-import 'ag-grid-community2/styles/ag-theme-alpine.css'
-import { LicenseManager } from 'ag-grid-enterprise2'
+} from 'ag-grid-community'
+import 'ag-grid-community/styles/ag-grid.css'
+import 'ag-grid-community/styles/ag-theme-alpine.css'
+import { LicenseManager } from 'ag-grid-enterprise'
 import { DiffModeToggleGroup } from '../components/diffModeContext'
 import { uploadNotes, uploadTemplates } from '../domain/sync'
 import { type NookId } from 'shared/brand'

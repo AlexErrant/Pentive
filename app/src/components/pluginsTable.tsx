@@ -10,10 +10,10 @@ import {
 	type ICellRendererParams,
 	type ICellRendererComp,
 	type GridApi,
-} from 'ag-grid-community2'
-import 'ag-grid-community2/styles/ag-grid.css'
-import 'ag-grid-community2/styles/ag-theme-alpine.css'
-import { LicenseManager } from 'ag-grid-enterprise2'
+} from 'ag-grid-community'
+import 'ag-grid-community/styles/ag-grid.css'
+import 'ag-grid-community/styles/ag-theme-alpine.css'
+import { LicenseManager } from 'ag-grid-enterprise'
 import '@github/relative-time-element'
 import { type Plugin } from 'shared-dom/plugin'
 import { C } from '../topLevelAwait'

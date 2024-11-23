@@ -211,12 +211,12 @@ importers:
       '@zip.js/zip.js':
         specifier: ^2.7.29
         version: 2.7.29
-      ag-grid-community2:
-        specifier: npm:ag-grid-community@^32.2.2
-        version: ag-grid-community@32.2.2
-      ag-grid-enterprise2:
-        specifier: npm:ag-grid-enterprise@^32.2.2
-        version: ag-grid-enterprise@32.2.2
+      ag-grid-community:
+        specifier: ^32.2.2
+        version: 32.2.2
+      ag-grid-enterprise:
+        specifier: ^32.2.2
+        version: 32.2.2
       ajv:
         specifier: ^8.12.0
         version: 8.17.1

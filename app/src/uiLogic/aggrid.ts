@@ -1,7 +1,4 @@
-import {
-	createGrid as createAgGrid,
-	type GridOptions,
-} from 'ag-grid-community2'
+import { createGrid as createAgGrid, type GridOptions } from 'ag-grid-community'
 import { type Override } from 'shared/utility'
 import { getOwner, type JSX, type Owner, runWithOwner } from 'solid-js'
 import { render } from 'solid-js/web'
