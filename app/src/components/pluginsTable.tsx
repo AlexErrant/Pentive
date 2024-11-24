@@ -135,9 +135,7 @@ const PluginsTable: VoidComponent = () => {
 	onMount(() => {
 		gridApi = createGrid(ref, C.pluginGridOptions)
 	})
-	const [plugins] = createResource(C.db.getPlugins, {
-		initialValue: [],
-	})
+	const [plugins] = createResource(C.db.getPlugins)
 	createEffect(() => {
 		gridApi.setGridOption('rowData', plugins())
 	})

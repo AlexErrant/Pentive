@@ -188,9 +188,7 @@ function Content(): JSX.Element {
 	onMount(() => {
 		gridApi = createGrid(ref, C.syncGridOptions)
 	})
-	const [uploadables] = createResource(getUploadables, {
-		initialValue: [],
-	})
+	const [uploadables] = createResource(getUploadables)
 	createEffect(() => {
 		gridApi.setGridOption('rowData', uploadables())
 	})
