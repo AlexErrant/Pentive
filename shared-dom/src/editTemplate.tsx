@@ -1,4 +1,4 @@
-import { type VoidComponent, For, Show, createEffect } from 'solid-js'
+import { type VoidComponent, For, Show, createEffect, on } from 'solid-js'
 import { type SetStoreFunction, createStore } from 'solid-js/store'
 import { Select } from '@thisbeyond/solid-select'
 import { type ClozeTemplate, type StandardTemplate } from './cardHtml'
@@ -41,11 +41,14 @@ export const EditTemplate: VoidComponent<{
 		// eslint-disable-next-line solid/reactivity
 		template: props.getDefaultTemplate(),
 	})
-	createEffect(() => {
-		// eslint-disable-next-line @typescript-eslint/no-unused-expressions -- touch template.id so we setTemplate if template changes
-		props.template.id
-		setTemplate('template', props.template)
-	})
+	createEffect(
+		on(
+			() => props.template.id,
+			() => {
+				setTemplate('template', props.template)
+			},
+		),
+	)
 	return (
 		<>
 			<Select

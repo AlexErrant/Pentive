@@ -5,16 +5,21 @@ import { C } from './topLevelAwait'
 import { ThemeProvider } from 'shared-dom/themeSelector'
 import { DiffModeProvider } from './components/diffModeContext'
 import { WhoAmIProvider } from './components/whoAmIContext'
+import { QueryClient, QueryClientProvider } from '@tanstack/solid-query'
+
+const client = new QueryClient()
 
 render(
 	() => (
-		<WhoAmIProvider>
-			<DiffModeProvider>
-				<ThemeProvider>
-					<App />
-				</ThemeProvider>
-			</DiffModeProvider>
-		</WhoAmIProvider>
+		<QueryClientProvider client={client}>
+			<WhoAmIProvider>
+				<DiffModeProvider>
+					<ThemeProvider>
+						<App />
+					</ThemeProvider>
+				</DiffModeProvider>
+			</WhoAmIProvider>
+		</QueryClientProvider>
 	),
 	document.getElementById('root') as HTMLElement,
 )

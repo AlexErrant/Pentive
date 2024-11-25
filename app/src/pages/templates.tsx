@@ -40,7 +40,7 @@ export default function Templates(): JSX.Element {
 				render(
 					() => (
 						<Show when={selected.template != null}>
-							<EditTemplate template={selected.template!} />
+							<EditTemplate type='edit' template={selected.template!} />
 						</Show>
 					),
 					container.element,
@@ -66,7 +66,7 @@ export default function Templates(): JSX.Element {
 			(container) => {
 				container.element.style.overflow = 'auto'
 				render(
-					() => <EditTemplate template={getDefaultTemplate()} />,
+					() => <EditTemplate type='add' template={getDefaultTemplate()} />,
 					container.element,
 				)
 			},

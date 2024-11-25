@@ -1,5 +1,5 @@
 import { EditTemplate as EditTemplateOg } from 'shared-dom/editTemplate'
-import { Show, type VoidComponent } from 'solid-js'
+import { createSignal, type Setter, Show, type VoidComponent } from 'solid-js'
 import { type SetStoreFunction } from 'solid-js/store'
 import { useThemeContext } from 'shared-dom/themeSelector'
 import { C } from '../topLevelAwait'
@@ -7,16 +7,36 @@ import { getDefaultTemplate } from '../domain/utility'
 import { type Template } from 'shared/domain/template'
 import { type NookId } from 'shared/brand'
 import { Entries } from '@solid-primitives/keyed'
+import { createMutation } from '@tanstack/solid-query'
 
-const saveButton = (template: { template: Template }) => (
-	<button
-		onClick={async () => {
-			await C.db.upsertTemplate(template.template)
-		}}
-	>
-		Save
-	</button>
-)
+type AddEdit = 'add' | 'edit'
+
+const saveButton = (props: {
+	template: Template
+	type: AddEdit
+	setTemplate: Setter<Template>
+}) => {
+	const upsertTemplate = createMutation(() => ({
+		mutationFn: async () => {
+			await C.db.upsertTemplate(props.template)
+		},
+		onSuccess: () => {
+			if (props.type === 'add') {
+				props.setTemplate(getDefaultTemplate())
+			}
+		},
+	}))
+	return (
+		<button
+			disabled={upsertTemplate.isPending}
+			onClick={() => {
+				upsertTemplate.mutate()
+			}}
+		>
+			Save
+		</button>
+	)
+}
 
 function removeNook(
 	nook: NookId,
@@ -84,15 +104,20 @@ const remoteCell: VoidComponent<{
 
 export const EditTemplate: VoidComponent<{
 	template: Template
+	type: AddEdit
 }> = (props) => {
 	const [theme] = useThemeContext()
+	// eslint-disable-next-line solid/reactivity
+	const [template, setTemplate] = createSignal(props.template)
 	return (
 		<EditTemplateOg
 			getDefaultTemplate={getDefaultTemplate}
-			saveButton={saveButton}
+			saveButton={({ template }) =>
+				saveButton({ template, setTemplate, type: props.type })
+			}
 			theme={theme()}
 			renderContainer={C}
-			template={props.template}
+			template={template()}
 			remoteCell={remoteCell}
 		/>
 	)
