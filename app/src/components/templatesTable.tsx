@@ -36,15 +36,17 @@ const cacheBlockSize = 100
 export const templateGridOptions = {
 	columnDefs: [
 		{
-			headerName: 'Name',
-			valueGetter: (row) => row.data?.name,
+			colId: 'name',
+			field: 'name',
 		},
 		{
+			colId: 'Type',
 			headerName: 'Type',
 			valueGetter: (row) => startCase(row?.data?.templateType.tag),
 		},
 		{
 			headerName: 'Remotes',
+			flex: 1,
 			cellRenderer: class
 				extends Renderer
 				implements ICellRendererComp<Template>
@@ -141,12 +143,6 @@ export const templateGridOptions = {
 		enableClickSelection: true,
 	},
 	cacheBlockSize,
-	onGridSizeChanged: (event) => {
-		event.api.sizeColumnsToFit()
-	},
-	onFirstDataRendered: (params) => {
-		params.api.sizeColumnsToFit()
-	},
 } satisfies TemplateGridOptions as TemplateGridOptions
 
 const TemplatesTable: VoidComponent<{
@@ -167,6 +163,7 @@ const TemplatesTable: VoidComponent<{
 					.getTemplatesInfinitely(p.startRow, cacheBlockSize)
 					.then((x) => {
 						p.successCallback(x.templates, x.count)
+						gridApi.autoSizeColumns(['name', 'Type'])
 					})
 					.catch(() => {
 						p.failCallback()

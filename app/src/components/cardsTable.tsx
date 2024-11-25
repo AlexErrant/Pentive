@@ -156,6 +156,7 @@ export const cardGridOptions = {
 		{ field: 'card.id', hide: true },
 		{ field: 'note.id', hide: true },
 		{
+			colId: 'Card',
 			headerName: 'Card',
 			valueGetter: (x) => {
 				if (x.data != null) {
@@ -182,6 +183,7 @@ export const cardGridOptions = {
 				}
 			},
 			cellClass: ['has-[mark]:bg-yellow-50'],
+			flex: 2,
 		},
 		{
 			headerName: 'Short Back',
@@ -194,6 +196,7 @@ export const cardGridOptions = {
 				}
 			},
 			cellClass: ['has-[mark]:bg-yellow-50'],
+			flex: 1,
 		},
 		{
 			headerName: 'Due',
@@ -233,6 +236,7 @@ export const cardGridOptions = {
 		},
 		{
 			headerName: 'Remotes',
+			flex: 1,
 			cellRenderer: class
 				extends Renderer
 				implements ICellRendererComp<NoteCard>
@@ -288,6 +292,7 @@ export const cardGridOptions = {
 		},
 		{
 			headerName: 'Tags',
+			flex: 1,
 			valueGetter: (x) =>
 				Array.from(x.data?.card.tags.keys() ?? [])
 					.concat(Array.from(x.data?.note.tags.keys() ?? []))
@@ -345,15 +350,9 @@ export const cardGridOptions = {
 		enableClickSelection: true,
 	},
 	rowModelType: 'infinite',
-	onGridSizeChanged: (event) => {
-		event.api.sizeColumnsToFit()
-	},
 	cacheBlockSize,
 	suppressMultiSort: true,
 	navigateToNextCell: arrowKeyNavigation,
-	onFirstDataRendered: (params) => {
-		params.api.sizeColumnsToFit()
-	},
 } satisfies CardGridOptions as CardGridOptions
 
 const [query, setQuery] = createSignal('')
@@ -406,6 +405,7 @@ const CardsTable: VoidComponent<{
 							: countish,
 					)
 					if (p.startRow === 0) {
+						gridApi.autoSizeColumns(['Card', 'card.due', 'card.created'])
 						if (countish === 0) {
 							gridApi.showNoRowsOverlay()
 						} else {

@@ -53,12 +53,6 @@ export const filterGridOptions = {
 	rowModelType: 'clientSide',
 	domLayout: 'autoHeight',
 	groupDefaultExpanded: 2,
-	onGridSizeChanged: (event) => {
-		event.api.sizeColumnsToFit()
-	},
-	onFirstDataRendered: (params) => {
-		params.api.sizeColumnsToFit()
-	},
 	getDataPath: (data: FilterNode) => data.dataPath,
 	treeData: true,
 } satisfies FilterGridOptions as FilterGridOptions

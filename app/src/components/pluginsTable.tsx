@@ -121,12 +121,6 @@ export const pluginGridOptions = {
 	defaultColDef: { resizable: true },
 	getRowId: (params) => params.data.name,
 	rowModelType: 'clientSide',
-	onGridSizeChanged: (event) => {
-		event.api.sizeColumnsToFit()
-	},
-	onFirstDataRendered: (params) => {
-		params.api.sizeColumnsToFit()
-	},
 } satisfies PluginGridOptions as PluginGridOptions
 
 const PluginsTable: VoidComponent = () => {
