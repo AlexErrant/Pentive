@@ -97,6 +97,7 @@
 		"@solid-primitives/scheduled": "^1.4.3",
 		"@solidjs/router": "^0.14.1",
 		"@tanstack/solid-query": "^5.60.6",
+		"@tanstack/solid-query-devtools": "^5.61.4",
 		"@tanstack/solid-table": "^8.10.3",
 		"@thisbeyond/solid-select": "^0.14.0",
 		"@trpc/client": "^10.38.5",
