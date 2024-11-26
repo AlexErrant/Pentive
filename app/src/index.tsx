@@ -6,6 +6,7 @@ import { ThemeProvider } from 'shared-dom/themeSelector'
 import { DiffModeProvider } from './components/diffModeContext'
 import { WhoAmIProvider } from './components/whoAmIContext'
 import { QueryClient, QueryClientProvider } from '@tanstack/solid-query'
+import { TemplatesTableProvider } from './components/templatesTableContext'
 
 const client = new QueryClient()
 
@@ -15,7 +16,9 @@ render(
 			<WhoAmIProvider>
 				<DiffModeProvider>
 					<ThemeProvider>
-						<App />
+						<TemplatesTableProvider>
+							<App />
+						</TemplatesTableProvider>
 					</ThemeProvider>
 				</DiffModeProvider>
 			</WhoAmIProvider>
