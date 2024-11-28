@@ -26,7 +26,7 @@ import './registry'
 import { C } from '../topLevelAwait'
 import { type Override } from 'shared/utility'
 import { createGrid, Renderer } from '../uiLogic/aggrid'
-import { useTemplatesTableContext } from './templatesTableContext'
+import { useTableCountContext } from './tableCountContext'
 
 LicenseManager.setLicenseKey(import.meta.env.VITE_AG_GRID_LICENSE)
 
@@ -179,12 +179,13 @@ const TemplatesTable: VoidComponent<{
 			},
 		})
 	})
-	const [add, setAdd] = useTemplatesTableContext().addTemplate
+	const [templateRowDelta, setTemplateRowDelta] =
+		useTableCountContext().templateRowDelta
 	createEffect(
 		on(
-			add,
-			(add) => {
-				if (add != null) {
+			templateRowDelta,
+			(templateRowDelta) => {
+				if (templateRowDelta != null) {
 					// This code is copied from the "Using Cache API Methods" example
 					// https://www.ag-grid.com/javascript-data-grid/infinite-scrolling/#example-using-cache-api-methods
 					// https://codesandbox.io/p/sandbox/v6klrp
@@ -199,10 +200,10 @@ const TemplatesTable: VoidComponent<{
 					const maxRowFound = gridApi.isLastRowIndexKnown()
 					if (maxRowFound ?? false) {
 						const rowCount = gridApi.getDisplayedRowCount()
-						gridApi.setRowCount(rowCount + 1)
+						gridApi.setRowCount(rowCount + templateRowDelta)
 					}
 					gridApi.refreshInfiniteCache()
-					setAdd(undefined) // "unset" add so we can listen to new changes
+					setTemplateRowDelta(undefined) // "unset" add so we can listen to new changes
 				}
 			},
 			{ defer: true },

@@ -8,7 +8,7 @@ import { type Template } from 'shared/domain/template'
 import { type NookId } from 'shared/brand'
 import { Entries } from '@solid-primitives/keyed'
 import { createMutation } from '@tanstack/solid-query'
-import { useTemplatesTableContext } from './templatesTableContext'
+import { useTableCountContext } from './tableCountContext'
 
 type AddEdit = 'add' | 'edit'
 
@@ -17,7 +17,7 @@ const saveButton = (props: {
 	type: AddEdit
 	setTemplate: Setter<Template>
 }) => {
-	const [, setAdd] = useTemplatesTableContext().addTemplate
+	const [, setTemplateRowDelta] = useTableCountContext().templateRowDelta
 	const upsertTemplate = createMutation(() => ({
 		mutationFn: async () => {
 			await C.db.upsertTemplate(props.template)
@@ -25,7 +25,7 @@ const saveButton = (props: {
 		onSuccess: () => {
 			if (props.type === 'add') {
 				props.setTemplate(getDefaultTemplate())
-				setAdd(props.template)
+				setTemplateRowDelta(1)
 			}
 		},
 	}))
