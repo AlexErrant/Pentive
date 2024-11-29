@@ -9,6 +9,7 @@ import { type NookId } from 'shared/brand'
 import { Entries } from '@solid-primitives/keyed'
 import { createMutation } from '@tanstack/solid-query'
 import { useTableCountContext } from './tableCountContext'
+import { assertNever } from 'shared/utility'
 
 type AddEdit = 'add' | 'edit'
 
@@ -26,6 +27,10 @@ const saveButton = (props: {
 			if (props.type === 'add') {
 				props.setTemplate(getDefaultTemplate())
 				setTemplateRowDelta(1)
+			} else if (props.type === 'edit') {
+				setTemplateRowDelta(0)
+			} else {
+				assertNever(props.type)
 			}
 		},
 	}))
