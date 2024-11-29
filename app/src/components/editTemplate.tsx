@@ -33,6 +33,10 @@ const saveButton = (props: {
 				assertNever(props.type)
 			}
 		},
+		onError: (e) => {
+			C.toastError('Error occured while saving, see console for details.')
+			throw e
+		},
 	}))
 	return (
 		<button
