@@ -88,53 +88,58 @@ function domainToEditRemote(template: Template, nook?: NookId) {
 
 export const templateCollectionMethods = {
 	upsertTemplate: async function (template: Template) {
-		const { insertTemplate, remoteTemplates } = templateToDocType(template)
-		const conflictValues = {
-			...insertTemplate,
-			id: undefined,
-			created: undefined,
-		}
-		await ky
-			.insertInto('template')
-			.values(insertTemplate)
-			.onConflict((db) => db.doUpdateSet(conflictValues))
-			.execute()
-		const oldRts = await ky
-			.selectFrom('remoteTemplate')
-			.selectAll()
-			.where('localId', '=', template.id)
-			.execute()
-		// the following deleted/added/edited logic assumes ONE template
-		const newRts = remoteTemplates
-		const deleted = oldRts.filter((o) => !newRts.some((n) => n.nook === o.nook))
-		const added = newRts.filter((o) => !oldRts.some((n) => n.nook === o.nook))
-		const edited = newRts.filter((o) => oldRts.some((n) => n.nook === o.nook))
-		if (deleted.length !== 0) {
-			await ky
-				.deleteFrom('remoteTemplate')
+		await tx(async (tx) => {
+			const { insertTemplate, remoteTemplates } = templateToDocType(template)
+			const conflictValues = {
+				...insertTemplate,
+				id: undefined,
+				created: undefined,
+			}
+			await tx
+				.insertInto('template')
+				.values(insertTemplate)
+				.onConflict((db) => db.doUpdateSet(conflictValues))
+				.execute()
+			const oldRts = await tx
+				.selectFrom('remoteTemplate')
+				.selectAll()
 				.where('localId', '=', template.id)
-				.where(
-					'nook',
-					'in',
-					deleted.map((t) => t.nook),
-				)
 				.execute()
-		}
-		if (added.length !== 0) {
-			await ky.insertInto('remoteTemplate').values(added).execute()
-		}
-		if (edited.length !== 0) {
-			await ky
-				.insertInto('remoteTemplate')
-				.values(edited)
-				.onConflict((db) =>
-					db.doUpdateSet({
-						uploadDate: (x) => x.ref('excluded.uploadDate'),
-						remoteId: (x) => x.ref('excluded.remoteId'),
-					} satisfies OnConflictUpdateRemoteTemplateSet),
-				)
-				.execute()
-		}
+			// the following deleted/added/edited logic assumes ONE template
+			const newRts = remoteTemplates
+			const deleted = oldRts.filter(
+				(o) => !newRts.some((n) => n.nook === o.nook),
+			)
+			const added = newRts.filter((o) => !oldRts.some((n) => n.nook === o.nook))
+			const edited = newRts.filter((o) => oldRts.some((n) => n.nook === o.nook))
+			if (deleted.length !== 0) {
+				await tx
+					.deleteFrom('remoteTemplate')
+					.where('localId', '=', template.id)
+					.where(
+						'nook',
+						'in',
+						deleted.map((t) => t.nook),
+					)
+					.execute()
+			}
+			if (added.length !== 0) {
+				await tx.insertInto('remoteTemplate').values(added).execute()
+			}
+			if (edited.length !== 0) {
+				await tx
+					.insertInto('remoteTemplate')
+					.values(edited)
+					.onConflict((db) =>
+						db.doUpdateSet({
+							uploadDate: (x) => x.ref('excluded.uploadDate'),
+							remoteId: (x) => x.ref('excluded.remoteId'),
+						} satisfies OnConflictUpdateRemoteTemplateSet),
+					)
+					.execute()
+			}
+		})
+	},
 	},
 	bulkInsertTemplate: async function (templates: Template[]) {
 		const entities = templates.map(templateToDocType)
