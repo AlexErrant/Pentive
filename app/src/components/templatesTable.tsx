@@ -44,6 +44,11 @@ const cacheBlockSize = 100
 export const templateGridOptions = {
 	columnDefs: [
 		{
+			colId: 'id',
+			field: 'id',
+			hide: true,
+		},
+		{
 			colId: 'name',
 			field: 'name',
 		},
