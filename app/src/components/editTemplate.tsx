@@ -38,15 +38,39 @@ const saveButton = (props: {
 			throw e
 		},
 	}))
+	const deleteTemplate = createMutation(() => ({
+		mutationFn: async () => {
+			await C.db.deleteTemplate(props.template.id)
+		},
+		onSuccess: () => {
+			setTemplateRowDelta(-1)
+		},
+		onError: (e) => {
+			C.toastError('Error occured while deleting, see console for details.')
+			throw e
+		},
+	}))
 	return (
-		<button
-			disabled={upsertTemplate.isPending}
-			onClick={() => {
-				upsertTemplate.mutate()
-			}}
-		>
-			Save
-		</button>
+		<div class='flex justify-between'>
+			<button
+				disabled={upsertTemplate.isPending}
+				onClick={() => {
+					upsertTemplate.mutate()
+				}}
+			>
+				Save
+			</button>
+			<Show when={props.type === 'edit'}>
+				<button
+					disabled={deleteTemplate.isPending}
+					onClick={() => {
+						deleteTemplate.mutate()
+					}}
+				>
+					Delete
+				</button>
+			</Show>
+		</div>
 	)
 }
 

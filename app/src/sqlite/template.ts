@@ -140,6 +140,14 @@ export const templateCollectionMethods = {
 			}
 		})
 	},
+	deleteTemplate: async function (templateId: TemplateId) {
+		await tx(async (tx) => {
+			await tx.deleteFrom('template').where('id', '=', templateId).execute()
+			await tx
+				.deleteFrom('remoteTemplate')
+				.where('localId', '=', templateId)
+				.execute()
+		})
 	},
 	bulkInsertTemplate: async function (templates: Template[]) {
 		const entities = templates.map(templateToDocType)
