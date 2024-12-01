@@ -40,6 +40,7 @@ export const filterGridOptions = {
 			suppressCount: true,
 			checkbox: true,
 		} satisfies IGroupCellRendererParams<FilterNode>,
+		field: 'name',
 	},
 	rowSelection: {
 		mode: 'multiRow',
@@ -59,6 +60,7 @@ export const filterGridOptions = {
 
 export interface FilterNode {
 	searchId: string
+	name: string
 	dataPath: string[]
 }
 
@@ -90,20 +92,22 @@ const FiltersTable: VoidComponent<{
 	})
 	const [nodes] = createResource(async () => {
 		const tags = C.db.getTags().then((tags) =>
-			tags.map(
-				(t) =>
-					({
-						searchId: t,
-						dataPath: [TagsNodeName, ...t.split('/')],
-					}) satisfies FilterNode,
-			),
+			tags.map((t) => {
+				const dataPath = [TagsNodeName, ...t.split('/')]
+				return {
+					searchId: t,
+					dataPath,
+					name: dataPath.at(-1)!,
+				} satisfies FilterNode
+			}),
 		)
 		const templates = C.db.getTemplates().then((templates) =>
 			templates.map(
 				(t) =>
 					({
 						searchId: t.id,
-						dataPath: [TemplatesNodeName, t.name],
+						dataPath: [TemplatesNodeName, t.id],
+						name: t.name,
 					}) satisfies FilterNode,
 			),
 		)
