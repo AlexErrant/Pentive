@@ -90,15 +90,19 @@ export const templateCollectionMethods = {
 	upsertTemplate: async function (template: Template) {
 		await tx(async (tx) => {
 			const { insertTemplate, remoteTemplates } = templateToDocType(template)
-			const conflictValues = {
-				...insertTemplate,
-				id: undefined,
-				created: undefined,
-			}
 			await tx
 				.insertInto('template')
 				.values(insertTemplate)
-				.onConflict((db) => db.doUpdateSet(conflictValues))
+				.onConflict((db) =>
+					db.doUpdateSet({
+						name: (x) => x.ref('excluded.name'),
+						css: (x) => x.ref('excluded.css'),
+						fields: (x) => x.ref('excluded.fields'),
+						templateType: (x) => x.ref('excluded.templateType'),
+						edited: (x) => x.ref('excluded.edited'),
+						ankiId: (x) => x.ref('excluded.ankiId'),
+					} satisfies OnConflictUpdateTemplateSet),
+				)
 				.execute()
 			const oldRts = await tx
 				.selectFrom('remoteTemplate')
@@ -500,6 +504,18 @@ type OnConflictUpdateRemoteTemplateSet = {
 		x: ExpressionBuilder<
 			OnConflictDatabase<DB, 'remoteTemplate'>,
 			OnConflictTables<'remoteTemplate'>
+		>,
+	) => unknown
+}
+
+// The point of this type is to cause an error if something is added to Template
+// If that happens, you probably want to update the `doUpdateSet` call.
+// If not, you an add an exception to the Exclude below.
+type OnConflictUpdateTemplateSet = {
+	[K in keyof TemplateEntity as Exclude<K, 'id' | 'created'>]: (
+		x: ExpressionBuilder<
+			OnConflictDatabase<DB, 'template'>,
+			OnConflictTables<'template'>
 		>,
 	) => unknown
 }
