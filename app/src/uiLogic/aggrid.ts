@@ -1,6 +1,18 @@
-import { createGrid as createAgGrid, type GridOptions } from 'ag-grid-community'
+import {
+	createGrid as createAgGrid,
+	type GridApi,
+	type GridOptions,
+} from 'ag-grid-community'
 import { type Override } from 'shared/utility'
-import { getOwner, type JSX, type Owner, runWithOwner } from 'solid-js'
+import {
+	createEffect,
+	getOwner,
+	type JSX,
+	on,
+	type Owner,
+	runWithOwner,
+	type Signal,
+} from 'solid-js'
 import { render } from 'solid-js/web'
 
 export class Renderer {
@@ -42,4 +54,38 @@ export function createGrid<TData>(
 			owner: getOwner()!,
 		},
 	})
+}
+
+export function registerGridUpdate<T>(
+	gridApi: GridApi<T>,
+	[templateRowDelta, setTemplateRowDelta]: Signal<number | undefined>,
+) {
+	createEffect(
+		on(
+			templateRowDelta,
+			(templateRowDelta) => {
+				if (templateRowDelta != null) {
+					// This code is copied from the "Using Cache API Methods" example
+					// https://www.ag-grid.com/javascript-data-grid/infinite-scrolling/#example-using-cache-api-methods
+					// https://codesandbox.io/p/sandbox/v6klrp
+
+					// if the data has stopped looking for the last row, then we need to adjust the
+					// row count to allow for the extra data, otherwise the grid will not allow scrolling
+					// to the last row. eg if we have 1000 rows, scroll all the way to the bottom (so
+					// maxRowFound=true), and then add 5 rows, the rowCount needs to be adjusted
+					// to 1005, so grid can scroll to the end. the grid does NOT do this for you in the
+					// refreshInfiniteCache() method, as this would be assuming you want to do it which
+					// is not true, maybe the row count is constant and you just want to refresh the details.
+					const maxRowFound = gridApi.isLastRowIndexKnown()
+					if (maxRowFound ?? false) {
+						const rowCount = gridApi.getDisplayedRowCount()
+						gridApi.setRowCount(rowCount + templateRowDelta)
+					}
+					gridApi.refreshInfiniteCache()
+					setTemplateRowDelta(undefined) // "unset" add so we can listen to new changes
+				}
+			},
+			{ defer: true },
+		),
+	)
 }
