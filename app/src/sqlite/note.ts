@@ -34,12 +34,13 @@ import { notEmpty, objEntries, objKeys, objValues } from 'shared/utility'
 import initSql from 'shared/sql.json'
 
 function noteToDocType(note: Note) {
+	const now = C.getDate().getTime()
 	return [
 		{
 			id: note.id,
 			templateId: note.templateId,
-			created: note.created.getTime(),
-			edited: note.edited.getTime(),
+			created: now,
+			edited: now,
 			ankiNoteId: note.ankiNoteId,
 		},
 		Array.from(note.tags).map((tag) => ({ tag, noteId: note.id })),

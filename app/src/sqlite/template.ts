@@ -35,12 +35,13 @@ import {
 } from 'shared/utility'
 
 function templateToDocType(template: Template) {
+	const now = C.getDate().getTime()
 	const insertTemplate: InsertObject<DB, 'template'> = {
 		id: template.id,
 		name: template.name,
 		css: template.css,
-		created: template.created.getTime(),
-		edited: template.edited.getTime(),
+		created: now,
+		edited: now,
 		fields: JSON.stringify(template.fields),
 		templateType: JSON.stringify(template.templateType),
 	}

@@ -68,25 +68,15 @@ function deserializeState(s: number | null): State | undefined {
 function cardToDocType(
 	card: Card,
 ): [InsertObject<DB, 'cardBase'>, Array<InsertObject<DB, 'cardTag'>>] {
-	const {
-		id,
-		noteId,
-		due,
-		ord,
-		tags,
-		cardSettingId,
-		state,
-		lapses,
-		repCount,
-		created,
-		edited,
-	} = card
+	const { id, noteId, due, ord, tags, cardSettingId, state, lapses, repCount } =
+		card
+	const now = C.getDate().getTime()
 	return [
 		{
 			id,
 			noteId,
-			created: created.getTime(),
-			edited: edited.getTime(),
+			created: now,
+			edited: now,
 			lapses,
 			repCount,
 			due: typeof due === 'number' ? due * -1 : due.getTime(),
