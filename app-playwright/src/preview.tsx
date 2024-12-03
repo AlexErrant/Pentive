@@ -12,6 +12,7 @@ render(() => {
 					// @ts-expect-error resizingIframe isn't used
 					resizingIframe: null,
 				}).db,
+				new Date(),
 			)}
 		</>
 	)

@@ -57,9 +57,11 @@ function log<T>(equal: boolean, expected: T, actual: T) {
 	}
 }
 
-async function testTemplate(db: Db) {
+async function testTemplate(db: Db, date: Date) {
 	await fc.assert(
 		fc.asyncProperty(arbitraryTemplate, async (expected) => {
+			expected.created = date
+			expected.edited = date
 			await db.upsertTemplate(expected)
 			const actual = await db.getTemplate(expected.id)
 			const r = isEqual(expected, actual)
@@ -71,12 +73,14 @@ async function testTemplate(db: Db) {
 	return true
 }
 
-async function testNote(db: Db) {
+async function testNote(db: Db, date: Date) {
 	const templates = await db.getTemplates()
 	await fc.assert(
 		fc.asyncProperty(
 			fc.constantFrom(...templates).chain(arbitraryNote),
 			async (expected) => {
+				expected.created = date
+				expected.edited = date
 				await db.upsertNote(expected)
 				const actual = await db.getNote(expected.id)
 				const r = isEqual(expected, actual)
@@ -89,9 +93,11 @@ async function testNote(db: Db) {
 	return true
 }
 
-async function testCard(db: Db) {
+async function testCard(db: Db, date: Date) {
 	await fc.assert(
 		fc.asyncProperty(arbitraryCard, async (expected) => {
+			expected.created = date
+			expected.edited = date
 			await db.upsertCard(expected)
 			const actual = await db.getCard(expected.id)
 			const r = isEqual(expected, actual)
@@ -103,11 +109,11 @@ async function testCard(db: Db) {
 	return true
 }
 
-export default function TestDb(db: Db): JSX.Element {
+export default function TestDb(db: Db, date: Date): JSX.Element {
 	const [testsResult] = createResource(async () => {
-		const template = await testTemplate(db)
-		const note = await testNote(db)
-		const card = await testCard(db)
+		const template = await testTemplate(db, date)
+		const note = await testNote(db, date)
+		const card = await testCard(db, date)
 		const statuses = [template, note, card]
 		if (statuses.some((a) => a === undefined)) {
 			return undefined
