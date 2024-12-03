@@ -1,7 +1,7 @@
 import { undefinedMap } from 'shared/utility'
 import { type Media } from 'shared/domain/media'
 import * as Comlink from 'comlink'
-import { ky, rd } from '../topLevelAwait'
+import { C, ky, rd } from '../topLevelAwait'
 import { type Media as MediaEntity } from './database'
 import { type MediaId } from 'shared/brand'
 
@@ -19,40 +19,32 @@ type MediaSansHash = Omit<Media, 'hash'>
 
 export const mediaCollectionMethods = {
 	insertMedia: async function (media: MediaSansHash) {
-		const db = rd
-		const created = media.created.getTime()
-		const edited = media.edited.getTime()
+		const now = C.getDate().getTime()
 		const hash = await crypto.subtle.digest('SHA-256', media.data)
-		await db.exec(
+		await rd.exec(
 			`INSERT INTO media (id,created,edited,data,hash)
-                  VALUES ( ?,      ?,      ?,   ?,   ?)`,
-			[
-				media.id,
-				created,
-				edited,
-				new Uint8Array(media.data),
-				new Uint8Array(hash),
-			],
+                  VALUES ( ?,      ?,      ?,  ?,   ?)`,
+			// lowTODO add conflict types via typescript, i.e. "point of this type is to cause an error if something is added to Media"
+			[media.id, now, now, new Uint8Array(media.data), new Uint8Array(hash)],
 		)
 	},
 	async bulkInsertMedia(media: MediaSansHash[]) {
+		const now = C.getDate().getTime()
 		// wa-sqlite write perf is significantly worse than Dexie's.
 		// If moving to SQLite official doesn't improve perf, consider using Origin Private File System
-		const db = rd
-		await db.tx(async (tx) => {
+		await rd.tx(async (tx) => {
 			const insert = await tx.prepare(
 				`INSERT INTO media (id,created,edited,data,hash)
-                    VALUES ( ?,      ?,      ?,   ?,   ?)`,
+                    VALUES ( ?,      ?,      ?,  ?,   ?)`,
 			)
+			// lowTODO add conflict types via typescript, i.e. "point of this type is to cause an error if something is added to Media"
 			for (const m of media) {
-				const created = m.created.getTime()
-				const edited = m.edited.getTime()
 				const hash = await crypto.subtle.digest('SHA-256', m.data)
 				await insert.run(
 					tx,
 					m.id,
-					created,
-					edited,
+					now,
+					now,
 					new Uint8Array(m.data),
 					new Uint8Array(hash),
 				)

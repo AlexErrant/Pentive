@@ -1,26 +1,27 @@
 import { type Plugin } from 'shared-dom/plugin'
-import { rd, ky } from '../topLevelAwait'
+import { rd, ky, C } from '../topLevelAwait'
 import { pluginEntityToDomain } from './util'
 import { type PluginName } from 'shared/brand'
 import { type SqliteCount } from 'shared/utility'
 
 export const pluginCollectionMethods = {
 	upsertPlugin: async function (plugin: Plugin) {
-		const db = rd
-		await db.exec(
+		const now = C.getDate().getTime()
+		await rd.exec(
 			`INSERT INTO plugin (name,version,dependencies,created,edited,script)
-                   VALUES (   ?,      ?,           ?,      ?,       ?,    ?)
+                   VALUES (   ?,      ?,           ?,      ?,      ?,    ?)
        ON CONFLICT(name) DO UPDATE SET
          version=excluded.version,
          dependencies=excluded.dependencies,
          edited=excluded.edited,
          script=excluded.script`,
+			// lowTODO add conflict types via typescript, i.e. "point of this type is to cause an error if something is added to Plugin"
 			[
 				plugin.name,
 				plugin.version,
 				plugin.dependencies ?? null,
-				plugin.created.getTime(),
-				plugin.edited.getTime(),
+				now,
+				now,
 				new Uint8Array(await plugin.script.arrayBuffer()),
 			],
 		)
