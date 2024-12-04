@@ -156,7 +156,8 @@ export const syncGridOptions = {
 							/>
 						))
 					} else if (params.data.tag === 'note') {
-						const remoteNote = params.data.note.remotes[params.data.nook]
+						const remoteNote =
+							params.data.note.remotes[params.data.nook] ?? null
 						this.render(params.context.owner, () => (
 							<NoteNookSync
 								template={(params.data as RowNote).template}

@@ -26,9 +26,7 @@ export const UploadEntry: ParentComponent<{
 						state={state}
 						setState={setState}
 					/>
-					<Show when={props.remote} fallback={<div>Not yet uploaded.</div>}>
-						{props.children}
-					</Show>
+					{props.children}
 				</div>
 			)}
 		</>

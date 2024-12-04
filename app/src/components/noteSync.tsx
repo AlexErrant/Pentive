@@ -1,9 +1,9 @@
 import {
 	type VoidComponent,
-	Show,
 	createResource,
 	Switch,
 	Match,
+	Suspense,
 } from 'solid-js'
 import { type NookId, type RemoteNoteId } from 'shared/brand'
 import { augcClient } from '../trpcClient'
@@ -44,13 +44,10 @@ export const NoteNookSync: VoidComponent<{
 	note: Note
 	template: Template
 	nook?: NookId
-	remoteNote:
-		| {
-				remoteNoteId: RemoteNoteId
-				uploadDate: Date
-		  }
-		| null
-		| undefined
+	remoteNote: {
+		remoteNoteId: RemoteNoteId
+		uploadDate: Date
+	} | null
 }> = (props) => {
 	return (
 		<UploadEntry
@@ -63,7 +60,7 @@ export const NoteNookSync: VoidComponent<{
 			<NoteNookSyncActual
 				note={props.note}
 				template={props.template}
-				remoteNote={props.remoteNote!}
+				remoteNote={props.remoteNote}
 			/>
 		</UploadEntry>
 	)
@@ -75,25 +72,28 @@ const NoteNookSyncActual: VoidComponent<{
 	remoteNote: {
 		remoteNoteId: RemoteNoteId
 		uploadDate: Date
-	}
+	} | null
 }> = (props) => {
 	const [remoteNote] = createResource(
-		() => props.remoteNote.remoteNoteId,
+		() => props.remoteNote?.remoteNoteId,
 		async (id) => await augcClient.getNote.query(id), // medTODO planetscale needs an id that associates all notes so we can lookup in 1 pass. Also would be useful to find "related" notes
 	)
 	const mergedFieldValues = () => {
-		if (remoteNote() == null) return null
-		const m: Record<string, [string | undefined, string | undefined]> = {}
+		if (remoteNote.loading) return null
+		const m: Record<string, [string, string]> = {}
 		for (const [field, value] of objEntries(props.note.fieldValues)) {
-			m[field] = [value, undefined]
+			m[field] = [value, '']
 		}
-		for (const [field, value] of objEntries(remoteNote()!.fieldValues)) {
-			m[field] = [m[field]?.at(0), value]
+		const rn = remoteNote()
+		if (rn != null) {
+			for (const [field, value] of objEntries(rn.fieldValues)) {
+				m[field] = [m[field]?.at(0) ?? '', value]
+			}
 		}
 		return m
 	}
 	return (
-		<Show when={remoteNote()}>
+		<Suspense fallback={'Loading...'}>
 			<ul>
 				<Entries of={mergedFieldValues()}>
 					{(field, localRemote) => (
@@ -102,29 +102,29 @@ const NoteNookSyncActual: VoidComponent<{
 								fallback={
 									<DiffHtml
 										extensions={[html()]}
-										before={localRemote()[1]!}
-										after={localRemote()[0]!}
+										before={localRemote()[1]}
+										after={localRemote()[0]}
 										css={props.template.css}
 										title={field}
 									/>
 								}
 							>
-								<Match when={localRemote()[0]! == null}>
+								<Match when={localRemote()[0] == null}>
 									<h2>Deleted</h2>
 									<ResizingIframe
 										i={{
 											tag: 'raw',
-											html: localRemote()[1]!,
+											html: localRemote()[1],
 											css: props.template.css,
 										}}
 									/>
 								</Match>
-								<Match when={localRemote()[1]! == null}>
+								<Match when={localRemote()[1] == null}>
 									<h2>Added</h2>
 									<ResizingIframe
 										i={{
 											tag: 'raw',
-											html: localRemote()[0]!,
+											html: localRemote()[0],
 											css: props.template.css,
 										}}
 									/>
@@ -134,6 +134,6 @@ const NoteNookSyncActual: VoidComponent<{
 					)}
 				</Entries>
 			</ul>
-		</Show>
+		</Suspense>
 	)
 }

@@ -1,14 +1,7 @@
 import { Select } from '@thisbeyond/solid-select'
 import '@thisbeyond/solid-select/style.css'
 import 'shared-dom/solidSelect.css'
-import {
-	Show,
-	Suspense,
-	createEffect,
-	createResource,
-	createSignal,
-	on,
-} from 'solid-js'
+import { Show, createEffect, createResource, createSignal, on } from 'solid-js'
 import { FieldsEditor } from '../components/fieldsEditor'
 import { ulidAsBase64Url } from '../domain/utility'
 import { createStore } from 'solid-js/store'
@@ -80,20 +73,18 @@ export default function AddNote() {
 
 	return (
 		<>
-			<Suspense fallback={<span>Loading...</span>}>
-				<Select
-					class='bg-white'
-					initialValue={templateNames().at(0)}
-					options={templateNames()}
-					onChange={(value: string) =>
-						setTemplate(templates()?.find((t) => t.name === value))
-					}
-				/>
-				<Show when={wip.noteCard}>
-					<FieldsEditor setNoteCard={setWip} noteCard={wip.noteCard!} />
-					<CardsPreview noteCard={wip.noteCard!} />
-				</Show>
-			</Suspense>
+			<Select
+				class='bg-white'
+				initialValue={templateNames().at(0)}
+				options={templateNames()}
+				onChange={(value: string) =>
+					setTemplate(templates()?.find((t) => t.name === value))
+				}
+			/>
+			<Show when={wip.noteCard}>
+				<FieldsEditor setNoteCard={setWip} noteCard={wip.noteCard!} />
+				<CardsPreview noteCard={wip.noteCard!} />
+			</Show>
 		</>
 	)
 }
