@@ -6,12 +6,14 @@ import {
 import { type Override } from 'shared/utility'
 import {
 	createEffect,
+	ErrorBoundary,
 	getOwner,
 	type JSX,
 	on,
 	type Owner,
 	runWithOwner,
 	type Signal,
+	Suspense,
 } from 'solid-js'
 import { render } from 'solid-js/web'
 
@@ -34,7 +36,17 @@ export class Renderer {
 	}
 
 	render(owner: Owner, fn: () => JSX.Element) {
-		this.dispose = render(() => runWithOwner(owner, fn), this.eGui)
+		this.dispose = render(
+			() =>
+				runWithOwner(owner, () => (
+					<Suspense fallback='Loading...'>
+						<ErrorBoundary fallback='Error rendering cell.'>
+							{fn()}
+						</ErrorBoundary>
+					</Suspense>
+				)),
+			this.eGui,
+		)
 	}
 }
 
