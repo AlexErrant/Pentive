@@ -1,7 +1,6 @@
 import {
 	type VoidComponent,
 	For,
-	Show,
 	createResource,
 	Switch,
 	Match,
@@ -48,13 +47,10 @@ export default TemplateSync
 
 export const TemplateNookSync: VoidComponent<{
 	template: Template
-	remoteTemplate:
-		| {
-				remoteTemplateId: RemoteTemplateId
-				uploadDate: Date
-		  }
-		| null
-		| undefined
+	remoteTemplate: {
+		remoteTemplateId: RemoteTemplateId
+		uploadDate: Date
+	} | null
 	nook?: NookId
 }> = (props) => {
 	return (
@@ -67,7 +63,7 @@ export const TemplateNookSync: VoidComponent<{
 		>
 			<TemplateNookSyncActual
 				template={props.template}
-				remoteTemplate={props.remoteTemplate!}
+				remoteTemplate={props.remoteTemplate}
 			/>
 		</UploadEntry>
 	)
@@ -78,26 +74,26 @@ const TemplateNookSyncActual: VoidComponent<{
 	remoteTemplate: {
 		remoteTemplateId: RemoteTemplateId
 		uploadDate: Date
-	}
+	} | null
 }> = (props) => {
 	const [remoteTemplate] = createResource(
-		() => props.remoteTemplate.remoteTemplateId,
+		() => props.remoteTemplate?.remoteTemplateId,
 		async (id) => await augcClient.getTemplate.query(id), // medTODO planetscale needs an id that associates all templates so we can lookup in 1 pass. Also would be useful to find "related" templates
 	)
 	return (
-		<Show when={remoteTemplate()}>
+		<>
 			<Diff
 				title='Name'
-				changes={diffChars(remoteTemplate()!.name, props.template.name)}
+				changes={diffChars(remoteTemplate()?.name ?? '', props.template.name)}
 			/>
 			<Diff
 				title='Css'
-				changes={diffCss(remoteTemplate()!.css, props.template.css)}
+				changes={diffCss(remoteTemplate()?.css ?? '', props.template.css)}
 			/>
 			<Diff
 				title='Fields'
 				changes={diffWords(
-					remoteTemplate()!.fields.join(', '),
+					remoteTemplate()?.fields.join(', ') ?? '',
 					props.template.fields.map((f) => f.name).join(', '),
 				)}
 			/>
@@ -107,8 +103,9 @@ const TemplateNookSyncActual: VoidComponent<{
 					<Switch>
 						<Match
 							when={
+								remoteTemplate() != null &&
 								props.template.templateType.tag !==
-								remoteTemplate()!.templateType.tag
+									remoteTemplate()!.templateType.tag
 							}
 						>
 							Your template is a {props.template.templateType.tag}, but the
@@ -117,8 +114,8 @@ const TemplateNookSyncActual: VoidComponent<{
 							<Diff
 								title='Child Template(s)'
 								changes={diffJson(
-									JSON.stringify(remoteTemplate()!.templateType),
-									JSON.stringify(props.template.templateType),
+									remoteTemplate()!.templateType,
+									props.template.templateType,
 								)}
 							/>
 						</Match>
@@ -126,7 +123,7 @@ const TemplateNookSyncActual: VoidComponent<{
 							<For
 								each={zip(
 									(props.template.templateType as Standard).templates,
-									(remoteTemplate()!.templateType as Standard).templates,
+									(remoteTemplate()?.templateType as Standard)?.templates ?? [],
 								)}
 							>
 								{([localTemplate, remoteTemplate]) => (
@@ -142,13 +139,13 @@ const TemplateNookSyncActual: VoidComponent<{
 							<ChildTemplateNookSync
 								css={props.template.css}
 								local={(props.template.templateType as Cloze).template}
-								remote={(remoteTemplate()!.templateType as Cloze).template}
+								remote={(remoteTemplate()?.templateType as Cloze)?.template}
 							/>
 						</Match>
 					</Switch>
 				</div>
 			</div>
-		</Show>
+		</>
 	)
 }
 
@@ -158,40 +155,39 @@ const ChildTemplateNookSync: VoidComponent<{
 	css: string
 	local?: ChildTemplate
 	remote?: ChildTemplate
-}> = (props) => {
-	return (
-		<Switch
-			fallback={
-				<>
-					<Diff
-						title='Name'
-						changes={diffChars(props.remote!.name, props.local!.name)}
-					/>
-					<DiffHtml
-						extensions={extensions}
-						before={props.remote!.front}
-						after={props.local!.front}
-						css={props.css}
-						title='Front'
-					/>
-					<DiffHtml
-						extensions={extensions}
-						before={props.remote!.back}
-						after={props.local!.back}
-						css={props.css}
-						title='Back'
-					/>
-				</>
-			}
-		>
-			<Match when={props.local == null}>
-				<h2>Deleted</h2>
-				<pre>{JSON.stringify(props.remote, null, 4)}</pre>
-			</Match>
-			<Match when={props.remote == null}>
-				<h2>Added</h2>
-				<pre>{JSON.stringify(props.local, null, 4)}</pre>
-			</Match>
-		</Switch>
-	)
-}
+}> = (props) => (
+	<>
+		<Diff
+			title='Name'
+			changes={diffChars(props.remote?.name ?? '', props.local?.name ?? '')}
+		/>
+		<DiffHtml
+			extensions={extensions}
+			before={props.remote?.front ?? ''}
+			after={props.local?.front ?? ''}
+			css={props.css}
+			title='Front'
+		/>
+		<DiffHtml
+			extensions={extensions}
+			before={props.remote?.back ?? ''}
+			after={props.local?.back ?? ''}
+			css={props.css}
+			title='Back'
+		/>
+		<Diff
+			title='Short Front'
+			changes={diffWords(
+				props.remote?.shortFront ?? '',
+				props.local?.shortFront ?? '',
+			)}
+		/>
+		<Diff
+			title='Short Back'
+			changes={diffWords(
+				props.remote?.shortBack ?? '',
+				props.local?.shortBack ?? '',
+			)}
+		/>
+	</>
+)

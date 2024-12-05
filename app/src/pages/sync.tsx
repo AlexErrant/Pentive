@@ -147,7 +147,7 @@ export const syncGridOptions = {
 					}
 					if (params.data.tag === 'template') {
 						const remoteTemplate =
-							params.data.template.remotes[params.data.nook]
+							params.data.template.remotes[params.data.nook] ?? null
 						this.render(params.context.owner, () => (
 							<TemplateNookSync
 								template={(params.data as RowTemplate).template}
