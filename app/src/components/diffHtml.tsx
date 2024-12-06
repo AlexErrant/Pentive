@@ -117,7 +117,7 @@ function createConfig(
 			EditorView.editable.of(false),
 			EditorState.readOnly.of(true),
 			...maybeDark,
-			[...extensions],
+			[...(doc === '' ? [] : extensions)], // no need for any extensions if template is empty
 		],
 	}
 }
