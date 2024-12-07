@@ -22,8 +22,8 @@ import { disposeObserver } from 'shared-dom/utility'
 
 const DiffHtml: VoidComponent<{
 	extensions: Array<Extension | LRLanguage>
-	before: string
-	after: string
+	before?: string
+	after?: string
 	css: string
 	title: string
 }> = (props) => {
@@ -40,7 +40,7 @@ const DiffHtml: VoidComponent<{
 						<ResizingIframe
 							i={{
 								tag: 'raw',
-								html: diffHtml(props.before, props.after),
+								html: diffHtml(props.before ?? '', props.after ?? ''),
 								css:
 									props.css + 'ins{background:palegreen}del{background:pink}',
 							}}
@@ -48,8 +48,8 @@ const DiffHtml: VoidComponent<{
 					</Match>
 					<Match when={diffMode() === 'split'}>
 						<MergeComp
-							before={props.before}
-							after={props.after}
+							before={props.before ?? ''}
+							after={props.after ?? ''}
 							extensions={props.extensions}
 						/>
 					</Match>

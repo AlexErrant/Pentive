@@ -5,7 +5,7 @@ import {
 	Switch,
 	Match,
 } from 'solid-js'
-import { diffChars, diffCss, diffJson, diffWords } from 'diff'
+import { diffChars, diffCss, diffJson, diffWords } from '../uiLogic/diff'
 import { augcClient } from '../trpcClient'
 import Diff from './diff'
 import { zip } from '../domain/utility'
@@ -84,16 +84,12 @@ const TemplateNookSyncActual: VoidComponent<{
 		<>
 			<Diff
 				title='Name'
-				changes={diffChars(remoteTemplate()?.name ?? '', props.template.name)}
-			/>
-			<Diff
-				title='Css'
-				changes={diffCss(remoteTemplate()?.css ?? '', props.template.css)}
+				changes={diffChars(remoteTemplate()?.name, props.template.name)}
 			/>
 			<Diff
 				title='Fields'
 				changes={diffWords(
-					remoteTemplate()?.fields.join(', ') ?? '',
+					remoteTemplate()?.fields.join(', '),
 					props.template.fields.map((f) => f.name).join(', '),
 				)}
 			/>
@@ -145,6 +141,10 @@ const TemplateNookSyncActual: VoidComponent<{
 					</Switch>
 				</div>
 			</div>
+			<Diff
+				title='Css'
+				changes={diffCss(remoteTemplate()?.css, props.template.css)}
+			/>
 		</>
 	)
 }
@@ -159,35 +159,29 @@ const ChildTemplateNookSync: VoidComponent<{
 	<>
 		<Diff
 			title='Name'
-			changes={diffChars(props.remote?.name ?? '', props.local?.name ?? '')}
+			changes={diffChars(props.remote?.name, props.local?.name)}
 		/>
 		<DiffHtml
 			extensions={extensions}
-			before={props.remote?.front ?? ''}
-			after={props.local?.front ?? ''}
+			before={props.remote?.front}
+			after={props.local?.front}
 			css={props.css}
 			title='Front'
 		/>
 		<DiffHtml
 			extensions={extensions}
-			before={props.remote?.back ?? ''}
-			after={props.local?.back ?? ''}
+			before={props.remote?.back}
+			after={props.local?.back}
 			css={props.css}
 			title='Back'
 		/>
 		<Diff
 			title='Short Front'
-			changes={diffWords(
-				props.remote?.shortFront ?? '',
-				props.local?.shortFront ?? '',
-			)}
+			changes={diffWords(props.remote?.shortFront, props.local?.shortFront)}
 		/>
 		<Diff
 			title='Short Back'
-			changes={diffWords(
-				props.remote?.shortBack ?? '',
-				props.local?.shortBack ?? '',
-			)}
+			changes={diffWords(props.remote?.shortBack, props.local?.shortBack)}
 		/>
 	</>
 )

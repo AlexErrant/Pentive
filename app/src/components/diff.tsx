@@ -19,13 +19,7 @@ const Diff: VoidComponent<{
 			<For each={props.changes}>
 				{({ added, removed, value }) => (
 					<span
-						class={
-							added === true
-								? 'text-green-500'
-								: removed === true
-									? 'text-red-500'
-									: ''
-						}
+						classList={{ 'text-red-500': removed, 'text-green-500': added }}
 					>
 						{value}
 					</span>
