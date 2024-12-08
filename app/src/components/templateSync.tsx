@@ -5,11 +5,12 @@ import {
 	Switch,
 	Match,
 } from 'solid-js'
-import { diffChars, diffCss, diffJson, diffWords } from '../uiLogic/diff'
+import { diffChars, diffJson, diffWords } from '../uiLogic/diff'
 import { augcClient } from '../trpcClient'
 import Diff from './diff'
 import { zip } from '../domain/utility'
 import DiffHtml from './diffHtml'
+import DiffCss from './diffCss'
 import { htmlTemplateLanguage } from 'shared-dom/language/htmlTemplateParser'
 import { html } from '@codemirror/lang-html'
 import { templateLinter } from 'shared-dom/language/templateLinter'
@@ -141,10 +142,7 @@ const TemplateNookSyncActual: VoidComponent<{
 					</Switch>
 				</div>
 			</div>
-			<Diff
-				title='Css'
-				changes={diffCss(remoteTemplate()?.css, props.template.css)}
-			/>
+			<DiffCss before={remoteTemplate()?.css} after={props.template.css} />
 		</>
 	)
 }
