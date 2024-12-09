@@ -1,3 +1,4 @@
+import { createMutation } from '@tanstack/solid-query'
 import { type SyncState } from '../domain/sync'
 import {
 	Switch,
@@ -38,6 +39,20 @@ const UploadButton: VoidComponent<{
 	state: Accessor<SyncState>
 	setState: Setter<SyncState>
 }> = (props) => {
+	const upload = createMutation(() => ({
+		mutationFn: async () => {
+			props.setState('uploading')
+			await props.upload()
+		},
+		onSuccess: () => {
+			props.setState('uploaded')
+		},
+		onError: (e) => {
+			props.setState('errored')
+			console.error(e)
+			throw e // for some reason errors thrown here aren't logged in the console
+		},
+	}))
 	return (
 		<div class='flex justify-end'>
 			<Switch>
@@ -51,15 +66,9 @@ const UploadButton: VoidComponent<{
 						</Show>
 						<button
 							class='border-gray-900 rounded-lg border px-2'
-							onClick={async () => {
-								props.setState('uploading')
-								try {
-									await props.upload()
-								} catch (error) {
-									props.setState('errored')
-									throw error
-								}
-								props.setState('uploaded')
+							disabled={upload.isPending}
+							onClick={() => {
+								upload.mutate()
 							}}
 						>
 							Upload
