@@ -14,8 +14,10 @@ const Diff: VoidComponent<{
 			)
 		}
 	>
-		<div class='border-black border p-1'>
-			<h3>{props.title}</h3>
+		<fieldset class='border-black border p-1'>
+			<legend>
+				<span class='p-2 px-4 font-bold'>{props.title}</span>
+			</legend>
 			<For each={props.changes}>
 				{({ added, removed, value }) => (
 					<span
@@ -25,7 +27,7 @@ const Diff: VoidComponent<{
 					</span>
 				)}
 			</For>
-		</div>
+		</fieldset>
 	</Show>
 )
 

@@ -30,8 +30,10 @@ const DiffHtml: VoidComponent<{
 	const [diffMode] = useDiffModeContext()
 	return (
 		<Show when={props.before !== props.after}>
-			<div class='border-black m-2 border p-1'>
-				<h3>{props.title}</h3>
+			<fieldset class='border-black border p-1'>
+				<legend>
+					<span class='p-2 px-4 font-bold'>{props.title}</span>
+				</legend>
 				<Switch>
 					<Match when={props.before === props.after}>
 						<></>
@@ -54,7 +56,7 @@ const DiffHtml: VoidComponent<{
 						/>
 					</Match>
 				</Switch>
-			</div>
+			</fieldset>
 		</Show>
 	)
 }

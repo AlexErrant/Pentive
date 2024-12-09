@@ -94,8 +94,10 @@ const TemplateNookSyncActual: VoidComponent<{
 					props.template.fields.map((f) => f.name).join(', '),
 				)}
 			/>
-			<div class='ctContainer border-black border p-1'>
-				<h3>Child Templates</h3>
+			<fieldset class='ctContainer border-black border p-1'>
+				<legend>
+					<span class='p-2 px-4 font-bold'>Child Templates</span>
+				</legend>
 				<div class='ctResults'>
 					<Switch>
 						<Match
@@ -141,7 +143,7 @@ const TemplateNookSyncActual: VoidComponent<{
 						</Match>
 					</Switch>
 				</div>
-			</div>
+			</fieldset>
 			<DiffCss before={remoteTemplate()?.css} after={props.template.css} />
 		</>
 	)
