@@ -89,7 +89,7 @@ const TemplateNookSyncActual: VoidComponent<{
 			/>
 			<Diff
 				title='Fields'
-				changes={diffWords(
+				changes={diffChars(
 					remoteTemplate()?.fields.join(', '),
 					props.template.fields.map((f) => f.name).join(', '),
 				)}

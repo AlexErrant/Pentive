@@ -181,6 +181,7 @@ export const syncGridOptions = {
 	suppressRowHoverHighlight: true,
 	enableCellTextSelection: true,
 	rowGroupPanelShow: 'onlyWhenGrouping',
+	animateRows: false,
 } satisfies SyncGridOptions as SyncGridOptions
 
 function Content(): JSX.Element {
