@@ -559,7 +559,7 @@ JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field
 function withLocalMediaIdByRemoteMediaId<
 	T extends CreateRemoteNote | EditRemoteNote,
 >(dp: DOMParser, note: T) {
-	const fieldValues = new Map<string, string>()
+	const fieldValues: Record<string, string> = {} satisfies T['fieldValues']
 	const { docs, remoteMediaIdByLocal } =
 		updateLocalMediaIdByRemoteMediaIdAndGetNewDoc(
 			dp,
@@ -567,7 +567,7 @@ function withLocalMediaIdByRemoteMediaId<
 		)
 	let i = 0
 	for (const field of objKeys(note.fieldValues)) {
-		fieldValues.set(field, docs[i]!.body.innerHTML)
+		fieldValues[field] = docs[i]!.body.innerHTML
 		i++
 	}
 	return {
