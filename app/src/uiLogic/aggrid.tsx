@@ -70,13 +70,13 @@ export function createGrid<TData>(
 
 export function registerGridUpdate<T>(
 	gridApi: GridApi<T>,
-	[templateRowDelta, setTemplateRowDelta]: Signal<number | undefined>,
+	[rowDelta, setRowDelta]: Signal<number | undefined>,
 ) {
 	createEffect(
 		on(
-			templateRowDelta,
-			(templateRowDelta) => {
-				if (templateRowDelta != null) {
+			rowDelta,
+			(rowDelta) => {
+				if (rowDelta != null) {
 					// This code is copied from the "Using Cache API Methods" example
 					// https://www.ag-grid.com/javascript-data-grid/infinite-scrolling/#example-using-cache-api-methods
 					// https://codesandbox.io/p/sandbox/v6klrp
@@ -91,10 +91,10 @@ export function registerGridUpdate<T>(
 					const maxRowFound = gridApi.isLastRowIndexKnown()
 					if (maxRowFound ?? false) {
 						const rowCount = gridApi.getDisplayedRowCount()
-						gridApi.setRowCount(rowCount + templateRowDelta)
+						gridApi.setRowCount(rowCount + rowDelta)
 					}
 					gridApi.refreshInfiniteCache()
-					setTemplateRowDelta(undefined) // "unset" add so we can listen to new changes
+					setRowDelta(undefined) // "unset" add so we can listen to new changes
 				}
 			},
 			{ defer: true },

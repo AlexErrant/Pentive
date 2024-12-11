@@ -52,19 +52,20 @@ export default function AddNote() {
 				if (note != null && template != null) {
 					const ords = C.noteOrds(note, template)
 					const now = C.getDate()
-					const cards = ords.map((ord) => {
-						return {
-							id: ulidAsBase64Url() as CardId,
-							ord,
-							noteId: note.id,
-							tags: new Set(),
-							created: now,
-							edited: now,
-							due: now,
-							lapses: 0,
-							repCount: 0,
-						} satisfies Card
-					})
+					const cards = ords.map(
+						(ord) =>
+							({
+								id: ulidAsBase64Url() as CardId,
+								ord,
+								noteId: note.id,
+								tags: new Set(),
+								created: now,
+								edited: now,
+								due: now,
+								lapses: 0,
+								repCount: 0,
+							}) satisfies Card,
+					)
 					setWip('noteCard', 'cards', cards)
 				}
 			},
