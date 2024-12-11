@@ -5,7 +5,7 @@ import {
 	Match,
 	Suspense,
 } from 'solid-js'
-import { type NookId, type RemoteNoteId } from 'shared/brand'
+import { type NookId } from 'shared/brand'
 import { augcClient } from '../trpcClient'
 import DiffHtml from './diffHtml'
 import ResizingIframe from './resizingIframe'
@@ -14,7 +14,7 @@ import { DiffModeToggleGroup } from './diffModeContext'
 import { objEntries } from 'shared/utility'
 import { Entries } from '@solid-primitives/keyed'
 import { type Template } from 'shared/domain/template'
-import { type Note } from 'shared/domain/note'
+import { type NoteRemote, type Note } from 'shared/domain/note'
 import { UploadEntry } from './uploadEntry'
 import { uploadNotes } from '../domain/sync'
 
@@ -44,10 +44,7 @@ export const NoteNookSync: VoidComponent<{
 	note: Note
 	template: Template
 	nook?: NookId
-	remoteNote: {
-		remoteNoteId: RemoteNoteId
-		uploadDate: Date
-	} | null
+	remoteNote: NoteRemote
 }> = (props) => {
 	return (
 		<UploadEntry
@@ -69,10 +66,7 @@ export const NoteNookSync: VoidComponent<{
 const NoteNookSyncActual: VoidComponent<{
 	note: Note
 	template: Template
-	remoteNote: {
-		remoteNoteId: RemoteNoteId
-		uploadDate: Date
-	} | null
+	remoteNote: NoteRemote
 }> = (props) => {
 	const [remoteNote] = createResource(
 		() => props.remoteNote?.remoteNoteId,

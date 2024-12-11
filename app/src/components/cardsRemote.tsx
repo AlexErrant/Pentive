@@ -6,15 +6,11 @@ import {
 	createEffect,
 	createSignal,
 } from 'solid-js'
-import {
-	type NookId,
-	type RemoteTemplateId,
-	type RemoteNoteId,
-	type NoteId,
-} from 'shared/brand'
+import { type NookId, type RemoteTemplateId, type NoteId } from 'shared/brand'
 import { objEntries } from 'shared/utility'
 import { type NoteCardView } from '../uiLogic/cards'
 import { C } from '../topLevelAwait'
+import { type NoteRemote } from 'shared/domain/note'
 
 interface Remotes {
 	readonly nookId: NookId
@@ -22,10 +18,7 @@ interface Remotes {
 		remoteTemplateId: RemoteTemplateId
 		uploadDate: Date
 	} | null
-	readonly remote: {
-		remoteNoteId: RemoteNoteId
-		uploadDate: Date
-	} | null
+	readonly remote: NoteRemote
 	readonly uploadable: boolean
 }
 

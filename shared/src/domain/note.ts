@@ -13,8 +13,7 @@ export interface Note {
 	edited: Date
 	tags: Set<string>
 	fieldValues: Record<string, string>
-	remotes: Record<
-		NookId,
-		{ remoteNoteId: RemoteNoteId; uploadDate: Date } | null
-	>
+	remotes: Record<NookId, NoteRemote>
 }
+
+export type NoteRemote = { remoteNoteId: RemoteNoteId; uploadDate: Date } | null

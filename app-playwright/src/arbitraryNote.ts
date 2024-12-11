@@ -6,7 +6,7 @@ import {
 	reasonableDates,
 	recordWithOptionalFields,
 } from './arbitrary'
-import { type Note } from 'shared/domain/note'
+import { type NoteRemote, type Note } from 'shared/domain/note'
 import { type Template } from 'shared/domain/template'
 
 export function note(template: Template) {
@@ -36,7 +36,7 @@ export function note(template: Template) {
 				arbitraryNookId,
 				fc.oneof(
 					fc.constant(null),
-					fc.record<{ remoteNoteId: RemoteNoteId; uploadDate: Date }>({
+					fc.record<NoteRemote>({
 						remoteNoteId: arbitraryUlid<RemoteNoteId>(),
 						uploadDate: reasonableDates,
 					}),
