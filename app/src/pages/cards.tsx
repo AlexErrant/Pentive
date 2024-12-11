@@ -2,8 +2,6 @@ import { type JSX, Show, createResource, createEffect, onMount } from 'solid-js'
 import { GoldenLayout, LayoutConfig } from 'golden-layout'
 import { createStore } from 'solid-js/store'
 import CardsTable from '../components/cardsTable'
-import { CardsRemote } from '../components/cardsRemote'
-import { FieldsEditor } from '../components/fieldsEditor'
 import { CardsPreview } from '../components/cardsPreview'
 import { render } from 'solid-js/web'
 import AddNote from '../components/addNote'
@@ -56,13 +54,7 @@ export default function Cards(): JSX.Element {
 			render(
 				() => (
 					<Show when={selected.noteCard != null}>
-						<div class='h-full overflow-auto'>
-							<CardsRemote noteCard={selected.noteCard!} />
-							<FieldsEditor
-								noteCard={selected.noteCard!}
-								setNoteCard={setSelected}
-							/>
-						</div>
+						<AddNote noteCard={selected.noteCard} />
 					</Show>
 				),
 				container.element,
