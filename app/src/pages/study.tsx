@@ -33,13 +33,14 @@ export default function Study(): JSX.Element {
 		return fsrsMap
 	})
 	const cardId = () => noteCard()?.card.id
+	const cardSettingId = () => noteCard()?.card.cardSettingId
 	const [fsrsItems] = createResource(cardId, C.db.getFsrsItemsForCard)
 	const states = () => {
-		const cid = cardId()
+		const csId = cardSettingId()
 		const fi = fsrsItems()
-		if (cid != null && fi != null) {
+		if (csId != null && fi != null) {
 			const { eases, ids, cids, types } = fi
-			const fsrs = fsrsMap()?.get(cid) ?? new Fsrs()
+			const fsrs = fsrsMap()?.get(csId) ?? new Fsrs()
 			const [stability, difficulty] =
 				fi.ids.length === 0
 					? [undefined, undefined]
@@ -53,7 +54,7 @@ export default function Study(): JSX.Element {
 			const desiredRetention =
 				cardSettings()
 					?.map((cs) => cardSettingParser.parse(cs)) // medTODO could memoize
-					.find((cs) => cs.id === cardId())?.desiredRetention ?? 0.9
+					.find((cs) => cs.id === cardSettingId())?.desiredRetention ?? 0.9
 			return fsrs.nextStates(
 				stability,
 				difficulty,

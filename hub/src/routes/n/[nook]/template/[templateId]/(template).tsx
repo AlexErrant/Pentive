@@ -1,5 +1,5 @@
 import { For, Show, Suspense } from 'solid-js'
-import { type NookId, type RemoteTemplateId } from 'shared/brand'
+import { cast, type NookId, type RemoteTemplateId } from 'shared/brand'
 import { getTemplate, getTemplateComments } from 'shared-edge'
 import { ResizingIframe } from '~/components/clientOnly'
 import Comment from '~/components/comment'
@@ -107,7 +107,7 @@ export default function Thread(props: RouteSectionProps) {
 							// eslint-disable-next-line solid/reactivity -- doesn't need to be reactive
 							onSubmit={async (text) => {
 								await cwaClient.insertTemplateComment.mutate({
-									templateId: template().id,
+									templateId: cast(template().id),
 									text,
 								})
 							}}

@@ -1,7 +1,7 @@
 import { type Review as ReviewEntity } from '../sqlite/database'
 import { chunk } from 'lodash-es'
 import { C, ky } from '../topLevelAwait'
-import { type CardId } from 'shared/brand'
+import { fromLDbId, toLDbId, type LDbId, type CardId } from 'shared/brand'
 import { type Review, type Kind } from 'shared/domain/review'
 import { assertNever } from 'shared/utility'
 
@@ -41,8 +41,8 @@ function deserializeKind(s: number): Kind {
 
 function toEntity({ id, cardId, created, rating, kind, ...r }: Review) {
 	return {
-		id,
-		cardId,
+		id: toLDbId(id),
+		cardId: toLDbId(cardId),
 		rating,
 		kind: serializeKind(kind),
 		created: created.getTime(),
@@ -71,9 +71,11 @@ export const reviewCollectionMethods = {
 			.orderBy('created')
 			.execute()
 		return reviews.map(
-			({ details, created, kind, ...r }) =>
+			({ id, cardId, details, created, kind, ...r }) =>
 				({
 					...r,
+					id: fromLDbId(id),
+					cardId: fromLDbId(cardId),
 					created: new Date(created),
 					kind: deserializeKind(kind),
 					...parseDetails(details),
@@ -92,7 +94,7 @@ export const reviewCollectionMethods = {
 		const eases = new Uint8Array(reviews.length)
 		const ids = new BigInt64Array(reviews.length)
 		const types = new Uint8Array(reviews.length)
-		let currentCardId = '' as CardId
+		let currentCardId = '' as LDbId
 		let cid = BigInt(0)
 		for (let index = 0; index < reviews.length; index++) {
 			const review = reviews[index]!
@@ -116,7 +118,7 @@ export const reviewCollectionMethods = {
 	getFsrsItemsForCard: async function (cardId: CardId) {
 		const reviews = await ky
 			.selectFrom('review')
-			.where('cardId', '=', cardId) // highTODO filter out manual reviews and other edge cases
+			.where('cardId', '=', toLDbId(cardId)) // highTODO filter out manual reviews and other edge cases
 			.select(['rating', 'created', 'kind'])
 			.orderBy('cardId')
 			.orderBy('created')

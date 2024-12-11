@@ -31,7 +31,7 @@ import {
 } from './util'
 import { type convert } from 'shared-dom/language/query2sql'
 import { type CardTagRowid, type NoteTagRowid } from './tag'
-import { type CardId, type NoteId } from 'shared/brand'
+import { fromLDbId, toLDbId, type CardId, type NoteId } from 'shared/brand'
 import { type NoteCard, type State, type Card } from 'shared/domain/card'
 import { assertNever, type SqliteCount, undefinedMap } from 'shared/utility'
 
@@ -65,33 +65,31 @@ function deserializeState(s: number | null): State | undefined {
 	}
 }
 
-function cardToDocType(
-	card: Card,
-): [InsertObject<DB, 'cardBase'>, Array<InsertObject<DB, 'cardTag'>>] {
+function cardToDocType(card: Card) {
 	const { id, noteId, due, ord, tags, cardSettingId, state, lapses, repCount } =
 		card
 	const now = C.getDate().getTime()
 	return [
 		{
-			id,
-			noteId,
+			id: toLDbId(id),
+			noteId: toLDbId(noteId),
 			created: now,
 			edited: now,
 			lapses,
 			repCount,
 			due: typeof due === 'number' ? due * -1 : due.getTime(),
 			ord,
-			cardSettingId: cardSettingId ?? null,
+			cardSettingId: toLDbId(cardSettingId ?? null),
 			state: undefinedMap(state, serializeState) ?? null,
 		},
-		Array.from(tags).map((tag) => ({ tag, cardId: id })),
+		Array.from(tags).map((tag) => ({ tag, cardId: toLDbId(id) })),
 	] satisfies [InsertObject<DB, 'cardBase'>, Array<InsertObject<DB, 'cardTag'>>]
 }
 
-function cardBaseToDomain(card: CardView): Card {
+function cardBaseToDomain(card: CardView) {
 	const r = {
-		id: card.id,
-		noteId: card.noteId,
+		id: fromLDbId(card.id),
+		noteId: fromLDbId(card.noteId),
 		created: new Date(card.created),
 		edited: new Date(card.edited),
 		lapses: card.lapses,
@@ -100,8 +98,8 @@ function cardBaseToDomain(card: CardView): Card {
 		ord: card.ord,
 		tags: parseTags(card.tags),
 		state: deserializeState(card.state),
-		cardSettingId: card.cardSettingId ?? undefined,
-	}
+		cardSettingId: fromLDbId(card.cardSettingId ?? undefined),
+	} satisfies Card
 	if (r.state === undefined) {
 		delete r.state
 	}
@@ -545,7 +543,7 @@ export const cardCollectionMethods = {
 					} satisfies OnConflictUpdateCardSet),
 				)
 				.execute()
-			const cardIds = sql.join(cards.map((c) => c.id as CardId))
+			const cardIds = sql.join(cards.map((c) => fromLDbId<CardId>(c.id)))
 			const cardsTagsJson = JSON.stringify(
 				tags.map((t) => ({ [t.cardId as string]: t.tag })),
 			)
@@ -580,7 +578,7 @@ JOIN cardTag ON cardTag.cardId = x.cardId AND cardTag.tag = x.tag)`,
 		const card = await ky
 			.selectFrom('card')
 			.selectAll()
-			.where('id', '=', cardId)
+			.where('id', '=', toLDbId(cardId))
 			.executeTakeFirst()
 		return card == null ? null : cardBaseToDomain(card)
 	},
@@ -588,7 +586,7 @@ JOIN cardTag ON cardTag.cardId = x.cardId AND cardTag.tag = x.tag)`,
 		const cards = await ky
 			.selectFrom('card')
 			.selectAll()
-			.where('noteId', '=', noteId)
+			.where('noteId', '=', toLDbId(noteId))
 			.execute()
 		return cards.map(cardBaseToDomain)
 	},

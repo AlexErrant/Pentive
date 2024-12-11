@@ -21,6 +21,8 @@ import {
 	type RemoteTemplateId,
 	type MediaId,
 	type RemoteMediaNum,
+	fromLDbId,
+	toLDbId,
 } from 'shared/brand'
 import {
 	type CreateRemoteTemplate,
@@ -36,22 +38,24 @@ import {
 
 function templateToDocType(template: Template) {
 	const now = C.getDate().getTime()
-	const insertTemplate: InsertObject<DB, 'template'> = {
-		id: template.id,
+	const templateDbId = toLDbId(template.id)
+	const insertTemplate = {
+		id: templateDbId,
 		name: template.name,
 		css: template.css,
 		created: now,
 		edited: now,
 		fields: JSON.stringify(template.fields),
 		templateType: JSON.stringify(template.templateType),
-	}
-	const remoteTemplates: RemoteTemplate[] = objEntries(template.remotes).map(
-		([nook, remote]) => ({
-			localId: template.id,
-			nook,
-			remoteId: remote?.remoteTemplateId ?? null,
-			uploadDate: remote?.uploadDate.getTime() ?? null,
-		}),
+	} satisfies InsertObject<DB, 'template'>
+	const remoteTemplates = objEntries(template.remotes).map(
+		([nook, remote]) =>
+			({
+				localId: templateDbId,
+				nook,
+				remoteId: toLDbId(remote?.remoteTemplateId ?? null),
+				uploadDate: remote?.uploadDate.getTime() ?? null,
+			}) satisfies RemoteTemplate,
 	)
 	return { insertTemplate, remoteTemplates }
 }
@@ -89,6 +93,7 @@ function domainToEditRemote(template: Template, nook?: NookId) {
 
 export const templateCollectionMethods = {
 	upsertTemplate: async function (template: Template) {
+		const templateDbId = toLDbId(template.id)
 		await tx(async (tx) => {
 			const { insertTemplate, remoteTemplates } = templateToDocType(template)
 			await tx
@@ -108,7 +113,7 @@ export const templateCollectionMethods = {
 			const oldRts = await tx
 				.selectFrom('remoteTemplate')
 				.selectAll()
-				.where('localId', '=', template.id)
+				.where('localId', '=', templateDbId)
 				.execute()
 			// the following deleted/added/edited logic assumes ONE template
 			const newRts = remoteTemplates
@@ -120,7 +125,7 @@ export const templateCollectionMethods = {
 			if (deleted.length !== 0) {
 				await tx
 					.deleteFrom('remoteTemplate')
-					.where('localId', '=', template.id)
+					.where('localId', '=', templateDbId)
 					.where(
 						'nook',
 						'in',
@@ -146,11 +151,12 @@ export const templateCollectionMethods = {
 		})
 	},
 	deleteTemplate: async function (templateId: TemplateId) {
+		const templateDbId = toLDbId(templateId)
 		await tx(async (tx) => {
-			await tx.deleteFrom('template').where('id', '=', templateId).execute()
+			await tx.deleteFrom('template').where('id', '=', templateDbId).execute()
 			await tx
 				.deleteFrom('remoteTemplate')
-				.where('localId', '=', templateId)
+				.where('localId', '=', templateDbId)
 				.execute()
 		})
 	},
@@ -166,11 +172,12 @@ export const templateCollectionMethods = {
 		})
 	},
 	getTemplate: async function (templateId: TemplateId) {
+		const templateDbId = toLDbId(templateId)
 		const template = await ky
 			.selectFrom('template')
 			.leftJoin('remoteTemplate', 'template.id', 'remoteTemplate.localId')
 			.selectAll()
-			.where('id', '=', templateId)
+			.where('id', '=', templateDbId)
 			.execute()
 		return undefinedMap(template, toTemplate) ?? null
 	},
@@ -183,7 +190,7 @@ export const templateCollectionMethods = {
 					selectFrom('remoteTemplate')
 						.select('remoteTemplate.localId')
 						.whereRef('template.id', '=', 'remoteTemplate.localId')
-						.where('remoteTemplate.remoteId', '=', templateId),
+						.where('remoteTemplate.remoteId', '=', toLDbId(templateId)),
 				),
 			)
 			.selectAll()
@@ -231,7 +238,7 @@ export const templateCollectionMethods = {
 			.where('remoteTemplate.remoteId', 'is', null)
 			.where('remoteTemplate.nook', 'is not', null)
 			.$if(templateId != null, (db) =>
-				db.where('template.id', '=', templateId!),
+				db.where('template.id', '=', toLDbId(templateId!)),
 			)
 			.execute()
 		return toTemplates(templatesAndStuff)
@@ -255,7 +262,7 @@ export const templateCollectionMethods = {
 			.where('remoteId', 'is not', null)
 			.whereRef('remoteTemplate.uploadDate', '<', 'template.edited')
 			.$if(templateId != null, (db) =>
-				db.where('template.id', '=', templateId!),
+				db.where('template.id', '=', toLDbId(templateId!)),
 			)
 			.selectAll()
 			.execute()
@@ -281,7 +288,7 @@ export const templateCollectionMethods = {
 				]),
 			)
 			.$if(templateId != null, (db) =>
-				db.where('template.id', '=', templateId!),
+				db.where('template.id', '=', toLDbId(templateId!)),
 			)
 			.execute()
 		const media = new Map<
@@ -307,7 +314,7 @@ export const templateCollectionMethods = {
 				C.toastImpossible(
 					`mediaBinaries is missing '${m.localMediaId}'... how?`,
 				)
-			value.ids.push([m.localEntityId, remoteId, m.i])
+			value.ids.push([fromLDbId(m.localEntityId), fromLDbId(remoteId), m.i])
 		}
 		return media
 	},
@@ -315,12 +322,13 @@ export const templateCollectionMethods = {
 		templateId: TemplateId,
 		nook: NookId,
 	) {
+		const templateDbId = toLDbId(templateId)
 		const remoteTemplate = {
-			localId: templateId,
+			localId: templateDbId,
 			nook,
 			remoteId: null,
 			uploadDate: null,
-		}
+		} satisfies InsertObject<DB, 'remoteTemplate'>
 		await tx(async (db) => {
 			await db
 				.insertInto('remoteTemplate')
@@ -330,7 +338,7 @@ export const templateCollectionMethods = {
 			const template = await db
 				.selectFrom('template')
 				.selectAll()
-				.where('id', '=', templateId)
+				.where('id', '=', templateDbId)
 				.executeTakeFirstOrThrow()
 			const { remoteMediaIdByLocal } = withLocalMediaIdByRemoteMediaId(
 				new DOMParser(),
@@ -346,7 +354,7 @@ export const templateCollectionMethods = {
 				C.toastFatal("You're missing a media.") // medTODO better error message
 			await db
 				.deleteFrom('remoteMedia')
-				.where('localEntityId', '=', templateId)
+				.where('localEntityId', '=', templateDbId)
 				.where('i', '>', srcs.size as RemoteMediaNum)
 				.execute()
 			if (remoteMediaIdByLocal.size !== 0) {
@@ -354,7 +362,7 @@ export const templateCollectionMethods = {
 					.insertInto('remoteMedia')
 					.values(
 						Array.from(remoteMediaIdByLocal).map(([localMediaId, i]) => ({
-							localEntityId: templateId,
+							localEntityId: templateDbId,
 							i,
 							localMediaId,
 						})),
@@ -374,10 +382,11 @@ export const templateCollectionMethods = {
 		templateId: TemplateId,
 		nook: NookId,
 	) {
+		const templateDbId = toLDbId(templateId)
 		await tx(async (db) => {
 			const r1 = await db
 				.deleteFrom('remoteTemplate')
-				.where('localId', '=', templateId)
+				.where('localId', '=', templateDbId)
 				.where('nook', '=', nook)
 				.returningAll()
 				.execute()
@@ -387,7 +396,7 @@ export const templateCollectionMethods = {
 				)
 			await db
 				.deleteFrom('remoteMedia')
-				.where('localEntityId', '=', templateId)
+				.where('localEntityId', '=', templateDbId)
 				.execute()
 		})
 	},
@@ -396,11 +405,12 @@ export const templateCollectionMethods = {
 	) {
 		const now = C.getDate().getTime()
 		for (const [[templateId, nook], remoteId] of remoteIdByLocal) {
+			const templateDbId = toLDbId(templateId)
 			const r = await ky
 				.updateTable('remoteTemplate')
-				.set({ remoteId, uploadDate: now })
+				.set({ remoteId: toLDbId(remoteId), uploadDate: now })
 				.where('nook', '=', nook)
-				.where('localId', '=', templateId)
+				.where('localId', '=', templateDbId)
 				.returningAll()
 				.execute()
 			if (r.length !== 1)
@@ -413,7 +423,7 @@ export const templateCollectionMethods = {
 		const r = await ky
 			.updateTable('remoteTemplate')
 			.set({ uploadDate: C.getDate().getTime() })
-			.where('remoteId', 'in', remoteTemplateIds)
+			.where('remoteId', 'in', remoteTemplateIds.map(toLDbId))
 			.returningAll()
 			.execute()
 		if (r.length !== remoteTemplateIds.length)
@@ -431,15 +441,16 @@ type TemplateRow = Nullable<RemoteTemplate> & TemplateEntity
 function toTemplates(allTemplates: TemplateRow[]) {
 	const map = new Map<TemplateId, Template>()
 	for (const row of allTemplates) {
-		if (map.get(row.id) == null) {
-			map.set(row.id, templateEntityToDomain(row, []))
+		const id = fromLDbId<TemplateId>(row.id)
+		if (map.get(id) == null) {
+			map.set(id, templateEntityToDomain(row, []))
 		}
 		if (row.nook != null) {
-			map.get(row.id)!.remotes[row.nook] =
+			map.get(id)!.remotes[row.nook] =
 				row.uploadDate == null
 					? null
 					: {
-							remoteTemplateId: row.remoteId!,
+							remoteTemplateId: fromLDbId(row.remoteId),
 							uploadDate: new Date(row.uploadDate),
 						}
 		}

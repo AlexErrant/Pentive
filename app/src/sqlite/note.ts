@@ -28,6 +28,8 @@ import {
 	type MediaId,
 	type RemoteMediaNum,
 	type NookId,
+	toLDbId,
+	fromLDbId,
 } from 'shared/brand'
 import { type CreateRemoteNote, type EditRemoteNote } from 'shared/schema'
 import { notEmpty, objEntries, objKeys, objValues } from 'shared/utility'
@@ -37,22 +39,22 @@ function noteToDocType(note: Note) {
 	const now = C.getDate().getTime()
 	return [
 		{
-			id: note.id,
-			templateId: note.templateId,
+			id: toLDbId(note.id),
+			templateId: toLDbId(note.templateId),
 			created: now,
 			edited: now,
 			ankiNoteId: note.ankiNoteId,
 		},
-		Array.from(note.tags).map((tag) => ({ tag, noteId: note.id })),
+		Array.from(note.tags).map((tag) => ({ tag, noteId: toLDbId(note.id) })),
 		objEntries(note.fieldValues).map(([field, value]) => ({
 			noteId: note.id,
 			field,
 			value,
 		})),
 		objEntries(note.remotes).map(([nook, remote]) => ({
-			localId: note.id,
+			localId: toLDbId(note.id),
 			nook,
-			remoteId: remote?.remoteNoteId,
+			remoteId: toLDbId(remote?.remoteNoteId),
 			uploadDate: remote?.uploadDate.getTime(),
 		})),
 	] satisfies [
@@ -235,32 +237,34 @@ JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field
 		})
 	},
 	getNote: async function (noteId: NoteId) {
+		const noteDbId = toLDbId(noteId)
 		const remoteNotes = await ky
 			.selectFrom('remoteNote')
 			.selectAll()
-			.where('localId', '=', noteId)
+			.where('localId', '=', noteDbId)
 			.execute()
 		const note = await ky
 			.selectFrom('note')
 			.selectAll('note')
 			.innerJoin('template', 'note.templateId', 'template.id')
 			.select('template.fields as template_fields')
-			.where('note.id', '=', noteId)
+			.where('note.id', '=', noteDbId)
 			.executeTakeFirst()
 		return note == null ? null : noteEntityToDomain(note, remoteNotes)
 	},
 	getNotesByIds: async function (noteIds: NoteId[]) {
+		const noteDbIds = noteIds.map(toLDbId)
 		const remoteNotes = await ky
 			.selectFrom('remoteNote')
 			.selectAll()
-			.where('localId', 'in', noteIds)
+			.where('localId', 'in', noteDbIds)
 			.execute()
 		const notes = await ky
 			.selectFrom('note')
 			.selectAll('note')
 			.innerJoin('template', 'note.templateId', 'template.id')
 			.select('template.fields as template_fields')
-			.where('note.id', 'in', noteIds)
+			.where('note.id', 'in', noteDbIds)
 			.execute()
 		return notes.map((ln) =>
 			noteEntityToDomain(
@@ -309,7 +313,7 @@ JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field
 			.innerJoin('template', 'note.templateId', 'template.id')
 			.select(templateSelection)
 			.where('note.id', 'in', localIds)
-			.$if(noteId != null, (db) => db.where('note.id', '=', noteId!))
+			.$if(noteId != null, (db) => db.where('note.id', '=', toLDbId(noteId!)))
 			.execute()
 			.then((n) =>
 				n.map((entity) => {
@@ -354,7 +358,7 @@ JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field
 											noteId: note.id,
 										})} is null.`,
 									),
-								rt.remoteId ??
+								fromLDbId<RemoteTemplateId>(rt.remoteId) ??
 									C.toastImpossible(
 										`remoteId for ${JSON.stringify({
 											nook: remoteNook,
@@ -384,7 +388,7 @@ JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field
 			.innerJoin('template', 'note.templateId', 'template.id')
 			.select(templateSelection)
 			.where('note.id', 'in', localIds)
-			.$if(noteId != null, (db) => db.where('note.id', '=', noteId!))
+			.$if(noteId != null, (db) => db.where('note.id', '=', toLDbId(noteId!)))
 			.execute()
 			.then((n) =>
 				n.map((entity) => {
@@ -419,7 +423,9 @@ JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field
 					eb('media.edited', '>', ref('remoteMedia.uploadDate')),
 				]),
 			)
-			.$if(noteId != null, (db) => db.where('noteBase.id', '=', noteId!))
+			.$if(noteId != null, (db) =>
+				db.where('noteBase.id', '=', toLDbId(noteId!)),
+			)
 			.execute()
 		const media = new Map<
 			MediaId,
@@ -441,13 +447,14 @@ JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field
 				C.toastImpossible(
 					`mediaBinaries is missing '${m.localMediaId}'... how?`,
 				)
-			value.ids.push([m.localEntityId, remoteId, m.i])
+			value.ids.push([fromLDbId(m.localEntityId), fromLDbId(remoteId), m.i])
 		}
 		return media
 	},
 	makeNoteUploadable: async function (noteId: NoteId, nook: NookId) {
+		const noteDbId = toLDbId(noteId)
 		const remoteNote = {
-			localId: noteId,
+			localId: noteDbId,
 			nook,
 			remoteId: null,
 			uploadDate: null,
@@ -463,7 +470,7 @@ JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field
 				.selectAll('note')
 				.innerJoin('template', 'note.templateId', 'template.id')
 				.select('template.fields as template_fields')
-				.where('note.id', '=', noteId)
+				.where('note.id', '=', noteDbId)
 				.executeTakeFirstOrThrow()
 			const { remoteMediaIdByLocal } = withLocalMediaIdByRemoteMediaId(
 				new DOMParser(),
@@ -481,7 +488,7 @@ JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field
 				C.toastFatal("You're missing a media.") // medTODO better error message
 			await db
 				.deleteFrom('remoteMedia')
-				.where('localEntityId', '=', noteId)
+				.where('localEntityId', '=', noteDbId)
 				.where('i', '>', srcs.size as RemoteMediaNum)
 				.execute()
 			if (remoteMediaIdByLocal.size !== 0) {
@@ -489,7 +496,7 @@ JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field
 					.insertInto('remoteMedia')
 					.values(
 						Array.from(remoteMediaIdByLocal).map(([localMediaId, i]) => ({
-							localEntityId: noteId,
+							localEntityId: noteDbId,
 							i,
 							localMediaId,
 						})),
@@ -506,10 +513,11 @@ JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field
 		})
 	},
 	makeNoteNotUploadable: async function (noteId: NoteId, nook: NookId) {
+		const noteDbId = toLDbId(noteId)
 		await tx(async (db) => {
 			const r1 = await db
 				.deleteFrom('remoteNote')
-				.where('localId', '=', noteId)
+				.where('localId', '=', noteDbId)
 				.where('nook', '=', nook)
 				.returningAll()
 				.execute()
@@ -519,7 +527,7 @@ JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field
 				)
 			await db
 				.deleteFrom('remoteMedia')
-				.where('localEntityId', '=', noteId)
+				.where('localEntityId', '=', noteDbId)
 				.execute()
 		})
 	},
@@ -527,11 +535,15 @@ JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field
 		remoteIdByLocal: Map<readonly [NoteId, NookId], RemoteNoteId>,
 	) {
 		for (const [[noteId, nook], remoteId] of remoteIdByLocal) {
+			const noteDbId = toLDbId(noteId)
 			const r = await ky
 				.updateTable('remoteNote')
-				.set({ remoteId, uploadDate: C.getDate().getTime() })
+				.set({
+					remoteId: toLDbId(remoteId),
+					uploadDate: C.getDate().getTime(),
+				})
 				.where('nook', '=', nook)
-				.where('localId', '=', noteId)
+				.where('localId', '=', noteDbId)
 				.returningAll()
 				.execute()
 			if (r.length !== 1)
@@ -544,7 +556,7 @@ JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field
 		const r = await ky
 			.updateTable('remoteNote')
 			.set({ uploadDate: C.getDate().getTime() })
-			.where('remoteId', 'in', remoteNoteIds)
+			.where('remoteId', 'in', remoteNoteIds.map(toLDbId))
 			.returningAll()
 			.execute()
 		if (r.length !== remoteNoteIds.length)

@@ -2,7 +2,7 @@
 
 import fc, { type Arbitrary, type RecordConstraints } from 'fast-check'
 import { Ulid } from 'id128'
-import { type Brand } from 'shared/brand'
+import { type Base64Url } from 'shared/brand'
 import { base64url, hex } from '@scure/base'
 import { nookIdRegex } from 'shared/schema'
 
@@ -42,9 +42,7 @@ export const reasonableDates = fc.date({
 	max: new Date('9999-12-31T23:59:59.999Z'),
 })
 
-export function arbitraryUlid<
-	T extends Brand<string, 'base64url'>,
->(): fc.Arbitrary<T> {
+export function arbitraryUlid<T extends Base64Url>(): fc.Arbitrary<T> {
 	return fc
 		.date({
 			min: new Date(1971, 0, 1),

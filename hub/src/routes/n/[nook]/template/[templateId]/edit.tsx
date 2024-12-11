@@ -2,6 +2,7 @@ import { type JSX, Show } from 'solid-js'
 import { EditTemplate } from 'shared-dom/editTemplate'
 import { defaultRenderContainer } from '~/lib/utility'
 import {
+	cast,
 	type NookId,
 	type RemoteTemplateId,
 	type TemplateId,
@@ -33,7 +34,7 @@ const saveButton = (template: { template: Template }) => (
 					name: template.template.name,
 					css: template.template.css,
 					templateType: template.template.templateType,
-					remoteIds: [template.template.id],
+					remoteIds: [cast(template.template.id)],
 					fields: template.template.fields.map((x) => x.name),
 				},
 			])
@@ -68,13 +69,19 @@ export const route = {
 
 export default function Edit(props: RouteSectionProps): JSX.Element {
 	const isMod = useIsModContext()
-	const template = createAsync(
-		async () =>
-			await getTemplateCached(
-				props.params.templateId as RemoteTemplateId,
-				props.params.nook as NookId,
-			),
-	)
+	const template = createAsync(async () => {
+		const r = await getTemplateCached(
+			props.params.templateId as RemoteTemplateId,
+			props.params.nook as NookId,
+		)
+		if (r == null) return undefined
+		return {
+			...r,
+			id: cast(r.id),
+			remotes: {}, // unused
+			fields: r.fields.map((f) => ({ name: f })),
+		} satisfies Template
+	})
 	const [theme] = useThemeContext()
 	return (
 		<main>
@@ -85,12 +92,8 @@ export default function Edit(props: RouteSectionProps): JSX.Element {
 						getDefaultTemplate={getDefaultTemplate}
 						saveButton={saveButton}
 						theme={theme()}
+						template={template()!}
 						renderContainer={defaultRenderContainer}
-						template={{
-							...template()!,
-							remotes: {}, // unused
-							fields: template()!.fields.map((f) => ({ name: f })),
-						}}
 					/>
 				</Show>
 			</Show>

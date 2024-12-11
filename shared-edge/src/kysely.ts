@@ -102,7 +102,7 @@ function toTemplate(
 		fields: string
 	},
 	templateId: RemoteTemplateId,
-): RemoteTemplate {
+) {
 	return {
 		id: templateId,
 		name: x.templateName,
@@ -112,7 +112,7 @@ function toTemplate(
 		fields: deserializeFields(x.fields),
 		css: x.css,
 		templateType: deserializeTemplateType(x.type),
-	}
+	} satisfies RemoteTemplate
 }
 
 function noteToNookView(x: {
@@ -133,8 +133,8 @@ function noteToNookView(x: {
 	comments: number
 	til?: number | null
 }) {
-	const noteId = dbIdToBase64Url(x.id) as RemoteNoteId
-	const templateId = dbIdToBase64Url(x.templateId) as RemoteTemplateId
+	const noteId = dbIdToBase64Url<RemoteNoteId>(x.id)
+	const templateId = dbIdToBase64Url<RemoteTemplateId>(x.templateId)
 	return {
 		id: noteId,
 		subscribers: x.subscribers,
@@ -262,9 +262,10 @@ export async function getNote(noteId: RemoteNoteId, userId: UserId | null) {
 		.where('note.id', '=', fromBase64Url(noteId))
 		.executeTakeFirst()
 	if (r == null) return null
+	const templateId = dbIdToBase64Url<RemoteTemplateId>(r.templateId)
 	return {
 		id: noteId,
-		templateId: dbIdToBase64Url(r.templateId) as RemoteTemplateId,
+		templateId,
 		created: epochToDate(r.created),
 		edited: epochToDate(r.edited),
 		authorId: r.authorId as UserId,
@@ -273,8 +274,8 @@ export async function getNote(noteId: RemoteNoteId, userId: UserId | null) {
 		ankiId: r.ankiId ?? undefined,
 		til: maybeEpochToDate(r.til),
 		nook: r.nook,
-		template: toTemplate(r, dbIdToBase64Url(r.templateId) as TemplateId),
-	}
+		template: toTemplate(r, templateId),
+	} satisfies RemoteNote & Record<string, unknown>
 }
 
 export async function searchNotes(input: string, userId: UserId | null) {
@@ -349,8 +350,8 @@ export interface Comment<T extends Base64Url> {
 	comments: Array<Comment<T>>
 }
 
-export type TemplateComment = Comment<TemplateId>
-export type NoteComment = Comment<NoteId>
+export type TemplateComment = Comment<RemoteTemplateId>
+export type NoteComment = Comment<RemoteNoteId>
 
 export async function getTemplateComments(templateId: RemoteTemplateId) {
 	const cs = await db
@@ -369,21 +370,21 @@ export async function getTemplateComments(templateId: RemoteTemplateId) {
 		.orderBy('level', 'asc')
 		.orderBy('votes', 'desc')
 		.execute()
-	const commentsList = cs.map((c) => {
-		const r: TemplateComment = {
-			id: dbIdToBase64Url(c.id) as CommentId,
-			parentId: nullMap(c.parentId, dbIdToBase64Url) as CommentId | null,
-			entityId: templateId,
-			created: epochToDate(c.created),
-			edited: epochToDate(c.edited),
-			text: c.text,
-			authorId: c.authorId as UserId,
-			votes: c.votes,
-			level: c.level,
-			comments: [],
-		}
-		return r
-	})
+	const commentsList = cs.map(
+		(c) =>
+			({
+				id: dbIdToBase64Url(c.id),
+				parentId: nullMap(c.parentId, dbIdToBase64Url<CommentId>),
+				entityId: templateId,
+				created: epochToDate(c.created),
+				edited: epochToDate(c.edited),
+				text: c.text,
+				authorId: c.authorId as UserId,
+				votes: c.votes,
+				level: c.level,
+				comments: [],
+			}) satisfies TemplateComment,
+	)
 	return listToTree(commentsList)
 }
 
@@ -404,21 +405,21 @@ export async function getNoteComments(noteId: RemoteNoteId) {
 		.orderBy('level', 'asc')
 		.orderBy('votes', 'desc')
 		.execute()
-	const commentsList = cs.map((c) => {
-		const r: NoteComment = {
-			id: dbIdToBase64Url(c.id) as CommentId,
-			parentId: nullMap(c.parentId, dbIdToBase64Url) as CommentId | null,
-			entityId: noteId,
-			created: epochToDate(c.created),
-			edited: epochToDate(c.edited),
-			text: c.text,
-			authorId: c.authorId as UserId,
-			votes: c.votes,
-			level: c.level,
-			comments: [],
-		}
-		return r
-	})
+	const commentsList = cs.map(
+		(c) =>
+			({
+				id: dbIdToBase64Url(c.id),
+				parentId: nullMap(c.parentId, dbIdToBase64Url<CommentId>),
+				entityId: noteId,
+				created: epochToDate(c.created),
+				edited: epochToDate(c.edited),
+				text: c.text,
+				authorId: c.authorId as UserId,
+				votes: c.votes,
+				level: c.level,
+				comments: [],
+			}) satisfies NoteComment,
+	)
 	return listToTree(commentsList)
 }
 
@@ -496,7 +497,7 @@ function templateEntityToDomain(t: {
 	til?: number | null
 }) {
 	return {
-		id: dbIdToBase64Url(t.id) as RemoteTemplateId,
+		id: dbIdToBase64Url(t.id),
 		name: t.name,
 		nook: t.nook,
 		css: t.css,
@@ -1138,8 +1139,8 @@ function mapIdToBase64Url<T>(t: T & { id: DbId }): T & {
 	}
 }
 
-export function dbIdToBase64Url(dbId: DbId) {
-	return base64url.encode(new Uint8Array(dbId)).substring(0, 22) as Base64Url
+export function dbIdToBase64Url<T extends Base64Url>(dbId: DbId) {
+	return base64url.encode(new Uint8Array(dbId)).substring(0, 22) as T
 }
 
 export function dbIdToBase64(dbId: DbId) {

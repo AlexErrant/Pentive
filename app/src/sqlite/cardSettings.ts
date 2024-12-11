@@ -9,7 +9,7 @@ import {
 } from 'kysely'
 import { chunk } from 'lodash-es'
 import { C, ky } from '../topLevelAwait'
-import { type CardSettingId } from 'shared/brand'
+import { fromLDbId, toLDbId } from 'shared/brand'
 import { type CardSetting } from 'shared/domain/cardSetting'
 
 export const cardSettingsCollectionMethods = {
@@ -17,7 +17,7 @@ export const cardSettingsCollectionMethods = {
 		const entities = cardSetting.map(
 			({ id, name, ...r }) =>
 				({
-					id,
+					id: toLDbId(id),
 					name,
 					details: stringifyDetails(r),
 				}) satisfies CardSettingEntity,
@@ -45,7 +45,7 @@ export const cardSettingsCollectionMethods = {
 		return cardSettings.map((s) => {
 			const details = parseDetails(s.details)
 			return {
-				id: s.id satisfies CardSettingId,
+				id: fromLDbId(s.id),
 				name: s.name,
 				...details,
 			} satisfies CardSetting

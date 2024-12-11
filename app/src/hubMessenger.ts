@@ -7,7 +7,7 @@ import {
 	type RemoteNote,
 	type RemoteTemplate,
 } from 'shared/schema'
-import { type NookId, type CardId, type MediaId } from 'shared/brand'
+import { type NookId, type CardId, type MediaId, cast } from 'shared/brand'
 import { relativeChar } from 'shared/image'
 import { type Template } from 'shared/domain/template'
 import { type Note } from 'shared/domain/note'
@@ -19,8 +19,8 @@ export const appExpose = {
 		const serializer = new XMLSerializer()
 		const now = C.getDate()
 		await tx(async () => {
-			const template: Template = {
-				id: rt.id,
+			const template = {
+				id: cast(rt.id),
 				name: rt.name,
 				css: rt.css,
 				created: now,
@@ -30,7 +30,7 @@ export const appExpose = {
 				remotes: {
 					[rt.nook]: { remoteTemplateId: rt.id, uploadDate: now },
 				},
-			}
+			} satisfies Template
 			const dp = new DOMParser()
 			if (template.templateType.tag === 'standard') {
 				await Promise.all(
@@ -60,8 +60,8 @@ export const appExpose = {
 			const template =
 				(await C.db.getTemplateIdByRemoteId(rn.templateId)) ??
 				C.toastFatal(`You don't have the remote template ${rn.templateId}`)
-			const n: Note = {
-				id: rn.id,
+			const n = {
+				id: cast(rn.id),
 				templateId: template.id,
 				// ankiNoteId: rn.ankiNoteId,
 				created: rn.created,
@@ -71,7 +71,7 @@ export const appExpose = {
 				remotes: Object.fromEntries([
 					[nook, { remoteNoteId: rn.id, uploadDate: now }],
 				]),
-			}
+			} satisfies Note
 			await downloadImages(getNoteImages(n.fieldValues, new DOMParser()))
 			await C.db.upsertNote(n)
 			const ords = noteOrds.bind(C)(n, template)

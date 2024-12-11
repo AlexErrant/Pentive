@@ -10,9 +10,8 @@ import {
 import {
 	type MediaId,
 	type RemoteMediaNum,
-	type TemplateId,
-	type RemoteTemplateId,
-	type NoteId,
+	fromLDbId,
+	type NookId,
 } from 'shared/brand'
 import { type Field, type Template } from 'shared/domain/template'
 import { imgPlaceholder } from 'shared/image'
@@ -71,8 +70,8 @@ export function templateEntityToDomain(
 	template: TemplateEntity,
 	remotes: RemoteTemplate[],
 ) {
-	const r: Template = {
-		id: template.id as TemplateId,
+	return {
+		id: fromLDbId(template.id),
 		name: template.name,
 		created: new Date(template.created),
 		edited: new Date(template.edited),
@@ -84,15 +83,14 @@ export function templateEntityToDomain(
 				const value =
 					r.remoteId == null || r.uploadDate == null
 						? null
-						: {
-								remoteTemplateId: r.remoteId as RemoteTemplateId,
+						: ({
+								remoteTemplateId: fromLDbId(r.remoteId),
 								uploadDate: new Date(r.uploadDate),
-							}
+							} satisfies Template['remotes'][NookId])
 				return [r.nook, value]
 			}),
 		),
-	}
-	return r
+	} satisfies Template
 }
 
 export function noteEntityToDomain(
@@ -110,11 +108,11 @@ export function noteEntityToDomain(
 			fieldValues[f] = v
 		}
 	})
-	const r: Note = {
-		id: note.id as NoteId,
+	const r = {
+		id: fromLDbId(note.id),
 		created: new Date(note.created),
 		edited: new Date(note.edited),
-		templateId: note.templateId,
+		templateId: fromLDbId(note.templateId),
 		tags: parseTags(note.tags),
 		fieldValues,
 		ankiNoteId: note.ankiNoteId ?? undefined,
@@ -123,10 +121,13 @@ export function noteEntityToDomain(
 				r.nook,
 				r.remoteId == null
 					? null
-					: { remoteNoteId: r.remoteId, uploadDate: new Date(r.uploadDate!) },
+					: ({
+							remoteNoteId: fromLDbId(r.remoteId),
+							uploadDate: new Date(r.uploadDate!),
+						} satisfies Note['remotes'][NookId]),
 			]),
 		),
-	}
+	} satisfies Note
 	if (r.ankiNoteId === undefined) {
 		delete r.ankiNoteId
 	}
