@@ -52,9 +52,8 @@ export const filterGridOptions = {
 		enableSelectionWithoutKeys: true,
 	},
 	rowModelType: 'clientSide',
-	domLayout: 'autoHeight',
 	groupDefaultExpanded: 2,
-	getDataPath: (data: FilterNode) => data.dataPath,
+	getDataPath: (data) => data.dataPath,
 	treeData: true,
 } satisfies FilterGridOptions as FilterGridOptions
 
