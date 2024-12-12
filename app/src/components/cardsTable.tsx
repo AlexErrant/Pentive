@@ -42,7 +42,8 @@ import { agGridTheme, useThemeContext } from 'shared-dom/themeSelector'
 import { type NoteCard } from 'shared/domain/card'
 import { throwExp, assertNever, type Override } from 'shared/utility'
 import { Entries } from '@solid-primitives/keyed'
-import { createGrid, Renderer } from '../uiLogic/aggrid'
+import { createGrid, registerGridUpdate, Renderer } from '../uiLogic/aggrid'
+import { useTableCountContext } from './tableCountContext'
 
 LicenseManager.setLicenseKey(import.meta.env.VITE_AG_GRID_LICENSE)
 
@@ -464,6 +465,7 @@ const CardsTable: VoidComponent<{
 			props.onSelectionChanged(ncs)
 		})
 		gridApi.setGridOption('datasource', datasource)
+		registerGridUpdate(gridApi, useTableCountContext().noteRowDelta)
 	})
 	createEffect(
 		on(

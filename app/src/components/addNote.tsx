@@ -18,8 +18,10 @@ import { toNoteCards, type NoteCardView } from '../uiLogic/cards'
 import { type Template } from 'shared/domain/template'
 import { type Card } from 'shared/domain/card'
 import { type NoteId, type CardId, type MediaId } from 'shared/brand'
-import { objEntries, objValues } from 'shared/utility'
+import { assertNever, objEntries, objValues } from 'shared/utility'
 import { CardsRemote } from './cardsRemote'
+import { createMutation } from '@tanstack/solid-query'
+import { useTableCountContext } from './tableCountContext'
 
 function toView(template: Template): NoteCardView {
 	const now = C.getDate()
@@ -37,9 +39,13 @@ function toView(template: Template): NoteCardView {
 	return { template, note, cards: [] }
 }
 
+type AddEdit = 'add' | 'edit'
+
 export const AddNote: VoidComponent<{
 	readonly noteCard?: NoteCardView
+	readonly type: AddEdit
 }> = (props) => {
+	const [, setNoteRowDelta] = useTableCountContext().noteRowDelta
 	const [templates] = createResource(C.db.getTemplates, { initialValue: [] })
 	const templateNames = () => templates()?.map((t) => t.name) ?? []
 	const [template, setTemplate] = createSignal<Template>()
@@ -84,7 +90,50 @@ export const AddNote: VoidComponent<{
 			},
 		),
 	)
-
+	const upsert = createMutation(() => ({
+		mutationFn: async () => {
+			const noteCard = wip.noteCard!
+			if (noteCard.cards.length === 0)
+				C.toastFatal('There must be at least 1 card')
+			const dp = new DOMParser()
+			await tx(async () => {
+				const fieldValues = await Promise.all(
+					objEntries(noteCard.note.fieldValues).map(async ([f, v]) => {
+						const doc = dp.parseFromString(v, 'text/html')
+						await Promise.all(
+							Array.from(doc.images).map(async (i) => {
+								await mutate(i)
+							}),
+						)
+						return [f, doc.body.innerHTML] as const
+					}),
+				)
+				const noteCards = toNoteCards({
+					...noteCard,
+					note: {
+						...noteCard.note,
+						fieldValues: Object.fromEntries(fieldValues),
+					},
+				})
+				await C.db.upsertNote(noteCards[0]!.note)
+				await C.db.bulkUpsertCards(noteCards.map((nc) => nc.card))
+			})
+		},
+		onSuccess: () => {
+			if (props.type === 'add') {
+				setWip('noteCard', toView(wip.noteCard!.template)) // reset wip (to a "default" using the template)
+				setNoteRowDelta(1)
+			} else if (props.type === 'edit') {
+				setNoteRowDelta(0)
+			} else {
+				assertNever(props.type)
+			}
+		},
+		onError: (e) => {
+			C.toastError('Error occured while saving, see console for details.')
+			throw e
+		},
+	}))
 	return (
 		<>
 			<Select
@@ -102,33 +151,9 @@ export const AddNote: VoidComponent<{
 				<div>
 					<button
 						class='text-white bg-green-600 rounded p-2 px-4 font-bold hover:bg-green-700'
-						onClick={async () => {
-							const noteCard = wip.noteCard!
-							if (noteCard.cards.length === 0)
-								C.toastFatal('There must be at least 1 card')
-							const dp = new DOMParser()
-							await tx(async () => {
-								const fieldValues = await Promise.all(
-									objEntries(noteCard.note.fieldValues).map(async ([f, v]) => {
-										const doc = dp.parseFromString(v, 'text/html')
-										await Promise.all(
-											Array.from(doc.images).map(async (i) => {
-												await mutate(i)
-											}),
-										)
-										return [f, doc.body.innerHTML] as const
-									}),
-								)
-								const noteCards = toNoteCards({
-									...noteCard,
-									note: {
-										...noteCard.note,
-										fieldValues: Object.fromEntries(fieldValues),
-									},
-								})
-								await C.db.upsertNote(noteCards[0]!.note)
-								await C.db.bulkUpsertCards(noteCards.map((nc) => nc.card))
-							})
+						disabled={upsert.isPending}
+						onClick={() => {
+							upsert.mutate()
 						}}
 					>
 						Save

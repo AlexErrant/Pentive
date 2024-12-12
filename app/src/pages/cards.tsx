@@ -25,7 +25,7 @@ export default function Cards(): JSX.Element {
 		goldenLayout.resizeWithContainerAutomatically = true
 		goldenLayout.registerComponentFactoryFunction('Add Note', (container) => {
 			container.element.style.overflow = 'auto'
-			render(() => <AddNote />, container.element)
+			render(() => <AddNote type='add' />, container.element)
 		})
 		goldenLayout.registerComponentFactoryFunction('CardsTable', (container) => {
 			render(
@@ -54,7 +54,7 @@ export default function Cards(): JSX.Element {
 			render(
 				() => (
 					<Show when={selected.noteCard != null}>
-						<AddNote noteCard={selected.noteCard} />
+						<AddNote noteCard={selected.noteCard} type='edit' />
 					</Show>
 				),
 				container.element,

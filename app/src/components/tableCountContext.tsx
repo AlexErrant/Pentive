@@ -10,6 +10,7 @@ import { throwExp } from 'shared/utility'
 
 interface Signals {
 	templateRowDelta: Signal<number | undefined>
+	noteRowDelta: Signal<number | undefined>
 }
 
 const TableCountContext = createContext<Signals>()
@@ -19,7 +20,9 @@ export function TableCountProvider(props: { children: JSX.Element }) {
 		<TableCountContext.Provider
 			value={{
 				// eslint-disable-next-line solid/reactivity
-				templateRowDelta: createSignal<number>(),
+				templateRowDelta: createSignal(),
+				// eslint-disable-next-line solid/reactivity
+				noteRowDelta: createSignal(),
 			}}
 		>
 			{props.children}
