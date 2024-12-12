@@ -45,11 +45,8 @@ export async function postMedia(
 	}
 }
 
+// medTODO figure out a way to transactionally upload. Currently can upload templates with missing media
 export async function uploadTemplates(templateId?: TemplateId, nook?: NookId) {
-	const media = await C.db.getTemplateMediaToUpload(templateId)
-	for (const [mediaId, { data, ids }] of media) {
-		await postMedia('template', mediaId, ids, data)
-	}
 	const newTemplates = await C.db.getNewTemplatesToUpload(templateId, nook)
 	if (newTemplates.length > 0) {
 		const remoteIdByLocal = await cwaClient.createTemplates.mutate(newTemplates)
@@ -63,6 +60,10 @@ export async function uploadTemplates(templateId?: TemplateId, nook?: NookId) {
 		await cwaClient.editTemplates.mutate(editedTemplates)
 		await C.db.markTemplateAsPushed(editedTemplates.flatMap((n) => n.remoteIds))
 	}
+	const media = await C.db.getTemplateMediaToUpload(templateId)
+	for (const [mediaId, { data, ids }] of media) {
+		await postMedia('template', mediaId, ids, data)
+	}
 	if (
 		editedTemplates.length === 0 &&
 		newTemplates.length === 0 &&
@@ -74,14 +75,11 @@ export async function uploadTemplates(templateId?: TemplateId, nook?: NookId) {
 
 export type SyncState = 'different' | 'uploaded' | 'uploading' | 'errored'
 
+// medTODO figure out a way to transactionally upload. Currently can upload notes with missing media
 export async function uploadNotes(
 	noteId?: NoteId,
 	nook?: NookId,
 ): Promise<void> {
-	const media = await C.db.getNoteMediaToUpload(noteId)
-	for (const [mediaId, { data, ids }] of media) {
-		await postMedia('note', mediaId, ids, data)
-	}
 	const newNotes = await C.db.getNewNotesToUpload(noteId, nook)
 	if (newNotes.length > 0) {
 		const remoteIdByLocal = await cwaClient.createNote.mutate(newNotes)
@@ -93,6 +91,10 @@ export async function uploadNotes(
 		await C.db.markNoteAsPushed(
 			editedNotes.flatMap((n) => Array.from(n.remoteIds.keys())),
 		)
+	}
+	const media = await C.db.getNoteMediaToUpload(noteId)
+	for (const [mediaId, { data, ids }] of media) {
+		await postMedia('note', mediaId, ids, data)
 	}
 	if (editedNotes.length === 0 && newNotes.length === 0 && media.size === 0) {
 		C.toastInfo('Nothing to upload!')
