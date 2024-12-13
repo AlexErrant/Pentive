@@ -16,4 +16,7 @@ export interface Note {
 	remotes: Record<NookId, NoteRemote>
 }
 
-export type NoteRemote = { remoteNoteId: RemoteNoteId; uploadDate: Date } | null
+export type NoteRemote =
+	| undefined // "not uploadable"
+	| null // "marked for upload, but not yet uploaded"
+	| { remoteNoteId: RemoteNoteId; uploadDate: Date }

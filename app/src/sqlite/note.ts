@@ -32,7 +32,13 @@ import {
 	fromLDbId,
 } from 'shared/brand'
 import { type CreateRemoteNote, type EditRemoteNote } from 'shared/schema'
-import { notEmpty, objEntries, objKeys, objValues } from 'shared/utility'
+import {
+	notEmpty,
+	objEntries,
+	objKeys,
+	objValues,
+	type Override,
+} from 'shared/utility'
 import initSql from 'shared/sql.json'
 
 function noteToDocType(note: Note) {
@@ -52,6 +58,7 @@ function noteToDocType(note: Note) {
 			value,
 		})),
 		objEntries(note.remotes).map(([nook, remote]) => ({
+			note,
 			localId: toLDbId(note.id),
 			nook,
 			remoteId: toLDbId(remote?.remoteNoteId),
@@ -61,7 +68,7 @@ function noteToDocType(note: Note) {
 		InsertObject<DB, 'noteBase'>,
 		Array<InsertObject<DB, 'noteTag'>>,
 		Array<InsertObject<DB, 'noteFieldValue'>>,
-		Array<InsertObject<DB, 'remoteNote'>>,
+		Array<InsertObject<DB, 'remoteNote'> & { note: Note }>,
 	]
 }
 
@@ -109,18 +116,6 @@ type OnConflictUpdateNoteValueSet = {
 		x: ExpressionBuilder<
 			OnConflictDatabase<DB, 'noteFieldValue'>,
 			OnConflictTables<'noteFieldValue'>
-		>,
-	) => unknown
-}
-
-// The point of this type is to cause an error if something is added to RemoteNote
-// If that happens, you probably want to update the `doUpdateSet` call.
-// If not, you an add an exception to the Exclude below.
-type OnConflictUpdateRemoteNoteSet = {
-	[K in keyof RemoteNote as Exclude<K, 'localId' | 'nook'>]: (
-		x: ExpressionBuilder<
-			OnConflictDatabase<DB, 'remoteNote'>,
-			OnConflictTables<'remoteNote'>
 		>,
 	) => unknown
 }
@@ -208,17 +203,8 @@ JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field
 							)
 							.execute()
 					}
-					if (remotes.length > 0) {
-						await db
-							.insertInto('remoteNote')
-							.values(remotes)
-							.onConflict((x) =>
-								x.doUpdateSet({
-									remoteId: (x) => x.ref('excluded.remoteId'),
-									uploadDate: (x) => x.ref('excluded.uploadDate'),
-								} satisfies OnConflictUpdateRemoteNoteSet),
-							)
-							.execute()
+					for (const r of remotes) {
+						await this.makeNoteUploadable(r) // doesn't handle deletions! F19F2731-BA29-406F-8F35-4E399CB40242
 					}
 				}
 				await sql`INSERT INTO noteFieldFts(noteFieldFts) VALUES('rebuild')`.execute(
@@ -293,7 +279,7 @@ JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field
 							C.toastImpossible(
 								`No template found for id '${note.templateId}' with nook '${remoteNook}'.`,
 							)
-						return rt.remoteId as RemoteTemplateId | null
+						return fromLDbId<RemoteTemplateId | null>(rt.remoteId)
 					})
 					.filter(notEmpty)
 				return domainToCreateRemote(note, remoteIds)
@@ -451,33 +437,26 @@ JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field
 		}
 		return media
 	},
-	makeNoteUploadable: async function (noteId: NoteId, nook: NookId) {
-		const noteDbId = toLDbId(noteId)
-		const remoteNote = {
-			localId: noteDbId,
-			nook,
-			remoteId: null,
-			uploadDate: null,
-		}
+	makeNoteUploadable: async function (
+		remoteNote: Override<
+			InsertObject<DB, 'remoteNote'>,
+			{ localId: RemoteNote['localId'] }
+		> & { note: Note },
+	) {
+		const { remoteMediaIdByLocal } = withLocalMediaIdByRemoteMediaId(
+			new DOMParser(),
+			domainToCreateRemote(remoteNote.note, [
+				/* this doesn't need any real values */
+			]),
+		)
+		// @ts-expect-error kysley doesn't use note - it's only used by the above
+		delete remoteNote.note
 		await tx(async (db) => {
 			await db
 				.insertInto('remoteNote')
 				.values(remoteNote)
 				.onConflict((db) => db.doNothing())
 				.execute()
-			const note = await db
-				.selectFrom('note')
-				.selectAll('note')
-				.innerJoin('template', 'note.templateId', 'template.id')
-				.select('template.fields as template_fields')
-				.where('note.id', '=', noteDbId)
-				.executeTakeFirstOrThrow()
-			const { remoteMediaIdByLocal } = withLocalMediaIdByRemoteMediaId(
-				new DOMParser(),
-				domainToCreateRemote(noteEntityToDomain(note, [remoteNote]), [
-					/* this doesn't need any real values... I think */
-				]),
-			)
 			const srcs = new Set(remoteMediaIdByLocal.keys())
 			const mediaBinaries = await db
 				.selectFrom('media')
@@ -488,18 +467,21 @@ JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field
 				C.toastFatal("You're missing a media.") // medTODO better error message
 			await db
 				.deleteFrom('remoteMedia')
-				.where('localEntityId', '=', noteDbId)
+				.where('localEntityId', '=', remoteNote.localId)
 				.where('i', '>', srcs.size as RemoteMediaNum)
 				.execute()
 			if (remoteMediaIdByLocal.size !== 0) {
 				await db
 					.insertInto('remoteMedia')
 					.values(
-						Array.from(remoteMediaIdByLocal).map(([localMediaId, i]) => ({
-							localEntityId: noteDbId,
-							i,
-							localMediaId,
-						})),
+						Array.from(remoteMediaIdByLocal).map(
+							([localMediaId, i]) =>
+								({
+									localEntityId: remoteNote.localId,
+									i,
+									localMediaId,
+								}) satisfies InsertObject<DB, 'remoteMedia'>,
+						),
 					)
 					// insert into "remoteMedia" ("localEntityId", "i", "localMediaId") values (?, ?, ?)
 					// on conflict do update set "localMediaId" = "excluded"."localMediaId"

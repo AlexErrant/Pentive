@@ -146,7 +146,7 @@ export const AddNote: VoidComponent<{
 			/>
 			<Show when={wip.noteCard}>
 				<FieldsEditor setNoteCard={setWip} noteCard={wip.noteCard!} />
-				<CardsRemote noteCard={wip.noteCard!} />
+				<CardsRemote setNoteCard={setWip} noteCard={wip.noteCard!} />
 				<CardsPreview noteCard={wip.noteCard!} />
 				<div>
 					<button
