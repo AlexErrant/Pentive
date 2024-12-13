@@ -6,7 +6,11 @@ import {
 	recordWithOptionalFields,
 } from './arbitrary'
 import { type Ord, type TemplateId, type RemoteTemplateId } from 'shared/brand'
-import { type Field, type Template } from 'shared/domain/template'
+import {
+	type TemplateRemote,
+	type Field,
+	type Template,
+} from 'shared/domain/template'
 import { type ChildTemplate, type TemplateType } from 'shared/schema'
 
 const field = recordWithOptionalFields<Field>(
@@ -58,7 +62,7 @@ export const template = recordWithOptionalFields<Template>(
 			arbitraryNookId,
 			fc.oneof(
 				fc.constant(null),
-				fc.record<{ remoteTemplateId: RemoteTemplateId; uploadDate: Date }>({
+				fc.record<TemplateRemote>({
 					remoteTemplateId: arbitraryUlid<RemoteTemplateId>(),
 					uploadDate: reasonableDates,
 				}),

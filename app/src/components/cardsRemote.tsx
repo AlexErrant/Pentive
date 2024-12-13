@@ -1,8 +1,9 @@
 import { Show, type VoidComponent } from 'solid-js'
-import { type NookId, type RemoteTemplateId } from 'shared/brand'
+import { type NookId } from 'shared/brand'
 import { type NoteCardView } from '../uiLogic/cards'
 import { Entries } from '@solid-primitives/keyed'
 import { type SetStoreFunction } from 'solid-js/store'
+import { type TemplateRemote } from 'shared/domain/template'
 
 export const CardsRemote: VoidComponent<{
 	readonly noteCard: NoteCardView
@@ -13,12 +14,12 @@ export const CardsRemote: VoidComponent<{
 	<Show when={Object.keys(props.noteCard.template.remotes).length !== 0}>
 		Remote Nooks:
 		<Entries of={props.noteCard.template.remotes}>
-			{(nookId, remoteTemplate) => (
+			{(nookId, templateRemote) => (
 				<RemoteNook
 					noteCard={props.noteCard}
 					setNoteCard={props.setNoteCard}
 					nookId={nookId}
-					remoteTemplate={remoteTemplate()}
+					templateRemote={templateRemote()}
 				/>
 			)}
 		</Entries>
@@ -31,13 +32,7 @@ const RemoteNook: VoidComponent<{
 		noteCard?: NoteCardView
 	}>
 	readonly nookId: NookId
-	readonly remoteTemplate:
-		| {
-				remoteTemplateId: RemoteTemplateId
-				uploadDate: Date
-		  }
-		| null
-		| undefined
+	readonly templateRemote: TemplateRemote
 }> = (props) => {
 	const remote = () => props.noteCard.note.remotes[props.nookId] ?? null
 	const uploadable = () =>

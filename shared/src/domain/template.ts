@@ -21,11 +21,14 @@ export interface Template {
 	created: Date
 	edited: Date
 	templateType: TemplateType
-	remotes: Record<
-		NookId,
-		{ remoteTemplateId: RemoteTemplateId; uploadDate: Date } | null
-	>
+	remotes: Record<NookId, TemplateRemote>
 }
+
+export type TemplateRemote =
+	| undefined // "not uploadable"
+	| null // "marked for upload, but not yet uploaded"
+	| { remoteTemplateId: RemoteTemplateId; uploadDate: Date }
+
 export const getDefaultTemplate = (id: TemplateId): Template => ({
 	id,
 	name: 'New Template',

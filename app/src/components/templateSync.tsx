@@ -17,8 +17,8 @@ import { templateLinter } from 'shared-dom/language/templateLinter'
 import { DiffModeToggleGroup } from './diffModeContext'
 import './templateSync.css'
 import { uploadTemplates } from '../domain/sync'
-import { type Template } from 'shared/domain/template'
-import { type RemoteTemplateId, type NookId } from 'shared/brand'
+import { type TemplateRemote, type Template } from 'shared/domain/template'
+import { type NookId } from 'shared/brand'
 import { type Standard, type Cloze, type ChildTemplate } from 'shared/schema'
 import { Entries } from '@solid-primitives/keyed'
 import { UploadEntry } from './uploadEntry'
@@ -29,12 +29,12 @@ const TemplateSync: VoidComponent<{ template: Template }> = (props) => {
 			<DiffModeToggleGroup />
 			<ul>
 				<Entries of={props.template.remotes}>
-					{(nookId, remoteTemplate) => (
+					{(nookId, templateRemote) => (
 						<li>
 							<h2>/n/{nookId}</h2>
 							<TemplateNookSync
 								template={props.template}
-								remoteTemplate={remoteTemplate()}
+								templateRemote={templateRemote()}
 							/>
 						</li>
 					)}
@@ -48,15 +48,12 @@ export default TemplateSync
 
 export const TemplateNookSync: VoidComponent<{
 	template: Template
-	remoteTemplate: {
-		remoteTemplateId: RemoteTemplateId
-		uploadDate: Date
-	} | null
+	templateRemote: TemplateRemote
 	nook?: NookId
 }> = (props) => {
 	return (
 		<UploadEntry
-			remote={props.remoteTemplate}
+			remote={props.templateRemote}
 			// eslint-disable-next-line solid/reactivity
 			upload={async () => {
 				await uploadTemplates(props.template.id, props.nook)
@@ -64,7 +61,7 @@ export const TemplateNookSync: VoidComponent<{
 		>
 			<TemplateNookSyncActual
 				template={props.template}
-				remoteTemplate={props.remoteTemplate}
+				templateRemote={props.templateRemote}
 			/>
 		</UploadEntry>
 	)
@@ -72,13 +69,10 @@ export const TemplateNookSync: VoidComponent<{
 
 const TemplateNookSyncActual: VoidComponent<{
 	template: Template
-	remoteTemplate: {
-		remoteTemplateId: RemoteTemplateId
-		uploadDate: Date
-	} | null
+	templateRemote: TemplateRemote
 }> = (props) => {
 	const [remoteTemplate] = createResource(
-		() => props.remoteTemplate?.remoteTemplateId,
+		() => props.templateRemote?.remoteTemplateId,
 		async (id) => await augcClient.getTemplate.query(id), // medTODO planetscale needs an id that associates all templates so we can lookup in 1 pass. Also would be useful to find "related" templates
 	)
 	return (
