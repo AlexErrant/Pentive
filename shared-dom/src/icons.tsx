@@ -77,36 +77,28 @@ export function Hamburger(props: ComponentProps<'svg'>) {
 	return (
 		<svg
 			viewBox='0 0 24 24'
-			fill='currentColor'
+			stroke='currentColor'
 			{...props}
 			xmlns='http://www.w3.org/2000/svg'
+			stroke-width='2'
+			stroke-linecap='round'
 		>
-			<g id='SVGRepo_bgCarrier' stroke-width='0' />
-			<g
-				id='SVGRepo_tracerCarrier'
-				stroke-linecap='round'
-				stroke-linejoin='round'
-			/>
-			<g id='SVGRepo_iconCarrier'>
-				<path
-					d='M4 18L20 18'
-					stroke='#000000'
-					stroke-width='2'
-					stroke-linecap='round'
-				/>
-				<path
-					d='M4 12L20 12'
-					stroke='#000000'
-					stroke-width='2'
-					stroke-linecap='round'
-				/>
-				<path
-					d='M4 6L20 6'
-					stroke='#000000'
-					stroke-width='2'
-					stroke-linecap='round'
-				/>
-			</g>
+			<path d='M4 18L20 18' />
+			<path d='M4 12L20 12' />
+			<path d='M4 6L20 6' />
+		</svg>
+	)
+}
+
+export function ExternalLink(props: ComponentProps<'svg'>) {
+	return (
+		<svg
+			viewBox='0 0 32 32'
+			xmlns='http://www.w3.org/2000/svg'
+			fill='currentColor'
+			{...props}
+		>
+			<path d='M 18 5 L 18 7 L 23.5625 7 L 11.28125 19.28125 L 12.71875 20.71875 L 25 8.4375 L 25 14 L 27 14 L 27 5 Z M 5 9 L 5 27 L 23 27 L 23 14 L 21 16 L 21 25 L 7 25 L 7 11 L 16 11 L 18 9 Z' />
 		</svg>
 	)
 }
