@@ -119,6 +119,11 @@
 			"development": "./src/domain/review.ts",
 			"default": "./lib/src/domain/review.js"
 		},
+		"./domain/setting": {
+			"types": "./src/domain/setting.ts",
+			"development": "./src/domain/setting.ts",
+			"default": "./lib/src/domain/setting.js"
+		},
 		"./domain/cardSetting": {
 			"types": "./src/domain/cardSetting.ts",
 			"development": "./src/domain/cardSetting.ts",

@@ -39,6 +39,7 @@ export type CommentId = Brand<string, 'commentId'>
 
 export type RemoteCardId = Brand<string, 'remoteCardId'>
 
+export type SettingId = Brand<string, 'settingId'>
 export type CardSettingId = Brand<string, 'cardSettingId'>
 
 export type RemoteMediaNum = Brand<number, 'remoteMediaNum'>
@@ -64,6 +65,7 @@ type LocalId =
 	| CardId
 	| ReviewId
 	| CardSettingId
+	| SettingId
 	// remotes
 	| RemoteTemplateId
 	| RemoteNoteId

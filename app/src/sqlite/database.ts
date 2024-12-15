@@ -217,4 +217,6 @@ export interface DB {
 	remoteTemplate: RemoteTemplate
 	review: Review
 	cardSetting: CardSetting
+	setting: Setting
+	settingBase: SettingBase
 }
