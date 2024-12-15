@@ -171,6 +171,17 @@ export interface Review {
 	details: string
 }
 
+export interface SettingBase {
+	id: LDbId
+	key: string
+	value: string
+}
+
+export interface Setting {
+	id: LDbId
+	json: string
+}
+
 export interface CardSetting {
 	id: LDbId
 	name: string
