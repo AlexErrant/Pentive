@@ -1,29 +1,26 @@
 import { createStore } from 'solid-js/store'
 import { type JSX, Show, onMount, For, createEffect } from 'solid-js'
-import { getCardSettings } from './settings.data'
+import { getSettings } from './settings.data'
 import { createAsync } from '@solidjs/router'
 import { GoldenLayout, LayoutConfig } from 'golden-layout'
 import { render } from 'solid-js/web'
-import EditCardSetting from '../components/editCardSetting'
+import EditSetting from '../components/editSetting'
 import { cloneDeep } from 'lodash-es'
 import { ulidAsBase64Url } from '../domain/utility'
-import { type CardSettingId } from 'shared/brand'
-import {
-	type CardSetting,
-	getDefaultCardSetting,
-} from 'shared/domain/cardSetting'
+import { type SettingId } from 'shared/brand'
+import { type Setting, getDefaultSetting } from 'shared/domain/setting'
 
 export default function Settings(): JSX.Element {
-	const initialSettings = createAsync(async () => await getCardSettings(), {
+	const initialSettings = createAsync(async () => await getSettings(), {
 		initialValue: [],
 	})
 	const [settings, setSettings] = createStore({
-		cardSettings: [] as CardSetting[],
+		settings: [] as Setting[],
 	})
 	createEffect(() => {
-		setSettings({ cardSettings: initialSettings() })
+		setSettings({ settings: initialSettings() })
 	})
-	const [selected, setSelected] = createStore<{ setting?: CardSetting }>({})
+	const [selected, setSelected] = createStore<{ setting?: Setting }>({})
 	let glRoot: HTMLDivElement
 	onMount(() => {
 		const goldenLayout = new GoldenLayout(glRoot)
@@ -34,16 +31,14 @@ export default function Settings(): JSX.Element {
 				render(
 					() => (
 						<ul>
-							<For each={settings.cardSettings}>
+							<For each={settings.settings}>
 								{(s) => (
 									<li>
 										<button
 											type='button'
 											onClick={() => {
-												const setting = cloneDeep(
-													settings.cardSettings.find((c) => c.id === s.id),
-												) // some fns mutate the selectedSetting, so clone to avoid issues... I think. Just copy pasting for now, maybe I don't need to clone.
-												setSelected('setting', setting)
+												const setting = cloneDeep(s) // some fns mutate the selectedSetting, so clone to avoid issues... I think. Just copy pasting for now, maybe I don't need to clone.
+												setSelected({ setting })
 											}}
 										>
 											{s.name}
@@ -64,11 +59,11 @@ export default function Settings(): JSX.Element {
 				render(
 					() => (
 						<Show when={selected.setting != null}>
-							<EditCardSetting
-								cardSetting={selected.setting!}
-								setCardSetting={(s: CardSetting) => {
+							<EditSetting
+								setting={selected.setting!}
+								setSetting={(s) => {
 									setSettings(
-										'cardSettings',
+										'settings',
 										(x) => x.id === selected.setting!.id,
 										s,
 									)
@@ -86,13 +81,11 @@ export default function Settings(): JSX.Element {
 				container.element.style.overflow = 'auto'
 				render(
 					() => (
-						<EditCardSetting
-							setCardSetting={(s: CardSetting) => {
-								setSettings('cardSettings', [...settings.cardSettings, s])
+						<EditSetting
+							setSetting={(s: Setting) => {
+								setSettings('settings', [...settings.settings, s])
 							}}
-							cardSetting={getDefaultCardSetting(
-								ulidAsBase64Url() as CardSettingId,
-							)}
+							setting={getDefaultSetting(ulidAsBase64Url() as SettingId)}
 						/>
 					),
 					container.element,

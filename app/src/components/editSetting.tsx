@@ -22,34 +22,33 @@ import Ajv from 'ajv'
 import { C } from '../topLevelAwait'
 import { useThemeContext } from 'shared-dom/themeSelector'
 import { basicSetup } from 'shared-dom/codemirror'
-import { type CardSetting } from 'shared/domain/cardSetting'
+import { type Setting } from 'shared/domain/setting'
 
-const EditCardSetting: VoidComponent<{
-	cardSetting: CardSetting
-	setCardSetting: (_: CardSetting) => void
+const EditSetting: VoidComponent<{
+	setting: Setting
+	setSetting: (_: Setting) => void
 }> = (props) => {
 	let ref: HTMLDivElement
 	let view: EditorView
-	const stringifiedCardSetting = () =>
-		JSON.stringify(props.cardSetting, null, 2)
+	const stringifiedSetting = () => JSON.stringify(props.setting, null, 2)
 	const [theme] = useThemeContext()
 	onMount(() => {
 		view = new EditorView({
 			parent: ref,
-			state: createEditorState(stringifiedCardSetting(), theme()),
+			state: createEditorState(stringifiedSetting(), theme()),
 		})
 	})
 	createEffect(
 		on(
-			() => props.cardSetting.id,
+			() => props.setting.id,
 			() => {
-				view.setState(createEditorState(stringifiedCardSetting(), theme()))
+				view.setState(createEditorState(stringifiedSetting(), theme()))
 			},
 		),
 	)
 	createEffect(
 		on(theme, (t) => {
-			view.setState(createEditorState(stringifiedCardSetting(), t))
+			view.setState(createEditorState(stringifiedSetting(), t))
 		}),
 	)
 	onCleanup(() => {
@@ -67,16 +66,16 @@ const EditCardSetting: VoidComponent<{
 				type='button'
 				class='text-white bg-green-600 rounded p-2 px-4 font-bold hover:bg-green-700'
 				onClick={async () => {
-					let cardSetting: CardSetting
+					let setting: Setting
 					try {
-						cardSetting = JSON.parse(view.state.doc.toString()) as CardSetting
+						setting = JSON.parse(view.state.doc.toString()) as Setting
 					} catch (error) {
 						C.toastError('Invalid JSON.')
 						return
 					}
-					if (validate(cardSetting)) {
-						props.setCardSetting(cardSetting)
-						await C.db.bulkUploadCardSettings([cardSetting])
+					if (validate(setting)) {
+						props.setSetting(setting)
+						await C.db.bulkUploadSettings([setting])
 					} else {
 						C.toastError(
 							<>
@@ -93,7 +92,7 @@ const EditCardSetting: VoidComponent<{
 	)
 }
 
-export default EditCardSetting
+export default EditSetting
 
 const schema = {
 	type: 'object',
