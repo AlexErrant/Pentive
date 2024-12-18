@@ -1,9 +1,9 @@
 CREATE TABLE IF NOT EXISTS settingBase (
   id TEXT, -- make BLOB upon SQLite v3.41 and the landing of UNHEX https://sqlite.org/forum/forumpost/30cca4e613d2fa2a grep F235B7FB-8CEA-4AE2-99CC-2790E607B1EB
   key TEXT,
-  value TEXT,
+  value,
   PRIMARY KEY (id, key)
-) STRICT;
+);
 CREATE VIEW IF NOT EXISTS setting AS
   SELECT
     MIN(rowid) AS rowid,
