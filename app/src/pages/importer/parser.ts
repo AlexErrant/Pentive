@@ -5,8 +5,9 @@ import {
 	type TemplateId,
 	type CardSettingId,
 	type ReviewId,
+	type SettingId,
 } from 'shared/brand'
-import { throwExp, dayInMs } from 'shared/utility'
+import { throwExp, dayInMs, objEntries } from 'shared/utility'
 import { type Field, type Template } from 'shared/domain/template'
 import { type Kind, type Review } from 'shared/domain/review'
 import { type Note as PNote } from 'shared/domain/note'
@@ -27,6 +28,8 @@ import { zip } from 'lodash-es'
 import { z } from 'zod'
 import { C } from '../../topLevelAwait'
 import { type ChildTemplate, type TemplateType } from 'shared/schema'
+import { type Setting } from 'shared/domain/setting'
+import { flattenObject } from '../../sqlite/util'
 
 function parseField(fld: Fld): Field {
 	return {
@@ -216,11 +219,14 @@ function convertType(s: number): Kind {
 	}
 }
 
-export function parseCardSetting(dconf: Dconf): CardSetting[] {
-	return Array.from(Object.entries(dconf)).map(([id, rest]) => ({
-		...rest,
-		id: id as CardSettingId,
-	}))
+export function parseCardSetting(dconf: Dconf) {
+	return objEntries(dconf).map(
+		([id, rest]) =>
+			({
+				...flattenObject(rest),
+				id: id as SettingId,
+			}) satisfies Setting,
+	)
 }
 
 export const cardSetting = dconfSingle.merge(

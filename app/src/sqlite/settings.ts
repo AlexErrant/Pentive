@@ -9,6 +9,7 @@ import { C, ky } from '../topLevelAwait'
 import { fromLDbId, toLDbId } from 'shared/brand'
 import { type Setting } from 'shared/domain/setting'
 import { objEntries } from 'shared/utility'
+import { unflattenObject } from './util'
 
 export const settingsCollectionMethods = {
 	bulkUploadSettings: async function (settings: Setting[]) {
@@ -46,7 +47,7 @@ export const settingsCollectionMethods = {
 			return {
 				id: fromLDbId(s.id),
 				name: json.name ?? 'Placeholder Name',
-				...json,
+				...unflattenObject(json),
 			} satisfies Setting
 		})
 	},

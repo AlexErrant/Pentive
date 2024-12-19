@@ -16,7 +16,7 @@ import {
 import { type Field, type Template } from 'shared/domain/template'
 import { imgPlaceholder } from 'shared/image'
 import { type TemplateType } from 'shared/schema'
-import { parseSet, parseMap } from 'shared/utility'
+import { parseSet, parseMap, objEntries } from 'shared/utility'
 import { type Note } from 'shared/domain/note'
 import { C } from '../topLevelAwait'
 import { jsonArrayFrom } from 'kysely/helpers/sqlite'
@@ -209,4 +209,51 @@ export function getTemplate(
 			uploadDate: rt.uploadDate,
 		})),
 	)
+}
+
+interface JSONObject {
+	[key: string]: string | number | boolean | JSONObject | number[]
+}
+
+const delimiter = '/'
+
+export function flattenObject(obj: JSONObject, parentKey: string = '') {
+	const result: Record<string, string | number> = {}
+	for (const [key, value] of objEntries(obj)) {
+		const newKey = parentKey === '' ? key : `${parentKey}${delimiter}${key}`
+		if (Array.isArray(value)) {
+			result[newKey] = JSON.stringify(value)
+		} else if (typeof value === 'object') {
+			Object.assign(result, flattenObject(value, newKey))
+		} else {
+			const newValue = typeof value === 'boolean' ? (value ? 1 : 0) : value
+			result[newKey] = newValue
+		}
+	}
+	return result as Record<string, string | number> & { name: string }
+}
+
+export function unflattenObject(flattened: Record<string, string | number>) {
+	const result: JSONObject = {}
+	for (const [key, value] of objEntries(flattened)) {
+		const keys = key.split(delimiter)
+		let currentLevel: JSONObject = result
+		for (let i = 0; i < keys.length; i++) {
+			const segment = keys[i]!
+			if (/* "is last" */ i === keys.length - 1) {
+				if (
+					typeof value === 'string' &&
+					value.startsWith('[') &&
+					value.endsWith(']')
+				) {
+					currentLevel[segment] = JSON.parse(value) as number[]
+				} else {
+					currentLevel[segment] = value
+				}
+			} else {
+				currentLevel = (currentLevel[segment] as JSONObject) ??= {}
+			}
+		}
+	}
+	return result
 }

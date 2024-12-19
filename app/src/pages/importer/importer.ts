@@ -129,8 +129,8 @@ async function importAnkiDb(sqlite: Entry): Promise<void> {
 			const templates = parseTemplates(col.models)
 			await C.db.bulkInsertTemplate(templates)
 			templates.forEach((t) => templatesMap.set(t.id, t))
-			const cardSettings = parseCardSetting(col.dconf)
-			await C.db.bulkUploadCardSettings(cardSettings)
+			const settings = parseCardSetting(col.dconf)
+			await C.db.bulkUploadSettings(settings)
 		}
 		cols.free()
 		const notes = ankiDb.prepare('select * from notes') // lowTODO select exact columns
