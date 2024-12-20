@@ -8,19 +8,25 @@ import EditSetting from '../components/editSetting'
 import { cloneDeep } from 'lodash-es'
 import { ulidAsBase64Url } from '../domain/utility'
 import { type SettingId } from 'shared/brand'
-import { type Setting, getDefaultSetting } from 'shared/domain/setting'
+import {
+	type CardSetting,
+	type Setting,
+	getDefaultSetting,
+} from 'shared/domain/setting'
 
 export default function Settings(): JSX.Element {
 	const initialSettings = createAsync(async () => await getSettings(), {
 		initialValue: [],
 	})
 	const [settings, setSettings] = createStore({
-		settings: [] as Setting[],
+		settings: [] as Array<CardSetting | Setting>,
 	})
 	createEffect(() => {
 		setSettings({ settings: initialSettings() })
 	})
-	const [selected, setSelected] = createStore<{ setting?: Setting }>({})
+	const [selected, setSelected] = createStore<{
+		setting?: CardSetting | Setting
+	}>({})
 	let glRoot: HTMLDivElement
 	onMount(() => {
 		const goldenLayout = new GoldenLayout(glRoot)

@@ -22,10 +22,10 @@ import Ajv from 'ajv'
 import { C } from '../topLevelAwait'
 import { useThemeContext } from 'shared-dom/themeSelector'
 import { basicSetup } from 'shared-dom/codemirror'
-import { type Setting } from 'shared/domain/setting'
+import { type CardSetting, type Setting } from 'shared/domain/setting'
 
 const EditSetting: VoidComponent<{
-	setting: Setting
+	setting: CardSetting | Setting
 	setSetting: (_: Setting) => void
 }> = (props) => {
 	let ref: HTMLDivElement

@@ -1,13 +1,14 @@
 import { type DB, type SettingBase } from '../sqlite/database'
 import {
+	type SelectQueryBuilder,
 	type ExpressionBuilder,
 	type OnConflictDatabase,
 	type OnConflictTables,
 } from 'kysely'
 import { chunk } from 'lodash-es'
 import { C, ky } from '../topLevelAwait'
-import { fromLDbId, toLDbId } from 'shared/brand'
-import { type Setting } from 'shared/domain/setting'
+import { fromLDbId, type SettingId, toLDbId } from 'shared/brand'
+import { type CardSetting, type Setting } from 'shared/domain/setting'
 import { objEntries } from 'shared/utility'
 import { unflattenObject } from './util'
 
@@ -40,18 +41,57 @@ export const settingsCollectionMethods = {
 				.execute()
 		}
 	},
-	getSettings: async function () {
-		const settings = await ky.selectFrom('setting').selectAll().execute()
-		return settings.map((s) => {
+	getSettings: async function (
+		func?: (
+			qb: SelectQueryBuilder<DB, 'setting', Record<string, string>>,
+		) => SelectQueryBuilder<DB, 'setting', Record<string, string>>,
+	) {
+		const settings = await ky
+			.selectFrom('setting')
+			.$if(func != null, func!)
+			.selectAll()
+			.execute()
+		let hasUserSetting = false
+		const r = settings.map((s) => {
 			const json = parseJson(s.json)
+			if (s.id === userSettingId) {
+				hasUserSetting = true
+				return {
+					id: fromLDbId(s.id),
+					name: userSettingName,
+					...unflattenObject(json),
+				} satisfies Setting
+			}
 			return {
 				id: fromLDbId(s.id),
 				name: json.name ?? 'Placeholder Name',
 				...unflattenObject(json),
-			} satisfies Setting
+			} satisfies CardSetting
 		})
+		if (!hasUserSetting) {
+			r.push({
+				id: userSettingId,
+				name: userSettingName,
+			} satisfies Setting)
+		}
+		return r
+	},
+	getCardSettings: async function () {
+		const r = await this.getSettings((db) =>
+			db.where('id', '<>', toLDbId(userSettingId)),
+		)
+		return r as CardSetting[]
+	},
+	getUserSettings: async function () {
+		const r = await this.getSettings((db) =>
+			db.where('id', '=', toLDbId(userSettingId)),
+		)
+		return r[0] as Setting
 	},
 }
+
+const userSettingId = '' as SettingId
+const userSettingName = 'User Settings'
 
 // highTODO property test
 export function stringifyDetails(json: Record<string, unknown>) {
