@@ -40,6 +40,7 @@ import {
 } from 'shared/brand'
 import { hstsName, hstsValue } from 'shared/headers'
 import { iByEntityIdsValidator } from 'shared/publicToken'
+import { objEntries, objKeys } from 'shared/utility'
 export type * from '@trpc/server'
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -138,7 +139,7 @@ app
 			NoteId,
 			number
 		> // grep E7F24704-8D0B-460A-BF2C-A97344C535E0
-		const noteIds = Object.keys(iByEntityIds) as NoteId[]
+		const noteIds = objKeys(iByEntityIds)
 		if (noteIds.length === 0) return c.text(`Need at least one note.`, 400)
 		return await postPublicMedia(
 			c,
@@ -153,7 +154,7 @@ app
 			TemplateId,
 			number
 		> // grep E7F24704-8D0B-460A-BF2C-A97344C535E0
-		const templateIds = Object.keys(iByEntityIds) as TemplateId[]
+		const templateIds = objKeys(iByEntityIds)
 		if (templateIds.length === 0)
 			return c.text(`Need at least one template.`, 400)
 		return await postPublicMedia(
@@ -189,7 +190,7 @@ async function postPublicMedia(
 		userOwns: boolean
 		hasMedia: boolean
 	}>,
-	iByEntityIds: Record<Base64Url, number>,
+	iByEntityIds: Record<NoteId | TemplateId, number>,
 ) {
 	const authResult = await getUserId(c)
 	if (authResult.tag === 'Error') return c.text(authResult.error, 401)
@@ -200,10 +201,10 @@ async function postPublicMedia(
 		readable,
 		headers,
 	}: PersistParams): Promise<undefined | Response> => {
-		const insertValues = Object.entries(iByEntityIds).map(([entityId, i]) => ({
+		const insertValues = objEntries(iByEntityIds).map(([entityId, i]) => ({
 			mediaHash,
 			i,
-			entityId: fromBase64Url(entityId as Base64Url),
+			entityId: fromBase64Url(entityId),
 		}))
 		const { userOwns, hasMedia } = await userOwnsAndHasMedia(userId, mediaHash)
 		if (!userOwns)
