@@ -5,7 +5,7 @@ import {
 	type TemplateId,
 	type CardSettingId,
 	type ReviewId,
-	type SettingId,
+	type UserSettingId,
 } from 'shared/brand'
 import { throwExp, dayInMs, objEntries } from 'shared/utility'
 import { type Field, type Template } from 'shared/domain/template'
@@ -224,7 +224,7 @@ export function parseCardSetting(dconf: Dconf) {
 		([id, rest]) =>
 			({
 				...flattenObject(rest),
-				id: id as SettingId,
+				id: id as UserSettingId,
 			}) satisfies Setting,
 	)
 }

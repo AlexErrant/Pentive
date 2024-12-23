@@ -7,25 +7,21 @@ import { render } from 'solid-js/web'
 import EditSetting from '../components/editSetting'
 import { cloneDeep } from 'lodash-es'
 import { ulidAsBase64Url } from '../domain/utility'
-import { type SettingId } from 'shared/brand'
-import {
-	type CardSetting,
-	type Setting,
-	getDefaultSetting,
-} from 'shared/domain/setting'
+import { type CardSettingId } from 'shared/brand'
+import { type Setting, getDefaultSetting } from 'shared/domain/setting'
 
 export default function Settings(): JSX.Element {
 	const initialSettings = createAsync(async () => await getSettings(), {
 		initialValue: [],
 	})
 	const [settings, setSettings] = createStore({
-		settings: [] as Array<CardSetting | Setting>,
+		settings: [] as Setting[],
 	})
 	createEffect(() => {
 		setSettings({ settings: initialSettings() })
 	})
 	const [selected, setSelected] = createStore<{
-		setting?: CardSetting | Setting
+		setting?: Setting
 	}>({})
 	let glRoot: HTMLDivElement
 	onMount(() => {
@@ -91,7 +87,7 @@ export default function Settings(): JSX.Element {
 							setSetting={(s: Setting) => {
 								setSettings('settings', [...settings.settings, s])
 							}}
-							setting={getDefaultSetting(ulidAsBase64Url() as SettingId)}
+							setting={getDefaultSetting(ulidAsBase64Url() as CardSettingId)}
 						/>
 					),
 					container.element,

@@ -39,7 +39,8 @@ export type CommentId = Brand<string, 'commentId'>
 
 export type RemoteCardId = Brand<string, 'remoteCardId'>
 
-export type SettingId = Brand<string, 'settingId'>
+export const userSettingId = '' as const
+export type UserSettingId = typeof userSettingId
 export type CardSettingId = Brand<string, 'cardSettingId'>
 
 export type RemoteMediaNum = Brand<number, 'remoteMediaNum'>
@@ -65,7 +66,7 @@ type LocalId =
 	| CardId
 	| ReviewId
 	| CardSettingId
-	| SettingId
+	| UserSettingId
 	// remotes
 	| RemoteTemplateId
 	| RemoteNoteId

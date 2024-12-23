@@ -7,8 +7,12 @@ import {
 } from 'kysely'
 import { chunk } from 'lodash-es'
 import { C, ky } from '../topLevelAwait'
-import { fromLDbId, type SettingId, toLDbId } from 'shared/brand'
-import { type CardSetting, type Setting } from 'shared/domain/setting'
+import { fromLDbId, toLDbId, userSettingId } from 'shared/brand'
+import {
+	type CardSetting,
+	type UserSetting,
+	type Setting,
+} from 'shared/domain/setting'
 import { objEntries } from 'shared/utility'
 import { unflattenObject } from './util'
 
@@ -60,7 +64,7 @@ export const settingsCollectionMethods = {
 					id: fromLDbId(s.id),
 					name: userSettingName,
 					...unflattenObject(json),
-				} satisfies Setting
+				} satisfies UserSetting
 			}
 			return {
 				id: fromLDbId(s.id),
@@ -72,7 +76,7 @@ export const settingsCollectionMethods = {
 			r.push({
 				id: userSettingId,
 				name: userSettingName,
-			} satisfies Setting)
+			} satisfies UserSetting)
 		}
 		return r
 	},
@@ -86,11 +90,10 @@ export const settingsCollectionMethods = {
 		const r = await this.getSettings((db) =>
 			db.where('id', '=', toLDbId(userSettingId)),
 		)
-		return r[0] as Setting
+		return r[0] as UserSetting
 	},
 }
 
-const userSettingId = '' as SettingId
 const userSettingName = 'User Settings'
 
 // highTODO property test

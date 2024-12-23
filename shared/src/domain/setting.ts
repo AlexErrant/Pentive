@@ -1,7 +1,7 @@
-import { type CardSettingId, type SettingId } from '../brand'
+import { type UserSettingId, type CardSettingId } from '../brand'
 
-export type Setting = {
-	id: SettingId
+export type UserSetting = {
+	id: UserSettingId
 	name: string
 } & Record<string, string | number>
 
@@ -10,8 +10,10 @@ export type CardSetting = {
 	name: string
 } & Record<string, string | number>
 
-export const getDefaultSetting = (id: SettingId) =>
+export type Setting = UserSetting | CardSetting
+
+export const getDefaultSetting = (id: CardSettingId) =>
 	({
 		id,
 		name: 'New Setting',
-	}) satisfies Setting
+	}) satisfies CardSetting
