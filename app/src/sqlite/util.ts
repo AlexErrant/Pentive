@@ -6,6 +6,7 @@ import {
 	type RemoteTemplate,
 	type Template as TemplateEntity,
 	type DB,
+	type SettingBase,
 } from './database'
 import {
 	type MediaId,
@@ -21,6 +22,7 @@ import { type Note } from 'shared/domain/note'
 import { C } from '../topLevelAwait'
 import { jsonArrayFrom } from 'kysely/helpers/sqlite'
 import { type AliasedRawBuilder, type ExpressionBuilder } from 'kysely'
+import { type SettingValue, type Setting } from 'shared/domain/setting'
 
 export function parseTags(rawTags: string) {
 	return parseSet<string>(rawTags)
@@ -211,42 +213,50 @@ export function getTemplate(
 	)
 }
 
+// medTODO property test
+const encoder = new TextEncoder() // always utf-8
+const decoder = new TextDecoder('utf-8')
+export function encodeValue(rawValue: SettingValue) {
+	return Array.isArray(rawValue) || typeof rawValue === 'boolean'
+		? encoder.encode(JSON.stringify(rawValue))
+		: rawValue
+}
+function decodeValue(value: Uint8Array) {
+	return JSON.parse(decoder.decode(value)) as SettingValue
+}
+
 interface JSONObject {
-	[key: string]: string | number | boolean | JSONObject | number[]
+	[key: string]: SettingValue | JSONObject
 }
 
 const delimiter = '/'
 
 export function flattenObject(obj: JSONObject, parentKey: string = '') {
-	const result: Record<string, string | number> = {}
+	// eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+	const result = {} as Setting
 	for (const [key, value] of objEntries(obj)) {
 		const newKey = parentKey === '' ? key : `${parentKey}${delimiter}${key}`
-		if (Array.isArray(value)) {
-			result[newKey] = JSON.stringify(value)
-		} else if (typeof value === 'object') {
+		if (typeof value === 'object' && !Array.isArray(value)) {
 			Object.assign(result, flattenObject(value, newKey))
 		} else {
-			const newValue = typeof value === 'boolean' ? (value ? 1 : 0) : value
-			result[newKey] = newValue
+			result[newKey] = value
 		}
 	}
-	return result as Record<string, string | number> & { name: string }
+	return result
 }
 
-export function unflattenObject(flattened: Record<string, string | number>) {
+export function unflattenObject(
+	flattened: Array<readonly [string, SettingBase['value']]>,
+) {
 	const result: JSONObject = {}
-	for (const [key, value] of objEntries(flattened)) {
+	for (const [key, value] of flattened) {
 		const keys = key.split(delimiter)
 		let currentLevel: JSONObject = result
 		for (let i = 0; i < keys.length; i++) {
 			const segment = keys[i]!
 			if (/* "is last" */ i === keys.length - 1) {
-				if (
-					typeof value === 'string' &&
-					value.startsWith('[') &&
-					value.endsWith(']')
-				) {
-					currentLevel[segment] = JSON.parse(value) as number[]
+				if (ArrayBuffer.isView(value)) {
+					currentLevel[segment] = decodeValue(value)
 				} else {
 					currentLevel[segment] = value
 				}

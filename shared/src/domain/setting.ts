@@ -1,14 +1,16 @@
 import { type UserSettingId, type CardSettingId } from '../brand'
 
+export type SettingValue = string | number | boolean | number[]
+
 export type UserSetting = {
 	id: UserSettingId
 	name: string
-} & Record<string, string | number>
+} & Record<string, SettingValue>
 
 export type CardSetting = {
 	id: CardSettingId
 	name: string
-} & Record<string, string | number>
+} & Record<string, SettingValue>
 
 export type Setting = UserSetting | CardSetting
 

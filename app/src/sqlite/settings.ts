@@ -4,17 +4,24 @@ import {
 	type ExpressionBuilder,
 	type OnConflictDatabase,
 	type OnConflictTables,
+	type InsertObject,
 } from 'kysely'
 import { chunk } from 'lodash-es'
 import { C, ky } from '../topLevelAwait'
-import { fromLDbId, toLDbId, userSettingId } from 'shared/brand'
+import {
+	type CardSettingId,
+	fromLDbId,
+	toLDbId,
+	type UserSettingId,
+	userSettingId,
+} from 'shared/brand'
 import {
 	type CardSetting,
 	type UserSetting,
 	type Setting,
 } from 'shared/domain/setting'
 import { objEntries } from 'shared/utility'
-import { unflattenObject } from './util'
+import { encodeValue, unflattenObject } from './util'
 
 export const settingsCollectionMethods = {
 	bulkUploadSettings: async function (settings: Setting[]) {
@@ -24,8 +31,8 @@ export const settingsCollectionMethods = {
 					({
 						id: toLDbId(setting.id),
 						key,
-						value,
-					}) satisfies SettingBase,
+						value: encodeValue(value),
+					}) satisfies InsertObject<DB, 'settingBase'>,
 			),
 		)
 		const batches = chunk(entities, 1000)
@@ -47,29 +54,33 @@ export const settingsCollectionMethods = {
 	},
 	getSettings: async function (
 		func?: (
-			qb: SelectQueryBuilder<DB, 'setting', Record<string, string>>,
-		) => SelectQueryBuilder<DB, 'setting', Record<string, string>>,
+			qb: SelectQueryBuilder<DB, 'settingBase', Record<never, never>>,
+		) => SelectQueryBuilder<DB, 'settingBase', Record<never, never>>,
 	) {
-		const settings = await ky
-			.selectFrom('setting')
+		const settingEntities = await ky
+			.selectFrom('settingBase')
 			.$if(func != null, func!)
 			.selectAll()
 			.execute()
+		const groupedSettings = groupBy(settingEntities, (s) =>
+			fromLDbId<UserSettingId | CardSettingId>(s.id),
+		)
 		let hasUserSetting = false
-		const r = settings.map((s) => {
-			const json = parseJson(s.json)
-			if (s.id === userSettingId) {
+		const r = objEntries(groupedSettings).map(([id, settings]) => {
+			const keyVals = settings.map((s) => [s.key, s.value] as const)
+			if (id === userSettingId) {
 				hasUserSetting = true
 				return {
-					id: fromLDbId(s.id),
+					id,
 					name: userSettingName,
-					...unflattenObject(json),
+					...unflattenObject(keyVals),
 				} satisfies UserSetting
 			}
+			const obj = unflattenObject(keyVals)
 			return {
-				id: fromLDbId(s.id),
-				name: json.name ?? 'Placeholder Name',
-				...unflattenObject(json),
+				...obj,
+				id: id as CardSettingId,
+				name: typeof obj.name === 'string' ? obj.name : 'Placeholder Name',
 			} satisfies CardSetting
 		})
 		if (!hasUserSetting) {
@@ -93,6 +104,17 @@ export const settingsCollectionMethods = {
 		return r[0] as UserSetting
 	},
 }
+
+// https://stackoverflow.com/a/64489535
+
+const groupBy = <T>(
+	array: T[],
+	predicate: (value: T, index: number, array: T[]) => string,
+) =>
+	array.reduce<Record<string, T[]>>((acc, value, index, array) => {
+		;(acc[predicate(value, index, array)] ||= []).push(value)
+		return acc
+	}, {})
 
 const userSettingName = 'User Settings'
 
