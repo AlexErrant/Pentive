@@ -6,7 +6,7 @@ import {
 	type RemoteTemplate,
 	type Template as TemplateEntity,
 	type DB,
-	type SettingBase,
+	type Setting as SettingEntity,
 } from './database'
 import {
 	type MediaId,
@@ -246,7 +246,7 @@ export function flattenObject(obj: JSONObject, parentKey: string = '') {
 }
 
 export function unflattenObject(
-	flattened: Array<readonly [string, SettingBase['value']]>,
+	flattened: Array<readonly [string, SettingEntity['value']]>,
 ) {
 	const result: JSONObject = {}
 	for (const [key, value] of flattened) {

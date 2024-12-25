@@ -1,4 +1,4 @@
-import { type DB, type SettingBase } from '../sqlite/database'
+import { type DB, type Setting as SettingEntity } from '../sqlite/database'
 import {
 	type SelectQueryBuilder,
 	type ExpressionBuilder,
@@ -32,21 +32,21 @@ export const settingsCollectionMethods = {
 						id: toLDbId(setting.id),
 						key,
 						value: encodeValue(value),
-					}) satisfies InsertObject<DB, 'settingBase'>,
+					}) satisfies InsertObject<DB, 'setting'>,
 			),
 		)
 		const batches = chunk(entities, 1000)
 		for (let i = 0; i < batches.length; i++) {
 			C.toastInfo('setting batch ' + (i + 1) + '/' + batches.length)
 			await ky
-				.insertInto('settingBase')
+				.insertInto('setting')
 				.values(batches[i]!)
 				.onConflict(
 					(db) =>
 						db.doUpdateSet({
 							key: (x) => x.ref('excluded.key'),
 							value: (x) => x.ref('excluded.value'),
-						} satisfies OnConflictUpdateSettingBaseSet),
+						} satisfies OnConflictUpdateSettingSet),
 					// medTODO support deleting
 				)
 				.execute()
@@ -54,11 +54,11 @@ export const settingsCollectionMethods = {
 	},
 	getSettings: async function (
 		func?: (
-			qb: SelectQueryBuilder<DB, 'settingBase', Record<never, never>>,
-		) => SelectQueryBuilder<DB, 'settingBase', Record<never, never>>,
+			qb: SelectQueryBuilder<DB, 'setting', Record<never, never>>,
+		) => SelectQueryBuilder<DB, 'setting', Record<never, never>>,
 	) {
 		const settingEntities = await ky
-			.selectFrom('settingBase')
+			.selectFrom('setting')
 			.$if(func != null, func!)
 			.selectAll()
 			.execute()
@@ -127,14 +127,14 @@ export function parseJson(rawJson: string) {
 	return JSON.parse(rawJson) as Record<string, string>
 }
 
-// The point of this type is to cause an error if something is added to SettingBase
+// The point of this type is to cause an error if something is added to SettingEntity
 // If that happens, you probably want to update the `doUpdateSet` call.
 // If not, you an add an exception to the Exclude below.
-type OnConflictUpdateSettingBaseSet = {
-	[K in keyof SettingBase as Exclude<K, 'id'>]: (
+type OnConflictUpdateSettingSet = {
+	[K in keyof SettingEntity as Exclude<K, 'id'>]: (
 		x: ExpressionBuilder<
-			OnConflictDatabase<DB, 'settingBase'>,
-			OnConflictTables<'settingBase'>
+			OnConflictDatabase<DB, 'setting'>,
+			OnConflictTables<'setting'>
 		>,
 	) => unknown
 }

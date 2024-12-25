@@ -171,7 +171,7 @@ export interface Review {
 	details: string
 }
 
-export interface SettingBase {
+export interface Setting {
 	id: LDbId
 	key: string
 	value: string | number | Uint8Array
@@ -212,5 +212,5 @@ export interface DB {
 	remoteTemplate: RemoteTemplate
 	review: Review
 	cardSetting: CardSetting
-	settingBase: SettingBase
+	setting: Setting
 }
