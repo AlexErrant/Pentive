@@ -4,13 +4,10 @@ CREATE TABLE IF NOT EXISTS setting (
   value,
   PRIMARY KEY (id, key)
 );
-CREATE TABLE IF NOT EXISTS cardSetting (
-  id TEXT PRIMARY KEY, -- make BLOB upon SQLite v3.41 and the landing of UNHEX https://sqlite.org/forum/forumpost/30cca4e613d2fa2a grep F235B7FB-8CEA-4AE2-99CC-2790E607B1EB
-  name TEXT,
-  details TEXT
-) STRICT;
 CREATE VIEW IF NOT EXISTS cardSettingName AS
-  SELECT rowid, name, ftsNormalize(name, 1, 1, 0) AS normalized FROM cardSetting;
+  SELECT rowid, value as name, ftsNormalize(value, 1, 1, 0) AS normalized
+  FROM setting
+  WHERE key = 'name' AND id <> ''; -- 5A7C82EC-D401-4250-896C-DDB0FBE9107E
 CREATE TABLE IF NOT EXISTS template (
   id TEXT PRIMARY KEY, -- make BLOB upon SQLite v3.41 and the landing of UNHEX https://sqlite.org/forum/forumpost/30cca4e613d2fa2a grep F235B7FB-8CEA-4AE2-99CC-2790E607B1EB
   name TEXT,
@@ -54,15 +51,21 @@ CREATE TRIGGER IF NOT EXISTS template_after_update AFTER UPDATE ON template BEGI
   INSERT INTO templateNameFts (templateNameFts, rowid, name) VALUES('delete', old.rowid, old.name);
   INSERT INTO templateNameFts (rowid, name) VALUES (new.rowid, new.name);
 END;
-CREATE TRIGGER IF NOT EXISTS cardSetting_after_insert AFTER INSERT ON cardSetting BEGIN
-  INSERT INTO cardSettingNameFts (rowid, name) VALUES (new.rowid, new.name);
+CREATE TRIGGER IF NOT EXISTS cardSetting_after_insert AFTER INSERT ON setting
+WHEN new.key = 'name' AND new.id <> '' -- 5A7C82EC-D401-4250-896C-DDB0FBE9107E
+BEGIN
+  INSERT INTO cardSettingNameFts (rowid, name) VALUES (new.rowid, new.value);
 END;
-CREATE TRIGGER IF NOT EXISTS cardSetting_after_delete AFTER DELETE ON cardSetting BEGIN
-  INSERT INTO cardSettingNameFts (cardSettingNameFts, rowid, name) VALUES('delete', old.rowid, old.name);
+CREATE TRIGGER IF NOT EXISTS cardSetting_after_delete AFTER DELETE ON setting
+WHEN old.key = 'name' AND old.id <> '' -- 5A7C82EC-D401-4250-896C-DDB0FBE9107E
+BEGIN
+  INSERT INTO cardSettingNameFts (cardSettingNameFts, rowid, name) VALUES('delete', old.rowid, old.value);
 END;
-CREATE TRIGGER IF NOT EXISTS cardSetting_after_update AFTER UPDATE ON cardSetting BEGIN
-  INSERT INTO cardSettingNameFts (cardSettingNameFts, rowid, name) VALUES('delete', old.rowid, old.name);
-  INSERT INTO cardSettingNameFts (rowid, name) VALUES (new.rowid, new.name);
+CREATE TRIGGER IF NOT EXISTS cardSetting_after_update AFTER UPDATE ON setting
+WHEN new.key = 'name' AND new.id <> '' -- 5A7C82EC-D401-4250-896C-DDB0FBE9107E
+BEGIN
+  INSERT INTO cardSettingNameFts (cardSettingNameFts, rowid, name) VALUES('delete', old.rowid, old.value);
+  INSERT INTO cardSettingNameFts (rowid, name) VALUES (new.rowid, new.value);
 END;
 CREATE TABLE IF NOT EXISTS remoteNote (
   localId TEXT, -- make BLOB upon SQLite v3.41 and the landing of UNHEX https://sqlite.org/forum/forumpost/30cca4e613d2fa2a grep F235B7FB-8CEA-4AE2-99CC-2790E607B1EB

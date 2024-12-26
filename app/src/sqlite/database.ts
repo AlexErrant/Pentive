@@ -177,12 +177,6 @@ export interface Setting {
 	value: string | number | Uint8Array
 }
 
-export interface CardSetting {
-	id: LDbId
-	name: string
-	details: string
-}
-
 export interface DB {
 	// eslint-disable-next-line @typescript-eslint/naming-convention
 	sqlite_temp_master: SqliteTempMaster
@@ -211,6 +205,5 @@ export interface DB {
 	template: Template
 	remoteTemplate: RemoteTemplate
 	review: Review
-	cardSetting: CardSetting
 	setting: Setting
 }

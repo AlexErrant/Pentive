@@ -39,7 +39,7 @@ export type CommentId = Brand<string, 'commentId'>
 
 export type RemoteCardId = Brand<string, 'remoteCardId'>
 
-export const userSettingId = '' as const
+export const userSettingId = '' as const // if this changes, also update 5A7C82EC-D401-4250-896C-DDB0FBE9107E
 export type UserSettingId = typeof userSettingId
 export type CardSettingId = Brand<string, 'cardSettingId'>
 

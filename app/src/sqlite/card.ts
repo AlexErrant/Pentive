@@ -5,7 +5,7 @@ import {
 	type Card as CardView,
 	type CardBase,
 	type Note,
-	type CardSetting,
+	type Setting,
 	type Template,
 	type CardTag,
 	type NoteFieldValue,
@@ -141,7 +141,7 @@ type WithCache = {
 	// I'm not adding rowid to the official type definition of Notes because it adds noise to Insert/Update/Conflict resolution types
 	note: Note & { rowid: number }
 	card: CardBase & { rowid: number }
-	cardSetting: CardSetting & { rowid: number }
+	cardSetting: Setting & { rowid: number }
 	template: Template & { rowid: number }
 	noteFieldValue: NoteFieldValue & { rowid: number }
 	noteTag: NoteTag & { rowid: number }
