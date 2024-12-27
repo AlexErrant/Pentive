@@ -174,7 +174,7 @@ export interface Review {
 export interface Setting {
 	id: LDbId
 	key: string
-	value: string | number | Uint8Array
+	value: string | number | Uint8Array | null
 }
 
 export interface DB {

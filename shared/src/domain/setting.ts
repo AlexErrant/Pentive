@@ -1,6 +1,6 @@
 import { type UserSettingId, type CardSettingId } from '../brand'
 
-export type SettingValue = string | number | boolean | number[]
+export type SettingValue = string | number | boolean | number[] | null
 
 export type UserSetting = {
 	id: UserSettingId

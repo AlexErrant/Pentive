@@ -236,7 +236,7 @@ export function flattenObject(obj: JSONObject, parentKey: string = '') {
 	const result = {} as Setting
 	for (const [key, value] of objEntries(obj)) {
 		const newKey = parentKey === '' ? key : `${parentKey}${delimiter}${key}`
-		if (typeof value === 'object' && !Array.isArray(value)) {
+		if (typeof value === 'object' && !Array.isArray(value) && value != null) {
 			Object.assign(result, flattenObject(value, newKey))
 		} else {
 			result[newKey] = value
