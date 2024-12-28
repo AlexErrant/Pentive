@@ -229,7 +229,7 @@ interface JSONObject {
 	[key: string]: SettingValue | JSONObject
 }
 
-const delimiter = '/'
+export const delimiter = '/'
 
 export function flattenObject(obj: JSONObject, parentKey: string = '') {
 	// eslint-disable-next-line @typescript-eslint/consistent-type-assertions

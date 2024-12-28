@@ -36,6 +36,6 @@ test(
 		await page.goto('/testdb')
 		await expect(page.locator('section')).toContainText('Test IndexedDB')
 		const testStatus = page.locator('#testStatus')
-		await expect(testStatus).toHaveText('✔ Passed!', { timeout: 60000 })
+		await expect(testStatus).toHaveText('✔ Passed!', { timeout: 60_000 })
 	},
 )

@@ -5,6 +5,7 @@ import fc from 'fast-check'
 import { template as arbitraryTemplate } from './arbitraryTemplate'
 import { card as arbitraryCard } from './arbitraryCard'
 import { note as arbitraryNote } from './arbitraryNote'
+import { settings as arbitrarySettings } from './arbitrarySetting'
 import type { Container } from 'app/services'
 
 const numRuns = 10 // getting database corruption if we use larger numbers. lowTODO fix by upgrading
@@ -109,12 +110,29 @@ async function testCard(db: Db, date: Date) {
 	return true
 }
 
+async function testSettings(db: Db) {
+	await fc.assert(
+		fc.asyncProperty(arbitrarySettings, async (expected) => {
+			await db.deleteAllSettings()
+			const exs = [expected]
+			await db.bulkUploadSettings(exs)
+			const actual = await db.getCardSettings()
+			const r = isEqual(exs, actual)
+			log(r, exs, actual)
+			return r
+		}),
+		{ verbose: true },
+	)
+	return true
+}
+
 export default function TestDb(db: Db, date: Date): JSX.Element {
 	const [testsResult] = createResource(async () => {
 		const template = await testTemplate(db, date)
 		const note = await testNote(db, date)
 		const card = await testCard(db, date)
-		const statuses = [template, note, card]
+		const setting = await testSettings(db)
+		const statuses = [template, note, card, setting]
 		if (statuses.some((a) => a === undefined)) {
 			return undefined
 		}

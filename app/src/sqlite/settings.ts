@@ -21,21 +21,34 @@ import {
 	type Setting,
 } from 'shared/domain/setting'
 import { objEntries } from 'shared/utility'
-import { encodeValue, unflattenObject } from './util'
+import { delimiter, encodeValue, unflattenObject } from './util'
 
 export const settingsCollectionMethods = {
+	deleteAllSettings: async function () {
+		await ky.deleteFrom('setting').execute()
+	},
 	bulkUploadSettings: async function (settings: Setting[]) {
 		const entities = settings.flatMap((setting) =>
-			objEntries(setting).map(
-				([key, value]) =>
-					({
-						id: toLDbId(setting.id),
-						key,
-						value: encodeValue(value),
-					}) satisfies InsertObject<DB, 'setting'>,
-			),
+			objEntries(setting).map(([key, value]) => {
+				if (key === '__proto__') {
+					C.toastFatal('"__proto__" is not a valid key name.')
+				}
+				if (key.includes(delimiter)) {
+					C.toastFatal(
+						`The '${delimiter}' character is not allowed in a key's name.`,
+					)
+				}
+				if (typeof value === 'number' && isNaN(value)) {
+					C.toastFatal('"NaN" is not a valid value.')
+				}
+				return {
+					id: toLDbId(setting.id),
+					key,
+					value: encodeValue(value),
+				} satisfies InsertObject<DB, 'setting'>
+			}),
 		)
-		const batches = chunk(entities, 1000)
+		const batches = chunk(entities, 100)
 		for (let i = 0; i < batches.length; i++) {
 			C.toastInfo('setting batch ' + (i + 1) + '/' + batches.length)
 			await ky
@@ -44,7 +57,6 @@ export const settingsCollectionMethods = {
 				.onConflict(
 					(db) =>
 						db.doUpdateSet({
-							key: (x) => x.ref('excluded.key'),
 							value: (x) => x.ref('excluded.value'),
 						} satisfies OnConflictUpdateSettingSet),
 					// medTODO support deleting
@@ -56,6 +68,7 @@ export const settingsCollectionMethods = {
 		func?: (
 			qb: SelectQueryBuilder<DB, 'setting', Record<never, never>>,
 		) => SelectQueryBuilder<DB, 'setting', Record<never, never>>,
+		skipUserSetting?: true,
 	) {
 		const settingEntities = await ky
 			.selectFrom('setting')
@@ -83,7 +96,7 @@ export const settingsCollectionMethods = {
 				name: typeof obj.name === 'string' ? obj.name : 'Placeholder Name',
 			} satisfies CardSetting
 		})
-		if (!hasUserSetting) {
+		if (!skipUserSetting && !hasUserSetting) {
 			r.push({
 				id: userSettingId,
 				name: userSettingName,
@@ -92,8 +105,9 @@ export const settingsCollectionMethods = {
 		return r
 	},
 	getCardSettings: async function () {
-		const r = await this.getSettings((db) =>
-			db.where('id', '<>', toLDbId(userSettingId)),
+		const r = await this.getSettings(
+			(db) => db.where('id', '<>', toLDbId(userSettingId)),
+			true,
 		)
 		return r as CardSetting[]
 	},
@@ -131,7 +145,7 @@ export function parseJson(rawJson: string) {
 // If that happens, you probably want to update the `doUpdateSet` call.
 // If not, you an add an exception to the Exclude below.
 type OnConflictUpdateSettingSet = {
-	[K in keyof SettingEntity as Exclude<K, 'id'>]: (
+	[K in keyof SettingEntity as Exclude<K, 'id' | 'key'>]: (
 		x: ExpressionBuilder<
 			OnConflictDatabase<DB, 'setting'>,
 			OnConflictTables<'setting'>
