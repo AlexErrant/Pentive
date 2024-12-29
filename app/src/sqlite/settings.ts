@@ -19,9 +19,9 @@ import {
 	type CardSetting,
 	type UserSetting,
 	type Setting,
+	type SettingValue,
 } from 'shared/domain/setting'
 import { objEntries } from 'shared/utility'
-import { delimiter, encodeValue, unflattenObject } from './util'
 
 export const settingsCollectionMethods = {
 	deleteAllSettings: async function () {
@@ -132,13 +132,59 @@ const groupBy = <T>(
 
 const userSettingName = 'User Settings'
 
-// highTODO property test
-export function stringifyDetails(json: Record<string, unknown>) {
-	return JSON.stringify(json)
+// medTODO property test
+const encoder = new TextEncoder() // always utf-8
+const decoder = new TextDecoder('utf-8')
+export function encodeValue(rawValue: SettingValue) {
+	return Array.isArray(rawValue) || typeof rawValue === 'boolean'
+		? encoder.encode(JSON.stringify(rawValue))
+		: rawValue
+}
+function decodeValue(value: Uint8Array) {
+	return JSON.parse(decoder.decode(value)) as SettingValue
 }
 
-export function parseJson(rawJson: string) {
-	return JSON.parse(rawJson) as Record<string, string>
+interface JSONObject {
+	[key: string]: SettingValue | JSONObject
+}
+
+export const delimiter = '/'
+
+export function flattenObject(obj: JSONObject, parentKey: string = '') {
+	// eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+	const result = {} as Setting
+	for (const [key, value] of objEntries(obj)) {
+		const newKey = parentKey === '' ? key : `${parentKey}${delimiter}${key}`
+		if (typeof value === 'object' && !Array.isArray(value) && value != null) {
+			Object.assign(result, flattenObject(value, newKey))
+		} else {
+			result[newKey] = value
+		}
+	}
+	return result
+}
+
+export function unflattenObject(
+	flattened: Array<readonly [string, SettingEntity['value']]>,
+) {
+	const result: JSONObject = {}
+	for (const [key, value] of flattened) {
+		const keys = key.split(delimiter)
+		let currentLevel: JSONObject = result
+		for (let i = 0; i < keys.length; i++) {
+			const segment = keys[i]!
+			if (/* "is last" */ i === keys.length - 1) {
+				if (ArrayBuffer.isView(value)) {
+					currentLevel[segment] = decodeValue(value)
+				} else {
+					currentLevel[segment] = value
+				}
+			} else {
+				currentLevel = (currentLevel[segment] as JSONObject) ??= {}
+			}
+		}
+	}
+	return result
 }
 
 // The point of this type is to cause an error if something is added to SettingEntity

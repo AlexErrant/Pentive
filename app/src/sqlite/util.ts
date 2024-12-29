@@ -6,7 +6,6 @@ import {
 	type RemoteTemplate,
 	type Template as TemplateEntity,
 	type DB,
-	type Setting as SettingEntity,
 } from './database'
 import {
 	type MediaId,
@@ -17,12 +16,11 @@ import {
 import { type Field, type Template } from 'shared/domain/template'
 import { imgPlaceholder } from 'shared/image'
 import { type TemplateType } from 'shared/schema'
-import { parseSet, parseMap, objEntries } from 'shared/utility'
+import { parseSet, parseMap } from 'shared/utility'
 import { type Note } from 'shared/domain/note'
 import { C } from '../topLevelAwait'
 import { jsonArrayFrom } from 'kysely/helpers/sqlite'
 import { type AliasedRawBuilder, type ExpressionBuilder } from 'kysely'
-import { type SettingValue, type Setting } from 'shared/domain/setting'
 
 export function parseTags(rawTags: string) {
 	return parseSet<string>(rawTags)
@@ -211,59 +209,4 @@ export function getTemplate(
 			uploadDate: rt.uploadDate,
 		})),
 	)
-}
-
-// medTODO property test
-const encoder = new TextEncoder() // always utf-8
-const decoder = new TextDecoder('utf-8')
-export function encodeValue(rawValue: SettingValue) {
-	return Array.isArray(rawValue) || typeof rawValue === 'boolean'
-		? encoder.encode(JSON.stringify(rawValue))
-		: rawValue
-}
-function decodeValue(value: Uint8Array) {
-	return JSON.parse(decoder.decode(value)) as SettingValue
-}
-
-interface JSONObject {
-	[key: string]: SettingValue | JSONObject
-}
-
-export const delimiter = '/'
-
-export function flattenObject(obj: JSONObject, parentKey: string = '') {
-	// eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-	const result = {} as Setting
-	for (const [key, value] of objEntries(obj)) {
-		const newKey = parentKey === '' ? key : `${parentKey}${delimiter}${key}`
-		if (typeof value === 'object' && !Array.isArray(value) && value != null) {
-			Object.assign(result, flattenObject(value, newKey))
-		} else {
-			result[newKey] = value
-		}
-	}
-	return result
-}
-
-export function unflattenObject(
-	flattened: Array<readonly [string, SettingEntity['value']]>,
-) {
-	const result: JSONObject = {}
-	for (const [key, value] of flattened) {
-		const keys = key.split(delimiter)
-		let currentLevel: JSONObject = result
-		for (let i = 0; i < keys.length; i++) {
-			const segment = keys[i]!
-			if (/* "is last" */ i === keys.length - 1) {
-				if (ArrayBuffer.isView(value)) {
-					currentLevel[segment] = decodeValue(value)
-				} else {
-					currentLevel[segment] = value
-				}
-			} else {
-				currentLevel = (currentLevel[segment] as JSONObject) ??= {}
-			}
-		}
-	}
-	return result
 }

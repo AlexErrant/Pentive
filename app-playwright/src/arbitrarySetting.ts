@@ -1,7 +1,7 @@
 import fc from 'fast-check'
 import { type CardSettingId } from 'shared/brand'
 import { type Setting } from 'shared/domain/setting'
-import { delimiter } from '../../app/src/sqlite/util'
+import { delimiter } from '../../app/src/sqlite/settings'
 
 const settingsPrimitive = fc.oneof(
 	// 4CB24F8E-889C-472C-835A-A5A780C34963

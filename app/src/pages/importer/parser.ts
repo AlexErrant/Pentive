@@ -29,7 +29,7 @@ import { z } from 'zod'
 import { C } from '../../topLevelAwait'
 import { type ChildTemplate, type TemplateType } from 'shared/schema'
 import { type Setting } from 'shared/domain/setting'
-import { flattenObject } from '../../sqlite/util'
+import { flattenObject } from '../../sqlite/settings'
 
 function parseField(fld: Fld): Field {
 	return {
