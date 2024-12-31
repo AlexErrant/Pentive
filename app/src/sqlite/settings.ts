@@ -20,6 +20,7 @@ import {
 	type UserSetting,
 	type Setting,
 	type SettingValue,
+	type SettingRecord,
 } from 'shared/domain/setting'
 import { objEntries } from 'shared/utility'
 
@@ -29,24 +30,14 @@ export const settingsCollectionMethods = {
 	},
 	bulkUploadSettings: async function (settings: Setting[]) {
 		const entities = settings.flatMap((setting) =>
-			objEntries(setting).map(([key, value]) => {
-				if (key === '__proto__') {
-					C.toastFatal('"__proto__" is not a valid key name.')
-				}
-				if (key.includes(delimiter)) {
-					C.toastFatal(
-						`The '${delimiter}' character is not allowed in a key's name.`,
-					)
-				}
-				if (typeof value === 'number' && isNaN(value)) {
-					C.toastFatal('"NaN" is not a valid value.')
-				}
-				return {
-					id: toLDbId(setting.id),
-					key,
-					value: encodeValue(value),
-				} satisfies InsertObject<DB, 'setting'>
-			}),
+			objEntries(flattenObject(setting)).map(
+				([key, value]) =>
+					({
+						id: toLDbId(setting.id),
+						key,
+						value: encodeValue(value as Exclude<typeof value, SettingRecord>),
+					}) satisfies InsertObject<DB, 'setting'>,
+			),
 		)
 		const batches = chunk(entities, 100)
 		for (let i = 0; i < batches.length; i++) {
@@ -144,16 +135,29 @@ function decodeValue(value: Uint8Array) {
 	return JSON.parse(decoder.decode(value)) as SettingValue
 }
 
-interface JSONObject {
-	[key: string]: SettingValue | JSONObject
-}
-
 export const delimiter = '/'
 
-export function flattenObject(obj: JSONObject, parentKey: string = '') {
-	// eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-	const result = {} as Setting
-	for (const [key, value] of objEntries(obj)) {
+export function flattenObject(obj: SettingRecord, parentKey: string = '') {
+	const result: Record<string, SettingValue> = {}
+	const entries = objEntries(obj)
+	if (entries.length === 0) {
+		C.toastFatal('Settings object must have at least 1 key-value pair.')
+	}
+	for (const [key, value] of entries) {
+		if (key === '__proto__') {
+			C.toastFatal('"__proto__" is not a valid key name.')
+		}
+		if (key.length === 0) {
+			C.toastFatal('key cannot be empty')
+		}
+		if (key.includes(delimiter)) {
+			C.toastFatal(
+				`The '${delimiter}' character is not allowed in a key's name.`,
+			)
+		}
+		if (typeof value === 'number' && isNaN(value)) {
+			C.toastFatal('"NaN" is not a valid value.')
+		}
 		const newKey = parentKey === '' ? key : `${parentKey}${delimiter}${key}`
 		if (typeof value === 'object' && !Array.isArray(value) && value != null) {
 			Object.assign(result, flattenObject(value, newKey))
@@ -167,10 +171,10 @@ export function flattenObject(obj: JSONObject, parentKey: string = '') {
 export function unflattenObject(
 	flattened: Array<readonly [string, SettingEntity['value']]>,
 ) {
-	const result: JSONObject = {}
+	const result: SettingRecord = {}
 	for (const [key, value] of flattened) {
 		const keys = key.split(delimiter)
-		let currentLevel: JSONObject = result
+		let currentLevel: SettingRecord = result
 		for (let i = 0; i < keys.length; i++) {
 			const segment = keys[i]!
 			if (/* "is last" */ i === keys.length - 1) {
@@ -180,7 +184,7 @@ export function unflattenObject(
 					currentLevel[segment] = value
 				}
 			} else {
-				currentLevel = (currentLevel[segment] as JSONObject) ??= {}
+				currentLevel = (currentLevel[segment] as SettingRecord) ??= {}
 			}
 		}
 	}

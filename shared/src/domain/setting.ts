@@ -4,15 +4,19 @@ import { type UserSettingId, type CardSettingId } from '../brand'
 type SettingPrimitive = string | number | boolean | null
 export type SettingValue = SettingPrimitive | SettingPrimitive[]
 
+export interface SettingRecord {
+	[key: string]: SettingValue | SettingRecord
+}
+
 export type UserSetting = {
 	id: UserSettingId
 	name: string
-} & Record<string, SettingValue>
+} & SettingRecord
 
 export type CardSetting = {
 	id: CardSettingId
 	name: string
-} & Record<string, SettingValue>
+} & SettingRecord
 
 export type Setting = UserSetting | CardSetting
 
