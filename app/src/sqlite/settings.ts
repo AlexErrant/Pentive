@@ -171,7 +171,7 @@ export function flattenObject(obj: SettingRecord, parentKey: string = '') {
 export function unflattenObject(
 	flattened: Array<readonly [string, SettingEntity['value']]>,
 ) {
-	const result: SettingRecord = {}
+	const result = Object.create(null) as SettingRecord
 	for (const [key, value] of flattened) {
 		const keys = key.split(delimiter)
 		let currentLevel: SettingRecord = result
@@ -184,7 +184,8 @@ export function unflattenObject(
 					currentLevel[segment] = value
 				}
 			} else {
-				currentLevel = (currentLevel[segment] as SettingRecord) ??= {}
+				currentLevel = (currentLevel[segment] as SettingRecord) ??=
+					Object.create(null)
 			}
 		}
 	}
