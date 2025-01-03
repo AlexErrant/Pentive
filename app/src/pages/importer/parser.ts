@@ -28,7 +28,6 @@ import { z } from 'zod'
 import { C } from '../../topLevelAwait'
 import { type ChildTemplate, type TemplateType } from 'shared/schema'
 import { type CardSetting as DomainCardSetting } from 'shared/domain/setting'
-import { flattenObject } from '../../sqlite/settings'
 
 function parseField(fld: Fld): Field {
 	return {
@@ -193,8 +192,8 @@ export function parseRevlog({
 }: Revlog): Review {
 	return {
 		...revlog,
-		cardId: cid.toString() as CardId, // highTODO
-		id: id.toString() as ReviewId, // highTODO
+		cardId: cid.toString() as CardId, // highTODO make it a properly random id
+		id: id.toString() as ReviewId, // highTODO make it a properly random id
 		created: newDate(id),
 		rating: ease,
 		kind: convertType(type), // changing the name so its easier to grep - `type` is overloaded.
@@ -220,9 +219,10 @@ function convertType(s: number): Kind {
 
 export function parseCardSetting(dconf: Dconf) {
 	return objEntries(dconf).map(([id, rest]) => {
-		const r = flattenObject(rest)
-		r.id = id
-		return r as DomainCardSetting
+		// @ts-expect-error changing `id` type to string
+		rest.id = id as CardSettingId // highTODO make it a properly random id
+		// @ts-expect-error see above
+		return rest as DomainCardSetting
 	})
 }
 

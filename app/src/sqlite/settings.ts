@@ -152,7 +152,7 @@ export function flattenObject(obj: SettingRecord, parentKey: string = '') {
 		}
 		if (key.includes(delimiter)) {
 			C.toastFatal(
-				`The '${delimiter}' character is not allowed in a key's name.`,
+				`The '${delimiter}' character is not allowed in a key's name: ${key}`,
 			)
 		}
 		if (typeof value === 'number' && isNaN(value)) {
