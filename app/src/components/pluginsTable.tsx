@@ -54,7 +54,7 @@ export const pluginGridOptions = {
 			{
 				init(params: ICellRendererParams<Plugin, unknown, Context>) {
 					this.render(params.context.owner, () => (
-						<relative-time date={params.data?.created} />
+						<relative-time prop:date={params.data?.created} />
 					))
 				}
 			},
@@ -67,7 +67,7 @@ export const pluginGridOptions = {
 			{
 				init(params: ICellRendererParams<Plugin, unknown, Context>) {
 					this.render(params.context.owner, () => (
-						<relative-time date={params.data?.edited} />
+						<relative-time prop:date={params.data?.edited} />
 					))
 				}
 			},

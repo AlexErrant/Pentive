@@ -1,17 +1,19 @@
-/* eslint-disable @typescript-eslint/naming-convention */
-
 // https://stackoverflow.com/a/72239265
 // https://github.com/solidjs/solid/issues/616
 
-import type RelativeTimeElement from '@github/relative-time-element'
+export {}
 
 declare module 'solid-js' {
 	// eslint-disable-next-line @typescript-eslint/no-namespace
 	namespace JSX {
-		interface IntrinsicElements {
-			// https://github.com/github/relative-time-element/blob/3a8f30f1a66edbe8d4e76c721ff1767c49b0ed27/src/relative-time-element-define.ts#L27
-			'relative-time': JSX.IntrinsicElements['span'] &
-				Partial<Omit<RelativeTimeElement, keyof HTMLElement>>
+		type ElementProps<T> = {
+			// Add both the element's prefixed properties and the attributes
+			[K in keyof T]: Props<T[K]> & HTMLAttributes<T[K]>
 		}
+		// Prefixes all properties with `prop:` to match Solid's property setting syntax
+		type Props<T> = {
+			[K in keyof T as `prop:${string & K}`]?: T[K]
+		}
+		interface IntrinsicElements extends ElementProps<HTMLElementTagNameMap> {}
 	}
 }

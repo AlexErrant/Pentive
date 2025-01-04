@@ -110,14 +110,14 @@ export const templateGridOptions = {
 			headerName: 'Created',
 			hide: true,
 			cellRenderer: (props: ICellRendererParams<Template>) => (
-				<relative-time date={props.data?.created} />
+				<relative-time prop:date={props.data?.created} />
 			),
 		},
 		{
 			headerName: 'Edited',
 			hide: true,
 			cellRenderer: (props: ICellRendererParams<Template>) => (
-				<relative-time date={props.data?.edited} />
+				<relative-time prop:date={props.data?.edited} />
 			),
 		},
 	],

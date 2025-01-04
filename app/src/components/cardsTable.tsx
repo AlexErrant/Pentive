@@ -213,7 +213,7 @@ export const cardGridOptions = {
 							{typeof params.data?.card.due === 'number' ? (
 								<>New #{params.data?.card.due}</>
 							) : (
-								<relative-time date={params.data?.card.due} />
+								<relative-time prop:date={params.data?.card.due} />
 							)}
 						</>
 					))
@@ -230,7 +230,7 @@ export const cardGridOptions = {
 			{
 				init(params: ICellRendererParams<NoteCard, unknown, Context>) {
 					this.render(params.context.owner, () => (
-						<relative-time date={params.data?.card.created} />
+						<relative-time prop:date={params.data?.card.created} />
 					))
 				}
 			},
