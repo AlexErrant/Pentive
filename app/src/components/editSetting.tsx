@@ -23,11 +23,16 @@ import { C } from '../topLevelAwait'
 import { useThemeContext } from 'shared-dom/themeSelector'
 import { basicSetup } from 'shared-dom/codemirror'
 import { type Setting } from 'shared/domain/setting'
+import { userSettingId } from 'shared/brand'
 
 const EditSetting: VoidComponent<{
 	setting: Setting
 	setSetting: (_: Setting) => void
 }> = (props) => {
+	const schema = () =>
+		props.setting.id === userSettingId
+			? C.userSettingSchema
+			: C.cardSettingSchema
 	let ref: HTMLDivElement
 	let view: EditorView
 	const stringifiedSetting = () => JSON.stringify(props.setting, null, 2)
@@ -35,20 +40,22 @@ const EditSetting: VoidComponent<{
 	onMount(() => {
 		view = new EditorView({
 			parent: ref,
-			state: createEditorState(stringifiedSetting(), theme()),
+			state: createEditorState(stringifiedSetting(), theme(), schema()),
 		})
 	})
 	createEffect(
 		on(
 			() => props.setting.id,
 			() => {
-				view.setState(createEditorState(stringifiedSetting(), theme()))
+				view.setState(
+					createEditorState(stringifiedSetting(), theme(), schema()),
+				)
 			},
 		),
 	)
 	createEffect(
 		on(theme, (t) => {
-			view.setState(createEditorState(stringifiedSetting(), t))
+			view.setState(createEditorState(stringifiedSetting(), t, schema()))
 		}),
 	)
 	onCleanup(() => {
@@ -73,6 +80,7 @@ const EditSetting: VoidComponent<{
 						C.toastError('Invalid JSON.')
 						return
 					}
+					const validate = new Ajv({ allErrors: true }).compile(schema())
 					if (validate(setting)) {
 						props.setSetting(setting)
 						await C.db.bulkUploadSettings([setting])
@@ -94,7 +102,7 @@ const EditSetting: VoidComponent<{
 
 export default EditSetting
 
-const schema = {
+export const userSettingSchema = {
 	type: 'object',
 	properties: {
 		id: {
@@ -107,9 +115,24 @@ const schema = {
 	required: ['id', 'name'],
 } satisfies JSONSchema7
 
-const validate = new Ajv({ allErrors: true }).compile(schema)
+export const cardSettingSchema = {
+	type: 'object',
+	properties: {
+		id: {
+			type: 'string',
+		},
+		name: {
+			type: 'string',
+		},
+	},
+	required: ['id', 'name'],
+} satisfies JSONSchema7
 
-function createEditorState(doc: string, theme: 'light' | 'dark') {
+function createEditorState(
+	doc: string,
+	theme: 'light' | 'dark',
+	schema: JSONSchema7,
+) {
 	const maybeDark = theme === 'dark' ? [oneDark] : []
 	return EditorState.create({
 		doc,

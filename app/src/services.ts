@@ -11,6 +11,7 @@ import { templateGridOptions } from './components/templatesTable'
 import { cardGridOptions } from './components/cardsTable'
 import { filterGridOptions } from './components/filtersTable'
 import { db } from './db'
+import { cardSettingSchema, userSettingSchema } from './components/editSetting'
 
 export const domContainer = {
 	nav: Nav,
@@ -28,6 +29,8 @@ export const defaultContainer = (args: RenderContainerArgs) => ({
 	templateGridOptions,
 	cardGridOptions,
 	filterGridOptions,
+	cardSettingSchema,
+	userSettingSchema,
 	db,
 })
 
