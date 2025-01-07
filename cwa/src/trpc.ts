@@ -17,7 +17,7 @@ const t = initTRPC.context<Context>().create({
 
 export const router = t.router
 
-const isAuthed = t.middleware(async ({ next, ctx }) => {
+const isAuthenticated = t.middleware(async ({ next, ctx }) => {
 	if (ctx.user.tag === 'Error') {
 		throw new TRPCError({
 			code: 'UNAUTHORIZED',
@@ -31,5 +31,5 @@ const isAuthed = t.middleware(async ({ next, ctx }) => {
 	})
 })
 
-export const authedProcedure = t.procedure.use(isAuthed)
+export const enticatedProcedure = t.procedure.use(isAuthenticated)
 export const publicProcedure = t.procedure

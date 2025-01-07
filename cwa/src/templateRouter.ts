@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { authedProcedure } from './trpc'
+import { enticatedProcedure } from './trpc'
 import {
 	commentId,
 	commentText,
@@ -18,28 +18,33 @@ import {
 // When writing a `procedure.query`, ensure it doesn't return HTML!
 // That code belongs in api-ugc
 export const templateRouter = {
-	createTemplates: authedProcedure
+	//
+
+	// nook moderator mutations
+	// highTODO needs authorization
+	createTemplates: enticatedProcedure
 		.input(z.array(createRemoteTemplate).min(1))
 		.mutation(async ({ input, ctx }) => {
 			const remoteIdByLocal = await insertTemplates(ctx.user, input)
 			return remoteIdByLocal
 		}),
-	editTemplates: authedProcedure
+	editTemplates: enticatedProcedure
 		.input(z.array(editRemoteTemplate).min(1))
 		.mutation(async ({ input, ctx }) => {
 			await editTemplates(ctx.user, input)
 		}),
-	subscribeToTemplate: authedProcedure
+
+	subscribeToTemplate: enticatedProcedure
 		.input(remoteTemplateId)
 		.mutation(async ({ input, ctx }) => {
 			await subscribeToTemplate(ctx.user, input)
 		}),
-	insertTemplateComment: authedProcedure
+	insertTemplateComment: enticatedProcedure
 		.input(z.object({ templateId: remoteTemplateId, text: commentText }))
 		.mutation(async ({ input, ctx }) => {
 			await insertTemplateComment(input.templateId, input.text, ctx.user)
 		}),
-	insertTemplateChildComment: authedProcedure
+	insertTemplateChildComment: enticatedProcedure
 		.input(z.object({ parentCommentId: commentId, text: commentText }))
 		.mutation(async ({ input, ctx }) => {
 			await insertTemplateChildComment(
