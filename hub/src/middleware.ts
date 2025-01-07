@@ -12,6 +12,8 @@ export default createMiddleware({
 	],
 	onBeforeResponse: [
 		(event) => {
+			// More headers are set in `entry-server.tsx`.
+
 			// https://securityheaders.com/
 			event.response.headers.set(hstsName, hstsValue)
 			event.response.headers.set('X-Frame-Options', 'DENY')
