@@ -1,14 +1,12 @@
 import { For, Show, Suspense } from 'solid-js'
 import { cast, type NookId, type RemoteTemplateId } from 'shared/brand'
 import { getTemplate, getTemplateComments } from 'shared-edge'
-import { ResizingIframe } from '~/components/clientOnly'
+import { DownloadTemplate, ResizingIframe } from '~/components/clientOnly'
 import Comment from '~/components/comment'
 import SubmitComment from '~/components/submitComment'
 import { cwaClient } from '~/routes/cwaClient'
 import { getUserId } from '~/session'
-import { getAppMessenger } from '~/entry-client'
 import { defaultRenderContainer, remoteToTemplate } from '~/lib/utility'
-import { unwrap } from 'solid-js/store'
 import {
 	cache,
 	createAsync,
@@ -93,15 +91,7 @@ export default function Thread(props: RouteSectionProps) {
 							}}
 						</For>
 					</p>
-					<button
-						onClick={async () => {
-							await getAppMessenger().addTemplate(unwrap(remoteTemplate()!))
-							await cwaClient.subscribeToTemplate.mutate(remoteTemplate()!.id)
-						}}
-						disabled={remoteTemplate()?.til != null}
-					>
-						Download
-					</button>
+					<DownloadTemplate template={remoteTemplate()!} />
 					<ul class='comment-children'>
 						<SubmitComment
 							// eslint-disable-next-line solid/reactivity -- doesn't need to be reactive

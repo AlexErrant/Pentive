@@ -1,7 +1,7 @@
 import { For, Show } from 'solid-js'
 import { type NookId } from 'shared/brand'
 import { getTemplates } from 'shared-edge'
-import { ResizingIframe } from '~/components/clientOnly'
+import { DownloadTemplate, ResizingIframe } from '~/components/clientOnly'
 import { remoteToTemplate } from '~/lib/utility'
 import { getUserId } from '~/session'
 import RelativeDate from '~/components/relativeDate'
@@ -12,11 +12,6 @@ import {
 	type RouteDefinition,
 	type RouteSectionProps,
 } from '@solidjs/router'
-import { clientOnly } from '@solidjs/start'
-
-const DownloadTemplate = clientOnly(
-	async () => await import('~/components/downloadTemplate'),
-)
 
 const getTemplatesCached = cache(async (nook: NookId) => {
 	'use server'

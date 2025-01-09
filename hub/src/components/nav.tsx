@@ -1,8 +1,13 @@
-import { ThemeSelector } from './clientOnly'
 import { type JSX, Show } from 'solid-js'
 import { A, action } from '@solidjs/router'
 import { logout } from '~/session'
 import { useUserIdContext } from './userIdContext'
+import { clientOnly } from '@solidjs/start'
+
+const ThemeSelector = clientOnly(async () => {
+	const { ThemeSelector } = await import('shared-dom/themeSelector')
+	return { default: ThemeSelector }
+})
 
 // eslint-disable-next-line @typescript-eslint/require-await
 const logoutAction = action(async () => {
