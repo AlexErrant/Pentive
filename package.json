@@ -18,7 +18,7 @@
 		"eslint-plugin-n": "^16.6.2",
 		"eslint-plugin-prettier": "^5.2.1",
 		"eslint-plugin-promise": "^6.1.1",
-		"eslint-plugin-solid": "^0.14.0",
+		"eslint-plugin-solid": "^0.14.5",
 		"kill-port": "=1.6.1",
 		"prettier-plugin-tailwindcss": "^0.6.5",
 		"turbo": "^2.1.1",

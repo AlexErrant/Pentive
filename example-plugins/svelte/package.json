@@ -28,7 +28,7 @@
 		"@tsconfig/svelte": "^3.0.0",
 		"config": "workspace:*",
 		"eslint": "^8.57.0",
-		"solid-js": "^1.8.18",
+		"solid-js": "^1.9.4",
 		"svelte": "^3.59.2",
 		"svelte-check": "^3.5.2",
 		"svelte-preprocess": "^5.0.4",
