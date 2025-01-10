@@ -7,3 +7,7 @@ export const ResizingIframe = clientOnly(
 export const DownloadTemplate = clientOnly(
 	async () => await import('~/components/downloadTemplate'),
 )
+
+export const DownloadNote = clientOnly(
+	async () => await import('~/components/downloadNote'),
+)

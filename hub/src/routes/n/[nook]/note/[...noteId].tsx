@@ -1,19 +1,17 @@
 import { For, Show, Suspense } from 'solid-js'
 import { type NookId, type RemoteNoteId } from 'shared/brand'
 import { getNote, getNoteComments } from 'shared-edge'
-import { ResizingIframe } from '~/components/clientOnly'
+import { DownloadNote, ResizingIframe } from '~/components/clientOnly'
 import Comment from '~/components/comment'
 import SubmitComment from '~/components/submitComment'
 import { cwaClient } from '~/routes/cwaClient'
 import { getUserId } from '~/session'
-import { getAppMessenger } from '~/entry-client'
 import { noteOrds, toSampleCard } from 'shared-dom/cardHtml'
 import {
 	noteOrdsRenderContainer,
 	remoteToNote,
 	remoteToTemplate,
 } from '~/lib/utility'
-import { unwrap } from 'solid-js/store'
 import {
 	cache,
 	createAsync,
@@ -83,18 +81,10 @@ export default function Note(props: RouteSectionProps) {
 							}}
 						</For>
 					</p>
-					<button
-						onClick={async () => {
-							await getAppMessenger().addNote(
-								unwrap(remoteNote()!),
-								props.params.nook as NookId,
-							)
-							await cwaClient.subscribeToNote.mutate(remoteNote()!.id)
-						}}
-						disabled={remoteNote()!.til != null}
-					>
-						Download
-					</button>
+					<DownloadNote
+						note={remoteNote()!}
+						nook={props.params.nook as NookId}
+					/>
 					<ul class='comment-children'>
 						<SubmitComment
 							// eslint-disable-next-line solid/reactivity -- doesn't need to be reactive
