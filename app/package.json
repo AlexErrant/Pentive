@@ -95,7 +95,7 @@
 		"@scure/base": "^1.1.1",
 		"@solid-primitives/keyed": "^1.4.0",
 		"@solid-primitives/scheduled": "^1.4.4",
-		"@solidjs/router": "^0.14.1",
+		"@solidjs/router": "^0.15.2",
 		"@tanstack/solid-query": "^5.62.16",
 		"@tanstack/solid-query-devtools": "^5.62.16",
 		"@tanstack/solid-table": "^8.20.5",

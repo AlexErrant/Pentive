@@ -64,7 +64,7 @@
 		"@kobalte/tailwindcss": "^0.9.0",
 		"@scure/base": "^1.1.1",
 		"@solidjs/meta": "^0.29.4",
-		"@solidjs/router": "^0.14.1",
+		"@solidjs/router": "^0.15.2",
 		"@solidjs/start": "^1.0.11",
 		"@trpc/client": "^10.38.5",
 		"@trpc/server": "^10.38.5",
