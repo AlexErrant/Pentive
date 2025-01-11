@@ -70,7 +70,7 @@
 		"vite-plugin-checker": "^0.8.0",
 		"vite-plugin-pwa": "^0.20.5",
 		"vite-plugin-solid": "^2.11.0",
-		"vitest": "^2.0.5",
+		"vitest": "^2.1.8",
 		"workbox-precaching": "^7.0.0",
 		"workbox-routing": "^7.0.0",
 		"wrangler": "^3.81.0"
