@@ -6,7 +6,7 @@ import type {
 	PostMessageTypes,
 } from './registerServiceWorker'
 import { type MediaId } from 'shared/brand'
-import { throwExp } from 'shared/utility'
+import { sleep, throwExp } from 'shared/utility'
 
 declare let self: ServiceWorkerGlobalScope
 
@@ -67,10 +67,6 @@ self.onmessage = (event) => {
 			)
 		}
 	}
-}
-
-async function sleep(ms: number): Promise<void> {
-	await new Promise((resolve) => setTimeout(resolve, ms))
 }
 
 async function getLocalMediaResponse(

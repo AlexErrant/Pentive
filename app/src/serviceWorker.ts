@@ -7,7 +7,7 @@ import * as Comlink from 'comlink'
 import type { Expose, PostMessageTypes } from './registerServiceWorker'
 import { NavigationRoute, registerRoute } from 'workbox-routing'
 import { type MediaId } from 'shared/brand'
-import { throwExp } from 'shared/utility'
+import { sleep, throwExp } from 'shared/utility'
 
 declare let self: ServiceWorkerGlobalScope
 
@@ -77,10 +77,6 @@ self.onmessage = async (event) => {
 	} else if (data?.type === 'ClaimRequest') {
 		await self.clients.claim()
 	}
-}
-
-async function sleep(ms: number): Promise<void> {
-	await new Promise((resolve) => setTimeout(resolve, ms))
 }
 
 async function getLocalMediaResponse(

@@ -113,3 +113,7 @@ export function concatAB(a1: ArrayBuffer, a2: ArrayBuffer): Uint8Array {
 	tmp.set(new Uint8Array(a2), a1.byteLength)
 	return tmp
 }
+
+export async function sleep(ms: number): Promise<void> {
+	await new Promise((resolve) => setTimeout(resolve, ms))
+}
