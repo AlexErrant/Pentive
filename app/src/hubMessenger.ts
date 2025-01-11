@@ -15,6 +15,7 @@ import { type Card } from 'shared/domain/card'
 import { objEntries } from 'shared/utility'
 
 export const appExpose = {
+	ping: () => {},
 	addTemplate: async (rt: RemoteTemplate) => {
 		const serializer = new XMLSerializer()
 		const now = C.getDate()

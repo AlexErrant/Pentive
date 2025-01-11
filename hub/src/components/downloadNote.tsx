@@ -13,7 +13,7 @@ export const DownloadNote: Component<{ note: Note; nook: NookId }> = (
 	return (
 		<button
 			onClick={async () => {
-				await getAppMessenger().addNote(unwrap(props.note), props.nook)
+				await (await getAppMessenger()).addNote(unwrap(props.note), props.nook)
 				await cwaClient.subscribeToNote.mutate(props.note.id)
 			}}
 			disabled={props.note.til != null}

@@ -2,11 +2,11 @@
 import { mount, StartClient } from '@solidjs/start/client'
 import type { appExpose } from 'app/hubMessenger'
 import * as Comlink from 'comlink'
-import { throwExp } from 'shared/utility'
+import { retryWithTimeout, throwExp } from 'shared/utility'
 
 let appMessenger: Comlink.Remote<typeof appExpose> | null
 
-export function getAppMessenger() {
+export async function getAppMessenger() {
 	if (appMessenger == null) {
 		const pai = document.getElementById(
 			'pentive-app-iframe',
@@ -15,6 +15,14 @@ export function getAppMessenger() {
 		appMessenger = Comlink.wrap<typeof appExpose>(
 			Comlink.windowEndpoint(pai.contentWindow),
 		)
+		let messengerReady = false
+		while (!messengerReady) {
+			const timeoutMs = 50
+			const failoutMs = 30_000
+			const count = failoutMs / timeoutMs
+			await retryWithTimeout(appMessenger.ping, count, timeoutMs)
+			messengerReady = true
+		}
 	}
 	return appMessenger
 }

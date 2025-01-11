@@ -10,7 +10,7 @@ export const DownloadTemplate: Component<{ template: Template }> = (props) => {
 	return (
 		<button
 			onClick={async () => {
-				await getAppMessenger().addTemplate(unwrap(props.template))
+				await (await getAppMessenger()).addTemplate(unwrap(props.template))
 				await cwaClient.subscribeToTemplate.mutate(props.template.id)
 			}}
 			disabled={props.template.til != null}
