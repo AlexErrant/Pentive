@@ -7,13 +7,13 @@ import { getUserId } from '~/session'
 import RelativeDate from '~/components/relativeDate'
 import {
 	A,
-	cache,
+	query,
 	createAsync,
 	type RouteDefinition,
 	type RouteSectionProps,
 } from '@solidjs/router'
 
-const getTemplatesCached = cache(async (nook: NookId) => {
+const getTemplatesCached = query(async (nook: NookId) => {
 	'use server'
 	const userId = (await getUserId()) ?? undefined
 	return await getTemplates(nook, userId)

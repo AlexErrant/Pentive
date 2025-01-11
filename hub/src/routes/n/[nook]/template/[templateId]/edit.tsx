@@ -13,7 +13,7 @@ import {
 } from 'shared/domain/template'
 import {
 	type RouteDefinition,
-	cache,
+	query,
 	createAsync,
 	type RouteSectionProps,
 } from '@solidjs/router'
@@ -44,7 +44,7 @@ const saveButton = (template: { template: Template }) => (
 	</button>
 )
 
-const getTemplateCached = cache(
+const getTemplateCached = query(
 	async (templateId: RemoteTemplateId, nook: NookId) => {
 		'use server'
 		return await getUserId().then(

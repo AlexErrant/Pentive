@@ -12,18 +12,18 @@ import {
 import RelativeDate from '~/components/relativeDate'
 import {
 	A,
-	cache,
+	query,
 	createAsync,
 	type RouteDefinition,
 	type RouteSectionProps,
 } from '@solidjs/router'
 
-const getPostsCached = cache(async (nook: string) => {
+const getPostsCached = query(async (nook: string) => {
 	'use server'
 	return await getPosts({ nook })
 }, 'posts')
 
-const getNotesCached = cache(async (nook: string) => {
+const getNotesCached = query(async (nook: string) => {
 	'use server'
 	return await getUserId().then(
 		async (userId) => await getNotes(nook as NookId, userId),

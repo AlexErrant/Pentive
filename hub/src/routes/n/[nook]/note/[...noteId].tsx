@@ -13,18 +13,18 @@ import {
 	remoteToTemplate,
 } from '~/lib/utility'
 import {
-	cache,
+	query,
 	createAsync,
 	type RouteDefinition,
 	type RouteSectionProps,
 } from '@solidjs/router'
 
-const getNoteCached = cache(async (noteId: RemoteNoteId) => {
+const getNoteCached = query(async (noteId: RemoteNoteId) => {
 	'use server'
 	return await getUserId().then(async (userId) => await getNote(noteId, userId))
 }, 'note')
 
-const getNoteCommentsCached = cache(async (noteId: RemoteNoteId) => {
+const getNoteCommentsCached = query(async (noteId: RemoteNoteId) => {
 	'use server'
 	return await getNoteComments(noteId)
 }, 'noteComments')

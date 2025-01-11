@@ -1,4 +1,4 @@
-import { cache } from '@solidjs/router'
+import { query } from '@solidjs/router'
 import { C } from '../topLevelAwait'
 
-export const getSettings = cache(C.db.getSettings, 'settings')
+export const getSettings = query(C.db.getSettings, 'settings')

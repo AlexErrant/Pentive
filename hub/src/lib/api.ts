@@ -1,4 +1,4 @@
-import { cache } from '@solidjs/router'
+import { query } from '@solidjs/router'
 import {
 	type StoryDefinition,
 	type StoryTypes,
@@ -33,17 +33,17 @@ const mapStories = {
 	job: 'jobs',
 } as const
 
-export const getStories = cache(async (type: StoryTypes, page: number) => {
+export const getStories = query(async (type: StoryTypes, page: number) => {
 	'use server'
 	return await fetchAPI<StoryDefinition[]>(`${mapStories[type]}?page=${page}`)
 }, 'stories')
 
-export const getStory = cache(async (id: string) => {
+export const getStory = query(async (id: string) => {
 	'use server'
 	return await fetchAPI<StoryDefinition>(`item/${id}`)
 }, 'story')
 
-export const getUser = cache(async (id: string) => {
+export const getUser = query(async (id: string) => {
 	'use server'
 	return await fetchAPI<UserDefinition>(`user/${id}`)
 }, 'user')

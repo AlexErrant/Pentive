@@ -21,7 +21,7 @@ import {
 } from '~/session'
 import { getCasedUserId, getUserIdByEmail, registerUser } from 'shared-edge'
 import { type PageEvent } from '@solidjs/start/server'
-import { type Params, redirect } from '@solidjs/router'
+import { type Location, redirect } from '@solidjs/router'
 import { throwExp } from 'shared/utility'
 
 export const githubLoginUrl = (alphaKey: string) =>
@@ -29,8 +29,8 @@ export const githubLoginUrl = (alphaKey: string) =>
 	'/api/auth/login/github?alphaKey=' +
 	alphaKey
 
-export const devLoginUrl = (username: string, search: Params) => {
-	const p = new URLSearchParams(search)
+export const devLoginUrl = (username: string, search: Location['query']) => {
+	const p = new URLSearchParams(search as Record<string, string>)
 	p.set('username', username)
 	return import.meta.env.VITE_HUB_ORIGIN + '/api/auth/login/dev?' + p.toString()
 }

@@ -8,13 +8,13 @@ import { cwaClient } from '~/routes/cwaClient'
 import { getUserId } from '~/session'
 import { defaultRenderContainer, remoteToTemplate } from '~/lib/utility'
 import {
-	cache,
+	query,
 	createAsync,
 	type RouteDefinition,
 	type RouteSectionProps,
 } from '@solidjs/router'
 
-const getTemplateCached = cache(
+const getTemplateCached = query(
 	async (templateId: RemoteTemplateId, nook: NookId) => {
 		'use server'
 		return await getUserId().then(
@@ -28,7 +28,7 @@ const getTemplateCached = cache(
 	'template',
 )
 
-const getTemplateCommentsCached = cache(
+const getTemplateCommentsCached = query(
 	async (templateId: RemoteTemplateId) => {
 		'use server'
 		return await getTemplateComments(templateId)

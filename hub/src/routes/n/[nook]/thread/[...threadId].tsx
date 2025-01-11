@@ -5,10 +5,10 @@ import {
 	type RouteSectionProps,
 	createAsync,
 	type RouteDefinition,
-	cache,
+	query,
 } from '@solidjs/router'
 
-const getPostCached = cache(async (threadId: Base64Url) => {
+const getPostCached = query(async (threadId: Base64Url) => {
 	'use server'
 	return await getPost(threadId)
 }, 'posts')

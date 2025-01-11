@@ -1,6 +1,6 @@
 import { SignJWT } from 'jose'
 import { base64ToArray } from 'shared-edge'
-import { cache, redirect } from '@solidjs/router'
+import { query, redirect } from '@solidjs/router'
 import {
 	CookieManager,
 	EncryptedCookieManager,
@@ -138,7 +138,7 @@ function requireCsrfSignature(redirectTo: string) {
 }
 
 // eslint-disable-next-line @typescript-eslint/require-await
-export const getCsrfSignatureCached = cache(async (pathname: string) => {
+export const getCsrfSignatureCached = query(async (pathname: string) => {
 	'use server'
 	return requireCsrfSignature(pathname)
 }, 'csrfSignature')

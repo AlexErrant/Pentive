@@ -2,7 +2,7 @@ import { type NookId } from 'shared/brand'
 import { getNook } from 'shared-edge'
 import { For, Show, type VoidComponent } from 'solid-js'
 import {
-	cache,
+	query,
 	createAsync,
 	type RouteDefinition,
 	type RouteSectionProps,
@@ -10,7 +10,7 @@ import {
 import RelativeDate from '~/components/relativeDate'
 import { IsModProvider } from '~/components/isModContext'
 
-const getNookDetailsCached = cache(async (nook?: string) => {
+const getNookDetailsCached = query(async (nook?: string) => {
 	'use server'
 	if (nook == null) return null // nook may be null when doing a redirect after nook creation; not sure why
 	return await getNook(nook as NookId)

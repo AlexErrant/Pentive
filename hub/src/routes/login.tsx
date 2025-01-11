@@ -4,12 +4,12 @@ import { devLoginUrl, githubLoginUrl } from './api/auth/[...solidAuth]'
 import {
 	type RouteDefinition,
 	type RouteSectionProps,
-	cache,
+	query,
 	createAsync,
 	redirect,
 } from '@solidjs/router'
 
-const getUserIdCached = cache(async () => {
+const getUserIdCached = query(async () => {
 	'use server'
 	if ((await getUserId()) != null) {
 		throw redirect('/') as unknown

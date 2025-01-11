@@ -5,7 +5,7 @@ import {
 	A,
 	type RouteSectionProps,
 	action,
-	cache,
+	query,
 	redirect,
 	type RouteDefinition,
 	useSubmission,
@@ -41,7 +41,7 @@ async function validateUsername(username: unknown) {
 	}
 }
 
-const getUserIdCached = cache(async () => {
+const getUserIdCached = query(async () => {
 	'use server'
 	if ((await getUserId()) != null) {
 		throw redirect('/') as unknown
