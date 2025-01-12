@@ -1,5 +1,5 @@
 import { type getNote } from 'shared-edge'
-import { getAppMessenger } from '~/clientOnly'
+import { getAppMessenger } from '~/lib/clientOnly'
 import { unwrap } from 'solid-js/store'
 import { cwaClient } from 'app/trpcClient'
 import { type Component } from 'solid-js'

@@ -1,3 +1,5 @@
+// these functions should only be used from `clientOnly` components!
+
 import type { appExpose } from 'app/hubMessenger'
 import * as Comlink from 'comlink'
 import { retryWithTimeout, throwExp } from 'shared/utility'
