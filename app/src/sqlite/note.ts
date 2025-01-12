@@ -37,6 +37,7 @@ import {
 	objEntries,
 	objKeys,
 	objValues,
+	type SqliteCount,
 	type Override,
 } from 'shared/utility'
 import initSql from 'shared/sql.json'
@@ -547,6 +548,14 @@ JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field
 					remoteNoteIds,
 				)} not found. (This is the worst error message ever - medTODO.)`,
 			)
+	},
+	hasRemoteNote: async function (remoteNoteId: RemoteNoteId) {
+		const r = await ky
+			.selectFrom('remoteNote')
+			.where('remoteId', '=', toLDbId(remoteNoteId))
+			.select(ky.fn.count<SqliteCount>('remoteId').as('count'))
+			.executeTakeFirstOrThrow()
+		return r.count >= 1
 	},
 }
 

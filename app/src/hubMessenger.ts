@@ -93,6 +93,7 @@ export const appExpose = {
 			await C.db.bulkUpsertCards(cards)
 		})
 	},
+	hasRemoteNote: C.db.hasRemoteNote,
 }
 
 // highTODO needs security on the origin
