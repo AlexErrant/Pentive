@@ -14,6 +14,7 @@ import {
 	buildHtml,
 } from 'shared-dom/resizingIframe'
 import { type MediaId } from 'shared/brand'
+import { clientOnly } from '@solidjs/start'
 
 export type { RenderBodyInput, RawRenderBodyInput, ComlinkInit }
 
@@ -31,7 +32,7 @@ export interface HubExpose {
 	resize: () => void
 }
 
-const ResizingIframe: CommonResizingIframe = (props) => {
+const ResizingIframeDefault: CommonResizingIframe = (props) => {
 	const C = defaultRenderContainer({
 		// @ts-expect-error don't recurse
 		resizingIframe: null,
@@ -68,4 +69,8 @@ const ResizingIframe: CommonResizingIframe = (props) => {
 	)
 }
 
-export default ResizingIframe
+export default ResizingIframeDefault
+
+export const ResizingIframe = clientOnly(
+	async () => await import('./resizingIframe'),
+)

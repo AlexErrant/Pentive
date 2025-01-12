@@ -5,10 +5,11 @@ import { cwaClient } from 'app/trpcClient'
 import { type Component } from 'solid-js'
 import { type NookId } from 'shared/brand'
 import { createAsync } from '@solidjs/router'
+import { clientOnly } from '@solidjs/start'
 
 type Note = NonNullable<Awaited<ReturnType<typeof getNote>>>
 
-export const DownloadNote: Component<{ note: Note; nook: NookId }> = (
+export const DownloadNoteDefault: Component<{ note: Note; nook: NookId }> = (
 	props,
 ) => {
 	const hasRemoteNote = createAsync(
@@ -27,4 +28,8 @@ export const DownloadNote: Component<{ note: Note; nook: NookId }> = (
 	)
 }
 
-export default DownloadNote
+export default DownloadNoteDefault
+
+export const DownloadNote = clientOnly(
+	async () => await import('~/components/downloadNote'),
+)

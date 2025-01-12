@@ -3,10 +3,13 @@ import { getAppMessenger } from '~/clientOnly'
 import { unwrap } from 'solid-js/store'
 import { cwaClient } from 'app/trpcClient'
 import { type Component } from 'solid-js'
+import { clientOnly } from '@solidjs/start'
 
 type Template = Awaited<ReturnType<typeof getTemplates>>[0]
 
-export const DownloadTemplate: Component<{ template: Template }> = (props) => {
+export const DownloadTemplateDefault: Component<{ template: Template }> = (
+	props,
+) => {
 	return (
 		<button
 			onClick={async () => {
@@ -20,4 +23,8 @@ export const DownloadTemplate: Component<{ template: Template }> = (props) => {
 	)
 }
 
-export default DownloadTemplate
+export default DownloadTemplateDefault
+
+export const DownloadTemplate = clientOnly(
+	async () => await import('~/components/downloadTemplate'),
+)
