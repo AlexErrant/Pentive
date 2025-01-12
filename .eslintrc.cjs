@@ -53,6 +53,7 @@ module.exports = {
 				project,
 			},
 			rules: {
+				'prettier/prettier': 'warn',
 				'@typescript-eslint/no-non-null-assertion': 'off',
 				'@typescript-eslint/explicit-function-return-type': 'off',
 				'@typescript-eslint/no-misused-promises': [
@@ -119,6 +120,7 @@ module.exports = {
 				project,
 			},
 			rules: {
+				'prettier/prettier': 'warn',
 				'@typescript-eslint/no-non-null-assertion': 'off',
 				'@typescript-eslint/no-throw-literal': [
 					'error',
