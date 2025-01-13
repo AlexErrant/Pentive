@@ -2,7 +2,6 @@ import { For, Show, Suspense } from 'solid-js'
 import { type NookId, type RemoteNoteId } from 'shared/brand'
 import { getNote, getNoteComments } from 'shared-edge'
 import { ResizingIframe } from '~/components/resizingIframe'
-import { DownloadNote } from '~/components/downloadNote'
 import Comment from '~/components/comment'
 import SubmitComment from '~/components/submitComment'
 import { cwaClient } from '~/routes/cwaClient'
@@ -19,6 +18,7 @@ import {
 	type RouteDefinition,
 	type RouteSectionProps,
 } from '@solidjs/router'
+import { DownloadSubscribeNote } from '~/components/downloadSubscribeNote'
 
 const getNoteCached = query(async (noteId: RemoteNoteId) => {
 	'use server'
@@ -82,7 +82,7 @@ export default function Note(props: RouteSectionProps) {
 							}}
 						</For>
 					</p>
-					<DownloadNote
+					<DownloadSubscribeNote
 						note={remoteNote()!}
 						nook={props.params.nook as NookId}
 					/>

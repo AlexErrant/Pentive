@@ -1,13 +1,10 @@
-import { type getNote } from 'shared-edge'
 import { getAppMessenger } from '~/lib/clientOnly'
 import { unwrap } from 'solid-js/store'
-import { cwaClient } from 'app/trpcClient'
 import { type Component } from 'solid-js'
 import { type NookId } from 'shared/brand'
 import { createAsync } from '@solidjs/router'
 import { clientOnly } from '@solidjs/start'
-
-type Note = NonNullable<Awaited<ReturnType<typeof getNote>>>
+import { type Note } from './downloadSubscribeNote'
 
 export const DownloadNoteDefault: Component<{ note: Note; nook: NookId }> = (
 	props,
@@ -19,7 +16,6 @@ export const DownloadNoteDefault: Component<{ note: Note; nook: NookId }> = (
 		<button
 			onClick={async () => {
 				await (await getAppMessenger()).addNote(unwrap(props.note), props.nook)
-				await cwaClient.subscribeToNote.mutate(props.note.id)
 			}}
 			disabled={hasRemoteNote()}
 		>
