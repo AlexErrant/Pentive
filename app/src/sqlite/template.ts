@@ -433,6 +433,14 @@ export const templateCollectionMethods = {
 				)} not found. (This is the worst error message ever - medTODO.)`,
 			)
 	},
+	hasRemoteTemplate: async function (remoteTemplateId: RemoteTemplateId) {
+		const r = await ky
+			.selectFrom('remoteTemplate')
+			.where('remoteId', '=', toLDbId(remoteTemplateId))
+			.select(ky.fn.count<SqliteCount>('remoteId').as('count'))
+			.executeTakeFirstOrThrow()
+		return r.count >= 1
+	},
 }
 
 type Nullable<T> = { [K in keyof T]: T[K] | null }

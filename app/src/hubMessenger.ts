@@ -94,6 +94,7 @@ export const appExpose = {
 		})
 	},
 	hasRemoteNote: C.db.hasRemoteNote,
+	hasRemoteTemplate: C.db.hasRemoteTemplate,
 }
 
 // highTODO needs security on the origin
