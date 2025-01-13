@@ -21,7 +21,7 @@ import { getTemplate } from 'shared-edge'
 import { getUserId } from '~/session'
 import { useThemeContext } from 'shared-dom/themeSelector'
 import { useIsModContext } from '~/components/isModContext'
-import { cwaClient } from 'app/trpcClient'
+import { cwaClient } from '~/routes/cwaClient'
 
 const getDefaultTemplate = () =>
 	getDefaultTemplateOg(crypto.randomUUID() as TemplateId) // highTODO

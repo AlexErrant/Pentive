@@ -1,7 +1,7 @@
 import { For, Show } from 'solid-js'
 import { type NookId } from 'shared/brand'
 import { getTemplates } from 'shared-edge'
-import { DownloadTemplate } from '~/components/downloadTemplate'
+import { DownloadSubscribeTemplate } from '~/components/downloadSubscribeTemplate'
 import { ResizingIframe } from '~/components/resizingIframe'
 import { remoteToTemplate } from '~/lib/utility'
 import { getUserId } from '~/session'
@@ -41,7 +41,7 @@ export default function Thread(props: RouteSectionProps) {
 								<li>
 									<h1>{template.name}</h1>
 									<div>
-										<DownloadTemplate template={template} />
+										<DownloadSubscribeTemplate template={template} />
 										<div>
 											{template.til == null ? (
 												''

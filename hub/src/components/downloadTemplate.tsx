@@ -1,12 +1,10 @@
-import { type getTemplates } from 'shared-edge'
 import { getAppMessenger } from '~/lib/clientOnly'
 import { unwrap } from 'solid-js/store'
-import { cwaClient } from 'app/trpcClient'
+import { cwaClient } from '~/routes/cwaClient'
 import { type Component } from 'solid-js'
 import { clientOnly } from '@solidjs/start'
 import { createAsync } from '@solidjs/router'
-
-type Template = Awaited<ReturnType<typeof getTemplates>>[0]
+import { type Template } from './downloadSubscribeTemplate'
 
 export const DownloadTemplateDefault: Component<{ template: Template }> = (
 	props,

@@ -1,7 +1,7 @@
 import { For, Show, Suspense } from 'solid-js'
 import { cast, type NookId, type RemoteTemplateId } from 'shared/brand'
 import { getTemplate, getTemplateComments } from 'shared-edge'
-import { DownloadTemplate } from '~/components/downloadTemplate'
+import { DownloadSubscribeTemplate } from '~/components/downloadSubscribeTemplate'
 import { ResizingIframe } from '~/components/resizingIframe'
 import Comment from '~/components/comment'
 import SubmitComment from '~/components/submitComment'
@@ -92,7 +92,7 @@ export default function Thread(props: RouteSectionProps) {
 							}}
 						</For>
 					</p>
-					<DownloadTemplate template={remoteTemplate()!} />
+					<DownloadSubscribeTemplate template={remoteTemplate()!} />
 					<ul class='comment-children'>
 						<SubmitComment
 							// eslint-disable-next-line solid/reactivity -- doesn't need to be reactive
