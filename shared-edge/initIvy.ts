@@ -24,6 +24,15 @@ const tableCount = await client
 	.execute(`SELECT count(*) FROM sqlite_master WHERE type = 'table'`)
 	.then((x) => x.rows[0][0] as number)
 
+// eslint-disable-next-line no-constant-condition
+if (false) {
+	for (const sql of ivySchemaSplit) {
+		console.log('sql', sql.sql)
+		const r = await client.execute(sql)
+		console.log(JSON.stringify(r, null, 4))
+	}
+}
+
 if (tableCount === 0) {
 	const result = await client.batch(ivySchemaSplit, 'write')
 	console.log(JSON.stringify(result, null, 4))

@@ -14,8 +14,8 @@ export interface MediaUser {
 }
 
 export interface MediaEntity {
-	entityId: DbId // composite pk
-	i: number //      composite pk
+	id: DbId
+	entityId: DbId
 	mediaHash: MediaHash
 }
 
@@ -51,17 +51,17 @@ export interface NoteComment {
 	edited: Generated<number>
 	text: string
 	authorId: string
-	history: string | null
+	history: ArrayBuffer | null
 	votes: string
 	level: number
 }
 
-export interface NoteHistory {
+export interface NoteProposal {
 	noteId: DbId
 	created: Generated<number>
-	templateId: DbId | null
-	fieldValues: string
-	tags: string
+	authorId: string
+	delta: ArrayBuffer
+	status: number
 }
 
 export interface NoteSubscriber {
@@ -86,7 +86,7 @@ export interface PostComment {
 	edited: Generated<number>
 	text: string
 	authorId: string
-	history: string | null
+	history: ArrayBuffer | null
 	votes: string
 	level: number
 }
@@ -119,19 +119,17 @@ export interface TemplateComment {
 	edited: Generated<number>
 	text: string
 	authorId: string
-	history: string | null
+	history: ArrayBuffer | null
 	votes: string
 	level: number
 }
 
-export interface TemplateHistory {
+export interface TemplateProposal {
 	templateId: DbId
 	created: Generated<number>
-	name: string | null
-	authorId: string | null
-	type: string | null
-	fields: string | null
-	css: string | null
+	authorId: string
+	delta: ArrayBuffer
+	status: number
 }
 
 export interface TemplateSubscriber {
@@ -153,14 +151,14 @@ export interface DB {
 	nook: Nook
 	note: Note
 	noteComment: NoteComment
-	noteHistory: NoteHistory
+	noteProposal: NoteProposal
 	noteSubscriber: NoteSubscriber
 	post: Post
 	postComment: PostComment
 	postSubscriber: PostSubscriber
 	template: Template
 	templateComment: TemplateComment
-	templateHistory: TemplateHistory
+	templateProposal: TemplateProposal
 	templateSubscriber: TemplateSubscriber
 	user: User
 }

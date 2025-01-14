@@ -1,9 +1,8 @@
 create table media_Entity
 (
-    entityId  BLOB    not null,
-    i         INTEGER not null,
-    mediaHash BLOB    not null,
-    primary key (entityId, i)
+    id        BLOB not null primary key,
+    entityId  BLOB not null,
+    mediaHash BLOB not null
 ) STRICT;
 
 create index media_Entity_mediaHash_idx
@@ -19,8 +18,7 @@ create table media_User
 
 create table nook
 (
-    id          TEXT    not null
-        primary key,
+    id          TEXT    not null primary key,
     created     INTEGER not null default (cast(strftime('%s','now') as int)), -- https://stackoverflow.com/a/29420016
     moderators  TEXT    not null,
     description TEXT    not null,
@@ -31,8 +29,7 @@ create table nook
 
 create table note
 (
-    id               BLOB    not null
-        primary key,
+    id               BLOB    not null primary key,
     templateId       BLOB    not null,
     created          INTEGER not null default (cast(strftime('%s','now') as int)),
     edited           INTEGER not null default (cast(strftime('%s','now') as int)),
@@ -65,7 +62,7 @@ create table noteComment
     edited   INTEGER not null default (cast(strftime('%s','now') as int)),
     text     TEXT    not null,
     authorId TEXT    not null,
-    history  TEXT    null,
+    history  BLOB    null,
     votes    TEXT    not null,
     level    INTEGER not null,
     foreign key (noteId) references note(id),
@@ -78,17 +75,20 @@ create index noteComment_authorId_idx
 create index noteComment_noteId_idx
     on noteComment (noteId);
 
-create table noteHistory
+create table noteProposal
 (
     noteId      BLOB    not null,
     created     INTEGER not null default (cast(strftime('%s','now') as int)),
-    templateId  BLOB    null,
-    fieldValues TEXT    not null,
-    tags        TEXT    not null,
+    authorId    TEXT    not null,
+    delta       BLOB    not null,
+    status      INTEGER not null,
     primary key (noteId, created),
     foreign key (noteId) references note(id),
-    foreign key (templateId) references template(id)
+    foreign key (authorId) references user(id)
 ) STRICT;
+
+create index noteProposal_authorId_idx
+    on noteProposal (authorId);
 
 create table noteSubscriber
 (
@@ -129,7 +129,7 @@ create table postComment
     edited   INTEGER not null default (cast(strftime('%s','now') as int)),
     text     TEXT    not null,
     authorId TEXT    not null,
-    history  TEXT    null,
+    history  BLOB    null,
     votes    TEXT    not null,
     level    INTEGER not null,
     foreign key (postId) references post(id),
@@ -157,8 +157,7 @@ create index postSubscriber_userId_idx
 
 create table template
 (
-    id               BLOB    not null
-        primary key,
+    id               BLOB    not null primary key,
     created          INTEGER not null default (cast(strftime('%s','now') as int)),
     edited           INTEGER not null default (cast(strftime('%s','now') as int)),
     name             TEXT    not null,
@@ -167,8 +166,8 @@ create table template
     fields           TEXT    not null,
     css              TEXT    not null,
     ankiId           INTEGER null,
-    commentsCount    INTEGER default '0'                                 not null,
-    subscribersCount INTEGER default '0'                                 not null,
+    commentsCount    INTEGER not null default '0',
+    subscribersCount INTEGER not null default '0',
     foreign key (nook) references nook(id)
 ) STRICT;
 
@@ -180,15 +179,14 @@ create index template_nook_idx
 
 create table templateComment
 (
-    id         BLOB    not null
-        primary key,
+    id         BLOB    not null primary key,
     parentId   BLOB    null,
     templateId BLOB    not null,
     created    INTEGER not null default (cast(strftime('%s','now') as int)),
     edited     INTEGER not null default (cast(strftime('%s','now') as int)),
     text       TEXT    not null,
     authorId   TEXT    not null,
-    history    TEXT    null,
+    history    BLOB    null,
     votes      TEXT    not null,
     level      INTEGER not null,
     foreign key (templateId) references template(id),
@@ -201,22 +199,20 @@ create index templateComment_authorId_idx
 create index templateComment_templateId_idx
     on templateComment (templateId);
 
-create table templateHistory
+create table templateProposal
 (
     templateId BLOB    not null,
     created    INTEGER not null default (cast(strftime('%s','now') as int)),
-    name       TEXT    null,
-    authorId   TEXT    null,
-    type       TEXT    null,
-    fields     TEXT    null,
-    css        TEXT    null,
+    authorId   TEXT    not null,
+    delta      BLOB    not null,
+    status     INTEGER not null,
     primary key (templateId, created),
     foreign key (templateId) references template(id),
     foreign key (authorId) references user(id)
 ) STRICT;
 
-create index templateHistory_authorId_idx
-    on templateHistory (authorId);
+create index templateProposal_authorId_idx
+    on templateProposal (authorId);
 
 create table templateSubscriber
 (
