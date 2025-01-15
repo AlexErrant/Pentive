@@ -25,6 +25,7 @@ import {
 	type Hex,
 	type MediaHash,
 	type Base64,
+	type MediaId,
 } from 'shared/brand'
 import { ftsNormalize } from 'shared/htmlToText'
 import { imgPlaceholder, relativeChar } from 'shared/image'
@@ -750,12 +751,11 @@ export async function userOwnsTemplateAndHasMedia(
 	}
 }
 
-export async function lookupMediaHash(entityId: Base64, i: number) {
+export async function lookupMediaHash(id: MediaId) {
 	const mediaHash = await db
 		.selectFrom('media_Entity')
 		.select('mediaHash')
-		.where('entityId', '=', fromBase64(entityId))
-		.where('i', '=', i)
+		.where('id', '=', fromBase64Url(id))
 		.executeTakeFirst()
 	return mediaHash?.mediaHash
 }

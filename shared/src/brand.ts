@@ -61,6 +61,7 @@ export function cast<T>(value: T) {
 }
 
 type LocalId =
+	| MediaId
 	| TemplateId
 	| NoteId
 	| CardId

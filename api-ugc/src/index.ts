@@ -14,15 +14,13 @@ import { type Env, type ApiUgcContext } from './util'
 import {
 	setKysely,
 	lookupMediaHash,
-	binary16fromBase64URL,
 	getUserId,
 	dbIdToBase64,
 } from 'shared-edge'
 import { appRouter } from './router'
 import { fetchRequestHandler } from '@trpc/server/adapters/fetch'
-import { type MediaHash } from 'shared/brand'
+import { type MediaId, type MediaHash } from 'shared/brand'
 import { hstsName, hstsValue } from 'shared/headers'
-import { parsePublicToken } from 'shared/publicToken'
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const app = new Hono<{ Bindings: Env }>()
@@ -60,11 +58,10 @@ app
 		})
 	})
 	.get('/', (c) => c.text('Hono!!'))
-	.get('/i/:token', async (c) => {
+	.get('/i/:mediaId', async (c) => {
 		setKysely(c.env.tursoDbUrl, c.env.tursoAuthToken)
-		const [entityId, i] = parsePublicToken(c.req.param('token'))
-		const entityIdBase64 = binary16fromBase64URL(entityId)
-		const mediaHash = await lookupMediaHash(entityIdBase64, i)
+		const mediaId = c.req.param('mediaId') as MediaId
+		const mediaHash = await lookupMediaHash(mediaId)
 		if (mediaHash == null) return await c.notFound()
 		return await getMedia(c, mediaHash, 'public')
 	})

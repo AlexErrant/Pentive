@@ -19,27 +19,21 @@ import {
 	userOwnsTemplateAndHasMedia,
 	getUserId,
 	dbIdToBase64,
-	type MediaEntity,
-	type DB,
 } from 'shared-edge'
 import { connect } from '@planetscale/database'
 import { buildPrivateToken } from './privateToken'
 import { appRouter } from './router'
 import { fetchRequestHandler } from '@trpc/server/adapters/fetch'
 import {
-	type ExpressionBuilder,
-	type OnConflictDatabase,
-	type OnConflictTables,
-} from 'kysely'
-import {
 	type UserId,
 	type MediaHash,
 	type Base64Url,
 	type NoteId,
 	type TemplateId,
+	type MediaId,
 } from 'shared/brand'
 import { hstsName, hstsValue } from 'shared/headers'
-import { iByEntityIdsValidator } from 'shared/publicToken'
+import { mediaIdByEntityIdsValidator } from 'shared/publicToken'
 import { objEntries, objKeys } from 'shared/utility'
 export type * from '@trpc/server'
 
@@ -135,25 +129,23 @@ app
 		return await postMedia(c, persistDbAndBucket, buildToken)
 	})
 	.post('/media/note', async (c) => {
-		const iByEntityIds = iByEntityIdsValidator.parse(c.req.query()) as Record<
-			NoteId,
-			number
-		> // grep E7F24704-8D0B-460A-BF2C-A97344C535E0
-		const noteIds = objKeys(iByEntityIds)
+		const mediaIdByEntityIds = mediaIdByEntityIdsValidator.parse(
+			c.req.query(),
+		) as Record<NoteId, MediaId> // grep E7F24704-8D0B-460A-BF2C-A97344C535E0
+		const noteIds = objKeys(mediaIdByEntityIds)
 		if (noteIds.length === 0) return c.text(`Need at least one note.`, 400)
 		return await postPublicMedia(
 			c,
 			'note',
 			async (authorId: UserId, mediaHash: MediaHash) =>
 				await userOwnsNoteAndHasMedia(noteIds, authorId, mediaHash),
-			iByEntityIds,
+			mediaIdByEntityIds,
 		)
 	})
 	.post('/media/template', async (c) => {
-		const iByEntityIds = iByEntityIdsValidator.parse(c.req.query()) as Record<
-			TemplateId,
-			number
-		> // grep E7F24704-8D0B-460A-BF2C-A97344C535E0
+		const iByEntityIds = mediaIdByEntityIdsValidator.parse(
+			c.req.query(),
+		) as Record<TemplateId, MediaId> // grep E7F24704-8D0B-460A-BF2C-A97344C535E0
 		const templateIds = objKeys(iByEntityIds)
 		if (templateIds.length === 0)
 			return c.text(`Need at least one template.`, 400)
@@ -168,18 +160,6 @@ app
 
 export default app
 
-// The point of this type is to cause an error if something is added to MediaEntity
-// If that happens, you probably want to update the `doUpdateSet` call.
-// If not, you an add an exception to the Exclude below.
-type OnConflictUpdateMediaEntitySet = {
-	[K in keyof MediaEntity as Exclude<K, 'entityId' | 'i'>]: (
-		x: ExpressionBuilder<
-			OnConflictDatabase<DB, 'media_Entity'>,
-			OnConflictTables<'media_Entity'>
-		>,
-	) => unknown
-}
-
 async function postPublicMedia(
 	c: CwaContext,
 	type: 'note' | 'template',
@@ -190,7 +170,7 @@ async function postPublicMedia(
 		userOwns: boolean
 		hasMedia: boolean
 	}>,
-	iByEntityIds: Record<NoteId | TemplateId, number>,
+	mediaIdByEntityIds: Record<NoteId | TemplateId, MediaId>,
 ) {
 	const authResult = await getUserId(c)
 	if (authResult.tag === 'Error') return c.text(authResult.error, 401)
@@ -201,11 +181,13 @@ async function postPublicMedia(
 		readable,
 		headers,
 	}: PersistParams): Promise<undefined | Response> => {
-		const insertValues = objEntries(iByEntityIds).map(([entityId, i]) => ({
-			mediaHash,
-			i,
-			entityId: fromBase64Url(entityId),
-		}))
+		const insertValues = objEntries(mediaIdByEntityIds).map(
+			([entityId, mediaId]) => ({
+				mediaHash,
+				id: fromBase64Url(mediaId),
+				entityId: fromBase64Url(entityId),
+			}),
+		)
 		const { userOwns, hasMedia } = await userOwnsAndHasMedia(userId, mediaHash)
 		if (!userOwns)
 			return c.text(`You don't own one (or more) of these ${type}s.`, 401)
@@ -215,15 +197,7 @@ async function postPublicMedia(
 			// Just means we could PUT something into the mediaBucket and have no record of it in PlanetScale. Not great, but _fine_.
 			// Grep BC34B055-ECB7-496D-9E71-58EE899A11D1 for details.
 			.execute(async (trx) => {
-				await trx
-					.insertInto('media_Entity')
-					.values(insertValues)
-					.onConflict((db) =>
-						db.doUpdateSet({
-							mediaHash: (x) => x.ref('excluded.mediaHash'),
-						} satisfies OnConflictUpdateMediaEntitySet),
-					)
-					.execute()
+				await trx.insertInto('media_Entity').values(insertValues).execute()
 				if (!hasMedia) {
 					const object = await c.env.mediaBucket.put(
 						dbIdToBase64(mediaHash),
