@@ -7,6 +7,7 @@ import {
 	type RemoteTemplateId,
 	type NookId,
 	type CommentId,
+	type MediaId,
 } from './brand'
 import { objKeys } from './utility'
 
@@ -16,17 +17,12 @@ export const dateSchema = z.preprocess((arg) => {
 	if (typeof arg === 'string' || arg instanceof Date) return new Date(arg)
 }, z.date())
 
-export const remoteNoteId = z
-	.string()
-	.regex(/^[a-zA-Z0-9_-]{22}$/) as unknown as z.Schema<RemoteNoteId>
-
-export const remoteTemplateId = z
-	.string()
-	.regex(/^[a-zA-Z0-9_-]{22}$/) as unknown as z.Schema<RemoteTemplateId>
-
-export const commentId = z
-	.string()
-	.regex(/^[a-zA-Z0-9_-]{22}$/) as unknown as z.Schema<CommentId>
+const base64UrlId = z.string().regex(/^[a-zA-Z0-9_-]{22}$/) as unknown
+export const remoteNoteId = base64UrlId as z.Schema<RemoteNoteId>
+export const remoteTemplateId = base64UrlId as z.Schema<RemoteTemplateId>
+export const commentId = base64UrlId as z.Schema<CommentId>
+export const noteId = base64UrlId as z.Schema<NoteId>
+export const mediaId = base64UrlId as z.Schema<MediaId>
 
 const fieldValues = z
 	.record(z.string().min(1), z.string())

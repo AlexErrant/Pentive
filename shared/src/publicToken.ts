@@ -1,16 +1,5 @@
-import z from 'zod'
-import { type MediaId, type Base64Url, type NoteId } from './brand'
+import { type Base64Url } from './brand'
 import { throwExp } from './utility'
-
-const entityId = z
-	.string()
-	.regex(/^[a-zA-Z0-9_-]{22}$/) as unknown as z.Schema<NoteId>
-
-const mediaId = z
-	.string()
-	.regex(/^[a-zA-Z0-9_-]{22}$/) as unknown as z.Schema<MediaId>
-
-export const mediaIdByEntityIdsValidator = z.record(entityId, mediaId)
 
 /*
 

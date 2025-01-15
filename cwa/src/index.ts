@@ -33,8 +33,9 @@ import {
 	type MediaId,
 } from 'shared/brand'
 import { hstsName, hstsValue } from 'shared/headers'
-import { mediaIdByEntityIdsValidator } from 'shared/publicToken'
 import { objEntries, objKeys } from 'shared/utility'
+import z from 'zod'
+import { mediaId, noteId } from 'shared/schema'
 export type * from '@trpc/server'
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -157,6 +158,8 @@ app
 			iByEntityIds,
 		)
 	})
+
+const mediaIdByEntityIdsValidator = z.record(noteId, mediaId)
 
 export default app
 
