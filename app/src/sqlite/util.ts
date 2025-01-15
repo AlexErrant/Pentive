@@ -7,26 +7,22 @@ import {
 	type Template as TemplateEntity,
 	type DB,
 } from './database'
-import {
-	type MediaId,
-	type RemoteMediaNum,
-	fromLDbId,
-	type NookId,
-} from 'shared/brand'
+import { type MediaId, fromLDbId, type NookId } from 'shared/brand'
 import { type Field, type Template } from 'shared/domain/template'
 import { imgPlaceholder } from 'shared/image'
 import { type TemplateType } from 'shared/schema'
-import { parseSet, parseMap } from 'shared/utility'
+import { parseSet, parseMap, notEmpty } from 'shared/utility'
 import { type Note } from 'shared/domain/note'
-import { C } from '../topLevelAwait'
+import { C, ky } from '../topLevelAwait'
 import { jsonArrayFrom } from 'kysely/helpers/sqlite'
 import { type AliasedRawBuilder, type ExpressionBuilder } from 'kysely'
+import { uint8ArrayToBase64 } from 'shared-dom/utility'
 
 export function parseTags(rawTags: string) {
 	return parseSet<string>(rawTags)
 }
 
-export function updateLocalMediaIdByRemoteMediaIdAndGetNewDoc(
+export async function updateLocalMediaIdByRemoteMediaIdAndGetNewDoc(
 	dp: DOMParser,
 	rawDoms: string[],
 ) {
@@ -38,15 +34,25 @@ export function updateLocalMediaIdByRemoteMediaIdAndGetNewDoc(
 			.filter((i) => i !== '' && i != null),
 	)
 	const remoteMediaIdByLocal = new Map(
-		Array.from(imgSrcs.values()).map(
-			(src, i) => [src as MediaId, i as RemoteMediaNum] as const,
+		await Promise.all(
+			Array.from(imgSrcs.values())
+				.filter(notEmpty)
+				.map(async (src) => {
+					const hash = await ky
+						.selectFrom('media')
+						.select('hash')
+						.where('id', '=', src as MediaId)
+						.executeTakeFirstOrThrow()
+						.then((m) => uint8ArrayToBase64(m.hash))
+					return [src as MediaId, hash] as const
+				}),
 		),
 	)
 	for (const doc of docs) {
 		for (const image of doc.images) {
 			const src = image.getAttribute('src') as MediaId
 			if (src != null) {
-				const i =
+				const hash =
 					remoteMediaIdByLocal.get(src) ??
 					C.toastImpossible(
 						`${src} not found in ${JSON.stringify(
@@ -54,7 +60,7 @@ export function updateLocalMediaIdByRemoteMediaIdAndGetNewDoc(
 						)}`,
 					)
 				const extension = src.substring(src.lastIndexOf('.'))
-				image.setAttribute('src', `${imgPlaceholder}${i}${extension}`)
+				image.setAttribute('src', `${imgPlaceholder}${hash}${extension}`)
 			}
 		}
 	}

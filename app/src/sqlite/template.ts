@@ -225,10 +225,16 @@ export const templateCollectionMethods = {
 	) {
 		const dp = new DOMParser()
 		const templatesAndStuff = await this.getNewTemplatesToUploadDom(templateId)
-		return templatesAndStuff
-			.map((n) => domainToCreateRemote(n, nook))
-			.map((n) => withLocalMediaIdByRemoteMediaId(dp, n))
-			.map((n) => n.template)
+		return await Promise.all(
+			templatesAndStuff
+				.map((n) => domainToCreateRemote(n, nook))
+				.map(
+					async (n) =>
+						await withLocalMediaIdByRemoteMediaId(dp, n).then(
+							(x) => x.template,
+						),
+				),
+		)
 	},
 	getNewTemplatesToUploadDom: async function (templateId?: TemplateId) {
 		const templatesAndStuff = await ky
@@ -250,10 +256,16 @@ export const templateCollectionMethods = {
 		const dp = new DOMParser()
 		const templatesAndStuff =
 			await this.getEditedTemplatesToUploadDom(templateId)
-		return templatesAndStuff
-			.map((n) => domainToEditRemote(n, nook))
-			.map((n) => withLocalMediaIdByRemoteMediaId(dp, n))
-			.map((n) => n.template)
+		return await Promise.all(
+			templatesAndStuff
+				.map((n) => domainToEditRemote(n, nook))
+				.map(
+					async (n) =>
+						await withLocalMediaIdByRemoteMediaId(dp, n).then(
+							(x) => x.template,
+						),
+				),
+		)
 	},
 	getEditedTemplatesToUploadDom: async function (templateId?: TemplateId) {
 		const templatesAndStuff = await ky
@@ -314,7 +326,16 @@ export const templateCollectionMethods = {
 				C.toastImpossible(
 					`mediaBinaries is missing '${m.localMediaId}'... how?`,
 				)
-			value.ids.push([fromLDbId(m.localEntityId), fromLDbId(remoteId), m.i])
+			const remoteMediaId =
+				m.i ??
+				C.toastImpossible(
+					`remoteMedia with localMediaId '${m.localMediaId}' is missing remoteMediaId`, // this should've been set in the syncing step
+				)
+			value.ids.push([
+				fromLDbId(m.localEntityId),
+				fromLDbId(remoteId),
+				remoteMediaId,
+			])
 		}
 		return media
 	},
@@ -340,7 +361,7 @@ export const templateCollectionMethods = {
 				.selectAll()
 				.where('id', '=', templateDbId)
 				.executeTakeFirstOrThrow()
-			const { remoteMediaIdByLocal } = withLocalMediaIdByRemoteMediaId(
+			const { remoteMediaIdByLocal } = await withLocalMediaIdByRemoteMediaId(
 				new DOMParser(),
 				domainToCreateRemote(toTemplate([{ ...template, ...remoteTemplate }])!),
 			)
@@ -361,9 +382,8 @@ export const templateCollectionMethods = {
 				await db
 					.insertInto('remoteMedia')
 					.values(
-						Array.from(remoteMediaIdByLocal).map(([localMediaId, i]) => ({
+						Array.from(remoteMediaIdByLocal).map(([localMediaId]) => ({
 							localEntityId: templateDbId,
-							i,
 							localMediaId,
 						})),
 					)
@@ -471,7 +491,7 @@ function toTemplate(allTemplates: TemplateRow[]) {
 	return r.length === 0 ? null : r[0]
 }
 
-function withLocalMediaIdByRemoteMediaId<
+async function withLocalMediaIdByRemoteMediaId<
 	T extends CreateRemoteTemplate | EditRemoteTemplate,
 >(dp: DOMParser, template: T) {
 	const serializer = new XMLSerializer()
@@ -489,7 +509,7 @@ function withLocalMediaIdByRemoteMediaId<
 			t.back,
 		])
 		const { docs, remoteMediaIdByLocal } =
-			updateLocalMediaIdByRemoteMediaIdAndGetNewDoc(dp, rawDoms)
+			await updateLocalMediaIdByRemoteMediaIdAndGetNewDoc(dp, rawDoms)
 		let i = 0
 		for (const t of template.templateType.templates) {
 			t.front = serialize(docs[i]!)
@@ -503,7 +523,7 @@ function withLocalMediaIdByRemoteMediaId<
 		}
 	} else {
 		const { docs, remoteMediaIdByLocal } =
-			updateLocalMediaIdByRemoteMediaIdAndGetNewDoc(dp, [
+			await updateLocalMediaIdByRemoteMediaIdAndGetNewDoc(dp, [
 				template.templateType.template.front,
 				template.templateType.template.back,
 			])

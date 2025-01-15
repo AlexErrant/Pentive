@@ -267,25 +267,30 @@ JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field
 			.selectAll()
 			.execute()
 		const notesAndStuff = await this.getNewNotesToUploadDom(noteId)
-		return notesAndStuff
-			.map(([, note]) => {
-				const remoteIds = objKeys(note.remotes)
-					.map((remoteNook) => {
-						if (nook != null && remoteNook !== nook) return null
-						const rt =
-							remoteTemplates.find(
-								(rt) =>
-									rt.localId === note.templateId && remoteNook === rt.nook,
-							) ??
-							C.toastImpossible(
-								`No template found for id '${note.templateId}' with nook '${remoteNook}'.`,
-							)
-						return fromLDbId<RemoteTemplateId | null>(rt.remoteId)
-					})
-					.filter(notEmpty)
-				return domainToCreateRemote(note, remoteIds)
-			})
-			.map((n) => withLocalMediaIdByRemoteMediaId(dp, n).note)
+		return await Promise.all(
+			notesAndStuff
+				.map(([, note]) => {
+					const remoteIds = objKeys(note.remotes)
+						.map((remoteNook) => {
+							if (nook != null && remoteNook !== nook) return null
+							const rt =
+								remoteTemplates.find(
+									(rt) =>
+										rt.localId === note.templateId && remoteNook === rt.nook,
+								) ??
+								C.toastImpossible(
+									`No template found for id '${note.templateId}' with nook '${remoteNook}'.`,
+								)
+							return fromLDbId<RemoteTemplateId | null>(rt.remoteId)
+						})
+						.filter(notEmpty)
+					return domainToCreateRemote(note, remoteIds)
+				})
+				.map(
+					async (n) =>
+						await withLocalMediaIdByRemoteMediaId(dp, n).then((x) => x.note),
+				),
+		)
 	},
 	getNewNotesToUploadDom: async function (noteId?: NoteId) {
 		const remoteNotes = await ky
@@ -323,42 +328,47 @@ JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field
 			.selectAll()
 			.execute()
 		const notesAndStuff = await this.getEditedNotesToUploadDom(noteId)
-		return notesAndStuff
-			.map(([, note]) => {
-				const remotes = new Map(
-					objEntries(note.remotes)
-						.map(([remoteNook, remote]) => {
-							if (nook != null && remoteNook !== nook) return null
-							const rt =
-								remoteTemplates.find(
-									(rt) =>
-										rt.localId === note.templateId && remoteNook === rt.nook,
-								) ??
-								C.toastImpossible(
-									`No template found for id '${note.templateId}' with nook '${remoteNook}'.`,
-								)
-							return [
-								remote?.remoteNoteId ??
+		return await Promise.all(
+			notesAndStuff
+				.map(([, note]) => {
+					const remotes = new Map(
+						objEntries(note.remotes)
+							.map(([remoteNook, remote]) => {
+								if (nook != null && remoteNook !== nook) return null
+								const rt =
+									remoteTemplates.find(
+										(rt) =>
+											rt.localId === note.templateId && remoteNook === rt.nook,
+									) ??
 									C.toastImpossible(
-										`remoteNoteId for ${JSON.stringify({
-											nook: remoteNook,
-											noteId: note.id,
-										})} is null.`,
-									),
-								fromLDbId<RemoteTemplateId>(rt.remoteId) ??
-									C.toastImpossible(
-										`remoteId for ${JSON.stringify({
-											nook: remoteNook,
-											noteId: note.id,
-										})} is null.`,
-									),
-							] as const
-						})
-						.filter(notEmpty),
-				)
-				return domainToEditRemote(note, remotes)
-			})
-			.map((n) => withLocalMediaIdByRemoteMediaId(dp, n).note)
+										`No template found for id '${note.templateId}' with nook '${remoteNook}'.`,
+									)
+								return [
+									remote?.remoteNoteId ??
+										C.toastImpossible(
+											`remoteNoteId for ${JSON.stringify({
+												nook: remoteNook,
+												noteId: note.id,
+											})} is null.`,
+										),
+									fromLDbId<RemoteTemplateId>(rt.remoteId) ??
+										C.toastImpossible(
+											`remoteId for ${JSON.stringify({
+												nook: remoteNook,
+												noteId: note.id,
+											})} is null.`,
+										),
+								] as const
+							})
+							.filter(notEmpty),
+					)
+					return domainToEditRemote(note, remotes)
+				})
+				.map(
+					async (n) =>
+						await withLocalMediaIdByRemoteMediaId(dp, n).then((x) => x.note),
+				),
+		)
 	},
 	getEditedNotesToUploadDom: async function (noteId?: NoteId) {
 		const remoteNotes = await ky
@@ -434,7 +444,16 @@ JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field
 				C.toastImpossible(
 					`mediaBinaries is missing '${m.localMediaId}'... how?`,
 				)
-			value.ids.push([fromLDbId(m.localEntityId), fromLDbId(remoteId), m.i])
+			const remoteMediaId =
+				m.i ??
+				C.toastImpossible(
+					`remoteMedia with localMediaId '${m.localMediaId}' is missing remoteMediaId`, // this should've been set in the syncing step
+				)
+			value.ids.push([
+				fromLDbId(m.localEntityId),
+				fromLDbId(remoteId),
+				remoteMediaId,
+			])
 		}
 		return media
 	},
@@ -444,7 +463,7 @@ JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field
 			{ localId: RemoteNote['localId'] }
 		> & { note: Note },
 	) {
-		const { remoteMediaIdByLocal } = withLocalMediaIdByRemoteMediaId(
+		const { remoteMediaIdByLocal } = await withLocalMediaIdByRemoteMediaId(
 			new DOMParser(),
 			domainToCreateRemote(remoteNote.note, [
 				/* this doesn't need any real values */
@@ -476,10 +495,9 @@ JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field
 					.insertInto('remoteMedia')
 					.values(
 						Array.from(remoteMediaIdByLocal).map(
-							([localMediaId, i]) =>
+							([localMediaId]) =>
 								({
 									localEntityId: remoteNote.localId,
-									i,
 									localMediaId,
 								}) satisfies InsertObject<DB, 'remoteMedia'>,
 						),
@@ -559,12 +577,12 @@ JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field
 	},
 }
 
-function withLocalMediaIdByRemoteMediaId<
+async function withLocalMediaIdByRemoteMediaId<
 	T extends CreateRemoteNote | EditRemoteNote,
 >(dp: DOMParser, note: T) {
 	const fieldValues: Record<string, string> = {} satisfies T['fieldValues']
 	const { docs, remoteMediaIdByLocal } =
-		updateLocalMediaIdByRemoteMediaIdAndGetNewDoc(
+		await updateLocalMediaIdByRemoteMediaIdAndGetNewDoc(
 			dp,
 			objValues(note.fieldValues),
 		)

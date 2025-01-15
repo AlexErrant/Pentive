@@ -123,8 +123,8 @@ export interface Plugin {
 
 export interface RemoteMedia {
 	localEntityId: LDbId
-	i: RemoteMediaNum
 	localMediaId: MediaId
+	i: RemoteMediaNum | null
 	uploadDate: number | null
 }
 
