@@ -49,7 +49,7 @@ app
 	})
 	.use('/trpc/*', async (c) => {
 		const user = await getUserId(c)
-		setKysely(c.env.tursoDbUrl, c.env.tursoAuthToken)
+		setKysely(c.env.tursoDbUrl, c.env.tursoAuthToken, c.env.publicMediaSecret)
 		return await fetchRequestHandler({
 			endpoint: '/trpc',
 			req: c.req.raw,
@@ -59,7 +59,7 @@ app
 	})
 	.get('/', (c) => c.text('Hono!!'))
 	.get('/i/:mediaId', async (c) => {
-		setKysely(c.env.tursoDbUrl, c.env.tursoAuthToken)
+		setKysely(c.env.tursoDbUrl, c.env.tursoAuthToken, c.env.publicMediaSecret)
 		const mediaId = c.req.param('mediaId') as MediaId
 		const mediaHash = await lookupMediaHash(mediaId)
 		if (mediaHash == null) return await c.notFound()

@@ -6,8 +6,8 @@ import { hstsName, hstsValue } from 'shared/headers'
 export default createMiddleware({
 	onRequest: [
 		(event) => {
-			const { tursoDbUrl, tursoAuthToken } = env(event)
-			setKysely(tursoDbUrl, tursoAuthToken)
+			const { tursoDbUrl, tursoAuthToken, publicMediaSecret } = env(event)
+			setKysely(tursoDbUrl, tursoAuthToken, publicMediaSecret)
 		},
 	],
 	onBeforeResponse: [

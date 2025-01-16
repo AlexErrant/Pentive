@@ -1,35 +1,51 @@
-import { Brand, type Base64Url } from 'shared/brand'
-import { throwExp } from 'shared/utility'
+import { type Brand, type Base64Url, type Base64 } from 'shared/brand'
+import { concat } from 'shared/utility'
+import { base64 } from '@scure/base'
+import {
+	decodeBase64,
+	decodeBase64Url,
+	encodeBase64Url,
+} from 'hono/utils/encode'
 
 /*
 
-`token` is `entityId` + `i`.
+Lifecycle of img src in `<img src="my-file.jpg">`
 
-         token
- __________/\__________
-/                      \
-EqbOG7eOQ8edDQAAiBlWPA11
-\_________  _________/\/
-          \/           i
-       entityId
+app persisted = user-provided-filename.jpg
+upload to cwa = imgPlaceholder<then>imgHash.jpg
+ivy persisted = imgHmac.jpg
+                where imgHmac = remoteEntityId + imgHash
 
 */
 
-export function parsePublicToken(token: string): [Base64Url, number] {
-	const entityId = token.substring(0, 22) as Base64Url
-	// `token.substring(22)` yields values like `0.svg`
-	// This works with parseInt because
-	//   "If parseInt encounters a character that is not a numeral in the specified radix,
-	//    it ignores it and all succeeding characters and returns the integer value parsed up to that point."
-	//   https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/parseInt
-	const i = parseInt(token.substring(22), 10)
-	if (isNaN(i)) {
-		throwExp(`${i} is not a number.`)
-	}
-	return [entityId, i]
+export async function buildPublicToken(
+	entityId: Base64Url,
+	mediaHash: Base64,
+	publicMediaSecretBase64: PublicMediaSecretBase64,
+) {
+	const data = concat(decodeBase64Url(entityId), decodeBase64(mediaHash))
+	const key = await getPublicMediaKey(publicMediaSecretBase64)
+	const hmac = await crypto.subtle.sign('HMAC', key, data)
+	return encodeBase64Url(hmac) as Base64Url
 }
 
 export type PublicMediaSecretBase64 = Brand<
 	string,
 	'PublicMediaSecretBase64' | 'base64'
 >
+
+let maybePublicMediaKey: CryptoKey | null = null
+async function getPublicMediaKey(
+	publicMediaSecretBase64: PublicMediaSecretBase64,
+): Promise<CryptoKey> {
+	if (maybePublicMediaKey == null) {
+		maybePublicMediaKey = await crypto.subtle.importKey(
+			'raw',
+			base64.decode(publicMediaSecretBase64),
+			{ name: 'HMAC', hash: 'SHA-256' },
+			false,
+			['sign', 'verify'],
+		)
+	}
+	return maybePublicMediaKey
+}

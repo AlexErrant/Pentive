@@ -28,7 +28,7 @@ import {
 	type MediaId,
 } from 'shared/brand'
 import { ftsNormalize } from 'shared/htmlToText'
-import { imgPlaceholder, relativeChar } from 'shared/image'
+import { imgPlaceholder } from 'shared/image'
 import {
 	type RemoteTemplate,
 	type RemoteNote,
@@ -49,12 +49,20 @@ import { binary16fromBase64URL, ulidAsHex, ulidAsRaw } from './convertBinary'
 import { base16, base64, base64url } from '@scure/base'
 import { createClient } from '@libsql/client/web'
 import { base64ToArray } from './utility'
+import { buildPublicToken, type PublicMediaSecretBase64 } from './publicToken'
 export type * from 'kysely'
 
 // @ts-expect-error db calls should throw null error if not setup
 export let db: Kysely<DB> = null as Kysely<DB>
+export let publicMediaSecretBase64: PublicMediaSecretBase64 =
+	// @ts-expect-error references should throw null error if not setup
+	null as PublicMediaSecretBase64
 
-export function setKysely(url: string, authToken: string): void {
+export function setKysely(
+	url: string,
+	authToken: string,
+	publicMediaSecret: PublicMediaSecretBase64,
+): void {
 	if (db == null) {
 		db = new Kysely<DB>({
 			dialect: new LibsqlDialect({
@@ -64,6 +72,7 @@ export function setKysely(url: string, authToken: string): void {
 				}),
 			}),
 		})
+		publicMediaSecretBase64 = publicMediaSecret
 	}
 }
 
@@ -772,15 +781,25 @@ export async function insertNotes(authorId: UserId, notes: CreateRemoteNote[]) {
 		.execute()
 	if (templates.length !== rtIds.length)
 		throwExp('You have an invalid RemoteTemplateId.')
-	const noteCreatesAndIds = notes.flatMap((n) => {
-		const ncs = toNoteCreates(n, authorId)
-		return ncs.map(({ noteCreate, remoteIdBase64url, remoteTemplateId }) => {
-			const t =
-				templates.find((t) => dbIdToBase64Url(t.id) === remoteTemplateId) ??
-				throwExp()
-			return [noteCreate, [[n.localId, t.nook], remoteIdBase64url]] as const
-		})
-	})
+	const noteCreatesAndIds = (
+		await Promise.all(
+			notes.map(async (n) => {
+				const ncs = await toNoteCreates(n, authorId)
+				return ncs.map(
+					({ noteCreate, remoteIdBase64url, remoteTemplateId }) => {
+						const t =
+							templates.find(
+								(t) => dbIdToBase64Url(t.id) === remoteTemplateId,
+							) ?? throwExp()
+						return [
+							noteCreate,
+							[[n.localId, t.nook], remoteIdBase64url],
+						] as const
+					},
+				)
+			}),
+		)
+	).flatMap((x) => x)
 	const noteCreates = noteCreatesAndIds.map((x) => x[0])
 	await db.insertInto('note').values(noteCreates).execute()
 	const remoteIdByLocal = new Map(noteCreatesAndIds.map((x) => x[1]))
@@ -791,15 +810,19 @@ export async function insertTemplates(
 	authorId: UserId,
 	templates: CreateRemoteTemplate[],
 ) {
-	const templateCreatesAndIds = templates.flatMap((n) => {
-		const tcs = toTemplateCreates(n, authorId)
-		return tcs.map(({ templateCreate, remoteIdBase64url }) => {
-			return [
-				templateCreate,
-				[[n.localId, templateCreate.nook], remoteIdBase64url],
-			] as const
-		})
-	})
+	const templateCreatesAndIds = (
+		await Promise.all(
+			templates.map(async (n) => {
+				const tcs = await toTemplateCreates(n, authorId)
+				return tcs.map(({ templateCreate, remoteIdBase64url }) => {
+					return [
+						templateCreate,
+						[[n.localId, templateCreate.nook], remoteIdBase64url],
+					] as const
+				})
+			}),
+		)
+	).flatMap((x) => x)
 	const templateCreates = templateCreatesAndIds.map((x) => x[0])
 	const subscriptions = templateCreates.map((t) => ({
 		templateId: t.id as DbId,
@@ -886,7 +909,10 @@ export async function subscribeToNote(userId: UserId, noteId: RemoteNoteId) {
 	)
 }
 
-function toNoteCreates(n: EditRemoteNote | CreateRemoteNote, authorId: UserId) {
+async function toNoteCreates(
+	n: EditRemoteNote | CreateRemoteNote,
+	authorId: UserId,
+) {
 	const remoteIds =
 		'remoteIds' in n
 			? new Map(
@@ -896,10 +922,12 @@ function toNoteCreates(n: EditRemoteNote | CreateRemoteNote, authorId: UserId) {
 					]),
 				)
 			: new Map(n.remoteTemplateIds.map((rt) => [ulidAsRaw(), rt]))
-	return Array.from(remoteIds).map((x) => toNoteCreate(x, n, authorId))
+	return await Promise.all(
+		Array.from(remoteIds).map(async (x) => await toNoteCreate(x, n, authorId)),
+	)
 }
 
-function toNoteCreate(
+async function toNoteCreate(
 	[remoteNoteId, remoteTemplateId]: [Uint8Array, RemoteTemplateId],
 	n: EditRemoteNote | CreateRemoteNote,
 	authorId: UserId,
@@ -910,7 +938,7 @@ function toNoteCreate(
 		.encode(remoteNoteId)
 		.substring(0, 22) as RemoteNoteId
 	for (const [field, value] of objEntries(n.fieldValues)) {
-		n.fieldValues[field] = replaceImgSrcs(value, remoteIdBase64url)
+		n.fieldValues[field] = await replaceImgSrcs(value, remoteIdBase64url)
 	}
 	const noteCreate: InsertObject<DB, 'note'> = {
 		id: unhex(remoteIdHex),
@@ -928,11 +956,32 @@ function toNoteCreate(
 	return { noteCreate, remoteIdBase64url, remoteTemplateId }
 }
 
-function replaceImgSrcs(value: string, remoteIdBase64url: string) {
-	return value.replaceAll(imgPlaceholder, relativeChar + remoteIdBase64url)
+// https://stackoverflow.com/a/73891404
+async function replaceAsync(
+	string: string,
+	regexp: RegExp,
+	replacerFunction: (_: RegExpExecArray) => Promise<string>,
+) {
+	const replacements = await Promise.all(
+		Array.from(string.matchAll(regexp), replacerFunction),
+	)
+	let i = 0
+	return string.replace(regexp, () => replacements[i++]!)
 }
 
-function toTemplateCreates(
+const imgRegex = new RegExp(`${imgPlaceholder}(.{44})`, 'g')
+async function replaceImgSrcs(value: string, remoteIdBase64url: Base64Url) {
+	return await replaceAsync(value, imgRegex, async (array) => {
+		const mediaHash = array[1] as Base64
+		return await buildPublicToken(
+			remoteIdBase64url,
+			mediaHash,
+			publicMediaSecretBase64,
+		)
+	})
+}
+
+async function toTemplateCreates(
 	n: EditRemoteTemplate | CreateRemoteTemplate,
 	authorId: UserId, // highTODO update History. Could History be a compressed column instead of its own table?
 ) {
@@ -943,10 +992,12 @@ function toTemplateCreates(
 						[base64url.decode(id + '=='), 'undefined_nook' as NookId] as const,
 				)
 			: n.nooks.map((nook) => [ulidAsRaw(), nook] as const)
-	return remoteIds.map(([id, nook]) => toTemplateCreate(n, id, nook))
+	return await Promise.all(
+		remoteIds.map(async ([id, nook]) => await toTemplateCreate(n, id, nook)),
+	)
 }
 
-function toTemplateCreate(
+async function toTemplateCreate(
 	n: EditRemoteTemplate | CreateRemoteTemplate,
 	remoteId: Uint8Array,
 	nook: NookId,
@@ -958,15 +1009,15 @@ function toTemplateCreate(
 		.substring(0, 22) as RemoteTemplateId
 	if (n.templateType.tag === 'standard') {
 		for (const t of n.templateType.templates) {
-			t.front = replaceImgSrcs(t.front, remoteIdBase64url)
-			t.back = replaceImgSrcs(t.back, remoteIdBase64url)
+			t.front = await replaceImgSrcs(t.front, remoteIdBase64url)
+			t.back = await replaceImgSrcs(t.back, remoteIdBase64url)
 		}
 	} else {
-		n.templateType.template.front = replaceImgSrcs(
+		n.templateType.template.front = await replaceImgSrcs(
 			n.templateType.template.front,
 			remoteIdBase64url,
 		)
-		n.templateType.template.back = replaceImgSrcs(
+		n.templateType.template.back = await replaceImgSrcs(
 			n.templateType.template.back,
 			remoteIdBase64url,
 		)
@@ -1059,10 +1110,12 @@ export async function editNotes(authorId: UserId, notes: EditRemoteNote[]) {
 		.executeTakeFirstOrThrow()
 	if (count.c !== notes.length)
 		throwExp("At least one of these notes doesn't exist.")
-	const noteCreates = notes.map((n) => {
-		const tcs = toNoteCreates(n, authorId)
-		return tcs.map((tc) => tc.noteCreate)
-	})
+	const noteCreates = await Promise.all(
+		notes.map(async (n) => {
+			const tcs = await toNoteCreates(n, authorId)
+			return tcs.map((tc) => tc.noteCreate)
+		}),
+	)
 	// insert into `Note` (`id`, `templateId`, `authorId`, `fieldValues`, `fts`, `tags`)
 	// values (UNHEX(?), FROM_BASE64(?), ?, ?, ?, ?)
 	// on duplicate key update `templateId` = values(`templateId`), `edited` = values(`edited`), `authorId` = values(`authorId`), `fieldValues` = values(`fieldValues`), `fts` = values(`fts`), `tags` = values(`tags`), `ankiId` = values(`ankiId`)
@@ -1097,10 +1150,12 @@ export async function editTemplates(
 		.executeTakeFirstOrThrow()
 	if (count.c !== editTemplateIds.length)
 		throwExp("At least one of these templates doesn't exist.")
-	const templateCreates = templates.map((n) => {
-		const tcs = toTemplateCreates(n, authorId)
-		return tcs.map((tc) => tc.templateCreate)
-	})
+	const templateCreates = await Promise.all(
+		templates.map(async (n) => {
+			const tcs = await toTemplateCreates(n, authorId)
+			return tcs.map((tc) => tc.templateCreate)
+		}),
+	)
 	await db
 		.insertInto('template')
 		.values(templateCreates.flat())

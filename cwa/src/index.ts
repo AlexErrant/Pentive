@@ -65,7 +65,7 @@ app
 	})
 	.use('/trpc/*', async (c) => {
 		const user = await getUserId(c)
-		setKysely(c.env.tursoDbUrl, c.env.tursoAuthToken)
+		setKysely(c.env.tursoDbUrl, c.env.tursoAuthToken, c.env.publicMediaSecret)
 		return await fetchRequestHandler({
 			endpoint: '/trpc',
 			req: c.req.raw,
@@ -178,7 +178,7 @@ async function postPublicMedia(
 	const authResult = await getUserId(c)
 	if (authResult.tag === 'Error') return c.text(authResult.error, 401)
 	const userId = authResult.ok
-	setKysely(c.env.tursoDbUrl, c.env.tursoAuthToken)
+	setKysely(c.env.tursoDbUrl, c.env.tursoAuthToken, c.env.publicMediaSecret)
 	const persistDbAndBucket = async ({
 		mediaHash,
 		readable,
