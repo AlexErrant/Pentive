@@ -1,21 +1,30 @@
-import { type Base64Url, type LDbId, type RemoteMediaNum } from 'shared/brand'
+import {
+	type TemplateId,
+	type NoteId,
+	type RemoteNoteId,
+	type RemoteTemplateId,
+	type LDbId,
+	type RemoteMediaId,
+} from 'shared/brand'
 import { C, ky } from '../topLevelAwait'
 
 export const remoteMediaCollectionMethods = {
 	updateUploadDate: async function (
-		ids: Array<[Base64Url, unknown, RemoteMediaNum]>,
+		ids: Array<
+			[NoteId | TemplateId, RemoteNoteId | RemoteTemplateId, RemoteMediaId]
+		>,
 	) {
-		for (const [localEntityId, , i] of ids) {
+		for (const [localEntityId, , remoteMediaId] of ids) {
 			const r = await ky
 				.updateTable('remoteMedia')
 				.set({ uploadDate: C.getDate().getTime() })
 				.where('localEntityId', '=', localEntityId as LDbId)
-				.where('i', '=', i)
+				.where('remoteMediaId', '=', remoteMediaId)
 				.returningAll()
 				.execute()
 			if (r.length !== 1)
 				C.toastFatal(
-					`No remoteMedia found for localEntityId '${localEntityId}' with i ${i}.`,
+					`No remoteMedia found for localEntityId '${localEntityId}' with remoteId '${remoteMediaId}'.`,
 				)
 		}
 	},

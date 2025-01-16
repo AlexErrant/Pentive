@@ -17,7 +17,7 @@ import {
 	type TemplateId,
 	type RemoteTemplateId,
 	type MediaId,
-	type RemoteMediaNum,
+	type RemoteMediaId,
 	fromLDbId,
 	toLDbId,
 } from 'shared/brand'
@@ -281,7 +281,7 @@ export const templateCollectionMethods = {
 				'remoteMedia.localMediaId',
 				'media.data',
 				'remoteMedia.localEntityId',
-				'remoteMedia.i',
+				'remoteMedia.remoteMediaId',
 				'remoteTemplate.remoteId',
 			])
 			.where(({ eb, or, ref }) =>
@@ -298,7 +298,7 @@ export const templateCollectionMethods = {
 			MediaId,
 			{
 				data: ArrayBuffer
-				ids: Array<[TemplateId, RemoteTemplateId, RemoteMediaNum]>
+				ids: Array<[TemplateId, RemoteTemplateId, RemoteMediaId]>
 			}
 		>(
 			mediaBinaries.map(({ localMediaId, data }) => [
@@ -318,7 +318,7 @@ export const templateCollectionMethods = {
 					`mediaBinaries is missing '${m.localMediaId}'... how?`,
 				)
 			const remoteMediaId =
-				m.i ??
+				m.remoteMediaId ??
 				C.toastImpossible(
 					`remoteMedia with localMediaId '${m.localMediaId}' is missing remoteMediaId`, // this should've been set in the syncing step
 				)
@@ -367,7 +367,7 @@ export const templateCollectionMethods = {
 			await db
 				.deleteFrom('remoteMedia')
 				.where('localEntityId', '=', templateDbId)
-				.where('i', '>', srcs.size as RemoteMediaNum)
+				.where('localMediaId', 'in', Array.from(srcs))
 				.execute()
 			if (hashByLocal.size !== 0) {
 				await db

@@ -43,7 +43,7 @@ export const userSettingId = '' as const // if this changes, also update 5A7C82E
 export type UserSettingId = typeof userSettingId
 export type CardSettingId = Brand<string, 'cardSettingId'>
 
-export type RemoteMediaNum = Brand<number, 'remoteMediaNum'>
+export type RemoteMediaId = Brand<string, 'RemoteMediaId'>
 
 export type PeerJsId = Brand<string, 'peerJsId'> // in uuid format
 export type PeerDisplayName = Brand<string, 'peerDisplayName'>

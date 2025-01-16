@@ -84,7 +84,7 @@ CREATE TABLE IF NOT EXISTS media (
 CREATE TABLE IF NOT EXISTS remoteMedia (
   localEntityId TEXT, -- make BLOB upon SQLite v3.41 and the landing of UNHEX https://sqlite.org/forum/forumpost/30cca4e613d2fa2a grep F235B7FB-8CEA-4AE2-99CC-2790E607B1EB
   localMediaId TEXT, -- should stay TEXT!
-  i INTEGER,
+  remoteMediaId TEXT,
   uploadDate INTEGER,
   PRIMARY KEY (localEntityId, localMediaId)
 ) STRICT;

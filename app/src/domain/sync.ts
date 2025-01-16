@@ -1,7 +1,8 @@
 import {
 	type MediaId,
-	type Base64Url,
-	type RemoteMediaNum,
+	type RemoteNoteId,
+	type RemoteTemplateId,
+	type RemoteMediaId,
 	type TemplateId,
 	type NookId,
 	type NoteId,
@@ -13,19 +14,18 @@ import { cwaClient } from '../trpcClient'
 export async function postMedia(
 	type: 'note' | 'template',
 	mediaId: MediaId,
-	ids: Array<[Base64Url, Base64Url, RemoteMediaNum]>, // localId, remoteId, i
+	ids: Array<
+		[NoteId | TemplateId, RemoteNoteId | RemoteTemplateId, RemoteMediaId]
+	>,
 	data: ArrayBuffer,
 ): Promise<void> {
-	const remoteEntityIdAndRemoteMediaNum = ids.map(
-		([, remoteEntityId, remoteMediaNum]) => [
-			remoteEntityId,
-			remoteMediaNum.toString(),
-		],
+	const remoteEntityIdAndRemoteMediaId = ids.map(
+		([, remoteEntityId, remoteMediaId]) => [remoteEntityId, remoteMediaId],
 	)
 	const response = await fetch(
 		import.meta.env.VITE_CWA_URL +
 			`media/${type}?` +
-			new URLSearchParams(remoteEntityIdAndRemoteMediaNum).toString(),
+			new URLSearchParams(remoteEntityIdAndRemoteMediaId).toString(),
 		{
 			method: 'POST',
 			body: data,

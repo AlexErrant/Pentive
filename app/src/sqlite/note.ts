@@ -26,7 +26,7 @@ import {
 	type RemoteNoteId,
 	type NoteId,
 	type MediaId,
-	type RemoteMediaNum,
+	type RemoteMediaId,
 	type NookId,
 	toLDbId,
 	fromLDbId,
@@ -405,7 +405,7 @@ JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field
 				'remoteMedia.localMediaId',
 				'media.data',
 				'remoteMedia.localEntityId',
-				'remoteMedia.i',
+				'remoteMedia.remoteMediaId',
 				'remoteNote.remoteId',
 			])
 			.where(({ eb, ref, or }) =>
@@ -420,7 +420,7 @@ JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field
 			.execute()
 		const media = new Map<
 			MediaId,
-			{ data: ArrayBuffer; ids: Array<[NoteId, RemoteNoteId, RemoteMediaNum]> }
+			{ data: ArrayBuffer; ids: Array<[NoteId, RemoteNoteId, RemoteMediaId]> }
 		>(
 			mediaBinaries.map(({ localMediaId, data }) => [
 				localMediaId,
@@ -439,7 +439,7 @@ JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field
 					`mediaBinaries is missing '${m.localMediaId}'... how?`,
 				)
 			const remoteMediaId =
-				m.i ??
+				m.remoteMediaId ??
 				C.toastImpossible(
 					`remoteMedia with localMediaId '${m.localMediaId}' is missing remoteMediaId`, // this should've been set in the syncing step
 				)
@@ -482,7 +482,7 @@ JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field
 			await db
 				.deleteFrom('remoteMedia')
 				.where('localEntityId', '=', remoteNote.localId)
-				.where('i', '>', srcs.size as RemoteMediaNum)
+				.where('localMediaId', 'in', Array.from(srcs))
 				.execute()
 			if (hashByLocal.size !== 0) {
 				await db

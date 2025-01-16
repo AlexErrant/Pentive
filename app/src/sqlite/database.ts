@@ -5,7 +5,7 @@ import {
 	type LDbId,
 	type NookId,
 	type Ord,
-	type RemoteMediaNum,
+	type RemoteMediaId,
 	type PluginName,
 	type PluginVersion,
 } from 'shared/brand'
@@ -124,7 +124,7 @@ export interface Plugin {
 export interface RemoteMedia {
 	localEntityId: LDbId
 	localMediaId: MediaId
-	i: RemoteMediaNum | null
+	remoteMediaId: RemoteMediaId | null
 	uploadDate: number | null
 }
 
