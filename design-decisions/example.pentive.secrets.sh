@@ -10,8 +10,8 @@ export productionTursoAuthToken=
 # the following secrets may be generated as follows:
 #     openssl rand -base64 32 | head -c -1 | pbcopy
 # this generates 32 bits of random data in base64, cuts off the new line character, and adds it to the clipboard
-export developmentMediaTokenSecret=
-export productionMediaTokenSecret=
+export developmentPrivateMediaSecret=
+export productionPrivateMediaSecret=
 export developmentHubSessionSecret=
 export productionHubSessionSecret=
 export developmentCsrfSecret=

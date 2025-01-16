@@ -3,9 +3,9 @@ import { type Brand, type MediaHash, type Base64Url } from 'shared/brand'
 import { concatAB, concat } from 'shared/utility'
 
 export type UserId = Brand<string, 'userId'>
-export type MediaTokenSecretBase64 = Brand<
+export type PrivateMediaSecretBase64 = Brand<
 	string,
-	'mediaTokenSecretBase64' | 'base64'
+	'PrivateMediaSecretBase64' | 'base64'
 >
 
 /*
@@ -36,11 +36,11 @@ export type MediaTokenSecretBase64 = Brand<
 */
 
 export async function buildPrivateToken(
-	mediaTokenSecret: MediaTokenSecretBase64,
+	privateMediaSecret: PrivateMediaSecretBase64,
 	mediaHash: MediaHash,
 	userId: UserId,
 ): Promise<Base64Url> {
-	const signature = await signMessage(mediaTokenSecret, mediaHash, userId)
+	const signature = await signMessage(privateMediaSecret, mediaHash, userId)
 	const token = concatAB(mediaHash, signature)
 	return base64url.encode(token) as Base64Url
 }
@@ -53,12 +53,12 @@ function parseToken(token: ArrayBuffer): [MediaHash, ArrayBuffer] {
 
 let maybeTokenKey: CryptoKey | null = null
 async function getTokenKey(
-	mediaTokenSecret: MediaTokenSecretBase64,
+	privateMediaSecret: PrivateMediaSecretBase64,
 ): Promise<CryptoKey> {
 	if (maybeTokenKey == null) {
 		maybeTokenKey = await crypto.subtle.importKey(
 			'raw',
-			base64.decode(mediaTokenSecret),
+			base64.decode(privateMediaSecret),
 			{ name: 'HMAC', hash: 'SHA-256' },
 			false,
 			['sign', 'verify'],
@@ -73,22 +73,22 @@ function buildMessage(userId: UserId, mediaHash: MediaHash): ArrayBuffer {
 }
 
 async function signMessage(
-	mediaTokenSecret: MediaTokenSecretBase64,
+	privateMediaSecret: PrivateMediaSecretBase64,
 	mediaHash: MediaHash,
 	userId: UserId,
 ): Promise<ArrayBuffer> {
-	const tokenKey = await getTokenKey(mediaTokenSecret)
+	const tokenKey = await getTokenKey(privateMediaSecret)
 	const message = buildMessage(userId, mediaHash)
 	return await crypto.subtle.sign('HMAC', tokenKey, message)
 }
 
 export async function getMediaHash(
-	mediaTokenSecret: MediaTokenSecretBase64,
+	privateMediaSecret: PrivateMediaSecretBase64,
 	userId: UserId,
 	token: ArrayBuffer,
 ): Promise<MediaHash | null> {
 	const [mediaHash, signature] = parseToken(token)
-	const tokenKey = await getTokenKey(mediaTokenSecret)
+	const tokenKey = await getTokenKey(privateMediaSecret)
 	const message = buildMessage(userId, mediaHash)
 	const isValid = await crypto.subtle.verify(
 		'HMAC',

@@ -70,7 +70,7 @@ app
 //   if (authResult.tag === "Error") return authResult.error
 //   const userId = authResult.ok
 //   const mediaHash = await getMediaHash(
-//     c.env.mediaTokenSecret,
+//     c.env.privateMediaSecret,
 //     userId,
 //     base64url.decode(c.req.param("token"))
 //   )
