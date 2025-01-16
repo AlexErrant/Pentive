@@ -9,10 +9,7 @@ import {
 	type InsertObject,
 	type OnConflictTables,
 } from 'kysely'
-import {
-	templateEntityToDomain,
-	updateLocalMediaIdByRemoteMediaIdAndGetNewDoc,
-} from './util'
+import { templateEntityToDomain, remotifyDoms } from './util'
 import { tx, C, ky } from '../topLevelAwait'
 import { type Template } from 'shared/domain/template'
 import {
@@ -229,10 +226,7 @@ export const templateCollectionMethods = {
 			templatesAndStuff
 				.map((n) => domainToCreateRemote(n, nook))
 				.map(
-					async (n) =>
-						await withLocalMediaIdByRemoteMediaId(dp, n).then(
-							(x) => x.template,
-						),
+					async (n) => await remotifyTemplate(dp, n).then((x) => x.template),
 				),
 		)
 	},
@@ -260,10 +254,7 @@ export const templateCollectionMethods = {
 			templatesAndStuff
 				.map((n) => domainToEditRemote(n, nook))
 				.map(
-					async (n) =>
-						await withLocalMediaIdByRemoteMediaId(dp, n).then(
-							(x) => x.template,
-						),
+					async (n) => await remotifyTemplate(dp, n).then((x) => x.template),
 				),
 		)
 	},
@@ -361,11 +352,11 @@ export const templateCollectionMethods = {
 				.selectAll()
 				.where('id', '=', templateDbId)
 				.executeTakeFirstOrThrow()
-			const { remoteMediaIdByLocal } = await withLocalMediaIdByRemoteMediaId(
+			const { hashByLocal } = await remotifyTemplate(
 				new DOMParser(),
 				domainToCreateRemote(toTemplate([{ ...template, ...remoteTemplate }])!),
 			)
-			const srcs = new Set(remoteMediaIdByLocal.keys())
+			const srcs = new Set(hashByLocal.keys())
 			const mediaBinaries = await db
 				.selectFrom('media')
 				.select(['id', 'data'])
@@ -378,11 +369,11 @@ export const templateCollectionMethods = {
 				.where('localEntityId', '=', templateDbId)
 				.where('i', '>', srcs.size as RemoteMediaNum)
 				.execute()
-			if (remoteMediaIdByLocal.size !== 0) {
+			if (hashByLocal.size !== 0) {
 				await db
 					.insertInto('remoteMedia')
 					.values(
-						Array.from(remoteMediaIdByLocal).map(([localMediaId]) => ({
+						Array.from(hashByLocal).map(([localMediaId]) => ({
 							localEntityId: templateDbId,
 							localMediaId,
 						})),
@@ -491,7 +482,7 @@ function toTemplate(allTemplates: TemplateRow[]) {
 	return r.length === 0 ? null : r[0]
 }
 
-async function withLocalMediaIdByRemoteMediaId<
+async function remotifyTemplate<
 	T extends CreateRemoteTemplate | EditRemoteTemplate,
 >(dp: DOMParser, template: T) {
 	const serializer = new XMLSerializer()
@@ -508,8 +499,7 @@ async function withLocalMediaIdByRemoteMediaId<
 			t.front,
 			t.back,
 		])
-		const { docs, remoteMediaIdByLocal } =
-			await updateLocalMediaIdByRemoteMediaIdAndGetNewDoc(dp, rawDoms)
+		const { docs, hashByLocal } = await remotifyDoms(dp, rawDoms)
 		let i = 0
 		for (const t of template.templateType.templates) {
 			t.front = serialize(docs[i]!)
@@ -519,19 +509,18 @@ async function withLocalMediaIdByRemoteMediaId<
 		}
 		return {
 			template,
-			remoteMediaIdByLocal,
+			hashByLocal,
 		}
 	} else {
-		const { docs, remoteMediaIdByLocal } =
-			await updateLocalMediaIdByRemoteMediaIdAndGetNewDoc(dp, [
-				template.templateType.template.front,
-				template.templateType.template.back,
-			])
+		const { docs, hashByLocal } = await remotifyDoms(dp, [
+			template.templateType.template.front,
+			template.templateType.template.back,
+		])
 		template.templateType.template.front = serialize(docs[0]!)
 		template.templateType.template.back = serialize(docs[1]!)
 		return {
 			template,
-			remoteMediaIdByLocal,
+			hashByLocal,
 		}
 	}
 }

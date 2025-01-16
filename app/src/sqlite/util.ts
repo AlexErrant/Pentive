@@ -22,10 +22,7 @@ export function parseTags(rawTags: string) {
 	return parseSet<string>(rawTags)
 }
 
-export async function updateLocalMediaIdByRemoteMediaIdAndGetNewDoc(
-	dp: DOMParser,
-	rawDoms: string[],
-) {
+export async function remotifyDoms(dp: DOMParser, rawDoms: string[]) {
 	const docs = rawDoms.map((rawDom) => dp.parseFromString(rawDom, 'text/html'))
 	const imgSrcs = new Set(
 		docs
@@ -33,7 +30,7 @@ export async function updateLocalMediaIdByRemoteMediaIdAndGetNewDoc(
 			.map((i) => i.getAttribute('src'))
 			.filter((i) => i !== '' && i != null),
 	)
-	const remoteMediaIdByLocal = new Map(
+	const hashByLocal = new Map(
 		await Promise.all(
 			Array.from(imgSrcs.values())
 				.filter(notEmpty)
@@ -53,11 +50,9 @@ export async function updateLocalMediaIdByRemoteMediaIdAndGetNewDoc(
 			const src = image.getAttribute('src') as MediaId
 			if (src != null) {
 				const hash =
-					remoteMediaIdByLocal.get(src) ??
+					hashByLocal.get(src) ??
 					C.toastImpossible(
-						`${src} not found in ${JSON.stringify(
-							Array.from(remoteMediaIdByLocal),
-						)}`,
+						`${src} not found in ${JSON.stringify(Array.from(hashByLocal))}`,
 					)
 				const extension = src.substring(src.lastIndexOf('.'))
 				image.setAttribute('src', `${imgPlaceholder}${hash}${extension}`)
@@ -66,7 +61,7 @@ export async function updateLocalMediaIdByRemoteMediaIdAndGetNewDoc(
 	}
 	return {
 		docs,
-		remoteMediaIdByLocal,
+		hashByLocal,
 	}
 }
 

@@ -17,7 +17,7 @@ import {
 	getTemplate,
 	noteEntityToDomain,
 	templateSelection,
-	updateLocalMediaIdByRemoteMediaIdAndGetNewDoc,
+	remotifyDoms,
 } from './util'
 import { saveTags } from './tag'
 import { type Note } from 'shared/domain/note'
@@ -286,10 +286,7 @@ JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field
 						.filter(notEmpty)
 					return domainToCreateRemote(note, remoteIds)
 				})
-				.map(
-					async (n) =>
-						await withLocalMediaIdByRemoteMediaId(dp, n).then((x) => x.note),
-				),
+				.map(async (n) => await remotifyNote(dp, n).then((x) => x.note)),
 		)
 	},
 	getNewNotesToUploadDom: async function (noteId?: NoteId) {
@@ -364,10 +361,7 @@ JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field
 					)
 					return domainToEditRemote(note, remotes)
 				})
-				.map(
-					async (n) =>
-						await withLocalMediaIdByRemoteMediaId(dp, n).then((x) => x.note),
-				),
+				.map(async (n) => await remotifyNote(dp, n).then((x) => x.note)),
 		)
 	},
 	getEditedNotesToUploadDom: async function (noteId?: NoteId) {
@@ -463,7 +457,7 @@ JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field
 			{ localId: RemoteNote['localId'] }
 		> & { note: Note },
 	) {
-		const { remoteMediaIdByLocal } = await withLocalMediaIdByRemoteMediaId(
+		const { hashByLocal } = await remotifyNote(
 			new DOMParser(),
 			domainToCreateRemote(remoteNote.note, [
 				/* this doesn't need any real values */
@@ -477,7 +471,7 @@ JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field
 				.values(remoteNote)
 				.onConflict((db) => db.doNothing())
 				.execute()
-			const srcs = new Set(remoteMediaIdByLocal.keys())
+			const srcs = new Set(hashByLocal.keys())
 			const mediaBinaries = await db
 				.selectFrom('media')
 				.select(['id', 'data'])
@@ -490,11 +484,11 @@ JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field
 				.where('localEntityId', '=', remoteNote.localId)
 				.where('i', '>', srcs.size as RemoteMediaNum)
 				.execute()
-			if (remoteMediaIdByLocal.size !== 0) {
+			if (hashByLocal.size !== 0) {
 				await db
 					.insertInto('remoteMedia')
 					.values(
-						Array.from(remoteMediaIdByLocal).map(
+						Array.from(hashByLocal).map(
 							([localMediaId]) =>
 								({
 									localEntityId: remoteNote.localId,
@@ -577,15 +571,15 @@ JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field
 	},
 }
 
-async function withLocalMediaIdByRemoteMediaId<
-	T extends CreateRemoteNote | EditRemoteNote,
->(dp: DOMParser, note: T) {
+async function remotifyNote<T extends CreateRemoteNote | EditRemoteNote>(
+	dp: DOMParser,
+	note: T,
+) {
 	const fieldValues: Record<string, string> = {} satisfies T['fieldValues']
-	const { docs, remoteMediaIdByLocal } =
-		await updateLocalMediaIdByRemoteMediaIdAndGetNewDoc(
-			dp,
-			objValues(note.fieldValues),
-		)
+	const { docs, hashByLocal } = await remotifyDoms(
+		dp,
+		objValues(note.fieldValues),
+	)
 	let i = 0
 	for (const field of objKeys(note.fieldValues)) {
 		fieldValues[field] = docs[i]!.body.innerHTML
@@ -596,6 +590,6 @@ async function withLocalMediaIdByRemoteMediaId<
 			...note,
 			fieldValues,
 		},
-		remoteMediaIdByLocal,
+		hashByLocal,
 	}
 }
