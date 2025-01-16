@@ -1,5 +1,5 @@
-import { type Base64Url } from './brand'
-import { throwExp } from './utility'
+import { type Base64Url } from 'shared/brand'
+import { throwExp } from 'shared/utility'
 
 /*
 
