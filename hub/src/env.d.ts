@@ -5,6 +5,7 @@ import type {
 	Request as CfRequest,
 	ExecutionContext,
 } from '@cloudflare/workers-types'
+import { type PublicMediaSecretBase64 } from 'shared-edge'
 import { type Base64 } from 'shared/brand'
 
 export interface EnvVars {
@@ -20,6 +21,7 @@ export interface EnvVars {
 	oauthStateSecret: Base64
 	oauthCodeVerifierSecret: Base64
 	hubInfoSecret: Base64
+	publicMediaSecret: PublicMediaSecretBase64
 }
 
 declare global {

@@ -1,4 +1,4 @@
-import { type Base64Url } from 'shared/brand'
+import { Brand, type Base64Url } from 'shared/brand'
 import { throwExp } from 'shared/utility'
 
 /*
@@ -28,3 +28,8 @@ export function parsePublicToken(token: string): [Base64Url, number] {
 	}
 	return [entityId, i]
 }
+
+export type PublicMediaSecretBase64 = Brand<
+	string,
+	'PublicMediaSecretBase64' | 'base64'
+>

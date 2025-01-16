@@ -14,12 +14,14 @@ source ../PentiveSecrets/secrets.sh
 # echo $productionHubSessionSecret        | npx wrangler       secret put hubSessionSecret        --name cwa
 # echo $productionTursoDbUrl              | npx wrangler       secret put tursoDbUrl              --name cwa
 # echo $productionTursoAuthToken          | npx wrangler       secret put tursoAuthToken          --name cwa
+# echo $productionPublicMediaSecret       | npx wrangler       secret put publicMediaSecret       --name cwa
 # echo $productionPrivateMediaSecret      | npx wrangler       secret put privateMediaSecret      --name cwa
 # echo $productionPeerSyncPublicKey       | npx wrangler       secret put peerSyncPublicKey       --name cwa
 # echo $productionPeerSyncPrivateKey      | npx wrangler       secret put peerSyncPrivateKey      --name cwa
 # echo $productionTursoDbUrl              | npx wrangler       secret put tursoDbUrl              --name api-ugc
 # echo $productionTursoAuthToken          | npx wrangler       secret put tursoAuthToken          --name api-ugc
 # echo $productionHubSessionSecret        | npx wrangler       secret put hubSessionSecret        --name api-ugc
+# echo $productionPublicMediaSecret       | npx wrangler       secret put publicMediaSecret       --name api-ugc
 # echo $productionHubSessionSecret        | npx wrangler pages secret put hubSessionSecret        --project-name hub
 # echo $productionAlphaKey                | npx wrangler pages secret put alphaKey                --project-name hub
 # echo $productionDiscordId               | npx wrangler pages secret put discordId               --project-name hub
@@ -32,6 +34,7 @@ source ../PentiveSecrets/secrets.sh
 # echo $productionOauthStateSecret        | npx wrangler pages secret put oauthStateSecret        --project-name hub
 # echo $productionOauthCodeVerifierSecret | npx wrangler pages secret put oauthCodeVerifierSecret --project-name hub
 # echo $productionHubInfoSecret           | npx wrangler pages secret put hubInfoSecret           --project-name hub
+# echo $productionPublicMediaSecret       | npx wrangler pages secret put publicMediaSecret       --project-name hub
 
 # https://developers.cloudflare.com/workers/wrangler/configuration/#environmental-variables
 # https://developers.cloudflare.com/workers/platform/environment-variables/#adding-secrets-via-wrangler

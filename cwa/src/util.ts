@@ -1,5 +1,6 @@
 import { type Context } from 'hono'
 import { type PrivateMediaSecretBase64 } from './privateToken'
+import { type PublicMediaSecretBase64 } from 'shared-edge'
 import { type R2Bucket } from '@cloudflare/workers-types'
 
 export type CwaContext = Context<{
@@ -20,6 +21,7 @@ export type Env = {
 	mediaBucket: R2Bucket
 	hubSessionSecret: string
 	privateMediaSecret: PrivateMediaSecretBase64
+	publicMediaSecret: PublicMediaSecretBase64
 	tursoDbUrl: string
 	tursoAuthToken: string
 	peerSyncPublicKey: string
