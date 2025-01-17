@@ -239,3 +239,8 @@ create table user
     constraint user_email_key
         unique (email)
 ) STRICT;
+
+insert into user (id, email, created, peer) values
+    ('Griddle', 'griddle@pentive.com', 0, null),
+    ('Harry'  , 'harry@pentive.com'  , 0, null),
+    ('Campal' , 'campal@pentive.com' , 0, null);
