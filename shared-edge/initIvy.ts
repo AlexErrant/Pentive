@@ -48,21 +48,21 @@ if (false) {
 		}),
 	})
 
-	const mediaHash = crypto.getRandomValues(new Uint8Array(8))
-		.buffer as MediaHash
+	const hash = crypto.getRandomValues(new Uint8Array(8)).buffer as MediaHash
+	const id = crypto.getRandomValues(new Uint8Array(8)).buffer as DbId
 	const entityId = crypto.getRandomValues(new Uint8Array(8)).buffer as DbId
-	console.log('mediaHash', mediaHash)
+	console.log('mediaHash', hash)
 	console.log('entityId', entityId)
 
 	const inserted = await db
-		.insertInto('media_Entity')
-		.values({ mediaHash, i: 13, entityId })
+		.insertInto('media')
+		.values({ hash, id, entityId })
 		.execute()
 	console.log('inserted', inserted)
 
 	const queried = await db
-		.selectFrom('media_Entity')
-		.where('mediaHash', '=', mediaHash)
+		.selectFrom('media')
+		.where('hash', '=', hash)
 		.selectAll()
 		.execute()
 	console.log('queried', queried)

@@ -718,9 +718,9 @@ export async function userOwnsNoteAndHasMedia(
 				.where('authorId', '=', authorId)
 				.as('userOwns'),
 			db
-				.selectFrom('media_Entity')
-				.select(db.fn.count<SqliteCount>('mediaHash').as('hasMedia'))
-				.where('mediaHash', '=', id)
+				.selectFrom('media')
+				.select(db.fn.count<SqliteCount>('hash').as('hasMedia'))
+				.where('hash', '=', id)
 				.as('hasMedia'),
 		])
 		.selectAll()
@@ -748,9 +748,9 @@ export async function userOwnsTemplateAndHasMedia(
 				// .where("authorId", "=", authorId) // highTODO
 				.as('userOwns'),
 			db
-				.selectFrom('media_Entity')
-				.select(db.fn.count<SqliteCount>('mediaHash').as('hasMedia'))
-				.where('mediaHash', '=', id)
+				.selectFrom('media')
+				.select(db.fn.count<SqliteCount>('hash').as('hasMedia'))
+				.where('hash', '=', id)
 				.as('hasMedia'),
 		])
 		.selectAll()
@@ -763,11 +763,11 @@ export async function userOwnsTemplateAndHasMedia(
 
 export async function lookupMediaHash(id: MediaId) {
 	const mediaHash = await db
-		.selectFrom('media_Entity')
-		.select('mediaHash')
+		.selectFrom('media')
+		.select('hash')
 		.where('id', '=', fromBase64Url(id))
 		.executeTakeFirst()
-	return mediaHash?.mediaHash
+	return mediaHash?.hash
 }
 
 export async function insertNotes(authorId: UserId, notes: CreateRemoteNote[]) {

@@ -13,10 +13,10 @@ export interface MediaUser {
 	userId: string
 }
 
-export interface MediaEntity {
+export interface Media {
 	id: DbId
 	entityId: DbId
-	mediaHash: MediaHash
+	hash: MediaHash
 }
 
 export interface Nook {
@@ -147,7 +147,7 @@ export interface User {
 
 export interface DB {
 	media_User: MediaUser
-	media_Entity: MediaEntity
+	media: Media
 	nook: Nook
 	note: Note
 	noteComment: NoteComment

@@ -1,12 +1,15 @@
-create table media_Entity
+create table media
 (
     id        BLOB not null primary key,
     entityId  BLOB not null,
-    mediaHash BLOB not null
+    hash      BLOB not null
 ) STRICT;
 
-create index media_Entity_mediaHash_idx
-    on media_Entity (mediaHash);
+create index media_hash_idx
+    on media (hash);
+
+create index media_entityId_idx
+    on media (entityId);
 
 create table media_User
 (

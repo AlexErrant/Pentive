@@ -81,7 +81,7 @@ app
 		const buildToken = async (mediaHash: MediaHash): Promise<Base64Url> =>
 			await buildPrivateToken(c.env.privateMediaSecret, mediaHash, userId)
 		const persistDbAndBucket = async ({
-			mediaHash,
+			hash,
 			readable,
 			headers,
 		}: PersistParams): Promise<undefined> => {
@@ -102,7 +102,7 @@ app
 				const countResponse = await tx.execute(
 					`SELECT (SELECT COUNT(*) FROM Media_User WHERE mediaHash=? AND userId=?),
                   (SELECT COUNT(*) FROM Media_User WHERE mediaHash=?)`,
-					[mediaHash, userId, mediaHash],
+					[hash, userId, hash],
 					{ as: 'array' },
 				)
 				const userCount = (countResponse.rows[0] as string[])[0]
@@ -110,10 +110,10 @@ app
 				if (userCount === '0') {
 					await tx.execute(
 						'INSERT INTO Media_User (mediaHash, userId) VALUES (?, ?)',
-						[mediaHash, userId],
+						[hash, userId],
 					)
 					if (mediaCount === '0') {
-						const mediaHashBase64 = dbIdToBase64(mediaHash)
+						const mediaHashBase64 = dbIdToBase64(hash)
 						const object = await c.env.mediaBucket.put(
 							mediaHashBase64,
 							readable,
@@ -180,18 +180,18 @@ async function postPublicMedia(
 	const userId = authResult.ok
 	setKysely(c.env.tursoDbUrl, c.env.tursoAuthToken, c.env.publicMediaSecret)
 	const persistDbAndBucket = async ({
-		mediaHash,
+		hash,
 		readable,
 		headers,
 	}: PersistParams): Promise<undefined | Response> => {
 		const insertValues = objEntries(mediaIdByEntityIds).map(
 			([entityId, mediaId]) => ({
-				mediaHash,
+				hash,
 				id: fromBase64Url(mediaId),
 				entityId: fromBase64Url(entityId),
 			}),
 		)
-		const { userOwns, hasMedia } = await userOwnsAndHasMedia(userId, mediaHash)
+		const { userOwns, hasMedia } = await userOwnsAndHasMedia(userId, hash)
 		if (!userOwns)
 			return c.text(`You don't own one (or more) of these ${type}s.`, 401)
 		await db
@@ -200,10 +200,10 @@ async function postPublicMedia(
 			// Just means we could PUT something into the mediaBucket and have no record of it in PlanetScale. Not great, but _fine_.
 			// Grep BC34B055-ECB7-496D-9E71-58EE899A11D1 for details.
 			.execute(async (trx) => {
-				await trx.insertInto('media_Entity').values(insertValues).execute()
+				await trx.insertInto('media').values(insertValues).execute()
 				if (!hasMedia) {
 					const object = await c.env.mediaBucket.put(
-						dbIdToBase64(mediaHash),
+						dbIdToBase64(hash),
 						readable,
 						{
 							httpMetadata: headers,
@@ -251,11 +251,11 @@ async function postMedia(
 
 	const digestStream = new crypto.DigestStream('SHA-256') // https://developers.cloudflare.com/workers/runtime-apis/web-crypto/#constructors
 	void hashBody.pipeTo(digestStream)
-	const mediaHash = (await digestStream.digest) as MediaHash
+	const hash = (await digestStream.digest) as MediaHash
 
-	const response = await buildResponse(mediaHash)
+	const response = await buildResponse(hash)
 	const r = await persistDbAndBucket({
-		mediaHash,
+		hash,
 		readable,
 		headers,
 	})
@@ -264,7 +264,7 @@ async function postMedia(
 }
 
 interface PersistParams {
-	mediaHash: MediaHash
+	hash: MediaHash
 	readable: ReadableStream<Uint8Array>
 	headers: Headers
 }
