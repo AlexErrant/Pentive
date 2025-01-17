@@ -20,6 +20,7 @@ import {
 	type RemoteMediaId,
 	fromLDbId,
 	toLDbId,
+	type Base64,
 } from 'shared/brand'
 import {
 	type CreateRemoteTemplate,
@@ -32,6 +33,7 @@ import {
 	undefinedMap,
 	type SqliteCount,
 } from 'shared/utility'
+import { base64ToArray } from 'shared-dom/utility'
 
 function templateToDocType(template: Template) {
 	const now = C.getDate().getTime()
@@ -411,24 +413,47 @@ export const templateCollectionMethods = {
 				.execute()
 		})
 	},
-	updateTemplateRemoteIds: async function (
-		remoteIdByLocal: Map<readonly [TemplateId, NookId], RemoteTemplateId>,
+	updateTemplateRemotes: async function (
+		remoteIdByLocal: Map<
+			readonly [TemplateId, NookId],
+			readonly [RemoteTemplateId, Array<[Base64, RemoteMediaId]>]
+		>,
 	) {
 		const now = C.getDate().getTime()
-		for (const [[templateId, nook], remoteId] of remoteIdByLocal) {
-			const templateDbId = toLDbId(templateId)
-			const r = await ky
-				.updateTable('remoteTemplate')
-				.set({ remoteId: toLDbId(remoteId), uploadDate: now })
-				.where('nook', '=', nook)
-				.where('localId', '=', templateDbId)
-				.returningAll()
-				.execute()
-			if (r.length !== 1)
-				C.toastFatal(
-					`No remoteTemplate found for nook '${nook}' and templateId '${templateId}'`,
-				)
-		}
+		await tx(async (db) => {
+			for (const [
+				[templateId, nook],
+				[remoteId, hashAndRemoteMediaIds],
+			] of remoteIdByLocal) {
+				const templateDbId = toLDbId(templateId)
+				const r = await db
+					.updateTable('remoteTemplate')
+					.set({ remoteId: toLDbId(remoteId), uploadDate: now })
+					.where('nook', '=', nook)
+					.where('localId', '=', templateDbId)
+					.returningAll()
+					.execute()
+				for (const [hash, remoteMediaId] of hashAndRemoteMediaIds) {
+					await db
+						.updateTable('remoteMedia')
+						.set({ remoteMediaId })
+						.from((eb) =>
+							eb
+								.selectFrom('media')
+								.select('id')
+								.where('hash', '=', base64ToArray(hash))
+								.as('m'),
+						)
+						.where('localEntityId', '=', toLDbId(templateId))
+						.whereRef('localMediaId', '=', 'm.id')
+						.execute()
+				}
+				if (r.length !== 1)
+					C.toastFatal(
+						`No remoteTemplate found for nook '${nook}' and templateId '${templateId}'`,
+					)
+			}
+		})
 	},
 	markTemplateAsPushed: async function (remoteTemplateIds: RemoteTemplateId[]) {
 		const r = await ky

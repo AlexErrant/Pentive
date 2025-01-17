@@ -26,6 +26,7 @@ import {
 	type MediaHash,
 	type Base64,
 	type MediaId,
+	type RemoteMediaId,
 } from 'shared/brand'
 import { ftsNormalize } from 'shared/htmlToText'
 import { imgPlaceholder } from 'shared/image'
@@ -814,12 +815,17 @@ export async function insertTemplates(
 		await Promise.all(
 			templates.map(async (n) => {
 				const tcs = await toTemplateCreates(n, authorId)
-				return tcs.map(({ templateCreate, remoteIdBase64url }) => {
-					return [
-						templateCreate,
-						[[n.localId, templateCreate.nook], remoteIdBase64url],
-					] as const
-				})
+				return tcs.map(
+					({ templateCreate, remoteIdBase64url, hashAndRemoteMediaIds }) => {
+						return [
+							templateCreate,
+							[
+								[n.localId, templateCreate.nook],
+								[remoteIdBase64url, hashAndRemoteMediaIds],
+							],
+						] as const
+					},
+				)
 			}),
 		)
 	).flatMap((x) => x)
@@ -841,7 +847,10 @@ export async function insertTemplates(
 				]),
 		)
 	const remoteIdByLocal = new Map(templateCreatesAndIds.map((x) => x[1]))
-	return remoteIdByLocal
+	return remoteIdByLocal satisfies Map<
+		readonly [TemplateId, NookId],
+		readonly [RemoteTemplateId, Array<[Base64, RemoteMediaId]>]
+	>
 }
 
 export async function subscribeToTemplate(
@@ -937,8 +946,13 @@ async function toNoteCreate(
 	const remoteIdBase64url = base64url
 		.encode(remoteNoteId)
 		.substring(0, 22) as RemoteNoteId
+	const hashAndRemoteMediaIds: Array<[Base64, RemoteMediaId]> = []
 	for (const [field, value] of objEntries(n.fieldValues)) {
-		n.fieldValues[field] = await replaceImgSrcs(value, remoteIdBase64url)
+		n.fieldValues[field] = await replaceImgSrcs(
+			value,
+			remoteIdBase64url,
+			hashAndRemoteMediaIds,
+		)
 	}
 	const noteCreate: InsertObject<DB, 'note'> = {
 		id: unhex(remoteIdHex),
@@ -970,14 +984,20 @@ async function replaceAsync(
 }
 
 const imgRegex = new RegExp(`${imgPlaceholder}(.{44})`, 'g')
-async function replaceImgSrcs(value: string, remoteIdBase64url: Base64Url) {
+async function replaceImgSrcs(
+	value: string,
+	remoteIdBase64url: Base64Url,
+	hashAndRemoteMediaIds: Array<[Base64, RemoteMediaId]>,
+) {
 	return await replaceAsync(value, imgRegex, async (array) => {
 		const mediaHash = array[1] as Base64
-		return await buildPublicToken(
+		const remoteMediaId = (await buildPublicToken(
 			remoteIdBase64url,
 			mediaHash,
 			publicMediaSecretBase64,
-		)
+		)) as RemoteMediaId
+		hashAndRemoteMediaIds.push([mediaHash, remoteMediaId])
+		return remoteMediaId
 	})
 }
 
@@ -1007,19 +1027,30 @@ async function toTemplateCreate(
 	const remoteIdBase64url = base64url
 		.encode(remoteId)
 		.substring(0, 22) as RemoteTemplateId
+	const hashAndRemoteMediaIds: Array<[Base64, RemoteMediaId]> = []
 	if (n.templateType.tag === 'standard') {
 		for (const t of n.templateType.templates) {
-			t.front = await replaceImgSrcs(t.front, remoteIdBase64url)
-			t.back = await replaceImgSrcs(t.back, remoteIdBase64url)
+			t.front = await replaceImgSrcs(
+				t.front,
+				remoteIdBase64url,
+				hashAndRemoteMediaIds,
+			)
+			t.back = await replaceImgSrcs(
+				t.back,
+				remoteIdBase64url,
+				hashAndRemoteMediaIds,
+			)
 		}
 	} else {
 		n.templateType.template.front = await replaceImgSrcs(
 			n.templateType.template.front,
 			remoteIdBase64url,
+			hashAndRemoteMediaIds,
 		)
 		n.templateType.template.back = await replaceImgSrcs(
 			n.templateType.template.back,
 			remoteIdBase64url,
+			hashAndRemoteMediaIds,
 		)
 	}
 	const templateCreate: InsertObject<DB, 'template'> & { nook: NookId } = {
@@ -1033,7 +1064,11 @@ async function toTemplateCreate(
 		css: n.css,
 		subscribersCount: 1,
 	}
-	return { templateCreate, remoteIdBase64url }
+	return {
+		templateCreate,
+		remoteIdBase64url,
+		hashAndRemoteMediaIds,
+	}
 }
 
 // highTODO property test

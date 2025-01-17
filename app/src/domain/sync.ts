@@ -50,7 +50,7 @@ export async function uploadTemplates(templateId?: TemplateId, nook?: NookId) {
 	const newTemplates = await C.db.getNewTemplatesToUpload(templateId, nook)
 	if (newTemplates.length > 0) {
 		const remoteIdByLocal = await cwaClient.createTemplates.mutate(newTemplates)
-		await C.db.updateTemplateRemoteIds(remoteIdByLocal)
+		await C.db.updateTemplateRemotes(remoteIdByLocal)
 	}
 	const editedTemplates = await C.db.getEditedTemplatesToUpload(
 		templateId,
