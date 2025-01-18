@@ -84,12 +84,12 @@ export async function uploadNotes(
 	const newNotes = await C.db.getNewNotesToUpload(noteId, nook)
 	if (newNotes.length > 0) {
 		const remoteIdByLocal = await cwaClient.createNote.mutate(newNotes)
-		await C.db.updateNoteRemoteIds(remoteIdByLocal)
+		await C.db.updateRemotes('remoteNote', remoteIdByLocal)
 	}
 	const editedNotes = await C.db.getEditedNotesToUpload(noteId, nook)
 	if (editedNotes.length > 0) {
 		const remoteIdByLocal = await cwaClient.editNote.mutate(editedNotes)
-		await C.db.updateNoteRemoteIds(remoteIdByLocal)
+		await C.db.updateRemotes('remoteNote', remoteIdByLocal)
 	}
 	const media = await C.db.getNoteMediaToUpload(noteId)
 	for (const [mediaId, { data, ids }] of media) {

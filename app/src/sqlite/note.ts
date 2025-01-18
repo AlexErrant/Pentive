@@ -526,27 +526,6 @@ JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field
 				.execute()
 		})
 	},
-	updateNoteRemoteIds: async function (
-		remoteIdByLocal: Map<readonly [NoteId, NookId], RemoteNoteId>,
-	) {
-		for (const [[noteId, nook], remoteId] of remoteIdByLocal) {
-			const noteDbId = toLDbId(noteId)
-			const r = await ky
-				.updateTable('remoteNote')
-				.set({
-					remoteId: toLDbId(remoteId),
-					uploadDate: C.getDate().getTime(),
-				})
-				.where('nook', '=', nook)
-				.where('localId', '=', noteDbId)
-				.returningAll()
-				.execute()
-			if (r.length !== 1)
-				C.toastFatal(
-					`No remoteNote found for nook '${nook}' and noteId '${noteId}'`,
-				)
-		}
-	},
 	hasRemoteNote: async function (remoteNoteId: RemoteNoteId) {
 		const r = await ky
 			.selectFrom('remoteNote')

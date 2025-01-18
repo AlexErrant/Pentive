@@ -788,14 +788,22 @@ async function buildNoteCreates(
 			notes.map(async (n) => {
 				const ncs = await toNoteCreates(n, authorId)
 				return ncs.map(
-					({ noteCreate, remoteIdBase64url, remoteTemplateId }) => {
+					({
+						noteCreate,
+						remoteIdBase64url,
+						remoteTemplateId,
+						hashAndRemoteMediaIds,
+					}) => {
 						const t =
 							templates.find(
 								(t) => dbIdToBase64Url(t.id) === remoteTemplateId,
 							) ?? throwExp()
 						return [
 							noteCreate,
-							[[n.localId, t.nook], remoteIdBase64url],
+							[
+								[n.localId satisfies NoteId as NoteId, t.nook],
+								[remoteIdBase64url, hashAndRemoteMediaIds],
+							],
 						] as const
 					},
 				)
@@ -978,7 +986,7 @@ async function toNoteCreate(
 			hashAndRemoteMediaIds,
 		)
 	}
-	const noteCreate: InsertObject<DB, 'note'> = {
+	const noteCreate = {
 		id: unhex(remoteIdHex),
 		templateId: fromBase64Url(remoteTemplateId), // highTODO validate
 		authorId,
@@ -990,8 +998,13 @@ async function toNoteCreate(
 			.join(' '),
 		tags: serializeTags(n.tags),
 		ankiId: n.ankiId,
+	} satisfies InsertObject<DB, 'note'>
+	return {
+		noteCreate,
+		remoteIdBase64url,
+		remoteTemplateId,
+		hashAndRemoteMediaIds,
 	}
-	return { noteCreate, remoteIdBase64url, remoteTemplateId }
 }
 
 // https://stackoverflow.com/a/73891404
