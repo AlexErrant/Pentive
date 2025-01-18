@@ -127,6 +127,7 @@ export const editRemoteTemplate = remoteTemplate
 	.omit(templateUneditable)
 	.extend({
 		remoteIds: z.array(remoteTemplateId).min(1),
+		localId: z.string() as unknown as z.Schema<TemplateId>,
 	})
 
 export type EditRemoteTemplate = z.infer<typeof editRemoteTemplate>

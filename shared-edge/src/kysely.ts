@@ -809,7 +809,7 @@ export async function insertNotes(authorId: UserId, notes: CreateRemoteNote[]) {
 
 async function buildTemplateCreates(
 	authorId: UserId,
-	templates: CreateRemoteTemplate[],
+	templates: Array<EditRemoteTemplate | CreateRemoteTemplate>,
 ) {
 	const templateCreatesAndIds = (
 		await Promise.all(
@@ -1196,11 +1196,9 @@ export async function editTemplates(
 		.executeTakeFirstOrThrow()
 	if (count.c !== editTemplateIds.length)
 		throwExp("At least one of these templates doesn't exist.")
-	const templateCreates = await Promise.all(
-		templates.map(async (n) => {
-			const tcs = await toTemplateCreates(n, authorId)
-			return tcs.map((tc) => tc.templateCreate)
-		}),
+	const { templateCreates, remoteIdByLocal } = await buildTemplateCreates(
+		authorId,
+		templates,
 	)
 	await db
 		.insertInto('template')
@@ -1217,6 +1215,7 @@ export async function editTemplates(
 			} satisfies OnConflictUpdateTemplateSet),
 		)
 		.execute()
+	return remoteIdByLocal
 }
 
 function unhex(id: Hex): RawBuilder<DbId> {

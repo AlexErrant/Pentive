@@ -31,6 +31,8 @@ const saveButton = (template: { template: Template }) => (
 		onClick={async () => {
 			await cwaClient.editTemplates.mutate([
 				{
+					// @ts-expect-error this onClick doesn't use localId (because it doesn't use the return value)
+					localId: undefined,
 					name: template.template.name,
 					css: template.template.css,
 					templateType: template.template.templateType,

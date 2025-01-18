@@ -57,8 +57,9 @@ export async function uploadTemplates(templateId?: TemplateId, nook?: NookId) {
 		nook,
 	)
 	if (editedTemplates.length > 0) {
-		await cwaClient.editTemplates.mutate(editedTemplates)
-		await C.db.markTemplateAsPushed(editedTemplates.flatMap((n) => n.remoteIds))
+		const remoteIdByLocal =
+			await cwaClient.editTemplates.mutate(editedTemplates)
+		await C.db.updateTemplateRemotes(remoteIdByLocal)
 	}
 	const media = await C.db.getTemplateMediaToUpload(templateId)
 	for (const [mediaId, { data, ids }] of media) {

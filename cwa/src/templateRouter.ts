@@ -31,7 +31,8 @@ export const templateRouter = {
 	editTemplates: enticatedProcedure
 		.input(z.array(editRemoteTemplate).min(1))
 		.mutation(async ({ input, ctx }) => {
-			await editTemplates(ctx.user, input)
+			const remoteIdByLocal = await editTemplates(ctx.user, input)
+			return remoteIdByLocal
 		}),
 
 	subscribeToTemplate: enticatedProcedure

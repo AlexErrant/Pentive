@@ -82,6 +82,7 @@ function domainToEditRemote(template: Template, nook?: NookId) {
 	if (remoteIds.length === 0)
 		C.toastImpossible(`Zero remoteIds - is something wrong with the SQL query?`)
 	return {
+		localId: template.id,
 		name: template.name,
 		css: template.css,
 		templateType: template.templateType,
@@ -454,20 +455,6 @@ export const templateCollectionMethods = {
 					)
 			}
 		})
-	},
-	markTemplateAsPushed: async function (remoteTemplateIds: RemoteTemplateId[]) {
-		const r = await ky
-			.updateTable('remoteTemplate')
-			.set({ uploadDate: C.getDate().getTime() })
-			.where('remoteId', 'in', remoteTemplateIds.map(toLDbId))
-			.returningAll()
-			.execute()
-		if (r.length !== remoteTemplateIds.length)
-			C.toastFatal(
-				`Some remoteTemplates in ${JSON.stringify(
-					remoteTemplateIds,
-				)} not found. (This is the worst error message ever - medTODO.)`,
-			)
 	},
 	hasRemoteTemplate: async function (remoteTemplateId: RemoteTemplateId) {
 		const r = await ky
