@@ -7,16 +7,25 @@ import {
 	type Template as TemplateEntity,
 	type DB,
 } from './database'
-import { type MediaId, fromLDbId, type NookId } from 'shared/brand'
+import {
+	type MediaId,
+	fromLDbId,
+	type NookId,
+	type TemplateId,
+	type RemoteTemplateId,
+	type Base64,
+	type RemoteMediaId,
+	toLDbId,
+} from 'shared/brand'
 import { type Field, type Template } from 'shared/domain/template'
 import { imgPlaceholder } from 'shared/image'
 import { type TemplateType } from 'shared/schema'
 import { parseSet, parseMap, notEmpty } from 'shared/utility'
 import { type Note } from 'shared/domain/note'
-import { C, ky } from '../topLevelAwait'
+import { C, ky, tx } from '../topLevelAwait'
 import { jsonArrayFrom } from 'kysely/helpers/sqlite'
 import { type AliasedRawBuilder, type ExpressionBuilder } from 'kysely'
-import { uint8ArrayToBase64 } from 'shared-dom/utility'
+import { base64ToArray, uint8ArrayToBase64 } from 'shared-dom/utility'
 
 export function parseTags(rawTags: string) {
 	return parseSet<string>(rawTags)
@@ -210,4 +219,46 @@ export function getTemplate(
 			uploadDate: rt.uploadDate,
 		})),
 	)
+}
+export async function updateTemplateRemotes(
+	remoteIdByLocal: Map<
+		readonly [TemplateId, NookId],
+		readonly [RemoteTemplateId, Array<[Base64, RemoteMediaId]>]
+	>,
+) {
+	const now = C.getDate().getTime()
+	await tx(async (db) => {
+		for (const [
+			[templateId, nook],
+			[remoteId, hashAndRemoteMediaIds],
+		] of remoteIdByLocal) {
+			const templateDbId = toLDbId(templateId)
+			const r = await db
+				.updateTable('remoteTemplate')
+				.set({ remoteId: toLDbId(remoteId), uploadDate: now })
+				.where('nook', '=', nook)
+				.where('localId', '=', templateDbId)
+				.returningAll()
+				.execute()
+			for (const [hash, remoteMediaId] of hashAndRemoteMediaIds) {
+				await db
+					.updateTable('remoteMedia')
+					.set({ remoteMediaId })
+					.from((eb) =>
+						eb
+							.selectFrom('media')
+							.select('id')
+							.where('hash', '=', base64ToArray(hash))
+							.as('m'),
+					)
+					.where('localEntityId', '=', templateDbId)
+					.whereRef('localMediaId', '=', 'm.id')
+					.execute()
+			}
+			if (r.length !== 1)
+				C.toastFatal(
+					`No remoteTemplate found for nook '${nook}' and templateId '${templateId}'`,
+				)
+		}
+	})
 }
