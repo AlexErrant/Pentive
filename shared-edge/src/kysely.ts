@@ -770,7 +770,7 @@ export async function lookupMediaHash(id: MediaId) {
 	return mediaHash?.hash
 }
 
-export async function insertNotes(authorId: UserId, notes: CreateRemoteNote[]) {
+async function buildNoteCreates(authorId: UserId, notes: CreateRemoteNote[]) {
 	const rtIds = Array.from(
 		new Set(notes.flatMap((n) => n.remoteTemplateIds)),
 	).map(fromBase64Url)
@@ -800,10 +800,18 @@ export async function insertNotes(authorId: UserId, notes: CreateRemoteNote[]) {
 				)
 			}),
 		)
-	).flatMap((x) => x)
+	).flat()
 	const noteCreates = noteCreatesAndIds.map((x) => x[0])
-	await db.insertInto('note').values(noteCreates).execute()
 	const remoteIdByLocal = new Map(noteCreatesAndIds.map((x) => x[1]))
+	return { noteCreates, remoteIdByLocal }
+}
+
+export async function insertNotes(authorId: UserId, notes: CreateRemoteNote[]) {
+	const { noteCreates, remoteIdByLocal } = await buildNoteCreates(
+		authorId,
+		notes,
+	)
+	await db.insertInto('note').values(noteCreates).execute()
 	return remoteIdByLocal
 }
 
