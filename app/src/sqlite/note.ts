@@ -76,25 +76,25 @@ function noteToDocType(note: Note) {
 function domainToCreateRemote(
 	{ id, tags, fieldValues }: Note,
 	remoteTemplateIds: RemoteTemplateId[],
-): CreateRemoteNote {
+) {
 	return {
 		localId: id,
 		remoteTemplateIds,
 		fieldValues,
 		tags: Array.from(tags),
-	}
+	} satisfies CreateRemoteNote
 }
 
 function domainToEditRemote(
 	note: Note,
 	remoteIds: Map<RemoteNoteId, RemoteTemplateId>,
 ) {
-	const r: EditRemoteNote = {
+	return {
+		localId: note.id,
 		remoteIds,
 		fieldValues: note.fieldValues,
 		tags: Array.from(note.tags),
-	}
-	return r
+	} satisfies EditRemoteNote
 }
 
 // The point of this type is to cause an error if something is added to NoteBase
@@ -546,20 +546,6 @@ JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field
 					`No remoteNote found for nook '${nook}' and noteId '${noteId}'`,
 				)
 		}
-	},
-	markNoteAsPushed: async function (remoteNoteIds: RemoteNoteId[]) {
-		const r = await ky
-			.updateTable('remoteNote')
-			.set({ uploadDate: C.getDate().getTime() })
-			.where('remoteId', 'in', remoteNoteIds.map(toLDbId))
-			.returningAll()
-			.execute()
-		if (r.length !== remoteNoteIds.length)
-			C.toastFatal(
-				`Some remoteNotes in ${JSON.stringify(
-					remoteNoteIds,
-				)} not found. (This is the worst error message ever - medTODO.)`,
-			)
 	},
 	hasRemoteNote: async function (remoteNoteId: RemoteNoteId) {
 		const r = await ky

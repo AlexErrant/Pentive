@@ -31,7 +31,8 @@ export const noteRouter = {
 	editNote: enticatedProcedure
 		.input(z.array(editRemoteNote).min(1))
 		.mutation(async ({ input, ctx }) => {
-			await editNotes(ctx.user, input)
+			const remoteIdByLocal = await editNotes(ctx.user, input)
+			return remoteIdByLocal
 		}),
 
 	subscribeToNote: enticatedProcedure

@@ -62,6 +62,7 @@ export const createRemoteNote = remoteNote.omit(noteUneditable).extend({
 export type CreateRemoteNote = z.infer<typeof createRemoteNote>
 
 export const editRemoteNote = remoteNote.omit(noteUneditable).extend({
+	localId: z.string() as unknown as z.Schema<NoteId>,
 	remoteIds: z.map(remoteNoteId, remoteTemplateId).refine((x) => x.size > 0),
 })
 export type EditRemoteNote = z.infer<typeof editRemoteNote>

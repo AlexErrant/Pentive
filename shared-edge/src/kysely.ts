@@ -770,17 +770,18 @@ export async function lookupMediaHash(id: MediaId) {
 	return mediaHash?.hash
 }
 
-async function buildNoteCreates(authorId: UserId, notes: CreateRemoteNote[]) {
-	const rtIds = Array.from(
-		new Set(notes.flatMap((n) => n.remoteTemplateIds)),
-	).map(fromBase64Url)
+async function buildNoteCreates(
+	authorId: UserId,
+	notes: Array<CreateRemoteNote | EditRemoteNote>,
+	remoteTemplateIds: RemoteTemplateId[],
+) {
 	// highTODO validate author
 	const templates = await db
 		.selectFrom('template')
 		.select(['nook', 'id'])
-		.where('id', 'in', rtIds)
+		.where('id', 'in', remoteTemplateIds.map(fromBase64Url))
 		.execute()
-	if (templates.length !== rtIds.length)
+	if (templates.length !== remoteTemplateIds.length)
 		throwExp('You have an invalid RemoteTemplateId.')
 	const noteCreatesAndIds = (
 		await Promise.all(
@@ -807,9 +808,13 @@ async function buildNoteCreates(authorId: UserId, notes: CreateRemoteNote[]) {
 }
 
 export async function insertNotes(authorId: UserId, notes: CreateRemoteNote[]) {
+	const remoteTemplateIds = Array.from(
+		new Set(notes.flatMap((n) => n.remoteTemplateIds)),
+	)
 	const { noteCreates, remoteIdByLocal } = await buildNoteCreates(
 		authorId,
 		notes,
+		remoteTemplateIds,
 	)
 	await db.insertInto('note').values(noteCreates).execute()
 	return remoteIdByLocal
@@ -1164,11 +1169,13 @@ export async function editNotes(authorId: UserId, notes: EditRemoteNote[]) {
 		.executeTakeFirstOrThrow()
 	if (count.c !== notes.length)
 		throwExp("At least one of these notes doesn't exist.")
-	const noteCreates = await Promise.all(
-		notes.map(async (n) => {
-			const tcs = await toNoteCreates(n, authorId)
-			return tcs.map((tc) => tc.noteCreate)
-		}),
+	const remoteTemplateIds = notes.flatMap((t) =>
+		Array.from(t.remoteIds.values()),
+	)
+	const { noteCreates, remoteIdByLocal } = await buildNoteCreates(
+		authorId,
+		notes,
+		remoteTemplateIds,
 	)
 	// insert into `Note` (`id`, `templateId`, `authorId`, `fieldValues`, `fts`, `tags`)
 	// values (UNHEX(?), FROM_BASE64(?), ?, ?, ?, ?)
@@ -1188,6 +1195,7 @@ export async function editNotes(authorId: UserId, notes: EditRemoteNote[]) {
 			} satisfies OnConflictUpdateNoteSet),
 		)
 		.execute()
+	return remoteIdByLocal
 }
 
 export async function editTemplates(
