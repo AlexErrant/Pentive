@@ -16,6 +16,8 @@ import {
 	type Base64,
 	type RemoteMediaId,
 	toLDbId,
+	type NoteId,
+	type RemoteNoteId,
 } from 'shared/brand'
 import { type Field, type Template } from 'shared/domain/template'
 import { imgPlaceholder } from 'shared/image'
@@ -220,24 +222,25 @@ export function getTemplate(
 		})),
 	)
 }
-export async function updateTemplateRemotes(
+export async function updateRemotes(
+	table: 'remoteNote' | 'remoteTemplate',
 	remoteIdByLocal: Map<
-		readonly [TemplateId, NookId],
-		readonly [RemoteTemplateId, Array<[Base64, RemoteMediaId]>]
+		readonly [NoteId | TemplateId, NookId],
+		readonly [RemoteNoteId | RemoteTemplateId, Array<[Base64, RemoteMediaId]>]
 	>,
 ) {
 	const now = C.getDate().getTime()
 	await tx(async (db) => {
 		for (const [
-			[templateId, nook],
+			[entityId, nook],
 			[remoteId, hashAndRemoteMediaIds],
 		] of remoteIdByLocal) {
-			const templateDbId = toLDbId(templateId)
+			const entityDbId = toLDbId(entityId)
 			const r = await db
-				.updateTable('remoteTemplate')
+				.updateTable(table)
 				.set({ remoteId: toLDbId(remoteId), uploadDate: now })
 				.where('nook', '=', nook)
-				.where('localId', '=', templateDbId)
+				.where('localId', '=', entityDbId)
 				.returningAll()
 				.execute()
 			for (const [hash, remoteMediaId] of hashAndRemoteMediaIds) {
@@ -251,13 +254,13 @@ export async function updateTemplateRemotes(
 							.where('hash', '=', base64ToArray(hash))
 							.as('m'),
 					)
-					.where('localEntityId', '=', templateDbId)
+					.where('localEntityId', '=', entityDbId)
 					.whereRef('localMediaId', '=', 'm.id')
 					.execute()
 			}
 			if (r.length !== 1)
 				C.toastFatal(
-					`No remoteTemplate found for nook '${nook}' and templateId '${templateId}'`,
+					`No ${table} found for nook '${nook}' and ${table === 'remoteTemplate' ? 'templateId' : 'noteId'} ${entityId}'`,
 				)
 		}
 	})

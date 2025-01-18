@@ -50,7 +50,7 @@ export async function uploadTemplates(templateId?: TemplateId, nook?: NookId) {
 	const newTemplates = await C.db.getNewTemplatesToUpload(templateId, nook)
 	if (newTemplates.length > 0) {
 		const remoteIdByLocal = await cwaClient.createTemplates.mutate(newTemplates)
-		await C.db.updateTemplateRemotes(remoteIdByLocal)
+		await C.db.updateRemotes('remoteTemplate', remoteIdByLocal)
 	}
 	const editedTemplates = await C.db.getEditedTemplatesToUpload(
 		templateId,
@@ -59,7 +59,7 @@ export async function uploadTemplates(templateId?: TemplateId, nook?: NookId) {
 	if (editedTemplates.length > 0) {
 		const remoteIdByLocal =
 			await cwaClient.editTemplates.mutate(editedTemplates)
-		await C.db.updateTemplateRemotes(remoteIdByLocal)
+		await C.db.updateRemotes('remoteTemplate', remoteIdByLocal)
 	}
 	const media = await C.db.getTemplateMediaToUpload(templateId)
 	for (const [mediaId, { data, ids }] of media) {

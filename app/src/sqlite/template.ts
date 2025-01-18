@@ -9,11 +9,7 @@ import {
 	type InsertObject,
 	type OnConflictTables,
 } from 'kysely'
-import {
-	templateEntityToDomain,
-	remotifyDoms,
-	updateTemplateRemotes,
-} from './util'
+import { templateEntityToDomain, remotifyDoms, updateRemotes } from './util'
 import { tx, C, ky } from '../topLevelAwait'
 import { type Template } from 'shared/domain/template'
 import {
@@ -416,7 +412,7 @@ export const templateCollectionMethods = {
 				.execute()
 		})
 	},
-	updateTemplateRemotes,
+	updateRemotes,
 	hasRemoteTemplate: async function (remoteTemplateId: RemoteTemplateId) {
 		const r = await ky
 			.selectFrom('remoteTemplate')
