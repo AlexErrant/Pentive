@@ -807,7 +807,7 @@ export async function insertNotes(authorId: UserId, notes: CreateRemoteNote[]) {
 	return remoteIdByLocal
 }
 
-export async function insertTemplates(
+async function buildTemplateCreates(
 	authorId: UserId,
 	templates: CreateRemoteTemplate[],
 ) {
@@ -820,7 +820,10 @@ export async function insertTemplates(
 						return [
 							templateCreate,
 							[
-								[n.localId, templateCreate.nook],
+								[
+									n.localId satisfies TemplateId as TemplateId,
+									templateCreate.nook,
+								],
 								[remoteIdBase64url, hashAndRemoteMediaIds],
 							],
 						] as const
@@ -828,10 +831,22 @@ export async function insertTemplates(
 				)
 			}),
 		)
-	).flatMap((x) => x)
+	).flat()
 	const templateCreates = templateCreatesAndIds.map((x) => x[0])
+	const remoteIdByLocal = new Map(templateCreatesAndIds.map((x) => x[1]))
+	return { templateCreates, remoteIdByLocal }
+}
+
+export async function insertTemplates(
+	authorId: UserId,
+	templates: CreateRemoteTemplate[],
+) {
+	const { templateCreates, remoteIdByLocal } = await buildTemplateCreates(
+		authorId,
+		templates,
+	)
 	const subscriptions = templateCreates.map((t) => ({
-		templateId: t.id as DbId,
+		templateId: t.id,
 		userId: authorId,
 	}))
 	await db
@@ -846,11 +861,7 @@ export async function insertTemplates(
 						.execute(),
 				]),
 		)
-	const remoteIdByLocal = new Map(templateCreatesAndIds.map((x) => x[1]))
-	return remoteIdByLocal satisfies Map<
-		readonly [TemplateId, NookId],
-		readonly [RemoteTemplateId, Array<[Base64, RemoteMediaId]>]
-	>
+	return remoteIdByLocal
 }
 
 export async function subscribeToTemplate(
@@ -1053,7 +1064,7 @@ async function toTemplateCreate(
 			hashAndRemoteMediaIds,
 		)
 	}
-	const templateCreate: InsertObject<DB, 'template'> & { nook: NookId } = {
+	const templateCreate = {
 		id: unhex(remoteIdHex),
 		ankiId: n.ankiId,
 		edited,
@@ -1063,7 +1074,7 @@ async function toTemplateCreate(
 		fields: serializeFields(n.fields),
 		css: n.css,
 		subscribersCount: 1,
-	}
+	} satisfies InsertObject<DB, 'template'> & { nook: NookId }
 	return {
 		templateCreate,
 		remoteIdBase64url,
