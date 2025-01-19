@@ -5,7 +5,7 @@ import { type Base64 } from './brand'
 // https://web.dev/articles/base64-encoding#btoa_and_atob_with_unicode
 export function arrayToBase64(bytes: Uint8Array): Base64 {
 	const binString = String.fromCodePoint(...bytes)
-	return btoa(binString) as Base64
+	return btoa(binString).replaceAll('=', '') as Base64
 }
 
 // https://web.dev/articles/base64-encoding#btoa_and_atob_with_unicode
