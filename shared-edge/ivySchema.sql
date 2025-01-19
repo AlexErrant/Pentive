@@ -40,6 +40,7 @@ create table note
     fieldValues      TEXT    not null,
     fts              TEXT    not null,
     tags             TEXT    not null,
+    status           INTEGER not null default '0',
     subscribersCount INTEGER not null default '0',
     commentsCount    INTEGER not null default '0',
     ankiId           INTEGER null,
@@ -169,6 +170,7 @@ create table template
     fields           TEXT    not null,
     css              TEXT    not null,
     ankiId           INTEGER null,
+    status           INTEGER not null default '0',
     commentsCount    INTEGER not null default '0',
     subscribersCount INTEGER not null default '0',
     foreign key (nook) references nook(id)

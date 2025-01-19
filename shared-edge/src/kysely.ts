@@ -1001,6 +1001,7 @@ async function toNoteCreate(
 			.join(' '),
 		tags: serializeTags(n.tags),
 		ankiId: n.ankiId,
+		status: 0,
 	} satisfies InsertObject<DB, 'note'>
 	return {
 		noteCreate,
@@ -1100,6 +1101,7 @@ async function toTemplateCreate(
 		fields: serializeFields(n.fields),
 		css: n.css,
 		subscribersCount: 1,
+		status: 0,
 	} satisfies InsertObject<DB, 'template'> & { nook: NookId }
 	return {
 		templateCreate,
@@ -1205,6 +1207,7 @@ export async function editNotes(authorId: UserId, notes: EditRemoteNote[]) {
 				fts: (x) => x.ref('excluded.fts'),
 				tags: (x) => x.ref('excluded.tags'),
 				ankiId: (x) => x.ref('excluded.ankiId'),
+				status: (x) => x.ref('excluded.status'),
 			} satisfies OnConflictUpdateNoteSet),
 		)
 		.execute()
@@ -1241,6 +1244,7 @@ export async function editTemplates(
 				type: (x) => x.ref('excluded.type'),
 				fields: (x) => x.ref('excluded.fields'),
 				css: (x) => x.ref('excluded.css'),
+				status: (x) => x.ref('excluded.status'),
 			} satisfies OnConflictUpdateTemplateSet),
 		)
 		.execute()

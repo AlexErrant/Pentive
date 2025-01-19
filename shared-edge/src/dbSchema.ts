@@ -39,6 +39,7 @@ export interface Note {
 	fts: string
 	tags: string
 	ankiId: number | null
+	status: number
 	subscribersCount: Generated<number>
 	commentsCount: Generated<number>
 }
@@ -107,6 +108,7 @@ export interface Template {
 	fields: string
 	css: string
 	ankiId: number | null
+	status: number
 	subscribersCount: Generated<number>
 	commentsCount: Generated<number>
 }
