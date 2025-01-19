@@ -27,7 +27,7 @@ import { type Note } from 'shared/domain/note'
 import { C, ky, tx } from '../topLevelAwait'
 import { jsonArrayFrom } from 'kysely/helpers/sqlite'
 import { type AliasedRawBuilder, type ExpressionBuilder } from 'kysely'
-import { uint8ArrayToBase64, base64ToArray } from 'shared/binary'
+import { arrayToBase64, base64ToArray } from 'shared/binary'
 
 export function parseTags(rawTags: string) {
 	return parseSet<string>(rawTags)
@@ -51,7 +51,7 @@ export async function remotifyDoms(dp: DOMParser, rawDoms: string[]) {
 						.select('hash')
 						.where('id', '=', src as MediaId)
 						.executeTakeFirstOrThrow()
-						.then((m) => uint8ArrayToBase64(m.hash))
+						.then((m) => arrayToBase64(m.hash))
 					return [src as MediaId, hash] as const
 				}),
 		),

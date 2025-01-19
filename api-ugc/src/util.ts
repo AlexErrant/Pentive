@@ -1,6 +1,7 @@
 import { type Context } from 'hono'
 import { type R2Bucket } from '@cloudflare/workers-types'
 import { type PublicMediaSecretBase64 } from 'shared-edge'
+import { type Base64 } from 'shared/brand'
 
 export type ApiUgcContext = Context<{
 	// eslint-disable-next-line @typescript-eslint/naming-convention
@@ -20,6 +21,6 @@ export type Env = {
 	mediaBucket: R2Bucket
 	tursoDbUrl: string
 	tursoAuthToken: string
-	hubSessionSecret: string
+	hubSessionSecret: Base64
 	publicMediaSecret: PublicMediaSecretBase64
 }

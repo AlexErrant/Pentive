@@ -2,27 +2,14 @@
 
 import { type Base64 } from './brand'
 
-// https://stackoverflow.com/a/38858127/
-export function arrayBufferToBase64(buffer: ArrayBuffer): Base64 {
-	const bytes = new Uint8Array(buffer)
-	return uint8ArrayToBase64(bytes)
+// https://web.dev/articles/base64-encoding#btoa_and_atob_with_unicode
+export function arrayToBase64(bytes: Uint8Array): Base64 {
+	const binString = String.fromCodePoint(...bytes)
+	return btoa(binString) as Base64
 }
 
-export function uint8ArrayToBase64(bytes: Uint8Array): Base64 {
-	let binary = ''
-	const len = bytes.byteLength
-	for (let i = 0; i < len; i++) {
-		binary += String.fromCharCode(bytes[i]!)
-	}
-	return btoa(binary) as Base64
-}
-
-export function base64ToArray(base64: string): Uint8Array {
-	const binaryString = atob(base64)
-	const len = binaryString.length
-	const bytes = new Uint8Array(len)
-	for (let i = 0; i < len; i++) {
-		bytes[i] = binaryString.charCodeAt(i)
-	}
-	return bytes
+// https://web.dev/articles/base64-encoding#btoa_and_atob_with_unicode
+export function base64ToArray(base64: Base64): Uint8Array {
+	const binString = atob(base64)
+	return Uint8Array.from(binString, (m) => m.codePointAt(0)!)
 }

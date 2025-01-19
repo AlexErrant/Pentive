@@ -1,8 +1,8 @@
 import { type CookieParseOptions, parse, serialize } from 'cookie-es'
 import { type JWTVerifyResult, type SignJWT, jwtVerify } from 'jose'
 import { type WithRequired, concat } from 'shared/utility'
-import { type Brand } from 'shared/brand'
-import { arrayBufferToBase64, base64ToArray } from 'shared/binary'
+import { type Base64, type Brand } from 'shared/brand'
+import { arrayToBase64, base64ToArray } from 'shared/binary'
 import { type CookieSerializeOptions } from 'vinxi/http'
 
 const encoder = new TextEncoder()
@@ -48,14 +48,14 @@ export class EncryptedCookieManager {
 
 	cm: CookieManager
 
-	async serialize(value: string, secret: string) {
+	async serialize(value: string, secret: Base64) {
 		if (this.key == null) await this.setKey(secret) // avoiding an `await` when the key is cached, hence the ! assertion in the line below
 		const cipher = await encrypt(value, this.key!)
 		return this.cm.serialize(cipher)
 	}
 
-	async parse(value: string | null | undefined, secret: string) {
-		const cipher = this.cm.parse(value) as IvCipherBase64
+	async parse(value: string | null | undefined, secret: Base64) {
+		const cipher = this.cm.parse(value) as IvCipher
 		if (this.key == null) await this.setKey(secret) // avoiding an `await` when the key is cached, hence the ! assertion in the line below
 		return await decrypt(cipher, this.key!)
 	}
@@ -65,7 +65,7 @@ export class EncryptedCookieManager {
 	}
 
 	key: CryptoKey | undefined
-	async setKey(secret: string) {
+	async setKey(secret: Base64) {
 		this.key = await crypto.subtle.importKey(
 			'raw',
 			base64ToArray(secret),
@@ -80,7 +80,7 @@ export class EncryptedCookieManager {
 
 const ivLength = 12 // https://crypto.stackexchange.com/q/41601
 
-type IvCipherBase64 = Brand<string, 'ivCipherBase64' | 'base64'>
+type IvCipher = Brand<string, 'ivCipher'> & Base64
 
 function splitIvCipher(ivCipher: ArrayBuffer): [ArrayBuffer, ArrayBuffer] {
 	const iv = ivCipher.slice(0, ivLength)
@@ -99,10 +99,10 @@ async function encrypt(value: string, key: CryptoKey) {
 		encoder.encode(value),
 	)
 	const ivCipher = concat(iv, cipher)
-	return arrayBufferToBase64(ivCipher) as IvCipherBase64
+	return arrayToBase64(ivCipher) as IvCipher
 }
 
-async function decrypt(ivCipher: IvCipherBase64, key: CryptoKey) {
+async function decrypt(ivCipher: IvCipher, key: CryptoKey) {
 	const [iv, cipher] = splitIvCipher(base64ToArray(ivCipher).buffer)
 	const decrypted = await crypto.subtle.decrypt(
 		{
@@ -122,7 +122,7 @@ export class SignedCookieManager {
 
 	cm: CookieManager
 
-	async serialize(signJWT: SignJWT, secret: string) {
+	async serialize(signJWT: SignJWT, secret: Base64) {
 		if (this.key == null) await this.setKey(secret) // avoiding an `await` when the key is cached, hence the ! assertion below
 		const jwt = await signJWT
 			.setProtectedHeader({ alg: 'HS256' }) // No reason to go asymmetric yet https://crypto.stackexchange.com/a/30660
@@ -130,7 +130,7 @@ export class SignedCookieManager {
 		return this.cm.serialize(jwt)
 	}
 
-	async parse(cookie: string | null | undefined, secret: string) {
+	async parse(cookie: string | null | undefined, secret: Base64) {
 		const jwt = this.cm.parse(cookie, { decode: (x) => x })
 		if (typeof jwt !== 'string' || jwt.length === 0) {
 			return null
@@ -148,7 +148,7 @@ export class SignedCookieManager {
 	}
 
 	key: CryptoKey | undefined
-	async setKey(secret: string) {
+	async setKey(secret: Base64) {
 		this.key = await crypto.subtle.importKey(
 			'raw',
 			base64ToArray(secret),

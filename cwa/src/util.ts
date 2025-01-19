@@ -6,6 +6,7 @@ import {
 	type RemoteNoteId,
 	type RemoteTemplateId,
 	type RemoteMediaId,
+	type Base64,
 } from 'shared/brand'
 
 export type CwaContext = Context<{
@@ -24,7 +25,7 @@ export type Env = {
 	//
 	// Example binding to R2. Learn more at https://developers.cloudflare.com/workers/runtime-apis/r2/
 	mediaBucket: R2Bucket
-	hubSessionSecret: string
+	hubSessionSecret: Base64
 	privateMediaSecret: PrivateMediaSecretBase64
 	publicMediaSecret: PublicMediaSecretBase64
 	tursoDbUrl: string

@@ -2,11 +2,11 @@ import { type JWTVerifyResult, jwtVerify } from 'jose'
 import { type Context } from 'hono'
 import { getCookie } from 'hono/cookie'
 import { base64ToArray } from 'shared/binary'
-import { type UserId } from 'shared/brand'
+import { type Base64, type UserId } from 'shared/brand'
 import { csrfHeaderName, hubSessionCookieName } from 'shared/headers'
 import { toError, toOk } from 'shared/result'
 
-export async function getUserId<T extends { hubSessionSecret: string }>(
+export async function getUserId<T extends { hubSessionSecret: Base64 }>(
 	c: Context<{
 		// eslint-disable-next-line @typescript-eslint/naming-convention
 		Bindings: T
@@ -43,7 +43,7 @@ export async function getUserId<T extends { hubSessionSecret: string }>(
 
 let hubSessionSecret: null | Uint8Array = null
 
-function getHubSessionSecret(hubSessionSecretString: string): Uint8Array {
+function getHubSessionSecret(hubSessionSecretString: Base64): Uint8Array {
 	if (hubSessionSecret === null) {
 		hubSessionSecret = base64ToArray(hubSessionSecretString)
 	}
