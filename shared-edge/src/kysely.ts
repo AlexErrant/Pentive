@@ -48,9 +48,14 @@ import {
 	escapeRegExp,
 } from 'shared/utility'
 import { ulidAsHex, ulidAsRaw } from './convertBinary'
-import { base16, base64, base64url, base64urlnopad } from '@scure/base'
+import { base16 } from '@scure/base'
 import { createClient } from '@libsql/client/web'
-import { base64ToArray } from 'shared/binary'
+import {
+	arrayToBase64,
+	arrayToBase64url,
+	base64ToArray,
+	base64urlToArray,
+} from 'shared/binary'
 import { buildPublicToken, type PublicMediaSecret } from './publicToken'
 export type * from 'kysely'
 
@@ -958,7 +963,7 @@ async function toNoteCreates(
 		'remoteIds' in n
 			? new Map(
 					Array.from(n.remoteIds).map(([remoteNoteId, remoteTemplateId]) => [
-						base64url.decode(remoteNoteId + '=='),
+						base64urlToArray(remoteNoteId),
 						remoteTemplateId,
 					]),
 				)
@@ -975,9 +980,7 @@ async function toNoteCreate(
 ) {
 	const edited = 'remoteId' in n ? new Date().getTime() / 1000 : undefined
 	const remoteIdHex = base16.encode(remoteNoteId) as Hex
-	const remoteIdBase64url = base64url
-		.encode(remoteNoteId)
-		.substring(0, 22) as RemoteNoteId
+	const remoteIdBase64url = arrayToBase64url(remoteNoteId) as RemoteNoteId
 	const hashAndRemoteMediaIds: Array<[Base64, RemoteMediaId]> = []
 	for (const [field, value] of objEntries(n.fieldValues)) {
 		n.fieldValues[field] = await replaceImgSrcs(
@@ -1045,8 +1048,7 @@ async function toTemplateCreates(
 	const remoteIds =
 		'remoteIds' in n
 			? n.remoteIds.map(
-					(id) =>
-						[base64url.decode(id + '=='), 'undefined_nook' as NookId] as const,
+					(id) => [base64urlToArray(id), 'undefined_nook' as NookId] as const,
 				)
 			: n.nooks.map((nook) => [ulidAsRaw(), nook] as const)
 	return await Promise.all(
@@ -1061,9 +1063,7 @@ async function toTemplateCreate(
 ) {
 	const edited = 'remoteId' in n ? new Date().getTime() / 1000 : undefined
 	const remoteIdHex = base16.encode(remoteId) as Hex
-	const remoteIdBase64url = base64url
-		.encode(remoteId)
-		.substring(0, 22) as RemoteTemplateId
+	const remoteIdBase64url = arrayToBase64url(remoteId) as RemoteTemplateId
 	const hashAndRemoteMediaIds: Array<[Base64, RemoteMediaId]> = []
 	if (n.templateType.tag === 'standard') {
 		for (const t of n.templateType.templates) {
@@ -1256,7 +1256,7 @@ export function fromBase64(id: Base64): RawBuilder<DbId> {
 }
 
 export function fromBase64Url(id: Base64Url): RawBuilder<DbId> {
-	return sql<DbId>`${base64urlnopad.decode(id)}`
+	return sql<DbId>`${base64urlToArray(id)}`
 }
 
 function mapIdToBase64Url<T>(t: T & { id: DbId }): T & {
@@ -1264,20 +1264,16 @@ function mapIdToBase64Url<T>(t: T & { id: DbId }): T & {
 } {
 	return {
 		...t,
-		id: base64url.encode(new Uint8Array(t.id)).substring(0, 22) as Base64Url,
+		id: arrayToBase64url(new Uint8Array(t.id)),
 	}
 }
 
 export function dbIdToBase64Url<T extends Base64Url>(dbId: DbId) {
-	return base64url.encode(new Uint8Array(dbId)).substring(0, 22) as T
+	return arrayToBase64url(new Uint8Array(dbId)) as T
 }
 
 export function dbIdToBase64(dbId: DbId) {
-	return toBase64(new Uint8Array(dbId))
-}
-
-export function toBase64(array: Uint8Array) {
-	return base64.encode(array).substring(0, 22) as Base64
+	return arrayToBase64(new Uint8Array(dbId))
 }
 
 // use with .$call(log)
