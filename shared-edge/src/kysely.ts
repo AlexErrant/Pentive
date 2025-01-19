@@ -38,6 +38,7 @@ import {
 	type EditRemoteNote,
 	type EditRemoteTemplate,
 	type TemplateType,
+	type Status,
 } from 'shared/schema'
 import {
 	nullMap,
@@ -106,6 +107,24 @@ function maybeEpochToDate(epoch: number | null | undefined) {
 	return epochToDate(epoch)
 }
 
+function deserializeStatus(status: number): Status {
+	if (status === 0) {
+		return 'default'
+	} else if (status === 1) {
+		return 'awaitingMedia'
+	}
+	throwExp()
+}
+
+function serializeStatus(status: Status): number {
+	if (status === 'default') {
+		return 0
+	} else if (status === 'awaitingMedia') {
+		return 1
+	}
+	throwExp()
+}
+
 function toTemplate(
 	x: {
 		templateId: DbId
@@ -116,6 +135,7 @@ function toTemplate(
 		css: string
 		type: string
 		fields: string
+		templateStatus: number
 	},
 	templateId: RemoteTemplateId,
 ) {
@@ -128,6 +148,7 @@ function toTemplate(
 		fields: deserializeFields(x.fields),
 		css: x.css,
 		templateType: deserializeTemplateType(x.type),
+		status: deserializeStatus(x.templateStatus),
 	} satisfies RemoteTemplate
 }
 
@@ -147,6 +168,8 @@ function noteToNookView(x: {
 	fields: string
 	subscribers: number
 	comments: number
+	noteStatus: number
+	templateStatus: number
 	til?: number | null
 }) {
 	const noteId = dbIdToBase64Url<RemoteNoteId>(x.id)
@@ -171,6 +194,7 @@ function toNote(
 		noteCreated: number
 		noteEdited: number
 		tags: string
+		noteStatus: number
 	},
 	noteId: RemoteNoteId,
 	templateId: RemoteTemplateId,
@@ -184,6 +208,7 @@ function toNote(
 		edited: epochToDate(x.noteEdited),
 		tags: deserializeTags(x.tags),
 		ankiId: x.ankiNoteId,
+		status: deserializeStatus(x.noteStatus),
 	}
 }
 
@@ -220,6 +245,7 @@ export async function getNotes(nook: NookId, userId: UserId | null) {
 			'note.tags',
 			'note.subscribersCount as subscribers',
 			'note.commentsCount as comments',
+			'note.status as noteStatus',
 			'template.id as templateId',
 			'template.name as templateName',
 			'template.created as templateCreated',
@@ -228,6 +254,7 @@ export async function getNotes(nook: NookId, userId: UserId | null) {
 			'template.css',
 			'template.fields',
 			'template.type',
+			'template.status as templateStatus',
 		])
 		.$if(userId != null, (a) =>
 			a.select((b) =>
@@ -256,6 +283,7 @@ export async function getNote(noteId: RemoteNoteId, userId: UserId | null) {
 			'note.fieldValues',
 			'note.tags',
 			'note.ankiId',
+			'note.status as noteStatus',
 			'template.id as templateId',
 			'template.name as templateName',
 			'template.created as templateCreated',
@@ -264,6 +292,7 @@ export async function getNote(noteId: RemoteNoteId, userId: UserId | null) {
 			'template.css',
 			'template.fields',
 			'template.type',
+			'template.status as templateStatus',
 		])
 		.$if(userId != null, (a) =>
 			a.select((b) =>
@@ -291,6 +320,7 @@ export async function getNote(noteId: RemoteNoteId, userId: UserId | null) {
 		til: maybeEpochToDate(r.til),
 		nook: r.nook,
 		template: toTemplate(r, templateId),
+		status: deserializeStatus(r.noteStatus),
 	} satisfies RemoteNote & Record<string, unknown>
 }
 
@@ -306,6 +336,7 @@ export async function searchNotes(input: string, userId: UserId | null) {
 			'note.tags',
 			'note.subscribersCount as subscribers',
 			'note.commentsCount as comments',
+			'note.status as noteStatus',
 			'template.id as templateId',
 			'template.name as templateName',
 			'template.created as templateCreated',
@@ -314,6 +345,7 @@ export async function searchNotes(input: string, userId: UserId | null) {
 			'template.css',
 			'template.fields',
 			'template.type',
+			'template.status as templateStatus',
 		])
 		.$if(userId != null, (a) =>
 			a.select((b) =>
@@ -510,6 +542,7 @@ function templateEntityToDomain(t: {
 	ankiId: number | null
 	subscribersCount: number
 	commentsCount: number
+	status: number
 	til?: number | null
 }) {
 	return {
@@ -523,6 +556,7 @@ function templateEntityToDomain(t: {
 		templateType: deserializeTemplateType(t.type),
 		subscribers: t.subscribersCount,
 		comments: t.commentsCount,
+		status: deserializeStatus(t.status),
 		til: maybeEpochToDate(t.til),
 	} satisfies RemoteTemplate & Record<string, unknown>
 }
@@ -1001,7 +1035,10 @@ async function toNoteCreate(
 			.join(' '),
 		tags: serializeTags(n.tags),
 		ankiId: n.ankiId,
-		status: 0,
+		status:
+			hashAndRemoteMediaIds.length === 0
+				? serializeStatus('default')
+				: serializeStatus('awaitingMedia'),
 	} satisfies InsertObject<DB, 'note'>
 	return {
 		noteCreate,
@@ -1101,7 +1138,10 @@ async function toTemplateCreate(
 		fields: serializeFields(n.fields),
 		css: n.css,
 		subscribersCount: 1,
-		status: 0,
+		status:
+			hashAndRemoteMediaIds.length === 0
+				? serializeStatus('default')
+				: serializeStatus('awaitingMedia'),
 	} satisfies InsertObject<DB, 'template'> & { nook: NookId }
 	return {
 		templateCreate,

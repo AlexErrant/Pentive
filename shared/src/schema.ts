@@ -37,6 +37,7 @@ const noteUneditable = {
 	created: true,
 	edited: true,
 	nook: true,
+	status: true,
 } as const
 
 export const nookIdRegex = /^[a-z][a-z0-9]{2,21}$/
@@ -44,6 +45,10 @@ export const nookIdRegex = /^[a-z][a-z0-9]{2,21}$/
 export const nookId = z
 	.string()
 	.regex(nookIdRegex) as unknown as z.Schema<NookId>
+
+const status = z.union([z.literal('awaitingMedia'), z.literal('default')])
+
+export type Status = z.infer<typeof status>
 
 export const remoteNote = z.object({
 	id: remoteNoteId,
@@ -54,6 +59,7 @@ export const remoteNote = z.object({
 	fieldValues,
 	tags: z.array(z.string()),
 	ankiId: z.number().positive().optional(),
+	status,
 })
 
 export type RemoteNote = z.infer<typeof remoteNote>
@@ -107,6 +113,7 @@ export const remoteTemplate = z.object({
 	fields: z.array(z.string()),
 	css: z.string(),
 	ankiId: z.number().positive().optional(),
+	status,
 })
 
 export type RemoteTemplate = z.infer<typeof remoteTemplate>
@@ -116,6 +123,7 @@ const templateUneditable = {
 	nook: true,
 	created: true,
 	edited: true,
+	status: true,
 } as const
 
 export const createRemoteTemplate = remoteTemplate
