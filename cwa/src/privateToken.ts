@@ -1,12 +1,14 @@
 import { base64, base64url } from '@scure/base'
-import { type Brand, type MediaHash, type Base64Url } from 'shared/brand'
+import {
+	type Brand,
+	type MediaHash,
+	type Base64Url,
+	type Base64,
+} from 'shared/brand'
 import { concatAB, concat } from 'shared/utility'
 
 export type UserId = Brand<string, 'userId'>
-export type PrivateMediaSecretBase64 = Brand<
-	string,
-	'PrivateMediaSecretBase64' | 'base64'
->
+export type PrivateMediaSecret = Brand<string, 'PrivateMediaSecret'> & Base64
 
 /*
 
@@ -36,7 +38,7 @@ export type PrivateMediaSecretBase64 = Brand<
 */
 
 export async function buildPrivateToken(
-	privateMediaSecret: PrivateMediaSecretBase64,
+	privateMediaSecret: PrivateMediaSecret,
 	mediaHash: MediaHash,
 	userId: UserId,
 ): Promise<Base64Url> {
@@ -53,7 +55,7 @@ function parseToken(token: ArrayBuffer): [MediaHash, ArrayBuffer] {
 
 let maybeTokenKey: CryptoKey | null = null
 async function getTokenKey(
-	privateMediaSecret: PrivateMediaSecretBase64,
+	privateMediaSecret: PrivateMediaSecret,
 ): Promise<CryptoKey> {
 	if (maybeTokenKey == null) {
 		maybeTokenKey = await crypto.subtle.importKey(
@@ -73,7 +75,7 @@ function buildMessage(userId: UserId, mediaHash: MediaHash): ArrayBuffer {
 }
 
 async function signMessage(
-	privateMediaSecret: PrivateMediaSecretBase64,
+	privateMediaSecret: PrivateMediaSecret,
 	mediaHash: MediaHash,
 	userId: UserId,
 ): Promise<ArrayBuffer> {
@@ -83,7 +85,7 @@ async function signMessage(
 }
 
 export async function getMediaHash(
-	privateMediaSecret: PrivateMediaSecretBase64,
+	privateMediaSecret: PrivateMediaSecret,
 	userId: UserId,
 	token: ArrayBuffer,
 ): Promise<MediaHash | null> {

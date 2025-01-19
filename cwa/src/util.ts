@@ -1,6 +1,6 @@
 import { type Context } from 'hono'
-import { type PrivateMediaSecretBase64 } from './privateToken'
-import { type PublicMediaSecretBase64 } from 'shared-edge'
+import { type PrivateMediaSecret } from './privateToken'
+import { type PublicMediaSecret } from 'shared-edge'
 import { type R2Bucket } from '@cloudflare/workers-types'
 import {
 	type RemoteNoteId,
@@ -26,8 +26,8 @@ export type Env = {
 	// Example binding to R2. Learn more at https://developers.cloudflare.com/workers/runtime-apis/r2/
 	mediaBucket: R2Bucket
 	hubSessionSecret: Base64
-	privateMediaSecret: PrivateMediaSecretBase64
-	publicMediaSecret: PublicMediaSecretBase64
+	privateMediaSecret: PrivateMediaSecret
+	publicMediaSecret: PublicMediaSecret
 	tursoDbUrl: string
 	tursoAuthToken: string
 	peerSyncPublicKey: string

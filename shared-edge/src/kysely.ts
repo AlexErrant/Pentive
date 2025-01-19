@@ -51,19 +51,18 @@ import { ulidAsHex, ulidAsRaw } from './convertBinary'
 import { base16, base64, base64url, base64urlnopad } from '@scure/base'
 import { createClient } from '@libsql/client/web'
 import { base64ToArray } from 'shared/binary'
-import { buildPublicToken, type PublicMediaSecretBase64 } from './publicToken'
+import { buildPublicToken, type PublicMediaSecret } from './publicToken'
 export type * from 'kysely'
 
 // @ts-expect-error db calls should throw null error if not setup
 export let db: Kysely<DB> = null as Kysely<DB>
-export let publicMediaSecretBase64: PublicMediaSecretBase64 =
-	// @ts-expect-error references should throw null error if not setup
-	null as PublicMediaSecretBase64
+export let publicMediaSecretBase64: PublicMediaSecret =
+	null as PublicMediaSecret
 
 export function setKysely(
 	url: string,
 	authToken: string,
-	publicMediaSecret: PublicMediaSecretBase64,
+	publicMediaSecret: PublicMediaSecret,
 ): void {
 	if (db == null) {
 		db = new Kysely<DB>({

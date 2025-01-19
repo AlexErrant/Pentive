@@ -1,6 +1,6 @@
 import { type Context } from 'hono'
 import { type R2Bucket } from '@cloudflare/workers-types'
-import { type PublicMediaSecretBase64 } from 'shared-edge'
+import { type PublicMediaSecret } from 'shared-edge'
 import { type Base64 } from 'shared/brand'
 
 export type ApiUgcContext = Context<{
@@ -22,5 +22,5 @@ export type Env = {
 	tursoDbUrl: string
 	tursoAuthToken: string
 	hubSessionSecret: Base64
-	publicMediaSecret: PublicMediaSecretBase64
+	publicMediaSecret: PublicMediaSecret
 }
