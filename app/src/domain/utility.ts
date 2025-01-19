@@ -1,4 +1,4 @@
-import { hex } from '@scure/base'
+import { base16 } from '@scure/base'
 import { Ulid } from 'id128'
 import { arrayToBase64url } from 'shared/binary'
 import { type Base64Url, type TemplateId } from 'shared/brand'
@@ -6,7 +6,7 @@ import { getDefaultTemplate as getDefaultTemplateOg } from 'shared/domain/templa
 
 export function ulidAsBase64Url(): Base64Url {
 	const hexUlid = Ulid.generate().toRaw()
-	return arrayToBase64url(hex.decode(hexUlid))
+	return arrayToBase64url(base16.decode(hexUlid))
 }
 
 export const getDefaultTemplate = () =>

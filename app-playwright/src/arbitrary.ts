@@ -3,7 +3,7 @@
 import fc, { type Arbitrary, type RecordConstraints } from 'fast-check'
 import { Ulid } from 'id128'
 import { type Base64Url } from 'shared/brand'
-import { hex } from '@scure/base'
+import { base16 } from '@scure/base'
 import { nookIdRegex } from 'shared/schema'
 import { arrayToBase64url } from 'shared/binary'
 
@@ -51,7 +51,7 @@ export function arbitraryUlid<T extends Base64Url>(): fc.Arbitrary<T> {
 		})
 		.map((time) => {
 			const hexUlid = Ulid.generate({ time }).toRaw()
-			return arrayToBase64url(hex.decode(hexUlid)) as T
+			return arrayToBase64url(base16.decode(hexUlid)) as T
 		})
 }
 
