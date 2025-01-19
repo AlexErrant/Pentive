@@ -1,5 +1,9 @@
 import { SignJWT } from 'jose'
-import { base64ToArray } from 'shared/binary'
+import {
+	arrayToBase64url,
+	base64ToArray,
+	base64urlToArray,
+} from 'shared/binary'
 import { query, redirect } from '@solidjs/router'
 import {
 	CookieManager,
@@ -9,8 +13,7 @@ import {
 import { getRequestEvent } from 'solid-js/web'
 import { type EnvVars } from './env'
 import type { FetchEvent } from '@solidjs/start/server'
-import { base64url } from '@scure/base'
-import { type UserId } from 'shared/brand'
+import { type Base64Url, type UserId } from 'shared/brand'
 import { hubSessionCookieName, csrfSignatureCookieName } from 'shared/headers'
 import { throwExp } from 'shared/utility'
 
@@ -98,7 +101,7 @@ export async function getOauthCodeVerifier(request: Request) {
 
 export interface HubSession {
 	sub: UserId
-	jti: string
+	jti: CsrfFormat
 }
 
 export async function getSession() {
@@ -109,7 +112,7 @@ export async function getSession() {
 	if (payload == null) return null
 	return {
 		sub: (payload.sub as UserId) ?? throwExp(),
-		jti: payload.jti ?? throwExp(),
+		jti: (payload.jti as CsrfFormat) ?? throwExp(),
 	}
 }
 
@@ -241,23 +244,25 @@ async function getCsrfKey(): Promise<CryptoKey> {
 	return maybeCsrfKey
 }
 
-async function generateCsrf(): Promise<[string, string]> {
+export type CsrfFormat = Base64Url
+
+async function generateCsrf() {
 	const csrfBytes = crypto.getRandomValues(new Uint8Array(32))
 	const csrfKey = await getCsrfKey()
 	const csrfSignature = await crypto.subtle.sign('HMAC', csrfKey, csrfBytes)
 	return [
-		base64url.encode(csrfBytes).substring(0, 43),
-		base64url.encode(new Uint8Array(csrfSignature)).substring(0, 43),
-	]
+		arrayToBase64url(csrfBytes),
+		arrayToBase64url(new Uint8Array(csrfSignature)),
+	] as const satisfies [CsrfFormat, CsrfFormat]
 }
 
 export async function isInvalidCsrf(
-	csrfSignature: string,
-	csrf: string,
-): Promise<boolean> {
+	csrfSignature: CsrfFormat,
+	csrf: CsrfFormat,
+) {
 	const csrfKey = await getCsrfKey()
-	const signature = base64url.decode(csrfSignature + '=')
-	const data = base64url.decode(csrf + '=')
+	const signature = base64urlToArray(csrfSignature)
+	const data = base64urlToArray(csrf)
 	const isValid = await crypto.subtle.verify('HMAC', csrfKey, signature, data)
 	return !isValid
 }

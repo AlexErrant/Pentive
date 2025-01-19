@@ -5,6 +5,7 @@ import {
 	isInvalidCsrf,
 	requireUserId,
 	getCsrfSignatureCached,
+	type CsrfFormat,
 } from '~/session'
 import { type NookId } from 'shared/brand'
 import {
@@ -51,7 +52,7 @@ const submitting = action(async (form: FormData) => {
 	const description = form.get('description')
 	const nook = form.get('nook') as NookId
 	const nookType = form.get('nookType') as NookType
-	const csrfSignature = form.get('csrfSignature')
+	const csrfSignature = form.get('csrfSignature') as CsrfFormat
 	if (
 		typeof sidebar !== 'string' ||
 		typeof description !== 'string' ||

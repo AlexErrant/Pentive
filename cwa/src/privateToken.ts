@@ -1,4 +1,4 @@
-import { base64, base64url } from '@scure/base'
+import { arrayToBase64url, base64ToArray } from 'shared/binary'
 import {
 	type Brand,
 	type MediaHash,
@@ -44,7 +44,7 @@ export async function buildPrivateToken(
 ): Promise<Base64Url> {
 	const signature = await signMessage(privateMediaSecret, mediaHash, userId)
 	const token = concatAB(mediaHash, signature)
-	return base64url.encode(token) as Base64Url
+	return arrayToBase64url(token)
 }
 
 function parseToken(token: ArrayBuffer): [MediaHash, ArrayBuffer] {
@@ -60,7 +60,7 @@ async function getTokenKey(
 	if (maybeTokenKey == null) {
 		maybeTokenKey = await crypto.subtle.importKey(
 			'raw',
-			base64.decode(privateMediaSecret),
+			base64ToArray(privateMediaSecret),
 			{ name: 'HMAC', hash: 'SHA-256' },
 			false,
 			['sign', 'verify'],

@@ -4,6 +4,7 @@ import {
 	requireSession,
 	isInvalidCsrf,
 	getCsrfSignatureCached,
+	type CsrfFormat,
 } from '~/session'
 import {
 	type RouteDefinition,
@@ -48,7 +49,7 @@ const submitting = action(async (form: FormData) => {
 	const title = form.get('title')
 	const text = form.get('text')
 	const nook = form.get('nook')
-	const csrfSignature = form.get('csrfSignature')
+	const csrfSignature = form.get('csrfSignature') as CsrfFormat
 	if (
 		typeof title !== 'string' ||
 		typeof text !== 'string' ||
