@@ -1023,7 +1023,7 @@ async function replaceAsync(
 	return string.replace(regexp, () => replacements[i++]!)
 }
 
-const imgRegex = new RegExp(escapeRegExp(imgPlaceholder) + `(.{44})`, 'g')
+const imgRegex = new RegExp(escapeRegExp(imgPlaceholder) + `(.{43})`, 'g')
 async function replaceImgSrcs(
 	value: string,
 	remoteIdBase64url: Base64Url,
