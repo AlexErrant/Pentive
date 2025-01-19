@@ -45,7 +45,7 @@
 		"//ci": "simulate cicd locally",
 		"ci": "git clean -xdf && ./mkenv.sh && ./rmcert.sh && ./mkcert.sh && pnpm i && pnpm turbo:all --force && ./initIvy.sh",
 		"cf": "git clean -xdf && ./mkenv.sh && ./rmcert.sh && ./mkcert.sh && pnpm i && npx turbo run tsc-build build && ./initIvy.sh",
-		"turbo:all": "PLAYWRIGHT_HTML_OPEN=never turbo run tsc-build eslint check test:run build"
+		"turbo:all": "PLAYWRIGHT_HTML_OPEN=never turbo run tsc-build eslint check test:run build",
 	},
 	"pnpm": {
 		"patchedDependencies": {

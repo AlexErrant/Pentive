@@ -2,8 +2,7 @@ import { type CookieParseOptions, parse, serialize } from 'cookie-es'
 import { type JWTVerifyResult, type SignJWT, jwtVerify } from 'jose'
 import { type WithRequired, concat } from 'shared/utility'
 import { type Brand } from 'shared/brand'
-import { arrayBufferToBase64 } from 'shared-dom/utility'
-import { base64ToArray } from 'shared/binary'
+import { arrayBufferToBase64, base64ToArray } from 'shared/binary'
 import { type CookieSerializeOptions } from 'vinxi/http'
 
 const encoder = new TextEncoder()
