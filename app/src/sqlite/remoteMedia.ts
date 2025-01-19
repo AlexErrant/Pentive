@@ -14,10 +14,11 @@ export const remoteMediaCollectionMethods = {
 			[NoteId | TemplateId, RemoteNoteId | RemoteTemplateId, RemoteMediaId]
 		>,
 	) {
+		const uploadDate = C.getDate().getTime()
 		for (const [localEntityId, , remoteMediaId] of ids) {
 			const r = await ky
 				.updateTable('remoteMedia')
-				.set({ uploadDate: C.getDate().getTime() })
+				.set({ uploadDate })
 				.where('localEntityId', '=', localEntityId as LDbId)
 				.where('remoteMediaId', '=', remoteMediaId)
 				.returningAll()

@@ -45,9 +45,10 @@ import {
 	throwExp,
 	type SqliteCount,
 	objEntries,
+	escapeRegExp,
 } from 'shared/utility'
-import { binary16fromBase64URL, ulidAsHex, ulidAsRaw } from './convertBinary'
-import { base16, base64, base64url } from '@scure/base'
+import { ulidAsHex, ulidAsRaw } from './convertBinary'
+import { base16, base64, base64url, base64urlnopad } from '@scure/base'
 import { createClient } from '@libsql/client/web'
 import { base64ToArray } from './utility'
 import { buildPublicToken, type PublicMediaSecretBase64 } from './publicToken'
@@ -702,7 +703,7 @@ export async function insertNoteChildComment(
 }
 
 export async function userOwnsNoteAndHasMedia(
-	ids: NoteId[],
+	ids: RemoteNoteId[],
 	authorId: UserId,
 	id: MediaHash,
 ): Promise<{
@@ -732,7 +733,7 @@ export async function userOwnsNoteAndHasMedia(
 }
 
 export async function userOwnsTemplateAndHasMedia(
-	ids: TemplateId[],
+	ids: RemoteTemplateId[],
 	authorId: UserId,
 	id: MediaHash,
 ): Promise<{
@@ -1020,7 +1021,7 @@ async function replaceAsync(
 	return string.replace(regexp, () => replacements[i++]!)
 }
 
-const imgRegex = new RegExp(`${imgPlaceholder}(.{44})`, 'g')
+const imgRegex = new RegExp(escapeRegExp(imgPlaceholder) + `(.{44})`, 'g')
 async function replaceImgSrcs(
 	value: string,
 	remoteIdBase64url: Base64Url,
@@ -1256,7 +1257,7 @@ export function fromBase64(id: Base64): RawBuilder<DbId> {
 }
 
 export function fromBase64Url(id: Base64Url): RawBuilder<DbId> {
-	return fromBase64(binary16fromBase64URL(id))
+	return sql<DbId>`${base64urlnopad.decode(id)}`
 }
 
 function mapIdToBase64Url<T>(t: T & { id: DbId }): T & {

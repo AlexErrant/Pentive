@@ -22,7 +22,7 @@ const client = createClient({
 
 const tableCount = await client
 	.execute(`SELECT count(*) FROM sqlite_master WHERE type = 'table'`)
-	.then((x) => x.rows[0][0] as number)
+	.then((x) => x.rows[0]![0] as number)
 
 // eslint-disable-next-line no-constant-condition
 if (false) {

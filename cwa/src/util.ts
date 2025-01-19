@@ -2,6 +2,11 @@ import { type Context } from 'hono'
 import { type PrivateMediaSecretBase64 } from './privateToken'
 import { type PublicMediaSecretBase64 } from 'shared-edge'
 import { type R2Bucket } from '@cloudflare/workers-types'
+import {
+	type RemoteNoteId,
+	type RemoteTemplateId,
+	type RemoteMediaId,
+} from 'shared/brand'
 
 export type CwaContext = Context<{
 	// eslint-disable-next-line @typescript-eslint/naming-convention
@@ -27,3 +32,6 @@ export type Env = {
 	peerSyncPublicKey: string
 	peerSyncPrivateKey: string
 }
+
+export type MediaTemplateQueryKey = RemoteNoteId | RemoteTemplateId
+export type MediaTemplateQueryValue = RemoteMediaId

@@ -10,7 +10,12 @@
 
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
-import { type Env, type CwaContext } from './util'
+import {
+	type Env,
+	type CwaContext,
+	type MediaTemplateQueryKey,
+	type MediaTemplateQueryValue,
+} from './util'
 import {
 	setKysely,
 	db,
@@ -30,12 +35,14 @@ import {
 	type Base64Url,
 	type NoteId,
 	type TemplateId,
-	type MediaId,
+	type RemoteMediaId,
+	type RemoteNoteId,
+	type RemoteTemplateId,
 } from 'shared/brand'
 import { hstsName, hstsValue } from 'shared/headers'
 import { objEntries, objKeys } from 'shared/utility'
 import z from 'zod'
-import { mediaId, noteId } from 'shared/schema'
+import { noteId, remoteMediaId } from 'shared/schema'
 export type * from '@trpc/server'
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -130,23 +137,23 @@ app
 		return await postMedia(c, persistDbAndBucket, buildToken)
 	})
 	.post('/media/note', async (c) => {
-		const mediaIdByEntityIds = mediaIdByEntityIdsValidator.parse(
-			c.req.query(),
-		) as Record<NoteId, MediaId> // grep E7F24704-8D0B-460A-BF2C-A97344C535E0
+		const mediaIdByEntityIds = mediaIdByEntityIdsValidator.parse(c.req.query())
 		const noteIds = objKeys(mediaIdByEntityIds)
 		if (noteIds.length === 0) return c.text(`Need at least one note.`, 400)
 		return await postPublicMedia(
 			c,
 			'note',
 			async (authorId: UserId, mediaHash: MediaHash) =>
-				await userOwnsNoteAndHasMedia(noteIds, authorId, mediaHash),
+				await userOwnsNoteAndHasMedia(
+					noteIds as RemoteNoteId[],
+					authorId,
+					mediaHash,
+				),
 			mediaIdByEntityIds,
 		)
 	})
 	.post('/media/template', async (c) => {
-		const iByEntityIds = mediaIdByEntityIdsValidator.parse(
-			c.req.query(),
-		) as Record<TemplateId, MediaId> // grep E7F24704-8D0B-460A-BF2C-A97344C535E0
+		const iByEntityIds = mediaIdByEntityIdsValidator.parse(c.req.query())
 		const templateIds = objKeys(iByEntityIds)
 		if (templateIds.length === 0)
 			return c.text(`Need at least one template.`, 400)
@@ -154,12 +161,18 @@ app
 			c,
 			'template',
 			async (authorId: UserId, mediaHash: MediaHash) =>
-				await userOwnsTemplateAndHasMedia(templateIds, authorId, mediaHash),
+				await userOwnsTemplateAndHasMedia(
+					templateIds as RemoteTemplateId[],
+					authorId,
+					mediaHash,
+				),
 			iByEntityIds,
 		)
 	})
 
-const mediaIdByEntityIdsValidator = z.record(noteId, mediaId)
+const mediaIdByEntityIdsValidator = z.record(noteId, remoteMediaId) as z.Schema<
+	Record<MediaTemplateQueryKey, MediaTemplateQueryValue>
+>
 
 export default app
 
@@ -173,7 +186,7 @@ async function postPublicMedia(
 		userOwns: boolean
 		hasMedia: boolean
 	}>,
-	mediaIdByEntityIds: Record<NoteId | TemplateId, MediaId>,
+	mediaIdByEntityIds: Record<NoteId | TemplateId, RemoteMediaId>,
 ) {
 	const authResult = await getUserId(c)
 	if (authResult.tag === 'Error') return c.text(authResult.error, 401)

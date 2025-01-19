@@ -10,6 +10,10 @@ import {
 import { csrfHeaderName } from 'shared/headers'
 import { C } from '../topLevelAwait'
 import { cwaClient } from '../trpcClient'
+import {
+	type MediaTemplateQueryValue,
+	type MediaTemplateQueryKey,
+} from 'cwa/src/util'
 
 export async function postMedia(
 	type: 'note' | 'template',
@@ -20,7 +24,11 @@ export async function postMedia(
 	data: ArrayBuffer,
 ): Promise<void> {
 	const remoteEntityIdAndRemoteMediaId = ids.map(
-		([, remoteEntityId, remoteMediaId]) => [remoteEntityId, remoteMediaId],
+		([, remoteEntityId, remoteMediaId]) =>
+			[remoteEntityId, remoteMediaId] as const satisfies [
+				MediaTemplateQueryKey,
+				MediaTemplateQueryValue,
+			],
 	)
 	const response = await fetch(
 		import.meta.env.VITE_CWA_URL +

@@ -1,11 +1,6 @@
 import { type Brand, type Base64Url, type Base64 } from 'shared/brand'
 import { concat } from 'shared/utility'
-import { base64 } from '@scure/base'
-import {
-	decodeBase64,
-	decodeBase64Url,
-	encodeBase64Url,
-} from 'hono/utils/encode'
+import { base64, base64urlnopad } from '@scure/base'
 
 /*
 
@@ -25,10 +20,10 @@ export async function buildPublicToken(
 	mediaHash: Base64,
 	publicMediaSecretBase64: PublicMediaSecretBase64,
 ) {
-	const data = concat(decodeBase64Url(entityId), decodeBase64(mediaHash))
+	const data = concat(base64urlnopad.decode(entityId), base64.decode(mediaHash))
 	const key = await getPublicMediaKey(publicMediaSecretBase64)
 	const hmac = await crypto.subtle.sign('HMAC', key, data)
-	return encodeBase64Url(hmac) as Base64Url
+	return base64urlnopad.encode(new Uint8Array(hmac)) as Base64Url
 }
 
 export type PublicMediaSecretBase64 = Brand<

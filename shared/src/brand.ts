@@ -72,6 +72,7 @@ type LocalId =
 	| RemoteTemplateId
 	| RemoteNoteId
 	| RemoteCardId
+	| RemoteMediaId
 
 export function toLDbId<T extends LocalId | undefined | null>(value: T) {
 	return value as unknown as T extends undefined

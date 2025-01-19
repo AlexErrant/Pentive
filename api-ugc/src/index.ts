@@ -60,7 +60,7 @@ app
 	.get('/', (c) => c.text('Hono!!'))
 	.get('/i/:mediaId', async (c) => {
 		setKysely(c.env.tursoDbUrl, c.env.tursoAuthToken, c.env.publicMediaSecret)
-		const mediaId = c.req.param('mediaId') as MediaId
+		const mediaId = c.req.param('mediaId').substring(0, 43) as MediaId
 		const mediaHash = await lookupMediaHash(mediaId)
 		if (mediaHash == null) return await c.notFound()
 		return await getMedia(c, mediaHash, 'public')
