@@ -27,7 +27,8 @@ import { type Note } from 'shared/domain/note'
 import { C, ky, tx } from '../topLevelAwait'
 import { jsonArrayFrom } from 'kysely/helpers/sqlite'
 import { type AliasedRawBuilder, type ExpressionBuilder } from 'kysely'
-import { base64ToArray, uint8ArrayToBase64 } from 'shared-dom/utility'
+import { uint8ArrayToBase64 } from 'shared-dom/utility'
+import { base64ToArray } from 'shared/binary'
 
 export function parseTags(rawTags: string) {
 	return parseSet<string>(rawTags)

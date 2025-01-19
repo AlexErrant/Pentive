@@ -50,7 +50,7 @@ import {
 import { ulidAsHex, ulidAsRaw } from './convertBinary'
 import { base16, base64, base64url, base64urlnopad } from '@scure/base'
 import { createClient } from '@libsql/client/web'
-import { base64ToArray } from './utility'
+import { base64ToArray } from 'shared/binary'
 import { buildPublicToken, type PublicMediaSecretBase64 } from './publicToken'
 export type * from 'kysely'
 

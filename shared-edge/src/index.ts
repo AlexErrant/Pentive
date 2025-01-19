@@ -1,7 +1,6 @@
 export * from './convertBinary'
 export * from './kysely'
 export * from './nook'
-export * from './utility'
 export * from './user'
 export * from './userId'
 export * from './publicToken'

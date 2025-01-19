@@ -1,5 +1,5 @@
 import { SignJWT } from 'jose'
-import { base64ToArray } from 'shared-edge'
+import { base64ToArray } from 'shared/binary'
 import { query, redirect } from '@solidjs/router'
 import {
 	CookieManager,

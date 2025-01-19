@@ -3,7 +3,7 @@ import { type JWTVerifyResult, type SignJWT, jwtVerify } from 'jose'
 import { type WithRequired, concat } from 'shared/utility'
 import { type Brand } from 'shared/brand'
 import { arrayBufferToBase64 } from 'shared-dom/utility'
-import { base64ToArray } from 'shared-edge'
+import { base64ToArray } from 'shared/binary'
 import { type CookieSerializeOptions } from 'vinxi/http'
 
 const encoder = new TextEncoder()

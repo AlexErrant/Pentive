@@ -144,6 +144,11 @@
 			"development": "./src/ugcViteConfig.ts",
 			"default": "./lib/src/ugcViteConfig.js"
 		},
+		"./binary": {
+			"types": "./src/binary.ts",
+			"development": "./src/binary.ts",
+			"default": "./lib/src/binary.js"
+		},
 		"./sql.json": {
 			"default": "./lib/src/sql.json"
 		}
