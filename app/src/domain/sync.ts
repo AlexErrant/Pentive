@@ -69,7 +69,7 @@ export async function uploadTemplates(templateId?: TemplateId, nook?: NookId) {
 			await cwaClient.editTemplates.mutate(editedTemplates)
 		await C.db.updateRemotes('remoteTemplate', remoteIdByLocal)
 	}
-	const media = await C.db.getTemplateMediaToUpload(templateId)
+	const media = await C.db.getMediaToUpload('template', templateId)
 	for (const [mediaId, { data, ids }] of media) {
 		await postMedia('template', mediaId, ids, data)
 	}
@@ -99,7 +99,7 @@ export async function uploadNotes(
 		const remoteIdByLocal = await cwaClient.editNote.mutate(editedNotes)
 		await C.db.updateRemotes('remoteNote', remoteIdByLocal)
 	}
-	const media = await C.db.getNoteMediaToUpload(noteId)
+	const media = await C.db.getMediaToUpload('note', noteId)
 	for (const [mediaId, { data, ids }] of media) {
 		await postMedia('note', mediaId, ids, data)
 	}

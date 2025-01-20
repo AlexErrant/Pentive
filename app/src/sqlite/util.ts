@@ -266,8 +266,8 @@ export async function updateRemotes(
 	})
 }
 
-export async function getNoteMediaToUpload(noteId?: NoteId) {
-	const mediaBinaries = await ky
+async function noteMediaBinaries(noteId?: NoteId) {
+	return await ky
 		.selectFrom('remoteMedia')
 		.innerJoin('media', 'remoteMedia.localMediaId', 'media.id')
 		.innerJoin('noteBase', 'remoteMedia.localEntityId', 'noteBase.id')
@@ -279,7 +279,7 @@ export async function getNoteMediaToUpload(noteId?: NoteId) {
 			'remoteMedia.remoteMediaId',
 			'remoteNote.remoteId',
 		])
-		.where(({ eb, ref, or }) =>
+		.where(({ eb, or, ref }) =>
 			or([
 				eb('remoteMedia.uploadDate', 'is', null),
 				eb('media.edited', '>', ref('remoteMedia.uploadDate')),
@@ -287,9 +287,53 @@ export async function getNoteMediaToUpload(noteId?: NoteId) {
 		)
 		.$if(noteId != null, (db) => db.where('noteBase.id', '=', toLDbId(noteId!)))
 		.execute()
+}
+
+async function templateMediaBinaries(templateId?: TemplateId) {
+	return await ky
+		.selectFrom('remoteMedia')
+		.innerJoin('media', 'remoteMedia.localMediaId', 'media.id')
+		.innerJoin('template', 'remoteMedia.localEntityId', 'template.id')
+		.leftJoin('remoteTemplate', 'remoteTemplate.localId', 'template.id')
+		.select([
+			'remoteMedia.localMediaId',
+			'media.data',
+			'remoteMedia.localEntityId',
+			'remoteMedia.remoteMediaId',
+			'remoteTemplate.remoteId',
+		])
+		.where(({ eb, or, ref }) =>
+			or([
+				eb('remoteMedia.uploadDate', 'is', null),
+				eb('media.edited', '>', ref('remoteMedia.uploadDate')),
+			]),
+		)
+		.$if(templateId != null, (db) =>
+			db.where('template.id', '=', toLDbId(templateId!)),
+		)
+		.execute()
+}
+
+export async function getMediaToUpload<TType extends 'note' | 'template'>(
+	type: TType,
+	entityId?: TType extends 'note' ? NoteId : TemplateId,
+) {
+	const mediaBinaries =
+		type === 'note'
+			? await noteMediaBinaries(entityId as NoteId)
+			: await templateMediaBinaries(entityId as TemplateId)
 	const media = new Map<
 		MediaId,
-		{ data: ArrayBuffer; ids: Array<[NoteId, RemoteNoteId, RemoteMediaId]> }
+		{
+			data: ArrayBuffer
+			ids: Array<
+				[
+					TType extends 'note' ? NoteId : TemplateId,
+					TType extends 'note' ? RemoteNoteId : RemoteTemplateId,
+					RemoteMediaId,
+				]
+			>
+		}
 	>(
 		mediaBinaries.map(({ localMediaId, data }) => [
 			localMediaId,
@@ -300,7 +344,7 @@ export async function getNoteMediaToUpload(noteId?: NoteId) {
 		const remoteId =
 			m.remoteId ??
 			C.toastImpossible(
-				`Note media '${m.localMediaId}' is missing a remoteId, is something wrong with the SQL query?`,
+				`${type} media '${m.localMediaId}' is missing a remoteId, is something wrong with the SQL query?`,
 			)
 		const value =
 			media.get(m.localMediaId) ??

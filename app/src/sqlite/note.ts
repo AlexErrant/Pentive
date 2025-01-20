@@ -18,7 +18,7 @@ import {
 	noteEntityToDomain,
 	templateSelection,
 	remotifyDoms,
-	getNoteMediaToUpload,
+	getMediaToUpload,
 } from './util'
 import { saveTags } from './tag'
 import { type Note } from 'shared/domain/note'
@@ -394,7 +394,7 @@ JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field
 				}),
 			)
 	},
-	getNoteMediaToUpload,
+	getMediaToUpload,
 	makeNoteUploadable: async function (
 		remoteNote: Override<
 			InsertObject<DB, 'remoteNote'>,
