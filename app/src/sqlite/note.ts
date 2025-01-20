@@ -18,6 +18,7 @@ import {
 	noteEntityToDomain,
 	templateSelection,
 	remotifyDoms,
+	getNoteMediaToUpload,
 } from './util'
 import { saveTags } from './tag'
 import { type Note } from 'shared/domain/note'
@@ -25,8 +26,6 @@ import {
 	type RemoteTemplateId,
 	type RemoteNoteId,
 	type NoteId,
-	type MediaId,
-	type RemoteMediaId,
 	type NookId,
 	toLDbId,
 	fromLDbId,
@@ -395,62 +394,7 @@ JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field
 				}),
 			)
 	},
-	getNoteMediaToUpload: async function (noteId?: NoteId) {
-		const mediaBinaries = await ky
-			.selectFrom('remoteMedia')
-			.innerJoin('media', 'remoteMedia.localMediaId', 'media.id')
-			.innerJoin('noteBase', 'remoteMedia.localEntityId', 'noteBase.id')
-			.leftJoin('remoteNote', 'remoteNote.localId', 'noteBase.id')
-			.select([
-				'remoteMedia.localMediaId',
-				'media.data',
-				'remoteMedia.localEntityId',
-				'remoteMedia.remoteMediaId',
-				'remoteNote.remoteId',
-			])
-			.where(({ eb, ref, or }) =>
-				or([
-					eb('remoteMedia.uploadDate', 'is', null),
-					eb('media.edited', '>', ref('remoteMedia.uploadDate')),
-				]),
-			)
-			.$if(noteId != null, (db) =>
-				db.where('noteBase.id', '=', toLDbId(noteId!)),
-			)
-			.execute()
-		const media = new Map<
-			MediaId,
-			{ data: ArrayBuffer; ids: Array<[NoteId, RemoteNoteId, RemoteMediaId]> }
-		>(
-			mediaBinaries.map(({ localMediaId, data }) => [
-				localMediaId,
-				{ data, ids: [] },
-			]),
-		)
-		for (const m of mediaBinaries) {
-			const remoteId =
-				m.remoteId ??
-				C.toastImpossible(
-					`Note media '${m.localMediaId}' is missing a remoteId, is something wrong with the SQL query?`,
-				)
-			const value =
-				media.get(m.localMediaId) ??
-				C.toastImpossible(
-					`mediaBinaries is missing '${m.localMediaId}'... how?`,
-				)
-			const remoteMediaId =
-				m.remoteMediaId ??
-				C.toastImpossible(
-					`remoteMedia with localMediaId '${m.localMediaId}' is missing remoteMediaId`, // this should've been set in the syncing step
-				)
-			value.ids.push([
-				fromLDbId(m.localEntityId),
-				fromLDbId(remoteId),
-				remoteMediaId,
-			])
-		}
-		return media
-	},
+	getNoteMediaToUpload,
 	makeNoteUploadable: async function (
 		remoteNote: Override<
 			InsertObject<DB, 'remoteNote'>,
