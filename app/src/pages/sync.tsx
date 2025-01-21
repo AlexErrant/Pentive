@@ -22,12 +22,7 @@ import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-alpine.css'
 import { LicenseManager } from 'ag-grid-enterprise'
 import { DiffModeToggleGroup } from '../components/diffModeContext'
-import {
-	uploadNoteMedia,
-	uploadNotes,
-	uploadTemplateMedia,
-	uploadTemplates,
-} from '../domain/sync'
+import { uploadNotes, uploadTemplates } from '../domain/sync'
 import { type NookId } from 'shared/brand'
 import { type Template } from 'shared/domain/template'
 import { objKeys, type Override } from 'shared/utility'
@@ -37,6 +32,7 @@ import { useWhoAmIContext } from '../components/whoAmIContext'
 import { createGrid, Renderer } from '../uiLogic/aggrid'
 import { createAsync } from '@solidjs/router'
 import { uploadableNoteMedia, uploadableTemplateMedia } from '../sqlite/util'
+import ResumeUpload from '../components/resumeUpload'
 
 LicenseManager.setLicenseKey(import.meta.env.VITE_AG_GRID_LICENSE)
 
@@ -114,22 +110,7 @@ export default function Sync(): JSX.Element {
 			when={whoAmI()}
 			fallback={"You can only upload/download/sync when you're logged in."}
 		>
-			<Show
-				when={uploadableMediaCount() === 0}
-				fallback={
-					<>
-						Your upload of {uploadableMediaCount()} media files was interrupted.
-						<button
-							onClick={async () => {
-								await uploadTemplateMedia(true)
-								await uploadNoteMedia(true)
-							}}
-						>
-							Resume Upload
-						</button>
-					</>
-				}
-			>
+			<Show when={uploadableMediaCount() === 0} fallback={<ResumeUpload />}>
 				<Content />
 			</Show>
 		</Show>
