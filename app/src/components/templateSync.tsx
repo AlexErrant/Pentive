@@ -56,7 +56,7 @@ export const TemplateNookSync: VoidComponent<{
 			remote={props.templateRemote}
 			// eslint-disable-next-line solid/reactivity
 			upload={async () => {
-				await uploadTemplates(props.template.id, props.nook)
+				await uploadTemplates(false, props.template.id, props.nook)
 			}}
 		>
 			<TemplateNookSyncActual

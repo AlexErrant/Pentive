@@ -54,7 +54,11 @@ export async function postMedia(
 }
 
 // medTODO figure out a way to transactionally upload. Currently can upload templates with missing media
-export async function uploadTemplates(templateId?: TemplateId, nook?: NookId) {
+export async function uploadTemplates(
+	torn: boolean,
+	templateId?: TemplateId,
+	nook?: NookId,
+) {
 	const newTemplates = await C.db.getNewTemplatesToUpload(templateId, nook)
 	if (newTemplates.length > 0) {
 		const remoteIdByLocal = await cwaClient.createTemplates.mutate(newTemplates)
@@ -69,10 +73,7 @@ export async function uploadTemplates(templateId?: TemplateId, nook?: NookId) {
 			await cwaClient.editTemplates.mutate(editedTemplates)
 		await C.db.updateRemotes('remoteTemplate', remoteIdByLocal)
 	}
-	const media = await C.db.getMediaToUpload('template', templateId)
-	for (const [mediaId, { data, ids }] of media) {
-		await postMedia('template', mediaId, ids, data)
-	}
+	const media = await uploadTemplateMedia(torn, templateId)
 	if (
 		editedTemplates.length === 0 &&
 		newTemplates.length === 0 &&
@@ -82,10 +83,22 @@ export async function uploadTemplates(templateId?: TemplateId, nook?: NookId) {
 	}
 }
 
+export async function uploadTemplateMedia(
+	torn: boolean,
+	templateId?: TemplateId,
+) {
+	const media = await C.db.getMediaToUpload('template', torn, templateId)
+	for (const [mediaId, { data, ids }] of media) {
+		await postMedia('template', mediaId, ids, data)
+	}
+	return media
+}
+
 export type SyncState = 'different' | 'uploaded' | 'uploading' | 'errored'
 
 // medTODO figure out a way to transactionally upload. Currently can upload notes with missing media
 export async function uploadNotes(
+	torn: boolean,
 	noteId?: NoteId,
 	nook?: NookId,
 ): Promise<void> {
@@ -99,11 +112,16 @@ export async function uploadNotes(
 		const remoteIdByLocal = await cwaClient.editNote.mutate(editedNotes)
 		await C.db.updateRemotes('remoteNote', remoteIdByLocal)
 	}
-	const media = await C.db.getMediaToUpload('note', noteId)
-	for (const [mediaId, { data, ids }] of media) {
-		await postMedia('note', mediaId, ids, data)
-	}
+	const media = await uploadNoteMedia(torn, noteId)
 	if (editedNotes.length === 0 && newNotes.length === 0 && media.size === 0) {
 		C.toastInfo('Nothing to upload!')
 	}
+}
+
+export async function uploadNoteMedia(torn: boolean, noteId?: NoteId) {
+	const media = await C.db.getMediaToUpload('note', torn, noteId)
+	for (const [mediaId, { data, ids }] of media) {
+		await postMedia('note', mediaId, ids, data)
+	}
+	return media
 }

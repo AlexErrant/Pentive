@@ -3,6 +3,9 @@ export type WithRequired<T, K extends keyof T> = T & { [P in K]-?: T[P] }
 
 export type SqliteCount = number
 
+// https://stackoverflow.com/a/57683652
+export type Rasterize<T> = T extends infer O ? { [K in keyof O]: O[K] } : never
+
 // https://basarat.gitbook.io/typescript/type-system/discriminated-unions#throw-in-exhaustive-checks
 export function assertNever(x: never): never {
 	throw new Error(

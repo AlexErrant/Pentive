@@ -51,7 +51,7 @@ export const NoteNookSync: VoidComponent<{
 			remote={props.remoteNote}
 			// eslint-disable-next-line solid/reactivity
 			upload={async () => {
-				await uploadNotes(props.note.id, props.nook)
+				await uploadNotes(false, props.note.id, props.nook)
 			}}
 		>
 			<NoteNookSyncActual

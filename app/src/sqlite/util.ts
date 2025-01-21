@@ -22,7 +22,13 @@ import {
 import { type Field, type Template } from 'shared/domain/template'
 import { imgPlaceholder } from 'shared/image'
 import { type TemplateType } from 'shared/schema'
-import { parseSet, parseMap, notEmpty } from 'shared/utility'
+import {
+	parseSet,
+	parseMap,
+	notEmpty,
+	type SqliteCount,
+	type Rasterize,
+} from 'shared/utility'
 import { type Note } from 'shared/domain/note'
 import { C, ky, tx } from '../topLevelAwait'
 import { jsonArrayFrom } from 'kysely/helpers/sqlite'
@@ -266,62 +272,109 @@ export async function updateRemotes(
 	})
 }
 
-async function noteMediaBinaries(noteId?: NoteId) {
-	return await ky
+export async function uploadableNoteMedia<
+	TId extends NoteId | undefined = undefined,
+	TCount extends true | undefined = undefined,
+>(
+	torn: boolean,
+	noteId: TId = undefined as TId,
+	count: TCount = undefined as TCount,
+) {
+	const r = await ky
 		.selectFrom('remoteMedia')
 		.innerJoin('media', 'remoteMedia.localMediaId', 'media.id')
 		.innerJoin('noteBase', 'remoteMedia.localEntityId', 'noteBase.id')
 		.leftJoin('remoteNote', 'remoteNote.localId', 'noteBase.id')
-		.select([
-			'remoteMedia.localMediaId',
-			'media.data',
-			'remoteMedia.localEntityId',
-			'remoteMedia.remoteMediaId',
-			'remoteNote.remoteId',
-		])
+		.$if(count === true, (qb) =>
+			qb.select(
+				ky.fn.count<SqliteCount>('remoteMedia.localEntityId').as('count'),
+			),
+		)
+		.$if(count === undefined, (qb) =>
+			qb.select([
+				'remoteMedia.localMediaId',
+				'media.data',
+				'remoteMedia.localEntityId',
+				'remoteMedia.remoteMediaId',
+				'remoteNote.remoteId',
+			]),
+		)
+		.$if(noteId != null, (qb) => qb.where('noteBase.id', '=', toLDbId(noteId!)))
+		.$if(torn, (qb) => qb.where('remoteMedia.remoteMediaId', 'is not', null))
 		.where(({ eb, or, ref }) =>
 			or([
 				eb('remoteMedia.uploadDate', 'is', null),
 				eb('media.edited', '>', ref('remoteMedia.uploadDate')),
 			]),
 		)
-		.$if(noteId != null, (db) => db.where('noteBase.id', '=', toLDbId(noteId!)))
 		.execute()
+	type SqlRow = (typeof r)[0]
+	type R = TCount extends true
+		? number
+		: Array<Rasterize<Required<Omit<SqlRow, 'count'>>>>
+	if (count) {
+		return r[0]!.count as R
+	}
+	return r as R
 }
 
-async function templateMediaBinaries(templateId?: TemplateId) {
-	return await ky
+export async function uploadableTemplateMedia<
+	TId extends TemplateId | undefined = undefined,
+	TCount extends true | undefined = undefined,
+>(
+	torn: boolean,
+	templateId: TId = undefined as TId,
+	count: TCount = undefined as TCount,
+) {
+	const r = await ky
 		.selectFrom('remoteMedia')
 		.innerJoin('media', 'remoteMedia.localMediaId', 'media.id')
 		.innerJoin('template', 'remoteMedia.localEntityId', 'template.id')
 		.leftJoin('remoteTemplate', 'remoteTemplate.localId', 'template.id')
-		.select([
-			'remoteMedia.localMediaId',
-			'media.data',
-			'remoteMedia.localEntityId',
-			'remoteMedia.remoteMediaId',
-			'remoteTemplate.remoteId',
-		])
+		.$if(count === true, (qb) =>
+			qb.select(
+				ky.fn.count<SqliteCount>('remoteMedia.localEntityId').as('count'),
+			),
+		)
+		.$if(count === undefined, (qb) =>
+			qb.select([
+				'remoteMedia.localMediaId',
+				'media.data',
+				'remoteMedia.localEntityId',
+				'remoteMedia.remoteMediaId',
+				'remoteTemplate.remoteId',
+			]),
+		)
+		.$if(templateId != null, (qb) =>
+			qb.where('template.id', '=', toLDbId(templateId!)),
+		)
+		.$if(torn, (qb) => qb.where('remoteMedia.remoteMediaId', 'is not', null))
 		.where(({ eb, or, ref }) =>
 			or([
 				eb('remoteMedia.uploadDate', 'is', null),
 				eb('media.edited', '>', ref('remoteMedia.uploadDate')),
 			]),
 		)
-		.$if(templateId != null, (db) =>
-			db.where('template.id', '=', toLDbId(templateId!)),
-		)
 		.execute()
+	type SqlRow = (typeof r)[0]
+	type R = TCount extends true
+		? number
+		: Array<Rasterize<Required<Omit<SqlRow, 'count'>>>>
+	if (count) {
+		return r[0]!.count as R
+	}
+	return r as R
 }
 
 export async function getMediaToUpload<TType extends 'note' | 'template'>(
 	type: TType,
+	torn: boolean,
 	entityId?: TType extends 'note' ? NoteId : TemplateId,
 ) {
 	const mediaBinaries =
 		type === 'note'
-			? await noteMediaBinaries(entityId as NoteId)
-			: await templateMediaBinaries(entityId as TemplateId)
+			? await uploadableNoteMedia(torn, entityId as NoteId)
+			: await uploadableTemplateMedia(torn, entityId as TemplateId)
 	const media = new Map<
 		MediaId,
 		{
