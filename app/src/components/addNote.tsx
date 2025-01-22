@@ -129,9 +129,8 @@ export const AddNote: VoidComponent<{
 				assertNever(props.type)
 			}
 		},
-		onError: (e) => {
-			C.toastError('Error occured while saving, see console for details.')
-			throw e
+		onError: () => {
+			C.toastError('Error occurred while saving, see console for details.')
 		},
 	}))
 	return (
@@ -152,8 +151,8 @@ export const AddNote: VoidComponent<{
 					<button
 						class='text-white bg-green-600 rounded p-2 px-4 font-bold hover:bg-green-700'
 						disabled={upsert.isPending}
-						onClick={() => {
-							upsert.mutate()
+						onClick={async () => {
+							await upsert.mutateAsync()
 						}}
 					>
 						Save

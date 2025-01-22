@@ -9,7 +9,9 @@ import { QueryClient, QueryClientProvider } from '@tanstack/solid-query'
 import { TableCountProvider } from './components/tableCountContext'
 import { SolidQueryDevtools } from '@tanstack/solid-query-devtools'
 
-const client = new QueryClient()
+const client = new QueryClient({
+	defaultOptions: { queries: { throwOnError: true } },
+})
 
 render(
 	() => (

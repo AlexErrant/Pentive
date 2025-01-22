@@ -47,10 +47,8 @@ const UploadButton: VoidComponent<{
 		onSuccess: () => {
 			props.setState('uploaded')
 		},
-		onError: (e) => {
+		onError: () => {
 			props.setState('errored')
-			console.error(e)
-			throw e // for some reason errors thrown here aren't logged in the console
 		},
 	}))
 	return (
@@ -67,8 +65,8 @@ const UploadButton: VoidComponent<{
 						<button
 							class='border-gray-900 rounded-lg border px-2'
 							disabled={upload.isPending}
-							onClick={() => {
-								upload.mutate()
+							onClick={async () => {
+								await upload.mutateAsync()
 							}}
 						>
 							Upload

@@ -33,9 +33,8 @@ const saveButton = (props: {
 				assertNever(props.type)
 			}
 		},
-		onError: (e) => {
-			C.toastError('Error occured while saving, see console for details.')
-			throw e
+		onError: () => {
+			C.toastError('Error occurred while saving, see console for details.')
 		},
 	}))
 	const deleteTemplate = createMutation(() => ({
@@ -45,17 +44,16 @@ const saveButton = (props: {
 		onSuccess: () => {
 			setTemplateRowDelta(-1)
 		},
-		onError: (e) => {
-			C.toastError('Error occured while deleting, see console for details.')
-			throw e
+		onError: () => {
+			C.toastError('Error occurred while deleting, see console for details.')
 		},
 	}))
 	return (
 		<div class='flex justify-between'>
 			<button
 				disabled={upsertTemplate.isPending}
-				onClick={() => {
-					upsertTemplate.mutate()
+				onClick={async () => {
+					await upsertTemplate.mutateAsync()
 				}}
 			>
 				Save
@@ -63,8 +61,8 @@ const saveButton = (props: {
 			<Show when={props.type === 'edit'}>
 				<button
 					disabled={deleteTemplate.isPending}
-					onClick={() => {
-						deleteTemplate.mutate()
+					onClick={async () => {
+						await deleteTemplate.mutateAsync()
 					}}
 				>
 					Delete
