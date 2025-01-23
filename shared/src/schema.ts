@@ -22,6 +22,9 @@ const base64UrlId = z.string().regex(/^[a-zA-Z0-9_-]{22}$/) as unknown
 const base64urlHash = z.string().regex(/^[a-zA-Z0-9_-]{43}$/) as unknown
 export const remoteNoteId = base64UrlId as z.Schema<RemoteNoteId>
 export const remoteTemplateId = base64UrlId as z.Schema<RemoteTemplateId>
+export const remoteTemplateNoteId = base64UrlId as z.Schema<
+	RemoteTemplateId | RemoteNoteId
+>
 export const commentId = base64UrlId as z.Schema<CommentId>
 export const noteId = base64UrlId as z.Schema<NoteId>
 export const mediaId = base64UrlId as z.Schema<MediaId>

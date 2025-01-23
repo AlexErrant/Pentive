@@ -13,8 +13,8 @@ import { cors } from 'hono/cors'
 import {
 	type Env,
 	type CwaContext,
-	type MediaTemplateQueryKey,
-	type MediaTemplateQueryValue,
+	type PostMediaQueryKey,
+	type PostMediaQueryValue,
 } from './util'
 import {
 	setKysely,
@@ -43,7 +43,7 @@ import {
 import { hstsName, hstsValue } from 'shared/headers'
 import { objEntries, objKeys } from 'shared/utility'
 import z from 'zod'
-import { noteId, remoteMediaId } from 'shared/schema'
+import { remoteMediaId, remoteTemplateNoteId } from 'shared/schema'
 export type * from '@trpc/server'
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -154,8 +154,8 @@ app
 		)
 	})
 	.post('/media/template', async (c) => {
-		const iByEntityIds = mediaIdByEntityIdsValidator.parse(c.req.query())
-		const templateIds = objKeys(iByEntityIds)
+		const mediaIdByEntityIds = mediaIdByEntityIdsValidator.parse(c.req.query())
+		const templateIds = objKeys(mediaIdByEntityIds)
 		if (templateIds.length === 0)
 			return c.text(`Need at least one template.`, 400)
 		return await postPublicMedia(
@@ -167,13 +167,14 @@ app
 					authorId,
 					mediaHash,
 				),
-			iByEntityIds,
+			mediaIdByEntityIds,
 		)
 	})
 
-const mediaIdByEntityIdsValidator = z.record(noteId, remoteMediaId) as z.Schema<
-	Record<MediaTemplateQueryKey, MediaTemplateQueryValue>
->
+const mediaIdByEntityIdsValidator = z.record(
+	remoteTemplateNoteId satisfies z.Schema<PostMediaQueryKey>,
+	remoteMediaId satisfies z.Schema<PostMediaQueryValue>,
+)
 
 export default app
 
@@ -198,6 +199,9 @@ async function postPublicMedia(
 		readable,
 		headers,
 	}: PersistParams): Promise<undefined | Response> => {
+		const { userOwns, hasMedia } = await userOwnsAndHasMedia(userId, hash)
+		if (!userOwns)
+			return c.text(`You don't own one (or more) of these ${type}s.`, 401)
 		const insertValues = objEntries(mediaIdByEntityIds).map(
 			([entityId, mediaId]) => ({
 				hash,
@@ -205,9 +209,6 @@ async function postPublicMedia(
 				entityId: fromBase64Url(entityId),
 			}),
 		)
-		const { userOwns, hasMedia } = await userOwnsAndHasMedia(userId, hash)
-		if (!userOwns)
-			return c.text(`You don't own one (or more) of these ${type}s.`, 401)
 		await db
 			.transaction()
 			// Not a "real" transaction since the final `COMMIT` still needs to be sent as a fetch, but whatever.

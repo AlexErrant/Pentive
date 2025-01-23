@@ -34,5 +34,5 @@ export type Env = {
 	peerSyncPrivateKey: string
 }
 
-export type MediaTemplateQueryKey = RemoteNoteId | RemoteTemplateId
-export type MediaTemplateQueryValue = RemoteMediaId
+export type PostMediaQueryKey = RemoteNoteId | RemoteTemplateId
+export type PostMediaQueryValue = RemoteMediaId
