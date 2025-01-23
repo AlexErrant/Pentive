@@ -116,7 +116,7 @@ function deserializeStatus(status: number): Status {
 	throwExp()
 }
 
-function serializeStatus(status: Status): number {
+export function serializeStatus(status: Status): number {
 	if (status === 'default') {
 		return 0
 	} else if (status === 'awaitingMedia') {

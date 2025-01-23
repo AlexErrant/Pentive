@@ -24,6 +24,7 @@ import {
 	userOwnsTemplateAndHasMedia,
 	getUserId,
 	dbIdToBase64,
+	serializeStatus,
 } from 'shared-edge'
 import { connect } from '@planetscale/database'
 import { buildPrivateToken } from './privateToken'
@@ -214,6 +215,17 @@ async function postPublicMedia(
 			// Grep BC34B055-ECB7-496D-9E71-58EE899A11D1 for details.
 			.execute(async (trx) => {
 				await trx.insertInto('media').values(insertValues).execute()
+				await trx
+					.updateTable(type)
+					.set({
+						status: serializeStatus('default'),
+					})
+					.where(
+						'id',
+						'in',
+						insertValues.map((x) => x.entityId),
+					)
+					.execute()
 				if (!hasMedia) {
 					const object = await c.env.mediaBucket.put(
 						dbIdToBase64(hash),
