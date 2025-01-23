@@ -1,5 +1,11 @@
 // If you get `Error: EMFILE: too many open files...`, running all 3 options here https://stackoverflow.com/a/60881735 and restarting WSL worked for me
 
+keybinds {
+    normal {
+        bind "c" { Clear; }
+    }
+}
+
 layout {
     pane split_direction="vertical" {
         pane split_direction="horizontal" {
