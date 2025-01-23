@@ -3,7 +3,12 @@ import {
 	base64ToArray,
 	base64urlToArray,
 } from 'shared/binary'
-import { type Brand, type Base64Url, type Base64 } from 'shared/brand'
+import {
+	type Brand,
+	type Base64Url,
+	type Base64,
+	type RemoteMediaId,
+} from 'shared/brand'
 import { concat } from 'shared/utility'
 
 /*
@@ -21,13 +26,13 @@ grep 69D0971A-FE47-4D4F-91B9-15A6FAA3CAF1
 
 export async function buildPublicToken(
 	entityId: Base64Url,
-	mediaHash: Base64,
+	mediaHash: Uint8Array,
 	publicMediaSecret: PublicMediaSecret,
 ) {
-	const data = concat(base64urlToArray(entityId), base64ToArray(mediaHash))
+	const data = concat(base64urlToArray(entityId), mediaHash)
 	const key = await getPublicMediaKey(publicMediaSecret)
 	const hmac = await crypto.subtle.sign('HMAC', key, data)
-	return arrayToBase64url(new Uint8Array(hmac))
+	return arrayToBase64url(new Uint8Array(hmac)) as RemoteMediaId
 }
 
 export type PublicMediaSecret = Brand<string, 'PublicMediaSecret'> & Base64

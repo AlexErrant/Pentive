@@ -25,6 +25,7 @@ import {
 	getUserId,
 	dbIdToBase64,
 	serializeStatus,
+	buildPublicToken,
 } from 'shared-edge'
 import { connect } from '@planetscale/database'
 import { buildPrivateToken } from './privateToken'
@@ -39,11 +40,13 @@ import {
 	type RemoteMediaId,
 	type RemoteNoteId,
 	type RemoteTemplateId,
+	type DbId,
 } from 'shared/brand'
 import { hstsName, hstsValue } from 'shared/headers'
 import { objEntries, objKeys } from 'shared/utility'
 import z from 'zod'
 import { remoteMediaId, remoteTemplateNoteId } from 'shared/schema'
+import { type RawBuilder } from 'kysely'
 export type * from '@trpc/server'
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -202,13 +205,28 @@ async function postPublicMedia(
 		const { userOwns, hasMedia } = await userOwnsAndHasMedia(userId, hash)
 		if (!userOwns)
 			return c.text(`You don't own one (or more) of these ${type}s.`, 401)
-		const insertValues = objEntries(mediaIdByEntityIds).map(
-			([entityId, mediaId]) => ({
+		const insertValues = [] as Array<{
+			hash: MediaHash
+			id: RawBuilder<DbId>
+			entityId: RawBuilder<DbId>
+		}>
+		for (const [entityId, mediaId] of objEntries(mediaIdByEntityIds)) {
+			const expectedId = await buildPublicToken(
+				entityId,
+				new Uint8Array(hash),
+				c.env.publicMediaSecret,
+			)
+			if (mediaId !== expectedId)
+				return c.text(
+					`Integrity check failed - uploaded content doesn't have the expected entityId or hash.`,
+					400,
+				)
+			insertValues.push({
 				hash,
 				id: fromBase64Url(mediaId),
 				entityId: fromBase64Url(entityId),
-			}),
-		)
+			})
+		}
 		await db
 			.transaction()
 			// Not a "real" transaction since the final `COMMIT` still needs to be sent as a fetch, but whatever.

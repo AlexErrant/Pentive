@@ -1069,11 +1069,11 @@ async function replaceImgSrcs(
 ) {
 	return await replaceAsync(value, imgRegex, async (array) => {
 		const mediaHash = array[1] as Base64
-		const remoteMediaId = (await buildPublicToken(
+		const remoteMediaId = await buildPublicToken(
 			remoteIdBase64url,
-			mediaHash,
+			base64ToArray(mediaHash),
 			publicMediaSecretBase64,
-		)) as RemoteMediaId
+		)
 		hashAndRemoteMediaIds.push([mediaHash, remoteMediaId])
 		return remoteMediaId
 	})
