@@ -54,6 +54,7 @@ export default defineConfig(({ mode }: UserConfig) => {
 	return {
 		define,
 		esbuild: {
+			drop: ['debugger' as const],
 			legalComments: 'none' as const, // we include sourcemaps which have the legal stuff
 		},
 		plugins: [

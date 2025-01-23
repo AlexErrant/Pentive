@@ -30,9 +30,9 @@ import { type Note } from 'shared/domain/note'
 import { NoteNookSync } from '../components/noteSync'
 import { useWhoAmIContext } from '../components/whoAmIContext'
 import { createGrid, Renderer } from '../uiLogic/aggrid'
-import { createAsync } from '@solidjs/router'
 import { uploadableNoteMedia, uploadableTemplateMedia } from '../sqlite/util'
 import ResumeUpload from '../components/resumeUpload'
+import { createQuery } from '@tanstack/solid-query'
 
 LicenseManager.setLicenseKey(import.meta.env.VITE_AG_GRID_LICENSE)
 
@@ -98,19 +98,22 @@ async function getUploadables() {
 
 export default function Sync(): JSX.Element {
 	const whoAmI = useWhoAmIContext()
-	const uploadableMediaCount = createAsync(async () => {
-		const [noteCount, templateCount] = await Promise.all([
-			uploadableNoteMedia(true, undefined, true),
-			uploadableTemplateMedia(true, undefined, true),
-		])
-		return noteCount + templateCount
-	})
+	const uploadableMediaCount = createQuery(() => ({
+		queryKey: ['uploadableMediaCount'],
+		queryFn: async () => {
+			const [noteCount, templateCount] = await Promise.all([
+				uploadableNoteMedia(true, undefined, true),
+				uploadableTemplateMedia(true, undefined, true),
+			])
+			return noteCount + templateCount
+		},
+	}))
 	return (
 		<Show
 			when={whoAmI()}
 			fallback={"You can only upload/download/sync when you're logged in."}
 		>
-			<Show when={uploadableMediaCount() === 0} fallback={<ResumeUpload />}>
+			<Show when={uploadableMediaCount.data === 0} fallback={<ResumeUpload />}>
 				<Content />
 			</Show>
 		</Show>

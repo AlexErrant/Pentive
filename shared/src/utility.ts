@@ -33,7 +33,7 @@ export function nullMap<T, R>(t: T | null, f: (_: T) => R): R | null {
 
 // https://stackoverflow.com/a/65666402
 // If you update this function, also update `./utility.workerd.ts`!
-export function throwExp(error?: unknown): never {
+export function throwExp(error?: unknown, ...metadata: unknown[]): never {
 	console.error('`throwExp` hit!')
 	// eslint-disable-next-line no-debugger
 	debugger
@@ -43,6 +43,7 @@ export function throwExp(error?: unknown): never {
 			'This error should never occur - please open an issue if you see this!',
 		)
 	}
+	if (metadata.length !== 0) console.error(...metadata)
 	if (typeof error === 'string') {
 		throw new Error(error)
 	}

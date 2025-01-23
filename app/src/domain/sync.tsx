@@ -14,6 +14,7 @@ import {
 	type MediaTemplateQueryValue,
 	type MediaTemplateQueryKey,
 } from 'cwa/src/util'
+import { throwExp } from 'shared/utility'
 
 export async function postMedia(
 	type: 'note' | 'template',
@@ -22,7 +23,7 @@ export async function postMedia(
 		[NoteId | TemplateId, RemoteNoteId | RemoteTemplateId, RemoteMediaId]
 	>,
 	data: ArrayBuffer,
-): Promise<void> {
+) {
 	const remoteEntityIdAndRemoteMediaId = ids.map(
 		([, remoteEntityId, remoteMediaId]) =>
 			[remoteEntityId, remoteMediaId] as const satisfies [
@@ -47,9 +48,18 @@ export async function postMedia(
 	if (200 <= response.status && response.status <= 299) {
 		await C.db.updateUploadDate(ids)
 	} else {
+		const text = await response.text()
 		C.toastError(
-			`'${response.status}' HTTP status while uploading media with id ${mediaId}.`,
+			<>
+				<div>
+					Error uploading <code>{mediaId}</code>:
+				</div>
+				<div>{text}</div>
+			</>,
+			response,
+			text,
 		)
+		return mediaId
 	}
 }
 
@@ -73,7 +83,11 @@ export async function uploadTemplates(
 			await cwaClient.editTemplates.mutate(editedTemplates)
 		await C.db.updateRemotes('remoteTemplate', remoteIdByLocal)
 	}
-	const media = await uploadTemplateMedia(torn, templateId)
+	const [media, failed] = await uploadTemplateMedia(torn, templateId)
+	if (failed.length !== 0)
+		throwExp('Failed uploading a Template media', {
+			failedTemplateMediaIds: failed,
+		})
 	if (
 		editedTemplates.length === 0 &&
 		newTemplates.length === 0 &&
@@ -88,10 +102,12 @@ export async function uploadTemplateMedia(
 	templateId?: TemplateId,
 ) {
 	const media = await C.db.getMediaToUpload('template', torn, templateId)
+	const failed = []
 	for (const [mediaId, { data, ids }] of media) {
-		await postMedia('template', mediaId, ids, data)
+		const f = await postMedia('template', mediaId, ids, data)
+		if (f != null) failed.push(f)
 	}
-	return media
+	return [media, failed] as const
 }
 
 export type SyncState = 'different' | 'uploaded' | 'uploading' | 'errored'
@@ -101,7 +117,7 @@ export async function uploadNotes(
 	torn: boolean,
 	noteId?: NoteId,
 	nook?: NookId,
-): Promise<void> {
+) {
 	const newNotes = await C.db.getNewNotesToUpload(noteId, nook)
 	if (newNotes.length > 0) {
 		const remoteIdByLocal = await cwaClient.createNote.mutate(newNotes)
@@ -112,7 +128,9 @@ export async function uploadNotes(
 		const remoteIdByLocal = await cwaClient.editNote.mutate(editedNotes)
 		await C.db.updateRemotes('remoteNote', remoteIdByLocal)
 	}
-	const media = await uploadNoteMedia(torn, noteId)
+	const [media, failed] = await uploadNoteMedia(torn, noteId)
+	if (failed.length !== 0)
+		throwExp('Failed uploading a Note media', { failedNoteMediaIds: failed })
 	if (editedNotes.length === 0 && newNotes.length === 0 && media.size === 0) {
 		C.toastInfo('Nothing to upload!')
 	}
@@ -120,8 +138,10 @@ export async function uploadNotes(
 
 export async function uploadNoteMedia(torn: boolean, noteId?: NoteId) {
 	const media = await C.db.getMediaToUpload('note', torn, noteId)
+	const failed = []
 	for (const [mediaId, { data, ids }] of media) {
-		await postMedia('note', mediaId, ids, data)
+		const f = await postMedia('note', mediaId, ids, data)
+		if (f != null) failed.push(f)
 	}
-	return media
+	return [media, failed] as const
 }

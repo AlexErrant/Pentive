@@ -1,4 +1,4 @@
-import { createMutation } from '@tanstack/solid-query'
+import { createMutation, useQueryClient } from '@tanstack/solid-query'
 import { type SyncState } from '../domain/sync'
 import {
 	Switch,
@@ -39,6 +39,7 @@ const UploadButton: VoidComponent<{
 	state: Accessor<SyncState>
 	setState: Setter<SyncState>
 }> = (props) => {
+	const queryClient = useQueryClient()
 	const upload = createMutation(() => ({
 		mutationFn: async () => {
 			props.setState('uploading')
@@ -47,8 +48,11 @@ const UploadButton: VoidComponent<{
 		onSuccess: () => {
 			props.setState('uploaded')
 		},
-		onError: () => {
+		onError: async () => {
 			props.setState('errored')
+			await queryClient.invalidateQueries({
+				queryKey: ['uploadableMediaCount'],
+			})
 		},
 	}))
 	return (
