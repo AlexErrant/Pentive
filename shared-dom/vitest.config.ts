@@ -2,7 +2,6 @@ import { defineConfig } from 'vitest/config'
 import solidPlugin from 'vite-plugin-solid'
 
 export default defineConfig({
-	// @ts-expect-error not sure wtf is going on
 	plugins: [solidPlugin()],
 	test: {
 		environment: 'jsdom',
