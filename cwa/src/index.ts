@@ -237,7 +237,7 @@ async function postPublicMedia(
 				await trx
 					.updateTable(type)
 					.set({
-						status: serializeStatus('default'),
+						status: serializeStatus('draft'),
 					})
 					.where(
 						'id',

@@ -49,9 +49,22 @@ export const nookId = z
 	.string()
 	.regex(nookIdRegex) as unknown as z.Schema<NookId>
 
-const status = z.union([z.literal('awaitingMedia'), z.literal('default')])
-
+const status = z.union([
+	z.literal('awaitingMedia'),
+	z.literal('draft'),
+	z.literal('active'),
+	z.literal('archived'),
+])
 export type Status = z.infer<typeof status>
+
+const proposalStatus = z.union([
+	z.literal('awaitingMedia'),
+	z.literal('draft'),
+	z.literal('open'),
+	z.literal('closed'),
+	z.literal('merged'),
+])
+export type ProposalStatus = z.infer<typeof proposalStatus>
 
 export const remoteNote = z.object({
 	id: remoteNoteId,

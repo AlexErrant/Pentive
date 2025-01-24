@@ -1,7 +1,15 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import type { ColumnType } from 'kysely'
-import { type DbId, type MediaHash, type NookId } from 'shared/brand'
+import {
+	type Brand,
+	type DbId,
+	type MediaHash,
+	type NookId,
+} from 'shared/brand'
 import { type PeerValidator } from 'shared/domain/user'
+
+export type RawStatus = Brand<number, 'Status'>
+export type RawProposalStatus = Brand<number, 'ProposalStatus'>
 
 export type Generated<T> =
 	T extends ColumnType<infer S, infer I, infer U>
@@ -39,7 +47,7 @@ export interface Note {
 	fts: string
 	tags: string
 	ankiId: number | null
-	status: number
+	status: RawStatus
 	subscribersCount: Generated<number>
 	commentsCount: Generated<number>
 }
@@ -62,7 +70,7 @@ export interface NoteProposal {
 	created: Generated<number>
 	authorId: string
 	delta: ArrayBuffer
-	status: number
+	status: RawProposalStatus
 }
 
 export interface NoteSubscriber {
@@ -108,7 +116,7 @@ export interface Template {
 	fields: string
 	css: string
 	ankiId: number | null
-	status: number
+	status: RawStatus
 	subscribersCount: Generated<number>
 	commentsCount: Generated<number>
 }
@@ -131,7 +139,7 @@ export interface TemplateProposal {
 	created: Generated<number>
 	authorId: string
 	delta: ArrayBuffer
-	status: number
+	status: RawProposalStatus
 }
 
 export interface TemplateSubscriber {

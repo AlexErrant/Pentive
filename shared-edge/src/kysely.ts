@@ -11,7 +11,7 @@ import {
 	type ExpressionBuilder,
 } from 'kysely'
 import { LibsqlDialect } from '@libsql/kysely-libsql'
-import { type Note, type DB, type Template } from './dbSchema'
+import { type Note, type DB, type Template, type RawStatus } from './dbSchema'
 import {
 	type Base64Url,
 	type DbId,
@@ -107,20 +107,20 @@ function maybeEpochToDate(epoch: number | null | undefined) {
 	return epochToDate(epoch)
 }
 
-function deserializeStatus(status: number): Status {
+function deserializeStatus(status: RawStatus): Status {
 	if (status === 0) {
-		return 'default'
+		return 'draft'
 	} else if (status === 1) {
 		return 'awaitingMedia'
 	}
 	throwExp()
 }
 
-export function serializeStatus(status: Status): number {
-	if (status === 'default') {
-		return 0
+export function serializeStatus(status: Status): RawStatus {
+	if (status === 'draft') {
+		return 0 as RawStatus
 	} else if (status === 'awaitingMedia') {
-		return 1
+		return 1 as RawStatus
 	}
 	throwExp()
 }
@@ -135,7 +135,7 @@ function toTemplate(
 		css: string
 		type: string
 		fields: string
-		templateStatus: number
+		templateStatus: RawStatus
 	},
 	templateId: RemoteTemplateId,
 ) {
@@ -168,8 +168,8 @@ function noteToNookView(x: {
 	fields: string
 	subscribers: number
 	comments: number
-	noteStatus: number
-	templateStatus: number
+	noteStatus: RawStatus
+	templateStatus: RawStatus
 	til?: number | null
 }) {
 	const noteId = dbIdToBase64Url<RemoteNoteId>(x.id)
@@ -194,7 +194,7 @@ function toNote(
 		noteCreated: number
 		noteEdited: number
 		tags: string
-		noteStatus: number
+		noteStatus: RawStatus
 	},
 	noteId: RemoteNoteId,
 	templateId: RemoteTemplateId,
@@ -542,7 +542,7 @@ function templateEntityToDomain(t: {
 	ankiId: number | null
 	subscribersCount: number
 	commentsCount: number
-	status: number
+	status: RawStatus
 	til?: number | null
 }) {
 	return {
@@ -1037,7 +1037,7 @@ async function toNoteCreate(
 		ankiId: n.ankiId,
 		status:
 			hashAndRemoteMediaIds.length === 0
-				? serializeStatus('default')
+				? serializeStatus('draft')
 				: serializeStatus('awaitingMedia'),
 	} satisfies InsertObject<DB, 'note'>
 	return {
@@ -1140,7 +1140,7 @@ async function toTemplateCreate(
 		subscribersCount: 1,
 		status:
 			hashAndRemoteMediaIds.length === 0
-				? serializeStatus('default')
+				? serializeStatus('draft')
 				: serializeStatus('awaitingMedia'),
 	} satisfies InsertObject<DB, 'template'> & { nook: NookId }
 	return {
