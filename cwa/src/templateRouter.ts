@@ -13,6 +13,7 @@ import {
 	insertTemplateComment,
 	subscribeToTemplate,
 	insertTemplateChildComment,
+	assertIsMod,
 } from 'shared-edge'
 
 // When writing a `procedure.query`, ensure it doesn't return HTML!
@@ -21,16 +22,20 @@ export const templateRouter = {
 	//
 
 	// nook moderator mutations
-	// highTODO needs authorization
+	// all methods needs authorization!
 	createTemplates: enticatedProcedure
 		.input(z.array(createRemoteTemplate).min(1))
 		.mutation(async ({ input, ctx }) => {
+			const nooks = [...new Set(input.flatMap((t) => t.nooks))]
+			await assertIsMod({ nooks }, ctx.user)
 			const remoteIdByLocal = await insertTemplates(ctx.user, input)
 			return remoteIdByLocal
 		}),
 	editTemplates: enticatedProcedure
 		.input(z.array(editRemoteTemplate).min(1))
 		.mutation(async ({ input, ctx }) => {
+			const templateIds = [...new Set(input.flatMap((t) => t.remoteIds))]
+			await assertIsMod({ templateIds }, ctx.user)
 			const remoteIdByLocal = await editTemplates(ctx.user, input)
 			return remoteIdByLocal
 		}),

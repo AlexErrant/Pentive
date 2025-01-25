@@ -1,7 +1,14 @@
-import { type NookId, type UserId } from 'shared/brand'
+import { type RemoteTemplateId, type NookId, type UserId } from 'shared/brand'
 import { type NookType } from 'shared/domain/nook'
-import { undefinedMap, throwExp, assertNever } from 'shared/utility'
-import { db, epochToDate } from './kysely'
+import {
+	undefinedMap,
+	throwExp,
+	assertNever,
+	type SqliteCount,
+} from 'shared/utility'
+import { db, epochToDate, fromBase64Url } from './kysely'
+import { sql } from 'kysely'
+import { TRPCError } from '@trpc/server'
 
 export async function getNook(nook: NookId) {
 	const r = await db
@@ -94,4 +101,49 @@ function deserializeModerators(moderators: string) {
 
 function serializeModerators(userId: UserId) {
 	return JSON.stringify([userId])
+}
+
+interface FilterNooks {
+	nooks: NookId[]
+}
+interface FilterTemplate {
+	templateIds: RemoteTemplateId[]
+}
+export async function assertIsMod(
+	filter: FilterTemplate | FilterNooks,
+	userId: UserId,
+) {
+	let expectedLength
+	const { c: modCount } = await db
+		.selectFrom('nook')
+		.select(db.fn.count<SqliteCount>('nook.id').as('c'))
+		.where((qb) =>
+			qb.exists(
+				qb
+					.selectFrom((eb) =>
+						sql`json_each(${eb.ref('nook.moderators')})`.as('json_each'),
+					)
+					.select(sql`1`.as('_'))
+					.where(sql`json_each.value`, '=', userId),
+			),
+		)
+		.$if('nooks' in filter, (eb) => {
+			const nooks = (filter as FilterNooks).nooks
+			expectedLength = nooks.length
+			return eb.where('nook.id', 'in', nooks)
+		})
+		.$if('templateIds' in filter, (eb) => {
+			const templateIds = (filter as FilterTemplate).templateIds
+			expectedLength = templateIds.length
+			return eb
+				.innerJoin('template', 'template.nook', 'nook.id')
+				.where('template.id', 'in', templateIds.map(fromBase64Url))
+		})
+		.executeTakeFirstOrThrow()
+	if (modCount !== expectedLength) {
+		throw new TRPCError({
+			code: 'UNAUTHORIZED',
+			message: "You're not a mod.",
+		})
+	}
 }

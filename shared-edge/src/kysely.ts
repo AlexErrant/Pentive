@@ -867,6 +867,13 @@ export async function insertNotes(authorId: UserId, notes: CreateRemoteNote[]) {
 	return remoteIdByLocal
 }
 
+// We use an empty string to signify the lack of knowledge of the Nook.
+// This should ONLY be the case for RemoteTemplates that are being edited.
+// `EditRemoteTemplate` doesn't have the NookId because is has RemoteTemplateId (from which Nook can be imputed, so we don't require it for normalization reasons).
+// We cannot use null because SQLite will throw due to the not null constraint.
+// It is safe to pass the empty string to the SQLite insert statement because it is not part of the `UPDATE SET` statement 0ECD7865-A077-421F-AE4B-52D7062288AF
+export const nullNook = '' as NookId
+
 async function buildTemplateCreates(
 	authorId: UserId,
 	templates: Array<EditRemoteTemplate | CreateRemoteTemplate>,
@@ -1085,9 +1092,7 @@ async function toTemplateCreates(
 ) {
 	const remoteIds =
 		'remoteIds' in n
-			? n.remoteIds.map(
-					(id) => [base64urlToArray(id), 'undefined_nook' as NookId] as const,
-				)
+			? n.remoteIds.map((id) => [base64urlToArray(id), nullNook] as const)
 			: n.nooks.map((nook) => [ulidAsRaw(), nook] as const)
 	return await Promise.all(
 		remoteIds.map(async ([id, nook]) => await toTemplateCreate(n, id, nook)),
@@ -1142,7 +1147,7 @@ async function toTemplateCreate(
 			hashAndRemoteMediaIds.length === 0
 				? serializeStatus('draft')
 				: serializeStatus('awaitingMedia'),
-	} satisfies InsertObject<DB, 'template'> & { nook: NookId }
+	} satisfies InsertObject<DB, 'template'>
 	return {
 		templateCreate,
 		remoteIdBase64url,
@@ -1204,7 +1209,11 @@ type OnConflictUpdateNoteSet = {
 type OnConflictUpdateTemplateSet = {
 	[K in keyof Template as Exclude<
 		K,
-		'id' | 'created' | 'subscribersCount' | 'commentsCount' | 'nook'
+		| 'id'
+		| 'created'
+		| 'subscribersCount'
+		| 'nook' // 0ECD7865-A077-421F-AE4B-52D7062288AF
+		| 'commentsCount'
 	>]: (
 		x: ExpressionBuilder<
 			OnConflictDatabase<DB, 'template'>,

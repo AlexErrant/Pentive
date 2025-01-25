@@ -34,6 +34,7 @@ import { C, ky, tx } from '../topLevelAwait'
 import { jsonArrayFrom } from 'kysely/helpers/sqlite'
 import { type AliasedRawBuilder, type ExpressionBuilder } from 'kysely'
 import { arrayToBase64, base64ToArray } from 'shared/binary'
+import { nullNook } from 'shared-edge'
 
 export function parseTags(rawTags: string) {
 	return parseSet<string>(rawTags)
@@ -244,8 +245,16 @@ export async function updateRemotes(
 			const entityDbId = toLDbId(entityId)
 			const r = await db
 				.updateTable(table)
-				.set({ remoteId: toLDbId(remoteId), uploadDate: now })
-				.where('nook', '=', nook)
+				.$if(nook !== nullNook, (eb) =>
+					eb
+						.set({ remoteId: toLDbId(remoteId), uploadDate: now })
+						.where('nook', '=', nook),
+				)
+				.$if(nook === nullNook, (eb) =>
+					eb
+						.set({ uploadDate: now }) //
+						.where('remoteId', '=', toLDbId(remoteId)),
+				)
 				.where('localId', '=', entityDbId)
 				.returningAll()
 				.execute()
