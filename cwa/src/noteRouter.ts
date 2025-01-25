@@ -8,6 +8,7 @@ import {
 import { z } from 'zod'
 import { enticatedProcedure } from './trpc'
 import {
+	assertIsMod,
 	editNotes,
 	insertNoteChildComment,
 	insertNoteComment,
@@ -21,16 +22,24 @@ export const noteRouter = {
 	//
 
 	// nook moderator mutations
-	// highTODO needs authorization
+	// all methods needs authorization!
 	createNote: enticatedProcedure
 		.input(z.array(createRemoteNote).min(1))
 		.mutation(async ({ input, ctx }) => {
+			const templateIds = [
+				...new Set(input.flatMap((t) => t.remoteTemplateIds)),
+			]
+			await assertIsMod({ templateIds }, ctx.user)
 			const remoteIdByLocal = await insertNotes(ctx.user, input)
 			return remoteIdByLocal
 		}),
 	editNote: enticatedProcedure
 		.input(z.array(editRemoteNote).min(1))
 		.mutation(async ({ input, ctx }) => {
+			const templateIds = [
+				...new Set(input.flatMap((t) => Array.from(t.remoteIds.values()))),
+			]
+			await assertIsMod({ templateIds }, ctx.user)
 			const remoteIdByLocal = await editNotes(ctx.user, input)
 			return remoteIdByLocal
 		}),

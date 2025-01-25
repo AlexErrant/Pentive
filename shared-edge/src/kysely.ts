@@ -812,16 +812,7 @@ export async function lookupMediaHash(id: MediaId) {
 async function buildNoteCreates(
 	authorId: UserId,
 	notes: Array<CreateRemoteNote | EditRemoteNote>,
-	remoteTemplateIds: RemoteTemplateId[],
 ) {
-	// highTODO validate author
-	const templates = await db
-		.selectFrom('template')
-		.select(['nook', 'id'])
-		.where('id', 'in', remoteTemplateIds.map(fromBase64Url))
-		.execute()
-	if (templates.length !== remoteTemplateIds.length)
-		throwExp('You have an invalid RemoteTemplateId.')
 	const noteCreatesAndIds = (
 		await Promise.all(
 			notes.map(async (n) => {
@@ -833,14 +824,10 @@ async function buildNoteCreates(
 						remoteTemplateId,
 						hashAndRemoteMediaIds,
 					}) => {
-						const t =
-							templates.find(
-								(t) => dbIdToBase64Url(t.id) === remoteTemplateId,
-							) ?? throwExp()
 						return [
 							noteCreate,
 							[
-								[n.localId satisfies NoteId as NoteId, t.nook],
+								[n.localId satisfies NoteId as NoteId, remoteTemplateId],
 								[remoteIdBase64url, hashAndRemoteMediaIds],
 							],
 						] as const
@@ -855,13 +842,9 @@ async function buildNoteCreates(
 }
 
 export async function insertNotes(authorId: UserId, notes: CreateRemoteNote[]) {
-	const remoteTemplateIds = Array.from(
-		new Set(notes.flatMap((n) => n.remoteTemplateIds)),
-	)
 	const { noteCreates, remoteIdByLocal } = await buildNoteCreates(
 		authorId,
 		notes,
-		remoteTemplateIds,
 	)
 	await db.insertInto('note').values(noteCreates).execute()
 	return remoteIdByLocal
@@ -1223,27 +1206,10 @@ type OnConflictUpdateTemplateSet = {
 }
 
 export async function editNotes(authorId: UserId, notes: EditRemoteNote[]) {
-	const editNoteIds = notes
-		.flatMap((t) => Array.from(t.remoteIds.keys()))
-		.map(fromBase64Url)
-	const count = await db
-		.selectFrom('note')
-		.select(db.fn.count<SqliteCount>('id').as('c'))
-		.where('id', 'in', editNoteIds)
-		.executeTakeFirstOrThrow()
-	if (count.c !== notes.length)
-		throwExp("At least one of these notes doesn't exist.")
-	const remoteTemplateIds = notes.flatMap((t) =>
-		Array.from(t.remoteIds.values()),
-	)
 	const { noteCreates, remoteIdByLocal } = await buildNoteCreates(
 		authorId,
 		notes,
-		remoteTemplateIds,
 	)
-	// insert into `Note` (`id`, `templateId`, `authorId`, `fieldValues`, `fts`, `tags`)
-	// values (UNHEX(?), FROM_BASE64(?), ?, ?, ?, ?)
-	// on duplicate key update `templateId` = values(`templateId`), `edited` = values(`edited`), `authorId` = values(`authorId`), `fieldValues` = values(`fieldValues`), `fts` = values(`fts`), `tags` = values(`tags`), `ankiId` = values(`ankiId`)
 	await db
 		.insertInto('note')
 		.values(noteCreates.flat())
@@ -1267,16 +1233,6 @@ export async function editTemplates(
 	authorId: UserId,
 	templates: EditRemoteTemplate[],
 ) {
-	const editTemplateIds = templates
-		.flatMap((t) => t.remoteIds)
-		.map(fromBase64Url)
-	const count = await db
-		.selectFrom('template')
-		.select(db.fn.count<SqliteCount>('id').as('c'))
-		.where('id', 'in', editTemplateIds)
-		.executeTakeFirstOrThrow()
-	if (count.c !== editTemplateIds.length)
-		throwExp("At least one of these templates doesn't exist.")
 	const { templateCreates, remoteIdByLocal } = await buildTemplateCreates(
 		authorId,
 		templates,

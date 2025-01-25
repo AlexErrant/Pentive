@@ -32,7 +32,7 @@ import {
 import { type Note } from 'shared/domain/note'
 import { C, ky, tx } from '../topLevelAwait'
 import { jsonArrayFrom } from 'kysely/helpers/sqlite'
-import { type AliasedRawBuilder, type ExpressionBuilder } from 'kysely'
+import { sql, type AliasedRawBuilder, type ExpressionBuilder } from 'kysely'
 import { arrayToBase64, base64ToArray } from 'shared/binary'
 import { nullNook } from 'shared-edge'
 
@@ -231,29 +231,55 @@ export function getTemplate(
 }
 export async function updateRemotes(
 	table: 'remoteNote' | 'remoteTemplate',
+	isCreate: boolean,
 	remoteIdByLocal: Map<
-		readonly [NoteId | TemplateId, NookId],
+		readonly [NoteId, RemoteTemplateId] | readonly [TemplateId, NookId],
 		readonly [RemoteNoteId | RemoteTemplateId, Array<[Base64, RemoteMediaId]>]
 	>,
 ) {
 	const now = C.getDate().getTime()
 	await tx(async (db) => {
 		for (const [
-			[entityId, nook],
+			[entityId, nOrT],
 			[remoteId, hashAndRemoteMediaIds],
 		] of remoteIdByLocal) {
 			const entityDbId = toLDbId(entityId)
 			const r = await db
 				.updateTable(table)
-				.$if(nook !== nullNook, (eb) =>
+				.$if(table === 'remoteTemplate' && nOrT !== nullNook, (eb) =>
 					eb
 						.set({ remoteId: toLDbId(remoteId), uploadDate: now })
-						.where('nook', '=', nook),
+						.where('nook', '=', nOrT as NookId),
 				)
-				.$if(nook === nullNook, (eb) =>
+				.$if(table === 'remoteTemplate' && nOrT === nullNook, (eb) =>
 					eb
 						.set({ uploadDate: now }) //
 						.where('remoteId', '=', toLDbId(remoteId)),
+				)
+				.$if(table === 'remoteNote', (eb) =>
+					eb
+						.set({
+							remoteId: isCreate ? toLDbId(remoteId) : undefined,
+							uploadDate: now,
+						})
+						.where(({ selectFrom, exists }) =>
+							exists(
+								selectFrom('remoteNote')
+									.select(sql`1`.as('_'))
+									.innerJoin('note', 'note.id', 'remoteNote.localId')
+									.innerJoin(
+										'remoteTemplate',
+										'remoteTemplate.localId',
+										'note.templateId',
+									)
+									.where(
+										'remoteTemplate.remoteId',
+										'=',
+										toLDbId(nOrT as RemoteTemplateId),
+									)
+									.where('remoteNote.localId', '=', entityDbId),
+							),
+						),
 				)
 				.where('localId', '=', entityDbId)
 				.returningAll()
@@ -274,8 +300,8 @@ export async function updateRemotes(
 					.execute()
 			}
 			if (r.length !== 1)
-				C.toastFatal(
-					`No ${table} found for nook '${nook}' and ${table === 'remoteTemplate' ? 'templateId' : 'noteId'} ${entityId}'`,
+				C.toastImpossible(
+					`No ${table} found for ${table === 'remoteTemplate' ? 'nook' : 'RemoteTemplateId'} '${nOrT}' and ${table === 'remoteTemplate' ? 'templateId' : 'noteId'} ${entityId}'`,
 				)
 		}
 	})

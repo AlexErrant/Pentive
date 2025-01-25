@@ -69,7 +69,7 @@ export async function uploadTemplates(
 	const newTemplates = await C.db.getNewTemplatesToUpload(templateId, nook)
 	if (newTemplates.length > 0) {
 		const remoteIdByLocal = await cwaClient.createTemplates.mutate(newTemplates)
-		await C.db.updateRemotes('remoteTemplate', remoteIdByLocal)
+		await C.db.updateRemotes('remoteTemplate', true, remoteIdByLocal)
 	}
 	const editedTemplates = await C.db.getEditedTemplatesToUpload(
 		templateId,
@@ -78,7 +78,7 @@ export async function uploadTemplates(
 	if (editedTemplates.length > 0) {
 		const remoteIdByLocal =
 			await cwaClient.editTemplates.mutate(editedTemplates)
-		await C.db.updateRemotes('remoteTemplate', remoteIdByLocal)
+		await C.db.updateRemotes('remoteTemplate', false, remoteIdByLocal)
 	}
 	const [media, failed] = await uploadTemplateMedia(torn, templateId)
 	if (failed.length !== 0)
@@ -118,12 +118,12 @@ export async function uploadNotes(
 	const newNotes = await C.db.getNewNotesToUpload(noteId, nook)
 	if (newNotes.length > 0) {
 		const remoteIdByLocal = await cwaClient.createNote.mutate(newNotes)
-		await C.db.updateRemotes('remoteNote', remoteIdByLocal)
+		await C.db.updateRemotes('remoteNote', true, remoteIdByLocal)
 	}
 	const editedNotes = await C.db.getEditedNotesToUpload(noteId, nook)
 	if (editedNotes.length > 0) {
 		const remoteIdByLocal = await cwaClient.editNote.mutate(editedNotes)
-		await C.db.updateRemotes('remoteNote', remoteIdByLocal)
+		await C.db.updateRemotes('remoteNote', false, remoteIdByLocal)
 	}
 	const [media, failed] = await uploadNoteMedia(torn, noteId)
 	if (failed.length !== 0)
