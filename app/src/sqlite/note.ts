@@ -423,11 +423,11 @@ JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field
 				.execute()
 			if (mediaBinaries.length !== srcs.size)
 				C.toastFatal("You're missing a media.") // medTODO better error message
-			await db
-				.deleteFrom('remoteMedia')
-				.where('localEntityId', '=', remoteNote.localId)
-				.where('localMediaId', 'in', Array.from(srcs))
-				.execute()
+			// await db // F19F2731-BA29-406F-8F35-4E399CB40242
+			// 	.deleteFrom('remoteMedia')
+			// 	.where('localEntityId', '=', remoteNote.localId)
+			// 	.where('localMediaId', 'in', Array.from(srcs))
+			// 	.execute()
 			if (hashByLocal.size !== 0) {
 				await db
 					.insertInto('remoteMedia')
@@ -440,8 +440,6 @@ JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field
 								}) satisfies InsertObject<DB, 'remoteMedia'>,
 						),
 					)
-					// insert into "remoteMedia" ("localEntityId", "i", "localMediaId") values (?, ?, ?)
-					// on conflict do update set "localMediaId" = "excluded"."localMediaId"
 					.onConflict((db) =>
 						db.doUpdateSet({
 							localMediaId: (x) => x.ref('excluded.localMediaId'),

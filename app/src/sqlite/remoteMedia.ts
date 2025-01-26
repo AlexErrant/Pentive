@@ -29,4 +29,11 @@ export const remoteMediaCollectionMethods = {
 				)
 		}
 	},
+	getLocalMediaId: async function (remoteMediaId: RemoteMediaId) {
+		return await ky
+			.selectFrom('remoteMedia')
+			.select('localMediaId')
+			.where('remoteMediaId', '=', remoteMediaId)
+			.executeTakeFirst()
+	},
 }

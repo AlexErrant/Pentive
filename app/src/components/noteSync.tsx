@@ -5,7 +5,7 @@ import {
 	Match,
 	Suspense,
 } from 'solid-js'
-import { type NookId } from 'shared/brand'
+import { type RemoteMediaId, type NookId } from 'shared/brand'
 import { augcClient } from '../trpcClient'
 import DiffHtml from './diffHtml'
 import ResizingIframe from './resizingIframe'
@@ -17,6 +17,7 @@ import { type Template } from 'shared/domain/template'
 import { type NoteRemote, type Note } from 'shared/domain/note'
 import { UploadEntry } from './uploadEntry'
 import { uploadNotes } from '../domain/sync'
+import { C } from '../topLevelAwait'
 
 const NoteSync: VoidComponent<{ template: Template; note: Note }> = (props) => (
 	<>
@@ -63,6 +64,8 @@ export const NoteNookSync: VoidComponent<{
 	)
 }
 
+const dp = new DOMParser()
+
 const NoteNookSyncActual: VoidComponent<{
 	note: Note
 	template: Template
@@ -72,20 +75,35 @@ const NoteNookSyncActual: VoidComponent<{
 		() => props.remoteNote?.remoteNoteId,
 		async (id) => await augcClient.getNote.query(id), // medTODO planetscale needs an id that associates all notes so we can lookup in 1 pass. Also would be useful to find "related" notes
 	)
-	const mergedFieldValues = () => {
-		if (remoteNote.loading) return null
-		const m: Record<string, [string, string]> = {}
-		for (const [field, value] of objEntries(props.note.fieldValues)) {
-			m[field] = [value, '']
-		}
-		const rn = remoteNote()
-		if (rn != null) {
-			for (const [field, value] of objEntries(rn.fieldValues)) {
-				m[field] = [m[field]?.at(0) ?? '', value]
+	const [mergedFieldValues] = createResource(
+		() => [props.note, remoteNote()] as const,
+		async ([note, remoteNote]) => {
+			const m: Record<string, [string, string]> = {}
+			for (const [field, value] of objEntries(note.fieldValues)) {
+				m[field] = [value, '']
 			}
-		}
-		return m
-	}
+			if (remoteNote != null) {
+				for (const [field, value] of objEntries(remoteNote.fieldValues)) {
+					const doc = dp.parseFromString(value, 'text/html')
+					await Promise.all(
+						Array.from(doc.images).map(async (imgEl) => {
+							const rmId = imgEl
+								.getAttribute('src')!
+								.substring(0, 43) as RemoteMediaId
+							const mediaId = await C.db.getLocalMediaId(rmId)
+							if (mediaId == null) {
+								C.toastWarn(`Unable to find the remoteMediaId for ${rmId}`)
+							} else {
+								imgEl.setAttribute('src', mediaId.localMediaId)
+							}
+						}),
+					)
+					m[field] = [m[field]?.at(0) ?? '', doc.body.innerHTML]
+				}
+			}
+			return m
+		},
+	)
 	return (
 		<Suspense fallback={'Loading...'}>
 			<ul>
