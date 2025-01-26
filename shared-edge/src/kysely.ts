@@ -782,9 +782,18 @@ export async function userOwnsTemplateAndHasMedia(
 		.selectFrom([
 			db
 				.selectFrom('template')
+				.innerJoin('nook', 'template.nook', 'nook.id')
 				.select(db.fn.count<SqliteCount>('id').as('userOwns'))
+				.where(({ exists, selectFrom }) =>
+					exists(
+						selectFrom((eb) =>
+							sql`json_each(${eb.ref('nook.moderators')})`.as('json_each'),
+						)
+							.select(sql`1`.as('_'))
+							.where(sql`json_each.value`, '=', authorId),
+					),
+				)
 				.where('id', 'in', ids.map(fromBase64Url))
-				// .where("authorId", "=", authorId) // highTODO
 				.as('userOwns'),
 			db
 				.selectFrom('media')

@@ -117,12 +117,11 @@ export async function assertIsMod(
 	const { c: modCount } = await db
 		.selectFrom('nook')
 		.select(db.fn.count<SqliteCount>('nook.id').as('c'))
-		.where((qb) =>
-			qb.exists(
-				qb
-					.selectFrom((eb) =>
-						sql`json_each(${eb.ref('nook.moderators')})`.as('json_each'),
-					)
+		.where(({ exists, selectFrom }) =>
+			exists(
+				selectFrom((eb) =>
+					sql`json_each(${eb.ref('nook.moderators')})`.as('json_each'),
+				)
 					.select(sql`1`.as('_'))
 					.where(sql`json_each.value`, '=', userId),
 			),
