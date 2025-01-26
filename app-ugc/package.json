@@ -22,7 +22,6 @@
 	},
 	"devDependencies": {
 		"@cloudflare/workers-types": "^4.20240725.0",
-		"@types/iframe-resizer": "^3.5.10",
 		"@types/node": "20.14.11",
 		"@typescript-eslint/eslint-plugin": "^6.21.0",
 		"@typescript-eslint/parser": "^6.21.0",
@@ -46,9 +45,9 @@
 		"wrangler": "^3.81.0"
 	},
 	"dependencies": {
+		"@iframe-resizer/child": "^5.3.2",
 		"app": "workspace:*",
 		"comlink": "^4.4.1",
-		"iframe-resizer": "^4.3.7",
 		"micromorph": "^0.4.5",
 		"shared": "workspace:*"
 	}
