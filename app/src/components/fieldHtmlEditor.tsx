@@ -10,13 +10,12 @@ import {
 } from 'solid-js'
 import { oneDark } from '@codemirror/theme-one-dark'
 import ResizingIframe from './resizingIframe'
-import { format } from 'prettier'
-import * as prettierPluginHtml from 'prettier/plugins/html'
 import { C } from '../topLevelAwait'
 import { useThemeContext } from 'shared-dom/themeSelector'
 import { basicSetup } from 'shared-dom/codemirror'
 import { disposeObserver } from 'shared-dom/utility'
 import { type NoteId } from 'shared/brand'
+import { formatHtml } from '../domain/utility'
 
 const FieldHtmlEditor: VoidComponent<{
 	noteId: NoteId
@@ -40,12 +39,7 @@ const FieldHtmlEditor: VoidComponent<{
 		})
 		ro.observe(ref)
 		view.setState(
-			createEditorState(
-				view,
-				// https://prettier.io/blog/2018/11/07/1.15.0#whitespace-sensitive-formatting https://prettier.io/docs/en/options.html#html-whitespace-sensitivity
-				await format(props.value, htmlFormatOpts),
-				theme(),
-			),
+			createEditorState(view, await formatHtml(props.value), theme()),
 		)
 	})
 	createEffect(
@@ -105,7 +99,7 @@ function createEditorState(
 				{
 					key: 'Shift-Alt-f',
 					run: (x) => {
-						format(x.state.doc.toString(), htmlFormatOpts)
+						formatHtml(x.state.doc.toString())
 							.then((v) => {
 								view.dispatch({
 									changes: {
@@ -127,10 +121,4 @@ function createEditorState(
 			...maybeDark,
 		],
 	})
-}
-
-const htmlFormatOpts = {
-	parser: 'html',
-	plugins: [prettierPluginHtml],
-	useTabs: true,
 }

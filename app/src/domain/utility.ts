@@ -3,6 +3,8 @@ import { Ulid } from 'id128'
 import { arrayToBase64url } from 'shared/binary'
 import { type Base64Url, type TemplateId } from 'shared/brand'
 import { getDefaultTemplate as getDefaultTemplateOg } from 'shared/domain/template'
+import { format } from 'prettier'
+import * as prettierPluginHtml from 'prettier/plugins/html'
 
 export function ulidAsBase64Url(): Base64Url {
 	const hexUlid = Ulid.generate().toRaw()
@@ -187,3 +189,13 @@ export function md5(inputString: string) {
 	}
 	return rh(a) + rh(b) + rh(c) + rh(d)
 }
+
+const htmlFormatOpts = {
+	parser: 'html',
+	plugins: [prettierPluginHtml],
+	useTabs: true,
+}
+
+// https://prettier.io/blog/2018/11/07/1.15.0#whitespace-sensitive-formatting https://prettier.io/docs/en/options.html#html-whitespace-sensitivity
+export const formatHtml = async (html: string) =>
+	await format(html, htmlFormatOpts)
