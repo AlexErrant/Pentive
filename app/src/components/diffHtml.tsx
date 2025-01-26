@@ -19,6 +19,8 @@ import { oneDark } from '@codemirror/theme-one-dark'
 import { EditorView } from '@codemirror/view'
 import { type LRLanguage } from '@codemirror/language'
 import { disposeObserver } from 'shared-dom/utility'
+import { createAsync } from '@solidjs/router'
+import { formatHtml } from '../domain/utility'
 
 const DiffHtml: VoidComponent<{
 	extensions: Array<Extension | LRLanguage>
@@ -28,21 +30,28 @@ const DiffHtml: VoidComponent<{
 	title: string
 }> = (props) => {
 	const [diffMode] = useDiffModeContext()
+	const formatted = createAsync(
+		async () =>
+			await Promise.all([
+				formatHtml(props.before ?? ''),
+				formatHtml(props.after ?? ''),
+			] as const),
+	)
 	return (
-		<Show when={props.before !== props.after}>
+		<Show when={formatted()?.[0] !== formatted()?.[1]}>
 			<fieldset class='border-black border p-1'>
 				<legend>
 					<span class='p-2 px-4 font-bold'>{props.title}</span>
 				</legend>
 				<Switch>
-					<Match when={props.before === props.after}>
+					<Match when={formatted()?.[0] === formatted()?.[1]}>
 						<></>
 					</Match>
 					<Match when={diffMode() === 'pretty'}>
 						<ResizingIframe
 							i={{
 								tag: 'raw',
-								html: diffHtml(props.before ?? '', props.after ?? ''),
+								html: diffHtml(formatted()?.[0] ?? '', formatted()?.[1] ?? ''),
 								css:
 									props.css + 'ins{background:palegreen}del{background:pink}',
 							}}
@@ -50,8 +59,8 @@ const DiffHtml: VoidComponent<{
 					</Match>
 					<Match when={diffMode() === 'split'}>
 						<MergeComp
-							before={props.before ?? ''}
-							after={props.after ?? ''}
+							before={formatted()?.[0] ?? ''}
+							after={formatted()?.[1] ?? ''}
 							extensions={props.extensions}
 						/>
 					</Match>
