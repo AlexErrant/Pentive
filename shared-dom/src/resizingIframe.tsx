@@ -1,4 +1,5 @@
-import { iframeResizer, type IFrameComponent } from 'iframe-resizer'
+import { type IFrameComponent } from 'iframe-resizer'
+import iframeResizer from '@iframe-resizer/parent'
 import {
 	createEffect,
 	onCleanup,
