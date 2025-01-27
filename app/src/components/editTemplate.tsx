@@ -56,7 +56,7 @@ const saveButton = (props: {
 					await upsertTemplate.mutateAsync()
 				}}
 			>
-				Save
+				{upsertTemplate.isPending ? 'Saving...' : 'Save'}
 			</button>
 			<Show when={props.type === 'edit'}>
 				<button
@@ -65,7 +65,7 @@ const saveButton = (props: {
 						await deleteTemplate.mutateAsync()
 					}}
 				>
-					Delete
+					{upsertTemplate.isPending ? 'Deleting...' : 'Delete'}
 				</button>
 			</Show>
 		</div>

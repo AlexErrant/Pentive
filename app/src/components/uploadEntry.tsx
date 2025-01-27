@@ -78,7 +78,7 @@ const UploadButton: VoidComponent<{
 								await upload.mutateAsync()
 							}}
 						>
-							Upload
+							{upload.isPending ? 'Uploading...' : 'Upload'}
 						</button>
 					</>
 				</Match>

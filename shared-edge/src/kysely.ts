@@ -1024,7 +1024,7 @@ async function toNoteCreate(
 	}
 	const noteCreate = {
 		id: unhex(remoteIdHex),
-		templateId: fromBase64Url(remoteTemplateId), // highTODO validate
+		templateId: fromBase64Url(remoteTemplateId),
 		authorId,
 		edited,
 		fieldValues: serializeFieldValues(n.fieldValues),

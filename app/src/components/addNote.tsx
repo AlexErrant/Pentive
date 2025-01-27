@@ -155,7 +155,7 @@ export const AddNote: VoidComponent<{
 							await upsert.mutateAsync()
 						}}
 					>
-						Save
+						{upsert.isPending ? 'Saving...' : 'Save'}
 					</button>
 				</div>
 			</Show>

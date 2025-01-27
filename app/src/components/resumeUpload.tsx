@@ -50,7 +50,7 @@ export default function ResumeUpload(): JSX.Element {
 						await upload.mutateAsync()
 					}}
 				>
-					Retry Upload
+					{upload.isPending ? 'Uploading...' : 'Retry Upload'}
 				</button>
 			</div>
 		</div>
