@@ -13,13 +13,8 @@
 		"jsx": "preserve",
 		"jsxImportSource": "solid-js",
 		"outDir": "lib",
-		"lib": [
-			"ES2022",
-			"DOM"
-		]
+		"types": ["vite/client"],
+		"lib": ["ES2022", "DOM"]
 	},
-	"include": [
-		"src/**/*",
-		"*.ts"
-	]
+	"include": ["src/**/*", "*.ts"]
 }
