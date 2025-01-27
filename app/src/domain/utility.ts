@@ -190,12 +190,11 @@ export function md5(inputString: string) {
 	return rh(a) + rh(b) + rh(c) + rh(d)
 }
 
-const htmlFormatOpts = {
-	parser: 'html',
-	plugins: [prettierPluginHtml],
-	useTabs: true,
-}
-
 // https://prettier.io/blog/2018/11/07/1.15.0#whitespace-sensitive-formatting https://prettier.io/docs/en/options.html#html-whitespace-sensitivity
 export const formatHtml = async (html: string) =>
-	await format(html, htmlFormatOpts)
+	await format(html, {
+		parser: 'html',
+		plugins: [prettierPluginHtml],
+		useTabs: true,
+		singleAttributePerLine: true,
+	})
