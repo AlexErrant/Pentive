@@ -1,5 +1,6 @@
-import { type IFrameComponent } from 'iframe-resizer'
-import iframeResizer from '@iframe-resizer/parent'
+import iframeResizer, {
+	type iframeResizer as ifr,
+} from '@iframe-resizer/parent'
 import {
 	createEffect,
 	onCleanup,
@@ -19,6 +20,7 @@ import { type Card } from 'shared/domain/card'
 import { type Note } from 'shared/domain/note'
 import { type Template } from 'shared/domain/template'
 import { assertNever } from 'shared/utility'
+type IFrameComponent = ifr.IFrameComponent
 
 const targetOrigin = '*' // highTODO make more limiting. Also implement https://stackoverflow.com/q/8169582
 

@@ -1,4 +1,4 @@
-import { type IFrameComponent } from 'iframe-resizer'
+import { type iframeResizer } from '@iframe-resizer/parent'
 import { type MediaId } from 'shared/brand'
 import { type SetStoreFunction, unwrap } from 'solid-js/store'
 import { C } from '../topLevelAwait'
@@ -10,6 +10,7 @@ import {
 	type ComlinkInit,
 	buildHtml,
 } from 'shared-dom/resizingIframe'
+type IFrameComponent = iframeResizer.IFrameComponent
 
 export type { RawRenderBodyInput, ComlinkInit }
 
