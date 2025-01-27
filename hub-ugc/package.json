@@ -39,6 +39,7 @@
 		"comlink": "^4.4.1",
 		"hub": "workspace:*",
 		"micromorph": "^0.4.5",
-		"shared": "workspace:*"
+		"shared": "workspace:*",
+		"shared-dom": "workspace:*"
 	}
 }

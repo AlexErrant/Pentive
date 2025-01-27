@@ -260,7 +260,6 @@ JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field
 		)
 	},
 	getNewNotesToUpload: async function (noteId?: NoteId, nook?: NookId) {
-		const dp = new DOMParser()
 		const remoteTemplates = await ky
 			.selectFrom('remoteTemplate')
 			.selectAll()
@@ -285,7 +284,7 @@ JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field
 						.filter(notEmpty)
 					return domainToCreateRemote(note, remoteIds)
 				})
-				.map(async (n) => await remotifyNote(dp, n).then((x) => x.note)),
+				.map(async (n) => await remotifyNote(n).then((x) => x.note)),
 		)
 	},
 	getNewNotesToUploadDom: async function (noteId?: NoteId) {
@@ -318,7 +317,6 @@ JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field
 			)
 	},
 	getEditedNotesToUpload: async function (noteId?: NoteId, nook?: NookId) {
-		const dp = new DOMParser()
 		const remoteTemplates = await ky
 			.selectFrom('remoteTemplate')
 			.selectAll()
@@ -360,7 +358,7 @@ JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field
 					)
 					return domainToEditRemote(note, remotes)
 				})
-				.map(async (n) => await remotifyNote(dp, n).then((x) => x.note)),
+				.map(async (n) => await remotifyNote(n).then((x) => x.note)),
 		)
 	},
 	getEditedNotesToUploadDom: async function (noteId?: NoteId) {
@@ -402,7 +400,6 @@ JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field
 		> & { note: Note },
 	) {
 		const { hashByLocal } = await remotifyNote(
-			new DOMParser(),
 			domainToCreateRemote(remoteNote.note, [
 				/* this doesn't need any real values */
 			]),
@@ -479,14 +476,10 @@ JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field
 }
 
 async function remotifyNote<T extends CreateRemoteNote | EditRemoteNote>(
-	dp: DOMParser,
 	note: T,
 ) {
 	const fieldValues: Record<string, string> = {} satisfies T['fieldValues']
-	const { docs, hashByLocal } = await remotifyDoms(
-		dp,
-		objValues(note.fieldValues),
-	)
+	const { docs, hashByLocal } = await remotifyDoms(objValues(note.fieldValues))
 	let i = 0
 	for (const field of objKeys(note.fieldValues)) {
 		fieldValues[field] = docs[i]!.body.innerHTML

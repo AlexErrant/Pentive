@@ -219,14 +219,11 @@ export const templateCollectionMethods = {
 		templateId?: TemplateId,
 		nook?: NookId,
 	) {
-		const dp = new DOMParser()
 		const templatesAndStuff = await this.getNewTemplatesToUploadDom(templateId)
 		return await Promise.all(
 			templatesAndStuff
 				.map((n) => domainToCreateRemote(n, nook))
-				.map(
-					async (n) => await remotifyTemplate(dp, n).then((x) => x.template),
-				),
+				.map(async (n) => await remotifyTemplate(n).then((x) => x.template)),
 		)
 	},
 	getNewTemplatesToUploadDom: async function (templateId?: TemplateId) {
@@ -246,15 +243,12 @@ export const templateCollectionMethods = {
 		templateId?: TemplateId,
 		nook?: NookId,
 	) {
-		const dp = new DOMParser()
 		const templatesAndStuff =
 			await this.getEditedTemplatesToUploadDom(templateId)
 		return await Promise.all(
 			templatesAndStuff
 				.map((n) => domainToEditRemote(n, nook))
-				.map(
-					async (n) => await remotifyTemplate(dp, n).then((x) => x.template),
-				),
+				.map(async (n) => await remotifyTemplate(n).then((x) => x.template)),
 		)
 	},
 	getEditedTemplatesToUploadDom: async function (templateId?: TemplateId) {
@@ -293,7 +287,6 @@ export const templateCollectionMethods = {
 				.where('id', '=', templateDbId)
 				.executeTakeFirstOrThrow()
 			const { hashByLocal } = await remotifyTemplate(
-				new DOMParser(),
 				domainToCreateRemote(toTemplate([{ ...template, ...remoteTemplate }])!),
 			)
 			const srcs = new Set(hashByLocal.keys())
@@ -392,7 +385,7 @@ function toTemplate(allTemplates: TemplateRow[]) {
 
 async function remotifyTemplate<
 	T extends CreateRemoteTemplate | EditRemoteTemplate,
->(dp: DOMParser, template: T) {
+>(template: T) {
 	const serializer = new XMLSerializer()
 	const serialize = (doc: Document) => {
 		const s = serializer.serializeToString(doc)
@@ -407,7 +400,7 @@ async function remotifyTemplate<
 			t.front,
 			t.back,
 		])
-		const { docs, hashByLocal } = await remotifyDoms(dp, rawDoms)
+		const { docs, hashByLocal } = await remotifyDoms(rawDoms)
 		let i = 0
 		for (const t of template.templateType.templates) {
 			t.front = serialize(docs[i]!)
@@ -420,7 +413,7 @@ async function remotifyTemplate<
 			hashByLocal,
 		}
 	} else {
-		const { docs, hashByLocal } = await remotifyDoms(dp, [
+		const { docs, hashByLocal } = await remotifyDoms([
 			template.templateType.template.front,
 			template.templateType.template.back,
 		])

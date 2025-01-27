@@ -35,13 +35,14 @@ import { jsonArrayFrom } from 'kysely/helpers/sqlite'
 import { sql, type AliasedRawBuilder, type ExpressionBuilder } from 'kysely'
 import { arrayToBase64, base64ToArray } from 'shared/binary'
 import { nullNook } from 'shared-edge'
+import { parseHtml } from 'shared-dom/utility'
 
 export function parseTags(rawTags: string) {
 	return parseSet<string>(rawTags)
 }
 
-export async function remotifyDoms(dp: DOMParser, rawDoms: string[]) {
-	const docs = rawDoms.map((rawDom) => dp.parseFromString(rawDom, 'text/html'))
+export async function remotifyDoms(rawDoms: string[]) {
+	const docs = rawDoms.map(parseHtml)
 	const imgSrcs = new Set(
 		docs
 			.flatMap((pd) => Array.from(pd.images))

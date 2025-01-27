@@ -525,6 +525,9 @@ importers:
       shared:
         specifier: workspace:*
         version: link:../shared
+      shared-dom:
+        specifier: workspace:*
+        version: link:../shared-dom
     devDependencies:
       '@cloudflare/workers-types':
         specifier: ^4.20240725.0
@@ -844,6 +847,9 @@ importers:
       shared:
         specifier: workspace:*
         version: link:../shared
+      shared-dom:
+        specifier: workspace:*
+        version: link:../shared-dom
     devDependencies:
       '@cloudflare/workers-types':
         specifier: ^4.20240725.0

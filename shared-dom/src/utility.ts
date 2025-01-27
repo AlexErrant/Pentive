@@ -7,3 +7,9 @@ export function disposeObserver(ro: ResizeObserver | undefined, ref: Element) {
 		ro.disconnect()
 	}
 }
+
+let domParser: DOMParser
+export function parseHtml(html: string) {
+	if (domParser == null) domParser = new DOMParser()
+	return domParser.parseFromString(html, 'text/html')
+}

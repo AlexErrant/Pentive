@@ -31,6 +31,7 @@ import { type NoteCardView } from '../uiLogic/cards'
 import { toOneLine } from 'shared/htmlToText'
 import { type NoteId, type MediaId } from 'shared/brand'
 import { C } from '../topLevelAwait'
+import { parseHtml } from 'shared-dom/utility'
 // import "prosemirror-image-plugin/src/styles/sideResize.css"
 
 // cf. https://gitlab.com/emergence-engineering/prosemirror-image-plugin/-/blob/master/src/updateImageNode.ts
@@ -131,7 +132,6 @@ const mySchema = makeSchema('editor')
 const mySchemaSerializer = makeSchema('serializer')
 
 const domSerializer = DOMSerializer.fromSchema(mySchemaSerializer)
-const domParser = new DOMParser()
 const proseMirrorDOMParser = ProseMirrorDOMParser.fromSchema(mySchema)
 
 export const FieldEditor: VoidComponent<{
@@ -220,7 +220,7 @@ async function updateImgSrc(img: HTMLImageElement) {
 }
 
 async function createEditorState(value: string) {
-	const doc = domParser.parseFromString(value, 'text/html')
+	const doc = parseHtml(value)
 	await Promise.all(Array.from(doc.images).map(updateImgSrc))
 	return EditorState.create({
 		doc: proseMirrorDOMParser.parse(doc),

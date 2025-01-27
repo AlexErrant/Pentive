@@ -12,13 +12,11 @@ import { SQLITE_DETERMINISTIC, SQLITE_UTF8 } from '@vlcn.io/wa-sqlite'
 import initSql from 'shared/sql.json'
 import { ftsNormalize } from 'shared/htmlToText'
 
-// const dp = new DOMParser()
-
 function getMediaIds(fvs: string) {
 	// highTODO uncomment and fix by adding the mediaId table back
 	// const values = parseMap<string, string>(fvs).values()
 	// return Array.from(values)
-	// 	.flatMap((v) => dp.parseFromString(v, 'text/html'))
+	// 	.flatMap((v) => parseHtml(v))
 	// 	.flatMap((d) => Array.from(d.images))
 	// 	.map((i) => i.getAttribute('src'))
 	// 	.join(unitSeparator)

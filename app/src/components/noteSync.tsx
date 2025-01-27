@@ -18,6 +18,7 @@ import { type NoteRemote, type Note } from 'shared/domain/note'
 import { UploadEntry } from './uploadEntry'
 import { uploadNotes } from '../domain/sync'
 import { C } from '../topLevelAwait'
+import { parseHtml } from 'shared-dom/utility'
 
 const NoteSync: VoidComponent<{ template: Template; note: Note }> = (props) => (
 	<>
@@ -64,8 +65,6 @@ export const NoteNookSync: VoidComponent<{
 	)
 }
 
-const dp = new DOMParser()
-
 const NoteNookSyncActual: VoidComponent<{
 	note: Note
 	template: Template
@@ -84,7 +83,7 @@ const NoteNookSyncActual: VoidComponent<{
 			}
 			if (remoteNote != null) {
 				for (const [field, value] of objEntries(remoteNote.fieldValues)) {
-					const doc = dp.parseFromString(value, 'text/html')
+					const doc = parseHtml(value)
 					await Promise.all(
 						Array.from(doc.images).map(async (imgEl) => {
 							const rmId = imgEl

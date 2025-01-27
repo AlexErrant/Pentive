@@ -13,6 +13,7 @@ import { type Template } from 'shared/domain/template'
 import { type Note } from 'shared/domain/note'
 import { type Card } from 'shared/domain/card'
 import { objEntries } from 'shared/utility'
+import { parseHtml } from 'shared-dom/utility'
 
 export const appExpose = {
 	ping: () => {},
@@ -32,11 +33,10 @@ export const appExpose = {
 					[rt.nook]: { remoteTemplateId: rt.id, uploadDate: now },
 				},
 			} satisfies Template
-			const dp = new DOMParser()
 			if (template.templateType.tag === 'standard') {
 				await Promise.all(
 					template.templateType.templates.map(async (t) => {
-						const { imgSrcs, front, back } = getTemplateImages(t, dp)
+						const { imgSrcs, front, back } = getTemplateImages(t)
 						t.front = serializer.serializeToString(front)
 						t.back = serializer.serializeToString(back)
 						return await downloadImages(imgSrcs)
@@ -45,7 +45,6 @@ export const appExpose = {
 			} else {
 				const { imgSrcs, front, back } = getTemplateImages(
 					template.templateType.template,
-					dp,
 				)
 				await downloadImages(imgSrcs)
 				template.templateType.template.front =
@@ -73,7 +72,7 @@ export const appExpose = {
 					[nook, { remoteNoteId: rn.id, uploadDate: now }],
 				]),
 			} satisfies Note
-			await downloadImages(getNoteImages(n.fieldValues, new DOMParser()))
+			await downloadImages(getNoteImages(n.fieldValues))
 			await C.db.upsertNote(n)
 			const ords = noteOrds.bind(C)(n, template)
 			const cards = ords.map((i) => {
@@ -100,10 +99,10 @@ export const appExpose = {
 // highTODO needs security on the origin
 Comlink.expose(appExpose, Comlink.windowEndpoint(self.parent))
 
-function getNoteImages(fieldValues: Record<string, string>, dp: DOMParser) {
+function getNoteImages(fieldValues: Record<string, string>) {
 	const imgSrcs = new Map<MediaId, string>()
 	for (const [f, v] of objEntries(fieldValues)) {
-		const doc = dp.parseFromString(v, 'text/html')
+		const doc = parseHtml(v)
 		Array.from(doc.images).forEach((i) => {
 			mutate(i, imgSrcs)
 		})
@@ -128,10 +127,10 @@ function mutate(img: HTMLImageElement, imgSrcs: Map<MediaId, string>) {
 	}
 }
 
-function getTemplateImages(ct: ChildTemplate, dp: DOMParser) {
+function getTemplateImages(ct: ChildTemplate) {
 	const imgSrcs = new Map<MediaId, string>()
-	const front = dp.parseFromString(ct.front, 'text/html')
-	const back = dp.parseFromString(ct.back, 'text/html')
+	const front = parseHtml(ct.front)
+	const back = parseHtml(ct.back)
 	Array.from(front.images).forEach((i) => {
 		mutate(i, imgSrcs)
 	})

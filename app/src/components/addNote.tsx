@@ -22,6 +22,7 @@ import { assertNever, objEntries, objValues } from 'shared/utility'
 import { CardsRemote } from './cardsRemote'
 import { createMutation } from '@tanstack/solid-query'
 import { useTableCountContext } from './tableCountContext'
+import { parseHtml } from 'shared-dom/utility'
 
 function toView(template: Template): NoteCardView {
 	const now = C.getDate()
@@ -95,11 +96,10 @@ export const AddNote: VoidComponent<{
 			const noteCard = wip.noteCard!
 			if (noteCard.cards.length === 0)
 				C.toastFatal('There must be at least 1 card')
-			const dp = new DOMParser()
 			await tx(async () => {
 				const fieldValues = await Promise.all(
 					objEntries(noteCard.note.fieldValues).map(async ([f, v]) => {
-						const doc = dp.parseFromString(v, 'text/html')
+						const doc = parseHtml(v)
 						await Promise.all(
 							Array.from(doc.images).map(async (i) => {
 								await mutate(i)

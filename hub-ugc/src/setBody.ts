@@ -6,6 +6,7 @@ import {
 import { resizeIframe } from './registerServiceWorker'
 import diff from 'micromorph'
 import '@iframe-resizer/child'
+import { parseHtml } from 'shared-dom/utility'
 
 self.onmessage = async (event) => {
 	const data = event.data as unknown
@@ -21,10 +22,8 @@ self.onmessage = async (event) => {
 	}
 }
 
-const domParser = new DOMParser()
-
 export async function setBody({ body, css }: RawRenderBodyInput) {
-	await diff(document, domParser.parseFromString(body, 'text/html'))
+	await diff(document, parseHtml(body))
 	if (css != null) {
 		const style = document.createElement('style')
 		style.textContent = css
