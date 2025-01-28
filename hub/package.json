@@ -54,6 +54,7 @@
 		"@solidjs/meta": "^0.29.4",
 		"@solidjs/router": "^0.15.2",
 		"@solidjs/start": "^1.0.11",
+		"@tanstack/solid-table": "^8.20.5",
 		"@trpc/client": "^10.38.5",
 		"@trpc/server": "^10.38.5",
 		"app": "workspace:*",
