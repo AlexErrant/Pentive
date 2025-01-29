@@ -729,6 +729,9 @@ importers:
       '@solidjs/start':
         specifier: ^1.0.11
         version: 1.0.11(solid-js@1.9.4)(vinxi@0.4.1(@planetscale/database@1.19.0)(@types/node@22.10.7)(ioredis@5.4.1)(sass@1.83.4)(terser@5.37.0))(vite@5.4.11(@types/node@22.10.7)(sass@1.83.4)(terser@5.37.0))
+      '@tanstack/solid-query':
+        specifier: ^5.62.16
+        version: 5.62.16(solid-js@1.9.4)
       '@tanstack/solid-table':
         specifier: ^8.20.5
         version: 8.20.5(solid-js@1.9.4)
