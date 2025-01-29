@@ -68,6 +68,18 @@ export default function Nook(props: RouteSectionProps) {
 				cell: (info) => info.row.original.subscribers,
 			},
 			{
+				header: 'Created',
+				cell: (info) => (
+					<relative-time prop:date={info.row.original.note.created} />
+				),
+			},
+			{
+				header: 'Edited',
+				cell: (info) => (
+					<relative-time prop:date={info.row.original.note.edited} />
+				),
+			},
+			{
 				header: 'Til',
 				cell: (info) => (
 					<>
