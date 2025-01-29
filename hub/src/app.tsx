@@ -6,6 +6,7 @@ import Nav from './components/nav'
 import { ThemeProvider } from 'shared-dom/themeSelector'
 import { UserIdProvider } from './components/userIdContext'
 import { QueryClient, QueryClientProvider } from '@tanstack/solid-query'
+import { SolidQueryDevtools } from '@tanstack/solid-query-devtools'
 
 const queryClient = new QueryClient()
 
@@ -24,6 +25,7 @@ export default function App() {
 					>
 						<FileRoutes />
 					</Router>
+					<SolidQueryDevtools initialIsOpen={false} />
 				</QueryClientProvider>
 			</ThemeProvider>
 		</UserIdProvider>
