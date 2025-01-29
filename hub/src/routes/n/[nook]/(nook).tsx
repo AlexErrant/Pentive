@@ -9,7 +9,6 @@ import {
 	remoteToNote,
 	remoteToTemplate,
 } from '~/lib/utility'
-import RelativeDate from '~/components/relativeDate'
 import {
 	A,
 	query,
@@ -24,6 +23,7 @@ import {
 	type ColumnDef,
 	createSolidTable,
 } from '@tanstack/solid-table'
+import '@github/relative-time-element'
 
 const getPostsCached = query(async (nook: string) => {
 	'use server'
@@ -75,7 +75,8 @@ export default function Nook(props: RouteSectionProps) {
 							''
 						) : (
 							<>
-								Last synced at <RelativeDate date={info.row.original.til} />
+								Last synced at
+								<relative-time prop:date={info.row.original.til} />
 							</>
 						)}
 					</>

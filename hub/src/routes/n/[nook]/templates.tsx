@@ -5,7 +5,6 @@ import { DownloadSubscribeTemplate } from '~/components/downloadSubscribeTemplat
 import { ResizingIframe } from '~/components/resizingIframe'
 import { remoteToTemplate } from '~/lib/utility'
 import { getUserId } from '~/session'
-import RelativeDate from '~/components/relativeDate'
 import {
 	A,
 	query,
@@ -13,6 +12,7 @@ import {
 	type RouteDefinition,
 	type RouteSectionProps,
 } from '@solidjs/router'
+import '@github/relative-time-element'
 
 const getTemplatesCached = query(async (nook: NookId) => {
 	'use server'
@@ -46,7 +46,8 @@ export default function Thread(props: RouteSectionProps) {
 										''
 									) : (
 										<>
-											Last synced at <RelativeDate date={template.til} />
+											Last synced at
+											<relative-time prop:date={template.til} />
 										</>
 									)}
 								</div>

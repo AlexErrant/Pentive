@@ -4,8 +4,8 @@ import Toggle from './toggle'
 import SubmitComment from './submitComment'
 import { cwaClient } from '~/routes/cwaClient'
 import { type Base64Url } from 'shared/brand'
-import RelativeDate from './relativeDate'
 import { A } from '@solidjs/router'
+import '@github/relative-time-element'
 
 const Comment: Component<{
 	comment: CommentType<Base64Url>
@@ -18,7 +18,7 @@ const Comment: Component<{
 				<A href={`/users/${props.comment.authorId}`}>
 					{props.comment.authorId}
 				</A>{' '}
-				<RelativeDate date={props.comment.edited} />
+				<relative-time prop:date={props.comment.edited} />
 			</div>
 			<div class='text'>{props.comment.text}</div>
 			<button

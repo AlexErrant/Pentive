@@ -4,9 +4,9 @@ import {
 	type RouteDefinition,
 	type RouteSectionProps,
 } from '@solidjs/router'
-import RelativeDate from '~/components/relativeDate'
 import { getNookDetailsCached } from '~/lib/useServer'
 import { IsModProvider } from '~/components/isModContext'
+import '@github/relative-time-element'
 
 export const route = {
 	preload({ params }) {
@@ -40,7 +40,8 @@ export default function NookLayout(props: RouteSectionProps) {
 										Submit
 									</a>
 									<div>
-										Est. <RelativeDate date={nd().created} />
+										Est.
+										<relative-time prop:date={nd().created} />
 									</div>
 									<div>
 										mods:
