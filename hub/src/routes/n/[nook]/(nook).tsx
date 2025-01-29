@@ -24,6 +24,7 @@ import {
 	createSolidTable,
 } from '@tanstack/solid-table'
 import '@github/relative-time-element'
+import { createInfiniteQuery, keepPreviousData } from '@tanstack/solid-query'
 
 const getPostsCached = query(async (nook: string) => {
 	'use server'
@@ -51,16 +52,23 @@ export default function Nook(props: RouteSectionProps) {
 		async () => await getPostsCached(props.params.nook!),
 		{ deferStream: true },
 	)
-	const notes = createAsync(
-		async () => await getNotesCached(props.params.nook!),
-		{ initialValue: [], deferStream: true },
-	)
+	const notes = createInfiniteQuery(() => ({
+		queryKey: ['nook/notes', props.params.nook],
+		queryFn: async ({ pageParam }) => {
+			return await getNotesCached(props.params.nook!)
+		},
+		initialPageParam: 0,
+		getNextPageParam: (_lastGroup, groups) => groups.length,
+		refetchOnWindowFocus: false,
+		placeholderData: keepPreviousData,
+		deferStream: true,
+	}))
 	const nookDetails = createAsync(
 		async () => await getNookDetailsCached(props.params.nook),
 	)
 	const table = createSolidTable({
 		get data() {
-			return notes()
+			return notes.data?.pages.flat() ?? []
 		},
 		columns: [
 			{
@@ -139,6 +147,8 @@ export default function Nook(props: RouteSectionProps) {
 						</li>
 					)}
 				</For>
+			</ul>
+			<Show when={notes.data?.pages[0]?.length !== 0}>
 				<table class='w-full table-auto text-left'>
 					<thead>
 						<For each={table.getHeaderGroups()}>
@@ -199,10 +209,10 @@ export default function Nook(props: RouteSectionProps) {
 						</For>
 					</tfoot>
 				</table>
-			</ul>
+			</Show>
 			<Show
 				when={
-					notes()?.length === 0 && // We optimize for when there is more than one note/post (which is more common).
+					notes.data?.pages[0]?.length === 0 && // We optimize for when there is more than one note/post (which is more common).
 					posts()?.length === 0 && // Only if there are none do we check to see if the nook exists, which is async.
 					nookDetails() == null // If it doesn't, show the create link.
 				}

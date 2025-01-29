@@ -5,21 +5,26 @@ import './app.css'
 import Nav from './components/nav'
 import { ThemeProvider } from 'shared-dom/themeSelector'
 import { UserIdProvider } from './components/userIdContext'
+import { QueryClient, QueryClientProvider } from '@tanstack/solid-query'
+
+const queryClient = new QueryClient()
 
 export default function App() {
 	return (
 		<UserIdProvider>
 			<ThemeProvider>
-				<Router
-					root={(props) => (
-						<Suspense fallback={<div class='news-list-nav'>Loading...</div>}>
-							<Nav />
-							{props.children}
-						</Suspense>
-					)}
-				>
-					<FileRoutes />
-				</Router>
+				<QueryClientProvider client={queryClient}>
+					<Router
+						root={(props) => (
+							<Suspense fallback={<div class='news-list-nav'>Loading...</div>}>
+								<Nav />
+								{props.children}
+							</Suspense>
+						)}
+					>
+						<FileRoutes />
+					</Router>
+				</QueryClientProvider>
 			</ThemeProvider>
 		</UserIdProvider>
 	)
