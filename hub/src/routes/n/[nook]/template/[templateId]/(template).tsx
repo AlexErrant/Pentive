@@ -54,6 +54,7 @@ export default function Thread(props: RouteSectionProps) {
 				props.params.templateId as RemoteTemplateId,
 				props.params.nook as NookId,
 			),
+		{ deferStream: true },
 	)
 	const comments = createAsync(
 		async () =>
@@ -63,52 +64,52 @@ export default function Thread(props: RouteSectionProps) {
 	)
 	const template = () => remoteToTemplate(remoteTemplate()!)
 	return (
-		<Suspense fallback={<p>Loading template...</p>}>
-			<Show when={remoteTemplate()} fallback={<p>"404 Not Found"</p>}>
-				<div class='item-view-comments'>
-					<p class='item-view-comments-header'>
-						<For each={defaultRenderContainer.templateIndexes(template())}>
-							{(index) => {
-								return (
-									<>
-										<ResizingIframe
-											i={{
-												index,
-												tag: 'template',
-												side: 'front',
-												template: template(),
-											}}
-										/>
-										<ResizingIframe
-											i={{
-												index,
-												tag: 'template',
-												side: 'back',
-												template: template(),
-											}}
-										/>
-									</>
-								)
-							}}
-						</For>
-					</p>
-					<DownloadSubscribeTemplate template={remoteTemplate()!} />
-					<ul class='comment-children'>
-						<SubmitComment
-							// eslint-disable-next-line solid/reactivity -- doesn't need to be reactive
-							onSubmit={async (text) => {
-								await cwaClient.insertTemplateComment.mutate({
-									templateId: cast(template().id),
-									text,
-								})
-							}}
-						/>
+		<Show when={remoteTemplate()} fallback={<p>"404 Not Found"</p>}>
+			<div class='item-view-comments'>
+				<p class='item-view-comments-header'>
+					<For each={defaultRenderContainer.templateIndexes(template())}>
+						{(index) => {
+							return (
+								<>
+									<ResizingIframe
+										i={{
+											index,
+											tag: 'template',
+											side: 'front',
+											template: template(),
+										}}
+									/>
+									<ResizingIframe
+										i={{
+											index,
+											tag: 'template',
+											side: 'back',
+											template: template(),
+										}}
+									/>
+								</>
+							)
+						}}
+					</For>
+				</p>
+				<DownloadSubscribeTemplate template={remoteTemplate()!} />
+				<ul class='comment-children'>
+					<SubmitComment
+						// eslint-disable-next-line solid/reactivity -- doesn't need to be reactive
+						onSubmit={async (text) => {
+							await cwaClient.insertTemplateComment.mutate({
+								templateId: cast(template().id),
+								text,
+							})
+						}}
+					/>
+					<Suspense>
 						<For each={comments()}>
 							{(comment) => <Comment comment={comment} type='template' />}
 						</For>
-					</ul>
-				</div>
-			</Show>
-		</Suspense>
+					</Suspense>
+				</ul>
+			</div>
+		</Show>
 	)
 }

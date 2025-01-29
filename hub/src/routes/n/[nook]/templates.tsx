@@ -1,4 +1,4 @@
-import { For, Show } from 'solid-js'
+import { For } from 'solid-js'
 import { type NookId } from 'shared/brand'
 import { getTemplates } from 'shared-edge'
 import { DownloadSubscribeTemplate } from '~/components/downloadSubscribeTemplate'
@@ -29,59 +29,54 @@ export const route = {
 export default function Thread(props: RouteSectionProps) {
 	const templates = createAsync(
 		async () => await getTemplatesCached(props.params.nook as NookId),
+		{ deferStream: true },
 	)
 	return (
-		<>
-			<Show when={templates()}>
-				<ul>
-					<For each={templates()}>
-						{(template) => {
-							const localTemplate = () => remoteToTemplate(template)
-							return (
-								<li>
-									<h1>{template.name}</h1>
-									<div>
-										<DownloadSubscribeTemplate template={template} />
-										<div>
-											{template.til == null ? (
-												''
-											) : (
-												<>
-													Last synced at <RelativeDate date={template.til} />
-												</>
-											)}
-										</div>
-										<a href={`/n/${props.params.nook}/template/${template.id}`}>
-											Comments: {template.comments}
-										</a>
-									</div>
-									<ResizingIframe
-										i={{
-											tag: 'template',
-											side: 'front',
-											template: localTemplate(),
-											index: 0,
-										}}
-									/>
-									<ResizingIframe
-										i={{
-											tag: 'template',
-											side: 'back',
-											template: localTemplate(),
-											index: 0,
-										}}
-									/>
-									<A
-										href={`/n/${props.params.nook}/template/${template.id}/edit`}
-									>
-										Edit
-									</A>
-								</li>
-							)
-						}}
-					</For>
-				</ul>
-			</Show>
-		</>
+		<ul>
+			<For each={templates()}>
+				{(template) => {
+					const localTemplate = () => remoteToTemplate(template)
+					return (
+						<li>
+							<h1>{template.name}</h1>
+							<div>
+								<DownloadSubscribeTemplate template={template} />
+								<div>
+									{template.til == null ? (
+										''
+									) : (
+										<>
+											Last synced at <RelativeDate date={template.til} />
+										</>
+									)}
+								</div>
+								<a href={`/n/${props.params.nook}/template/${template.id}`}>
+									Comments: {template.comments}
+								</a>
+							</div>
+							<ResizingIframe
+								i={{
+									tag: 'template',
+									side: 'front',
+									template: localTemplate(),
+									index: 0,
+								}}
+							/>
+							<ResizingIframe
+								i={{
+									tag: 'template',
+									side: 'back',
+									template: localTemplate(),
+									index: 0,
+								}}
+							/>
+							<A href={`/n/${props.params.nook}/template/${template.id}/edit`}>
+								Edit
+							</A>
+						</li>
+					)
+				}}
+			</For>
+		</ul>
 	)
 }

@@ -4,11 +4,11 @@ import { useUserIdContext } from './userIdContext'
 const IsModContext = createContext<Accessor<boolean>>()
 
 export function IsModProvider(props: {
-	moderators: string[]
+	moderators: string[] | undefined
 	children: JSX.Element
 }) {
 	const userId = useUserIdContext()
-	const isMod = () => props.moderators.includes(userId() as string)
+	const isMod = () => props.moderators?.includes(userId() as string) ?? false
 	return (
 		<IsModContext.Provider value={isMod}>
 			{props.children}

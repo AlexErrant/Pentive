@@ -40,6 +40,7 @@ export const route = {
 export default function Note(props: RouteSectionProps) {
 	const remoteNote = createAsync(
 		async () => await getNoteCached(props.params.noteId as RemoteNoteId),
+		{ deferStream: true },
 	)
 	const comments = createAsync(
 		async () =>
@@ -48,60 +49,60 @@ export default function Note(props: RouteSectionProps) {
 	const template = () => remoteToTemplate(remoteNote()!.template)
 	const note = () => remoteToNote(remoteNote()!)
 	return (
-		<Suspense fallback={<p>Loading note...</p>}>
-			<Show when={remoteNote()} fallback={<p>"404 Not Found"</p>}>
-				<div class='item-view-comments'>
-					<p class='item-view-comments-header'>
-						<For
-							each={noteOrds.bind(noteOrdsRenderContainer)(note(), template())}
-						>
-							{(ord) => {
-								const card = () => toSampleCard(ord)
-								return (
-									<>
-										<ResizingIframe
-											i={{
-												tag: 'card',
-												side: 'front',
-												template: template(),
-												card: card(),
-												note: note(),
-											}}
-										/>
-										<ResizingIframe
-											i={{
-												tag: 'card',
-												side: 'back',
-												template: template(),
-												card: card(),
-												note: note(),
-											}}
-										/>
-									</>
-								)
-							}}
-						</For>
-					</p>
-					<DownloadSubscribeNote
-						note={remoteNote()!}
-						nook={props.params.nook as NookId}
+		<Show when={remoteNote()} fallback={<p>"404 Not Found"</p>}>
+			<div class='item-view-comments'>
+				<p class='item-view-comments-header'>
+					<For
+						each={noteOrds.bind(noteOrdsRenderContainer)(note(), template())}
+					>
+						{(ord) => {
+							const card = () => toSampleCard(ord)
+							return (
+								<>
+									<ResizingIframe
+										i={{
+											tag: 'card',
+											side: 'front',
+											template: template(),
+											card: card(),
+											note: note(),
+										}}
+									/>
+									<ResizingIframe
+										i={{
+											tag: 'card',
+											side: 'back',
+											template: template(),
+											card: card(),
+											note: note(),
+										}}
+									/>
+								</>
+							)
+						}}
+					</For>
+				</p>
+				<DownloadSubscribeNote
+					note={remoteNote()!}
+					nook={props.params.nook as NookId}
+				/>
+				<ul class='comment-children'>
+					<SubmitComment
+						// eslint-disable-next-line solid/reactivity -- doesn't need to be reactive
+						onSubmit={async (text) => {
+							await cwaClient.insertNoteComment.mutate({
+								noteId: remoteNote()!.id,
+								text,
+							})
+						}}
 					/>
-					<ul class='comment-children'>
-						<SubmitComment
-							// eslint-disable-next-line solid/reactivity -- doesn't need to be reactive
-							onSubmit={async (text) => {
-								await cwaClient.insertNoteComment.mutate({
-									noteId: remoteNote()!.id,
-									text,
-								})
-							}}
-						/>
+					<Suspense>
 						<For each={comments()}>
 							{(comment) => <Comment comment={comment} type='note' />}
 						</For>
-					</ul>
-				</div>
-			</Show>
-		</Suspense>
+					</Suspense>
+				</ul>
+			</div>
+		</Show>
 	)
 }
