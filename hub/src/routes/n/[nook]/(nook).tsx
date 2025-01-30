@@ -1,5 +1,5 @@
-import { For, Show } from 'solid-js'
-import { getPosts, getNotes } from 'shared-edge'
+import { createSignal, For, Show } from 'solid-js'
+import { getPosts, getNotes, type NoteSortColumn } from 'shared-edge'
 import { noteOrds, toSampleCard } from 'shared-dom/cardHtml'
 import { type NookId, type Ord } from 'shared/brand'
 import { ResizingIframe } from '~/components/resizingIframe'
@@ -31,32 +31,45 @@ const getPostsCached = query(async (nook: string) => {
 	return await getPosts({ nook })
 }, 'posts')
 
-const getNotesCached = query(async (nook: string) => {
+type GetNotesParam = Omit<Parameters<typeof getNotes>[0], 'userId'>
+
+const getNotesCached = query(async (x: GetNotesParam) => {
 	'use server'
 	return await getUserId().then(
-		async (userId) => await getNotes(nook as NookId, userId),
+		async (userId) => await getNotes({ ...x, userId }),
 	)
 }, 'notes')
 
 export const route = {
 	preload({ params }) {
 		void getPostsCached(params.nook!)
-		void getNotesCached(params.nook!)
+		void getNotesCached({ nook: params.nook as NookId })
 	},
 } satisfies RouteDefinition
 
 type Note = Awaited<ReturnType<typeof getNotesCached>>[0]
 
 export default function Nook(props: RouteSectionProps) {
+	const [sort, setSort] = createSignal<
+		Array<{ id: NoteSortColumn; desc: boolean }>
+	>([])
 	const posts = createAsync(
 		async () => await getPostsCached(props.params.nook!),
 		{ deferStream: true },
 	)
 	const notes = createInfiniteQuery(() => ({
-		queryKey: ['nook/notes', props.params.nook],
-		queryFn: async ({ pageParam }) => {
-			return await getNotesCached(props.params.nook!)
-		},
+		queryKey: [
+			'nook/notes',
+			{
+				nook: props.params.nook,
+				sort: sort(),
+			},
+		],
+		queryFn: async ({ pageParam }) =>
+			await getNotesCached({
+				nook: props.params.nook as NookId,
+				sort: sort(),
+			}),
 		initialPageParam: 0,
 		getNextPageParam: (_lastGroup, groups) => groups.length,
 		refetchOnWindowFocus: false,
@@ -67,28 +80,42 @@ export default function Nook(props: RouteSectionProps) {
 		async () => await getNookDetailsCached(props.params.nook),
 	)
 	const table = createSolidTable({
+		onSortingChange: setSort,
+		state: {
+			get sorting() {
+				return sort()
+			},
+		},
 		get data() {
 			return notes.data?.pages.flat() ?? []
 		},
 		columns: [
 			{
 				header: 'Subscribers',
+				id: 'subscribers' satisfies NoteSortColumn,
+				accessorFn: (x) => x.subscribers,
 				cell: (info) => info.row.original.subscribers,
 			},
 			{
 				header: 'Created',
+				id: 'noteCreated' satisfies NoteSortColumn,
+				accessorFn: (x) => x.note.created,
 				cell: (info) => (
 					<relative-time prop:date={info.row.original.note.created} />
 				),
 			},
 			{
 				header: 'Edited',
+				id: 'noteEdited' satisfies NoteSortColumn,
+				accessorFn: (x) => x.note.edited,
 				cell: (info) => (
 					<relative-time prop:date={info.row.original.note.edited} />
 				),
 			},
 			{
 				header: 'Til',
+				id: 'til' satisfies NoteSortColumn,
+				accessorFn: (x) => x.til,
 				cell: (info) => (
 					<>
 						{info.row.original.til == null ? (
@@ -104,6 +131,8 @@ export default function Nook(props: RouteSectionProps) {
 			},
 			{
 				header: 'Comments',
+				id: 'comments' satisfies NoteSortColumn,
+				accessorFn: (x) => x.comments,
 				cell: (info) => (
 					<a href={`/n/${props.params.nook}/note/${info.row.original.id}`}>
 						{info.row.original.comments}
@@ -156,13 +185,26 @@ export default function Nook(props: RouteSectionProps) {
 								<tr>
 									<For each={headerGroup.headers}>
 										{(header) => (
-											<th>
-												{header.isPlaceholder
-													? null
-													: flexRender(
+											<th colSpan={header.colSpan}>
+												<Show when={!header.isPlaceholder}>
+													<div
+														class={
+															header.column.getCanSort()
+																? 'cursor-pointer select-none'
+																: undefined
+														}
+														onClick={header.column.getToggleSortingHandler()}
+													>
+														{flexRender(
 															header.column.columnDef.header,
 															header.getContext(),
 														)}
+														{{
+															asc: ' 🔼',
+															desc: ' 🔽',
+														}[header.column.getIsSorted() as string] ?? null}
+													</div>
+												</Show>
 											</th>
 										)}
 									</For>

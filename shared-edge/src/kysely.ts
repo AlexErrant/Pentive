@@ -233,7 +233,18 @@ export async function registerUser(id: string, email: string) {
 	await db.insertInto('user').values({ id, email }).execute()
 }
 
-export async function getNotes(nook: NookId, userId: UserId | null) {
+export type NoteSortColumn =
+	| 'subscribers'
+	| 'noteCreated'
+	| 'noteEdited'
+	| 'comments'
+	| 'til'
+
+export async function getNotes(x: {
+	nook: NookId
+	userId: UserId | null
+	sort?: Array<{ id: NoteSortColumn; desc: boolean }>
+}) {
 	const r = await db
 		.selectFrom('note')
 		.innerJoin('template', 'template.id', 'note.templateId')
@@ -256,17 +267,25 @@ export async function getNotes(nook: NookId, userId: UserId | null) {
 			'template.type',
 			'template.status as templateStatus',
 		])
-		.$if(userId != null, (a) =>
+		.$if(x.userId != null, (a) =>
 			a.select((b) =>
 				b
 					.selectFrom('noteSubscriber')
 					.select(['til'])
-					.where('userId', '=', userId)
+					.where('userId', '=', x.userId!)
 					.whereRef('noteSubscriber.noteId', '=', 'note.id')
 					.as('til'),
 			),
 		)
-		.where('template.nook', '=', nook)
+		.$if(true, (qb) => {
+			for (const { id, desc } of x.sort ?? [
+				{ id: 'noteCreated', desc: true },
+			]) {
+				qb = qb.orderBy(id, desc ? 'desc' : undefined)
+			}
+			return qb.orderBy('note.id', 'desc')
+		})
+		.where('template.nook', '=', x.nook)
 		.execute()
 	return r.map(noteToNookView)
 }
