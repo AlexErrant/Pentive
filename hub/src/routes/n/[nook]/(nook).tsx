@@ -25,19 +25,22 @@ import {
 } from '@tanstack/solid-table'
 import '@github/relative-time-element'
 import { createInfiniteQuery, keepPreviousData } from '@tanstack/solid-query'
+import { useUserIdContext } from '~/components/userIdContext'
 
 const getPostsCached = query(async (nook: string) => {
 	'use server'
 	return await getPosts({ nook })
 }, 'posts')
 
-type GetNotesParam = Omit<Parameters<typeof getNotes>[0], 'userId'>
+type GetNotesParam = Parameters<typeof getNotes>[0]
+type GetNotesParamOptionalUser = Omit<GetNotesParam, 'userId'> & {
+	userId?: GetNotesParam['userId']
+}
 
-const getNotesCached = query(async (x: GetNotesParam) => {
+const getNotesCached = query(async (x: GetNotesParamOptionalUser) => {
 	'use server'
-	return await getUserId().then(
-		async (userId) => await getNotes({ ...x, userId }),
-	)
+	if (x.userId === undefined) x.userId = await getUserId()
+	return await getNotes(x as GetNotesParam)
 }, 'notes')
 
 export const route = {
@@ -50,6 +53,7 @@ export const route = {
 type Note = Awaited<ReturnType<typeof getNotesCached>>[0]
 
 export default function Nook(props: RouteSectionProps) {
+	const userId = useUserIdContext()
 	const [sort, setSort] = createSignal<
 		Array<{ id: NoteSortColumn; desc: boolean }>
 	>([])
@@ -57,25 +61,22 @@ export default function Nook(props: RouteSectionProps) {
 		async () => await getPostsCached(props.params.nook!),
 		{ deferStream: true },
 	)
-	const notes = createInfiniteQuery(() => ({
-		queryKey: [
-			'nook/notes',
-			{
-				nook: props.params.nook,
-				sort: sort(),
-			},
-		],
-		queryFn: async ({ pageParam }) =>
-			await getNotesCached({
-				nook: props.params.nook as NookId,
-				sort: sort(),
-			}),
-		initialPageParam: 0,
-		getNextPageParam: (_lastGroup, groups) => groups.length,
-		refetchOnWindowFocus: false,
-		placeholderData: keepPreviousData,
-		deferStream: true,
-	}))
+	const notes = createInfiniteQuery(() => {
+		const params = {
+			nook: props.params.nook as NookId,
+			sort: sort(),
+			userId: userId(),
+		}
+		return {
+			queryKey: ['nook/notes', params],
+			queryFn: async ({ pageParam }) => await getNotesCached(params),
+			initialPageParam: 0,
+			getNextPageParam: (_lastGroup, groups) => groups.length,
+			refetchOnWindowFocus: false,
+			placeholderData: keepPreviousData,
+			deferStream: true,
+		}
+	})
 	const nookDetails = createAsync(
 		async () => await getNookDetailsCached(props.params.nook),
 	)
