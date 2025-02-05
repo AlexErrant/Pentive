@@ -1,4 +1,4 @@
-import { createSignal, For, Show } from 'solid-js'
+import { createSignal, For, Index, Show } from 'solid-js'
 import { getPosts, getNotes, type NoteSortColumn, pageSize } from 'shared-edge'
 import { noteOrds, toSampleCard } from 'shared-dom/cardHtml'
 import type { RemoteNoteId, NookId, Ord } from 'shared/brand'
@@ -18,7 +18,6 @@ import {
 } from '@solidjs/router'
 import { getNookDetailsCached } from '~/lib/useServer'
 import {
-	flexRender,
 	getCoreRowModel,
 	type ColumnDef,
 	createSolidTable,
@@ -27,6 +26,7 @@ import {
 import '@github/relative-time-element'
 import { createInfiniteQuery, keepPreviousData } from '@tanstack/solid-query'
 import { useUserIdContext } from '~/components/userIdContext'
+import { Dynamic } from 'solid-js/web'
 
 const getPostsCached = query(async (nook: string) => {
 	'use server'
@@ -114,13 +114,13 @@ export default function Nook(props: RouteSectionProps) {
 		},
 		columns: [
 			{
-				header: 'Subscribers',
+				header: () => 'Subscribers',
 				id: 'subscribers' satisfies NoteSortColumn,
 				accessorFn: (x) => x.subscribers,
 				cell: (info) => info.row.original.subscribers,
 			},
 			{
-				header: 'Created',
+				header: () => 'Created',
 				id: 'noteCreated' satisfies NoteSortColumn,
 				accessorFn: (x) => x.note.created,
 				cell: (info) => (
@@ -128,7 +128,7 @@ export default function Nook(props: RouteSectionProps) {
 				),
 			},
 			{
-				header: 'Edited',
+				header: () => 'Edited',
 				id: 'noteEdited' satisfies NoteSortColumn,
 				accessorFn: (x) => x.note.edited,
 				cell: (info) => (
@@ -136,7 +136,7 @@ export default function Nook(props: RouteSectionProps) {
 				),
 			},
 			{
-				header: 'Til',
+				header: () => 'Til',
 				id: 'til' satisfies NoteSortColumn,
 				accessorFn: (x) => x.til,
 				cell: (info) => (
@@ -153,7 +153,7 @@ export default function Nook(props: RouteSectionProps) {
 				),
 			},
 			{
-				header: 'Comments',
+				header: () => 'Comments',
 				id: 'comments' satisfies NoteSortColumn,
 				accessorFn: (x) => x.comments,
 				cell: (info) => (
@@ -218,10 +218,10 @@ export default function Nook(props: RouteSectionProps) {
 														}
 														onClick={header.column.getToggleSortingHandler()}
 													>
-														{flexRender(
-															header.column.columnDef.header,
-															header.getContext(),
-														)}
+														<Dynamic
+															component={header.column.columnDef.header}
+															{...header.getContext()}
+														/>
 														{{
 															asc: ' 🔼',
 															desc: ' 🔽',
@@ -236,22 +236,22 @@ export default function Nook(props: RouteSectionProps) {
 						</For>
 					</thead>
 					<tbody>
-						<For each={table.getRowModel().rows}>
+						<Index each={table.getRowModel().rows}>
 							{(row) => (
 								<tr>
-									<For each={row.getVisibleCells()}>
+									<Index each={row().getVisibleCells()}>
 										{(cell) => (
 											<td>
-												{flexRender(
-													cell.column.columnDef.cell,
-													cell.getContext(),
-												)}
+												<Dynamic
+													component={cell().column.columnDef.cell}
+													{...cell().getContext()}
+												/>
 											</td>
 										)}
-									</For>
+									</Index>
 								</tr>
 							)}
-						</For>
+						</Index>
 					</tbody>
 					<tfoot>
 						<For each={table.getFooterGroups()}>
@@ -260,12 +260,10 @@ export default function Nook(props: RouteSectionProps) {
 									<For each={footerGroup.headers}>
 										{(header) => (
 											<th>
-												{header.isPlaceholder
-													? null
-													: flexRender(
-															header.column.columnDef.footer,
-															header.getContext(),
-														)}
+												<Dynamic
+													component={header.column.columnDef.footer}
+													{...header.getContext()}
+												/>
 											</th>
 										)}
 									</For>
