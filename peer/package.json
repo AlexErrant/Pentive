@@ -20,8 +20,7 @@
 		"tsc-build": "tsc",
 		"format:check": "prettier --ignore-path .gitignore --check .",
 		"format": "prettier --ignore-path .gitignore --write .",
-		"eslint": "eslint . --ignore-path .gitignore --max-warnings 0",
-		"eslint:fix": "eslint . --fix --ignore-path .gitignore --max-warnings 0"
+		"eslint": "eslint . --max-warnings 0",
+		"eslint:fix": "eslint . --fix --max-warnings 0"
 	}
 }
-

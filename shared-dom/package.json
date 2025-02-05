@@ -9,8 +9,8 @@
 	"main": "src/index.tsx",
 	"scripts": {
 		"tsc-build": "tsc && cp ./src/solidSelect.css ./lib/src/solidSelect.css",
-		"eslint": "eslint . --ignore-path .gitignore --max-warnings 0",
-		"eslint:fix": "eslint . --fix --ignore-path .gitignore --max-warnings 0",
+		"eslint": "eslint . --max-warnings 0",
+		"eslint:fix": "eslint . --fix --max-warnings 0",
 		"format:check": "prettier --ignore-path .gitignore --check .",
 		"format": "prettier --ignore-path .gitignore --write .",
 		"generate-glob-parser": "lezer-generator src/language/glob.grammar --typeScript -o src/language/globParser.ts",
