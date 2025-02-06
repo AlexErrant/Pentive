@@ -19,9 +19,26 @@ export function buildEslintConfig(importMetaUrl) {
 	return [
 		...tseslint.config(
 			eslint.configs.recommended,
-			tseslint.configs.recommended,
+			tseslint.configs.strictTypeChecked,
+			tseslint.configs.stylisticTypeChecked,
 		),
 		includeIgnoreFile(gitignorePath),
 		solid,
+		{
+			ignores: [
+				'**/public/assets/*.js',
+				'**/build.js',
+				'**/sw.js',
+				'**/*.config.js',
+			],
+		},
+		{
+			languageOptions: {
+				parserOptions: {
+					projectService: true,
+					tsconfigRootDir: import.meta.dirname,
+				},
+			},
+		},
 	]
 }
