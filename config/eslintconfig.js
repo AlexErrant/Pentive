@@ -5,6 +5,7 @@ import tseslint from 'typescript-eslint'
 import { includeIgnoreFile } from '@eslint/compat'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import solid from 'eslint-plugin-solid/configs/typescript'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -21,5 +22,6 @@ export function buildEslintConfig(importMetaUrl) {
 			tseslint.configs.recommended,
 		),
 		includeIgnoreFile(gitignorePath),
+		solid,
 	]
 }
