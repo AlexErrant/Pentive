@@ -72,8 +72,8 @@ const EditChildTemplate: VoidComponent<{
 		),
 	)
 	onCleanup(() => {
-		frontView?.destroy()
-		backView?.destroy()
+		frontView.destroy()
+		backView.destroy()
 		disposeObserver(frontRo, frontRef)
 		disposeObserver(backRo, backRef)
 	})

@@ -899,7 +899,7 @@ function toBody(
 	card: Card,
 	note: Note,
 	template: Template,
-	short: boolean = false,
+	short = false,
 ) {
 	return getOk(defaultRenderContainer.body(card, note, template, short))
 }

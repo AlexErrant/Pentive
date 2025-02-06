@@ -11,7 +11,7 @@ const user = (path: string) =>
 
 async function fetchAPI<T>(path: string) {
 	const url = path.startsWith('user') ? user(path) : story(path)
-	// eslint-disable-next-line @typescript-eslint/naming-convention
+	 
 	const headers: Record<string, string> = { 'User-Agent': 'chrome' }
 
 	const response = await fetch(url, { headers })

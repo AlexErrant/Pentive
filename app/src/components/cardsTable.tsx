@@ -211,7 +211,7 @@ export const cardGridOptions = {
 					this.render(params.context.owner, () => (
 						<>
 							{typeof params.data?.card.due === 'number' ? (
-								<>New #{params.data?.card.due}</>
+								<>New #{params.data.card.due}</>
 							) : (
 								<relative-time prop:date={params.data?.card.due} />
 							)}
@@ -507,7 +507,7 @@ function arrowKeyNavigation(
 	const agApi = agParams.api
 	const { nextCellPosition, previousCellPosition, event, key } = agParams
 	const shiftKey = event?.shiftKey ?? false
-	const prevIndex = previousCellPosition?.rowIndex ?? null
+	const prevIndex = previousCellPosition.rowIndex ?? null
 	const prevNode =
 		prevIndex != null ? agApi.getDisplayedRowAtIndex(prevIndex) : null
 
@@ -515,7 +515,7 @@ function arrowKeyNavigation(
 		case 'ArrowDown':
 		case 'ArrowUp':
 			if (nextCellPosition != null) {
-				const nextIndex = nextCellPosition?.rowIndex ?? null
+				const nextIndex = nextCellPosition.rowIndex ?? null
 				const isUp = key === 'ArrowUp'
 
 				// agGrid can weirdly wrap focus when bottom summary present - prevent that

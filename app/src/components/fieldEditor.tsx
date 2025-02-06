@@ -184,7 +184,7 @@ export const FieldEditor: VoidComponent<{
 		),
 	)
 	onCleanup(() => {
-		view?.destroy()
+		view.destroy()
 	})
 	return <div ref={editor!} />
 }

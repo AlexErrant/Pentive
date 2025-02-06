@@ -7,7 +7,7 @@ import { Text } from './templateParser.terms'
 const htmlTemplateParser = templateParser.configure({
 	props: [
 		foldNodeProp.add({
-			// eslint-disable-next-line @typescript-eslint/naming-convention
+			 
 			Element: foldInside,
 		}),
 	],

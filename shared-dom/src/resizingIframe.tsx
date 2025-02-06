@@ -55,7 +55,6 @@ export interface Diagnostics {
 }
 
 export const ResizingIframe: VoidComponent<{
-	// eslint-disable-next-line @typescript-eslint/naming-convention
 	C: RenderContainer
 	readonly i: RenderBodyInput
 	class?: string
@@ -68,10 +67,10 @@ export const ResizingIframe: VoidComponent<{
 	) => Record<string, unknown>
 	origin: string
 }> = (props) => {
-	let iframeReference: IFrameComponent
+	let iframeReference: IFrameComponent | undefined
 	let intersectionObserver: IntersectionObserver
 	onCleanup(() => {
-		iframeReference?.iFrameResizer?.close()
+		iframeReference?.iFrameResizer.close()
 		disposeObserver(intersectionObserver, iframeReference)
 	})
 	const [diagnostics, setDiagnostics] = createStore<Diagnostics>({
@@ -208,6 +207,7 @@ const RenderDiagnostics: VoidComponent<{
 function throwaway(d: Warning | Error) {
 	if (d.tag === 'SyntaxError') {
 		return ''
+		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 	} else if (d.tag === 'Transformer404') {
 		return ''
 	}
@@ -222,13 +222,12 @@ function getOk(
 		setDiagnostics({ warnings: htmlResult.warnings, errors: [] })
 		return htmlResult.ok
 	} else if (htmlResult?.tag === 'Error') {
-		setDiagnostics({ errors: htmlResult?.errors, warnings: [] })
+		setDiagnostics({ errors: htmlResult.errors, warnings: [] })
 	}
 	return null
 }
 
 export function buildHtml(
-	// eslint-disable-next-line @typescript-eslint/naming-convention
 	C: RenderContainer,
 	i: RenderBodyInput,
 	setDiagnostics: SetStoreFunction<Diagnostics>,

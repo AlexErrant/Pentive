@@ -116,7 +116,8 @@ const TemplateNookSyncActual: VoidComponent<{
 							<For
 								each={zip(
 									(props.template.templateType as Standard).templates,
-									(remoteTemplate()?.templateType as Standard)?.templates ?? [],
+									(remoteTemplate()?.templateType as Standard | null)
+										?.templates ?? [],
 								)}
 							>
 								{([localTemplate, remoteTemplate]) => (
@@ -132,7 +133,9 @@ const TemplateNookSyncActual: VoidComponent<{
 							<ChildTemplateNookSync
 								css={props.template.css}
 								local={(props.template.templateType as Cloze).template}
-								remote={(remoteTemplate()?.templateType as Cloze)?.template}
+								remote={
+									(remoteTemplate()?.templateType as Cloze | null)?.template
+								}
 							/>
 						</Match>
 					</Switch>

@@ -1,6 +1,6 @@
 // copy/paste from https://github.com/ankitrohatgi/tarballjs
 
-/* eslint-disable @typescript-eslint/naming-convention */
+ 
 
 import { throwExp } from 'shared/utility'
 

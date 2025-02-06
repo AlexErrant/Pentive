@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import WDB, {
 	type Changeset,
 	type PokeProtocol,
@@ -8,7 +7,7 @@ import WDB, {
 } from './wholeDbReplicator'
 import { type DBAsync } from '@vlcn.io/xplat-api'
 import Peer, { type PeerJSOption, type DataConnection } from 'peerjs'
-import { untrack } from 'solid-js/web'
+import { untrack } from 'solid-js'
 import { stringify as uuidStringify } from 'uuid'
 import { cwaClient } from '../trpcClient'
 import { type JWTVerifyResult, jwtVerify, importSPKI } from 'jose'

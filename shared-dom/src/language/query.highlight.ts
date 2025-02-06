@@ -9,7 +9,7 @@ const labelValue = Tag.define()
 const delimiter = Tag.define()
 
 export const queryHighlighting = styleTags({
-	/* eslint-disable @typescript-eslint/naming-convention */
+	 
 	'Not Or Wildcard Is': t.operatorKeyword,
 	'Open Close': delimiter,
 	Regex: t.regexp,
@@ -18,7 +18,7 @@ export const queryHighlighting = styleTags({
 	'RatingEnum StateEnum KindEnum DueEnum FieldValueEnum': labelValue,
 	'Squared/...': squared,
 	'Wildcard Wildcard1': wildcard,
-	/* eslint-enable @typescript-eslint/naming-convention */
+	 
 	[stringLabels.join(' ')]: t.labelName,
 })
 

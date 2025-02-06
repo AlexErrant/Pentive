@@ -59,7 +59,7 @@ export function body(
 	card: Card,
 	note: Note,
 	template: Template,
-	short: boolean = false,
+	short = false,
 ): HtmlResult {
 	let { front, back, shortFront, shortBack } =
 		template.templateType.tag === 'standard'
@@ -285,7 +285,7 @@ const getStandardFieldAndValue = (field: Field) =>
 export function renderTemplate(
 	this: RenderContainer,
 	template: Template,
-	short: boolean = false,
+	short = false,
 ): readonly HtmlResult[] {
 	const fieldsAndValues = Object.fromEntries(
 		template.fields.map(getStandardFieldAndValue),

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/naming-convention */
+ 
 import { type DBAsync } from '@vlcn.io/xplat-api'
 import { parse as uuidParse, stringify as uuidStringify } from 'uuid'
 import { C } from '../topLevelAwait'

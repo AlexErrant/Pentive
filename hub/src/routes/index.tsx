@@ -46,9 +46,9 @@ export default function Home(): JSX.Element {
 					template: template(),
 					card: toSampleCard(0 as Ord),
 					note: toSampleNote({
-						// eslint-disable-next-line @typescript-eslint/naming-convention
+						 
 						Front: 'q',
-						// eslint-disable-next-line @typescript-eslint/naming-convention
+						 
 						Back: 'a',
 					}),
 				}}

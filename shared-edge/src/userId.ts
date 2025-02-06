@@ -8,7 +8,7 @@ import { toError, toOk } from 'shared/result'
 
 export async function getUserId<T extends { hubSessionSecret: Base64 }>(
 	c: Context<{
-		// eslint-disable-next-line @typescript-eslint/naming-convention
+		 
 		Bindings: T
 	}>,
 ) {

@@ -16,9 +16,7 @@ import { throwExp } from 'shared/utility'
 export async function postMedia(
 	type: 'note' | 'template',
 	mediaId: MediaId,
-	ids: Array<
-		[NoteId | TemplateId, RemoteNoteId | RemoteTemplateId, RemoteMediaId]
-	>,
+	ids: Array<[NoteId | TemplateId, RemoteNoteId | RemoteTemplateId, RemoteMediaId]>,
 	data: ArrayBuffer,
 ) {
 	const remoteEntityIdAndRemoteMediaId = ids.map(
@@ -41,7 +39,7 @@ export async function postMedia(
 			}),
 		},
 	)
-	// eslint-disable-next-line yoda
+	 
 	if (200 <= response.status && response.status <= 299) {
 		await C.db.updateUploadDate(ids)
 	} else {

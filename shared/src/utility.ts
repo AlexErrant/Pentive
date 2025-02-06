@@ -122,7 +122,7 @@ export async function sleep(ms: number): Promise<void> {
 	await new Promise((resolve) => setTimeout(resolve, ms))
 }
 
-// eslint-disable-next-line symbol-description
+ 
 const timeoutSymbol = Symbol()
 
 // https://stackoverflow.com/a/67630893

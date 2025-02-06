@@ -15,7 +15,7 @@ import { csrfHeaderName, hstsName, hstsValue } from 'shared/headers'
 async function createContext(
 	x: NodeHTTPCreateContextFnOptions<
 		IncomingMessage,
-		ServerResponse<IncomingMessage>
+		ServerResponse
 	>,
 ): Promise<Context> {
 	const user = await getUser(x.req.headers)

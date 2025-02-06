@@ -1,6 +1,6 @@
 // literal copy/paste of https://github.com/Azarattum/CRStore/blob/main/src/lib/database/dialect.ts
 
-/* eslint-disable no-unmodified-loop-condition */
+ 
 /* eslint-disable require-yield */
 /* eslint-disable promise/param-names */
 /* eslint-disable @typescript-eslint/require-await */
@@ -60,7 +60,7 @@ class CRDialect extends SqliteDialect {
 				waiter.unlock()
 			},
 			async destroy() {
-				db?.close()
+				db.close()
 			},
 		}
 	}

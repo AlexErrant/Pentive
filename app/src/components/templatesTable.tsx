@@ -48,7 +48,7 @@ export const templateGridOptions = {
 		{
 			colId: 'Type',
 			headerName: 'Type',
-			valueGetter: (row) => startCase(row?.data?.templateType.tag),
+			valueGetter: (row) => startCase(row.data?.templateType.tag),
 		},
 		{
 			headerName: 'Remotes',

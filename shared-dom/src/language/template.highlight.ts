@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/naming-convention */
+ 
 import { styleTags, tags as t } from '@lezer/highlight'
 
 export const xmlHighlighting = styleTags({

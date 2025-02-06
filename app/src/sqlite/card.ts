@@ -123,12 +123,12 @@ type OnConflictUpdateCardSet = {
 
 // This exists to lie to Typescript, saying that all fts join tables are called `joinFts`.
 // There are multiple fts join tables with different names, but idk how to get that working with Kysely.
-const joinFtsConst = 'joinFts' as const
+const joinFtsConst = 'joinFts'
 type JoinFts = typeof joinFtsConst
 
 // This exists to lie to Typescript, saying that all caches are called `searchCache`.
 // There are multiple caches with different names, but idk how to get that working with Kysely.
-const searchCacheConst = 'searchCache' as const
+const searchCacheConst = 'searchCache'
 type SearchCache = typeof searchCacheConst
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-definitions -- interface doesn't work with `withTables`
@@ -483,7 +483,7 @@ async function getCards(
 				edited: entity.note_edited,
 				tags: entity.note_tags,
 				templateId: entity.note_templateId,
-				// eslint-disable-next-line @typescript-eslint/naming-convention
+				 
 				template_fields: entity.template_fields,
 			},
 			forceParse(entity.remoteNote).map((rn) => ({

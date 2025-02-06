@@ -34,7 +34,7 @@ const EditSql: VoidComponent<{
 		}),
 	)
 	onCleanup(() => {
-		view?.destroy()
+		view.destroy()
 	})
 	return (
 		<fieldset class='border-black border p-2'>

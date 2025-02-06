@@ -178,7 +178,7 @@ export interface Setting {
 }
 
 export interface DB {
-	// eslint-disable-next-line @typescript-eslint/naming-convention
+	 
 	sqlite_temp_master: SqliteTempMaster
 	distinctCardTag: DistinctCardTag
 	distinctNoteTag: DistinctNoteTag

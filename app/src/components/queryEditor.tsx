@@ -91,7 +91,7 @@ const QueryEditor: VoidComponent<{
 		),
 	)
 	onCleanup(() => {
-		view?.destroy()
+		view.destroy()
 		disposeObserver(ro, ref)
 	})
 	return (
@@ -251,7 +251,7 @@ const baseTheme = EditorView.baseTheme({
 })
 
 const blackBackground = EditorView.theme({
-	[`${prefix}`]: {
+	[prefix]: {
 		backgroundColor: 'black',
 	},
 })

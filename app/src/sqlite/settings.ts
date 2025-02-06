@@ -35,7 +35,7 @@ export const settingsCollectionMethods = {
 					({
 						id: toLDbId(setting.id),
 						key,
-						value: encodeValue(value as Exclude<typeof value, SettingRecord>),
+						value: encodeValue(value),
 					}) satisfies InsertObject<DB, 'setting'>,
 			),
 		)
@@ -137,7 +137,7 @@ function decodeValue(value: Uint8Array) {
 
 export const delimiter = '/'
 
-export function flattenObject(obj: SettingRecord, parentKey: string = '') {
+export function flattenObject(obj: SettingRecord, parentKey = '') {
 	const result: Record<string, SettingValue> = {}
 	const entries = objEntries(obj)
 	if (entries.length === 0) {

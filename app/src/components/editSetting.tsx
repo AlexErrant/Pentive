@@ -59,7 +59,7 @@ const EditSetting: VoidComponent<{
 		}),
 	)
 	onCleanup(() => {
-		view?.destroy()
+		view.destroy()
 	})
 	return (
 		<>

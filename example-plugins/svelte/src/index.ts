@@ -17,7 +17,7 @@ const services = (c: Container): Partial<Container> => {
 			createComponent(Router, {
 				get children() {
 					const div = document.createElement('div')
-					// eslint-disable-next-line no-new -- svelte API requires that we side effect
+					 
 					new App({
 						target: div,
 						props,

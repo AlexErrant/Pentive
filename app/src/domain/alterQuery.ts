@@ -49,7 +49,7 @@ export function alterQuery(query: string, input: { tags?: string[] }) {
 		const toAdd = getToAdd(input.tags)
 		if (q.trim().length === 0) {
 			q = toAdd
-		} else if (q.slice(-1) === ' ') {
+		} else if (q.endsWith(' ')) {
 			q = q + toAdd
 		} else {
 			q = q + ' ' + toAdd

@@ -65,7 +65,7 @@ async function assertEqual(
 	if (typeof joinsOrArgCount === 'number') {
 		expect(i.i).toBe(joinsOrArgCount)
 	} else {
-		// eslint-disable-next-line no-inner-declarations
+		 
 		async function testJoin(
 			list: Array<{
 				sql: RawBuilder<SqlBool>

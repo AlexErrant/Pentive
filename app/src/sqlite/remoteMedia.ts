@@ -10,9 +10,7 @@ import { C, ky } from '../topLevelAwait'
 
 export const remoteMediaCollectionMethods = {
 	updateUploadDate: async function (
-		ids: Array<
-			[NoteId | TemplateId, RemoteNoteId | RemoteTemplateId, RemoteMediaId]
-		>,
+		ids: Array<[NoteId | TemplateId, RemoteNoteId | RemoteTemplateId, RemoteMediaId]>,
 	) {
 		const uploadDate = C.getDate().getTime()
 		for (const [localEntityId, , remoteMediaId] of ids) {

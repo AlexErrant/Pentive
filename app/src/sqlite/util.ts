@@ -114,7 +114,7 @@ export function templateEntityToDomain(
 }
 
 export function noteEntityToDomain(
-	// eslint-disable-next-line @typescript-eslint/naming-convention
+	 
 	note: NoteEntity & { template_fields: string },
 	remotes: RemoteNote[],
 ): Note {
@@ -415,13 +415,11 @@ export async function getMediaToUpload<TType extends 'note' | 'template'>(
 		MediaId,
 		{
 			data: ArrayBuffer
-			ids: Array<
-				[
+			ids: Array<[
 					TType extends 'note' ? NoteId : TemplateId,
 					TType extends 'note' ? RemoteNoteId : RemoteTemplateId,
 					RemoteMediaId,
-				]
-			>
+				]>
 		}
 	>(
 		mediaBinaries.map(({ localMediaId, data }) => [

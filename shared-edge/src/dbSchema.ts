@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/naming-convention */
+ 
 import type { ColumnType } from 'kysely'
 import {
 	type Brand,

@@ -14,7 +14,7 @@ export async function setUserPeer(
 			peer: (x) =>
 				sql`JSON_SET(${sql`IFNULL(${x.ref(
 					'peer',
-				)},'{}')`}, ${`$."${peerId}"`}, ${`${peerDisplayName}`})`,
+				)},'{}')`}, ${`$."${peerId}"`}, ${peerDisplayName})`,
 		})
 		.where('id', '=', userId)
 		.execute()

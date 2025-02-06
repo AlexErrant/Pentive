@@ -48,7 +48,7 @@ export const AddNote: VoidComponent<{
 }> = (props) => {
 	const [, setNoteRowDelta] = useTableCountContext().noteRowDelta
 	const [templates] = createResource(C.db.getTemplates, { initialValue: [] })
-	const templateNames = () => templates()?.map((t) => t.name) ?? []
+	const templateNames = () => templates().map((t) => t.name) ?? []
 	const [template, setTemplate] = createSignal<Template>()
 	const [wip, setWip] = createStore<{ noteCard?: NoteCardView }>({})
 	createEffect(() => {
@@ -140,7 +140,7 @@ export const AddNote: VoidComponent<{
 				initialValue={templateNames().at(0)}
 				options={templateNames()}
 				onChange={(value: string) =>
-					setTemplate(templates()?.find((t) => t.name === value))
+					setTemplate(templates().find((t) => t.name === value))
 				}
 			/>
 			<Show when={wip.noteCard}>

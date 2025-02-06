@@ -25,7 +25,7 @@ export function ftsNormalize(
 	html: string,
 	stripHtml: boolean,
 	caseFoldBool: boolean,
-	// eslint-disable-next-line @typescript-eslint/naming-convention
+	 
 	removeCombiningCharacters_DoNotEnableByDefault: boolean,
 ) {
 	// "The W3C Character Model for the World Wide Web 1.0: Normalization [CharNorm]... recommend using Normalization Form C for all content" https://www.unicode.org/reports/tr15/

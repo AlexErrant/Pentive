@@ -28,7 +28,7 @@ render(
 			<SolidQueryDevtools initialIsOpen={false} />
 		</QueryClientProvider>
 	),
-	document.getElementById('root') as HTMLElement,
+	document.getElementById('root')!,
 )
 
 import('./registerServiceWorker').catch((e) => {

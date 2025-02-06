@@ -22,7 +22,7 @@ import { fetchRequestHandler } from '@trpc/server/adapters/fetch'
 import { type MediaId, type MediaHash } from 'shared/brand'
 import { hstsName, hstsValue } from 'shared/headers'
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
+ 
 const app = new Hono<{ Bindings: Env }>()
 
 declare global {

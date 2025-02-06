@@ -16,7 +16,7 @@ self.onmessage = async (event) => {
 			const i = data.i as RawRenderBodyInput
 			await setBody(i)
 			await resizeIframe()
-		} else if (data?.type === 'ComlinkInit') {
+		} else if (data.type === 'ComlinkInit') {
 			setHubMessengerPort((data as ComlinkInit).port)
 		}
 	}

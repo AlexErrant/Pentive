@@ -192,7 +192,7 @@ function _toastWarn(userMsg: JSXElement, ...consoleMsg: unknown[]) {
 }
 
 // based on the "With Timer" example on https://www.solid-toast.com/
-export function toastInfo(userMsg: string, duration: number = 6000) {
+export function toastInfo(userMsg: string, duration = 6000) {
 	console.info(userMsg)
 	toast.custom(
 		(t) => {

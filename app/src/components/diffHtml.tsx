@@ -109,7 +109,7 @@ const MergeComp: VoidComponent<{
 		),
 	)
 	onCleanup(() => {
-		view?.destroy()
+		view.destroy()
 		disposeObserver(ro, ref)
 	})
 	return <div class='max-h-[500px] resize-y overflow-auto' ref={ref!} />

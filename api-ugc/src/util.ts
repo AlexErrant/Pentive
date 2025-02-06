@@ -4,7 +4,7 @@ import { type PublicMediaSecret } from 'shared-edge'
 import { type Base64 } from 'shared/brand'
 
 export type ApiUgcContext = Context<{
-	// eslint-disable-next-line @typescript-eslint/naming-convention
+	 
 	Bindings: Env
 }>
 

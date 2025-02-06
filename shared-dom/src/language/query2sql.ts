@@ -973,15 +973,15 @@ export type Node = Group | Leaf
 type Label = (typeof labels)[number]
 
 // types
-const group = 'Group' as const
-const simpleString = 'SimpleString' as const
-const quoted = 'Quoted' as const
-const html = 'Html' as const
-const number = 'Number' as const
-const date = 'Date' as const
-const or = 'OR' as const
-const and = 'AND' as const
-const regex = 'Regex' as const
+const group = 'Group'
+const simpleString = 'SimpleString'
+const quoted = 'Quoted'
+const html = 'Html'
+const number = 'Number'
+const date = 'Date'
+const or = 'OR'
+const and = 'AND'
+const regex = 'Regex'
 
 export class Group {
 	constructor(parent: Group | null, negate: boolean, label?: Label) {

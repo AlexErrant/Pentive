@@ -49,7 +49,7 @@ import { remoteMediaId, remoteTemplateNoteId } from 'shared/schema'
 import { type RawBuilder } from 'kysely'
 export type * from '@trpc/server'
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
+ 
 const app = new Hono<{ Bindings: Env }>()
 
 declare global {

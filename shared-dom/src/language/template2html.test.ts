@@ -16,7 +16,7 @@ test('can handle opening (and closing) brace', () => {
 		tree,
 		true,
 		toSampleCard(0 as Ord),
-		// eslint-disable-next-line @typescript-eslint/naming-convention
+		 
 		toSampleNote({ Front: 'Foo' }),
 		// @ts-expect-error whatever
 		getDefaultTemplate(null),

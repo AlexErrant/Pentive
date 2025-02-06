@@ -10,7 +10,7 @@ import {
 } from 'shared/brand'
 
 export type CwaContext = Context<{
-	// eslint-disable-next-line @typescript-eslint/naming-convention
+	 
 	Bindings: Env
 }>
 

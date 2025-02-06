@@ -57,7 +57,7 @@ const FieldHtmlEditor: VoidComponent<{
 		),
 	)
 	onCleanup(() => {
-		view?.destroy()
+		view.destroy()
 		disposeObserver(ro, ref)
 	})
 	return (
