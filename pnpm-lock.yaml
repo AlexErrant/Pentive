@@ -33,6 +33,9 @@ importers:
 
   .:
     devDependencies:
+      eslint:
+        specifier: ^9.19.0
+        version: 9.19.0(jiti@1.21.7)
       kill-port:
         specifier: '=1.6.1'
         version: 1.6.1
@@ -403,7 +406,7 @@ importers:
         version: 1.2.1(rollup@4.27.2)
       vite-plugin-checker:
         specifier: ^0.8.0
-        version: 0.8.0(eslint@9.19.0)(optionator@0.9.4)(stylelint@15.10.3(typescript@5.6.2))(typescript@5.6.2)(vite@5.4.11(@types/node@20.14.11)(sass@1.83.4)(terser@5.37.0))
+        version: 0.8.0(eslint@9.19.0(jiti@1.21.7))(optionator@0.9.4)(stylelint@15.10.3(typescript@5.6.2))(typescript@5.6.2)(vite@5.4.11(@types/node@20.14.11)(sass@1.83.4)(terser@5.37.0))
       vite-plugin-pwa:
         specifier: ^0.20.5
         version: 0.20.5(vite@5.4.11(@types/node@20.14.11)(sass@1.83.4)(terser@5.37.0))(workbox-build@7.3.0(@types/babel__core@7.20.5))(workbox-window@7.3.0)
@@ -823,7 +826,7 @@ importers:
         version: 5.4.11(@types/node@22.10.7)(sass@1.83.4)(terser@5.37.0)
       vite-plugin-checker:
         specifier: ^0.8.0
-        version: 0.8.0(eslint@9.19.0)(optionator@0.9.4)(stylelint@15.10.3(typescript@5.6.2))(typescript@5.6.2)(vite@5.4.11(@types/node@22.10.7)(sass@1.83.4)(terser@5.37.0))
+        version: 0.8.0(eslint@9.19.0(jiti@1.21.7))(optionator@0.9.4)(stylelint@15.10.3(typescript@5.6.2))(typescript@5.6.2)(vite@5.4.11(@types/node@22.10.7)(sass@1.83.4)(terser@5.37.0))
       wrangler:
         specifier: ^3.81.0
         version: 3.81.0(@cloudflare/workers-types@4.20240725.0)
@@ -11838,12 +11841,6 @@ snapshots:
       eslint: 9.19.0(jiti@1.21.7)
       eslint-visitor-keys: 3.4.3
 
-  '@eslint-community/eslint-utils@4.4.0(eslint@9.19.0)':
-    dependencies:
-      eslint: 9.19.0
-      eslint-visitor-keys: 3.4.3
-    optional: true
-
   '@eslint-community/regexpp@4.10.0': {}
 
   '@eslint-community/regexpp@4.12.1': {}
@@ -15585,46 +15582,6 @@ snapshots:
       text-table: 0.2.0
     transitivePeerDependencies:
       - supports-color
-
-  eslint@9.19.0:
-    dependencies:
-      '@eslint-community/eslint-utils': 4.4.0(eslint@9.19.0)
-      '@eslint-community/regexpp': 4.12.1
-      '@eslint/config-array': 0.19.2
-      '@eslint/core': 0.10.0
-      '@eslint/eslintrc': 3.2.0
-      '@eslint/js': 9.19.0
-      '@eslint/plugin-kit': 0.2.5
-      '@humanfs/node': 0.16.6
-      '@humanwhocodes/module-importer': 1.0.1
-      '@humanwhocodes/retry': 0.4.1
-      '@types/estree': 1.0.6
-      '@types/json-schema': 7.0.15
-      ajv: 6.12.6
-      chalk: 4.1.2
-      cross-spawn: 7.0.6
-      debug: 4.4.0(supports-color@8.1.1)
-      escape-string-regexp: 4.0.0
-      eslint-scope: 8.2.0
-      eslint-visitor-keys: 4.2.0
-      espree: 10.3.0
-      esquery: 1.5.0
-      esutils: 2.0.3
-      fast-deep-equal: 3.1.3
-      file-entry-cache: 8.0.0
-      find-up: 5.0.0
-      glob-parent: 6.0.2
-      ignore: 5.2.4
-      imurmurhash: 0.1.4
-      is-glob: 4.0.3
-      json-stable-stringify-without-jsonify: 1.0.1
-      lodash.merge: 4.6.2
-      minimatch: 3.1.2
-      natural-compare: 1.4.0
-      optionator: 0.9.4
-    transitivePeerDependencies:
-      - supports-color
-    optional: true
 
   eslint@9.19.0(jiti@1.21.7):
     dependencies:
@@ -20693,7 +20650,7 @@ snapshots:
       stylelint: 16.13.2(typescript@5.6.2)
       typescript: 5.6.2
 
-  vite-plugin-checker@0.8.0(eslint@9.19.0)(optionator@0.9.4)(stylelint@15.10.3(typescript@5.6.2))(typescript@5.6.2)(vite@5.4.11(@types/node@20.14.11)(sass@1.83.4)(terser@5.37.0)):
+  vite-plugin-checker@0.8.0(eslint@9.19.0(jiti@1.21.7))(optionator@0.9.4)(stylelint@15.10.3(typescript@5.6.2))(typescript@5.6.2)(vite@5.4.11(@types/node@20.14.11)(sass@1.83.4)(terser@5.37.0)):
     dependencies:
       '@babel/code-frame': 7.26.2
       ansi-escapes: 4.3.2
@@ -20711,12 +20668,12 @@ snapshots:
       vscode-languageserver-textdocument: 1.0.12
       vscode-uri: 3.0.8
     optionalDependencies:
-      eslint: 9.19.0
+      eslint: 9.19.0(jiti@1.21.7)
       optionator: 0.9.4
       stylelint: 15.10.3(typescript@5.6.2)
       typescript: 5.6.2
 
-  vite-plugin-checker@0.8.0(eslint@9.19.0)(optionator@0.9.4)(stylelint@15.10.3(typescript@5.6.2))(typescript@5.6.2)(vite@5.4.11(@types/node@22.10.7)(sass@1.83.4)(terser@5.37.0)):
+  vite-plugin-checker@0.8.0(eslint@9.19.0(jiti@1.21.7))(optionator@0.9.4)(stylelint@15.10.3(typescript@5.6.2))(typescript@5.6.2)(vite@5.4.11(@types/node@22.10.7)(sass@1.83.4)(terser@5.37.0)):
     dependencies:
       '@babel/code-frame': 7.26.2
       ansi-escapes: 4.3.2
@@ -20734,7 +20691,7 @@ snapshots:
       vscode-languageserver-textdocument: 1.0.12
       vscode-uri: 3.0.8
     optionalDependencies:
-      eslint: 9.19.0
+      eslint: 9.19.0(jiti@1.21.7)
       optionator: 0.9.4
       stylelint: 15.10.3(typescript@5.6.2)
       typescript: 5.6.2

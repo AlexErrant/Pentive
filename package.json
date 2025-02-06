@@ -9,6 +9,7 @@
 	"packageManager": "pnpm@9.5.0",
 	"type": "module",
 	"devDependencies": {
+		"eslint": "^9.19.0",
 		"kill-port": "=1.6.1",
 		"prettier": "^3.3.3",
 		"prettier-plugin-tailwindcss": "^0.6.5",
