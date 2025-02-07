@@ -91,7 +91,7 @@ export function ThemeSelector() {
 			optionTextValue='label'
 			value={THEME_OPTIONS.find((option) => option.value === colorMode())}
 			onChange={(option) => {
-				setColorMode(option.value)
+				setColorMode(option?.value ?? 'system')
 			}}
 			gutter={8}
 			sameWidth={false}
