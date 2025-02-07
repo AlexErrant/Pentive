@@ -57,6 +57,7 @@ const status = z.union([
 ])
 export type Status = z.infer<typeof status>
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const proposalStatus = z.union([
 	z.literal('awaitingMedia'),
 	z.literal('draft'),

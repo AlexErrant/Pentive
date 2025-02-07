@@ -181,9 +181,10 @@ export const templateCollectionMethods = {
 		const template = await ky
 			.selectFrom('template')
 			.leftJoin('remoteTemplate', 'template.id', 'remoteTemplate.localId')
-			.where(({ selectFrom, exists }) =>
-				exists(
-					selectFrom('remoteTemplate')
+			.where((eb) =>
+				eb.exists(
+					eb
+						.selectFrom('remoteTemplate')
 						.select('remoteTemplate.localId')
 						.whereRef('template.id', '=', 'remoteTemplate.localId')
 						.where('remoteTemplate.remoteId', '=', toLDbId(templateId)),
@@ -202,6 +203,7 @@ export const templateCollectionMethods = {
 		return toTemplates(allTemplates)
 	},
 	// lowTODO actually use the offset/limit
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	getTemplatesInfinitely: async function (offset: number, limit: number) {
 		const allTemplates = await ky
 			.selectFrom('template')

@@ -14,6 +14,7 @@ declare module 'solid-js' {
 		type Props<T> = {
 			[K in keyof T as `prop:${string & K}`]?: T[K]
 		}
+		// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 		interface IntrinsicElements extends ElementProps<HTMLElementTagNameMap> {}
 	}
 }

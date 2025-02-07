@@ -483,7 +483,6 @@ async function getCards(
 				edited: entity.note_edited,
 				tags: entity.note_tags,
 				templateId: entity.note_templateId,
-				 
 				template_fields: entity.template_fields,
 			},
 			forceParse(entity.remoteNote).map((rn) => ({
@@ -525,7 +524,7 @@ export const cardCollectionMethods = {
 		// highTODO make this a transaction
 		const batches = chunk(cards.map(cardToDocType), 1000)
 		for (let i = 0; i < batches.length; i++) {
-			C.toastInfo('card batch ' + i)
+			C.toastInfo(`card batch ${i}`)
 			const cardsTags = batches[i]!
 			const cards = cardsTags.map((ct) => ct[0])
 			const tags = cardsTags.flatMap((ct) => ct[1])

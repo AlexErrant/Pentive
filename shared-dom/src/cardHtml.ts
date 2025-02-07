@@ -61,6 +61,7 @@ export function body(
 	template: Template,
 	short = false,
 ): HtmlResult {
+	// eslint-disable-next-line prefer-const
 	let { front, back, shortFront, shortBack } =
 		template.templateType.tag === 'standard'
 			? (template.templateType.templates.find((t) => t.id === card.ord) ??
@@ -135,7 +136,7 @@ function textTransformer(
 
 function clozeTransformer(
 	this: RenderContainer,
-	{ initialValue, isFront, card, note, template }: TransformerArgs,
+	{ initialValue, isFront, card, template }: TransformerArgs,
 ) {
 	let r = initialValue
 	if (template.templateType.tag === 'cloze') {
@@ -290,39 +291,44 @@ export function renderTemplate(
 	const fieldsAndValues = Object.fromEntries(
 		template.fields.map(getStandardFieldAndValue),
 	) // medTODO consider adding escape characters so you can do e.g. {{Front}}. Apparently Anki doesn't have escape characters - now would be a good time to introduce this feature.
-	if (template.templateType.tag === 'standard') {
-		const note = toSampleNote(fieldsAndValues)
-		return template.templateType.templates.map(({ id }) =>
-			this.body(toSampleCard(id), note, template, short),
-		)
-	} else if (template.templateType.tag === 'cloze') {
-		const getFieldsAndValues = (
-			clozeField: string,
-			i: number,
-		): Array<readonly [string, string]> =>
-			template.fields.map((f) => {
-				return f.name === clozeField
-					? ([
-							f.name,
-							`This is a cloze deletion for {{c${i + 1}::${f.name}}}.`,
-						] as const)
-					: getStandardFieldAndValue(f)
-			})
-		const { front } = template.templateType.template
-		return getClozeFields
-			.call(this, front)
-			.map((clozeField, i) =>
-				this.body(
-					toSampleCard(i as Ord),
-					toSampleNote(Object.fromEntries(getFieldsAndValues(clozeField, i))),
-					template,
-					short,
-				),
+	switch (template.templateType.tag) {
+		case 'standard': {
+			const note = toSampleNote(fieldsAndValues)
+			return template.templateType.templates.map(({ id }) =>
+				this.body(toSampleCard(id), note, template, short),
+			)
+		}
+		case 'cloze': {
+			const getFieldsAndValues = (
+				clozeField: string,
+				i: number,
+			): Array<readonly [string, string]> =>
+				template.fields.map((f) => {
+					return f.name === clozeField
+						? ([
+								f.name,
+								`This is a cloze deletion for {{c${i + 1}::${f.name}}}.`,
+							] as const)
+						: getStandardFieldAndValue(f)
+				})
+			const { front } = template.templateType.template
+			return getClozeFields
+				.call(this, front)
+				.map((clozeField, i) =>
+					this.body(
+						toSampleCard(i as Ord),
+						toSampleNote(Object.fromEntries(getFieldsAndValues(clozeField, i))),
+						template,
+						short,
+					),
+				)
+		}
+		default:
+			assertNever(
+				template.templateType,
+				`No renderer found for Template: ${JSON.stringify(template.templateType)}`,
 			)
 	}
-	throw new Error(
-		`No renderer found for Template: ${JSON.stringify(template.templateType)}`,
-	)
 }
 
 export function templateIndexes(this: RenderContainer, template: Template) {
@@ -335,27 +341,31 @@ export function noteOrds(
 	note: Note,
 	template: Template,
 ) {
-	if (template.templateType.tag === 'standard') {
-		const ords = template.templateType.templates
-			.map((_, i) => {
-				const body = this.body(toSampleCard(i as Ord), note, template)
-				if (body.tag === 'Error' || body.ok == null) return null
-				return i as Ord
-			})
-			.filter(notEmpty)
-		return distinctAndOrder(ords)
-	} else if (template.templateType.tag === 'cloze') {
-		const ords = objEntries(note.fieldValues).flatMap(([, value]) =>
-			Array.from(value.matchAll(clozeRegex)).map((x) => {
-				const clozeIndex =
-					x.groups?.clozeIndex ??
-					throwExp('This error should never occur - is `clozeRegex` broken?')
-				return (parseInt(clozeIndex) - 1) as Ord
-			}),
-		)
-		return distinctAndOrder(ords)
+	switch (template.templateType.tag) {
+		case 'standard': {
+			const ords = template.templateType.templates
+				.map((_, i) => {
+					const body = this.body(toSampleCard(i as Ord), note, template)
+					if (body.tag === 'Error' || body.ok == null) return null
+					return i as Ord
+				})
+				.filter(notEmpty)
+			return distinctAndOrder(ords)
+		}
+		case 'cloze': {
+			const ords = objEntries(note.fieldValues).flatMap(([, value]) =>
+				Array.from(value.matchAll(clozeRegex)).map((x) => {
+					const clozeIndex =
+						x.groups?.clozeIndex ??
+						throwExp('This error should never occur - is `clozeRegex` broken?')
+					return (parseInt(clozeIndex) - 1) as Ord
+				}),
+			)
+			return distinctAndOrder(ords)
+		}
+		default:
+			assertNever(template.templateType)
 	}
-	assertNever(template.templateType)
 }
 
 function distinctAndOrder(ords: Ord[]) {

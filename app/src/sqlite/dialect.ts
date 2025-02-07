@@ -1,8 +1,6 @@
 // literal copy/paste of https://github.com/Azarattum/CRStore/blob/main/src/lib/database/dialect.ts
 
- 
 /* eslint-disable require-yield */
-/* eslint-disable promise/param-names */
 /* eslint-disable @typescript-eslint/require-await */
 import {
 	SqliteDialect,

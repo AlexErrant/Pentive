@@ -77,9 +77,9 @@ const NoteNookSyncActual: VoidComponent<{
 	const [mergedFieldValues] = createResource(
 		() => [props.note, remoteNote()] as const,
 		async ([note, remoteNote]) => {
-			const m: Record<string, [string, string]> = {}
+			const m: Record<string, [string | undefined, string | undefined]> = {}
 			for (const [field, value] of objEntries(note.fieldValues)) {
-				m[field] = [value, '']
+				m[field] = [value, undefined]
 			}
 			if (remoteNote != null) {
 				for (const [field, value] of objEntries(remoteNote.fieldValues)) {
@@ -97,7 +97,7 @@ const NoteNookSyncActual: VoidComponent<{
 							}
 						}),
 					)
-					m[field] = [m[field]?.at(0) ?? '', doc.body.innerHTML]
+					m[field] = [m[field]?.at(0), doc.body.innerHTML]
 				}
 			}
 			return m
@@ -125,7 +125,7 @@ const NoteNookSyncActual: VoidComponent<{
 									<ResizingIframe
 										i={{
 											tag: 'raw',
-											html: localRemote()[1],
+											html: localRemote()[1]!,
 											css: props.template.css,
 										}}
 									/>
@@ -135,7 +135,7 @@ const NoteNookSyncActual: VoidComponent<{
 									<ResizingIframe
 										i={{
 											tag: 'raw',
-											html: localRemote()[0],
+											html: localRemote()[0]!,
 											css: props.template.css,
 										}}
 									/>

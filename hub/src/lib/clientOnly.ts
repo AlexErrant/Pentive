@@ -25,7 +25,7 @@ export async function getAppMessenger() {
 		}
 	} else if (!messengerReady) {
 		let i = 0
-		 
+		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 		while (!messengerReady && i <= count) {
 			i++
 			await sleep(timeoutMs)

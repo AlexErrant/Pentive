@@ -20,7 +20,7 @@ export default function Study(): JSX.Element {
 	const [i, setI] = createSignal(0)
 	const [side, setSide] = createSignal<'front' | 'back'>('front')
 	const noteCard = () => cards()?.noteCards.at(i())
-	const [cardSettings] = createResource(C.db.getCardSettings)
+	const [cardSettings] = createResource(async () => await C.db.getCardSettings())
 	const [fsrsMap] = createResource(cardSettings, async (cardSettings) => {
 		await init()
 		const fsrsMap = new Map<CardSettingId, Fsrs>()
@@ -34,7 +34,7 @@ export default function Study(): JSX.Element {
 	})
 	const cardId = () => noteCard()?.card.id
 	const cardSettingId = () => noteCard()?.card.cardSettingId
-	const [fsrsItems] = createResource(cardId, C.db.getFsrsItemsForCard)
+	const [fsrsItems] = createResource(cardId, async (x) => await C.db.getFsrsItemsForCard(x))
 	const states = () => {
 		const csId = cardSettingId()
 		const fi = fsrsItems()

@@ -12,6 +12,7 @@ import { SQLITE_DETERMINISTIC, SQLITE_UTF8 } from '@vlcn.io/wa-sqlite'
 import initSql from 'shared/sql.json'
 import { ftsNormalize } from 'shared/htmlToText'
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function getMediaIds(fvs: string) {
 	// highTODO uncomment and fix by adding the mediaId table back
 	// const values = parseMap<string, string>(fvs).values()

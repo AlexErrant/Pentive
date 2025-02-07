@@ -69,7 +69,7 @@ export default function Nook(props: RouteSectionProps) {
 		}
 		return {
 			queryKey: ['nook/notes', params],
-			queryFn: async ({ pageParam }) => await getNotesCached(params),
+			queryFn: async () => await getNotesCached(params),
 			initialPageParam: 0,
 			getNextPageParam: (_lastGroup, groups) => groups.length,
 			refetchOnWindowFocus: false,

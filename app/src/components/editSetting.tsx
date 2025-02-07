@@ -27,7 +27,7 @@ import { userSettingId } from 'shared/brand'
 
 const EditSetting: VoidComponent<{
 	setting: Setting
-	setSetting: (_: Setting) => void
+	setSetting: (setting: Setting) => void
 }> = (props) => {
 	const schema = () =>
 		props.setting.id === userSettingId
@@ -76,7 +76,7 @@ const EditSetting: VoidComponent<{
 					let setting: Setting
 					try {
 						setting = JSON.parse(view.state.doc.toString()) as Setting
-					} catch (error) {
+					} catch {
 						C.toastError('Invalid JSON.')
 						return
 					}

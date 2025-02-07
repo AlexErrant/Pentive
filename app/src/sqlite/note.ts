@@ -136,7 +136,7 @@ export const noteCollectionMethods = {
 			try {
 				await sql`drop trigger noteFieldValue_after_insert`.execute(db)
 				for (let i = 0; i < batches.length; i++) {
-					C.toastInfo('note batch ' + i)
+					C.toastInfo(`note batch ${i}`)
 					const batch = batches[i]!
 					const notes = batch.map((ct) => ct[0])
 					const tags = batch.flatMap((ct) => ct[1])
@@ -345,7 +345,7 @@ JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field
 												noteId: note.id,
 											})} is null.`,
 										),
-									fromLDbId<RemoteTemplateId>(rt.remoteId) ??
+									fromLDbId<RemoteTemplateId | null>(rt.remoteId) ??
 										C.toastImpossible(
 											`remoteId for ${JSON.stringify({
 												nook: remoteNook,

@@ -14,5 +14,5 @@
 		"outDir": "lib",
 		"lib": ["ES2022"]
 	},
-	"include": ["src/**/*"]
+	"include": ["src/**/*", "./initIvy.ts"]
 }

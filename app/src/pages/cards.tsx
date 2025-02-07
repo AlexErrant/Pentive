@@ -14,7 +14,7 @@ export default function Cards(): JSX.Element {
 	const [selected, setSelected] = createStore<{ noteCard?: NoteCardView }>({})
 	const [cards] = createResource(
 		() => selected.noteCard?.note.id,
-		C.db.getCardsByNote,
+		async (x) => await C.db.getCardsByNote(x),
 	)
 	createEffect(() => {
 		if (cards() != null) setSelected('noteCard', 'cards', cards()!)

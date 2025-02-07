@@ -16,7 +16,7 @@ const WhoAmIContext = createContext<Resource<UserId | undefined>>()
 export function WhoAmIProvider(props: { children: JSX.Element }) {
 	// lowTODO have hub send app a message when a successful login occurs
 	const [whoAmI] = createResource(async () => {
-		const r = await cwaClient.whoAmI.query().catch((e) => {
+		const r = await cwaClient.whoAmI.query().catch((e: unknown) => {
 			if (window.navigator.onLine) {
 				C.toastError('Error occurred while verifying identity.', e)
 			} else {

@@ -7,7 +7,10 @@ export type SqliteCount = number
 export type Rasterize<T> = T extends infer O ? { [K in keyof O]: O[K] } : never
 
 // https://basarat.gitbook.io/typescript/type-system/discriminated-unions#throw-in-exhaustive-checks
-export function assertNever(x: never): never {
+export function assertNever(x: never, msg?: string): never {
+	if (msg != null) {
+		throw new Error(msg)
+	}
 	throw new Error(
 		`Expected 'never', but got an unexpected value:
 ${JSON.stringify(x)}`,
@@ -122,7 +125,6 @@ export async function sleep(ms: number): Promise<void> {
 	await new Promise((resolve) => setTimeout(resolve, ms))
 }
 
- 
 const timeoutSymbol = Symbol()
 
 // https://stackoverflow.com/a/67630893

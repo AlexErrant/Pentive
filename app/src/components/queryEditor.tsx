@@ -209,7 +209,7 @@ function getLanguageData(isSimpleString?: true) {
 		} satisfies CloseBracketConfig,
 		autocomplete: queryCompletion(
 			{
-				getTags: C.db.getTags,
+				getTags: async () => await C.db.getTags(),
 				getTemplates: async () =>
 					await C.db.getTemplates().then((ts) => ts.map((t) => t.name)),
 				getCardSettings: async () =>

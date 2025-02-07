@@ -41,7 +41,7 @@ function newDate(i: number) {
 	const d = new Date(i)
 	if (isNaN(+d)) {
 		// https://stackoverflow.com/q/1353684#comment131454756_67410020
-		throwExp('Invalid date: ' + i)
+		throwExp(`Invalid date: ${i}`)
 	}
 	return d
 }
@@ -179,7 +179,7 @@ function parseDue(due: number, type: number, colCrtMs: number): Date | number {
 		// review
 		return newDate(due * dayInMs + colCrtMs)
 	} else {
-		throwExp('Unhandled type: ' + type)
+		throwExp(`Unhandled type: ${type}`)
 	}
 }
 

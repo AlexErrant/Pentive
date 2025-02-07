@@ -31,6 +31,6 @@ render(
 	document.getElementById('root')!,
 )
 
-import('./registerServiceWorker').catch((e) => {
+import('./registerServiceWorker').catch((e: unknown) => {
 	C.toastError('Error registering service worker.', e)
 })

@@ -31,7 +31,7 @@ const parser = globQuery().language.parser
 export function alterQuery(query: string, input: { tags?: string[] }) {
 	let q = query
 	const tree = parser.parse(q)
-	let handledTags = false
+	let handledTags = false as boolean
 	tree.cursor().iterate((node) => {
 		if (node.node.parent?.type.is(queryTerms.Program) === true) {
 			if (

@@ -6,9 +6,9 @@ import { type Base64, type UserId } from 'shared/brand'
 import { csrfHeaderName, hubSessionCookieName } from 'shared/headers'
 import { toError, toOk } from 'shared/result'
 
+// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters
 export async function getUserId<T extends { hubSessionSecret: Base64 }>(
 	c: Context<{
-		 
 		Bindings: T
 	}>,
 ) {

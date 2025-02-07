@@ -54,7 +54,7 @@ export function ThemeSelector() {
 			document.documentElement.className.includes('dark')
 				? ('dark' as const)
 				: ('light' as const)
-		mo = new MutationObserver((_: MutationRecord[]) => {
+		mo = new MutationObserver(() => {
 			const current = currentTheme()
 			if (current !== untrack(theme)) {
 				setTheme(current)

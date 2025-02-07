@@ -11,7 +11,7 @@ export function disposeObserver(
 	}
 }
 
-let domParser: DOMParser
+let domParser: DOMParser | undefined
 export function parseHtml(html: string) {
 	if (domParser == null) domParser = new DOMParser()
 	return domParser.parseFromString(html, 'text/html')

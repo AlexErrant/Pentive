@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unnecessary-condition */
+/* eslint-disable no-constant-condition */
 import * as fs from 'fs'
 import { createClient } from '@libsql/client'
 import { Kysely } from 'kysely'
@@ -24,7 +26,6 @@ const tableCount = await client
 	.execute(`SELECT count(*) FROM sqlite_master WHERE type = 'table'`)
 	.then((x) => x.rows[0]![0] as number)
 
-// eslint-disable-next-line no-constant-condition
 if (false) {
 	for (const sql of ivySchemaSplit) {
 		console.log('sql', sql.sql)
@@ -40,7 +41,6 @@ if (tableCount === 0) {
 
 // Kysely Playground
 
-// eslint-disable-next-line no-constant-condition
 if (false) {
 	const db = new Kysely<DB>({
 		dialect: new LibsqlDialect({

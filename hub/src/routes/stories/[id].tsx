@@ -34,7 +34,7 @@ export default function Story(props: RouteSectionProps) {
 				<div class='item-view-comments'>
 					<p class='item-view-comments-header'>
 						{story()!.comments_count !== 0
-							? story()!.comments_count + ' comments'
+							? `${story()!.comments_count} comments`
 							: 'No comments yet.'}
 					</p>
 					<ul class='comment-children'>

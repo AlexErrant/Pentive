@@ -113,15 +113,16 @@ export async function assertIsMod(
 	filter: FilterTemplate | FilterNooks,
 	userId: UserId,
 ) {
-	let expectedLength
+	let expectedLength = -1
 	const { c: modCount } = await db
 		.selectFrom('nook')
 		.select(db.fn.count<SqliteCount>('nook.id').as('c'))
-		.where(({ exists, selectFrom }) =>
-			exists(
-				selectFrom((eb) =>
-					sql`json_each(${eb.ref('nook.moderators')})`.as('json_each'),
-				)
+		.where((eb) =>
+			eb.exists(
+				eb
+					.selectFrom((eb) =>
+						sql`json_each(${eb.ref('nook.moderators')})`.as('json_each'),
+					)
 					.select(sql`1`.as('_'))
 					.where(sql`json_each.value`, '=', userId),
 			),
@@ -139,6 +140,7 @@ export async function assertIsMod(
 				.where('template.id', 'in', templateIds.map(fromBase64Url))
 		})
 		.executeTakeFirstOrThrow()
+	if (expectedLength === -1) throwExp('ya goofed')
 	if (modCount !== expectedLength) {
 		throw new TRPCError({
 			code: 'UNAUTHORIZED',

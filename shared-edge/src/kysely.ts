@@ -70,6 +70,7 @@ export function setKysely(
 	authToken: string,
 	publicMediaSecret: PublicMediaSecret,
 ): void {
+	// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 	if (db == null) {
 		db = new Kysely<DB>({
 			dialect: new LibsqlDialect({
@@ -803,11 +804,12 @@ export async function userOwnsTemplateAndHasMedia(
 				.selectFrom('template')
 				.innerJoin('nook', 'template.nook', 'nook.id')
 				.select(db.fn.count<SqliteCount>('id').as('userOwns'))
-				.where(({ exists, selectFrom }) =>
-					exists(
-						selectFrom((eb) =>
-							sql`json_each(${eb.ref('nook.moderators')})`.as('json_each'),
-						)
+				.where((eb) =>
+					eb.exists(
+						eb
+							.selectFrom((eb) =>
+								sql`json_each(${eb.ref('nook.moderators')})`.as('json_each'),
+							)
 							.select(sql`1`.as('_'))
 							.where(sql`json_each.value`, '=', authorId),
 					),
@@ -1099,6 +1101,7 @@ async function replaceImgSrcs(
 
 async function toTemplateCreates(
 	n: EditRemoteTemplate | CreateRemoteTemplate,
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	authorId: UserId, // highTODO update History. Could History be a compressed column instead of its own table?
 ) {
 	const remoteIds =
@@ -1305,6 +1308,7 @@ function mapIdToBase64Url<T>(t: T & { id: DbId }): T & {
 	}
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters
 export function dbIdToBase64Url<T extends Base64Url>(dbId: DbId) {
 	return arrayToBase64url(new Uint8Array(dbId)) as T
 }

@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-misused-promises */
 /* eslint-disable @typescript-eslint/no-explicit-any */
- 
+
 import { type DBAsync } from '@vlcn.io/xplat-api'
 import { parse as uuidParse, stringify as uuidStringify } from 'uuid'
 import { C } from '../topLevelAwait'
@@ -215,6 +216,7 @@ export class WholeDbReplicator {
 			[uuidParse(pokedBy)],
 		)
 		let ourVersionForPoker = 0n
+		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 		if (rows != null && rows.length > 0) {
 			// ensure it is a bigint. sqlite will return number if in js int range and bigint if out of range.
 			// eslint-disable-next-line @typescript-eslint/strict-boolean-expressions, @typescript-eslint/no-unsafe-argument

@@ -9,15 +9,13 @@ const services = (c: Container): Partial<Container> => {
 	return {
 		transformers: new Map(c.transformers).set(
 			'edit',
-			({ initialValue, isFront, card, note, template }) => {
-				return '[EDITABLE]' + initialValue + '[/EDITABLE]'
-			},
+			({ initialValue }) => '[EDITABLE]' + initialValue + '[/EDITABLE]',
 		),
 		nav: (props) =>
 			createComponent(Router, {
 				get children() {
 					const div = document.createElement('div')
-					 
+
 					new App({
 						target: div,
 						props,
@@ -44,7 +42,9 @@ const examplePlugin: VoidComponent<{
 	const examplePlugin = new ExamplePlugin({
 		target: div,
 		props: {
-			count: props.count,
+			get count() {
+				return props.count
+			},
 			solidProps: props,
 		},
 	})

@@ -15,7 +15,7 @@
 		"format:check": "prettier --ignore-path .gitignore --check .",
 		"format": "prettier --ignore-path .gitignore --write .",
 		"//initIvy": "in the code below, the first `.` means `source` in shell",
-		"initIvy": ". ../../PentiveSecrets/secrets.sh && npx tsx --tsconfig ./tsconfig.node.json initIvy.ts"
+		"initIvy": ". ../../PentiveSecrets/secrets.sh && npx tsx initIvy.ts"
 	},
 	"devDependencies": {
 		"@cloudflare/workers-types": "^4.20240725.0",

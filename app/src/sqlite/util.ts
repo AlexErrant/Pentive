@@ -66,7 +66,7 @@ export async function remotifyDoms(rawDoms: string[]) {
 	)
 	for (const doc of docs) {
 		for (const image of doc.images) {
-			const src = image.getAttribute('src') as MediaId
+			const src = image.getAttribute('src') as MediaId | null
 			if (src != null) {
 				const hash =
 					hashByLocal.get(src) ??
@@ -114,7 +114,6 @@ export function templateEntityToDomain(
 }
 
 export function noteEntityToDomain(
-	 
 	note: NoteEntity & { template_fields: string },
 	remotes: RemoteNote[],
 ): Note {
@@ -263,9 +262,10 @@ export async function updateRemotes(
 							remoteId: isCreate ? toLDbId(remoteId) : undefined,
 							uploadDate: now,
 						})
-						.where(({ selectFrom, exists }) =>
-							exists(
-								selectFrom('remoteNote')
+						.where((eb) =>
+							eb.exists(
+								eb
+									.selectFrom('remoteNote')
 									.select(sql`1`.as('_'))
 									.innerJoin('note', 'note.id', 'remoteNote.localId')
 									.innerJoin(
@@ -337,10 +337,10 @@ export async function uploadableNoteMedia<
 		)
 		.$if(noteId != null, (qb) => qb.where('noteBase.id', '=', toLDbId(noteId!)))
 		.$if(torn, (qb) => qb.where('remoteMedia.remoteMediaId', 'is not', null))
-		.where(({ eb, or, ref }) =>
-			or([
+		.where((eb) =>
+			eb.or([
 				eb('remoteMedia.uploadDate', 'is', null),
-				eb('media.edited', '>', ref('remoteMedia.uploadDate')),
+				eb('media.edited', '>', eb.ref('remoteMedia.uploadDate')),
 			]),
 		)
 		.execute()
@@ -385,10 +385,10 @@ export async function uploadableTemplateMedia<
 			qb.where('template.id', '=', toLDbId(templateId!)),
 		)
 		.$if(torn, (qb) => qb.where('remoteMedia.remoteMediaId', 'is not', null))
-		.where(({ eb, or, ref }) =>
-			or([
+		.where((eb) =>
+			eb.or([
 				eb('remoteMedia.uploadDate', 'is', null),
-				eb('media.edited', '>', ref('remoteMedia.uploadDate')),
+				eb('media.edited', '>', eb.ref('remoteMedia.uploadDate')),
 			]),
 		)
 		.execute()
@@ -415,11 +415,13 @@ export async function getMediaToUpload<TType extends 'note' | 'template'>(
 		MediaId,
 		{
 			data: ArrayBuffer
-			ids: Array<[
+			ids: Array<
+				[
 					TType extends 'note' ? NoteId : TemplateId,
 					TType extends 'note' ? RemoteNoteId : RemoteTemplateId,
 					RemoteMediaId,
-				]>
+				]
+			>
 		}
 	>(
 		mediaBinaries.map(({ localMediaId, data }) => [

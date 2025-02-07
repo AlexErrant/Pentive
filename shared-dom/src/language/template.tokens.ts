@@ -109,9 +109,11 @@ export const startTag = new ExternalTokenizer(
 		}
 		if (input.next != 123 /* '{' */) return
 		input.advance()
+		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 		if (input.next != 123 /* '{' */) return
 		input.advance()
 		// @ts-expect-error .advance changes the .next value but TS doesn't know that
+		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 		if (input.next == 47 /* '/' */) {
 			input.advance()
 			const name = tagNameAfter(input, 0)

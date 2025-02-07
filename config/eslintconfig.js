@@ -21,6 +21,40 @@ export function buildEslintConfig(importMetaUrl) {
 			eslint.configs.recommended,
 			tseslint.configs.strictTypeChecked,
 			tseslint.configs.stylisticTypeChecked,
+			{
+				rules: {
+					eqeqeq: ['error', 'smart'],
+					'@typescript-eslint/ban-ts-comment': [
+						'error',
+						{ minimumDescriptionLength: 1 },
+					],
+					'@typescript-eslint/restrict-template-expressions': [
+						'error',
+						{
+							allowNumber: true,
+						},
+					],
+					'@typescript-eslint/no-non-null-assertion': ['off'],
+					'@typescript-eslint/array-type': [
+						'error',
+						{ default: 'array-simple' },
+					],
+					'@typescript-eslint/strict-boolean-expressions': [
+						'error',
+						{
+							allowAny: false,
+							allowNullableBoolean: false,
+							allowNullableEnum: false,
+							allowNullableNumber: false,
+							allowNullableObject: false,
+							allowNullableString: false,
+							allowNumber: false,
+							allowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing: false,
+							allowString: false,
+						},
+					],
+				},
+			},
 		),
 		includeIgnoreFile(gitignorePath),
 		solid,
@@ -30,7 +64,15 @@ export function buildEslintConfig(importMetaUrl) {
 				'**/build.js',
 				'**/sw.js',
 				'**/*.config.js',
+				'**/*.config.cjs',
+				'**/*.config.mjs',
 			],
+		},
+		{
+			files: ['**/*.tsx'],
+			rules: {
+				'@typescript-eslint/no-misused-promises': ['off'], // medTODO remove when fully moved to Tanstack Query
+			},
 		},
 		{
 			languageOptions: {

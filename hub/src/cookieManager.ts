@@ -1,5 +1,5 @@
 import { type CookieParseOptions, parse, serialize } from 'cookie-es'
-import { type JWTVerifyResult, type SignJWT, jwtVerify } from 'jose'
+import { type SignJWT, jwtVerify } from 'jose'
 import { type WithRequired, concat } from 'shared/utility'
 import { type Base64, type Brand } from 'shared/brand'
 import { arrayToBase64, base64ToArray } from 'shared/binary'
@@ -136,11 +136,12 @@ export class SignedCookieManager {
 			return null
 		}
 		if (this.key == null) await this.setKey(secret) // avoiding an `await` when the key is cached, hence the ! assertion in the line below
-		let result: JWTVerifyResult | null = null
 		try {
-			result = await jwtVerify(jwt, this.key!)
-		} catch {}
-		return result == null ? null : result.payload
+			const result = await jwtVerify(jwt, this.key!)
+			return result.payload
+		} catch {
+			return null
+		}
 	}
 
 	clear() {

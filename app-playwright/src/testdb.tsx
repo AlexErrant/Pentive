@@ -133,9 +133,6 @@ export default function TestDb(db: Db, date: Date): JSX.Element {
 		const card = await testCard(db, date)
 		const setting = await testSettings(db)
 		const statuses = [template, note, card, setting]
-		if (statuses.some((a) => a === undefined)) {
-			return undefined
-		}
 		return statuses.every((element) => element)
 	})
 	return (

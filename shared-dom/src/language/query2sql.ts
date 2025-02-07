@@ -30,10 +30,12 @@ import {
 	due,
 	lapses,
 	reps,
-	type kindEnums,
-	type stateEnums,
 	type ratingEnums,
 	field,
+	serializeKind,
+	type KindEnum,
+	serializeState,
+	type StateEnum,
 } from './stringLabels'
 
 type JoinTable = Array<{
@@ -428,16 +430,22 @@ function astEnter(input: string, node: SyntaxNodeRef, context: Context) {
 					node.node.nextSibling.to,
 				) as (typeof ratingEnums)[number]
 				const child = context.current.children[0] as QueryString
-				child.rating =
-					rating === 'again'
-						? 1
-						: rating === 'hard'
-							? 2
-							: rating === 'good'
-								? 3
-								: rating === 'easy'
-									? 4
-									: throwExp()
+				switch (rating) {
+					case 'again':
+						child.rating = 1
+						break
+					case 'hard':
+						child.rating = 2
+						break
+					case 'good':
+						child.rating = 3
+						break
+					case 'easy':
+						child.rating = 4
+						break
+					default:
+						assertNever(rating)
+				}
 				child.ratingComparison = comparison
 			}
 		}
@@ -560,213 +568,250 @@ function handleField(
 }
 
 function serialize(node: Node, context: Context) {
-	if (
-		node.type === simpleString ||
-		node.type === quoted ||
-		node.type === html ||
-		node.type === number ||
-		node.type === date ||
-		node.type === regex
-	) {
-		const name = getJoinTableName(context)
-		if (node.type === 'Regex') {
-			context.joinNoteFieldValue.push({
-				name,
-				sql: handleField(
-					node,
-					regexpWithFlags(node, `noteFieldValue.value`, true),
-				),
-			})
-		} else if (node.type === 'Html') {
-			context.joinNoteValueFts.push({
-				name,
-				sql: handleField(node, glob(node, `noteValueFts`, `value`, true, '0')),
-			})
-		} else {
-			context.joinNoteValueFts.push({
-				name,
-				sql: handleField(node, glob(node, `noteValueFts`, `value`, true)),
-			})
-		}
-		context.trustedSql(`${name}.z IS ${node.negate ? '' : 'NOT'} NULL`) // `z` from 2DB5DD73-603E-4DF7-A366-A53375AF0093
-		if (!node.negate && node.fieldValueHighlight != null) {
-			context.fieldValueHighlight.push(node.fieldValueHighlight)
-		}
-	} else if (node.type === group) {
-		const paren = !node.isRoot
-		if (paren) {
-			if (node.negate) context.trustedSql('NOT')
-			context.trustedSql('(')
-		}
-		if (node.label == null) {
-			for (const child of node.children) {
-				serialize(child, context)
+	switch (node.type) {
+		case simpleString:
+		case quoted:
+		case html:
+		case number:
+		case date:
+		case regex: {
+			const name = getJoinTableName(context)
+			if (node.type === 'Regex') {
+				context.joinNoteFieldValue.push({
+					name,
+					sql: handleField(
+						node,
+						regexpWithFlags(node, `noteFieldValue.value`, true),
+					),
+				})
+			} else if (node.type === 'Html') {
+				context.joinNoteValueFts.push({
+					name,
+					sql: handleField(
+						node,
+						glob(node, `noteValueFts`, `value`, true, '0'),
+					),
+				})
+			} else {
+				context.joinNoteValueFts.push({
+					name,
+					sql: handleField(node, glob(node, `noteValueFts`, `value`, true)),
+				})
 			}
-		} else {
-			for (const child of node.children) {
-				if (
-					child.type === simpleString ||
-					child.type === quoted ||
-					child.type === number ||
-					child.type === date ||
-					child.type === html ||
-					child.type === regex
-				) {
-					handleLabel(child, context)
-				} else {
+			context.trustedSql(`${name}.z IS ${node.negate ? '' : 'NOT'} NULL`) // `z` from 2DB5DD73-603E-4DF7-A366-A53375AF0093
+			if (!node.negate && node.fieldValueHighlight != null) {
+				context.fieldValueHighlight.push(node.fieldValueHighlight)
+			}
+			break
+		}
+		case group: {
+			const paren = !node.isRoot
+			if (paren) {
+				if (node.negate) context.trustedSql('NOT')
+				context.trustedSql('(')
+			}
+			if (node.label == null) {
+				for (const child of node.children) {
 					serialize(child, context)
 				}
+			} else {
+				for (const child of node.children) {
+					switch (child.type) {
+						case simpleString:
+						case quoted:
+						case number:
+						case date:
+						case html:
+						case regex:
+							handleLabel(child, context)
+							break
+						default:
+							serialize(child, context)
+					}
+				}
 			}
+			if (paren) {
+				context.trustedSql(')')
+			}
+			break
 		}
-		if (paren) {
-			context.trustedSql(')')
-		}
-	} else if (node.type === and) {
-		context.trustedSql('AND')
-	} else if (node.type === or) {
-		context.trustedSql('OR')
-	} else {
-		assertNever(node.type)
+		case and:
+			context.trustedSql('AND')
+			break
+		case or:
+			context.trustedSql('OR')
+			break
+		default:
+			assertNever(node)
 	}
 }
 
 function handleLabel(node: QueryString | QueryRegex, context: Context) {
-	if (node.label === tag) {
-		buildTagSearch(node, context)
-	} else if (node.label === template) {
-		if (node.type === 'Regex') {
-			context.regexpWithFlags(node, `template.name`)
-		} else {
-			context.joinTemplateNameFts = true
-			context.like(node, 'templateNameFts', 'name')
+	switch (node.label) {
+		case tag: {
+			buildTagSearch(node, context)
+			break
 		}
-	} else if (node.label === templateId) {
-		if (node.type === 'Regex') throwExp()
-		const equals = sql.raw(node.negate ? '!=' : '=')
-		context.parameterizeSql(sql`note.templateId ${equals} ${node.value}`)
-	} else if (node.label === cardId) {
-		if (node.type === 'Regex') throwExp()
-		const equals = sql.raw(node.negate ? '!=' : '=')
-		context.parameterizeSql(sql`card.id ${equals} ${node.value}`)
-	} else if (node.label === noteId) {
-		if (node.type === 'Regex') throwExp()
-		const equals = sql.raw(node.negate ? '!=' : '=')
-		context.parameterizeSql(sql`note.id ${equals} ${node.value}`)
-	} else if (node.label === setting) {
-		if (node.type === 'Regex') {
-			context.regexpWithFlags(node, `cardSetting.name`)
-		} else {
-			context.joinCardSettingNameFts = true
-			context.like(node, 'cardSettingNameFts', 'name')
-		}
-	} else if (node.label === settingId) {
-		if (node.type === 'Regex') throwExp()
-		const equals = sql.raw(node.negate ? '!=' : '=')
-		context.parameterizeSql(sql`card.cardSettingId ${equals} ${node.value}`)
-	} else if (node.label === kind) {
-		if (node.type === 'Regex') throwExp()
-		context.joinLatestReview = true
-		const value = node.value as (typeof kindEnums)[number]
-		const n =
-			value === 'new'
-				? null
-				: value === 'learn'
-					? 0
-					: value === 'review'
-						? 1
-						: value === 'relearn'
-							? 2
-							: 3
-		const equals = sql.raw(node.negate ? 'IS NOT' : 'IS')
-		context.parameterizeSql(sql`latestReview.kind ${equals} ${n}`)
-	} else if (node.label === state) {
-		if (node.type === 'Regex') throwExp()
-		const value = node.value as (typeof stateEnums)[number]
-		const n =
-			value === 'normal'
-				? null
-				: value === 'schedulerBuried'
-					? 1
-					: value === 'userBuried'
-						? 2
-						: value === 'suspended'
-							? 3
-							: 4 // 'buried'
-		if (n === 4) {
-			if (node.negate) {
-				context.trustedSql(`(card.state <> 1 AND card.state <> 2)`)
+		case template: {
+			if (node.type === 'Regex') {
+				context.regexpWithFlags(node, `template.name`)
 			} else {
-				context.trustedSql(`(card.state = 1 OR card.state = 2)`)
+				context.joinTemplateNameFts = true
+				context.like(node, 'templateNameFts', 'name')
 			}
-		} else {
+			break
+		}
+		case templateId: {
+			if (node.type === 'Regex') throwExp()
+			const equals = sql.raw(node.negate ? '!=' : '=')
+			context.parameterizeSql(sql`note.templateId ${equals} ${node.value}`)
+			break
+		}
+		case cardId: {
+			if (node.type === 'Regex') throwExp()
+			const equals = sql.raw(node.negate ? '!=' : '=')
+			context.parameterizeSql(sql`card.id ${equals} ${node.value}`)
+			break
+		}
+		case noteId: {
+			if (node.type === 'Regex') throwExp()
+			const equals = sql.raw(node.negate ? '!=' : '=')
+			context.parameterizeSql(sql`note.id ${equals} ${node.value}`)
+			break
+		}
+		case setting: {
+			if (node.type === 'Regex') {
+				context.regexpWithFlags(node, `cardSetting.name`)
+			} else {
+				context.joinCardSettingNameFts = true
+				context.like(node, 'cardSettingNameFts', 'name')
+			}
+			break
+		}
+		case settingId: {
+			if (node.type === 'Regex') throwExp()
+			const equals = sql.raw(node.negate ? '!=' : '=')
+			context.parameterizeSql(sql`card.cardSettingId ${equals} ${node.value}`)
+			break
+		}
+		case kind: {
+			if (node.type === 'Regex') throwExp()
+			context.joinLatestReview = true
+			const n = serializeKind(node.value as KindEnum)
 			const equals = sql.raw(node.negate ? 'IS NOT' : 'IS')
-			context.parameterizeSql(sql`card.state ${equals} ${n}`)
+			context.parameterizeSql(sql`latestReview.kind ${equals} ${n}`)
+			break
 		}
-	} else if (node.label === reviewed) {
-		if (node.type === 'Regex') throwExp()
-		context.joinReview = true
-		context.trustedSql('(')
-		handleCreatedEditedDue(node, context, 'review', 'created')
-		if (node.ratingComparison != null && node.rating != null) {
+		case state: {
+			if (node.type === 'Regex') throwExp()
+			const n = serializeState(node.value as StateEnum)
+			if (n === 4) {
+				if (node.negate) {
+					context.trustedSql(`(card.state <> 1 AND card.state <> 2)`)
+				} else {
+					context.trustedSql(`(card.state = 1 OR card.state = 2)`)
+				}
+			} else {
+				const equals = sql.raw(node.negate ? 'IS NOT' : 'IS')
+				context.parameterizeSql(sql`card.state ${equals} ${n}`)
+			}
+			break
+		}
+		case reviewed: {
+			if (node.type === 'Regex') throwExp()
+			context.joinReview = true
+			context.trustedSql('(')
+			handleCreatedEditedDue(node, context, 'review', 'created')
+			if (node.ratingComparison != null && node.rating != null) {
+				context.parameterizeSql(
+					sql` AND review.rating ${sql.raw(node.ratingComparison)} ${node.rating}`,
+				)
+			}
+			context.trustedSql(')')
+			break
+		}
+		case firstReviewed: {
+			if (node.type === 'Regex') throwExp()
+			context.joinFirstReview = true
+			context.trustedSql('(')
+			handleCreatedEditedDue(node, context, 'firstReview', 'created')
+			if (node.ratingComparison != null && node.rating != null) {
+				context.parameterizeSql(
+					sql` AND firstReview.rating ${sql.raw(node.ratingComparison)} ${node.rating}`,
+				)
+			}
+			context.trustedSql(')')
+			break
+		}
+		case created: {
+			handleCreatedEditedDue(node, context, undefined, 'created')
+			break
+		}
+		case edited: {
+			handleCreatedEditedDue(node, context, undefined, 'edited')
+			break
+		}
+		case cardCreated: {
+			handleCreatedEditedDue(node, context, 'card', 'created')
+			break
+		}
+		case noteCreated: {
+			handleCreatedEditedDue(node, context, 'note', 'created')
+			break
+		}
+		case cardEdited: {
+			handleCreatedEditedDue(node, context, 'card', 'edited')
+			break
+		}
+		case noteEdited: {
+			handleCreatedEditedDue(node, context, 'note', 'edited')
+			break
+		}
+		case due: {
+			handleCreatedEditedDue(node, context, 'card', 'due')
+			break
+		}
+		case field: {
+			serialize(node, context)
+			break
+		}
+		case lapses: {
+			if (node.type === 'Regex' || node.comparison == null) throwExp()
 			context.parameterizeSql(
-				sql` AND review.rating ${sql.raw(node.ratingComparison)} ${
-					node.rating
-				}`,
+				sql`card.lapses ${sql.raw(node.comparison)} ${parseInt(node.value)}`,
 			)
+			break
 		}
-		context.trustedSql(')')
-	} else if (node.label === firstReviewed) {
-		if (node.type === 'Regex') throwExp()
-		context.joinFirstReview = true
-		context.trustedSql('(')
-		handleCreatedEditedDue(node, context, 'firstReview', 'created')
-		if (node.ratingComparison != null && node.rating != null) {
+		case reps: {
+			if (node.type === 'Regex' || node.comparison == null) throwExp()
 			context.parameterizeSql(
-				sql` AND firstReview.rating ${sql.raw(node.ratingComparison)} ${
-					node.rating
-				}`,
+				sql`card.repCount ${sql.raw(node.comparison)} ${parseInt(node.value)}`,
 			)
+			break
 		}
-		context.trustedSql(')')
-	} else if (node.label === created) {
-		handleCreatedEditedDue(node, context, undefined, 'created')
-	} else if (node.label === edited) {
-		handleCreatedEditedDue(node, context, undefined, 'edited')
-	} else if (node.label === cardCreated) {
-		handleCreatedEditedDue(node, context, 'card', 'created')
-	} else if (node.label === noteCreated) {
-		handleCreatedEditedDue(node, context, 'note', 'created')
-	} else if (node.label === cardEdited) {
-		handleCreatedEditedDue(node, context, 'card', 'edited')
-	} else if (node.label === noteEdited) {
-		handleCreatedEditedDue(node, context, 'note', 'edited')
-	} else if (node.label === due) {
-		handleCreatedEditedDue(node, context, 'card', 'due')
-	} else if (node.label === field) {
-		serialize(node, context)
-	} else if (node.label === lapses) {
-		if (node.type === 'Regex' || node.comparison == null) throwExp()
-		context.parameterizeSql(
-			sql`card.lapses ${sql.raw(node.comparison)} ${parseInt(node.value)}`,
-		)
-	} else if (node.label === reps) {
-		if (node.type === 'Regex' || node.comparison == null) throwExp()
-		context.parameterizeSql(
-			sql`card.repCount ${sql.raw(node.comparison)} ${parseInt(node.value)}`,
-		)
-	} else if (node.label === tagCount) {
-		context.cardTagCount = true
-		context.noteTagCount = true
-		handleTagCount(context, node, sql`card.tagCount + note.tagCount`)
-	} else if (node.label === cardTagCount) {
-		context.cardTagCount = true
-		handleTagCount(context, node, sql`card.tagCount`)
-	} else if (node.label === noteTagCount) {
-		context.noteTagCount = true
-		handleTagCount(context, node, sql`note.tagCount`)
-	} else if (node.label == null) {
-		throwExp()
-	} else assertNever(node.label)
+		case tagCount: {
+			context.cardTagCount = true
+			context.noteTagCount = true
+			handleTagCount(context, node, sql`card.tagCount + note.tagCount`)
+			break
+		}
+		case cardTagCount: {
+			context.cardTagCount = true
+			handleTagCount(context, node, sql`card.tagCount`)
+			break
+		}
+		case noteTagCount: {
+			context.noteTagCount = true
+			handleTagCount(context, node, sql`note.tagCount`)
+			break
+		}
+		case undefined: {
+			return throwExp()
+		}
+		default: {
+			assertNever(node.label)
+		}
+	}
 }
 
 function handleTagCount(
@@ -850,7 +895,7 @@ function handleOneComparison(
 function getJoinTableName(context: Context) {
 	context.joinTableName++
 	// x because sqlite doesn't like identifiers starting with numbers
-	return 'x' + context.joinTableName
+	return `x${context.joinTableName}`
 }
 
 function buildTagSearch(node: QueryString | QueryRegex, context: Context) {
@@ -992,7 +1037,7 @@ export class Group {
 		this.label = label
 	}
 
-	type = group
+	type: typeof group = group
 	label?: Label
 	parent: Group | null
 	isRoot: boolean

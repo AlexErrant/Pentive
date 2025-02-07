@@ -14,7 +14,9 @@ export async function getUser(
 			try {
 				const session = await jwtVerify(sessionCookie, hubSessionSecret)
 				return session.payload.sub
-			} catch {}
+			} catch {
+				//
+			}
 		}
 	}
 	return undefined

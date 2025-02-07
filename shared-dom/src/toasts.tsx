@@ -79,7 +79,6 @@ function _toastError(
 						typeof userMsg === 'object' &&
 						userMsg != null &&
 						'jsx' in userMsg &&
-						userMsg.impossible &&
 						userMsg.jsx
 					}
 					fallback={<h1 class='text-red-500 text-xl font-bold'>Error</h1>}

@@ -82,6 +82,7 @@ export function toLDbId<T extends LocalId | undefined | null>(value: T) {
 			: LDbId
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters
 export function fromLDbId<T extends LocalId | undefined | null>(
 	value: LDbId | null | undefined,
 ) {

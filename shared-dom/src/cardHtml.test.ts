@@ -895,12 +895,7 @@ function toTestNote(
 	}
 }
 
-function toBody(
-	card: Card,
-	note: Note,
-	template: Template,
-	short = false,
-) {
+function toBody(card: Card, note: Note, template: Template, short = false) {
 	return getOk(defaultRenderContainer.body(card, note, template, short))
 }
 
@@ -911,19 +906,18 @@ describe('standardTemplate tags', () => {
 	] as Array<[string, string]>
 
 	test('CardHtml generates proper basic card template with no tags', () => {
-		const [front, back] =
-			toBody(
-				toSampleCard(0 as Ord),
-				toTestNote(Object.fromEntries(fieldValues), { tags: new Set() }),
-				buildTemplate(
-					fieldValues,
-					'{{Front}}{{Tags}}',
-					`{{FrontSide}}
+		const [front, back] = toBody(
+			toSampleCard(0 as Ord),
+			toTestNote(Object.fromEntries(fieldValues), { tags: new Set() }),
+			buildTemplate(
+				fieldValues,
+				'{{Front}}{{Tags}}',
+				`{{FrontSide}}
     <hr id=answer>
     {{Back}}`,
-					'standard',
-				),
-			) ?? throwExp()
+				'standard',
+			),
+		)
 		expect(front).toBe('What is the capital of Canada?')
 		expect(back).toBe(`What is the capital of Canada?
     <hr id=answer>
@@ -931,21 +925,20 @@ describe('standardTemplate tags', () => {
 	})
 
 	test('CardHtml generates proper basic card template with 1 tag', () => {
-		const [front, back] =
-			toBody(
-				toSampleCard(0 as Ord),
-				toTestNote(Object.fromEntries(fieldValues), {
-					tags: new Set(['Geography']),
-				}),
-				buildTemplate(
-					fieldValues,
-					'{{Front}}{{Tags}}',
-					`{{FrontSide}}
+		const [front, back] = toBody(
+			toSampleCard(0 as Ord),
+			toTestNote(Object.fromEntries(fieldValues), {
+				tags: new Set(['Geography']),
+			}),
+			buildTemplate(
+				fieldValues,
+				'{{Front}}{{Tags}}',
+				`{{FrontSide}}
     <hr id=answer>
     {{Back}}`,
-					'standard',
-				),
-			) ?? throwExp()
+				'standard',
+			),
+		)
 		expect(front).toBe('What is the capital of Canada?Geography')
 		expect(back).toBe(`What is the capital of Canada?Geography
     <hr id=answer>
@@ -953,21 +946,20 @@ describe('standardTemplate tags', () => {
 	})
 
 	test('CardHtml generates proper basic card template with 2 tags', () => {
-		const [front, back] =
-			toBody(
-				toSampleCard(0 as Ord),
-				toTestNote(Object.fromEntries(fieldValues), {
-					tags: new Set(['Geography', 'Capital']),
-				}),
-				buildTemplate(
-					fieldValues,
-					'{{Front}}{{Tags}}',
-					`{{FrontSide}}
+		const [front, back] = toBody(
+			toSampleCard(0 as Ord),
+			toTestNote(Object.fromEntries(fieldValues), {
+				tags: new Set(['Geography', 'Capital']),
+			}),
+			buildTemplate(
+				fieldValues,
+				'{{Front}}{{Tags}}',
+				`{{FrontSide}}
     <hr id=answer>
     {{Back}}`,
-					'standard',
-				),
-			) ?? throwExp()
+				'standard',
+			),
+		)
 		expect(front).toBe('What is the capital of Canada?Geography, Capital')
 		expect(back).toBe(`What is the capital of Canada?Geography, Capital
     <hr id=answer>
@@ -975,19 +967,18 @@ describe('standardTemplate tags', () => {
 	})
 
 	test('CardHtml generates proper basic card template with no conditional tags', () => {
-		const [front, back] =
-			toBody(
-				toSampleCard(0 as Ord),
-				toTestNote(Object.fromEntries(fieldValues), { tags: new Set() }),
-				buildTemplate(
-					fieldValues,
-					'{{Front}}{{#Tags}}Tags: {{Tags}}{{/Tags}}',
-					`{{FrontSide}}
+		const [front, back] = toBody(
+			toSampleCard(0 as Ord),
+			toTestNote(Object.fromEntries(fieldValues), { tags: new Set() }),
+			buildTemplate(
+				fieldValues,
+				'{{Front}}{{#Tags}}Tags: {{Tags}}{{/Tags}}',
+				`{{FrontSide}}
     <hr id=answer>
     {{Back}}`,
-					'standard',
-				),
-			) ?? throwExp()
+				'standard',
+			),
+		)
 		expect(front).toBe('What is the capital of Canada?')
 		expect(back).toBe(`What is the capital of Canada?
     <hr id=answer>
@@ -995,21 +986,20 @@ describe('standardTemplate tags', () => {
 	})
 
 	test('CardHtml generates proper basic card template with 1 conditional tag', () => {
-		const [front, back] =
-			toBody(
-				toSampleCard(0 as Ord),
-				toTestNote(Object.fromEntries(fieldValues), {
-					tags: new Set(['Geography']),
-				}),
-				buildTemplate(
-					fieldValues,
-					'{{Front}}{{#Tags}}Tags: {{Tags}}{{/Tags}}',
-					`{{FrontSide}}
+		const [front, back] = toBody(
+			toSampleCard(0 as Ord),
+			toTestNote(Object.fromEntries(fieldValues), {
+				tags: new Set(['Geography']),
+			}),
+			buildTemplate(
+				fieldValues,
+				'{{Front}}{{#Tags}}Tags: {{Tags}}{{/Tags}}',
+				`{{FrontSide}}
     <hr id=answer>
     {{Back}}`,
-					'standard',
-				),
-			) ?? throwExp()
+				'standard',
+			),
+		)
 		expect(front).toBe('What is the capital of Canada?Tags: Geography')
 		expect(back).toBe(`What is the capital of Canada?Tags: Geography
     <hr id=answer>
@@ -1017,21 +1007,20 @@ describe('standardTemplate tags', () => {
 	})
 
 	test('CardHtml generates proper basic card template with 2 conditional tags', () => {
-		const [front, back] =
-			toBody(
-				toSampleCard(0 as Ord),
-				toTestNote(Object.fromEntries(fieldValues), {
-					tags: new Set(['Geography', 'Capital']),
-				}),
-				buildTemplate(
-					fieldValues,
-					'{{Front}}{{#Tags}}Tags: {{Tags}}{{/Tags}}',
-					`{{FrontSide}}
+		const [front, back] = toBody(
+			toSampleCard(0 as Ord),
+			toTestNote(Object.fromEntries(fieldValues), {
+				tags: new Set(['Geography', 'Capital']),
+			}),
+			buildTemplate(
+				fieldValues,
+				'{{Front}}{{#Tags}}Tags: {{Tags}}{{/Tags}}',
+				`{{FrontSide}}
     <hr id=answer>
     {{Back}}`,
-					'standard',
-				),
-			) ?? throwExp()
+				'standard',
+			),
+		)
 		expect(front).toBe('What is the capital of Canada?Tags: Geography, Capital')
 		expect(back).toBe(`What is the capital of Canada?Tags: Geography, Capital
     <hr id=answer>
@@ -1039,19 +1028,18 @@ describe('standardTemplate tags', () => {
 	})
 
 	test('CardHtml generates proper basic card template with no antiConditional tags', () => {
-		const [front, back] =
-			toBody(
-				toSampleCard(0 as Ord),
-				toTestNote(Object.fromEntries(fieldValues), { tags: new Set() }),
-				buildTemplate(
-					fieldValues,
-					'{{Front}}{{^Tags}}Tags: {{Tags}}{{/Tags}}',
-					`{{FrontSide}}
+		const [front, back] = toBody(
+			toSampleCard(0 as Ord),
+			toTestNote(Object.fromEntries(fieldValues), { tags: new Set() }),
+			buildTemplate(
+				fieldValues,
+				'{{Front}}{{^Tags}}Tags: {{Tags}}{{/Tags}}',
+				`{{FrontSide}}
     <hr id=answer>
     {{Back}}`,
-					'standard',
-				),
-			) ?? throwExp()
+				'standard',
+			),
+		)
 		expect(front).toBe('What is the capital of Canada?Tags:')
 		expect(back).toBe(`What is the capital of Canada?Tags:
     <hr id=answer>
@@ -1059,21 +1047,20 @@ describe('standardTemplate tags', () => {
 	})
 
 	test('CardHtml generates proper basic card template with 1 antiConditional tag', () => {
-		const [front, back] =
-			toBody(
-				toSampleCard(0 as Ord),
-				toTestNote(Object.fromEntries(fieldValues), {
-					tags: new Set(['Geography']),
-				}),
-				buildTemplate(
-					fieldValues,
-					'{{Front}}{{^Tags}}Tags: {{Tags}}{{/Tags}}',
-					`{{FrontSide}}
+		const [front, back] = toBody(
+			toSampleCard(0 as Ord),
+			toTestNote(Object.fromEntries(fieldValues), {
+				tags: new Set(['Geography']),
+			}),
+			buildTemplate(
+				fieldValues,
+				'{{Front}}{{^Tags}}Tags: {{Tags}}{{/Tags}}',
+				`{{FrontSide}}
     <hr id=answer>
     {{Back}}`,
-					'standard',
-				),
-			) ?? throwExp()
+				'standard',
+			),
+		)
 		expect(front).toBe('What is the capital of Canada?')
 		expect(back).toBe(`What is the capital of Canada?
     <hr id=answer>
@@ -1081,21 +1068,20 @@ describe('standardTemplate tags', () => {
 	})
 
 	test('CardHtml generates proper basic card template with 2 antiConditional tags', () => {
-		const [front, back] =
-			toBody(
-				toSampleCard(0 as Ord),
-				toTestNote(Object.fromEntries(fieldValues), {
-					tags: new Set(['Geography', 'Capital']),
-				}),
-				buildTemplate(
-					fieldValues,
-					'{{Front}}{{^Tags}}Tags: {{Tags}}{{/Tags}}',
-					`{{FrontSide}}
+		const [front, back] = toBody(
+			toSampleCard(0 as Ord),
+			toTestNote(Object.fromEntries(fieldValues), {
+				tags: new Set(['Geography', 'Capital']),
+			}),
+			buildTemplate(
+				fieldValues,
+				'{{Front}}{{^Tags}}Tags: {{Tags}}{{/Tags}}',
+				`{{FrontSide}}
     <hr id=answer>
     {{Back}}`,
-					'standard',
-				),
-			) ?? throwExp()
+				'standard',
+			),
+		)
 		expect(front).toBe('What is the capital of Canada?')
 		expect(back).toBe(`What is the capital of Canada?
     <hr id=answer>

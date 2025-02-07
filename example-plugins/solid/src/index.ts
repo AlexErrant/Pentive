@@ -6,9 +6,7 @@ const services = (c: Container): Partial<Container> => {
 	return {
 		transformers: new Map(c.transformers).set(
 			'edit',
-			({ initialValue, isFront, card, note, template }) => {
-				return '[EDITABLE]' + initialValue + '[/EDITABLE]'
-			},
+			({ initialValue }) => '[EDITABLE]' + initialValue + '[/EDITABLE]',
 		),
 		nav: Nav,
 		examplePlugin: ExamplePlugin,

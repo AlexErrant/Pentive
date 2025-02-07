@@ -24,6 +24,6 @@ onChange()
 
 chokidar
 	.watch(['./sql/init.sql', './sql/note.sql', './sql/card.sql'])
-	.on('change', (event, path) => {
+	.on('change', () => {
 		onChange()
 	})

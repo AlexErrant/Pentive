@@ -322,7 +322,9 @@ export const cardGridOptions = {
 									setQuery(q)
 									setExternalQuery(q)
 								}}
-								templatesChanged={() => {}}
+								templatesChanged={() => {
+									//
+								}}
 							/>
 						))
 					}
@@ -426,12 +428,14 @@ const CardsTable: VoidComponent<{
 					}
 					if (countishWrong && x.searchCache == null) {
 						// asynchronously/nonblockingly build the cache
-						C.db.buildCache(x.baseQuery(), cleanedQuery, sort).catch((e) => {
-							C.toastWarn('Error building cache', e)
-						})
+						C.db
+							.buildCache(x.baseQuery(), cleanedQuery, sort)
+							.catch((e: unknown) => {
+								C.toastWarn('Error building cache', e)
+							})
 					}
 				})
-				.catch((e) => {
+				.catch((e: unknown) => {
 					C.toastError('Error getting cards.', e)
 					p.failCallback()
 				})
@@ -491,7 +495,7 @@ const CardsTable: VoidComponent<{
 				/>
 				{selectedCount() === 0 || selectedCount() === 1
 					? ''
-					: selectedCount() + '/'}
+					: `${selectedCount()}/`}
 				{count() ?? '⏳'}
 				<Hamburger class='w-6' onclick={() => setHelp((x) => !x)} />
 			</div>
@@ -507,14 +511,17 @@ function arrowKeyNavigation(
 	const agApi = agParams.api
 	const { nextCellPosition, previousCellPosition, event, key } = agParams
 	const shiftKey = event?.shiftKey ?? false
+	// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 	const prevIndex = previousCellPosition.rowIndex ?? null
 	const prevNode =
+		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 		prevIndex != null ? agApi.getDisplayedRowAtIndex(prevIndex) : null
 
 	switch (key) {
 		case 'ArrowDown':
 		case 'ArrowUp':
 			if (nextCellPosition != null) {
+				// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 				const nextIndex = nextCellPosition.rowIndex ?? null
 				const isUp = key === 'ArrowUp'
 

@@ -59,7 +59,7 @@ export const reviewCollectionMethods = {
 		const entities = reviews.map(toEntity)
 		const batches = chunk(entities, 1000)
 		for (let i = 0; i < batches.length; i++) {
-			C.toastInfo('review batch ' + (i + 1) + '/' + batches.length)
+			C.toastInfo(`review batch ${i + 1}/${batches.length}`)
 			await ky.insertInto('review').values(batches[i]!).execute()
 		}
 	},

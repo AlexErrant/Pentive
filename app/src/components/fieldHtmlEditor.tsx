@@ -78,7 +78,6 @@ function dispatch(
 	editorView: EditorView,
 	setValue: (value: string) => void,
 ) {
-	if (editorView == null) return
 	editorView.update([tr])
 	if (tr.docChanged) {
 		const newCode = tr.newDoc.sliceString(0, tr.newDoc.length)
@@ -109,7 +108,7 @@ function createEditorState(
 									},
 								})
 							})
-							.catch((e) => {
+							.catch((e: unknown) => {
 								C.toastError('Error while formatting.', e)
 							})
 						return true

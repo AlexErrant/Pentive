@@ -162,7 +162,6 @@ function dispatch(
 		val: ChildTemplate[keyof ChildTemplate],
 	) => void,
 ) {
-	if (editorView == null) return
 	editorView.update([tr])
 	if (tr.docChanged) {
 		const newCode = tr.newDoc.sliceString(0, tr.newDoc.length)

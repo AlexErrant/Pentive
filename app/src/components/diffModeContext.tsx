@@ -36,6 +36,7 @@ export const DiffModeToggleGroup: VoidComponent = () => {
 		<ToggleGroup
 			value={diffMode()}
 			onChange={(x) => {
+				// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 				if (x != null) {
 					setDiffMode(x as Mode)
 				}

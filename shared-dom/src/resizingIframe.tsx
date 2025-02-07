@@ -123,19 +123,12 @@ export const ResizingIframe: VoidComponent<{
 						type: 'ComlinkInit',
 						port: port1,
 					}
-					Comlink.expose(props.expose(setDiagnostics, iframeReference), port2)
-					iframeReference.contentWindow!.postMessage(
-						comlinkInit,
-						targetOrigin,
-						[port1],
-					)
+					const ifr = iframeReference!
+					Comlink.expose(props.expose(setDiagnostics, ifr), port2)
+					ifr.contentWindow!.postMessage(comlinkInit, targetOrigin, [port1])
 					Comlink.expose(
-						props.expose(setDiagnostics, iframeReference),
-						Comlink.windowEndpoint(
-							iframeReference.contentWindow!,
-							self,
-							targetOrigin,
-						),
+						props.expose(setDiagnostics, ifr),
+						Comlink.windowEndpoint(ifr.contentWindow!, self, targetOrigin),
 					)
 					if (props.resize == null) {
 						iframeResizer(
@@ -147,15 +140,13 @@ export const ResizingIframe: VoidComponent<{
 								checkOrigin: [props.origin],
 								license: import.meta.env.VITE_IFRAME_RESIZER_LICENSE,
 							},
-							iframeReference,
+							ifr,
 						)
 					}
-					intersectionObserver = new IntersectionObserver(
-						props.resizeFn(iframeReference),
-					)
-					intersectionObserver.observe(iframeReference) // Resize when the iframe becomes visible, e.g. after the "Add Template" tab is clicked when we're looking at another tab. The resizing script behaves poorly when the iframe isn't visible.
+					intersectionObserver = new IntersectionObserver(props.resizeFn(ifr))
+					intersectionObserver.observe(ifr) // Resize when the iframe becomes visible, e.g. after the "Add Template" tab is clicked when we're looking at another tab. The resizing script behaves poorly when the iframe isn't visible.
 					debouncePostMessage()
-					props.resizeFn(iframeReference)()
+					props.resizeFn(ifr)()
 				}}
 				sandbox='allow-scripts allow-same-origin' // Changing this has security ramifications! https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe#attr-sandbox
 				// "When the embedded document has the same origin as the embedding page, it is strongly discouraged to use both allow-scripts and allow-same-origin"

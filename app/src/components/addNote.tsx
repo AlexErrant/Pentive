@@ -5,7 +5,6 @@ import {
 	Show,
 	type VoidComponent,
 	createEffect,
-	createResource,
 	createSignal,
 	on,
 } from 'solid-js'
@@ -23,6 +22,7 @@ import { CardsRemote } from './cardsRemote'
 import { createMutation } from '@tanstack/solid-query'
 import { useTableCountContext } from './tableCountContext'
 import { parseHtml } from 'shared-dom/utility'
+import { createAsync } from '@solidjs/router'
 
 function toView(template: Template): NoteCardView {
 	const now = C.getDate()
@@ -47,8 +47,10 @@ export const AddNote: VoidComponent<{
 	readonly type: AddEdit
 }> = (props) => {
 	const [, setNoteRowDelta] = useTableCountContext().noteRowDelta
-	const [templates] = createResource(C.db.getTemplates, { initialValue: [] })
-	const templateNames = () => templates().map((t) => t.name) ?? []
+	const templates = createAsync(async () => await C.db.getTemplates(), {
+		initialValue: [],
+	})
+	const templateNames = () => templates().map((t) => t.name)
 	const [template, setTemplate] = createSignal<Template>()
 	const [wip, setWip] = createStore<{ noteCard?: NoteCardView }>({})
 	createEffect(() => {
@@ -120,13 +122,16 @@ export const AddNote: VoidComponent<{
 			})
 		},
 		onSuccess: () => {
-			if (props.type === 'add') {
-				setWip('noteCard', toView(wip.noteCard!.template)) // reset wip (to a "default" using the template)
-				setNoteRowDelta(1)
-			} else if (props.type === 'edit') {
-				setNoteRowDelta(0)
-			} else {
-				assertNever(props.type)
+			switch (props.type) {
+				case 'add':
+					setWip('noteCard', toView(wip.noteCard!.template)) // reset wip (to a "default" using the template)
+					setNoteRowDelta(1)
+					break
+				case 'edit':
+					setNoteRowDelta(0)
+					break
+				default:
+					assertNever(props.type)
 			}
 		},
 		onError: () => {

@@ -38,18 +38,25 @@ export const resizeIframe = async () => {
 	await appMessenger.resize()
 }
 
-async function register() {
-	await navigator.serviceWorker.register(
-		import.meta.env.PROD ? '/serviceWorker.js' : '/dev-sw.js?dev-sw',
-		{ type: import.meta.env.MODE === 'production' ? 'classic' : 'module' },
-	)
-	const registration = await navigator.serviceWorker.ready
-	initComlink(registration.active)
+function register() {
+	navigator.serviceWorker
+		.register(
+			import.meta.env.PROD ? '/serviceWorker.js' : '/dev-sw.js?dev-sw',
+			{ type: import.meta.env.MODE === 'production' ? 'classic' : 'module' },
+		)
+		.then(async () => {
+			const registration = await navigator.serviceWorker.ready
+			initComlink(registration.active)
+		})
+		.catch((e: unknown) => {
+			console.error(e)
+			throw e
+		})
 }
 
 if ('serviceWorker' in navigator) {
 	if (document.readyState === 'complete') {
-		await register()
+		register()
 	} else {
 		// delay registration so it doesn't interfere with initial page render https://web.dev/articles/service-workers-registration#:~:text=Improving%20the%20boilerplate
 		window.addEventListener('load', register)

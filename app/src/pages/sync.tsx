@@ -25,7 +25,7 @@ import { DiffModeToggleGroup } from '../components/diffModeContext'
 import { uploadNotes, uploadTemplates } from '../domain/sync'
 import { type NookId } from 'shared/brand'
 import { type Template } from 'shared/domain/template'
-import { objKeys, type Override } from 'shared/utility'
+import { assertNever, objKeys, type Override } from 'shared/utility'
 import { type Note } from 'shared/domain/note'
 import { NoteNookSync } from '../components/noteSync'
 import { useWhoAmIContext } from '../components/whoAmIContext'
@@ -160,27 +160,36 @@ export const syncGridOptions = {
 					if (params.data == null) {
 						return
 					}
-					if (params.data.tag === 'template') {
-						const remoteTemplate =
-							params.data.template.remotes[params.data.nook] ?? null
-						this.render(params.context.owner, () => (
-							<TemplateNookSync
-								template={(params.data as RowTemplate).template}
-								templateRemote={remoteTemplate}
-								nook={params.data!.nook}
-							/>
-						))
-					} else if (params.data.tag === 'note') {
-						const remoteNote =
-							params.data.note.remotes[params.data.nook] ?? null
-						this.render(params.context.owner, () => (
-							<NoteNookSync
-								template={(params.data as RowNote).template}
-								note={(params.data as RowNote).note}
-								nook={params.data!.nook}
-								remoteNote={remoteNote}
-							/>
-						))
+					switch (params.data.tag) {
+						case 'template':
+							{
+								const remoteTemplate =
+									params.data.template.remotes[params.data.nook] ?? null
+								this.render(params.context.owner, () => (
+									<TemplateNookSync
+										template={(params.data as RowTemplate).template}
+										templateRemote={remoteTemplate}
+										nook={params.data!.nook}
+									/>
+								))
+							}
+							break
+						case 'note':
+							{
+								const remoteNote =
+									params.data.note.remotes[params.data.nook] ?? null
+								this.render(params.context.owner, () => (
+									<NoteNookSync
+										template={(params.data as RowNote).template}
+										note={(params.data as RowNote).note}
+										nook={params.data!.nook}
+										remoteNote={remoteNote}
+									/>
+								))
+							}
+							break
+						default:
+							assertNever(params.data)
 					}
 				}
 			},

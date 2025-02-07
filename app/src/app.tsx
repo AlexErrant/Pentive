@@ -10,9 +10,9 @@ export default function App(): JSX.Element {
 	const [theme] = useThemeContext()
 	createEffect(() => {
 		if (theme() === 'light') {
-			import('golden-layout/dist/css/themes/goldenlayout-light-theme.css')
+			void import('golden-layout/dist/css/themes/goldenlayout-light-theme.css')
 		} else {
-			import('golden-layout/dist/css/themes/goldenlayout-dark-theme.css')
+			void import('golden-layout/dist/css/themes/goldenlayout-dark-theme.css')
 		}
 	})
 

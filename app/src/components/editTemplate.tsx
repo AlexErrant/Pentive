@@ -24,13 +24,16 @@ const saveButton = (props: {
 			await C.db.upsertTemplate(props.template)
 		},
 		onSuccess: () => {
-			if (props.type === 'add') {
-				props.setTemplate(getDefaultTemplate())
-				setTemplateRowDelta(1)
-			} else if (props.type === 'edit') {
-				setTemplateRowDelta(0)
-			} else {
-				assertNever(props.type)
+			switch (props.type) {
+				case 'add':
+					props.setTemplate(getDefaultTemplate())
+					setTemplateRowDelta(1)
+					break
+				case 'edit':
+					setTemplateRowDelta(0)
+					break
+				default:
+					assertNever(props.type)
 			}
 		},
 		onError: () => {

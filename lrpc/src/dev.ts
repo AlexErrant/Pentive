@@ -13,10 +13,7 @@ import { csrfHeaderName, hstsName, hstsValue } from 'shared/headers'
 // run with `npm run dev`
 
 async function createContext(
-	x: NodeHTTPCreateContextFnOptions<
-		IncomingMessage,
-		ServerResponse
-	>,
+	x: NodeHTTPCreateContextFnOptions<IncomingMessage, ServerResponse>,
 ): Promise<Context> {
 	const user = await getUser(x.req.headers)
 	return { user }
@@ -32,7 +29,7 @@ const server = https.createServer(
 		key: fs.readFileSync('./.cert/key.pem'),
 		cert: fs.readFileSync('./.cert/cert.pem'),
 	},
-	async (req, res) => {
+	(req, res) => {
 		// Set CORS headers - https://github.com/trpc/trpc/discussions/655
 		// medTODO add caching https://httptoolkit.com/blog/cache-your-cors/ https://techpearl.com/blog/avoid-options-call-to-improve-the-performance-of-your-web-apps/
 		res.setHeader(
@@ -56,7 +53,10 @@ const server = https.createServer(
 			res.end()
 			return
 		}
-		await handler(req, res)
+		handler(req, res).catch((e: unknown) => {
+			console.error(e)
+			throw e
+		})
 	},
 )
 

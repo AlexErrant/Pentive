@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-expressions */
 import WDB, {
 	type Changeset,
 	type PokeProtocol,
@@ -76,6 +77,7 @@ export class WholeDbRtc implements PokeProtocol {
 	) {
 		this.site = new Peer(uuidStringify(siteId), peerOption)
 		this.token = token
+		// eslint-disable-next-line @typescript-eslint/no-misused-promises
 		this.site.on('connection', async (c) => {
 			const token = (c.metadata as Record<string, unknown> | null | undefined)
 				?.token
@@ -240,7 +242,7 @@ export class WholeDbRtc implements PokeProtocol {
 				C.toastInfo('Applied changes!')
 				break
 			case 'request-changes':
-				C.toastInfo('Requesting changes since ' + data.since)
+				C.toastInfo(`Requesting changes since ${data.since}`)
 				this._onChangesRequested != null &&
 					this._onChangesRequested(from, BigInt(data.since))
 				C.toastInfo('Requested changes!')
@@ -339,7 +341,9 @@ async function validateTokenWithKey(publicKeyString: string, token: string) {
 	let jwt: JWTVerifyResult | null = null
 	try {
 		jwt = await jwtVerify(token, publicKey)
-	} catch {}
+	} catch {
+		//
+	}
 	if (jwt?.payload.sub == null) {
 		return false
 	}

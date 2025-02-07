@@ -7,7 +7,14 @@ import {
 	type RemoteNote,
 	type RemoteTemplate,
 } from 'shared/schema'
-import { type NookId, type CardId, type MediaId, cast } from 'shared/brand'
+import {
+	type NookId,
+	type CardId,
+	type MediaId,
+	cast,
+	RemoteNoteId,
+	RemoteTemplateId,
+} from 'shared/brand'
 import { relativeChar } from 'shared/image'
 import { type Template } from 'shared/domain/template'
 import { type Note } from 'shared/domain/note'
@@ -16,7 +23,9 @@ import { objEntries } from 'shared/utility'
 import { parseHtml } from 'shared-dom/utility'
 
 export const appExpose = {
-	ping: () => {},
+	ping: () => {
+		//
+	},
 	addTemplate: async (rt: RemoteTemplate) => {
 		const serializer = new XMLSerializer()
 		const now = C.getDate()
@@ -92,8 +101,9 @@ export const appExpose = {
 			await C.db.bulkUpsertCards(cards)
 		})
 	},
-	hasRemoteNote: C.db.hasRemoteNote,
-	hasRemoteTemplate: C.db.hasRemoteTemplate,
+	hasRemoteNote: async (x: RemoteNoteId) => await C.db.hasRemoteNote(x),
+	hasRemoteTemplate: async (x: RemoteTemplateId) =>
+		await C.db.hasRemoteTemplate(x),
 }
 
 // highTODO needs security on the origin

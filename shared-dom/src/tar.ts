@@ -1,7 +1,5 @@
 // copy/paste from https://github.com/ankitrohatgi/tarballjs
 
- 
-
 import { throwExp } from 'shared/utility'
 
 export class TarReader {
@@ -19,7 +17,7 @@ export class TarReader {
 	buffer: ArrayBuffer | undefined
 
 	async readFile(file: Blob) {
-		return await new Promise((resolve, reject) => {
+		return await new Promise((resolve) => {
 			const reader = new FileReader()
 			reader.onload = (event) => {
 				if (

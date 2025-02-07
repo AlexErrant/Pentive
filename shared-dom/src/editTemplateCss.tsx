@@ -70,7 +70,6 @@ function dispatch(
 		template: Template
 	}>,
 ) {
-	if (editorView == null) return
 	editorView.update([tr])
 	if (tr.docChanged) {
 		const newCode = tr.newDoc.sliceString(0, tr.newDoc.length)

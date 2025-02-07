@@ -65,14 +65,13 @@ async function assertEqual(
 	if (typeof joinsOrArgCount === 'number') {
 		expect(i.i).toBe(joinsOrArgCount)
 	} else {
-		 
 		async function testJoin(
 			list: Array<{
 				sql: RawBuilder<SqlBool>
 				name: string
 			}>,
 		) {
-			for await (const x of list) {
+			for (const x of list) {
 				const compile = x.sql.compile(ky)
 				const p = unparameterize(i, compile)
 				const expected =

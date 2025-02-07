@@ -41,7 +41,7 @@ export const settingsCollectionMethods = {
 		)
 		const batches = chunk(entities, 100)
 		for (let i = 0; i < batches.length; i++) {
-			C.toastInfo('setting batch ' + (i + 1) + '/' + batches.length)
+			C.toastInfo(`setting batch ${i + 1}/${batches.length}`)
 			await ky
 				.insertInto('setting')
 				.values(batches[i]!)
@@ -87,6 +87,7 @@ export const settingsCollectionMethods = {
 				name: typeof obj.name === 'string' ? obj.name : 'Placeholder Name',
 			} satisfies CardSetting
 		})
+		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 		if (!skipUserSetting && !hasUserSetting) {
 			r.push({
 				id: userSettingId,
@@ -117,6 +118,7 @@ const groupBy = <T>(
 	predicate: (value: T, index: number, array: T[]) => string,
 ) =>
 	array.reduce<Record<string, T[]>>((acc, value, index, array) => {
+		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 		;(acc[predicate(value, index, array)] ||= []).push(value)
 		return acc
 	}, {})
@@ -184,8 +186,8 @@ export function unflattenObject(
 					currentLevel[segment] = value
 				}
 			} else {
-				currentLevel = (currentLevel[segment] as SettingRecord) ??=
-					Object.create(null)
+				currentLevel = (currentLevel[segment] as SettingRecord | undefined) ??=
+					Object.create(null) as SettingRecord
 			}
 		}
 	}

@@ -1,14 +1,15 @@
-import { createResource, createSignal, type VoidComponent } from 'solid-js'
+import { createSignal, type VoidComponent } from 'solid-js'
 import { createOptions, Select } from '@thisbeyond/solid-select'
 import '@thisbeyond/solid-select/style.css'
 import 'shared-dom/solidSelect.css'
 import { type NoteCardView } from '../uiLogic/cards'
 import { C } from '../topLevelAwait'
+import { createAsync } from '@solidjs/router'
 
 const NoteTags: VoidComponent<{
 	readonly noteCard: NoteCardView
 }> = (props) => {
-	const [dbTags] = createResource(C.db.getTags, {
+	const dbTags = createAsync(async () => await C.db.getTags(), {
 		initialValue: [],
 	})
 	const selectProps = () =>
