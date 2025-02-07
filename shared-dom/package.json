@@ -43,7 +43,7 @@
 		"@codemirror/theme-one-dark": "^6.1.2",
 		"@codemirror/view": "^6.33.0",
 		"@iframe-resizer/parent": "^5.3.2",
-		"@kobalte/core": "^0.13.4",
+		"@kobalte/core": "^0.13.8",
 		"@kobalte/tailwindcss": "^0.9.0",
 		"@lezer/common": "^1.2.1",
 		"@lezer/highlight": "^1.2.1",
