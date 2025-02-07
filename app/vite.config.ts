@@ -6,7 +6,6 @@ import {
 } from 'vite'
 import { resolve } from 'path'
 import solidPlugin from 'vite-plugin-solid'
-import checker from 'vite-plugin-checker'
 import fs from 'fs'
 import { VitePWA } from 'vite-plugin-pwa'
 import { throwExp } from 'shared/utility'
@@ -43,11 +42,10 @@ export default defineConfig(({ mode }: UserConfig) => {
 			cert: fs.readFileSync('./.cert/cert.pem'),
 		},
 		headers: {
-			 
 			'Cross-Origin-Opener-Policy': 'same-origin',
-			 
+
 			'Cross-Origin-Embedder-Policy': 'require-corp',
-			 
+
 			'Cross-Origin-Resource-Policy': 'cross-origin',
 		},
 	} satisfies ServerOptions
@@ -71,15 +69,6 @@ export default defineConfig(({ mode }: UserConfig) => {
 				filename: 'serviceWorker.ts',
 				devOptions: {
 					enabled: mode === 'development',
-				},
-			}),
-			checker({
-				overlay: {
-					initialIsOpen: false,
-				},
-				typescript: true,
-				eslint: {
-					lintCommand: 'eslint "./src/**/*.{ts,tsx}"',
 				},
 			}),
 		],
@@ -108,7 +97,6 @@ export default defineConfig(({ mode }: UserConfig) => {
 		},
 		resolve: {
 			alias: {
-				 
 				'~': resolve(__dirname, './src'),
 			},
 		},

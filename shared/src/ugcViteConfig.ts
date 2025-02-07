@@ -1,5 +1,4 @@
 import { type BuildOptions, defineConfig } from 'vite'
-import checker from 'vite-plugin-checker'
 import fs from 'fs'
 import { VitePWA } from 'vite-plugin-pwa'
 
@@ -42,11 +41,10 @@ const configBuilder = ({
 					}
 		const serverOptions = {
 			headers: {
-				 
 				'Cross-Origin-Opener-Policy': 'same-origin',
-				 
+
 				'Cross-Origin-Embedder-Policy': 'require-corp',
-				 
+
 				'Cross-Origin-Resource-Policy': 'cross-origin',
 			},
 			port: mode === 'development' ? devPort : testPort,
@@ -69,15 +67,6 @@ const configBuilder = ({
 					filename: 'serviceWorker.ts',
 					injectManifest: {
 						maximumFileSizeToCacheInBytes: 999999999999999,
-					},
-				}),
-				checker({
-					overlay: {
-						initialIsOpen: false,
-					},
-					typescript: true,
-					eslint: {
-						lintCommand: 'eslint "./src/**/*.ts"',
 					},
 				}),
 			],

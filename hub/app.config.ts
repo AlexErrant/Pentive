@@ -1,5 +1,4 @@
 import { defineConfig } from '@solidjs/start/config'
-import checker from 'vite-plugin-checker'
 
 export default defineConfig({
 	middleware: './src/middleware.ts',
@@ -27,17 +26,6 @@ export default defineConfig({
 	},
 	vite: () => {
 		return {
-			plugins: [
-				checker({
-					overlay: {
-						initialIsOpen: false,
-					},
-					typescript: true,
-					eslint: {
-						lintCommand: 'eslint "./src/**/*.{ts,tsx}"',
-					},
-				}),
-			],
 			esbuild: {
 				legalComments: 'none' as const, // we include sourcemaps which have the legal stuff
 			},
