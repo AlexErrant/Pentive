@@ -70,7 +70,7 @@ export const ResizingIframe: VoidComponent<{
 	let iframeReference: IFrameComponent | undefined
 	let intersectionObserver: IntersectionObserver
 	onCleanup(() => {
-		iframeReference?.iFrameResizer.close()
+		iframeReference?.iFrameResizer?.close()
 		disposeObserver(intersectionObserver, iframeReference)
 	})
 	const [diagnostics, setDiagnostics] = createStore<Diagnostics>({

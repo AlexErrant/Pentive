@@ -1,5 +1,5 @@
 diff --git a/iframe-resizer.parent.d.ts b/iframe-resizer.parent.d.ts
-index 4348a8226b5a59653439966025cd67853d16e40c..b825bff36bbb19e4ceb8d91f0d4461511cbec105 100644
+index 4348a8226b5a59653439966025cd67853d16e40c..c2964d23e555de69fa43557bba29141deca2df5e 100644
 --- a/iframe-resizer.parent.d.ts
 +++ b/iframe-resizer.parent.d.ts
 @@ -10,7 +10,7 @@
@@ -11,3 +11,12 @@ index 4348a8226b5a59653439966025cd67853d16e40c..b825bff36bbb19e4ceb8d91f0d446151
      // eslint-disable-next-line @typescript-eslint/naming-convention
      interface IFrameObject {
        close(): void
+@@ -26,7 +26,7 @@ declare module '@iframe-resizer/parent' {
+ 
+     // eslint-disable-next-line @typescript-eslint/naming-convention
+     interface IFrameComponent extends HTMLIFrameElement {
+-      iFrameResizer: IFrameObject
++      iFrameResizer?: IFrameObject
+     }
+ 
+     // eslint-disable-next-line @typescript-eslint/naming-convention

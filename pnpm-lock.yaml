@@ -17,7 +17,7 @@ overrides:
 
 patchedDependencies:
   '@iframe-resizer/parent@5.3.2':
-    hash: vtn2bmnr74ykcnzlnc57eofk4m
+    hash: rgit6ctxrqga2ytsgv6jig4kky
     path: patches/@iframe-resizer__parent@5.3.2.patch
   '@thisbeyond/solid-select@0.14.0':
     hash: 2qumt5mumsrcampzzb47wbecmy
@@ -144,7 +144,7 @@ importers:
         version: 4.3.0
       '@iframe-resizer/parent':
         specifier: ^5.3.2
-        version: 5.3.2(patch_hash=vtn2bmnr74ykcnzlnc57eofk4m)
+        version: 5.3.2(patch_hash=rgit6ctxrqga2ytsgv6jig4kky)
       '@kobalte/core':
         specifier: ^0.13.8
         version: 0.13.8(solid-js@1.9.4)
@@ -693,7 +693,7 @@ importers:
         version: 4.3.0
       '@iframe-resizer/parent':
         specifier: ^5.3.2
-        version: 5.3.2(patch_hash=vtn2bmnr74ykcnzlnc57eofk4m)
+        version: 5.3.2(patch_hash=rgit6ctxrqga2ytsgv6jig4kky)
       '@kobalte/core':
         specifier: ^0.13.8
         version: 0.13.8(solid-js@1.9.4)
@@ -1082,7 +1082,7 @@ importers:
         version: 6.33.0
       '@iframe-resizer/parent':
         specifier: ^5.3.2
-        version: 5.3.2(patch_hash=vtn2bmnr74ykcnzlnc57eofk4m)
+        version: 5.3.2(patch_hash=rgit6ctxrqga2ytsgv6jig4kky)
       '@kobalte/core':
         specifier: ^0.13.8
         version: 0.13.8(solid-js@1.9.4)
@@ -11617,7 +11617,7 @@ snapshots:
 
   '@iframe-resizer/core@5.3.2': {}
 
-  '@iframe-resizer/parent@5.3.2(patch_hash=vtn2bmnr74ykcnzlnc57eofk4m)':
+  '@iframe-resizer/parent@5.3.2(patch_hash=rgit6ctxrqga2ytsgv6jig4kky)':
     dependencies:
       '@iframe-resizer/core': 5.3.2
 

@@ -41,7 +41,7 @@ const ResizingIframeDefault: CommonResizingIframe = (props) => {
 	// eslint-disable-next-line solid/reactivity
 	const resize = (iframeReference?: IFrameComponent) => () => {
 		if (props.resize === false) return
-		iframeReference?.iFrameResizer.resize()
+		iframeReference?.iFrameResizer?.resize()
 	}
 	const html = (setDiagnostics: SetStoreFunction<Diagnostics>) =>
 		buildHtml(C, unwrap(props.i), setDiagnostics) satisfies RawRenderBodyInput
