@@ -143,9 +143,9 @@ export const FieldEditor: VoidComponent<{
 	}>
 }> = (props) => {
 	let editor!: HTMLDivElement
-	onMount(async () => {
+	onMount(() => {
 		const view = new EditorView(editor, {
-			state: await createEditorState(props.value),
+			state: createEditorState(proseMirrorDOMParser.parse(parseHtml(''))),
 			dispatchTransaction(this: EditorView, tr) {
 				this.updateState(this.state.apply(tr))
 				if (tr.docChanged) {
@@ -176,9 +176,12 @@ export const FieldEditor: VoidComponent<{
 			on(
 				() => props.noteId,
 				async () => {
-					view.updateState(await createEditorState(props.value))
+					const doc = parseHtml(props.value)
+					await Promise.all(Array.from(doc.images).map(updateImgSrc))
+					const node = proseMirrorDOMParser.parse(doc)
+					// we nuke the editor state when the noteId changes to prevent things like undo history from transferring between notes
+					view.updateState(createEditorState(node))
 				},
-				{ defer: true },
 			),
 		)
 		onCleanup(() => {
@@ -218,11 +221,9 @@ async function updateImgSrc(img: HTMLImageElement) {
 	}
 }
 
-async function createEditorState(value: string) {
-	const doc = parseHtml(value)
-	await Promise.all(Array.from(doc.images).map(updateImgSrc))
+function createEditorState(node: Node) {
 	return EditorState.create({
-		doc: proseMirrorDOMParser.parse(doc),
+		doc: node,
 		plugins: [
 			...exampleSetup({ schema: mySchema }),
 			imagePlugin(imageSettings),

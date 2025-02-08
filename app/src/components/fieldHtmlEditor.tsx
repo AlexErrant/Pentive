@@ -25,9 +25,10 @@ const FieldHtmlEditor: VoidComponent<{
 }> = (props) => {
 	const [theme] = useThemeContext()
 	let ref!: HTMLDivElement
-	onMount(async () => {
+	onMount(() => {
 		const view = new EditorView({
 			parent: ref,
+			state: createEditorState('', theme()),
 			dispatch: (tr) => {
 				dispatch(tr, view, props.setValue)
 			},
@@ -36,22 +37,11 @@ const FieldHtmlEditor: VoidComponent<{
 			view.requestMeasure()
 		})
 		ro.observe(ref)
-		view.setState(
-			createEditorState(view, await formatHtml(props.value), theme()),
-		)
 		createEffect(
-			on(theme, (t) => {
-				view.setState(createEditorState(view, props.value, t))
+			on([theme, () => props.noteId], async ([t]) => {
+				// we nuke the editor state when the noteId changes to prevent things like undo history from transferring between notes
+				view.setState(createEditorState(await formatHtml(props.value), t))
 			}),
-		)
-		createEffect(
-			on(
-				() => props.noteId,
-				() => {
-					view.setState(createEditorState(view, props.value, theme()))
-				},
-				{ defer: true },
-			),
 		)
 		onCleanup(() => {
 			view.destroy()
@@ -83,11 +73,7 @@ function dispatch(
 	}
 }
 
-function createEditorState(
-	view: EditorView,
-	doc: string,
-	theme: 'light' | 'dark',
-) {
+function createEditorState(doc: string, theme: 'light' | 'dark') {
 	const maybeDark = theme === 'dark' ? [oneDark] : []
 	return EditorState.create({
 		doc,
@@ -95,8 +81,8 @@ function createEditorState(
 			keymap.of([
 				{
 					key: 'Shift-Alt-f',
-					run: (x) => {
-						formatHtml(x.state.doc.toString())
+					run: (view) => {
+						formatHtml(view.state.doc.toString())
 							.then((v) => {
 								view.dispatch({
 									changes: {
