@@ -3,22 +3,11 @@
 	"compilerOptions": {
 		"emitDeclarationOnly": false,
 		"noEmit": true,
-		"strict": true,
-		"target": "ES2022",
-		"module": "ESNext",
-		"moduleResolution": "bundler",
-		"allowSyntheticDefaultImports": true,
-		"esModuleInterop": true,
-		"forceConsistentCasingInFileNames": true,
-		"skipLibCheck": true,
-		"types": [
-			"node"
-		]
+		"types": ["node"]
 	},
 	"ts-node": {
 		"esm": true
 	},
-	"include": [
-		"server.ts"
-	]
+	"include": ["server.ts"]
 }
+

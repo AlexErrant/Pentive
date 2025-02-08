@@ -1,18 +1,8 @@
 {
 	"extends": "config/tsconfig.json",
 	"compilerOptions": {
-		"outDir": "lib",
-		"allowSyntheticDefaultImports": true,
-		"esModuleInterop": true,
-		"skipLibCheck": true,
-		"target": "ESNext",
-		"module": "ESNext",
-		"moduleResolution": "bundler",
 		"jsxImportSource": "solid-js",
-		"jsx": "preserve",
-		"strict": true,
 		"types": ["vinxi/types/client"],
-		"isolatedModules": true,
 		"paths": {
 			"~/*": ["./src/*"]
 		}

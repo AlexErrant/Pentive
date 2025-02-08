@@ -1,18 +1,7 @@
 {
 	"extends": "config/tsconfig.json",
 	"compilerOptions": {
-		"strict": true,
-		"target": "ES2022",
-		"module": "ESNext",
-		"moduleResolution": "bundler",
-		"allowSyntheticDefaultImports": true,
-		"esModuleInterop": true,
-		"forceConsistentCasingInFileNames": true,
-		"skipLibCheck": true,
-		"declaration": true,
-		"jsx": "preserve",
 		"jsxImportSource": "solid-js",
-		"outDir": "lib",
 		"types": ["vite/client"],
 		"lib": ["ES2022", "DOM"]
 	},

@@ -1,20 +1,9 @@
 {
 	"extends": "config/tsconfig.json",
 	"compilerOptions": {
-		"strict": true,
-		"target": "ES2022",
-		"module": "ESNext",
-		"moduleResolution": "bundler",
-		"allowSyntheticDefaultImports": true,
-		"esModuleInterop": true,
-		"forceConsistentCasingInFileNames": true,
-		"skipLibCheck": true,
-		"jsx": "preserve",
 		"jsxImportSource": "solid-js",
 		"types": ["@cloudflare/workers-types", "vite/client"],
-		"lib": ["WebWorker", "DOM", "ES2022"],
-		"declaration": true,
-		"outDir": "lib"
+		"lib": ["WebWorker", "DOM", "ES2022"]
 	},
 	"exclude": ["lib", "dist"],
 	"include": ["src/**/*", "tests/**/*", "tests-examples/**/*", "*.ts"]

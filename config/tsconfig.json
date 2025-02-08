@@ -1,12 +1,23 @@
 {
 	"compilerOptions": {
+		"strict": true,
+		"target": "ES2022",
+		"module": "ESNext",
+		"moduleResolution": "bundler",
+		"allowSyntheticDefaultImports": true,
+		"esModuleInterop": true,
+		"forceConsistentCasingInFileNames": true,
+		"isolatedModules": true,
+		"isolatedDeclarations": true,
+		"jsx": "preserve",
+		"noErrorTruncation": true,
 		"declaration": true,
 		"declarationMap": true,
 		"noUncheckedIndexedAccess": true,
-		// "emitDeclarationOnly": true, // commenting out for now because I'm out of patience
 		"incremental": true,
 		"noEmitOnError": true,
 		"skipLibCheck": true,
-		"resolveJsonModule": true
+		"resolveJsonModule": true,
+		"outDir": "${configDir}/lib"
 	}
 }
