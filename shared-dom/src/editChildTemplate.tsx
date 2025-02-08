@@ -31,51 +31,47 @@ const EditChildTemplate: VoidComponent<{
 }> = (props) => {
 	let frontRef!: HTMLDivElement
 	let backRef!: HTMLDivElement
-	let frontView: EditorView
-	let backView: EditorView
-	let frontRo: ResizeObserver
-	let backRo: ResizeObserver
 	onMount(() => {
-		frontView = new EditorView({
+		const frontView = new EditorView({
 			parent: frontRef,
 			dispatch: (tr) => {
 				dispatch('front', tr, frontView, props.setTemplate)
 			},
 			state: createEditorState(props.childTemplate.front, props.theme),
 		})
-		backView = new EditorView({
+		const backView = new EditorView({
 			parent: backRef,
 			dispatch: (tr) => {
 				dispatch('back', tr, backView, props.setTemplate)
 			},
 			state: createEditorState(props.childTemplate.back, props.theme),
 		})
-		frontRo = new ResizeObserver(() => {
+		const frontRo = new ResizeObserver(() => {
 			frontView.requestMeasure()
 		})
 		frontRo.observe(frontRef)
-		backRo = new ResizeObserver(() => {
+		const backRo = new ResizeObserver(() => {
 			backView.requestMeasure()
 		})
 		backRo.observe(backRef)
-	})
-	createEffect(
-		on(
-			// Only run this effect when the theme changes!
-			// i.e. Don't run when childTemplate.front/back changes - it resets the cursor position.
-			() => props.theme,
-			(t) => {
-				frontView.setState(createEditorState(props.childTemplate.front, t))
-				backView.setState(createEditorState(props.childTemplate.back, t))
-			},
-			{ defer: true },
-		),
-	)
-	onCleanup(() => {
-		frontView.destroy()
-		backView.destroy()
-		disposeObserver(frontRo, frontRef)
-		disposeObserver(backRo, backRef)
+		createEffect(
+			on(
+				// Only run this effect when the theme changes!
+				// i.e. Don't run when childTemplate.front/back changes - it resets the cursor position.
+				() => props.theme,
+				(t) => {
+					frontView.setState(createEditorState(props.childTemplate.front, t))
+					backView.setState(createEditorState(props.childTemplate.back, t))
+				},
+				{ defer: true },
+			),
+		)
+		onCleanup(() => {
+			frontView.destroy()
+			backView.destroy()
+			disposeObserver(frontRo, frontRef)
+			disposeObserver(backRo, backRef)
+		})
 	})
 	const short = () =>
 		getOk(props.renderContainer.renderTemplate(props.template, true)[props.i])

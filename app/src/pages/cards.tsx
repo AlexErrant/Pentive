@@ -11,16 +11,16 @@ import { type NoteCardView } from '../uiLogic/cards'
 import { C } from '../topLevelAwait'
 
 export default function Cards(): JSX.Element {
-	const [selected, setSelected] = createStore<{ noteCard?: NoteCardView }>({})
-	const [cards] = createResource(
-		() => selected.noteCard?.note.id,
-		async (x) => await C.db.getCardsByNote(x),
-	)
-	createEffect(() => {
-		if (cards() != null) setSelected('noteCard', 'cards', cards()!)
-	})
-	let glRoot: HTMLDivElement
+	let glRoot!: HTMLDivElement
 	onMount(() => {
+		const [selected, setSelected] = createStore<{ noteCard?: NoteCardView }>({})
+		const [cards] = createResource(
+			() => selected.noteCard?.note.id,
+			async (x) => await C.db.getCardsByNote(x),
+		)
+		createEffect(() => {
+			if (cards() != null) setSelected('noteCard', 'cards', cards()!)
+		})
 		const goldenLayout = new GoldenLayout(glRoot)
 		goldenLayout.resizeWithContainerAutomatically = true
 		goldenLayout.registerComponentFactoryFunction('Add Note', (container) => {
@@ -206,5 +206,5 @@ export default function Cards(): JSX.Element {
 			})
 		}
 	})
-	return <div ref={(e) => (glRoot = e)} class='h-full' />
+	return <div ref={glRoot} class='h-full' />
 }

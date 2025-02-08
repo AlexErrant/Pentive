@@ -35,31 +35,31 @@ const EditSetting: VoidComponent<{
 			: C.cardSettingSchema
 	let ref!: HTMLDivElement
 	let view: EditorView
-	const stringifiedSetting = () => JSON.stringify(props.setting, null, 2)
-	const [theme] = useThemeContext()
 	onMount(() => {
+		const stringifiedSetting = () => JSON.stringify(props.setting, null, 2)
+		const [theme] = useThemeContext()
 		view = new EditorView({
 			parent: ref,
 			state: createEditorState(stringifiedSetting(), theme(), schema()),
 		})
-	})
-	createEffect(
-		on(
-			() => props.setting.id,
-			() => {
-				view.setState(
-					createEditorState(stringifiedSetting(), theme(), schema()),
-				)
-			},
-		),
-	)
-	createEffect(
-		on(theme, (t) => {
-			view.setState(createEditorState(stringifiedSetting(), t, schema()))
-		}),
-	)
-	onCleanup(() => {
-		view.destroy()
+		createEffect(
+			on(
+				() => props.setting.id,
+				() => {
+					view.setState(
+						createEditorState(stringifiedSetting(), theme(), schema()),
+					)
+				},
+			),
+		)
+		createEffect(
+			on(theme, (t) => {
+				view.setState(createEditorState(stringifiedSetting(), t, schema()))
+			}),
+		)
+		onCleanup(() => {
+			view.destroy()
+		})
 	})
 	return (
 		<>

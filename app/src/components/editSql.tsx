@@ -16,10 +16,9 @@ const EditSql: VoidComponent<{
 	run: (sql: string) => Promise<void>
 }> = (props) => {
 	let ref!: HTMLDivElement
-	let view: EditorView
-	const [theme] = useThemeContext()
 	onMount(() => {
-		view = new EditorView({
+		const [theme] = useThemeContext()
+		const view = new EditorView({
 			parent: ref,
 			state: createEditorState(
 				localStorage.getItem('sql') ?? '',
@@ -27,14 +26,16 @@ const EditSql: VoidComponent<{
 				props.run,
 			),
 		})
-	})
-	createEffect(
-		on(theme, (t) => {
-			view.setState(createEditorState(view.state.doc.toString(), t, props.run))
-		}),
-	)
-	onCleanup(() => {
-		view.destroy()
+		createEffect(
+			on(theme, (t) => {
+				view.setState(
+					createEditorState(view.state.doc.toString(), t, props.run),
+				)
+			}),
+		)
+		onCleanup(() => {
+			view.destroy()
+		})
 	})
 	return (
 		<fieldset class='border-black border p-2'>

@@ -3,7 +3,6 @@ import {
 	type GridOptions,
 	type ICellRendererParams,
 	type ICellRendererComp,
-	type GridApi,
 	type IGetRowsParams,
 } from 'ag-grid-community'
 import 'ag-grid-community/styles/ag-grid.css'
@@ -154,10 +153,10 @@ export const templateGridOptions = {
 const TemplatesTable: VoidComponent<{
 	readonly onSelectionChanged: (templates: Template[]) => void
 }> = (props) => {
+	const [theme] = useThemeContext()
 	let ref!: HTMLDivElement
-	let gridApi: GridApi<Template>
 	onMount(() => {
-		gridApi = createGrid(ref, C.templateGridOptions)
+		const gridApi = createGrid(ref, C.templateGridOptions)
 		// eslint-disable-next-line solid/reactivity -- onSelectionChanged shouldn't ever update
 		gridApi.setGridOption('onSelectionChanged', (event) => {
 			const ncs = event.api.getSelectedRows()
@@ -178,7 +177,6 @@ const TemplatesTable: VoidComponent<{
 		})
 		registerGridUpdate(gridApi, useTableCountContext().templateRowDelta)
 	})
-	const [theme] = useThemeContext()
 	return <div class={`${agGridTheme(theme)} h-full`} ref={ref} />
 }
 

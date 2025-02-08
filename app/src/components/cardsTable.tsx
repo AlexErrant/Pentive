@@ -374,87 +374,87 @@ interface Regexes {
 const CardsTable: VoidComponent<{
 	readonly onSelectionChanged: (noteCards: NoteCard[]) => void
 }> = (props) => {
-	const datasource = {
-		getRows: (p: IGetRowsParams) => {
-			const sort =
-				p.sortModel.length === 1
-					? ({
-							col: p.sortModel[0]!.colId as 'card.due' | 'card.created',
-							direction: p.sortModel[0]!.sort,
-						} satisfies Sort)
-					: undefined
-			const cleanedQuery = query().trim()
-			const now = C.getDate()
-			const conversionResult = convert(cleanedQuery, now)
-			const start = performance.now()
-			C.db
-				.getCards(
-					p.startRow,
-					cacheBlockSize,
-					cleanedQuery,
-					conversionResult,
-					sort,
-				) // medTODO could just cache the Template and mutate the NoteCard obj to add it
-				.then(async (x) => {
-					const end = performance.now()
-					console.log(`GetCards ${end - start} ms`, cleanedQuery)
-					// cSpell:ignore countish
-					const countish = x.noteCards.length
-					const countishWrong = countish === cacheBlockSize
-					p.successCallback(
-						x.noteCards,
-						countishWrong || gridApi.isLastRowIndexKnown() === true
-							? undefined
-							: countish,
-					)
-					if (p.startRow === 0) {
-						gridApi.autoSizeColumns(['Card', 'card.due', 'card.created'])
-						if (countish === 0) {
-							gridApi.showNoRowsOverlay()
-						} else {
-							gridApi.hideOverlay()
-						}
-					}
-					setFvHighlight(x.fieldValueHighlight)
-					if (countishWrong && gridApi.isLastRowIndexKnown() !== true) {
-						const start = performance.now()
-						const count = await C.db.getCardsCount(x.searchCache, x.baseQuery)
-						const end = performance.now()
-						console.log(`Count took ${end - start} ms`, cleanedQuery)
-						gridApi.setRowCount(count.c, true)
-						setCount(count.c)
-					} else if (!countishWrong) {
-						setCount(countish)
-					}
-					if (countishWrong && x.searchCache == null) {
-						// asynchronously/nonblockingly build the cache
-						C.db
-							.buildCache(x.baseQuery(), cleanedQuery, sort)
-							.catch((e: unknown) => {
-								C.toastWarn('Error building cache', e)
-							})
-					}
-				})
-				.catch((e: unknown) => {
-					C.toastError('Error getting cards.', e)
-					p.failCallback()
-				})
-		},
-	}
-	const regex = createMemo(() => regexCtor(fvHighlight(), true)!)
-	const regexLeft = createMemo(() =>
-		regexCtor(fvHighlight()?.filter((f) => f.boundLeft)),
-	)
-	const regexRight = createMemo(() =>
-		regexCtor(fvHighlight()?.filter((f) => f.boundRight)),
-	)
-	const regexBoth = createMemo(() =>
-		regexCtor(fvHighlight()?.filter((f) => f.boundRight && f.boundLeft)),
-	)
+	const [theme] = useThemeContext()
 	let ref!: HTMLDivElement
-	let gridApi: GridApi<NoteCard>
 	onMount(() => {
-		gridApi = createGrid(ref, C.cardGridOptions, {
+		const datasource = {
+			getRows: (p: IGetRowsParams) => {
+				const sort =
+					p.sortModel.length === 1
+						? ({
+								col: p.sortModel[0]!.colId as 'card.due' | 'card.created',
+								direction: p.sortModel[0]!.sort,
+							} satisfies Sort)
+						: undefined
+				const cleanedQuery = query().trim()
+				const now = C.getDate()
+				const conversionResult = convert(cleanedQuery, now)
+				const start = performance.now()
+				C.db
+					.getCards(
+						p.startRow,
+						cacheBlockSize,
+						cleanedQuery,
+						conversionResult,
+						sort,
+					) // medTODO could just cache the Template and mutate the NoteCard obj to add it
+					.then(async (x) => {
+						const end = performance.now()
+						console.log(`GetCards ${end - start} ms`, cleanedQuery)
+						// cSpell:ignore countish
+						const countish = x.noteCards.length
+						const countishWrong = countish === cacheBlockSize
+						p.successCallback(
+							x.noteCards,
+							countishWrong || gridApi.isLastRowIndexKnown() === true
+								? undefined
+								: countish,
+						)
+						if (p.startRow === 0) {
+							gridApi.autoSizeColumns(['Card', 'card.due', 'card.created'])
+							if (countish === 0) {
+								gridApi.showNoRowsOverlay()
+							} else {
+								gridApi.hideOverlay()
+							}
+						}
+						setFvHighlight(x.fieldValueHighlight)
+						if (countishWrong && gridApi.isLastRowIndexKnown() !== true) {
+							const start = performance.now()
+							const count = await C.db.getCardsCount(x.searchCache, x.baseQuery)
+							const end = performance.now()
+							console.log(`Count took ${end - start} ms`, cleanedQuery)
+							gridApi.setRowCount(count.c, true)
+							setCount(count.c)
+						} else if (!countishWrong) {
+							setCount(countish)
+						}
+						if (countishWrong && x.searchCache == null) {
+							// asynchronously/nonblockingly build the cache
+							C.db
+								.buildCache(x.baseQuery(), cleanedQuery, sort)
+								.catch((e: unknown) => {
+									C.toastWarn('Error building cache', e)
+								})
+						}
+					})
+					.catch((e: unknown) => {
+						C.toastError('Error getting cards.', e)
+						p.failCallback()
+					})
+			},
+		}
+		const regex = createMemo(() => regexCtor(fvHighlight(), true)!)
+		const regexLeft = createMemo(() =>
+			regexCtor(fvHighlight()?.filter((f) => f.boundLeft)),
+		)
+		const regexRight = createMemo(() =>
+			regexCtor(fvHighlight()?.filter((f) => f.boundRight)),
+		)
+		const regexBoth = createMemo(() =>
+			regexCtor(fvHighlight()?.filter((f) => f.boundRight && f.boundLeft)),
+		)
+		const gridApi = createGrid(ref, C.cardGridOptions, {
 			regexes: {
 				regex,
 				regexLeft,
@@ -470,20 +470,19 @@ const CardsTable: VoidComponent<{
 		})
 		gridApi.setGridOption('datasource', datasource)
 		registerGridUpdate(gridApi, useTableCountContext().noteRowDelta)
+		createEffect(
+			on(
+				[query],
+				() => {
+					setCount(undefined)
+					gridApi.setGridOption('datasource', datasource)
+				},
+				{
+					defer: true,
+				},
+			),
+		)
 	})
-	createEffect(
-		on(
-			[query],
-			() => {
-				setCount(undefined)
-				gridApi.setGridOption('datasource', datasource)
-			},
-			{
-				defer: true,
-			},
-		),
-	)
-	const [theme] = useThemeContext()
 	return (
 		<div class='flex h-full flex-col'>
 			{showHelp() && <CardsTableHelp />}

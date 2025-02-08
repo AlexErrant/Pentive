@@ -12,9 +12,9 @@ import { C } from '../topLevelAwait'
 import TemplateSync from '../components/templateSync'
 
 export default function Templates(): JSX.Element {
-	const [selected, setSelected] = createStore<{ template?: Template }>({})
-	let glRoot: HTMLDivElement
+	let glRoot!: HTMLDivElement
 	onMount(() => {
+		const [selected, setSelected] = createStore<{ template?: Template }>({})
 		const goldenLayout = new GoldenLayout(glRoot)
 		goldenLayout.resizeWithContainerAutomatically = true
 		goldenLayout.registerComponentFactoryFunction(
@@ -207,5 +207,5 @@ export default function Templates(): JSX.Element {
 			})
 		}
 	})
-	return <div ref={(e) => (glRoot = e)} class='h-full' />
+	return <div ref={glRoot} class='h-full' />
 }

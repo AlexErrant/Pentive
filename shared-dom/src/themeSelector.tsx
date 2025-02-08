@@ -45,16 +45,14 @@ const THEME_OPTIONS: ThemeOption[] = [
 ]
 
 export function ThemeSelector() {
-	let mo: MutationObserver
 	const [colorMode, setColorMode] = createSignal<Themes>('system')
-
 	onMount(() => {
 		const [theme, setTheme] = useThemeContext()
 		const currentTheme = () =>
 			document.documentElement.className.includes('dark')
 				? ('dark' as const)
 				: ('light' as const)
-		mo = new MutationObserver(() => {
+		const mo = new MutationObserver(() => {
 			const current = currentTheme()
 			if (current !== untrack(theme)) {
 				setTheme(current)
@@ -69,20 +67,20 @@ export function ThemeSelector() {
 		} else {
 			setColorMode('system')
 		}
-	})
-	onCleanup(() => {
-		mo.disconnect()
-	})
-	createEffect(() => {
-		if (colorMode() === 'system') {
-			window.localStorage.removeItem('nightwind-mode')
-			nightwind.addNightModeSelector() // yes the name is confusing; it adds/removes "dark" based on the system setting; see source code
-			document.documentElement.style.setProperty('color-scheme', 'light dark')
-		} else {
-			window.localStorage.setItem('nightwind-mode', colorMode())
-			nightwind.enable(colorMode() === 'dark')
-			document.documentElement.style.setProperty('color-scheme', colorMode())
-		}
+		onCleanup(() => {
+			mo.disconnect()
+		})
+		createEffect(() => {
+			if (colorMode() === 'system') {
+				window.localStorage.removeItem('nightwind-mode')
+				nightwind.addNightModeSelector() // yes the name is confusing; it adds/removes "dark" based on the system setting; see source code
+				document.documentElement.style.setProperty('color-scheme', 'light dark')
+			} else {
+				window.localStorage.setItem('nightwind-mode', colorMode())
+				nightwind.enable(colorMode() === 'dark')
+				document.documentElement.style.setProperty('color-scheme', colorMode())
+			}
+		})
 	})
 	return (
 		<Select.Root<ThemeOption>
@@ -91,7 +89,9 @@ export function ThemeSelector() {
 			optionTextValue='label'
 			value={THEME_OPTIONS.find((option) => option.value === colorMode())}
 			onChange={(option) => {
-				setColorMode(option?.value ?? 'system')
+				if (option != null) {
+					setColorMode(option.value)
+				}
 			}}
 			gutter={8}
 			sameWidth={false}

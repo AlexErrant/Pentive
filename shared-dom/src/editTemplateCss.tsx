@@ -21,37 +21,36 @@ export const EditTemplateCss: VoidComponent<{
 	theme: 'light' | 'dark'
 }> = (props) => {
 	let ref!: HTMLDivElement
-	let view: EditorView
 	onMount(() => {
-		view = new EditorView({
+		const view = new EditorView({
 			parent: ref,
 			dispatch: (tr) => {
 				dispatch(tr, view, props.setTemplate)
 			},
 			state: createEditorState(props.template.css, props.theme),
 		})
-	})
-	createEffect(
-		on(
-			() => props.template.id,
-			() => {
-				view.setState(createEditorState(props.template.css, props.theme))
-			},
-		),
-	)
-	createEffect(
-		on(
-			// Only run this effect when the theme changes!
-			// i.e. Don't run when childTemplate.front/back changes - it resets the cursor position.
-			() => props.theme,
-			(t) => {
-				view.setState(createEditorState(props.template.css, t))
-			},
-			{ defer: true },
-		),
-	)
-	onCleanup(() => {
-		view.destroy()
+		createEffect(
+			on(
+				() => props.template.id,
+				() => {
+					view.setState(createEditorState(props.template.css, props.theme))
+				},
+			),
+		)
+		createEffect(
+			on(
+				// Only run this effect when the theme changes!
+				// i.e. Don't run when childTemplate.front/back changes - it resets the cursor position.
+				() => props.theme,
+				(t) => {
+					view.setState(createEditorState(props.template.css, t))
+				},
+				{ defer: true },
+			),
+		)
+		onCleanup(() => {
+			view.destroy()
+		})
 	})
 	return (
 		<fieldset class='border-black border p-2'>

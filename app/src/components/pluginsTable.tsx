@@ -9,7 +9,6 @@ import {
 	type GridOptions,
 	type ICellRendererParams,
 	type ICellRendererComp,
-	type GridApi,
 } from 'ag-grid-community'
 import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-alpine.css'
@@ -124,16 +123,15 @@ export const pluginGridOptions = {
 } satisfies PluginGridOptions as PluginGridOptions
 
 const PluginsTable: VoidComponent = () => {
-	let ref!: HTMLDivElement
-	let gridApi: GridApi<Plugin>
-	onMount(() => {
-		gridApi = createGrid(ref, C.pluginGridOptions)
-	})
-	const [plugins] = createResource(async () => await C.db.getPlugins())
-	createEffect(() => {
-		gridApi.setGridOption('rowData', plugins())
-	})
 	const [theme] = useThemeContext()
+	let ref!: HTMLDivElement
+	onMount(() => {
+		const [plugins] = createResource(async () => await C.db.getPlugins())
+		const gridApi = createGrid(ref, C.pluginGridOptions)
+		createEffect(() => {
+			gridApi.setGridOption('rowData', plugins())
+		})
+	})
 	return <div class={`${agGridTheme(theme)} h-full`} ref={ref} />
 }
 

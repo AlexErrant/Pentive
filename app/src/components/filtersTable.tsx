@@ -7,7 +7,6 @@ import {
 } from 'solid-js'
 import {
 	type GridOptions,
-	type GridApi,
 	type IGroupCellRendererParams,
 } from 'ag-grid-community'
 import 'ag-grid-community/styles/ag-grid.css'
@@ -71,9 +70,8 @@ const FiltersTable: VoidComponent<{
 	templatesChanged: (templates: TemplateId[]) => void
 }> = (props) => {
 	let ref!: HTMLDivElement
-	let gridApi: GridApi<FilterNode>
 	onMount(() => {
-		gridApi = createGrid(ref, C.filterGridOptions)
+		const gridApi = createGrid(ref, C.filterGridOptions)
 		// eslint-disable-next-line solid/reactivity
 		gridApi.setGridOption('onSelectionChanged', () => {
 			const nodes = gridApi.getSelectedRows()
@@ -88,32 +86,32 @@ const FiltersTable: VoidComponent<{
 				props.templatesChanged(templates)
 			})
 		})
-	})
-	const [nodes] = createResource(async () => {
-		const tags = C.db.getTags().then((tags) =>
-			tags.map((t) => {
-				const dataPath = [TagsNodeName, ...t.split('/')]
-				return {
-					searchId: t,
-					dataPath,
-					name: dataPath.at(-1)!,
-				} satisfies FilterNode
-			}),
-		)
-		const templates = C.db.getTemplates().then((templates) =>
-			templates.map(
-				(t) =>
-					({
-						searchId: t.id,
-						dataPath: [TemplatesNodeName, t.id],
-						name: t.name,
-					}) satisfies FilterNode,
-			),
-		)
-		return [...(await tags), ...(await templates)]
-	})
-	createEffect(() => {
-		gridApi.setGridOption('rowData', nodes())
+		const [nodes] = createResource(async () => {
+			const tags = C.db.getTags().then((tags) =>
+				tags.map((t) => {
+					const dataPath = [TagsNodeName, ...t.split('/')]
+					return {
+						searchId: t,
+						dataPath,
+						name: dataPath.at(-1)!,
+					} satisfies FilterNode
+				}),
+			)
+			const templates = C.db.getTemplates().then((templates) =>
+				templates.map(
+					(t) =>
+						({
+							searchId: t.id,
+							dataPath: [TemplatesNodeName, t.id],
+							name: t.name,
+						}) satisfies FilterNode,
+				),
+			)
+			return [...(await tags), ...(await templates)]
+		})
+		createEffect(() => {
+			gridApi.setGridOption('rowData', nodes())
+		})
 	})
 	const [theme] = useThemeContext()
 	return <div class={`${agGridTheme(theme)} h-full`} ref={ref} />

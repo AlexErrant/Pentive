@@ -14,7 +14,6 @@ import {
 	type GridOptions,
 	type ICellRendererParams,
 	type ICellRendererComp,
-	type GridApi,
 	type IHeaderComp,
 	type IHeaderParams,
 } from 'ag-grid-community'
@@ -209,16 +208,15 @@ export const syncGridOptions = {
 } satisfies SyncGridOptions as SyncGridOptions
 
 function Content(): JSX.Element {
-	let ref!: HTMLDivElement
-	let gridApi: GridApi<Row>
-	onMount(() => {
-		gridApi = createGrid(ref, C.syncGridOptions)
-	})
-	const [uploadables] = createResource(getUploadables)
-	createEffect(() => {
-		gridApi.setGridOption('rowData', uploadables())
-	})
 	const [theme] = useThemeContext()
+	let ref!: HTMLDivElement
+	onMount(() => {
+		const [uploadables] = createResource(getUploadables)
+		const gridApi = createGrid(ref, C.syncGridOptions)
+		createEffect(() => {
+			gridApi.setGridOption('rowData', uploadables())
+		})
+	})
 	return (
 		<>
 			<div class={`${agGridTheme(theme)} h-full`} ref={ref} />

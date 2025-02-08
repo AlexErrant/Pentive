@@ -23,42 +23,40 @@ const FieldHtmlEditor: VoidComponent<{
 	setValue: (value: string) => void
 	css: string
 }> = (props) => {
-	let ref!: HTMLDivElement
-	let view: EditorView
-	let ro: ResizeObserver
 	const [theme] = useThemeContext()
+	let ref!: HTMLDivElement
 	onMount(async () => {
-		view = new EditorView({
+		const view = new EditorView({
 			parent: ref,
 			dispatch: (tr) => {
 				dispatch(tr, view, props.setValue)
 			},
 		})
-		ro = new ResizeObserver(() => {
+		const ro = new ResizeObserver(() => {
 			view.requestMeasure()
 		})
 		ro.observe(ref)
 		view.setState(
 			createEditorState(view, await formatHtml(props.value), theme()),
 		)
-	})
-	createEffect(
-		on(theme, (t) => {
-			view.setState(createEditorState(view, props.value, t))
-		}),
-	)
-	createEffect(
-		on(
-			() => props.noteId,
-			() => {
-				view.setState(createEditorState(view, props.value, theme()))
-			},
-			{ defer: true },
-		),
-	)
-	onCleanup(() => {
-		view.destroy()
-		disposeObserver(ro, ref)
+		createEffect(
+			on(theme, (t) => {
+				view.setState(createEditorState(view, props.value, t))
+			}),
+		)
+		createEffect(
+			on(
+				() => props.noteId,
+				() => {
+					view.setState(createEditorState(view, props.value, theme()))
+				},
+				{ defer: true },
+			),
+		)
+		onCleanup(() => {
+			view.destroy()
+			disposeObserver(ro, ref)
+		})
 	})
 	return (
 		<>

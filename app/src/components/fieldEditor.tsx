@@ -143,9 +143,8 @@ export const FieldEditor: VoidComponent<{
 	}>
 }> = (props) => {
 	let editor!: HTMLDivElement
-	let view: EditorView
 	onMount(async () => {
-		view = new EditorView(editor, {
+		const view = new EditorView(editor, {
 			state: await createEditorState(props.value),
 			dispatchTransaction(this: EditorView, tr) {
 				this.updateState(this.state.apply(tr))
@@ -173,18 +172,18 @@ export const FieldEditor: VoidComponent<{
 				}
 			},
 		})
-	})
-	createEffect(
-		on(
-			() => props.noteId,
-			async () => {
-				view.updateState(await createEditorState(props.value))
-			},
-			{ defer: true },
-		),
-	)
-	onCleanup(() => {
-		view.destroy()
+		createEffect(
+			on(
+				() => props.noteId,
+				async () => {
+					view.updateState(await createEditorState(props.value))
+				},
+				{ defer: true },
+			),
+		)
+		onCleanup(() => {
+			view.destroy()
+		})
 	})
 	return <div ref={editor} />
 }

@@ -77,40 +77,38 @@ const MergeComp: VoidComponent<{
 	before: string
 	after: string
 }> = (props) => {
-	const [theme] = useThemeContext()
 	let ref!: HTMLDivElement
-	let view: MergeView
-	let ro: ResizeObserver
 	onMount(() => {
-		view = new MergeView({
+		const [theme] = useThemeContext()
+		const view = new MergeView({
 			parent: ref,
 			a: createConfig(props.before, theme(), props.extensions),
 			b: createConfig(props.after, theme(), props.extensions),
 		})
-		ro = new ResizeObserver(() => {
+		const ro = new ResizeObserver(() => {
 			view.a.requestMeasure()
 			view.b.requestMeasure()
 		})
 		ro.observe(ref)
-	})
-	createEffect(
-		on(
-			// Only run this effect when the theme changes
-			theme,
-			(t) => {
-				view.a.setState(
-					EditorState.create(createConfig(props.before, t, props.extensions)),
-				)
-				view.b.setState(
-					EditorState.create(createConfig(props.after, t, props.extensions)),
-				)
-			},
-			{ defer: true },
-		),
-	)
-	onCleanup(() => {
-		view.destroy()
-		disposeObserver(ro, ref)
+		createEffect(
+			on(
+				// Only run this effect when the theme changes
+				theme,
+				(t) => {
+					view.a.setState(
+						EditorState.create(createConfig(props.before, t, props.extensions)),
+					)
+					view.b.setState(
+						EditorState.create(createConfig(props.after, t, props.extensions)),
+					)
+				},
+				{ defer: true },
+			),
+		)
+		onCleanup(() => {
+			view.destroy()
+			disposeObserver(ro, ref)
+		})
 	})
 	return <div class='max-h-[500px] resize-y overflow-auto' ref={ref} />
 }

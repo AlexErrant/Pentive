@@ -30,36 +30,34 @@ const MergeComp: VoidComponent<{
 	before: string
 	after: string
 }> = (props) => {
-	const [theme] = useThemeContext()
 	let ref!: HTMLDivElement
-	let view: MergeView
-	let ro: ResizeObserver
 	onMount(() => {
-		view = new MergeView({
+		const [theme] = useThemeContext()
+		const view = new MergeView({
 			parent: ref,
 			a: createConfig(props.before, theme()),
 			b: createConfig(props.after, theme()),
 		})
-		ro = new ResizeObserver(() => {
+		const ro = new ResizeObserver(() => {
 			view.a.requestMeasure()
 			view.b.requestMeasure()
 		})
 		ro.observe(ref)
-	})
-	createEffect(
-		on(
-			// Only run this effect when the theme changes
-			theme,
-			(t) => {
-				view.a.setState(EditorState.create(createConfig(props.before, t)))
-				view.b.setState(EditorState.create(createConfig(props.after, t)))
-			},
-			{ defer: true },
-		),
-	)
-	onCleanup(() => {
-		view.destroy()
-		disposeObserver(ro, ref)
+		createEffect(
+			on(
+				// Only run this effect when the theme changes
+				theme,
+				(t) => {
+					view.a.setState(EditorState.create(createConfig(props.before, t)))
+					view.b.setState(EditorState.create(createConfig(props.after, t)))
+				},
+				{ defer: true },
+			),
+		)
+		onCleanup(() => {
+			view.destroy()
+			disposeObserver(ro, ref)
+		})
 	})
 	return (
 		<fieldset class='border-black border p-2'>

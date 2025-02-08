@@ -64,41 +64,35 @@ const QueryEditor: VoidComponent<{
 	// We usually ignore changes to `value` to prevent unnecessary `view.setState` calls
 	externalValue: string
 }> = (props) => {
-	let view: EditorView
 	let ref!: HTMLDivElement
-	let ro: ResizeObserver
 	onMount(() => {
-		view = new EditorView({
+		const [theme] = useThemeContext()
+		const view = new EditorView({
 			parent: ref,
 		})
-		ro = new ResizeObserver(() => {
+		const ro = new ResizeObserver(() => {
 			view.requestMeasure()
 		})
 		ro.observe(ref)
+		createEffect(
+			on(theme, (t) => {
+				view.setState(createEditorState(view, props.value, t, props.setValue))
+			}),
+		)
+		createEffect(
+			on(
+				() => props.externalValue,
+				(v) => {
+					view.setState(createEditorState(view, v, theme(), props.setValue))
+				},
+			),
+		)
+		onCleanup(() => {
+			view.destroy()
+			disposeObserver(ro, ref)
+		})
 	})
-	const [theme] = useThemeContext()
-	createEffect(
-		on(theme, (t) => {
-			view.setState(createEditorState(view, props.value, t, props.setValue))
-		}),
-	)
-	createEffect(
-		on(
-			() => props.externalValue,
-			(v) => {
-				view.setState(createEditorState(view, v, theme(), props.setValue))
-			},
-		),
-	)
-	onCleanup(() => {
-		view.destroy()
-		disposeObserver(ro, ref)
-	})
-	return (
-		<>
-			<div class='query-editor max-h-40 flex-1 overflow-auto' ref={ref} />
-		</>
-	)
+	return <div class='query-editor max-h-40 flex-1 overflow-auto' ref={ref} />
 }
 
 export default QueryEditor

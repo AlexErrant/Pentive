@@ -11,20 +11,20 @@ import { type CardSettingId } from 'shared/brand'
 import { type Setting, getDefaultSetting } from 'shared/domain/setting'
 
 export default function Settings(): JSX.Element {
-	const initialSettings = createAsync(async () => await getSettings(), {
-		initialValue: [],
-	})
-	const [settings, setSettings] = createStore({
-		settings: [] as Setting[],
-	})
-	createEffect(() => {
-		setSettings({ settings: initialSettings() })
-	})
-	const [selected, setSelected] = createStore<{
-		setting?: Setting
-	}>({})
-	let glRoot: HTMLDivElement
+	let glRoot!: HTMLDivElement
 	onMount(() => {
+		const initialSettings = createAsync(async () => await getSettings(), {
+			initialValue: [],
+		})
+		const [settings, setSettings] = createStore({
+			settings: [] as Setting[],
+		})
+		createEffect(() => {
+			setSettings({ settings: initialSettings() })
+		})
+		const [selected, setSelected] = createStore<{
+			setting?: Setting
+		}>({})
 		const goldenLayout = new GoldenLayout(glRoot)
 		goldenLayout.resizeWithContainerAutomatically = true
 		goldenLayout.registerComponentFactoryFunction(
@@ -179,5 +179,5 @@ export default function Settings(): JSX.Element {
 			})
 		}
 	})
-	return <div ref={(e) => (glRoot = e)} class='h-full' />
+	return <div ref={glRoot} class='h-full' />
 }
