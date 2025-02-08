@@ -45,8 +45,8 @@ export interface Media {
 	id: MediaId
 	created: number
 	edited: number
-	data: Uint8Array
-	hash: Uint8Array
+	data: Uint8Array<ArrayBuffer>
+	hash: Uint8Array<ArrayBuffer>
 }
 
 export interface NoteBase {
@@ -118,7 +118,7 @@ export interface Plugin {
 	dependencies: string | null
 	created: number
 	edited: number
-	script: Uint8Array
+	script: Uint8Array<ArrayBuffer>
 }
 
 export interface RemoteMedia {
@@ -178,7 +178,6 @@ export interface Setting {
 }
 
 export interface DB {
-	 
 	sqlite_temp_master: SqliteTempMaster
 	distinctCardTag: DistinctCardTag
 	distinctNoteTag: DistinctNoteTag

@@ -108,13 +108,19 @@ export function escapeRegExp(string: string): string {
 export const dayInMs = 86_400_000
 
 // https://gist.github.com/72lions/4528834
-export function concat(a1: Uint8Array, a2: ArrayBuffer): Uint8Array {
+export function concat(
+	a1: Uint8Array<ArrayBuffer>,
+	a2: ArrayBuffer,
+): Uint8Array<ArrayBuffer> {
 	const tmp = new Uint8Array(a1.byteLength + a2.byteLength)
 	tmp.set(a1, 0)
 	tmp.set(new Uint8Array(a2), a1.byteLength)
 	return tmp
 }
-export function concatAB(a1: ArrayBuffer, a2: ArrayBuffer): Uint8Array {
+export function concatAB(
+	a1: ArrayBuffer,
+	a2: ArrayBuffer,
+): Uint8Array<ArrayBuffer> {
 	const tmp = new Uint8Array(a1.byteLength + a2.byteLength)
 	tmp.set(new Uint8Array(a1), 0)
 	tmp.set(new Uint8Array(a2), a1.byteLength)

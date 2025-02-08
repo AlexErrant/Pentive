@@ -1115,7 +1115,7 @@ async function toTemplateCreates(
 
 async function toTemplateCreate(
 	n: EditRemoteTemplate | CreateRemoteTemplate,
-	remoteId: Uint8Array,
+	remoteId: Uint8Array<ArrayBuffer>,
 	nook: NookId,
 ) {
 	const edited = 'remoteId' in n ? new Date().getTime() / 1000 : undefined

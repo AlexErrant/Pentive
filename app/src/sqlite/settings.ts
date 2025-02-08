@@ -133,7 +133,7 @@ export function encodeValue(rawValue: SettingValue) {
 		? encoder.encode(JSON.stringify(rawValue))
 		: rawValue
 }
-function decodeValue(value: Uint8Array) {
+function decodeValue(value: Uint8Array<ArrayBuffer>) {
 	return JSON.parse(decoder.decode(value)) as SettingValue
 }
 

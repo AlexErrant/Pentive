@@ -92,11 +92,9 @@ async function getLocalMediaResponse(
 		? new Response(media, { status: 404 })
 		: new Response(media, {
 				headers: {
-					 
 					// "image" seems like a valid content-type https://stackoverflow.com/a/28390633
 					'content-type': mediaId.endsWith('.svg') ? 'image/svg+xml' : 'image',
 					'cache-control': 'max-age=604800, immutable', // 7 days
-					 
 				},
 			})
 }

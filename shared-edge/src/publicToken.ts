@@ -26,7 +26,7 @@ grep 69D0971A-FE47-4D4F-91B9-15A6FAA3CAF1
 
 export async function buildPublicToken(
 	entityId: Base64Url,
-	mediaHash: Uint8Array,
+	mediaHash: Uint8Array<ArrayBuffer>,
 	publicMediaSecret: PublicMediaSecret,
 ) {
 	const data = concat(base64urlToArray(entityId), mediaHash)

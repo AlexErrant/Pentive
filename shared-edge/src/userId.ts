@@ -41,9 +41,11 @@ export async function getUserId<T extends { hubSessionSecret: Base64 }>(
 	}
 }
 
-let hubSessionSecret: null | Uint8Array = null
+let hubSessionSecret: null | Uint8Array<ArrayBuffer> = null
 
-function getHubSessionSecret(hubSessionSecretString: Base64): Uint8Array {
+function getHubSessionSecret(
+	hubSessionSecretString: Base64,
+): Uint8Array<ArrayBuffer> {
 	if (hubSessionSecret === null) {
 		hubSessionSecret = base64ToArray(hubSessionSecretString)
 	}

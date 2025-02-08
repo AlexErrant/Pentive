@@ -12,19 +12,17 @@ if (rawConfig.error !== undefined) {
 }
 
 const envZ = z.object({
-	 
 	tursoDbUrl: z.string(),
 	tursoAuthToken: z.string(),
 	hubSessionSecret: z.string(),
 	IS_OFFLINE: z.literal('true').or(z.undefined()),
-	 
 })
 
 const config = envZ.parse(rawConfig.parsed)
 export default config
 
 // grep 8AB879F7-16F0-409F-BAAB-5FB8EB32000D
-export function base64ToArray(base64: string): Uint8Array {
+export function base64ToArray(base64: string): Uint8Array<ArrayBuffer> {
 	const binaryString = atob(base64)
 	const len = binaryString.length
 	const bytes = new Uint8Array(len)
