@@ -78,7 +78,7 @@ const MergeComp: VoidComponent<{
 	after: string
 }> = (props) => {
 	const [theme] = useThemeContext()
-	let ref: HTMLDivElement
+	let ref!: HTMLDivElement
 	let view: MergeView
 	let ro: ResizeObserver
 	onMount(() => {
@@ -112,7 +112,7 @@ const MergeComp: VoidComponent<{
 		view.destroy()
 		disposeObserver(ro, ref)
 	})
-	return <div class='max-h-[500px] resize-y overflow-auto' ref={ref!} />
+	return <div class='max-h-[500px] resize-y overflow-auto' ref={ref} />
 }
 
 function createConfig(

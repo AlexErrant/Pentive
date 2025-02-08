@@ -23,7 +23,7 @@ const FieldHtmlEditor: VoidComponent<{
 	setValue: (value: string) => void
 	css: string
 }> = (props) => {
-	let ref: HTMLDivElement
+	let ref!: HTMLDivElement
 	let view: EditorView
 	let ro: ResizeObserver
 	const [theme] = useThemeContext()
@@ -65,7 +65,7 @@ const FieldHtmlEditor: VoidComponent<{
 			<ResizingIframe i={{ tag: 'raw', css: props.css, html: props.value }} />
 			<div
 				class='flex-1 resize-y overflow-auto focus-within:border-black focus-within:border'
-				ref={ref!}
+				ref={ref}
 			/>
 		</>
 	)

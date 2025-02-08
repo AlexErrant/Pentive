@@ -31,7 +31,7 @@ const MergeComp: VoidComponent<{
 	after: string
 }> = (props) => {
 	const [theme] = useThemeContext()
-	let ref: HTMLDivElement
+	let ref!: HTMLDivElement
 	let view: MergeView
 	let ro: ResizeObserver
 	onMount(() => {
@@ -66,7 +66,7 @@ const MergeComp: VoidComponent<{
 			<legend>
 				<span class='p-2 px-4 font-bold'>CSS</span>
 			</legend>
-			<div class='max-h-[500px] resize-y overflow-auto' ref={ref!} />
+			<div class='max-h-[500px] resize-y overflow-auto' ref={ref} />
 		</fieldset>
 	)
 }

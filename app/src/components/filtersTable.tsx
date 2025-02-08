@@ -70,7 +70,7 @@ const FiltersTable: VoidComponent<{
 	tagsChanged: (tags: string[]) => void
 	templatesChanged: (templates: TemplateId[]) => void
 }> = (props) => {
-	let ref: HTMLDivElement
+	let ref!: HTMLDivElement
 	let gridApi: GridApi<FilterNode>
 	onMount(() => {
 		gridApi = createGrid(ref, C.filterGridOptions)
@@ -116,7 +116,7 @@ const FiltersTable: VoidComponent<{
 		gridApi.setGridOption('rowData', nodes())
 	})
 	const [theme] = useThemeContext()
-	return <div class={`${agGridTheme(theme)} h-full`} ref={ref!} />
+	return <div class={`${agGridTheme(theme)} h-full`} ref={ref} />
 }
 
 export default FiltersTable

@@ -451,7 +451,7 @@ const CardsTable: VoidComponent<{
 	const regexBoth = createMemo(() =>
 		regexCtor(fvHighlight()?.filter((f) => f.boundRight && f.boundLeft)),
 	)
-	let ref: HTMLDivElement
+	let ref!: HTMLDivElement
 	let gridApi: GridApi<NoteCard>
 	onMount(() => {
 		gridApi = createGrid(ref, C.cardGridOptions, {
@@ -499,7 +499,7 @@ const CardsTable: VoidComponent<{
 				{count() ?? '⏳'}
 				<Hamburger class='w-6' onclick={() => setHelp((x) => !x)} />
 			</div>
-			<div class={`${agGridTheme(theme)} h-full`} ref={ref!} />
+			<div class={`${agGridTheme(theme)} h-full`} ref={ref} />
 		</div>
 	)
 }

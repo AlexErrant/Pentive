@@ -142,7 +142,7 @@ export const FieldEditor: VoidComponent<{
 		noteCard?: NoteCardView
 	}>
 }> = (props) => {
-	let editor: HTMLDivElement
+	let editor!: HTMLDivElement
 	let view: EditorView
 	onMount(async () => {
 		view = new EditorView(editor, {
@@ -186,7 +186,7 @@ export const FieldEditor: VoidComponent<{
 	onCleanup(() => {
 		view.destroy()
 	})
-	return <div ref={editor!} />
+	return <div ref={editor} />
 }
 
 /*

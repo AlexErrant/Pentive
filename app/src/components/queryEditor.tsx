@@ -65,7 +65,7 @@ const QueryEditor: VoidComponent<{
 	externalValue: string
 }> = (props) => {
 	let view: EditorView
-	let ref: HTMLDivElement
+	let ref!: HTMLDivElement
 	let ro: ResizeObserver
 	onMount(() => {
 		view = new EditorView({
@@ -96,7 +96,7 @@ const QueryEditor: VoidComponent<{
 	})
 	return (
 		<>
-			<div class='query-editor max-h-40 flex-1 overflow-auto' ref={ref!} />
+			<div class='query-editor max-h-40 flex-1 overflow-auto' ref={ref} />
 		</>
 	)
 }

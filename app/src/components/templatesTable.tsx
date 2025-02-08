@@ -154,7 +154,7 @@ export const templateGridOptions = {
 const TemplatesTable: VoidComponent<{
 	readonly onSelectionChanged: (templates: Template[]) => void
 }> = (props) => {
-	let ref: HTMLDivElement
+	let ref!: HTMLDivElement
 	let gridApi: GridApi<Template>
 	onMount(() => {
 		gridApi = createGrid(ref, C.templateGridOptions)
@@ -179,7 +179,7 @@ const TemplatesTable: VoidComponent<{
 		registerGridUpdate(gridApi, useTableCountContext().templateRowDelta)
 	})
 	const [theme] = useThemeContext()
-	return <div class={`${agGridTheme(theme)} h-full`} ref={ref!} />
+	return <div class={`${agGridTheme(theme)} h-full`} ref={ref} />
 }
 
 export default TemplatesTable

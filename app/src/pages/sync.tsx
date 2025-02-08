@@ -209,7 +209,7 @@ export const syncGridOptions = {
 } satisfies SyncGridOptions as SyncGridOptions
 
 function Content(): JSX.Element {
-	let ref: HTMLDivElement
+	let ref!: HTMLDivElement
 	let gridApi: GridApi<Row>
 	onMount(() => {
 		gridApi = createGrid(ref, C.syncGridOptions)
@@ -221,7 +221,7 @@ function Content(): JSX.Element {
 	const [theme] = useThemeContext()
 	return (
 		<>
-			<div class={`${agGridTheme(theme)} h-full`} ref={ref!} />
+			<div class={`${agGridTheme(theme)} h-full`} ref={ref} />
 			<div class='mt-4'>
 				<button
 					class='border-gray-900 rounded-lg border px-2'

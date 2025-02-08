@@ -15,7 +15,7 @@ import { basicSetup } from 'shared-dom/codemirror'
 const EditSql: VoidComponent<{
 	run: (sql: string) => Promise<void>
 }> = (props) => {
-	let ref: HTMLDivElement
+	let ref!: HTMLDivElement
 	let view: EditorView
 	const [theme] = useThemeContext()
 	onMount(() => {
@@ -41,7 +41,7 @@ const EditSql: VoidComponent<{
 			<legend>
 				<span class='p-2 px-4 font-bold'>SQL(ite)</span>
 			</legend>
-			<div class='h-[300px] resize-y overflow-auto' ref={ref!} />
+			<div class='h-[300px] resize-y overflow-auto' ref={ref} />
 		</fieldset>
 	)
 }

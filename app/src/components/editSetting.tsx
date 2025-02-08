@@ -33,7 +33,7 @@ const EditSetting: VoidComponent<{
 		props.setting.id === userSettingId
 			? C.userSettingSchema
 			: C.cardSettingSchema
-	let ref: HTMLDivElement
+	let ref!: HTMLDivElement
 	let view: EditorView
 	const stringifiedSetting = () => JSON.stringify(props.setting, null, 2)
 	const [theme] = useThemeContext()
@@ -67,7 +67,7 @@ const EditSetting: VoidComponent<{
 				<legend>
 					<span class='p-2 px-4 font-bold'>JSON</span>
 				</legend>
-				<div class='h-full resize-y overflow-auto' ref={ref!} />
+				<div class='h-full resize-y overflow-auto' ref={ref} />
 			</fieldset>
 			<button
 				type='button'

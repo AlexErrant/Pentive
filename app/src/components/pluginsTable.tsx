@@ -124,7 +124,7 @@ export const pluginGridOptions = {
 } satisfies PluginGridOptions as PluginGridOptions
 
 const PluginsTable: VoidComponent = () => {
-	let ref: HTMLDivElement
+	let ref!: HTMLDivElement
 	let gridApi: GridApi<Plugin>
 	onMount(() => {
 		gridApi = createGrid(ref, C.pluginGridOptions)
@@ -134,7 +134,7 @@ const PluginsTable: VoidComponent = () => {
 		gridApi.setGridOption('rowData', plugins())
 	})
 	const [theme] = useThemeContext()
-	return <div class={`${agGridTheme(theme)} h-full`} ref={ref!} />
+	return <div class={`${agGridTheme(theme)} h-full`} ref={ref} />
 }
 
 export default PluginsTable
