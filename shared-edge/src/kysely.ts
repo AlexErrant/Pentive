@@ -241,10 +241,13 @@ export type NoteSortColumn =
 	| 'comments'
 	| 'til'
 
+export const pageSize = 3
+
 export async function getNotes(x: {
 	nook: NookId
 	userId: UserId | null
 	sort?: Array<{ id: NoteSortColumn; desc: boolean }>
+	cursor: RemoteNoteId | null
 }) {
 	const r = await db
 		.selectFrom('note')
@@ -286,7 +289,11 @@ export async function getNotes(x: {
 			}
 			return qb.orderBy('note.id', 'desc')
 		})
+		.$if(x.cursor != null, (qb) =>
+			qb.where('note.id', '<', fromBase64Url(x.cursor!)),
+		)
 		.where('template.nook', '=', x.nook)
+		.limit(pageSize)
 		.execute()
 	return r.map(noteToNookView)
 }

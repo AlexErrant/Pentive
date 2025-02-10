@@ -1,7 +1,7 @@
 import { createSignal, For, Show } from 'solid-js'
-import { getPosts, getNotes, type NoteSortColumn } from 'shared-edge'
+import { getPosts, getNotes, type NoteSortColumn, pageSize } from 'shared-edge'
 import { noteOrds, toSampleCard } from 'shared-dom/cardHtml'
-import type { NookId, Ord } from 'shared/brand'
+import type { RemoteNoteId, NookId, Ord } from 'shared/brand'
 import { ResizingIframe } from '~/components/resizingIframe'
 import { getUserId } from '~/session'
 import {
@@ -22,6 +22,7 @@ import {
 	getCoreRowModel,
 	type ColumnDef,
 	createSolidTable,
+	type PaginationState,
 } from '@tanstack/solid-table'
 import '@github/relative-time-element'
 import { createInfiniteQuery, keepPreviousData } from '@tanstack/solid-query'
@@ -46,7 +47,7 @@ const getNotesCached = query(async (x: GetNotesParamOptionalUser) => {
 export const route = {
 	preload({ params }) {
 		void getPostsCached(params.nook!)
-		void getNotesCached({ nook: params.nook as NookId })
+		void getNotesCached({ nook: params.nook as NookId, cursor: null })
 	},
 } satisfies RouteDefinition
 
@@ -57,6 +58,10 @@ export default function Nook(props: RouteSectionProps) {
 	const [sort, setSort] = createSignal<
 		Array<{ id: NoteSortColumn; desc: boolean }>
 	>([])
+	const [pagination, setPagination] = createSignal<PaginationState>({
+		pageIndex: 0,
+		pageSize,
+	})
 	const posts = createAsync(
 		async () => await getPostsCached(props.params.nook!),
 		{ deferStream: true },
@@ -69,9 +74,16 @@ export default function Nook(props: RouteSectionProps) {
 		}
 		return {
 			queryKey: ['nook/notes', params],
-			queryFn: async () => await getNotesCached(params),
-			initialPageParam: 0,
-			getNextPageParam: (_lastGroup, groups) => groups.length,
+			queryFn: async ({ pageParam }) =>
+				await getNotesCached({ cursor: pageParam, ...params }),
+			initialPageParam: null as RemoteNoteId | null,
+			getNextPageParam: (lastPage) => {
+				if (lastPage.length < pageSize) {
+					return undefined
+				}
+				const lastItem = lastPage.slice(-1)[0]!
+				return lastItem.id
+			},
 			refetchOnWindowFocus: false,
 			placeholderData: keepPreviousData,
 			deferStream: true,
@@ -82,9 +94,19 @@ export default function Nook(props: RouteSectionProps) {
 	)
 	const table = createSolidTable({
 		onSortingChange: setSort,
+		manualSorting: true,
+
+		onPaginationChange: setPagination,
+		manualPagination: true,
+		pageCount: -1,
+		autoResetPageIndex: true,
+
 		state: {
 			get sorting() {
 				return sort()
+			},
+			get pagination() {
+				return pagination()
 			},
 		},
 		get data() {
@@ -252,6 +274,15 @@ export default function Nook(props: RouteSectionProps) {
 						</For>
 					</tfoot>
 				</table>
+				<button
+					class='rounded border p-1'
+					onClick={async () => {
+						await notes.fetchNextPage()
+					}}
+					disabled={!notes.hasNextPage}
+				>
+					{notes.hasNextPage ? 'Load More' : 'No More Items'}
+				</button>
 			</Show>
 			<Show
 				when={
