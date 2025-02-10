@@ -18,7 +18,6 @@ import { basicSetup } from 'shared-dom/codemirror'
 import { oneDark } from '@codemirror/theme-one-dark'
 import { EditorView } from '@codemirror/view'
 import { type LRLanguage } from '@codemirror/language'
-import { disposeObserver } from 'shared-dom/utility'
 import { createAsync } from '@solidjs/router'
 import { formatHtml } from '../domain/utility'
 import { ReadonlyHtmlEditor } from './fieldHtmlEditor'
@@ -100,11 +99,6 @@ const MergeComp: VoidComponent<{
 			a: createConfig(props.before, theme(), props.extensions),
 			b: createConfig(props.after, theme(), props.extensions),
 		})
-		const ro = new ResizeObserver(() => {
-			view.a.requestMeasure()
-			view.b.requestMeasure()
-		})
-		ro.observe(ref)
 		createEffect(
 			on(
 				// Only run this effect when the theme changes
@@ -122,7 +116,6 @@ const MergeComp: VoidComponent<{
 		)
 		onCleanup(() => {
 			view.destroy()
-			disposeObserver(ro, ref)
 		})
 	})
 	return <div class='max-h-[500px] resize-y overflow-auto' ref={ref} />

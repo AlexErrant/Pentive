@@ -55,7 +55,6 @@ import { queryDecorations } from './queryDecorations'
 import { C } from '../topLevelAwait'
 import { notEmpty } from 'shared/utility'
 import { useThemeContext } from 'shared-dom/themeSelector'
-import { disposeObserver } from 'shared-dom/utility'
 
 const QueryEditor: VoidComponent<{
 	value: string
@@ -70,10 +69,6 @@ const QueryEditor: VoidComponent<{
 		const view = new EditorView({
 			parent: ref,
 		})
-		const ro = new ResizeObserver(() => {
-			view.requestMeasure()
-		})
-		ro.observe(ref)
 		createEffect(
 			on(theme, (t) => {
 				view.setState(createEditorState(view, props.value, t, props.setValue))
@@ -89,7 +84,6 @@ const QueryEditor: VoidComponent<{
 		)
 		onCleanup(() => {
 			view.destroy()
-			disposeObserver(ro, ref)
 		})
 	})
 	return <div class='query-editor max-h-40 flex-1 overflow-auto' ref={ref} />

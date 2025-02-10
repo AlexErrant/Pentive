@@ -15,7 +15,6 @@ import { htmlTemplateLanguage } from './language/htmlTemplateParser'
 import { templateLinter } from './language/templateLinter'
 import { type RenderContainer } from './renderContainer'
 import { basicSetup } from './codemirror'
-import { disposeObserver } from './utility'
 import { type ChildTemplate } from 'shared/schema'
 
 const EditChildTemplate: VoidComponent<{
@@ -46,14 +45,6 @@ const EditChildTemplate: VoidComponent<{
 			},
 			state: createEditorState(props.childTemplate.back, props.theme),
 		})
-		const frontRo = new ResizeObserver(() => {
-			frontView.requestMeasure()
-		})
-		frontRo.observe(frontRef)
-		const backRo = new ResizeObserver(() => {
-			backView.requestMeasure()
-		})
-		backRo.observe(backRef)
 		createEffect(
 			on(
 				// Only run this effect when the theme changes!
@@ -69,8 +60,6 @@ const EditChildTemplate: VoidComponent<{
 		onCleanup(() => {
 			frontView.destroy()
 			backView.destroy()
-			disposeObserver(frontRo, frontRef)
-			disposeObserver(backRo, backRef)
 		})
 	})
 	const short = () =>

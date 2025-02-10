@@ -17,7 +17,6 @@ import ResizingIframe from './resizingIframe'
 import { C } from '../topLevelAwait'
 import { useThemeContext } from 'shared-dom/themeSelector'
 import { basicSetup } from 'shared-dom/codemirror'
-import { disposeObserver } from 'shared-dom/utility'
 import { type NoteId } from 'shared/brand'
 import { formatHtml } from '../domain/utility'
 
@@ -37,10 +36,6 @@ const FieldHtmlEditor: VoidComponent<{
 				dispatch(tr, view, props.setValue)
 			},
 		})
-		const ro = new ResizeObserver(() => {
-			view.requestMeasure()
-		})
-		ro.observe(ref)
 		createEffect(
 			on([theme, () => props.noteId], async ([t]) => {
 				// we nuke the editor state when the noteId changes to prevent things like undo history from transferring between notes
@@ -49,7 +44,6 @@ const FieldHtmlEditor: VoidComponent<{
 		)
 		onCleanup(() => {
 			view.destroy()
-			disposeObserver(ro, ref)
 		})
 	})
 	return (
@@ -129,10 +123,6 @@ export const ReadonlyHtmlEditor: VoidComponent<{
 			parent: ref,
 			state: createEditorState('', theme(), extensions),
 		})
-		const ro = new ResizeObserver(() => {
-			view.requestMeasure()
-		})
-		ro.observe(ref)
 		createEffect(
 			on([theme, () => props.value], async ([t, v]) => {
 				// we nuke the editor state when the noteId changes to prevent things like undo history from transferring between notes
@@ -141,7 +131,6 @@ export const ReadonlyHtmlEditor: VoidComponent<{
 		)
 		onCleanup(() => {
 			view.destroy()
-			disposeObserver(ro, ref)
 		})
 	})
 	return (

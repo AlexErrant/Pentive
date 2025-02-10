@@ -13,7 +13,6 @@ import { oneDark } from '@codemirror/theme-one-dark'
 import { basicSetup } from 'shared-dom/codemirror'
 import { MergeView } from '@codemirror/merge'
 import { useThemeContext } from 'shared-dom/themeSelector'
-import { disposeObserver } from 'shared-dom/utility'
 import { ReadonlyCssEditor } from 'shared-dom/editTemplateCss'
 import { throwExp } from 'shared/utility'
 
@@ -44,11 +43,6 @@ const MergeComp: VoidComponent<{
 			a: createConfig(props.before, theme()),
 			b: createConfig(props.after, theme()),
 		})
-		const ro = new ResizeObserver(() => {
-			view.a.requestMeasure()
-			view.b.requestMeasure()
-		})
-		ro.observe(ref)
 		createEffect(
 			on(
 				// Only run this effect when the theme changes
@@ -62,7 +56,6 @@ const MergeComp: VoidComponent<{
 		)
 		onCleanup(() => {
 			view.destroy()
-			disposeObserver(ro, ref)
 		})
 	})
 	return (
