@@ -14,13 +14,19 @@ import { basicSetup } from 'shared-dom/codemirror'
 import { MergeView } from '@codemirror/merge'
 import { useThemeContext } from 'shared-dom/themeSelector'
 import { disposeObserver } from 'shared-dom/utility'
+import { ReadonlyCssEditor } from 'shared-dom/editTemplateCss'
+import { throwExp } from 'shared/utility'
 
 const DiffCss: VoidComponent<{
 	before?: string
 	after?: string
 }> = (props) => (
 	<Show when={props.before !== props.after}>
-		<MergeComp before={props.before ?? ''} after={props.after ?? ''} />
+		{props.before == null || props.after == null ? (
+			<ReadonlyCssEditor css={props.after ?? props.before ?? throwExp()} />
+		) : (
+			<MergeComp before={props.before} after={props.after} />
+		)}
 	</Show>
 )
 

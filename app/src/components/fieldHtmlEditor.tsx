@@ -1,4 +1,8 @@
-import { EditorState, type Transaction } from '@codemirror/state'
+import {
+	EditorState,
+	type Extension,
+	type Transaction,
+} from '@codemirror/state'
 import { EditorView, keymap } from '@codemirror/view'
 import { html } from '@codemirror/lang-html'
 import {
@@ -73,7 +77,11 @@ function dispatch(
 	}
 }
 
-function createEditorState(doc: string, theme: 'light' | 'dark') {
+function createEditorState(
+	doc: string,
+	theme: 'light' | 'dark',
+	extensions: Extension[] = [],
+) {
 	const maybeDark = theme === 'dark' ? [oneDark] : []
 	return EditorState.create({
 		doc,
@@ -102,6 +110,44 @@ function createEditorState(doc: string, theme: 'light' | 'dark') {
 			[...basicSetup],
 			html(),
 			...maybeDark,
+			...extensions,
 		],
 	})
+}
+
+export const ReadonlyHtmlEditor: VoidComponent<{
+	value: string
+}> = (props) => {
+	let ref!: HTMLDivElement
+	onMount(() => {
+		const [theme] = useThemeContext()
+		const extensions = [
+			EditorView.editable.of(false),
+			EditorState.readOnly.of(true),
+		]
+		const view = new EditorView({
+			parent: ref,
+			state: createEditorState('', theme(), extensions),
+		})
+		const ro = new ResizeObserver(() => {
+			view.requestMeasure()
+		})
+		ro.observe(ref)
+		createEffect(
+			on([theme, () => props.value], async ([t, v]) => {
+				// we nuke the editor state when the noteId changes to prevent things like undo history from transferring between notes
+				view.setState(createEditorState(await formatHtml(v), t, extensions))
+			}),
+		)
+		onCleanup(() => {
+			view.destroy()
+			disposeObserver(ro, ref)
+		})
+	})
+	return (
+		<div
+			class='flex-1 resize-y overflow-auto focus-within:border-black focus-within:border'
+			ref={ref}
+		/>
+	)
 }

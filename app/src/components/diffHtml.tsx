@@ -21,6 +21,8 @@ import { type LRLanguage } from '@codemirror/language'
 import { disposeObserver } from 'shared-dom/utility'
 import { createAsync } from '@solidjs/router'
 import { formatHtml } from '../domain/utility'
+import { ReadonlyHtmlEditor } from './fieldHtmlEditor'
+import { throwExp } from 'shared/utility'
 
 const DiffHtml: VoidComponent<{
 	extensions: Array<Extension | LRLanguage>
@@ -37,6 +39,7 @@ const DiffHtml: VoidComponent<{
 				formatHtml(props.after ?? ''),
 			] as const),
 	)
+	const isChanged = () => Boolean(formatted()?.[0]) && Boolean(formatted()?.[1])
 	return (
 		<Show when={formatted()?.[0] !== formatted()?.[1]}>
 			<fieldset class='border-black border p-1'>
@@ -53,16 +56,28 @@ const DiffHtml: VoidComponent<{
 								tag: 'raw',
 								html: diffHtml(formatted()?.[0] ?? '', formatted()?.[1] ?? ''),
 								css:
-									props.css + 'ins{background:palegreen}del{background:pink}',
+									props.css +
+									(isChanged()
+										? 'ins{background:palegreen}del{background:pink}'
+										: ''),
 							}}
 						/>
 					</Match>
 					<Match when={diffMode() === 'split'}>
-						<MergeComp
-							before={formatted()?.[0] ?? ''}
-							after={formatted()?.[1] ?? ''}
-							extensions={props.extensions}
-						/>
+						<Show
+							when={isChanged()}
+							fallback={
+								<ReadonlyHtmlEditor
+									value={formatted()?.[1] ?? formatted()?.[0] ?? throwExp()}
+								/>
+							}
+						>
+							<MergeComp
+								before={formatted()?.[0] ?? ''}
+								after={formatted()?.[1] ?? ''}
+								extensions={props.extensions}
+							/>
+						</Show>
 					</Match>
 				</Switch>
 			</fieldset>

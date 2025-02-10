@@ -1,14 +1,7 @@
-import {
-	type VoidComponent,
-	createResource,
-	Switch,
-	Match,
-	Suspense,
-} from 'solid-js'
+import { type VoidComponent, createResource, Suspense } from 'solid-js'
 import { type RemoteMediaId, type NookId } from 'shared/brand'
 import { augcClient } from '../trpcClient'
 import DiffHtml from './diffHtml'
-import ResizingIframe from './resizingIframe'
 import { html } from '@codemirror/lang-html'
 import { DiffModeToggleGroup } from './diffModeContext'
 import { objEntries } from 'shared/utility'
@@ -79,6 +72,7 @@ const NoteNookSyncActual: VoidComponent<{
 		async ([note, remoteNote]) => {
 			const m: Record<string, [string | undefined, string | undefined]> = {}
 			for (const [field, value] of objEntries(note.fieldValues)) {
+				if (value === '') continue
 				m[field] = [value, undefined]
 			}
 			if (remoteNote != null) {
@@ -109,38 +103,13 @@ const NoteNookSyncActual: VoidComponent<{
 				<Entries of={mergedFieldValues()}>
 					{(field, localRemote) => (
 						<li>
-							<Switch
-								fallback={
-									<DiffHtml
-										extensions={[html()]}
-										before={localRemote()[1]}
-										after={localRemote()[0]}
-										css={props.template.css}
-										title={field}
-									/>
-								}
-							>
-								<Match when={localRemote()[0] == null}>
-									<h2>Deleted</h2>
-									<ResizingIframe
-										i={{
-											tag: 'raw',
-											html: localRemote()[1]!,
-											css: props.template.css,
-										}}
-									/>
-								</Match>
-								<Match when={localRemote()[1] == null}>
-									<h2>Added</h2>
-									<ResizingIframe
-										i={{
-											tag: 'raw',
-											html: localRemote()[0]!,
-											css: props.template.css,
-										}}
-									/>
-								</Match>
-							</Switch>
+							<DiffHtml
+								extensions={[html()]}
+								before={localRemote()[1]}
+								after={localRemote()[0]}
+								css={props.template.css}
+								title={field}
+							/>
 						</li>
 					)}
 				</Entries>

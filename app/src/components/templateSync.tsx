@@ -79,14 +79,15 @@ const TemplateNookSyncActual: VoidComponent<{
 		<>
 			<Diff
 				title='Name'
-				changes={diffChars(remoteTemplate()?.name, props.template.name)}
+				before={remoteTemplate()?.name}
+				after={props.template.name}
+				toChanges={diffChars}
 			/>
 			<Diff
 				title='Fields'
-				changes={diffChars(
-					remoteTemplate()?.fields.join(', '),
-					props.template.fields.map((f) => f.name).join(', '),
-				)}
+				before={remoteTemplate()?.fields.join(', ')}
+				after={props.template.fields.map((f) => f.name).join(', ')}
+				toChanges={diffChars}
 			/>
 			<fieldset class='ctContainer border-black border p-1'>
 				<legend>
@@ -106,10 +107,9 @@ const TemplateNookSyncActual: VoidComponent<{
 							know what you're doing...
 							<Diff
 								title='Child Template(s)'
-								changes={diffJson(
-									remoteTemplate()!.templateType,
-									props.template.templateType,
-								)}
+								before={remoteTemplate()!.templateType}
+								after={props.template.templateType}
+								toChanges={diffJson}
 							/>
 						</Match>
 						<Match when={props.template.templateType.tag === 'standard'}>
@@ -156,7 +156,9 @@ const ChildTemplateNookSync: VoidComponent<{
 	<>
 		<Diff
 			title='Name'
-			changes={diffChars(props.remote?.name, props.local?.name)}
+			before={props.remote?.name}
+			after={props.local?.name}
+			toChanges={diffChars}
 		/>
 		<DiffHtml
 			extensions={extensions}
@@ -174,11 +176,15 @@ const ChildTemplateNookSync: VoidComponent<{
 		/>
 		<Diff
 			title='Short Front'
-			changes={diffWords(props.remote?.shortFront, props.local?.shortFront)}
+			before={props.remote?.shortFront}
+			after={props.local?.shortFront}
+			toChanges={diffWords}
 		/>
 		<Diff
 			title='Short Back'
-			changes={diffWords(props.remote?.shortBack, props.local?.shortBack)}
+			before={props.remote?.shortBack}
+			after={props.local?.shortBack}
+			toChanges={diffWords}
 		/>
 	</>
 )

@@ -1,4 +1,8 @@
-import { EditorState, type Transaction } from '@codemirror/state'
+import {
+	EditorState,
+	type Extension,
+	type Transaction,
+} from '@codemirror/state'
 import { EditorView } from '@codemirror/view'
 import { css } from '@codemirror/lang-css'
 import {
@@ -12,6 +16,7 @@ import { type Template } from 'shared/domain/template'
 import { type SetStoreFunction } from 'solid-js/store'
 import { oneDark } from '@codemirror/theme-one-dark'
 import { basicSetup } from './codemirror'
+import { useThemeContext } from './themeSelector'
 
 export const EditTemplateCss: VoidComponent<{
 	template: Template
@@ -76,10 +81,45 @@ function dispatch(
 	}
 }
 
-function createEditorState(doc: string, theme: 'light' | 'dark') {
+function createEditorState(
+	doc: string,
+	theme: 'light' | 'dark',
+	extensions: Extension[] = [],
+) {
 	const maybeDark = theme === 'dark' ? [oneDark] : []
 	return EditorState.create({
 		doc,
-		extensions: [[...basicSetup], css(), ...maybeDark],
+		extensions: [[...basicSetup], css(), ...maybeDark, ...extensions],
 	})
+}
+
+export const ReadonlyCssEditor: VoidComponent<{
+	css: string
+}> = (props) => {
+	let ref!: HTMLDivElement
+	onMount(() => {
+		const extensions = [
+			EditorView.editable.of(false),
+			EditorState.readOnly.of(true),
+		]
+		const [theme] = useThemeContext()
+		const view = new EditorView({
+			parent: ref,
+			state: createEditorState(props.css, theme(), extensions),
+		})
+		createEffect(() => {
+			view.setState(createEditorState(props.css, theme(), extensions))
+		})
+		onCleanup(() => {
+			view.destroy()
+		})
+	})
+	return (
+		<fieldset class='border-black border p-2'>
+			<legend>
+				<span class='p-2 px-4 font-bold'>CSS</span>
+			</legend>
+			<div class='max-h-[500px] resize-y overflow-auto' ref={ref} />
+		</fieldset>
+	)
 }
