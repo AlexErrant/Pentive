@@ -1,4 +1,4 @@
-import { type SyntaxNodeRef, type SyntaxNode } from '@lezer/common'
+import type { SyntaxNodeRef, SyntaxNode } from '@lezer/common'
 import { parser } from './queryParser'
 import { assertNever, dayInMs, escapeRegExp, throwExp } from 'shared/utility'
 import { sql, type RawBuilder, type SqlBool } from 'kysely'

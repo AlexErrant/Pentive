@@ -1,16 +1,16 @@
-import {
-	type CardId,
-	type Ord,
-	type NoteId,
-	type TemplateId,
-	type CardSettingId,
-	type ReviewId,
+import type {
+	CardId,
+	Ord,
+	NoteId,
+	TemplateId,
+	CardSettingId,
+	ReviewId,
 } from 'shared/brand'
 import { throwExp, dayInMs, objEntries } from 'shared/utility'
-import { type Field, type Template } from 'shared/domain/template'
-import { type Kind, type Review } from 'shared/domain/review'
-import { type Note as PNote } from 'shared/domain/note'
-import { type Card as PCard } from 'shared/domain/card'
+import type { Field, Template } from 'shared/domain/template'
+import type { Kind, Review } from 'shared/domain/review'
+import type { Note as PNote } from 'shared/domain/note'
+import type { Card as PCard } from 'shared/domain/card'
 import {
 	type Card as ACard,
 	type Fld,
@@ -26,8 +26,8 @@ import {
 import { zip } from 'lodash-es'
 import { z } from 'zod'
 import { C } from '../../topLevelAwait'
-import { type ChildTemplate, type TemplateType } from 'shared/schema'
-import { type CardSetting as DomainCardSetting } from 'shared/domain/setting'
+import type { ChildTemplate, TemplateType } from 'shared/schema'
+import type { CardSetting as DomainCardSetting } from 'shared/domain/setting'
 
 function parseField(fld: Fld): Field {
 	return {

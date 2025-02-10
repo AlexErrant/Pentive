@@ -1,7 +1,7 @@
 import { ThemeSelector } from 'shared-dom/themeSelector'
 import { For, type VoidComponent, Show } from 'solid-js'
 import { A, useLocation } from '@solidjs/router'
-import { type NavLinkData } from './contracts'
+import type { NavLinkData } from './contracts'
 import { useWhoAmIContext } from './whoAmIContext'
 
 const Nav: VoidComponent<{ navLinks: NavLinkData[] }> = (props) => {

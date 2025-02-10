@@ -1,4 +1,4 @@
-import { type UserSettingId, type CardSettingId } from '../brand'
+import type { UserSettingId, CardSettingId } from '../brand'
 
 // update upon change 4CB24F8E-889C-472C-835A-A5A780C34963
 type SettingPrimitive = string | number | boolean | null

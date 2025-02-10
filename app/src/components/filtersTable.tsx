@@ -5,18 +5,18 @@ import {
 	onMount,
 	type VoidComponent,
 } from 'solid-js'
-import {
-	type GridOptions,
-	type IGroupCellRendererParams,
+import type {
+	GridOptions,
+	IGroupCellRendererParams,
 } from 'ag-grid-community'
 import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-alpine.css'
 import { LicenseManager } from 'ag-grid-enterprise'
 import '@github/relative-time-element'
-import { type TemplateId } from 'shared/brand'
+import type { TemplateId } from 'shared/brand'
 import { agGridTheme, useThemeContext } from 'shared-dom/themeSelector'
 import { C } from '../topLevelAwait'
-import { type Override } from 'shared/utility'
+import type { Override } from 'shared/utility'
 import { createGrid } from '../uiLogic/aggrid'
 
 LicenseManager.setLicenseKey(import.meta.env.VITE_AG_GRID_LICENSE)

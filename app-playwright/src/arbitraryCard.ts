@@ -1,9 +1,9 @@
 import fc from 'fast-check'
-import {
-	type CardId,
-	type Ord,
-	type NoteId,
-	type CardSettingId,
+import type {
+	CardId,
+	Ord,
+	NoteId,
+	CardSettingId,
 } from 'shared/brand'
 import { reasonableDates, recordWithOptionalFields } from './arbitrary'
 import { type Card, states } from 'shared/domain/card'

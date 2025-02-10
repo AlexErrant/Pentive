@@ -1,5 +1,5 @@
 import { createAsync } from '@solidjs/router'
-import { type UserId } from 'shared/brand'
+import type { UserId } from 'shared/brand'
 import { createContext, type JSX, useContext, type Accessor } from 'solid-js'
 import { getUserId } from '~/session'
 

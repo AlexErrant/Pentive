@@ -1,8 +1,8 @@
-import { type iframeResizer } from '@iframe-resizer/parent'
-import { type MediaId } from 'shared/brand'
+import type { iframeResizer } from '@iframe-resizer/parent'
+import type { MediaId } from 'shared/brand'
 import { type SetStoreFunction, unwrap } from 'solid-js/store'
 import { C } from '../topLevelAwait'
-import { type CommonResizingIframe } from 'shared-dom/renderContainer'
+import type { CommonResizingIframe } from 'shared-dom/renderContainer'
 import {
 	type RawRenderBodyInput,
 	ResizingIframe as CoreResizingIframe,

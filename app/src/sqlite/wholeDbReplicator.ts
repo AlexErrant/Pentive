@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { type DBAsync } from '@vlcn.io/xplat-api'
+import type { DBAsync } from '@vlcn.io/xplat-api'
 import { parse as uuidParse, stringify as uuidStringify } from 'uuid'
 import { C } from '../topLevelAwait'
 export type SiteIDWire = string

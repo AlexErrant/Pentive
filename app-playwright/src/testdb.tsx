@@ -1,4 +1,4 @@
-import { type JSX } from 'solid-js/jsx-runtime'
+import type { JSX } from 'solid-js/jsx-runtime'
 import { isEqual } from 'lodash-es'
 import { createResource, Match, Switch } from 'solid-js'
 import fc from 'fast-check'

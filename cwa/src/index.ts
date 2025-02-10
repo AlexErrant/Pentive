@@ -10,11 +10,11 @@
 
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
-import {
-	type Env,
-	type CwaContext,
-	type PostMediaQueryKey,
-	type PostMediaQueryValue,
+import type {
+	Env,
+	CwaContext,
+	PostMediaQueryKey,
+	PostMediaQueryValue,
 } from './util'
 import {
 	setKysely,
@@ -31,22 +31,22 @@ import { connect } from '@planetscale/database'
 import { buildPrivateToken } from './privateToken'
 import { appRouter } from './router'
 import { fetchRequestHandler } from '@trpc/server/adapters/fetch'
-import {
-	type UserId,
-	type MediaHash,
-	type Base64Url,
-	type NoteId,
-	type TemplateId,
-	type RemoteMediaId,
-	type RemoteNoteId,
-	type RemoteTemplateId,
-	type DbId,
+import type {
+	UserId,
+	MediaHash,
+	Base64Url,
+	NoteId,
+	TemplateId,
+	RemoteMediaId,
+	RemoteNoteId,
+	RemoteTemplateId,
+	DbId,
 } from 'shared/brand'
 import { hstsName, hstsValue } from 'shared/headers'
 import { objEntries, objKeys } from 'shared/utility'
 import z from 'zod'
 import { remoteMediaId, remoteTemplateNoteId } from 'shared/schema'
-import { type RawBuilder } from 'kysely'
+import type { RawBuilder } from 'kysely'
 export type * from '@trpc/server'
 
  

@@ -24,6 +24,11 @@ export function buildEslintConfig(importMetaUrl) {
 			{
 				rules: {
 					eqeqeq: ['error', 'smart'],
+					'@typescript-eslint/no-import-type-side-effects': 'error',
+					'@typescript-eslint/consistent-type-imports': [
+						'error',
+						{ fixStyle: 'inline-type-imports' },
+					],
 					'@typescript-eslint/ban-ts-comment': [
 						'error',
 						{ minimumDescriptionLength: 1 },

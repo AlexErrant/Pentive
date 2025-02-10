@@ -11,7 +11,7 @@ import { createAsync } from '@solidjs/router'
 import ResizingIframe from '../components/resizingIframe'
 import { cardSetting as cardSettingParser } from './importer/parser'
 import init, { Fsrs } from 'fsrs-browser'
-import { type ReviewId, type CardSettingId } from 'shared/brand'
+import type { ReviewId, CardSettingId } from 'shared/brand'
 import { ulidAsBase64Url } from '../domain/utility'
 import { C } from '../topLevelAwait'
 

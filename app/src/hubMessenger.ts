@@ -2,23 +2,23 @@ import * as Comlink from 'comlink'
 import { ulidAsBase64Url } from './domain/utility'
 import { noteOrds } from 'shared-dom/cardHtml'
 import { C, tx } from './topLevelAwait'
-import {
-	type ChildTemplate,
-	type RemoteNote,
-	type RemoteTemplate,
+import type {
+	ChildTemplate,
+	RemoteNote,
+	RemoteTemplate,
 } from 'shared/schema'
 import {
 	type NookId,
 	type CardId,
 	type MediaId,
 	cast,
-	RemoteNoteId,
-	RemoteTemplateId,
+	type RemoteNoteId,
+	type RemoteTemplateId,
 } from 'shared/brand'
 import { relativeChar } from 'shared/image'
-import { type Template } from 'shared/domain/template'
-import { type Note } from 'shared/domain/note'
-import { type Card } from 'shared/domain/card'
+import type { Template } from 'shared/domain/template'
+import type { Note } from 'shared/domain/note'
+import type { Card } from 'shared/domain/card'
 import { objEntries } from 'shared/utility'
 import { parseHtml } from 'shared-dom/utility'
 

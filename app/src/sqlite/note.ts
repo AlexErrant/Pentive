@@ -1,8 +1,8 @@
-import {
-	type RemoteNote,
-	type NoteBase,
-	type DB,
-	type NoteFieldValue,
+import type {
+	RemoteNote,
+	NoteBase,
+	DB,
+	NoteFieldValue,
 } from './database'
 import {
 	sql,
@@ -21,7 +21,7 @@ import {
 	getMediaToUpload,
 } from './util'
 import { saveTags } from './tag'
-import { type Note } from 'shared/domain/note'
+import type { Note } from 'shared/domain/note'
 import {
 	type RemoteTemplateId,
 	type RemoteNoteId,
@@ -30,7 +30,7 @@ import {
 	toLDbId,
 	fromLDbId,
 } from 'shared/brand'
-import { type CreateRemoteNote, type EditRemoteNote } from 'shared/schema'
+import type { CreateRemoteNote, EditRemoteNote } from 'shared/schema'
 import {
 	notEmpty,
 	objEntries,

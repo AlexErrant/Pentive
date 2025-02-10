@@ -7,7 +7,7 @@ import {
 	getCsrfSignatureCached,
 	type CsrfFormat,
 } from '~/session'
-import { type NookId } from 'shared/brand'
+import type { NookId } from 'shared/brand'
 import {
 	type RouteDefinition,
 	action,

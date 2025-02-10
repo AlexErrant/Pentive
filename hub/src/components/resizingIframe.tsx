@@ -1,4 +1,4 @@
-import { type iframeResizer } from '@iframe-resizer/parent'
+import type { iframeResizer } from '@iframe-resizer/parent'
 import { type SetStoreFunction, unwrap } from 'solid-js/store'
 import {
 	type RenderContainer,
@@ -13,7 +13,7 @@ import {
 	ResizingIframe as CoreResizingIframe,
 	buildHtml,
 } from 'shared-dom/resizingIframe'
-import { type MediaId } from 'shared/brand'
+import type { MediaId } from 'shared/brand'
 import { clientOnly } from '@solidjs/start'
 type IFrameComponent = iframeResizer.IFrameComponent
 

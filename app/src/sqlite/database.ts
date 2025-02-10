@@ -1,13 +1,13 @@
 // most of these columns are nullable in SQLite, but they're not nullable here for the sake of my sanity
 
-import {
-	type MediaId,
-	type LDbId,
-	type NookId,
-	type Ord,
-	type RemoteMediaId,
-	type PluginName,
-	type PluginVersion,
+import type {
+	MediaId,
+	LDbId,
+	NookId,
+	Ord,
+	RemoteMediaId,
+	PluginName,
+	PluginVersion,
 } from 'shared/brand'
 
 export interface CardBase {

@@ -1,6 +1,6 @@
 import { type Component, For, Show } from 'solid-js'
 import { A } from '@solidjs/router'
-import { type CommentDefinition } from '~/types'
+import type { CommentDefinition } from '~/types'
 import Toggle from './toggle'
 
 const HNComment: Component<{ comment: CommentDefinition }> = (props) => {

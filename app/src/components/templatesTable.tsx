@@ -1,9 +1,9 @@
 import { type VoidComponent, type Owner, Show, onMount } from 'solid-js'
-import {
-	type GridOptions,
-	type ICellRendererParams,
-	type ICellRendererComp,
-	type IGetRowsParams,
+import type {
+	GridOptions,
+	ICellRendererParams,
+	ICellRendererComp,
+	IGetRowsParams,
 } from 'ag-grid-community'
 import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-alpine.css'
@@ -12,11 +12,11 @@ import { startCase } from 'lodash-es'
 import '@github/relative-time-element'
 import { Upload } from 'shared-dom/icons'
 import { agGridTheme, useThemeContext } from 'shared-dom/themeSelector'
-import { type Template } from 'shared/domain/template'
+import type { Template } from 'shared/domain/template'
 import { Entries } from '@solid-primitives/keyed'
 import './registry'
 import { C } from '../topLevelAwait'
-import { type Override } from 'shared/utility'
+import type { Override } from 'shared/utility'
 import { createGrid, registerGridUpdate, Renderer } from '../uiLogic/aggrid'
 import { useTableCountContext } from './tableCountContext'
 

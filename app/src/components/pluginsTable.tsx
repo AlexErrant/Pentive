@@ -5,19 +5,19 @@ import {
 	createEffect,
 	onMount,
 } from 'solid-js'
-import {
-	type GridOptions,
-	type ICellRendererParams,
-	type ICellRendererComp,
+import type {
+	GridOptions,
+	ICellRendererParams,
+	ICellRendererComp,
 } from 'ag-grid-community'
 import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-alpine.css'
 import { LicenseManager } from 'ag-grid-enterprise'
 import '@github/relative-time-element'
-import { type Plugin } from 'shared-dom/plugin'
+import type { Plugin } from 'shared-dom/plugin'
 import { C } from '../topLevelAwait'
 import { agGridTheme, useThemeContext } from 'shared-dom/themeSelector'
-import { type Override } from 'shared/utility'
+import type { Override } from 'shared/utility'
 import { createGrid, Renderer } from '../uiLogic/aggrid'
 
 LicenseManager.setLicenseKey(import.meta.env.VITE_AG_GRID_LICENSE)

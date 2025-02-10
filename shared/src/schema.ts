@@ -1,14 +1,14 @@
 import { z } from 'zod'
-import {
-	type NoteId,
-	type TemplateId,
-	type RemoteNoteId,
-	type Ord,
-	type RemoteTemplateId,
-	type NookId,
-	type CommentId,
-	type MediaId,
-	type RemoteMediaId,
+import type {
+	NoteId,
+	TemplateId,
+	RemoteNoteId,
+	Ord,
+	RemoteTemplateId,
+	NookId,
+	CommentId,
+	MediaId,
+	RemoteMediaId,
 } from './brand'
 import { objKeys } from './utility'
 

@@ -1,6 +1,6 @@
 import { syntaxTree } from '@codemirror/language'
 import { linter, type Diagnostic } from '@codemirror/lint'
-import { type Extension } from '@codemirror/state'
+import type { Extension } from '@codemirror/state'
 import { MismatchedCloseTag } from './templateParser.terms'
 
 // maybe someday we'll add an html linter too

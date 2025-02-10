@@ -1,10 +1,10 @@
-import {
-	type TemplateId,
-	type NoteId,
-	type RemoteNoteId,
-	type RemoteTemplateId,
-	type LDbId,
-	type RemoteMediaId,
+import type {
+	TemplateId,
+	NoteId,
+	RemoteNoteId,
+	RemoteTemplateId,
+	LDbId,
+	RemoteMediaId,
 } from 'shared/brand'
 import { C, ky } from '../topLevelAwait'
 

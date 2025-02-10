@@ -1,12 +1,12 @@
-import { type Context } from 'hono'
-import { type PrivateMediaSecret } from './privateToken'
-import { type PublicMediaSecret } from 'shared-edge'
-import { type R2Bucket } from '@cloudflare/workers-types'
-import {
-	type RemoteNoteId,
-	type RemoteTemplateId,
-	type RemoteMediaId,
-	type Base64,
+import type { Context } from 'hono'
+import type { PrivateMediaSecret } from './privateToken'
+import type { PublicMediaSecret } from 'shared-edge'
+import type { R2Bucket } from '@cloudflare/workers-types'
+import type {
+	RemoteNoteId,
+	RemoteTemplateId,
+	RemoteMediaId,
+	Base64,
 } from 'shared/brand'
 
 export type CwaContext = Context<{

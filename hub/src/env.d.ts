@@ -5,8 +5,8 @@ import type {
 	Request as CfRequest,
 	ExecutionContext,
 } from '@cloudflare/workers-types'
-import { type PublicMediaSecret } from 'shared-edge'
-import { type Base64 } from 'shared/brand'
+import type { PublicMediaSecret } from 'shared-edge'
+import type { Base64 } from 'shared/brand'
 
 export interface EnvVars {
 	tursoDbUrl: string

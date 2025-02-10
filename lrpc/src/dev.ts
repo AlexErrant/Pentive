@@ -1,11 +1,11 @@
 // this exists because I couldn't figure out how to `watch` serverless/lambdaHandler.ts
 
 import { createHTTPHandler } from '@trpc/server/adapters/standalone'
-import { type IncomingMessage, type ServerResponse } from 'http'
-import { type NodeHTTPCreateContextFnOptions } from '@trpc/server/adapters/node-http'
+import type { IncomingMessage, ServerResponse } from 'http'
+import type { NodeHTTPCreateContextFnOptions } from '@trpc/server/adapters/node-http'
 import { appRouter } from './appRouter'
 import { getUser } from './core'
-import { type Context } from './trpc'
+import type { Context } from './trpc'
 import fs from 'fs'
 import https from 'https'
 import { csrfHeaderName, hstsName, hstsValue } from 'shared/headers'

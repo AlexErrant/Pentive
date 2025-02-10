@@ -1,7 +1,7 @@
 import { toLDbId, type NoteId } from 'shared/brand'
 import { ky, tx } from '../topLevelAwait'
 import { type InsertObject, sql } from 'kysely'
-import { type CardTag, type DB, type NoteTag } from './database'
+import type { CardTag, DB, NoteTag } from './database'
 
 export const tagCollectionMethods = {
 	getTags: async function () {

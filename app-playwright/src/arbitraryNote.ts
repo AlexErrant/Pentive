@@ -1,13 +1,13 @@
 import fc from 'fast-check'
-import { type NoteId, type RemoteNoteId } from 'shared/brand'
+import type { NoteId, RemoteNoteId } from 'shared/brand'
 import {
 	arbitraryNookId,
 	arbitraryUlid,
 	reasonableDates,
 	recordWithOptionalFields,
 } from './arbitrary'
-import { type NoteRemote, type Note } from 'shared/domain/note'
-import { type Template } from 'shared/domain/template'
+import type { NoteRemote, Note } from 'shared/domain/note'
+import type { Template } from 'shared/domain/template'
 
 export function note(template: Template) {
 	return recordWithOptionalFields<Note>(

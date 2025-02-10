@@ -2,7 +2,7 @@ import { expect, test } from 'vitest'
 import { convert, validate } from './template2html'
 import { defaultRenderContainer } from '../testUtil'
 import { toSampleCard, toSampleNote } from '../cardHtml'
-import { type Ord } from 'shared/brand'
+import type { Ord } from 'shared/brand'
 import { throwExp } from 'shared/utility'
 import { getDefaultTemplate } from 'shared/domain/template'
 

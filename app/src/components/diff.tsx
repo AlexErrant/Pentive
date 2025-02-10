@@ -1,5 +1,5 @@
 import { type JSX, For, Show } from 'solid-js'
-import { type Change } from 'diff'
+import type { Change } from 'diff'
 import { throwExp } from 'shared/utility'
 
 export default function Diff<T>(props: {

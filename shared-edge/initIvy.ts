@@ -4,8 +4,8 @@ import * as fs from 'fs'
 import { createClient } from '@libsql/client'
 import { Kysely } from 'kysely'
 import { LibsqlDialect } from '@libsql/kysely-libsql'
-import { type DB } from './src/dbSchema'
-import { type MediaHash, type DbId } from 'shared/brand'
+import type { DB } from './src/dbSchema'
+import type { MediaHash, DbId } from 'shared/brand'
 
 const ivySchema = fs.readFileSync('./ivySchema.sql').toString()
 const ivySchemaSplit = ivySchema

@@ -1,8 +1,8 @@
-import {
-	type NookId,
-	type RemoteNoteId,
-	type TemplateId,
-	type NoteId,
+import type {
+	NookId,
+	RemoteNoteId,
+	TemplateId,
+	NoteId,
 } from '../brand'
 
 export interface Note {

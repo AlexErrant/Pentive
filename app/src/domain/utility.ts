@@ -1,7 +1,7 @@
 import { base16 } from '@scure/base'
 import { Ulid } from 'id128'
 import { arrayToBase64url } from 'shared/binary'
-import { type Base64Url, type TemplateId } from 'shared/brand'
+import type { Base64Url, TemplateId } from 'shared/brand'
 import { getDefaultTemplate as getDefaultTemplateOg } from 'shared/domain/template'
 import { format } from 'prettier'
 import * as prettierPluginHtml from 'prettier/plugins/html'

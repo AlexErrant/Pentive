@@ -1,7 +1,7 @@
 import { setHubMessengerPort } from './hubMessenger'
-import {
-	type ComlinkInit,
-	type RawRenderBodyInput,
+import type {
+	ComlinkInit,
+	RawRenderBodyInput,
 } from 'hub/src/components/resizingIframe'
 import { resizeIframe } from './registerServiceWorker'
 import diff from 'micromorph'

@@ -1,11 +1,11 @@
-import {
-	type CardId,
-	type NoteId,
-	type Ord,
-	type CardSettingId,
+import type {
+	CardId,
+	NoteId,
+	Ord,
+	CardSettingId,
 } from '../brand'
-import { type Note } from './note'
-import { type Template } from './template'
+import type { Note } from './note'
+import type { Template } from './template'
 
 export const states = ['scheduler buried', 'user buried', 'suspended'] as const
 

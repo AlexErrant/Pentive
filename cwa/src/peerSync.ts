@@ -1,5 +1,5 @@
 import { importPKCS8, SignJWT } from 'jose'
-import { type UserId } from 'shared/brand'
+import type { UserId } from 'shared/brand'
 
 export const alg = 'ES512'
 

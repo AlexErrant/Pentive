@@ -1,17 +1,17 @@
-import {
-	type DB,
-	type RemoteTemplate,
-	type Template as TemplateEntity,
+import type {
+	DB,
+	RemoteTemplate,
+	Template as TemplateEntity,
 } from './database'
-import {
-	type ExpressionBuilder,
-	type OnConflictDatabase,
-	type InsertObject,
-	type OnConflictTables,
+import type {
+	ExpressionBuilder,
+	OnConflictDatabase,
+	InsertObject,
+	OnConflictTables,
 } from 'kysely'
 import { templateEntityToDomain, remotifyDoms, updateRemotes } from './util'
 import { tx, C, ky } from '../topLevelAwait'
-import { type Template } from 'shared/domain/template'
+import type { Template } from 'shared/domain/template'
 import {
 	type NookId,
 	type TemplateId,
@@ -19,9 +19,9 @@ import {
 	fromLDbId,
 	toLDbId,
 } from 'shared/brand'
-import {
-	type CreateRemoteTemplate,
-	type EditRemoteTemplate,
+import type {
+	CreateRemoteTemplate,
+	EditRemoteTemplate,
 } from 'shared/schema'
 import {
 	objEntries,

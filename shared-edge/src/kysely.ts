@@ -11,34 +11,34 @@ import {
 	type ExpressionBuilder,
 } from 'kysely'
 import { LibsqlDialect } from '@libsql/kysely-libsql'
-import { type Note, type DB, type Template, type RawStatus } from './dbSchema'
-import {
-	type Base64Url,
-	type DbId,
-	type RemoteTemplateId,
-	type NookId,
-	type RemoteNoteId,
-	type UserId,
-	type TemplateId,
-	type CommentId,
-	type NoteId,
-	type Hex,
-	type MediaHash,
-	type Base64,
-	type MediaId,
-	type RemoteMediaId,
+import type { Note, DB, Template, RawStatus } from './dbSchema'
+import type {
+	Base64Url,
+	DbId,
+	RemoteTemplateId,
+	NookId,
+	RemoteNoteId,
+	UserId,
+	TemplateId,
+	CommentId,
+	NoteId,
+	Hex,
+	MediaHash,
+	Base64,
+	MediaId,
+	RemoteMediaId,
 } from 'shared/brand'
 import { ftsNormalize } from 'shared/htmlToText'
 import { imgPlaceholder } from 'shared/image'
-import {
-	type RemoteTemplate,
-	type RemoteNote,
-	type CreateRemoteNote,
-	type CreateRemoteTemplate,
-	type EditRemoteNote,
-	type EditRemoteTemplate,
-	type TemplateType,
-	type Status,
+import type {
+	RemoteTemplate,
+	RemoteNote,
+	CreateRemoteNote,
+	CreateRemoteTemplate,
+	EditRemoteNote,
+	EditRemoteTemplate,
+	TemplateType,
+	Status,
 } from 'shared/schema'
 import {
 	nullMap,

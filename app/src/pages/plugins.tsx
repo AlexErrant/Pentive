@@ -1,4 +1,4 @@
-import { type JSX } from 'solid-js'
+import type { JSX } from 'solid-js'
 import PluginsTable from '../components/pluginsTable'
 import { parsePluginNpmPackage } from 'shared-dom/plugin'
 import { C } from '../topLevelAwait'

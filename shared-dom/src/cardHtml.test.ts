@@ -1,10 +1,10 @@
 import { defaultRenderContainer } from './testUtil'
 import { describe, expect, test } from 'vitest'
-import { type TemplateId, type Ord } from 'shared/brand'
-import { type Template } from 'shared/domain/template'
+import type { TemplateId, Ord } from 'shared/brand'
+import type { Template } from 'shared/domain/template'
 import { throwExp } from 'shared/utility'
-import { type Note } from 'shared/domain/note'
-import { type Card } from 'shared/domain/card'
+import type { Note } from 'shared/domain/note'
+import type { Card } from 'shared/domain/card'
 import {
 	type HtmlResult,
 	noteOrds,

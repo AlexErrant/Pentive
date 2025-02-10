@@ -1,14 +1,14 @@
 import { readFile } from 'fs/promises'
 import path from 'path'
 import { expect, test } from 'vitest'
-import {
-	type TemplateId,
-	type Ord,
-	type PluginName,
-	type PluginVersion,
+import type {
+	TemplateId,
+	Ord,
+	PluginName,
+	PluginVersion,
 } from 'shared/brand'
-import { type Template } from 'shared/domain/template'
-import { type Plugin } from './plugin'
+import type { Template } from 'shared/domain/template'
+import type { Plugin } from './plugin'
 import { registerPluginServices } from './pluginManager'
 import { strip } from './cardHtml'
 import { getOk } from './cardHtml.test'

@@ -1,12 +1,12 @@
  
 import type { ColumnType } from 'kysely'
-import {
-	type Brand,
-	type DbId,
-	type MediaHash,
-	type NookId,
+import type {
+	Brand,
+	DbId,
+	MediaHash,
+	NookId,
 } from 'shared/brand'
-import { type PeerValidator } from 'shared/domain/user'
+import type { PeerValidator } from 'shared/domain/user'
 
 export type RawStatus = Brand<number, 'Status'>
 export type RawProposalStatus = Brand<number, 'ProposalStatus'>

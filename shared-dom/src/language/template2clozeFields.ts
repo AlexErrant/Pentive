@@ -1,6 +1,6 @@
 import { parser } from './templateParser'
 import { SelfClosingTag, TagName, Transformer } from './templateParser.terms'
-import { type RenderContainer } from '../renderContainer'
+import type { RenderContainer } from '../renderContainer'
 
 // for `renderTemplate`'s usage only because it doesn't check for the existence of `field` in the note's fieldValues
 export function getClozeFields(this: RenderContainer, frontTemplate: string) {

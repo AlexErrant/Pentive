@@ -1,7 +1,7 @@
-import { type getNote } from 'shared-edge'
+import type { getNote } from 'shared-edge'
 import { cwaClient } from '~/routes/cwaClient'
-import { type NookId } from 'shared/brand'
-import { type Component } from 'solid-js'
+import type { NookId } from 'shared/brand'
+import type { Component } from 'solid-js'
 import { DownloadNote } from './downloadNote'
 
 export type Note = NonNullable<Awaited<ReturnType<typeof getNote>>>

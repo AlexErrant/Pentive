@@ -1,4 +1,4 @@
-import { type Setter, type VoidComponent } from 'solid-js'
+import type { Setter, VoidComponent } from 'solid-js'
 import { Dynamic } from 'solid-js/web'
 
 const ExamplePlugin: VoidComponent<{

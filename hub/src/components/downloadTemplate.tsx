@@ -1,10 +1,10 @@
 import { getAppMessenger } from '~/lib/clientOnly'
 import { unwrap } from 'solid-js/store'
 import { cwaClient } from '~/routes/cwaClient'
-import { type Component } from 'solid-js'
+import type { Component } from 'solid-js'
 import { clientOnly } from '@solidjs/start'
 import { createAsync } from '@solidjs/router'
-import { type Template } from './downloadSubscribeTemplate'
+import type { Template } from './downloadSubscribeTemplate'
 
 export const DownloadTemplateDefault: Component<{ template: Template }> = (
 	props,

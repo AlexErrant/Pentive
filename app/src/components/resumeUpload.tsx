@@ -1,4 +1,4 @@
-import { type JSX } from 'solid-js'
+import type { JSX } from 'solid-js'
 import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-alpine.css'
 import { uploadNoteMedia, uploadTemplateMedia } from '../domain/sync'

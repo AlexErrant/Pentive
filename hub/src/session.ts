@@ -11,9 +11,9 @@ import {
 	SignedCookieManager,
 } from '~/cookieManager'
 import { getRequestEvent } from 'solid-js/web'
-import { type EnvVars } from './env'
+import type { EnvVars } from './env'
 import type { FetchEvent } from '@solidjs/start/server'
-import { type Base64Url, type UserId } from 'shared/brand'
+import type { Base64Url, UserId } from 'shared/brand'
 import { hubSessionCookieName, csrfSignatureCookieName } from 'shared/headers'
 import { throwExp } from 'shared/utility'
 

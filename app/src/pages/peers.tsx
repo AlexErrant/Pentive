@@ -9,7 +9,7 @@ import { stringify as uuidStringify } from 'uuid'
 import { cwaClient, isTrpcClientError } from '../trpcClient'
 import { createWdbRtc } from '../sqlite/crsqlite'
 import { rd } from '../topLevelAwait'
-import { type WholeDbRtcPublic } from '../sqlite/wholeDbRtc'
+import type { WholeDbRtcPublic } from '../sqlite/wholeDbRtc'
 import { peerIdValidator, peerDisplayNameValidator } from 'shared/domain/user'
 
 export default function Peers() {

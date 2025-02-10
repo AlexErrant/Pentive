@@ -32,11 +32,11 @@ import {
 	parseRevlog,
 	parseCardSetting,
 } from './parser'
-import { type Review } from 'shared/domain/review'
-import { type Card as PCard } from 'shared/domain/card'
-import { type Note as PNote } from 'shared/domain/note'
-import { type Template } from 'shared/domain/template'
-import { type MediaId, type TemplateId } from 'shared/brand'
+import type { Review } from 'shared/domain/review'
+import type { Card as PCard } from 'shared/domain/card'
+import type { Note as PNote } from 'shared/domain/note'
+import type { Template } from 'shared/domain/template'
+import type { MediaId, TemplateId } from 'shared/brand'
 import { chunk } from 'lodash-es'
 import sqliteUrl from '../../assets/sql-wasm.wasm?url'
 import { C } from '../../topLevelAwait'

@@ -1,6 +1,6 @@
 // c.f. https://github.com/panva/jose/blob/e8cf88a4555385ea6ee41a2015f869888649caa2/src/runtime/browser/base64url.ts
 
-import { type Base64Url, type Base64 } from './brand'
+import type { Base64Url, Base64 } from './brand'
 
 // https://web.dev/articles/base64-encoding#btoa_and_atob_with_unicode
 export function arrayToBase64(bytes: Uint8Array<ArrayBuffer>): Base64 {

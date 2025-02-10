@@ -1,6 +1,6 @@
 import { lazy } from 'solid-js'
 import type { RouteDefinition } from '@solidjs/router'
-import { type NavLinkData } from './components/contracts'
+import type { NavLinkData } from './components/contracts'
 
 export const navLinks: NavLinkData[] = [
 	{

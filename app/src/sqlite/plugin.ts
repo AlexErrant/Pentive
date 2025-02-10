@@ -1,8 +1,8 @@
-import { type Plugin } from 'shared-dom/plugin'
+import type { Plugin } from 'shared-dom/plugin'
 import { rd, ky, C } from '../topLevelAwait'
 import { pluginEntityToDomain } from './util'
-import { type PluginName } from 'shared/brand'
-import { type SqliteCount } from 'shared/utility'
+import type { PluginName } from 'shared/brand'
+import type { SqliteCount } from 'shared/utility'
 
 export const pluginCollectionMethods = {
 	upsertPlugin: async function (plugin: Plugin) {

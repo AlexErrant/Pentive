@@ -8,20 +8,20 @@ import {
 } from './language/template2html'
 import type { RenderContainer } from './renderContainer'
 import { assertNever, notEmpty, objEntries, throwExp } from 'shared/utility'
-import { type Field, type Template } from 'shared/domain/template'
-import { type Card } from 'shared/domain/card'
-import { type Note } from 'shared/domain/note'
-import {
-	type NoteId,
-	type TemplateId,
-	type Ord,
-	type NookId,
-	type RemoteNoteId,
-	type CardId,
-	type CardSettingId,
+import type { Field, Template } from 'shared/domain/template'
+import type { Card } from 'shared/domain/card'
+import type { Note } from 'shared/domain/note'
+import type {
+	NoteId,
+	TemplateId,
+	Ord,
+	NookId,
+	RemoteNoteId,
+	CardId,
+	CardSettingId,
 } from 'shared/brand'
-import { type Tree } from '@lezer/common'
-import { type Standard, type Cloze } from 'shared/schema'
+import type { Tree } from '@lezer/common'
+import type { Standard, Cloze } from 'shared/schema'
 import { toOneLine } from 'shared/htmlToText'
 
 export type StandardTemplate = Omit<Template, 'templateType'> & {

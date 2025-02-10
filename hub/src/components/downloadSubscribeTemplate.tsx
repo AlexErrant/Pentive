@@ -1,6 +1,6 @@
-import { type getTemplates } from 'shared-edge'
+import type { getTemplates } from 'shared-edge'
 import { cwaClient } from '~/routes/cwaClient'
-import { type Component } from 'solid-js'
+import type { Component } from 'solid-js'
 import { DownloadTemplate } from './downloadTemplate'
 
 export type Template = Awaited<ReturnType<typeof getTemplates>>[0]

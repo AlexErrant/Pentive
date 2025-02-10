@@ -1,4 +1,4 @@
-import { type CardSettingId } from '../brand'
+import type { CardSettingId } from '../brand'
 
 export type CardSetting = {
 	id: CardSettingId

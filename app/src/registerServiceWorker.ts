@@ -1,6 +1,6 @@
 import * as Comlink from 'comlink' // https://github.com/GoogleChromeLabs/comlink/tree/main/docs/examples/05-serviceworker-example
 import { C } from './topLevelAwait'
-import { type MediaId } from 'shared/brand'
+import type { MediaId } from 'shared/brand'
 import { throwExp } from 'shared/utility'
 
 export interface ComlinkInit {

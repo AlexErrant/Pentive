@@ -1,7 +1,7 @@
 import { setAppMessengerPort } from './appMessenger'
-import {
-	type ComlinkInit,
-	type RawRenderBodyInput,
+import type {
+	ComlinkInit,
+	RawRenderBodyInput,
 } from 'app/components/resizingIframe'
 import { resizeIframe } from './registerServiceWorker'
 import diff from 'micromorph'

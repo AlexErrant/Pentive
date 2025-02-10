@@ -1,7 +1,7 @@
 import sqliteWasm, { type DB as crDB } from '@vlcn.io/crsqlite-wasm'
 import { lrpc } from '../lrpcClient'
 import { stringify as uuidStringify } from 'uuid'
-import { type DB } from './database'
+import type { DB } from './database'
 import { type CRDatabase, CRDialect } from './dialect'
 import { Kysely } from 'kysely'
 import crsqliteUrl from '@vlcn.io/crsqlite-wasm/crsqlite.wasm?url'

@@ -4,7 +4,7 @@ import {
 	type JSX,
 	type Setter,
 } from 'solid-js'
-import { type MediaId } from 'shared/brand'
+import type { MediaId } from 'shared/brand'
 import { importAnki } from './importer/importer'
 import { augcClient } from '../trpcClient'
 import { C, initFsrsTrainThreadPool, rd } from '../topLevelAwait'

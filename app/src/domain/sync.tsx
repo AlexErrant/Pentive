@@ -1,16 +1,16 @@
-import {
-	type MediaId,
-	type RemoteNoteId,
-	type RemoteTemplateId,
-	type RemoteMediaId,
-	type TemplateId,
-	type NookId,
-	type NoteId,
+import type {
+	MediaId,
+	RemoteNoteId,
+	RemoteTemplateId,
+	RemoteMediaId,
+	TemplateId,
+	NookId,
+	NoteId,
 } from 'shared/brand'
 import { csrfHeaderName } from 'shared/headers'
 import { C } from '../topLevelAwait'
 import { cwaClient } from '../trpcClient'
-import { type PostMediaQueryValue, type PostMediaQueryKey } from 'cwa/src/util'
+import type { PostMediaQueryValue, PostMediaQueryKey } from 'cwa/src/util'
 import { throwExp } from 'shared/utility'
 
 export async function postMedia(

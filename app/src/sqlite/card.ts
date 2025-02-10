@@ -1,15 +1,15 @@
 import { jsonArrayFrom } from 'kysely/helpers/sqlite'
 import { ky, C, rd } from '../topLevelAwait'
-import {
-	type DB,
-	type Card as CardView,
-	type CardBase,
-	type Note,
-	type Setting,
-	type Template,
-	type CardTag,
-	type NoteFieldValue,
-	type NoteTag,
+import type {
+	DB,
+	Card as CardView,
+	CardBase,
+	Note,
+	Setting,
+	Template,
+	CardTag,
+	NoteFieldValue,
+	NoteTag,
 } from './database'
 import {
 	type ExpressionBuilder,
@@ -29,10 +29,10 @@ import {
 	parseTags,
 	templateSelection,
 } from './util'
-import { type convert } from 'shared-dom/language/query2sql'
-import { type CardTagRowid, type NoteTagRowid } from './tag'
+import type { convert } from 'shared-dom/language/query2sql'
+import type { CardTagRowid, NoteTagRowid } from './tag'
 import { fromLDbId, toLDbId, type CardId, type NoteId } from 'shared/brand'
-import { type NoteCard, type State, type Card } from 'shared/domain/card'
+import type { NoteCard, State, Card } from 'shared/domain/card'
 import { assertNever, type SqliteCount, undefinedMap } from 'shared/utility'
 
 function serializeState(s?: State): number | null {

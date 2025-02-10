@@ -17,6 +17,7 @@
 		"noEmitOnError": true,
 		"skipLibCheck": true,
 		"resolveJsonModule": true,
+		"verbatimModuleSyntax": true,
 		"outDir": "${configDir}/lib"
 	}
 }

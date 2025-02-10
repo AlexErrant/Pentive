@@ -8,7 +8,7 @@ import {
 import './templateSync.css'
 import { C } from '../topLevelAwait'
 import { cwaClient } from '../trpcClient'
-import { type UserId } from 'shared/brand'
+import type { UserId } from 'shared/brand'
 import { throwExp } from 'shared/utility'
 
 const WhoAmIContext = createContext<Resource<UserId | undefined>>()

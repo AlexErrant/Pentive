@@ -10,7 +10,7 @@
 
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
-import { type Env, type ApiUgcContext } from './util'
+import type { Env, ApiUgcContext } from './util'
 import {
 	setKysely,
 	lookupMediaHash,
@@ -19,7 +19,7 @@ import {
 } from 'shared-edge'
 import { appRouter } from './router'
 import { fetchRequestHandler } from '@trpc/server/adapters/fetch'
-import { type MediaId, type MediaHash } from 'shared/brand'
+import type { MediaId, MediaHash } from 'shared/brand'
 import { hstsName, hstsValue } from 'shared/headers'
 
  

@@ -1,4 +1,4 @@
-import { type NookId } from 'shared/brand'
+import type { NookId } from 'shared/brand'
 import { getNook } from 'shared-edge'
 import { query } from '@solidjs/router'
 

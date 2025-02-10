@@ -1,6 +1,6 @@
-import { type Template } from 'shared/domain/template'
-import { type NoteCard, type Card } from 'shared/domain/card'
-import { type Note } from 'shared/domain/note'
+import type { Template } from 'shared/domain/template'
+import type { NoteCard, Card } from 'shared/domain/card'
+import type { Note } from 'shared/domain/note'
 
 export interface NoteCardView {
 	template: Template

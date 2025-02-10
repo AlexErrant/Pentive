@@ -1,6 +1,6 @@
-import {
-	type Completion,
-	type CompletionSource,
+import type {
+	Completion,
+	CompletionSource,
 } from '@codemirror/autocomplete'
 import { syntaxTree } from '@codemirror/language'
 import {
@@ -48,7 +48,7 @@ import {
 	reviewed,
 	firstReviewed,
 } from './stringLabels'
-import { type SyntaxNode } from '@lezer/common'
+import type { SyntaxNode } from '@lezer/common'
 
 // I don't think we should use Codemirror's autocomplete for showing history. Doing anything more
 // advanced, e.g. deleting an entry from history, is unsupported in `@codemirror/autocomplete`.

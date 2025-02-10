@@ -1,8 +1,8 @@
 import { query } from '@solidjs/router'
-import {
-	type StoryDefinition,
-	type StoryTypes,
-	type UserDefinition,
+import type {
+	StoryDefinition,
+	StoryTypes,
+	UserDefinition,
 } from '~/types'
 
 const story = (path: string) => `https://node-hnapi.herokuapp.com/${path}`

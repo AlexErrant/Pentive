@@ -2,7 +2,7 @@
 
 import fc, { type Arbitrary, type RecordConstraints } from 'fast-check'
 import { Ulid } from 'id128'
-import { type Base64Url } from 'shared/brand'
+import type { Base64Url } from 'shared/brand'
 import { base16 } from '@scure/base'
 import { nookIdRegex } from 'shared/schema'
 import { arrayToBase64url } from 'shared/binary'

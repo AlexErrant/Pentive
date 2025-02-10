@@ -1,10 +1,10 @@
 import { getAppMessenger } from '~/lib/clientOnly'
 import { unwrap } from 'solid-js/store'
-import { type Component } from 'solid-js'
-import { type NookId } from 'shared/brand'
+import type { Component } from 'solid-js'
+import type { NookId } from 'shared/brand'
 import { createAsync } from '@solidjs/router'
 import { clientOnly } from '@solidjs/start'
-import { type Note } from './downloadSubscribeNote'
+import type { Note } from './downloadSubscribeNote'
 
 export const DownloadNoteDefault: Component<{ note: Note; nook: NookId }> = (
 	props,

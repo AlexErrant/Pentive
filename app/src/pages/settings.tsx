@@ -7,7 +7,7 @@ import { render } from 'solid-js/web'
 import EditSetting from '../components/editSetting'
 import { cloneDeep } from 'lodash-es'
 import { ulidAsBase64Url } from '../domain/utility'
-import { type CardSettingId } from 'shared/brand'
+import type { CardSettingId } from 'shared/brand'
 import { type Setting, getDefaultSetting } from 'shared/domain/setting'
 
 export default function Settings(): JSX.Element {

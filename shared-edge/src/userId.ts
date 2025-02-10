@@ -1,8 +1,8 @@
 import { type JWTVerifyResult, jwtVerify } from 'jose'
-import { type Context } from 'hono'
+import type { Context } from 'hono'
 import { getCookie } from 'hono/cookie'
 import { base64ToArray } from 'shared/binary'
-import { type Base64, type UserId } from 'shared/brand'
+import type { Base64, UserId } from 'shared/brand'
 import { csrfHeaderName, hubSessionCookieName } from 'shared/headers'
 import { toError, toOk } from 'shared/result'
 

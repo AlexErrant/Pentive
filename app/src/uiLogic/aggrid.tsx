@@ -3,7 +3,7 @@ import {
 	type GridApi,
 	type GridOptions,
 } from 'ag-grid-community'
-import { type Override } from 'shared/utility'
+import type { Override } from 'shared/utility'
 import {
 	createEffect,
 	ErrorBoundary,

@@ -11,15 +11,15 @@ import {
 	onMount,
 } from 'solid-js'
 import '@github/relative-time-element'
-import {
-	type GridOptions,
-	type ICellRendererParams,
-	type ICellRendererComp,
-	type GridApi,
-	type NavigateToNextCellParams,
-	type IGetRowsParams,
-	type IToolPanelComp,
-	type IToolPanelParams,
+import type {
+	GridOptions,
+	ICellRendererParams,
+	ICellRendererComp,
+	GridApi,
+	NavigateToNextCellParams,
+	IGetRowsParams,
+	IToolPanelComp,
+	IToolPanelParams,
 } from 'ag-grid-community'
 import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-alpine.css'
@@ -37,9 +37,9 @@ import './cardsTable.css'
 import QueryEditor from './queryEditor'
 import { alterQuery } from '../domain/alterQuery'
 import CardsTableHelp from './cardsTableHelp'
-import { type Sort } from '../sqlite/card'
+import type { Sort } from '../sqlite/card'
 import { agGridTheme, useThemeContext } from 'shared-dom/themeSelector'
-import { type NoteCard } from 'shared/domain/card'
+import type { NoteCard } from 'shared/domain/card'
 import { throwExp, assertNever, type Override } from 'shared/utility'
 import { Entries } from '@solid-primitives/keyed'
 import { createGrid, registerGridUpdate, Renderer } from '../uiLogic/aggrid'

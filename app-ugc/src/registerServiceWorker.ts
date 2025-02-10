@@ -1,7 +1,7 @@
 import * as Comlink from 'comlink' // https://github.com/GoogleChromeLabs/comlink/tree/main/docs/examples/05-serviceworker-example
 import { appMessenger } from './appMessenger'
 import { setBody } from './setBody'
-import { type MediaId } from 'shared/brand'
+import type { MediaId } from 'shared/brand'
 
 export interface ComlinkInit {
 	type: 'ComlinkInit'

@@ -1,5 +1,5 @@
 import { createMutation, useQueryClient } from '@tanstack/solid-query'
-import { type SyncState } from '../domain/sync'
+import type { SyncState } from '../domain/sync'
 import {
 	Switch,
 	Match,

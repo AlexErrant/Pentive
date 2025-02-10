@@ -10,22 +10,22 @@ import Peers from './peers'
 import { C, rd } from '../topLevelAwait'
 import { TemplateNookSync } from '../components/templateSync'
 import { agGridTheme, useThemeContext } from 'shared-dom/themeSelector'
-import {
-	type GridOptions,
-	type ICellRendererParams,
-	type ICellRendererComp,
-	type IHeaderComp,
-	type IHeaderParams,
+import type {
+	GridOptions,
+	ICellRendererParams,
+	ICellRendererComp,
+	IHeaderComp,
+	IHeaderParams,
 } from 'ag-grid-community'
 import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-alpine.css'
 import { LicenseManager } from 'ag-grid-enterprise'
 import { DiffModeToggleGroup } from '../components/diffModeContext'
 import { uploadNotes, uploadTemplates } from '../domain/sync'
-import { type NookId } from 'shared/brand'
-import { type Template } from 'shared/domain/template'
+import type { NookId } from 'shared/brand'
+import type { Template } from 'shared/domain/template'
 import { assertNever, objKeys, type Override } from 'shared/utility'
-import { type Note } from 'shared/domain/note'
+import type { Note } from 'shared/domain/note'
 import { NoteNookSync } from '../components/noteSync'
 import { useWhoAmIContext } from '../components/whoAmIContext'
 import { createGrid, Renderer } from '../uiLogic/aggrid'

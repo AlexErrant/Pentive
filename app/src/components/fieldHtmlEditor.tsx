@@ -17,7 +17,7 @@ import ResizingIframe from './resizingIframe'
 import { C } from '../topLevelAwait'
 import { useThemeContext } from 'shared-dom/themeSelector'
 import { basicSetup } from 'shared-dom/codemirror'
-import { type NoteId } from 'shared/brand'
+import type { NoteId } from 'shared/brand'
 import { formatHtml } from '../domain/utility'
 
 const FieldHtmlEditor: VoidComponent<{

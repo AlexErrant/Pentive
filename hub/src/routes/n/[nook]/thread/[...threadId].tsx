@@ -1,5 +1,5 @@
 import { Show, Suspense } from 'solid-js'
-import { type Base64Url } from 'shared/brand'
+import type { Base64Url } from 'shared/brand'
 import { getPost } from 'shared-edge'
 import {
 	type RouteSectionProps,

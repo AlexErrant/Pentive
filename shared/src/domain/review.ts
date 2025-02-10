@@ -1,4 +1,4 @@
-import { type CardId, type ReviewId } from '../brand'
+import type { CardId, ReviewId } from '../brand'
 
 // export interface Review {
 // 	score: Score

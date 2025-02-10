@@ -1,9 +1,9 @@
 import { Show, type VoidComponent } from 'solid-js'
-import { type NookId } from 'shared/brand'
-import { type NoteCardView } from '../uiLogic/cards'
+import type { NookId } from 'shared/brand'
+import type { NoteCardView } from '../uiLogic/cards'
 import { Entries } from '@solid-primitives/keyed'
-import { type SetStoreFunction } from 'solid-js/store'
-import { type TemplateRemote } from 'shared/domain/template'
+import type { SetStoreFunction } from 'solid-js/store'
+import type { TemplateRemote } from 'shared/domain/template'
 import { ExternalLink } from 'shared-dom/icons'
 
 export const CardsRemote: VoidComponent<{

@@ -5,13 +5,13 @@ import {
 	reasonableDates,
 	recordWithOptionalFields,
 } from './arbitrary'
-import { type Ord, type TemplateId, type RemoteTemplateId } from 'shared/brand'
-import {
-	type TemplateRemote,
-	type Field,
-	type Template,
+import type { Ord, TemplateId, RemoteTemplateId } from 'shared/brand'
+import type {
+	TemplateRemote,
+	Field,
+	Template,
 } from 'shared/domain/template'
-import { type ChildTemplate, type TemplateType } from 'shared/schema'
+import type { ChildTemplate, TemplateType } from 'shared/schema'
 
 const field = recordWithOptionalFields<Field>(
 	{

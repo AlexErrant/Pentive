@@ -1,11 +1,11 @@
 import { createSignal, type VoidComponent, Show } from 'solid-js'
 import { FieldEditor } from './fieldEditor'
-import { type SetStoreFunction } from 'solid-js/store'
+import type { SetStoreFunction } from 'solid-js/store'
 import FieldHtmlEditor from './fieldHtmlEditor'
 import { ToggleButton } from '@kobalte/core'
 import { ChevronDown, Code, Quote } from 'shared-dom/icons'
-import { type NoteCardView } from '../uiLogic/cards'
-import { type NoteId } from 'shared/brand'
+import type { NoteCardView } from '../uiLogic/cards'
+import type { NoteId } from 'shared/brand'
 import { Entries } from '@solid-primitives/keyed'
 
 export const FieldsEditor: VoidComponent<{

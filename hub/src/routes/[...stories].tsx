@@ -6,7 +6,7 @@ import {
 import { For, Show } from 'solid-js'
 import Story from '~/components/story'
 import { getStories } from '~/lib/api'
-import { type StoryTypes } from '~/types'
+import type { StoryTypes } from '~/types'
 
 export const route = {
 	preload({ location, params }) {

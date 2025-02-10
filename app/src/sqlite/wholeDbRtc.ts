@@ -6,7 +6,7 @@ import WDB, {
 	type SiteIDWire,
 	type WholeDbReplicator,
 } from './wholeDbReplicator'
-import { type DBAsync } from '@vlcn.io/xplat-api'
+import type { DBAsync } from '@vlcn.io/xplat-api'
 import Peer, { type PeerJSOption, type DataConnection } from 'peerjs'
 import { untrack } from 'solid-js'
 import { stringify as uuidStringify } from 'uuid'

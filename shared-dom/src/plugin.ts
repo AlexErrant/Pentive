@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { TarReader } from './tar'
 import { throwExp } from 'shared/utility'
-import { type PluginName, type PluginVersion } from 'shared/brand'
+import type { PluginName, PluginVersion } from 'shared/brand'
 
 export interface Plugin {
 	readonly name: PluginName

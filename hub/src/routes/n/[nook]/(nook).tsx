@@ -1,7 +1,7 @@
 import { createSignal, For, Show } from 'solid-js'
 import { getPosts, getNotes, type NoteSortColumn } from 'shared-edge'
 import { noteOrds, toSampleCard } from 'shared-dom/cardHtml'
-import { type NookId, type Ord } from 'shared/brand'
+import type { NookId, Ord } from 'shared/brand'
 import { ResizingIframe } from '~/components/resizingIframe'
 import { getUserId } from '~/session'
 import {

@@ -1,4 +1,4 @@
-import { type Hex } from 'shared/brand'
+import type { Hex } from 'shared/brand'
 import { ulidFactory } from 'ulid-workers'
 import { base16, base32crockford } from '@scure/base'
 

@@ -6,7 +6,7 @@ import {
 import * as Comlink from 'comlink'
 import type { Expose, PostMessageTypes } from './registerServiceWorker'
 import { NavigationRoute, registerRoute } from 'workbox-routing'
-import { type MediaId } from 'shared/brand'
+import type { MediaId } from 'shared/brand'
 import { sleep, throwExp } from 'shared/utility'
 
 declare let self: ServiceWorkerGlobalScope

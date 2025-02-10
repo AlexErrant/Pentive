@@ -1,5 +1,5 @@
-import { type RemoteTemplateId, type NookId, type UserId } from 'shared/brand'
-import { type NookType } from 'shared/domain/nook'
+import type { RemoteTemplateId, NookId, UserId } from 'shared/brand'
+import type { NookType } from 'shared/domain/nook'
 import {
 	undefinedMap,
 	throwExp,

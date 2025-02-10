@@ -1,6 +1,6 @@
 // copied from https://github.com/kobaltedev/kobalte/blob/5dd86f7f557fcb9f00b7b004aa0686ee61769330/apps/docs/src/components/icons.tsx
 
-import { type ComponentProps } from 'solid-js'
+import type { ComponentProps } from 'solid-js'
 
 export function SunIcon(props: ComponentProps<'svg'>) {
 	return (

@@ -1,11 +1,11 @@
-import { type Plugin } from 'shared-dom/plugin'
-import {
-	type Plugin as PluginEntity,
-	type Note as NoteEntity,
-	type RemoteNote,
-	type RemoteTemplate,
-	type Template as TemplateEntity,
-	type DB,
+import type { Plugin } from 'shared-dom/plugin'
+import type {
+	Plugin as PluginEntity,
+	Note as NoteEntity,
+	RemoteNote,
+	RemoteTemplate,
+	Template as TemplateEntity,
+	DB,
 } from './database'
 import {
 	type MediaId,
@@ -19,9 +19,9 @@ import {
 	type NoteId,
 	type RemoteNoteId,
 } from 'shared/brand'
-import { type Field, type Template } from 'shared/domain/template'
+import type { Field, Template } from 'shared/domain/template'
 import { imgPlaceholder } from 'shared/image'
-import { type TemplateType } from 'shared/schema'
+import type { TemplateType } from 'shared/schema'
 import {
 	parseSet,
 	parseMap,
@@ -29,7 +29,7 @@ import {
 	type SqliteCount,
 	type Rasterize,
 } from 'shared/utility'
-import { type Note } from 'shared/domain/note'
+import type { Note } from 'shared/domain/note'
 import { C, ky, tx } from '../topLevelAwait'
 import { jsonArrayFrom } from 'kysely/helpers/sqlite'
 import { sql, type AliasedRawBuilder, type ExpressionBuilder } from 'kysely'

@@ -1,10 +1,10 @@
-import { type DB, type Setting as SettingEntity } from '../sqlite/database'
-import {
-	type SelectQueryBuilder,
-	type ExpressionBuilder,
-	type OnConflictDatabase,
-	type OnConflictTables,
-	type InsertObject,
+import type { DB, Setting as SettingEntity } from '../sqlite/database'
+import type {
+	SelectQueryBuilder,
+	ExpressionBuilder,
+	OnConflictDatabase,
+	OnConflictTables,
+	InsertObject,
 } from 'kysely'
 import { chunk } from 'lodash-es'
 import { C, ky } from '../topLevelAwait'
@@ -15,12 +15,12 @@ import {
 	type UserSettingId,
 	userSettingId,
 } from 'shared/brand'
-import {
-	type CardSetting,
-	type UserSetting,
-	type Setting,
-	type SettingValue,
-	type SettingRecord,
+import type {
+	CardSetting,
+	UserSetting,
+	Setting,
+	SettingValue,
+	SettingRecord,
 } from 'shared/domain/setting'
 import { objEntries } from 'shared/utility'
 

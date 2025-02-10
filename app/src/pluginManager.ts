@@ -1,5 +1,5 @@
 import { freeze } from 'immer'
-import { type Plugin } from 'shared-dom/plugin'
+import type { Plugin } from 'shared-dom/plugin'
 import { blobToBase64 } from 'shared-dom/pluginManager'
 import {
 	defaultContainer,

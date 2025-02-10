@@ -1,9 +1,9 @@
 import { type CookieParseOptions, parse, serialize } from 'cookie-es'
 import { type SignJWT, jwtVerify } from 'jose'
 import { type WithRequired, concat } from 'shared/utility'
-import { type Base64, type Brand } from 'shared/brand'
+import type { Base64, Brand } from 'shared/brand'
 import { arrayToBase64, base64ToArray } from 'shared/binary'
-import { type CookieSerializeOptions } from 'vinxi/http'
+import type { CookieSerializeOptions } from 'vinxi/http'
 
 const encoder = new TextEncoder()
 const decoder = new TextDecoder()

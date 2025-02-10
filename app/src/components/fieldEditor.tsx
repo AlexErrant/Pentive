@@ -19,17 +19,17 @@ import { exampleSetup } from 'prosemirror-example-setup'
 import 'prosemirror-view/style/prosemirror.css'
 import 'prosemirror-menu/style/menu.css'
 import 'prosemirror-example-setup/style/style.css'
-import { type SetStoreFunction } from 'solid-js/store'
-import { type ImagePluginSettings } from 'prosemirror-image-plugin'
+import type { SetStoreFunction } from 'solid-js/store'
+import type { ImagePluginSettings } from 'prosemirror-image-plugin'
 import {
 	defaultSettings as imageSettings,
 	imagePlugin,
 } from 'prosemirror-image-plugin'
 import 'prosemirror-image-plugin/dist/styles/common.css'
 import 'prosemirror-image-plugin/dist/styles/withResize.css'
-import { type NoteCardView } from '../uiLogic/cards'
+import type { NoteCardView } from '../uiLogic/cards'
 import { toOneLine } from 'shared/htmlToText'
-import { type NoteId, type MediaId } from 'shared/brand'
+import type { NoteId, MediaId } from 'shared/brand'
 import { C } from '../topLevelAwait'
 import { parseHtml } from 'shared-dom/utility'
 // import "prosemirror-image-plugin/src/styles/sideResize.css"

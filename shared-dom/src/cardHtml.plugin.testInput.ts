@@ -1,6 +1,6 @@
-import {
-	type RenderContainer,
-	type RenderPluginExports,
+import type {
+	RenderContainer,
+	RenderPluginExports,
 } from './renderContainer'
 
 function renderTemplate(c: RenderContainer): RenderContainer['renderTemplate'] {

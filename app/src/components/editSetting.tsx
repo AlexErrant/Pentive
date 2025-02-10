@@ -1,4 +1,4 @@
-import { type JSONSchema7 } from 'json-schema'
+import type { JSONSchema7 } from 'json-schema'
 import { EditorState } from '@codemirror/state'
 import { EditorView, hoverTooltip } from '@codemirror/view'
 import { linter, lintGutter } from '@codemirror/lint'
@@ -22,7 +22,7 @@ import Ajv from 'ajv'
 import { C } from '../topLevelAwait'
 import { useThemeContext } from 'shared-dom/themeSelector'
 import { basicSetup } from 'shared-dom/codemirror'
-import { type Setting } from 'shared/domain/setting'
+import type { Setting } from 'shared/domain/setting'
 import { userSettingId } from 'shared/brand'
 
 const EditSetting: VoidComponent<{

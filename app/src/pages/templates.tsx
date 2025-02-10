@@ -1,7 +1,7 @@
 import { createStore } from 'solid-js/store'
 import { type JSX, Show, onMount, For } from 'solid-js'
 import TemplatesTable from '../components/templatesTable'
-import { type Template } from 'shared/domain/template'
+import type { Template } from 'shared/domain/template'
 import { getDefaultTemplate } from '../domain/utility'
 import ResizingIframe from '../components/resizingIframe'
 import { GoldenLayout, LayoutConfig } from 'golden-layout'

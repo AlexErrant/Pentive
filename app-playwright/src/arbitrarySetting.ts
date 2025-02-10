@@ -1,6 +1,6 @@
 import fc, { type Arbitrary } from 'fast-check'
-import { type CardSettingId } from 'shared/brand'
-import { type Setting } from 'shared/domain/setting'
+import type { CardSettingId } from 'shared/brand'
+import type { Setting } from 'shared/domain/setting'
 import { delimiter } from '../../app/src/sqlite/settings'
 
 type ExtractGeneric<Type> = Type extends Arbitrary<infer X> ? X : never

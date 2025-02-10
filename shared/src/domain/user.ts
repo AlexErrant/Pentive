@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { type PeerDisplayName, type PeerJsId } from '../brand'
+import type { PeerDisplayName, PeerJsId } from '../brand'
 
 export const peerDisplayNameValidator = z
 	.string()

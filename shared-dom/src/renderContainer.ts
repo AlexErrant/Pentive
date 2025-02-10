@@ -1,4 +1,4 @@
-import { type VoidComponent } from 'solid-js'
+import type { VoidComponent } from 'solid-js'
 import {
 	body,
 	html,
@@ -8,7 +8,7 @@ import {
 	noteOrds,
 	templateIndexes,
 } from './cardHtml'
-import { type RenderBodyInput } from './resizingIframe'
+import type { RenderBodyInput } from './resizingIframe'
 import {
 	toastError,
 	toastFatal,

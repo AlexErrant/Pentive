@@ -1,10 +1,10 @@
-import {
-	type Ord,
-	type RemoteTemplateId,
-	type TemplateId,
-	type NookId,
+import type {
+	Ord,
+	RemoteTemplateId,
+	TemplateId,
+	NookId,
 } from '../brand'
-import { type TemplateType } from '../schema'
+import type { TemplateType } from '../schema'
 
 export interface Field {
 	name: string

@@ -1,7 +1,7 @@
-import { type Context } from 'hono'
-import { type R2Bucket } from '@cloudflare/workers-types'
-import { type PublicMediaSecret } from 'shared-edge'
-import { type Base64 } from 'shared/brand'
+import type { Context } from 'hono'
+import type { R2Bucket } from '@cloudflare/workers-types'
+import type { PublicMediaSecret } from 'shared-edge'
+import type { Base64 } from 'shared/brand'
 
 export type ApiUgcContext = Context<{
 	 
