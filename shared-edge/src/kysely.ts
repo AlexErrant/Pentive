@@ -47,6 +47,8 @@ import {
 	type SqliteCount,
 	objEntries,
 	escapeRegExp,
+	epochToDate,
+	maybeEpochToDate,
 } from 'shared/utility'
 import { ulidAsHex, ulidAsRaw } from './convertBinary'
 import { base16 } from '@scure/base'
@@ -98,14 +100,6 @@ export async function getPosts({ nook }: { nook: string }): Promise<
 		.where('nook', '=', nook)
 		.execute()
 		.then((ps) => ps.map(mapIdToBase64Url))
-}
-
-export function epochToDate(epoch: number) {
-	return new Date(epoch * 1000)
-}
-function maybeEpochToDate(epoch: number | null | undefined) {
-	if (epoch == null) return null
-	return epochToDate(epoch)
 }
 
 function deserializeStatus(status: RawStatus): Status {

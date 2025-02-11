@@ -166,3 +166,18 @@ export async function retryWithTimeout<T>(
 ) {
 	return await retry(async () => await timeout(f, timeoutMs), count)
 }
+
+export function epochToDate(epoch: number) {
+	return new Date(epoch * 1000)
+}
+export function dateToEpoch(date: Date) {
+	return date.getTime() / 1000
+}
+export function maybeDateToEpoch(date: Date | null | undefined) {
+	if (date == null) return null
+	return dateToEpoch(date)
+}
+export function maybeEpochToDate(epoch: number | null | undefined) {
+	if (epoch == null) return null
+	return epochToDate(epoch)
+}

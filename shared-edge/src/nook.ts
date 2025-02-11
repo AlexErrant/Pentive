@@ -5,8 +5,9 @@ import {
 	throwExp,
 	assertNever,
 	type SqliteCount,
+	epochToDate,
 } from 'shared/utility'
-import { db, epochToDate, fromBase64Url } from './kysely'
+import { db, fromBase64Url } from './kysely'
 import { sql } from 'kysely'
 import { TRPCError } from '@trpc/server'
 
