@@ -5,6 +5,5 @@
 		"types": ["@cloudflare/workers-types", "vite/client"],
 		"lib": ["WebWorker", "DOM", "ES2022"]
 	},
-	"exclude": ["lib", "dist"],
 	"include": ["src/**/*", "tests/**/*", "tests-examples/**/*", "*.ts"]
 }

@@ -18,6 +18,13 @@
 		"skipLibCheck": true,
 		"resolveJsonModule": true,
 		"verbatimModuleSyntax": true,
+		"types": [], // https://github.com/microsoft/TypeScript/wiki/Performance#controlling-types-inclusion
 		"outDir": "${configDir}/lib"
-	}
+	},
+	"exclude": [
+		"${configDir}/node_modules",
+		"${configDir}/dist",
+		"${configDir}/lib",
+		"${configDir}/.*/"
+	]
 }

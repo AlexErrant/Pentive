@@ -6,6 +6,5 @@
 		"lib": ["WebWorker", "DOM", "ES2022"],
 		"types": ["vite/client"]
 	},
-	"exclude": ["lib", "dist"],
 	"include": ["src/**/*", "tests/**/*", "tests-examples/**/*", "*.ts"]
 }
