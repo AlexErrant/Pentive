@@ -37,7 +37,6 @@
 		"@types/sql.js": "^1.4.5",
 		"@types/uuid": "^9.0.4",
 		"autoprefixer": "^10.4.16",
-		"better-sqlite3": "^8.6.0",
 		"config": "workspace:*",
 		"copyfiles": "^2.4.1",
 		"get-tsconfig": "^4.7.2",
