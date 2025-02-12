@@ -5,5 +5,5 @@
 		"lib": ["WebWorker", "DOM", "DOM.Iterable", "ES2022"],
 		"types": ["@cloudflare/workers-types", "vite/client"]
 	},
-	"include": ["src/**/*", "*.ts"]
+	"include": ["src/**/*", "vite.config.ts", "buildHeaders.ts"]
 }

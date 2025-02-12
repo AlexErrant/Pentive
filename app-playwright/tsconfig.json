@@ -6,5 +6,12 @@
 		"lib": ["WebWorker", "DOM", "ES2022"],
 		"types": ["vite/client"]
 	},
-	"include": ["src/**/*", "tests/**/*", "tests-examples/**/*", "*.ts"]
+	"include": [
+		"src/**/*",
+		"tests/**/*",
+		"tests-examples/**/*",
+		"vite.config.ts",
+		"playwright.config.ts",
+		"env.d.ts"
+	]
 }

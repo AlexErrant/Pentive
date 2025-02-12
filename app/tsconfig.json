@@ -5,5 +5,13 @@
 		"types": ["@cloudflare/workers-types", "vite/client"],
 		"lib": ["WebWorker", "DOM", "ES2022"]
 	},
-	"include": ["src/**/*", "tests/**/*", "tests-examples/**/*", "*.ts"]
+	"include": [
+		"src/**/*",
+		"tests/**/*",
+		"tests-examples/**/*",
+		"nightwind-helper.d.ts",
+		"vite.config.ts",
+		"vitest.config.ts",
+		"buildHeaders.ts"
+	]
 }
