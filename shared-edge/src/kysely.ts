@@ -47,8 +47,10 @@ import {
 	type SqliteCount,
 	objEntries,
 	escapeRegExp,
+	type Rasterize,
 	epochToDate,
 	maybeEpochToDate,
+	dateToEpoch,
 } from 'shared/utility'
 import { ulidAsHex, ulidAsRaw } from './convertBinary'
 import { base16 } from '@scure/base'
@@ -66,6 +68,10 @@ export type * from 'kysely'
 export let db: Kysely<DB> = null as Kysely<DB>
 export let publicMediaSecretBase64: PublicMediaSecret =
 	null as PublicMediaSecret
+
+function setDb(ky: Kysely<DB>) {
+	db = ky
+}
 
 export function setKysely(
 	url: string,
@@ -176,6 +182,8 @@ function noteToNookView(x: {
 		til: maybeEpochToDate(x.til),
 		note: toNote(x, noteId, templateId),
 		template: toTemplate(x, templateId),
+		noteCreated: epochToDate(x.noteCreated),
+		noteEdited: epochToDate(x.noteEdited),
 	}
 }
 
@@ -235,13 +243,29 @@ export type NoteSortColumn =
 	| 'comments'
 	| 'til'
 
-export const pageSize = 3
+export type NoteCursor = Rasterize<
+	Record<Exclude<NoteSortColumn, 'til'>, number> & {
+		til: number | null
+		noteId: RemoteNoteId
+	}
+>
 
-export async function getNotes(x: {
+export let pageSize = 3
+
+function setPageSize(ps: number) {
+	pageSize = ps
+}
+
+export async function getNotes({
+	nook,
+	userId,
+	sortState,
+	cursor,
+}: {
 	nook: NookId
 	userId: UserId | null
-	sort?: Array<{ id: NoteSortColumn; desc: boolean }>
-	cursor: RemoteNoteId | null
+	sortState: Array<{ id: NoteSortColumn; desc: 'desc' | undefined }>
+	cursor: NoteCursor | null
 }) {
 	const r = await db
 		.selectFrom('note')
@@ -265,28 +289,57 @@ export async function getNotes(x: {
 			'template.type',
 			'template.status as templateStatus',
 		])
-		.$if(x.userId != null, (a) =>
+		.$if(userId != null, (a) =>
 			a.select((b) =>
 				b
 					.selectFrom('noteSubscriber')
 					.select(['til'])
-					.where('userId', '=', x.userId!)
+					.where('userId', '=', userId!)
 					.whereRef('noteSubscriber.noteId', '=', 'note.id')
 					.as('til'),
 			),
 		)
 		.$if(true, (qb) => {
-			for (const { id, desc } of x.sort ?? [
-				{ id: 'noteCreated', desc: true },
-			]) {
-				qb = qb.orderBy(id, desc ? 'desc' : undefined)
+			if (sortState.length === 0)
+				sortState.push({ id: 'noteCreated' as const, desc: 'desc' as const })
+			if (cursor != null) {
+				const sortCols = sortState.map((s) => s.id as string)
+				sortCols.push('note.id')
+				const sortVals = sortState.map((s) => cursor[s.id])
+				sortVals.push(fromBase64Url(cursor.noteId) as never)
+				qb = qb.where((eb) => {
+					// the for loops builds sql like the below
+					//   WHERE
+					//     noteCreated > ?
+					//     OR (noteCreated = ? AND noteEdited < ?)
+					//     OR (noteCreated = ? AND noteEdited = ? AND noteId < ?)
+					const whereRows = []
+					for (let iRow = 0; iRow < sortCols.length; iRow++) {
+						const whereCols = []
+						for (let iCol = 0; iCol <= iRow; iCol++) {
+							let op: '=' | '<' | '>' = '='
+							if (iRow === iCol) {
+								const { desc } =
+									sortState.find((x) => x.id === sortCols[iCol]) ??
+									sortState.at(-1)! // noteId is asc/desc depending on the last sort col
+								// eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+								op = desc ? '<' : '>'
+							}
+							whereCols.push(
+								eb(sortCols[iCol] as never, op, sortVals[iCol] as never),
+							)
+						}
+						whereRows.push(eb.and(whereCols))
+					}
+					return eb.or(whereRows)
+				})
 			}
-			return qb.orderBy('note.id', 'desc')
+			for (const { id, desc } of sortState) {
+				qb = qb.orderBy(id, desc)
+			}
+			return qb.orderBy('note.id', sortState.at(-1)!.desc) // noteId is asc/desc depending on the last sort col
 		})
-		.$if(x.cursor != null, (qb) =>
-			qb.where('note.id', '<', fromBase64Url(x.cursor!)),
-		)
-		.where('template.nook', '=', x.nook)
+		.where('template.nook', '=', nook)
 		.limit(pageSize)
 		.execute()
 	return r.map(noteToNookView)
@@ -1033,7 +1086,7 @@ async function toNoteCreate(
 	n: EditRemoteNote | CreateRemoteNote,
 	authorId: UserId,
 ) {
-	const edited = 'remoteId' in n ? new Date().getTime() / 1000 : undefined
+	const edited = 'remoteId' in n ? dateToEpoch(new Date()) : undefined
 	const remoteIdHex = base16.encode(remoteNoteId) as Hex
 	const remoteIdBase64url = arrayToBase64url(remoteNoteId) as RemoteNoteId
 	const hashAndRemoteMediaIds: Array<[Base64, RemoteMediaId]> = []
@@ -1320,8 +1373,18 @@ export function dbIdToBase64(dbId: DbId) {
 
 // use with .$call(log)
 export function log<T extends Compilable>(qb: T): T {
-	console.log('Query : ', qb.compile().query)
+	// console.log('Query : ', qb.compile().query)
 	console.log('SQL   : ', qb.compile().sql)
 	console.log('Params: ', qb.compile().parameters)
 	return qb
 }
+
+const forTestsOnly =
+	process.env.NODE_ENV === 'test'
+		? {
+				setPageSize,
+				setDb,
+			}
+		: (undefined as never)
+
+export { forTestsOnly }

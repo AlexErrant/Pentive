@@ -48,7 +48,7 @@ export function buildEslintConfig(importMetaUrl) {
 						'error',
 						{
 							allowAny: false,
-							allowNullableBoolean: false,
+							allowNullableBoolean: true,
 							allowNullableEnum: false,
 							allowNullableNumber: false,
 							allowNullableObject: false,

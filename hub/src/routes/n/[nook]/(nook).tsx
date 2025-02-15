@@ -1,7 +1,13 @@
 import { createSignal, For, Index, Show } from 'solid-js'
-import { getPosts, getNotes, type NoteSortColumn, pageSize } from 'shared-edge'
+import {
+	getPosts,
+	getNotes,
+	type NoteSortColumn,
+	pageSize,
+	type NoteCursor,
+} from 'shared-edge'
 import { noteOrds, toSampleCard } from 'shared-dom/cardHtml'
-import type { RemoteNoteId, NookId, Ord } from 'shared/brand'
+import type { NookId, Ord } from 'shared/brand'
 import { ResizingIframe } from '~/components/resizingIframe'
 import { getUserId } from '~/session'
 import {
@@ -27,6 +33,7 @@ import '@github/relative-time-element'
 import { createInfiniteQuery, keepPreviousData } from '@tanstack/solid-query'
 import { useUserIdContext } from '~/components/userIdContext'
 import { Dynamic } from 'solid-js/web'
+import { dateToEpoch } from 'shared/utility'
 
 const getPostsCached = query(async (nook: string) => {
 	'use server'
@@ -47,7 +54,11 @@ const getNotesCached = query(async (x: GetNotesParamOptionalUser) => {
 export const route = {
 	preload({ params }) {
 		void getPostsCached(params.nook!)
-		void getNotesCached({ nook: params.nook as NookId, cursor: null })
+		void getNotesCached({
+			nook: params.nook as NookId,
+			cursor: null,
+			sortState: [{ id: 'noteCreated', desc: 'desc' }],
+		})
 	},
 } satisfies RouteDefinition
 
@@ -57,7 +68,7 @@ export default function Nook(props: RouteSectionProps) {
 	const userId = useUserIdContext()
 	const [sort, setSort] = createSignal<
 		Array<{ id: NoteSortColumn; desc: boolean }>
-	>([])
+	>([{ id: 'noteCreated', desc: true }])
 	const [pagination, setPagination] = createSignal<PaginationState>({
 		pageIndex: 0,
 		pageSize,
@@ -69,20 +80,30 @@ export default function Nook(props: RouteSectionProps) {
 	const notes = createInfiniteQuery(() => {
 		const params = {
 			nook: props.params.nook as NookId,
-			sort: sort(),
+			sortState: sort().map((s) => ({
+				id: s.id,
+				desc: s.desc ? ('desc' as const) : undefined,
+			})),
 			userId: userId(),
 		}
 		return {
 			queryKey: ['nook/notes', params],
 			queryFn: async ({ pageParam }) =>
 				await getNotesCached({ cursor: pageParam, ...params }),
-			initialPageParam: null as RemoteNoteId | null,
+			initialPageParam: null as NoteCursor | null,
 			getNextPageParam: (lastPage) => {
 				if (lastPage.length < pageSize) {
 					return undefined
 				}
 				const lastItem = lastPage.slice(-1)[0]!
-				return lastItem.id
+				return {
+					noteId: lastItem.id,
+					subscribers: lastItem.subscribers,
+					noteCreated: dateToEpoch(lastItem.noteCreated),
+					noteEdited: dateToEpoch(lastItem.noteEdited),
+					comments: lastItem.comments,
+					til: lastItem.til?.getTime() ?? null,
+				} satisfies NoteCursor
 			},
 			refetchOnWindowFocus: false,
 			placeholderData: keepPreviousData,

@@ -4,5 +4,5 @@
 		"types": ["@cloudflare/workers-types"],
 		"lib": ["ES2022"]
 	},
-	"include": ["src/**/*", "./initIvy.ts"]
+	"include": ["src/**/*", "initIvy.ts", "tests/**/*", "vitest.config.ts"]
 }
