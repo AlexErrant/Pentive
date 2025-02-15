@@ -20,10 +20,47 @@ import { base16 } from '@scure/base'
 import { dateToEpoch, maybeDateToEpoch, throwExp } from 'shared/utility'
 import fc from 'fast-check'
 
-test('cursor/keyset pagination works for getNotes', async () => {
-	const ivySchemaPath = path.join(__dirname, '..', 'ivySchema.sql')
-	const sqlScript = await fs.promises.readFile(ivySchemaPath, 'utf8')
+const userId = 'Griddle' as UserId
+const nook = 'testnook' as NookId
 
+const ivySchemaPath = path.join(__dirname, '..', 'ivySchema.sql')
+const sqlScript = await fs.promises.readFile(ivySchemaPath, 'utf8')
+
+async function setupDb() {
+	const database = new Database(':memory:')
+	database.exec(sqlScript)
+	forTestsOnly.setDb(
+		new Kysely<DB>({
+			dialect: new SqliteDialect({
+				database,
+			}),
+		}),
+	)
+
+	await createNook({
+		nook,
+		nookType: 'public',
+		userId,
+		sidebar: '',
+		description: '',
+	})
+
+	const templateId = arrayToBase64url(ulidAsRaw()) as TemplateId
+	const template = getDefaultTemplate(templateId)
+	const templateResponse = await insertTemplates(userId, [
+		{
+			...template,
+			nooks: [nook],
+			localId: templateId,
+			fields: template.fields.map((f) => f.name),
+		},
+	])
+	const remoteTemplateId = Array.from(templateResponse.values())[0]![0]
+
+	return { database, remoteTemplateId }
+}
+
+test('cursor/keyset pagination works for getNotes', async () => {
 	const sortState = fc
 		.tuple(
 			fc.boolean().map((desc) => ({
@@ -51,39 +88,7 @@ test('cursor/keyset pagination works for getNotes', async () => {
 				sortState,
 			}),
 			async ({ createdEditeds, sortState }) => {
-				const database = new Database(':memory:')
-				database.exec(sqlScript)
-				forTestsOnly.setDb(
-					new Kysely<DB>({
-						dialect: new SqliteDialect({
-							database,
-						}),
-					}),
-				)
-
-				const userId = 'Griddle' as UserId
-				const nook = 'testnook' as NookId
-
-				await createNook({
-					nook,
-					nookType: 'public',
-					userId,
-					sidebar: '',
-					description: '',
-				})
-
-				const templateId = arrayToBase64url(ulidAsRaw()) as TemplateId
-				const template = getDefaultTemplate(templateId)
-				const templateResponse = await insertTemplates(userId, [
-					{
-						...template,
-						nooks: [nook],
-						localId: templateId,
-						fields: template.fields.map((f) => f.name),
-					},
-				])
-				const remoteTemplateId = Array.from(templateResponse.values())[0]![0]
-
+				const { database, remoteTemplateId } = await setupDb()
 				const jsSorted: SimplifiedNote[] = []
 				for (const { created, edited } of createdEditeds) {
 					const noteResponse = await insertNotes(userId, [
