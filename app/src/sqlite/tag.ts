@@ -4,7 +4,7 @@ import { type InsertObject, sql } from 'kysely'
 import type { CardTag, DB, NoteTag } from './database'
 
 export const tagCollectionMethods = {
-	getTags: async function () {
+	async getTags () {
 		const tags = await ky
 			.selectFrom('distinctCardTag')
 			.select('tag')
@@ -13,7 +13,7 @@ export const tagCollectionMethods = {
 			.execute()
 		return tags.map((t) => t.tag)
 	},
-	saveTags: async function (noteId: NoteId, tags: string[]) {
+	async saveTags (noteId: NoteId, tags: string[]) {
 		const noteDbId = toLDbId(noteId)
 		await saveTags(
 			[noteDbId],

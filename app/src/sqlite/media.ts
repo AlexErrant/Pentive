@@ -18,7 +18,7 @@ function entityToDomain(entity: MediaEntity): Media {
 type MediaSansHash = Omit<Media, 'hash'>
 
 export const mediaCollectionMethods = {
-	insertMedia: async function (media: MediaSansHash) {
+	async insertMedia (media: MediaSansHash) {
 		const now = C.getDate().getTime()
 		const hash = await crypto.subtle.digest('SHA-256', media.data)
 		await rd.exec(

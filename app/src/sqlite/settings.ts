@@ -25,10 +25,10 @@ import type {
 import { objEntries } from 'shared/utility'
 
 export const settingsCollectionMethods = {
-	deleteAllSettings: async function () {
+	async deleteAllSettings () {
 		await ky.deleteFrom('setting').execute()
 	},
-	bulkUploadSettings: async function (settings: Setting[]) {
+	async bulkUploadSettings (settings: Setting[]) {
 		const entities = settings.flatMap((setting) =>
 			objEntries(flattenObject(setting)).map(
 				([key, value]) =>
@@ -55,7 +55,7 @@ export const settingsCollectionMethods = {
 				.execute()
 		}
 	},
-	getSettings: async function (
+	async getSettings (
 		func?: (
 			qb: SelectQueryBuilder<DB, 'setting', Record<never, never>>,
 		) => SelectQueryBuilder<DB, 'setting', Record<never, never>>,
@@ -96,14 +96,14 @@ export const settingsCollectionMethods = {
 		}
 		return r
 	},
-	getCardSettings: async function () {
+	async getCardSettings () {
 		const r = await this.getSettings(
 			(db) => db.where('id', '<>', toLDbId(userSettingId)),
 			true,
 		)
 		return r as CardSetting[]
 	},
-	getUserSettings: async function () {
+	async getUserSettings () {
 		const r = await this.getSettings((db) =>
 			db.where('id', '=', toLDbId(userSettingId)),
 		)

@@ -23,6 +23,7 @@ export function buildEslintConfig(importMetaUrl) {
 			tseslint.configs.stylisticTypeChecked,
 			{
 				rules: {
+					'object-shorthand': 'error',
 					eqeqeq: ['error', 'smart'],
 					'@typescript-eslint/no-import-type-side-effects': 'error',
 					'@typescript-eslint/consistent-type-imports': [

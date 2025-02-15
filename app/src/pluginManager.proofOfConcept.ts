@@ -19,7 +19,7 @@ const plugin = (c: Container): Partial<Container> => {
 		regex: () => {
 			return `plugin_regex(${c.regex()})`
 		},
-		render: function (i) {
+		render (i) {
 			return `plugin_render(${c.render.bind(this)(i)})`
 			// The `bind(this)` is very important! In the original container, `render` has a dependency on `regex` (L12).
 			// The plugin's render (L22) calls the container's  `render` (L23) which in turn calls the container's `regex` (L12).

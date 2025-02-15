@@ -127,10 +127,10 @@ type NoteFieldValueRowid = {
 }
 
 export const noteCollectionMethods = {
-	upsertNote: async function (note: Note) {
+	async upsertNote (note: Note) {
 		await this.bulkUpsertNotes([note])
 	},
-	bulkUpsertNotes: async function (notes: Note[]) {
+	async bulkUpsertNotes (notes: Note[]) {
 		const batches = chunk(notes.map(noteToDocType), 1000)
 		await tx(async (db) => {
 			try {
@@ -222,7 +222,7 @@ JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field
 			}
 		})
 	},
-	getNote: async function (noteId: NoteId) {
+	async getNote (noteId: NoteId) {
 		const noteDbId = toLDbId(noteId)
 		const remoteNotes = await ky
 			.selectFrom('remoteNote')
@@ -238,7 +238,7 @@ JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field
 			.executeTakeFirst()
 		return note == null ? null : noteEntityToDomain(note, remoteNotes)
 	},
-	getNotesByIds: async function (noteIds: NoteId[]) {
+	async getNotesByIds (noteIds: NoteId[]) {
 		const noteDbIds = noteIds.map(toLDbId)
 		const remoteNotes = await ky
 			.selectFrom('remoteNote')
@@ -259,7 +259,7 @@ JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field
 			),
 		)
 	},
-	getNewNotesToUpload: async function (noteId?: NoteId, nook?: NookId) {
+	async getNewNotesToUpload (noteId?: NoteId, nook?: NookId) {
 		const remoteTemplates = await ky
 			.selectFrom('remoteTemplate')
 			.selectAll()
@@ -287,7 +287,7 @@ JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field
 				.map(async (n) => await remotifyNote(n).then((x) => x.note)),
 		)
 	},
-	getNewNotesToUploadDom: async function (noteId?: NoteId) {
+	async getNewNotesToUploadDom (noteId?: NoteId) {
 		const remoteNotes = await ky
 			.selectFrom('remoteNote')
 			.selectAll()
@@ -316,7 +316,7 @@ JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field
 				}),
 			)
 	},
-	getEditedNotesToUpload: async function (noteId?: NoteId, nook?: NookId) {
+	async getEditedNotesToUpload (noteId?: NoteId, nook?: NookId) {
 		const remoteTemplates = await ky
 			.selectFrom('remoteTemplate')
 			.selectAll()
@@ -361,7 +361,7 @@ JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field
 				.map(async (n) => await remotifyNote(n).then((x) => x.note)),
 		)
 	},
-	getEditedNotesToUploadDom: async function (noteId?: NoteId) {
+	async getEditedNotesToUploadDom (noteId?: NoteId) {
 		const remoteNotes = await ky
 			.selectFrom('remoteNote')
 			.leftJoin('noteBase', 'remoteNote.localId', 'noteBase.id')
@@ -393,7 +393,7 @@ JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field
 			)
 	},
 	getMediaToUpload,
-	makeNoteUploadable: async function (
+	async makeNoteUploadable (
 		remoteNote: Override<
 			InsertObject<DB, 'remoteNote'>,
 			{ localId: RemoteNote['localId'] }
@@ -446,7 +446,7 @@ JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field
 			}
 		})
 	},
-	makeNoteNotUploadable: async function (noteId: NoteId, nook: NookId) {
+	async makeNoteNotUploadable (noteId: NoteId, nook: NookId) {
 		const noteDbId = toLDbId(noteId)
 		await tx(async (db) => {
 			const r1 = await db
@@ -465,7 +465,7 @@ JOIN noteFieldValue ON noteFieldValue.noteId = x.noteId AND noteFieldValue.field
 				.execute()
 		})
 	},
-	hasRemoteNote: async function (remoteNoteId: RemoteNoteId) {
+	async hasRemoteNote (remoteNoteId: RemoteNoteId) {
 		const r = await ky
 			.selectFrom('remoteNote')
 			.where('remoteId', '=', toLDbId(remoteNoteId))
