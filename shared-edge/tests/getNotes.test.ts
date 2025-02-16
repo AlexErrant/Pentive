@@ -60,6 +60,47 @@ async function setupDb() {
 	return { database, remoteTemplateId }
 }
 
+async function getAllNotes(
+	sortState: Array<
+		| {
+				id: 'noteCreated'
+				desc: 'desc' | undefined
+		  }
+		| {
+				id: 'noteEdited'
+				desc: 'desc' | undefined
+		  }
+	>,
+) {
+	const paginatedNotes = [] as Note[]
+	do {
+		const last = paginatedNotes.at(-1)
+		const cursor =
+			last == null
+				? null
+				: ({
+						noteCreated: dateToEpoch(last.noteCreated),
+						noteEdited: dateToEpoch(last.noteEdited),
+						subscribers: last.subscribers,
+						comments: last.comments,
+						til: maybeDateToEpoch(last.til),
+						noteId: last.id,
+					} satisfies NoteCursor)
+		const page = await getNotes({
+			nook,
+			userId,
+			sortState,
+			cursor,
+		})
+		if (page.length === 0) {
+			break
+		} else {
+			paginatedNotes.push(...page)
+		}
+	} while (true as boolean)
+	return paginatedNotes
+}
+
 test('cursor/keyset pagination works for getNotes', async () => {
 	const sortState = fc
 		.tuple(
@@ -118,34 +159,8 @@ test('cursor/keyset pagination works for getNotes', async () => {
 				}).then((x) => x.map(simplifyNote))
 
 				// Act
-
 				forTestsOnly.setPageSize(3)
-				const paginatedNotes = [] as Note[]
-				do {
-					const last = paginatedNotes.at(-1)
-					const cursor =
-						last == null
-							? null
-							: ({
-									noteCreated: dateToEpoch(last.noteCreated),
-									noteEdited: dateToEpoch(last.noteEdited),
-									subscribers: last.subscribers,
-									comments: last.comments,
-									til: maybeDateToEpoch(last.til),
-									noteId: last.id,
-								} satisfies NoteCursor)
-					const page = await getNotes({
-						nook,
-						userId,
-						sortState,
-						cursor,
-					})
-					if (page.length === 0) {
-						break
-					} else {
-						paginatedNotes.push(...page)
-					}
-				} while (true as boolean)
+				const paginatedNotes = await getAllNotes(sortState)
 
 				// Assert
 				const actualNotes = paginatedNotes.map(simplifyNote)
@@ -242,32 +257,7 @@ test('multiple sort columns search using indexes', async () => {
 	database.exec(`RELEASE SAVEPOINT my_savepoint;`)
 
 	// Act
-	const paginatedNotes = [] as Note[]
-	do {
-		const last = paginatedNotes.at(-1)
-		const cursor =
-			last == null
-				? null
-				: ({
-						noteCreated: dateToEpoch(last.noteCreated),
-						noteEdited: dateToEpoch(last.noteEdited),
-						subscribers: last.subscribers,
-						comments: last.comments,
-						til: maybeDateToEpoch(last.til),
-						noteId: last.id,
-					} satisfies NoteCursor)
-		const page = await getNotes({
-			nook,
-			userId,
-			sortState,
-			cursor,
-		})
-		if (page.length === 0) {
-			break
-		} else {
-			paginatedNotes.push(...page)
-		}
-	} while (true as boolean)
+	await getAllNotes(sortState)
 
 	// Assert
 	const midpoint = Math.round(forTestsOnly.sqlLog.length / 2)
