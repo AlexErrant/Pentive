@@ -62,6 +62,7 @@ import {
 	base64urlToArray,
 } from 'shared/binary'
 import { buildPublicToken, type PublicMediaSecret } from './publicToken'
+import type { CompiledQuery } from 'kysely'
 export type * from 'kysely'
 
 // @ts-expect-error db calls should throw null error if not setup
@@ -267,7 +268,7 @@ export async function getNotes({
 	sortState: Array<{ id: NoteSortColumn; desc: 'desc' | undefined }>
 	cursor: NoteCursor | null
 }) {
-	const r = await db
+	const r = db
 		.selectFrom('note')
 		.innerJoin('template', 'template.id', 'note.templateId')
 		.select([
@@ -341,8 +342,8 @@ export async function getNotes({
 		})
 		.where('template.nook', '=', nook)
 		.limit(pageSize)
-		.execute()
-	return r.map(noteToNookView)
+	if (process.env.NODE_ENV === 'test') sqlLog.push(r.compile())
+	return (await r.execute()).map(noteToNookView)
 }
 
 export async function getNote(noteId: RemoteNoteId, userId: UserId | null) {
@@ -1379,11 +1380,14 @@ export function log<T extends Compilable>(qb: T): T {
 	return qb
 }
 
+const sqlLog: CompiledQuery[] = []
+
 const forTestsOnly =
 	process.env.NODE_ENV === 'test'
 		? {
 				setPageSize,
 				setDb,
+				sqlLog,
 			}
 		: (undefined as never)
 

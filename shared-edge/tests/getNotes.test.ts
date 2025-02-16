@@ -1,5 +1,5 @@
 import { Kysely, SqliteDialect } from 'kysely'
-import { assert, test } from 'vitest'
+import { assert, expect, test } from 'vitest'
 import {
 	ulidAsRaw,
 	type DB,
@@ -172,6 +172,7 @@ interface SimplifiedNote {
 	remoteNoteId: Uint8Array<ArrayBuffer>
 }
 
+// https://stackoverflow.com/a/9175302
 function sort(
 	a: SimplifiedNote,
 	b: SimplifiedNote,
@@ -205,3 +206,98 @@ function sort(
 	throwExp()
 	/* eslint-enable @typescript-eslint/strict-boolean-expressions */
 }
+
+test('multiple sort columns search using indexes', async () => {
+	const rows = 1000
+	const { database, remoteTemplateId } = await setupDb()
+	const sortState = [
+		{
+			id: 'noteCreated' as const,
+			desc: undefined,
+		},
+		{
+			id: 'noteEdited' as const,
+			desc: 'desc' as const,
+		},
+	]
+	database.exec(`SAVEPOINT my_savepoint;`)
+	for (let index = 0; index < rows; index++) {
+		const noteResponse = await insertNotes(userId, [
+			{
+				localId: arrayToBase64url(ulidAsRaw()) as NoteId,
+				fieldValues: {},
+				tags: [],
+				remoteTemplateIds: [remoteTemplateId],
+			},
+		])
+		const remoteNoteId = Array.from(noteResponse.values())[0]![0]
+		const rawRemoteNoteId = base64urlToArray(remoteNoteId)
+		const hexNoteId = base16.encode(rawRemoteNoteId)
+		const created = Math.round((Math.random() * rows) / 10)
+		const edited = Math.round(Math.random() * rows)
+		database.exec(
+			`UPDATE note SET created = ${created}, edited = ${edited} WHERE id = unhex('${hexNoteId}')`,
+		)
+	}
+	database.exec(`RELEASE SAVEPOINT my_savepoint;`)
+
+	// Act
+	const paginatedNotes = [] as Note[]
+	do {
+		const last = paginatedNotes.at(-1)
+		const cursor =
+			last == null
+				? null
+				: ({
+						noteCreated: dateToEpoch(last.noteCreated),
+						noteEdited: dateToEpoch(last.noteEdited),
+						subscribers: last.subscribers,
+						comments: last.comments,
+						til: maybeDateToEpoch(last.til),
+						noteId: last.id,
+					} satisfies NoteCursor)
+		const page = await getNotes({
+			nook,
+			userId,
+			sortState,
+			cursor,
+		})
+		if (page.length === 0) {
+			break
+		} else {
+			paginatedNotes.push(...page)
+		}
+	} while (true as boolean)
+
+	// Assert
+	const midpoint = Math.round(forTestsOnly.sqlLog.length / 2)
+	const { sql, parameters } = forTestsOnly.sqlLog.at(midpoint)!
+
+	database.exec('ANALYZE;')
+	const queryPlan = database
+		.prepare(`EXPLAIN QUERY PLAN ${sql}`)
+		.all(parameters) as Array<{
+		detail: string
+	}>
+
+	const details = queryPlan.map((q) => q.detail).join('\n')
+
+	// I'm not thrilled at `SCAN note USING INDEX` but whatever
+	expect(details).matches(
+		new RegExp(`(SCAN template
+MULTI-INDEX OR
+INDEX 1
+SEARCH note USING INDEX note.*?_idx .*?
+INDEX 2
+SEARCH note USING INDEX note_.*?_idx .*?
+INDEX 3
+SEARCH note USING INDEX note_.*?_idx .*?
+CORRELATED SCALAR SUBQUERY 1
+SEARCH noteSubscriber USING INDEX sqlite_autoindex_noteSubscriber_1 \\(noteId=\\? AND userId=\\?\\)
+USE TEMP B-TREE FOR ORDER BY)|(SCAN note USING INDEX note_.*?_idx
+SCAN template
+CORRELATED SCALAR SUBQUERY 1
+SEARCH noteSubscriber USING INDEX sqlite_autoindex_noteSubscriber_1 \\(noteId=\\? AND userId=\\?\\)
+USE TEMP B-TREE FOR LAST 2 TERMS OF ORDER BY)`),
+	)
+})

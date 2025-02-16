@@ -48,6 +48,21 @@ create table note
     foreign key (authorId) references user(id)
 ) STRICT;
 
+create index note_created_idx
+    on note (created);
+
+create index note_edited_idx
+    on note (edited);
+
+create index note_commentsCount_idx
+    on note (commentsCount);
+
+create index note_subscribersCount_idx
+    on note (subscribersCount);
+
+create index note_status_idx
+    on note (status);
+
 create index note_ankiId_idx
     on note (ankiId);
 
