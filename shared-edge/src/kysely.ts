@@ -342,8 +342,13 @@ export async function getNotes({
 		})
 		.where('template.nook', '=', nook)
 		.limit(pageSize)
-	if (process.env.NODE_ENV === 'test') sqlLog.push(r.compile())
-	return (await r.execute()).map(noteToNookView)
+	const returnValue = (await r.execute()).map(noteToNookView)
+	if (process.env.NODE_ENV === 'test')
+		sqlLog.push({
+			...r.compile(),
+			return: returnValue.map((x) => x.id),
+		})
+	return returnValue
 }
 
 export async function getNote(noteId: RemoteNoteId, userId: UserId | null) {
@@ -1380,7 +1385,8 @@ export function log<T extends Compilable>(qb: T): T {
 	return qb
 }
 
-const sqlLog: CompiledQuery[] = []
+type SqlLog = CompiledQuery & { return: unknown }
+const sqlLog: SqlLog[] = []
 
 const forTestsOnly =
 	process.env.NODE_ENV === 'test'
@@ -1388,7 +1394,22 @@ const forTestsOnly =
 				setPageSize,
 				setDb,
 				sqlLog,
+				resetSqlLog,
 			}
 		: (undefined as never)
 
 export { forTestsOnly }
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function prettierSqlLog({ query, ...log }: SqlLog) {
+	return {
+		...log,
+		parameters: log.parameters.map((p) =>
+			ArrayBuffer.isView(p) ? arrayToBase64url(new Uint8Array(p.buffer)) : p,
+		),
+	}
+}
+
+export function resetSqlLog() {
+	sqlLog.splice(0, forTestsOnly.sqlLog.length)
+}

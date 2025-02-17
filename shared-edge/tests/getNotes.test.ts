@@ -9,6 +9,7 @@ import {
 	getNotes,
 	type NoteCursor,
 	forTestsOnly,
+	prettierSqlLog,
 } from '../src'
 import { arrayToBase64url, base64urlToArray } from 'shared/binary'
 import type { NookId, NoteId, TemplateId, UserId } from 'shared/brand'
@@ -129,6 +130,7 @@ test('cursor/keyset pagination works for getNotes', async () => {
 				sortState,
 			}),
 			async ({ createdEditeds, sortState }) => {
+				forTestsOnly.resetSqlLog()
 				const { database, remoteTemplateId } = await setupDb()
 				const jsSorted: SimplifiedNote[] = []
 				for (const { created, edited } of createdEditeds) {
@@ -164,12 +166,28 @@ test('cursor/keyset pagination works for getNotes', async () => {
 
 				// Assert
 				const actualNotes = paginatedNotes.map(simplifyNote)
-				assert.sameDeepOrderedMembers(actualNotes, jsSorted)
-				assert.sameDeepOrderedMembers(actualNotes, sqlSorted)
+				try {
+					assert.sameDeepOrderedMembers(actualNotes, jsSorted)
+					assert.sameDeepOrderedMembers(actualNotes, sqlSorted)
+				} catch (e) {
+					console.log('=================================================')
+					console.log('sortState', sortState)
+					console.log('actualNotes', actualNotes.map(prettier))
+					console.log('jsSorted', jsSorted.map(prettier))
+					console.log('sqlLog', forTestsOnly.sqlLog.map(prettierSqlLog))
+					throw e
+				}
 			},
 		),
 	)
 })
+
+function prettier({ remoteNoteId, ...n }: SimplifiedNote) {
+	return {
+		...n,
+		id: arrayToBase64url(remoteNoteId),
+	}
+}
 
 type Note = Awaited<ReturnType<typeof getNotes>>[0]
 
