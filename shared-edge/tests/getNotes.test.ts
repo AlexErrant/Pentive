@@ -8,8 +8,7 @@ import {
 	insertNotes,
 	getNotes,
 	type NoteCursor,
-	forTestsOnly,
-	prettierSqlLog,
+	_kysely,
 } from '../src'
 import { arrayToBase64url, base64urlToArray } from 'shared/binary'
 import type { NookId, NoteId, TemplateId, UserId } from 'shared/brand'
@@ -30,7 +29,7 @@ const sqlScript = await fs.promises.readFile(ivySchemaPath, 'utf8')
 async function setupDb() {
 	const database = new Database(':memory:')
 	database.exec(sqlScript)
-	forTestsOnly.setDb(
+	_kysely.setDb(
 		new Kysely<DB>({
 			dialect: new SqliteDialect({
 				database,
@@ -130,7 +129,7 @@ test('cursor/keyset pagination works for getNotes', async () => {
 				sortState,
 			}),
 			async ({ createdEditeds, sortState }) => {
-				forTestsOnly.resetSqlLog()
+				_kysely.resetSqlLog()
 				const { database, remoteTemplateId } = await setupDb()
 				const jsSorted: SimplifiedNote[] = []
 				for (const { created, edited } of createdEditeds) {
@@ -152,7 +151,7 @@ test('cursor/keyset pagination works for getNotes', async () => {
 				}
 				jsSorted.sort((a, b) => sort(a, b, sortState))
 
-				forTestsOnly.setPageSize(100_000_000)
+				_kysely.setPageSize(100_000_000)
 				const sqlSorted = await getNotes({
 					nook,
 					userId,
@@ -161,7 +160,7 @@ test('cursor/keyset pagination works for getNotes', async () => {
 				}).then((x) => x.map(simplifyNote))
 
 				// Act
-				forTestsOnly.setPageSize(3)
+				_kysely.setPageSize(3)
 				const paginatedNotes = await getAllNotes(sortState)
 
 				// Assert
@@ -174,7 +173,7 @@ test('cursor/keyset pagination works for getNotes', async () => {
 					console.log('sortState', sortState)
 					console.log('actualNotes', actualNotes.map(prettier))
 					console.log('jsSorted', jsSorted.map(prettier))
-					console.log('sqlLog', forTestsOnly.sqlLog.map(prettierSqlLog))
+					console.log('sqlLog', _kysely.sqlLog.map(_kysely.prettierSqlLog))
 					throw e
 				}
 			},
@@ -278,8 +277,8 @@ test('multiple sort columns search using indexes', async () => {
 	await getAllNotes(sortState)
 
 	// Assert
-	const midpoint = Math.round(forTestsOnly.sqlLog.length / 2)
-	const { sql, parameters } = forTestsOnly.sqlLog.at(midpoint)!
+	const midpoint = Math.round(_kysely.sqlLog.length / 2)
+	const { sql, parameters } = _kysely.sqlLog.at(midpoint)!
 
 	database.exec('ANALYZE;')
 	const queryPlan = database

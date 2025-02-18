@@ -70,10 +70,6 @@ export let db: Kysely<DB> = null as Kysely<DB>
 export let publicMediaSecretBase64: PublicMediaSecret =
 	null as PublicMediaSecret
 
-function setDb(ky: Kysely<DB>) {
-	db = ky
-}
-
 export function setKysely(
 	url: string,
 	authToken: string,
@@ -253,10 +249,6 @@ export type NoteCursor = Rasterize<
 
 export let pageSize = 3
 
-function setPageSize(ps: number) {
-	pageSize = ps
-}
-
 export async function getNotes({
 	nook,
 	userId,
@@ -344,7 +336,7 @@ export async function getNotes({
 		.limit(pageSize)
 	const returnValue = (await r.execute()).map(noteToNookView)
 	if (process.env.NODE_ENV === 'test')
-		sqlLog.push({
+		_kysely.sqlLog.push({
 			...r.compile(),
 			return: returnValue.map((x) => x.id),
 		})
@@ -1379,37 +1371,40 @@ export function dbIdToBase64(dbId: DbId) {
 
 // use with .$call(log)
 export function log<T extends Compilable>(qb: T): T {
+	const { sql, parameters } = qb.compile()
 	// console.log('Query : ', qb.compile().query)
-	console.log('SQL   : ', qb.compile().sql)
-	console.log('Params: ', qb.compile().parameters)
+	console.log('SQL   : ', sql)
+	console.log('Params: ', parameters)
 	return qb
 }
 
 type SqlLog = CompiledQuery & { return: unknown }
-const sqlLog: SqlLog[] = []
 
-const forTestsOnly =
+const _kysely =
 	process.env.NODE_ENV === 'test'
 		? {
-				setPageSize,
-				setDb,
-				sqlLog,
-				resetSqlLog,
+				setPageSize: (ps: number) => {
+					pageSize = ps
+				},
+				setDb: (ky: Kysely<DB>) => {
+					db = ky
+				},
+				sqlLog: [] as SqlLog[],
+				resetSqlLog() {
+					this.sqlLog.splice(0, this.sqlLog.length)
+				},
+				// eslint-disable-next-line @typescript-eslint/no-unused-vars
+				prettierSqlLog: ({ query, ...log }: SqlLog) => {
+					return {
+						...log,
+						parameters: log.parameters.map((p) =>
+							ArrayBuffer.isView(p)
+								? arrayToBase64url(new Uint8Array(p.buffer))
+								: p,
+						),
+					}
+				},
 			}
 		: (undefined as never)
 
-export { forTestsOnly }
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function prettierSqlLog({ query, ...log }: SqlLog) {
-	return {
-		...log,
-		parameters: log.parameters.map((p) =>
-			ArrayBuffer.isView(p) ? arrayToBase64url(new Uint8Array(p.buffer)) : p,
-		),
-	}
-}
-
-export function resetSqlLog() {
-	sqlLog.splice(0, forTestsOnly.sqlLog.length)
-}
+export { _kysely }
