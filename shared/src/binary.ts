@@ -47,3 +47,15 @@ export function uint8ArrayToNumber(arr: Uint8Array): number {
 	}
 	return num
 }
+
+export function incrementUint8Array(arr: Uint8Array): void {
+	for (let i = arr.length - 1; i >= 0; i--) {
+		if (arr[i]! < 255) {
+			arr[i]!++
+			return
+		}
+		arr[i] = 0
+	}
+	throw new Error('Overflow: Cannot increment beyond maximum value')
+}
+
