@@ -7,6 +7,8 @@ import {
 	prefixEpochToArray,
 	epochLength,
 	idToEpoch,
+	idFactory,
+	arrayToBase64url,
 } from '../src/binary'
 
 const epochMax = Math.pow(2, epochLength * 8) - 1 // https://github.com/ulid/spec#overflow-errors-when-parsing-base32-strings
@@ -112,4 +114,12 @@ test('incrementRandom increments, max', () => {
 	expect(() => {
 		incrementRandom(max)
 	}).toThrowError('max random reached')
+})
+
+test.skip('interactive test of idFactory', () => {
+	const factory = idFactory()
+	for (let index = 0; index < 1000; index++) {
+		const id = factory()
+		console.log(arrayToBase64url(id), ' ', id.join(' '))
+	}
 })

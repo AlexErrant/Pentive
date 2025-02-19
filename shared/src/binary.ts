@@ -61,3 +61,20 @@ export function incrementRandom(arr: Uint8Array): void {
 	throw new Error('max random reached')
 }
 
+// inspired by https://github.com/ryan-mars/ulid-workers/blob/06689d9ddd894bfc608c6131f9bbd2a8b48bcbc8/src/ulid.ts#L147
+export function idFactory() {
+	let lastTime = -1
+	const lastId = new Uint8Array(idLength)
+	return (epochMs?: number) => {
+		epochMs ??= Date.now()
+		if (epochMs > lastTime) {
+			lastTime = epochMs
+			crypto.getRandomValues(lastId)
+			prefixEpochToArray(epochMs, lastId)
+			return new Uint8Array(lastId)
+		} else {
+			incrementRandom(lastId)
+			return new Uint8Array(lastId)
+		}
+	}
+}
