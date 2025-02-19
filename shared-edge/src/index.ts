@@ -1,4 +1,3 @@
-export * from './convertBinary'
 export * from './kysely'
 export * from './nook'
 export * from './user'

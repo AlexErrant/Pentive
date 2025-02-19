@@ -52,7 +52,6 @@ import {
 	maybeEpochToDate,
 	dateToEpoch,
 } from 'shared/utility'
-import { ulidAsHex, ulidAsRaw } from './convertBinary'
 import { base16 } from '@scure/base'
 import { createClient } from '@libsql/client/web'
 import {
@@ -60,6 +59,8 @@ import {
 	arrayToBase64url,
 	base64ToArray,
 	base64urlToArray,
+	hexId,
+	rawId,
 } from 'shared/binary'
 import { buildPublicToken, type PublicMediaSecret } from './publicToken'
 import type { CompiledQuery } from 'kysely'
@@ -685,7 +686,7 @@ export async function insertTemplateComment(
 				tx
 					.insertInto('templateComment')
 					.values({
-						id: unhex(ulidAsHex()),
+						id: unhex(hexId()),
 						authorId,
 						level: 0,
 						templateId: templateDbId,
@@ -722,7 +723,7 @@ export async function insertTemplateChildComment(
 				await tx
 					.insertInto('templateComment')
 					.values({
-						id: unhex(ulidAsHex()),
+						id: unhex(hexId()),
 						authorId,
 						level: parent.level + 1,
 						templateId: parent.templateId,
@@ -762,7 +763,7 @@ export async function insertNoteComment(
 				tx
 					.insertInto('noteComment')
 					.values({
-						id: unhex(ulidAsHex()),
+						id: unhex(hexId()),
 						authorId,
 						level: 0,
 						noteId: noteDbId,
@@ -799,7 +800,7 @@ export async function insertNoteChildComment(
 				await tx
 					.insertInto('noteComment')
 					.values({
-						id: unhex(ulidAsHex()),
+						id: unhex(hexId()),
 						authorId,
 						level: parent.level + 1,
 						noteId: parent.noteId,
@@ -1073,7 +1074,7 @@ async function toNoteCreates(
 						remoteTemplateId,
 					]),
 				)
-			: new Map(n.remoteTemplateIds.map((rt) => [ulidAsRaw(), rt]))
+			: new Map(n.remoteTemplateIds.map((rt) => [rawId(), rt]))
 	return await Promise.all(
 		Array.from(remoteIds).map(async (x) => await toNoteCreate(x, n, authorId)),
 	)
@@ -1159,7 +1160,7 @@ async function toTemplateCreates(
 	const remoteIds =
 		'remoteIds' in n
 			? n.remoteIds.map((id) => [base64urlToArray(id), nullNook] as const)
-			: n.nooks.map((nook) => [ulidAsRaw(), nook] as const)
+			: n.nooks.map((nook) => [rawId(), nook] as const)
 	return await Promise.all(
 		remoteIds.map(async ([id, nook]) => await toTemplateCreate(n, id, nook)),
 	)

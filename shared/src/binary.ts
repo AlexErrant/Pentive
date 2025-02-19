@@ -1,6 +1,7 @@
 // c.f. https://github.com/panva/jose/blob/e8cf88a4555385ea6ee41a2015f869888649caa2/src/runtime/browser/base64url.ts
 
-import type { Base64Url, Base64 } from './brand'
+import type { Hex, Base64Url, Base64 } from './brand'
+import { base16 } from '@scure/base'
 
 // https://web.dev/articles/base64-encoding#btoa_and_atob_with_unicode
 export function arrayToBase64(bytes: Uint8Array<ArrayBuffer>): Base64 {
@@ -77,4 +78,13 @@ export function idFactory() {
 			return new Uint8Array(lastId)
 		}
 	}
+}
+
+export const rawId = idFactory()
+export function hexId(): Hex {
+	return base16.encode(rawId()) as Hex
+}
+// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters
+export function base64urlId<T extends Base64Url>() {
+	return arrayToBase64url(rawId()) as T
 }

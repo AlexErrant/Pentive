@@ -1,5 +1,5 @@
 import { Show } from 'solid-js'
-import { insertPost, ulidAsHex } from 'shared-edge'
+import { insertPost } from 'shared-edge'
 import {
 	requireSession,
 	isInvalidCsrf,
@@ -16,6 +16,7 @@ import {
 } from '@solidjs/router'
 import { getRequestEvent } from 'solid-js/web'
 import { nookIdRegex } from 'shared/schema'
+import { hexId } from 'shared/binary'
 
 function validateTitle(title: unknown): string | undefined {
 	if (typeof title !== 'string' || title.length < 3) {
@@ -80,7 +81,7 @@ const submitting = action(async (form: FormData) => {
 	}
 
 	await insertPost({
-		id: ulidAsHex(),
+		id: hexId(),
 		authorId: session.sub,
 		title,
 		text,

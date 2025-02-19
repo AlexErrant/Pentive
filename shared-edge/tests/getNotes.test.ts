@@ -1,7 +1,6 @@
 import { Kysely, SqliteDialect } from 'kysely'
 import { assert, expect, test } from 'vitest'
 import {
-	ulidAsRaw,
 	type DB,
 	insertTemplates,
 	createNook,
@@ -10,7 +9,7 @@ import {
 	type NoteCursor,
 	_kysely,
 } from '../src'
-import { arrayToBase64url, base64urlToArray } from 'shared/binary'
+import { arrayToBase64url, base64urlId, base64urlToArray } from 'shared/binary'
 import type { NookId, NoteId, TemplateId, UserId } from 'shared/brand'
 import Database from 'better-sqlite3'
 import * as fs from 'fs'
@@ -45,7 +44,7 @@ async function setupDb() {
 		description: '',
 	})
 
-	const templateId = arrayToBase64url(ulidAsRaw()) as TemplateId
+	const templateId = base64urlId<TemplateId>()
 	const template = getDefaultTemplate(templateId)
 	const templateResponse = await insertTemplates(userId, [
 		{
@@ -135,7 +134,7 @@ test('cursor/keyset pagination works for getNotes', async () => {
 				for (const { created, edited } of createdEditeds) {
 					const noteResponse = await insertNotes(userId, [
 						{
-							localId: arrayToBase64url(ulidAsRaw()) as NoteId,
+							localId: base64urlId<NoteId>(),
 							fieldValues: {},
 							tags: [],
 							remoteTemplateIds: [remoteTemplateId],
@@ -256,7 +255,7 @@ test('multiple sort columns search using indexes', async () => {
 	for (let index = 0; index < rows; index++) {
 		const noteResponse = await insertNotes(userId, [
 			{
-				localId: arrayToBase64url(ulidAsRaw()) as NoteId,
+				localId: base64urlId<NoteId>(),
 				fieldValues: {},
 				tags: [],
 				remoteTemplateIds: [remoteTemplateId],
