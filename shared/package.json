@@ -13,7 +13,10 @@
 		"eslint": "eslint . --max-warnings 0",
 		"eslint:fix": "eslint . --fix --max-warnings 0",
 		"format:check": "prettier --ignore-path .gitignore --check .",
-		"format": "prettier --ignore-path .gitignore --write ."
+		"format": "prettier --ignore-path .gitignore --write .",
+		"test": "vitest",
+		"test:ui": "vitest --ui",
+		"test:run": "vitest run"
 	},
 	"devDependencies": {
 		"@types/html-to-text": "^9.0.2",

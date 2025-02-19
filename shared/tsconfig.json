@@ -3,5 +3,11 @@
 	"compilerOptions": {
 		"lib": ["ES2022"]
 	},
-	"include": ["src/**/*", "sql/generateSql.ts", "src/sql.json"]
+	"include": [
+		"src/**/*",
+		"sql/generateSql.ts",
+		"src/sql.json",
+		"tests/**/*",
+		"vitest.config.ts"
+	]
 }

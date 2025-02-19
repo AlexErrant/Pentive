@@ -29,3 +29,21 @@ export function arrayToBase64url(bytes: Uint8Array<ArrayBuffer>): Base64Url {
 export function base64urlToArray(base64: Base64Url): Uint8Array<ArrayBuffer> {
 	return base64ToArray(fromBase64URL(base64))
 }
+
+// uses big endian
+export function numberToUint8Array(num: number): Uint8Array {
+	const arr = new Uint8Array(6)
+	for (let i = 0; i < 6; i++) {
+		const divisor = Math.pow(256, 5 - i)
+		arr[i] = Math.floor(num / divisor) % 256
+	}
+	return arr
+}
+
+export function uint8ArrayToNumber(arr: Uint8Array): number {
+	let num = 0
+	for (let i = 0; i < 6; i++) {
+		num = num * 256 + arr[i]!
+	}
+	return num
+}
