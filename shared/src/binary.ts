@@ -30,32 +30,34 @@ export function base64urlToArray(base64: Base64Url): Uint8Array<ArrayBuffer> {
 	return base64ToArray(fromBase64URL(base64))
 }
 
+export const epochLength = 6
+export const randomLength = 10
+export const idLength = epochLength + randomLength
+
 // uses big endian
-export function numberToUint8Array(num: number): Uint8Array {
-	const arr = new Uint8Array(6)
-	for (let i = 0; i < 6; i++) {
-		const divisor = Math.pow(256, 5 - i)
-		arr[i] = Math.floor(num / divisor) % 256
+export function prefixEpochToArray(epoch: number, id: Uint8Array) {
+	for (let i = 0; i < epochLength; i++) {
+		const divisor = Math.pow(256, epochLength - 1 - i)
+		id[i] = Math.floor(epoch / divisor) % 256
 	}
-	return arr
 }
 
-export function uint8ArrayToNumber(arr: Uint8Array): number {
-	let num = 0
-	for (let i = 0; i < 6; i++) {
-		num = num * 256 + arr[i]!
+export function idToEpoch(id: Uint8Array): number {
+	let epoch = 0
+	for (let i = 0; i < epochLength; i++) {
+		epoch = epoch * 256 + id[i]!
 	}
-	return num
+	return epoch
 }
 
-export function incrementUint8Array(arr: Uint8Array): void {
-	for (let i = arr.length - 1; i >= 0; i--) {
+export function incrementRandom(arr: Uint8Array): void {
+	for (let i = idLength - 1; i >= epochLength; i--) {
 		if (arr[i]! < 255) {
 			arr[i]!++
 			return
 		}
 		arr[i] = 0
 	}
-	throw new Error('Overflow: Cannot increment beyond maximum value')
+	throw new Error('max random reached')
 }
 
