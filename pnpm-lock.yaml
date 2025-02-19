@@ -1026,6 +1026,9 @@ importers:
       config:
         specifier: workspace:*
         version: link:../config
+      fast-check:
+        specifier: ^3.23.1
+        version: 3.23.1
       ts-node:
         specifier: ^10.9.1
         version: 10.9.2(@types/node@20.14.11)(typescript@5.7.3)
@@ -1041,6 +1044,9 @@ importers:
       vite-plugin-pwa:
         specifier: ^0.20.5
         version: 0.20.5(vite@5.4.11(@types/node@20.14.11)(sass@1.84.0)(terser@5.38.1))(workbox-build@7.3.0(@types/babel__core@7.20.5))(workbox-window@7.3.0)
+      vitest:
+        specifier: ^2.1.8
+        version: 2.1.8(@types/node@20.14.11)(jsdom@22.1.0)(sass@1.84.0)(terser@5.38.1)
 
   shared-dom:
     dependencies:
