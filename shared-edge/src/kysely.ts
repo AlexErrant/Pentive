@@ -283,15 +283,14 @@ export async function getNotes({
 			'template.type',
 			'template.status as templateStatus',
 		])
-		.$if(userId != null, (a) =>
-			a.select((b) =>
-				b
-					.selectFrom('noteSubscriber')
-					.select(['til'])
-					.where('userId', '=', userId!)
-					.whereRef('noteSubscriber.noteId', '=', 'note.id')
-					.as('til'),
-			),
+		.$if(userId != null, (qb) =>
+			qb
+				.leftJoin('noteSubscriber', (join) =>
+					join
+						.onRef('noteSubscriber.noteId', '=', 'note.id')
+						.on('noteSubscriber.userId', '=', userId),
+				)
+				.select('noteSubscriber.til'),
 		)
 		.$if(true, (qb) => {
 			if (sortState.length === 0)

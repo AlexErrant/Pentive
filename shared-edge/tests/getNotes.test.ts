@@ -297,9 +297,10 @@ test('multiple sort columns search using indexes', async () => {
 
 	const details = queryPlan.map((q) => q.detail).join('\n')
 
-	// I'm not thrilled at `SCAN note USING INDEX` but whatever
-	expect(details).matches(
-		new RegExp(`(SCAN template
+	try {
+		// I'm not thrilled at `SCAN note USING INDEX` but whatever
+		expect(details).matches(
+			new RegExp(`(SCAN template
 MULTI-INDEX OR
 INDEX 1
 SEARCH note USING INDEX note.*?_idx .*?
@@ -307,12 +308,14 @@ INDEX 2
 SEARCH note USING INDEX note_.*?_idx .*?
 INDEX 3
 SEARCH note USING INDEX note_.*?_idx .*?
-CORRELATED SCALAR SUBQUERY 1
-SEARCH noteSubscriber USING INDEX sqlite_autoindex_noteSubscriber_1 \\(noteId=\\? AND userId=\\?\\)
+SEARCH noteSubscriber USING INDEX sqlite_autoindex_noteSubscriber_1 \\(noteId=\\? AND userId=\\?\\) LEFT-JOIN
 USE TEMP B-TREE FOR ORDER BY)|(SCAN note USING INDEX note_.*?_idx
 SCAN template
-CORRELATED SCALAR SUBQUERY 1
-SEARCH noteSubscriber USING INDEX sqlite_autoindex_noteSubscriber_1 \\(noteId=\\? AND userId=\\?\\)
+SEARCH noteSubscriber USING INDEX sqlite_autoindex_noteSubscriber_1 \\(noteId=\\? AND userId=\\?\\) LEFT-JOIN
 USE TEMP B-TREE FOR LAST 2 TERMS OF ORDER BY)`),
-	)
+		)
+	} catch (error) {
+		console.error(details)
+		throw error
+	}
 })
