@@ -9,6 +9,9 @@ import {
 	idToEpoch,
 	idFactory,
 	arrayToBase64url,
+	arrayToBase64,
+	base64ToArray,
+	base64urlToArray,
 } from '../src/binary'
 
 const epochMax = Math.pow(2, epochLength * 8) - 1 // https://github.com/ulid/spec#overflow-errors-when-parsing-base32-strings
@@ -122,4 +125,36 @@ test.skip('interactive test of idFactory', () => {
 		const id = factory()
 		console.log(arrayToBase64url(id), ' ', id.join(' '))
 	}
+})
+
+test('base64ToArray and arrayToBase64 roundtrip', () => {
+	fc.assert(
+		fc.property(
+			fc.uint8Array({
+				minLength: idLength,
+				maxLength: idLength,
+			}),
+			(id) => {
+				const base64 = arrayToBase64(id)
+				const actual = base64ToArray(base64)
+				expect(actual).toEqual(id)
+			},
+		),
+	)
+})
+
+test('base64urlToArray and arrayToBase64url roundtrip', () => {
+	fc.assert(
+		fc.property(
+			fc.uint8Array({
+				minLength: idLength,
+				maxLength: idLength,
+			}),
+			(id) => {
+				const base64url = arrayToBase64url(id)
+				const actual = base64urlToArray(base64url)
+				expect(actual).toEqual(id)
+			},
+		),
+	)
 })
