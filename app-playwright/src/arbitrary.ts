@@ -3,7 +3,7 @@
 import fc, { type Arbitrary, type RecordConstraints } from 'fast-check'
 import type { Base64Url } from 'shared/brand'
 import { nookIdRegex } from 'shared/schema'
-import { base64urlId } from 'shared/binary'
+import { base64urlIdWithTime } from 'shared/binary'
 
 // https://stackoverflow.com/a/72760489
 type OptionalKeys<T> = Required<{
@@ -47,7 +47,7 @@ export function arbitraryUlid<T extends Base64Url>(): fc.Arbitrary<T> {
 			min: new Date(1971, 0, 1),
 			max: new Date(9999, 7, 2),
 		})
-		.map((time) => base64urlId(time.getTime()))
+		.map((time) => base64urlIdWithTime(time.getTime()))
 }
 
 export const arbitraryNookId = fc.stringMatching(nookIdRegex)

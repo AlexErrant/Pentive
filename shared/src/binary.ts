@@ -66,8 +66,8 @@ export function incrementRandom(arr: Uint8Array): void {
 export function idFactory() {
 	let lastTime = -1
 	const lastId = new Uint8Array(idLength)
-	return (epochMs?: number) => {
-		epochMs ??= Date.now()
+	return () => {
+		const epochMs = Date.now()
 		if (epochMs > lastTime) {
 			lastTime = epochMs
 			crypto.getRandomValues(lastId)
@@ -80,13 +80,25 @@ export function idFactory() {
 	}
 }
 
+// separate from idFactory because it's only used by tests and adds unnecessary complexity/conditionals to idFactory
+export const rawIdWithTime = (epochMs: number) => {
+	const id = new Uint8Array(idLength)
+	crypto.getRandomValues(id)
+	prefixEpochToArray(epochMs, id)
+	return id
+}
+
 export let rawId = idFactory()
 export function hexId(): Hex {
 	return base16.encode(rawId()) as Hex
 }
 // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters
-export function base64urlId<T extends Base64Url>(epochMs?: number) {
-	return arrayToBase64url(rawId(epochMs)) as T
+export function base64urlId<T extends Base64Url>() {
+	return arrayToBase64url(rawId()) as T
+}
+// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters
+export function base64urlIdWithTime<T extends Base64Url>(epochMs: number) {
+	return arrayToBase64url(rawIdWithTime(epochMs)) as T
 }
 
 const _binary =

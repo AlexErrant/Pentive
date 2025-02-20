@@ -14,7 +14,7 @@ import {
 	base64urlId,
 	base64urlToArray,
 	_binary,
-	idFactory,
+	rawIdWithTime,
 } from 'shared/binary'
 import type { NookId, NoteId, TemplateId, UserId } from 'shared/brand'
 import Database from 'better-sqlite3'
@@ -107,7 +107,6 @@ async function getAllNotes(
 }
 
 test('cursor/keyset pagination works for getNotes', async () => {
-	const rawId = idFactory()
 	const sortState = fc
 		.tuple(
 			fc.boolean().map((desc) => ({
@@ -139,7 +138,7 @@ test('cursor/keyset pagination works for getNotes', async () => {
 				const { database, remoteTemplateId } = await setupDb()
 				const jsSorted: SimplifiedNote[] = []
 				for (const { created, edited } of createdEditeds) {
-					_binary.setRawId(() => rawId(created))
+					_binary.setRawId(() => rawIdWithTime(created))
 					const noteResponse = await insertNotes(userId, [
 						{
 							localId: base64urlId<NoteId>(),
@@ -247,7 +246,6 @@ function sort(
 }
 
 test('multiple sort columns search using indexes', async () => {
-	const rawId = idFactory()
 	const rows = 1000
 	const { database, remoteTemplateId } = await setupDb()
 	const sortState = [
@@ -264,7 +262,7 @@ test('multiple sort columns search using indexes', async () => {
 	for (let index = 0; index < rows; index++) {
 		const created = Math.round((Math.random() * rows) / 10)
 		const edited = Math.round(Math.random() * rows)
-		_binary.setRawId(() => rawId(created))
+		_binary.setRawId(() => rawIdWithTime(created))
 		const noteResponse = await insertNotes(userId, [
 			{
 				localId: base64urlId<NoteId>(),
