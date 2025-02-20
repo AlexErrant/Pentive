@@ -1,18 +1,9 @@
-import { base16 } from '@scure/base'
-import { Ulid } from 'id128'
-import { arrayToBase64url } from 'shared/binary'
-import type { Base64Url, TemplateId } from 'shared/brand'
+import { base64urlId } from 'shared/binary'
 import { getDefaultTemplate as getDefaultTemplateOg } from 'shared/domain/template'
 import { format } from 'prettier'
 import * as prettierPluginHtml from 'prettier/plugins/html'
 
-export function ulidAsBase64Url(): Base64Url {
-	const hexUlid = Ulid.generate().toRaw()
-	return arrayToBase64url(base16.decode(hexUlid))
-}
-
-export const getDefaultTemplate = () =>
-	getDefaultTemplateOg(ulidAsBase64Url() as TemplateId)
+export const getDefaultTemplate = () => getDefaultTemplateOg(base64urlId())
 
 // https://stackoverflow.com/a/22015930
 export const zip = <T>(a: T[], b: T[]) =>

@@ -85,6 +85,6 @@ export function hexId(): Hex {
 	return base16.encode(rawId()) as Hex
 }
 // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters
-export function base64urlId<T extends Base64Url>() {
-	return arrayToBase64url(rawId()) as T
+export function base64urlId<T extends Base64Url>(epochMs?: number) {
+	return arrayToBase64url(rawId(epochMs)) as T
 }

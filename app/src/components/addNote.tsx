@@ -9,25 +9,25 @@ import {
 	on,
 } from 'solid-js'
 import { FieldsEditor } from '../components/fieldsEditor'
-import { ulidAsBase64Url } from '../domain/utility'
 import { createStore } from 'solid-js/store'
 import { C, tx } from '../topLevelAwait'
 import { CardsPreview } from '../components/cardsPreview'
 import { toNoteCards, type NoteCardView } from '../uiLogic/cards'
 import type { Template } from 'shared/domain/template'
 import type { Card } from 'shared/domain/card'
-import type { NoteId, CardId, MediaId } from 'shared/brand'
+import type { MediaId } from 'shared/brand'
 import { assertNever, objEntries, objValues } from 'shared/utility'
 import { CardsRemote } from './cardsRemote'
 import { createMutation } from '@tanstack/solid-query'
 import { useTableCountContext } from './tableCountContext'
 import { parseHtml } from 'shared-dom/utility'
 import { createAsync } from '@solidjs/router'
+import { base64urlId } from 'shared/binary'
 
 function toView(template: Template): NoteCardView {
 	const now = C.getDate()
 	const note: NoteCardView['note'] = {
-		id: ulidAsBase64Url() as NoteId,
+		id: base64urlId(),
 		templateId: template.id,
 		created: now,
 		edited: now,
@@ -77,7 +77,7 @@ export const AddNote: VoidComponent<{
 					const cards = ords.map(
 						(ord) =>
 							({
-								id: ulidAsBase64Url() as CardId,
+								id: base64urlId(),
 								ord,
 								noteId: note.id,
 								tags: new Set(),
@@ -177,7 +177,7 @@ async function mutate(img: HTMLImageElement) {
 	} else if (src.startsWith('data:')) {
 		const now = C.getDate()
 		const data = await (await fetch(src)).arrayBuffer()
-		const id = ulidAsBase64Url() as string as MediaId
+		const id = base64urlId<MediaId>()
 		await C.db.insertMedia({
 			id,
 			created: now,

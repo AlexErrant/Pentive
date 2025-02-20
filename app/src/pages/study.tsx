@@ -11,16 +11,18 @@ import { createAsync } from '@solidjs/router'
 import ResizingIframe from '../components/resizingIframe'
 import { cardSetting as cardSettingParser } from './importer/parser'
 import init, { Fsrs } from 'fsrs-browser'
-import type { ReviewId, CardSettingId } from 'shared/brand'
-import { ulidAsBase64Url } from '../domain/utility'
+import type { CardSettingId } from 'shared/brand'
 import { C } from '../topLevelAwait'
+import { base64urlId } from 'shared/binary'
 
 export default function Study(): JSX.Element {
 	const cards = createAsync(async () => await getCards())
 	const [i, setI] = createSignal(0)
 	const [side, setSide] = createSignal<'front' | 'back'>('front')
 	const noteCard = () => cards()?.noteCards.at(i())
-	const [cardSettings] = createResource(async () => await C.db.getCardSettings())
+	const [cardSettings] = createResource(
+		async () => await C.db.getCardSettings(),
+	)
 	const [fsrsMap] = createResource(cardSettings, async (cardSettings) => {
 		await init()
 		const fsrsMap = new Map<CardSettingId, Fsrs>()
@@ -34,7 +36,10 @@ export default function Study(): JSX.Element {
 	})
 	const cardId = () => noteCard()?.card.id
 	const cardSettingId = () => noteCard()?.card.cardSettingId
-	const [fsrsItems] = createResource(cardId, async (x) => await C.db.getFsrsItemsForCard(x))
+	const [fsrsItems] = createResource(
+		cardId,
+		async (x) => await C.db.getFsrsItemsForCard(x),
+	)
 	const states = () => {
 		const csId = cardSettingId()
 		const fi = fsrsItems()
@@ -65,7 +70,7 @@ export default function Study(): JSX.Element {
 	}
 	async function rate(rating: number) {
 		await C.db.insertReview({
-			id: ulidAsBase64Url() as ReviewId,
+			id: base64urlId(),
 			cardId: cardId()!,
 			created: C.getDate(),
 			rating,

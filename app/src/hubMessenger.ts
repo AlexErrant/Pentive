@@ -1,15 +1,9 @@
 import * as Comlink from 'comlink'
-import { ulidAsBase64Url } from './domain/utility'
 import { noteOrds } from 'shared-dom/cardHtml'
 import { C, tx } from './topLevelAwait'
-import type {
-	ChildTemplate,
-	RemoteNote,
-	RemoteTemplate,
-} from 'shared/schema'
+import type { ChildTemplate, RemoteNote, RemoteTemplate } from 'shared/schema'
 import {
 	type NookId,
-	type CardId,
 	type MediaId,
 	cast,
 	type RemoteNoteId,
@@ -21,6 +15,7 @@ import type { Note } from 'shared/domain/note'
 import type { Card } from 'shared/domain/card'
 import { objEntries } from 'shared/utility'
 import { parseHtml } from 'shared-dom/utility'
+import { base64urlId } from 'shared/binary'
 
 export const appExpose = {
 	ping: () => {
@@ -86,7 +81,7 @@ export const appExpose = {
 			const ords = noteOrds.bind(C)(n, template)
 			const cards = ords.map((i) => {
 				const card: Card = {
-					id: ulidAsBase64Url() as CardId,
+					id: base64urlId(),
 					ord: i,
 					noteId: n.id,
 					tags: new Set(),
@@ -131,7 +126,7 @@ function mutate(img: HTMLImageElement, imgSrcs: Map<MediaId, string>) {
 		img.setAttribute('src', id)
 	} else {
 		// not sure that this branch should ever be hit
-		const id = ulidAsBase64Url() as string as MediaId
+		const id = base64urlId<MediaId>()
 		imgSrcs.set(id, img.src)
 		img.setAttribute('src', id)
 	}

@@ -6,9 +6,8 @@ import { GoldenLayout, LayoutConfig } from 'golden-layout'
 import { render } from 'solid-js/web'
 import EditSetting from '../components/editSetting'
 import { cloneDeep } from 'lodash-es'
-import { ulidAsBase64Url } from '../domain/utility'
-import type { CardSettingId } from 'shared/brand'
 import { type Setting, getDefaultSetting } from 'shared/domain/setting'
+import { base64urlId } from 'shared/binary'
 
 export default function Settings(): JSX.Element {
 	let glRoot!: HTMLDivElement
@@ -87,7 +86,7 @@ export default function Settings(): JSX.Element {
 							setSetting={(s: Setting) => {
 								setSettings('settings', [...settings.settings, s])
 							}}
-							setting={getDefaultSetting(ulidAsBase64Url() as CardSettingId)}
+							setting={getDefaultSetting(base64urlId())}
 						/>
 					),
 					container.element,
