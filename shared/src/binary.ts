@@ -80,7 +80,7 @@ export function idFactory() {
 	}
 }
 
-export const rawId = idFactory()
+export let rawId = idFactory()
 export function hexId(): Hex {
 	return base16.encode(rawId()) as Hex
 }
@@ -88,3 +88,14 @@ export function hexId(): Hex {
 export function base64urlId<T extends Base64Url>(epochMs?: number) {
 	return arrayToBase64url(rawId(epochMs)) as T
 }
+
+const _binary =
+	process.env.NODE_ENV === 'test'
+		? {
+				setRawId: (newRawId: typeof rawId) => {
+					rawId = newRawId
+				},
+			}
+		: (undefined as never)
+
+export { _binary }

@@ -9,7 +9,13 @@ import {
 	type NoteCursor,
 	_kysely,
 } from '../src'
-import { arrayToBase64url, base64urlId, base64urlToArray } from 'shared/binary'
+import {
+	arrayToBase64url,
+	base64urlId,
+	base64urlToArray,
+	_binary,
+	idFactory,
+} from 'shared/binary'
 import type { NookId, NoteId, TemplateId, UserId } from 'shared/brand'
 import Database from 'better-sqlite3'
 import * as fs from 'fs'
@@ -101,6 +107,7 @@ async function getAllNotes(
 }
 
 test('cursor/keyset pagination works for getNotes', async () => {
+	const rawId = idFactory()
 	const sortState = fc
 		.tuple(
 			fc.boolean().map((desc) => ({
@@ -132,6 +139,7 @@ test('cursor/keyset pagination works for getNotes', async () => {
 				const { database, remoteTemplateId } = await setupDb()
 				const jsSorted: SimplifiedNote[] = []
 				for (const { created, edited } of createdEditeds) {
+					_binary.setRawId(() => rawId(created))
 					const noteResponse = await insertNotes(userId, [
 						{
 							localId: base64urlId<NoteId>(),
@@ -239,6 +247,7 @@ function sort(
 }
 
 test('multiple sort columns search using indexes', async () => {
+	const rawId = idFactory()
 	const rows = 1000
 	const { database, remoteTemplateId } = await setupDb()
 	const sortState = [
@@ -253,6 +262,9 @@ test('multiple sort columns search using indexes', async () => {
 	]
 	database.exec(`SAVEPOINT my_savepoint;`)
 	for (let index = 0; index < rows; index++) {
+		const created = Math.round((Math.random() * rows) / 10)
+		const edited = Math.round(Math.random() * rows)
+		_binary.setRawId(() => rawId(created))
 		const noteResponse = await insertNotes(userId, [
 			{
 				localId: base64urlId<NoteId>(),
@@ -264,8 +276,6 @@ test('multiple sort columns search using indexes', async () => {
 		const remoteNoteId = Array.from(noteResponse.values())[0]![0]
 		const rawRemoteNoteId = base64urlToArray(remoteNoteId)
 		const hexNoteId = base16.encode(rawRemoteNoteId)
-		const created = Math.round((Math.random() * rows) / 10)
-		const edited = Math.round(Math.random() * rows)
 		database.exec(
 			`UPDATE note SET created = ${created}, edited = ${edited} WHERE id = unhex('${hexNoteId}')`,
 		)
