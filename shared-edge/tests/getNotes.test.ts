@@ -191,6 +191,7 @@ function prettier({ remoteNoteId, ...n }: SimplifiedNote) {
 	return {
 		...n,
 		id: arrayToBase64url(remoteNoteId),
+		// id: remoteNoteId.join(' '),
 	}
 }
 

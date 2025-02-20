@@ -297,10 +297,16 @@ export async function getNotes({
 			if (sortState.length === 0)
 				sortState.push({ id: 'noteCreated' as const, desc: 'desc' as const })
 			if (cursor != null) {
-				const sortCols = sortState.map((s) => s.id as string)
-				sortCols.push('note.id')
+				const sortCols = sortState.map((s) => s.id)
 				const sortVals = sortState.map((s) => cursor[s.id])
-				sortVals.push(fromBase64Url(cursor.noteId) as never)
+				const lastIndex = sortCols.length - 1
+				if (sortCols[lastIndex] === 'noteCreated') {
+					sortCols[lastIndex] = 'note.id' as never
+					sortVals[lastIndex] = fromBase64Url(cursor.noteId) as never
+				} else {
+					sortCols.push('note.id' as never)
+					sortVals.push(fromBase64Url(cursor.noteId) as never)
+				}
 				qb = qb.where((eb) => {
 					// the for loops builds sql like the below
 					//   WHERE
