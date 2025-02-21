@@ -10,7 +10,6 @@ import {
 	_kysely,
 } from '../src'
 import {
-	arrayToBase64url,
 	base64urlId,
 	base64urlToArray,
 	_binary,
@@ -213,8 +212,8 @@ test('cursor/keyset pagination works for getNotes', async () => {
 function prettier({ remoteNoteId, ...n }: SimplifiedNote) {
 	return {
 		...n,
-		id: arrayToBase64url(remoteNoteId),
-		// id: remoteNoteId.join(' '),
+		// id: arrayToBase64url(remoteNoteId),
+		id: remoteNoteId.join(' '),
 	}
 }
 

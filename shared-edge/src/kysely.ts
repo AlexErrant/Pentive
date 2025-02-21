@@ -297,19 +297,19 @@ export async function getNotes({
 		.$if(true, (qb) => {
 			if (sortState.length === 0)
 				sortState.push({ id: 'noteCreated' as const, desc: 'desc' as const })
+			const lastIndex = sortState.length - 1
+			if (sortState[lastIndex]!.id === 'noteCreated') {
+				sortState[lastIndex]!.id = 'note.id' as never
+			} else {
+				sortState.push({
+					id: 'note.id' as never,
+					desc: sortState.at(-1)!.desc, // noteId is asc/desc depending on the last sort col
+				})
+			}
 			if (cursor != null) {
-				const sortVals = sortState.map((s) => cursor[s.id])
-				const lastIndex = sortState.length - 1
-				if (sortState[lastIndex]!.id === 'noteCreated') {
-					sortState[lastIndex]!.id = 'note.id' as never
-					sortVals[lastIndex] = fromBase64Url(cursor.noteId) as never
-				} else {
-					sortState.push({
-						id: 'note.id' as never,
-						desc: sortState.at(-1)!.desc, // noteId is asc/desc depending on the last sort col
-					})
-					sortVals.push(fromBase64Url(cursor.noteId) as never)
-				}
+				const sortVals = sortState.map(
+					(s) => cursor[s.id] ?? fromBase64Url(cursor.noteId),
+				)
 				qb = qb.where((eb) => {
 					// the for loops builds sql like the below
 					//   WHERE
@@ -337,7 +337,7 @@ export async function getNotes({
 			for (const { id, desc } of sortState) {
 				qb = qb.orderBy(id, desc)
 			}
-			return qb.orderBy('note.id', sortState.at(-1)!.desc) // noteId is asc/desc depending on the last sort col
+			return qb
 		})
 		.where('template.nook', '=', nook)
 		.limit(pageSize)
