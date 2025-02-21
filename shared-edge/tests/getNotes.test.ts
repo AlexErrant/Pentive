@@ -79,7 +79,10 @@ async function getAllNotes(
 	>,
 ) {
 	const paginatedNotes = [] as Note[]
+	let count = 0
 	do {
+		count++
+		if (count > 1000) throwExp(`loop count is ${count}, did you screw up?`)
 		const last = paginatedNotes.at(-1)
 		const cursor =
 			last == null
