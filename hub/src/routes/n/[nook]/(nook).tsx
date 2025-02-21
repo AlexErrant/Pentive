@@ -5,6 +5,7 @@ import {
 	type NoteSortColumn,
 	pageSize,
 	type NoteCursor,
+	type SortState,
 } from 'shared-edge'
 import { noteOrds, toSampleCard } from 'shared-dom/cardHtml'
 import type { NookId, Ord } from 'shared/brand'
@@ -83,7 +84,7 @@ export default function Nook(props: RouteSectionProps) {
 			sortState: sort().map((s) => ({
 				id: s.id,
 				desc: s.desc ? ('desc' as const) : undefined,
-			})),
+			})) satisfies SortState,
 			userId: userId(),
 		}
 		return {

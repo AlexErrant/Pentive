@@ -8,6 +8,7 @@ import {
 	getNotes,
 	type NoteCursor,
 	_kysely,
+	type SortState,
 } from '../src'
 import {
 	base64urlId,
@@ -66,18 +67,7 @@ async function setupDb() {
 	return { database, remoteTemplateId }
 }
 
-async function getAllNotes(
-	sortState: Array<
-		| {
-				id: 'noteCreated'
-				desc: 'desc' | undefined
-		  }
-		| {
-				id: 'noteEdited'
-				desc: 'desc' | undefined
-		  }
-	>,
-) {
+async function getAllNotes(sortState: SortState) {
 	const paginatedNotes = [] as Note[]
 	let count = 0
 	do {

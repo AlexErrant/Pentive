@@ -250,6 +250,7 @@ export type NoteCursor = Rasterize<
 >
 
 export let pageSize = 3
+export type SortState = Array<{ id: NoteSortColumn; desc: 'desc' | undefined }>
 
 export async function getNotes({
 	nook,
@@ -259,7 +260,7 @@ export async function getNotes({
 }: {
 	nook: NookId
 	userId: UserId | null
-	sortState: Array<{ id: NoteSortColumn; desc: 'desc' | undefined }>
+	sortState: SortState
 	cursor: NoteCursor | null
 }) {
 	if (process.env.NODE_ENV === 'test') sortState = cloneDeep(sortState)
