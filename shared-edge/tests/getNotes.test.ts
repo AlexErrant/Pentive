@@ -15,6 +15,8 @@ import {
 	base64urlToArray,
 	_binary,
 	rawIdWithTime,
+	prefixEpochToArray,
+	idLength,
 } from 'shared/binary'
 import type { NookId, NoteId, TemplateId, UserId } from 'shared/brand'
 import Database from 'better-sqlite3'
@@ -120,12 +122,33 @@ test('cursor/keyset pagination works for getNotes', async () => {
 		)
 		.chain((x) => fc.shuffledSubarray(x, { minLength: 2, maxLength: 2 }))
 	const arbNum = fc.integer({ min: 0, max: 5 })
-	const createdEditeds = fc.array(
-		fc.record({
-			created: arbNum,
-			edited: arbNum,
-		}),
-		{ minLength: 1, maxLength: 100 },
+	const createdEditeds = fc.uniqueArray(
+		fc
+			.record({
+				created: arbNum,
+				edited: arbNum,
+				rawId: fc.uint8Array({ maxLength: idLength, minLength: idLength }),
+			})
+			.map((x) => {
+				const id = new Uint8Array(x.rawId)
+				prefixEpochToArray(x.created, id)
+				return {
+					...x,
+					rawId: id,
+				}
+			}),
+		{
+			minLength: 1,
+			maxLength: 100,
+			selector: (x) => x.rawId,
+			comparator: (a: Uint8Array, b: Uint8Array) => {
+				if (a.length !== b.length) return false
+				for (let i = 0; i < a.length; i++) {
+					if (a[i] !== b[i]) return false
+				}
+				return true
+			},
+		},
 	)
 	await fc.assert(
 		fc.asyncProperty(
@@ -137,8 +160,8 @@ test('cursor/keyset pagination works for getNotes', async () => {
 				_kysely.resetSqlLog()
 				const { database, remoteTemplateId } = await setupDb()
 				const jsSorted: SimplifiedNote[] = []
-				for (const { created, edited } of createdEditeds) {
-					_binary.setRawId(() => rawIdWithTime(created))
+				for (const { created, edited, rawId } of createdEditeds) {
+					_binary.setRawId(() => rawId)
 					const noteResponse = await insertNotes(userId, [
 						{
 							localId: base64urlId<NoteId>(),
