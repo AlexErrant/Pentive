@@ -23,11 +23,13 @@
 	"devDependencies": {
 		"@cloudflare/workers-types": "^4.20240725.0",
 		"@types/better-sqlite3": "^7.6.12",
+		"@types/lodash-es": "^4.17.12",
 		"@types/node": "20.14.11",
 		"better-sqlite3": "^11.8.1",
 		"config": "workspace:*",
 		"fast-check": "^3.23.1",
 		"kysely-codegen": "^0.15.0",
+		"lodash-es": "^4.17.21",
 		"mysql2": "^3.6.1",
 		"tsx": "^4.18.0",
 		"typescript": "~5.7.3",
