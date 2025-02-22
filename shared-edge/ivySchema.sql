@@ -52,7 +52,7 @@ create index note_created_idx
     on note (created);
 
 create index note_edited_idx
-    on note (edited);
+    on note (edited, id);
 
 create index note_commentsCount_idx
     on note (commentsCount);

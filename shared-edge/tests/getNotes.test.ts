@@ -288,9 +288,38 @@ SCAN template
 SEARCH noteSubscriber USING INDEX sqlite_autoindex_noteSubscriber_1 \\(noteId=\\? AND userId=\\?\\) LEFT-JOIN
 USE TEMP B-TREE FOR LAST 2 TERMS OF ORDER BY)`,
 	},
+	{
+		sortState: [],
+		expected: `SEARCH note USING INDEX sqlite_autoindex_note_1 \\(id<\\?\\)
+SCAN template
+SEARCH noteSubscriber USING INDEX sqlite_autoindex_noteSubscriber_1 \\(noteId=\\? AND userId=\\?\\) LEFT-JOIN`,
+	},
+	{
+		sortState: [
+			{
+				id: 'noteCreated' as const,
+				desc: undefined,
+			},
+		],
+		expected: `SEARCH note USING INDEX sqlite_autoindex_note_1 \\(id>\\?\\)
+SCAN template
+SEARCH noteSubscriber USING INDEX sqlite_autoindex_noteSubscriber_1 \\(noteId=\\? AND userId=\\?\\) LEFT-JOIN`,
+	},
+	{
+		sortState: [
+			{
+				id: 'noteEdited' as const,
+				desc: undefined,
+			},
+		],
+		expected: `SCAN note USING INDEX note_edited_idx
+SCAN template
+SEARCH noteSubscriber USING INDEX sqlite_autoindex_noteSubscriber_1 \\(noteId=\\? AND userId=\\?\\) LEFT-JOIN`,
+	},
 ])(
 	'sort uses indexes - [$sortState.0.id:$sortState.0.desc, $sortState.1.id:$sortState.1.desc]',
 	async ({ sortState, expected }) => {
+		_kysely.resetSqlLog()
 		const rows = 1000
 		const { database, remoteTemplateId } = await setupDb()
 		database.exec(`SAVEPOINT my_savepoint;`)
