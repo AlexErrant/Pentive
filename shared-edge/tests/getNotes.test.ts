@@ -261,61 +261,20 @@ function sort(
 	/* eslint-enable @typescript-eslint/strict-boolean-expressions */
 }
 
-test('multiple sort columns search using indexes', async () => {
-	const rows = 1000
-	const { database, remoteTemplateId } = await setupDb()
-	const sortState = [
-		{
-			id: 'noteCreated' as const,
-			desc: undefined,
-		},
-		{
-			id: 'noteEdited' as const,
-			desc: 'desc' as const,
-		},
-	]
-	database.exec(`SAVEPOINT my_savepoint;`)
-	for (let index = 0; index < rows; index++) {
-		const created = Math.round((Math.random() * rows) / 10)
-		const edited = Math.round(Math.random() * rows)
-		_binary.setRawId(() => rawIdWithTime(created))
-		const noteResponse = await insertNotes(userId, [
+test.each([
+	{
+		sortState: [
 			{
-				localId: base64urlId<NoteId>(),
-				fieldValues: {},
-				tags: [],
-				remoteTemplateIds: [remoteTemplateId],
+				id: 'noteCreated' as const,
+				desc: undefined,
 			},
-		])
-		const remoteNoteId = Array.from(noteResponse.values())[0]![0]
-		const rawRemoteNoteId = base64urlToArray(remoteNoteId)
-		const hexNoteId = base16.encode(rawRemoteNoteId)
-		database.exec(
-			`UPDATE note SET created = ${created}, edited = ${edited} WHERE id = unhex('${hexNoteId}')`,
-		)
-	}
-	database.exec(`RELEASE SAVEPOINT my_savepoint;`)
-
-	// Act
-	await getAllNotes(sortState)
-
-	// Assert
-	const midpoint = Math.round(_kysely.sqlLog.length / 2)
-	const { sql, parameters } = _kysely.sqlLog.at(midpoint)!
-
-	database.exec('ANALYZE;')
-	const queryPlan = database
-		.prepare(`EXPLAIN QUERY PLAN ${sql}`)
-		.all(parameters) as Array<{
-		detail: string
-	}>
-
-	const details = queryPlan.map((q) => q.detail).join('\n')
-
-	try {
+			{
+				id: 'noteEdited' as const,
+				desc: 'desc' as const,
+			},
+		],
 		// I'm not thrilled at `SCAN note USING INDEX` but whatever
-		expect(details).matches(
-			new RegExp(`(SCAN template
+		expected: `(SCAN template
 MULTI-INDEX OR
 INDEX 1
 SEARCH note USING INDEX note.*?_idx .*?
@@ -327,10 +286,56 @@ SEARCH noteSubscriber USING INDEX sqlite_autoindex_noteSubscriber_1 \\(noteId=\\
 USE TEMP B-TREE FOR ORDER BY)|(SCAN note USING INDEX note_.*?_idx
 SCAN template
 SEARCH noteSubscriber USING INDEX sqlite_autoindex_noteSubscriber_1 \\(noteId=\\? AND userId=\\?\\) LEFT-JOIN
-USE TEMP B-TREE FOR LAST 2 TERMS OF ORDER BY)`),
-		)
-	} catch (error) {
-		console.error(details)
-		throw error
-	}
-})
+USE TEMP B-TREE FOR LAST 2 TERMS OF ORDER BY)`,
+	},
+])(
+	'sort uses indexes - [$sortState.0.id:$sortState.0.desc, $sortState.1.id:$sortState.1.desc]',
+	async ({ sortState, expected }) => {
+		const rows = 1000
+		const { database, remoteTemplateId } = await setupDb()
+		database.exec(`SAVEPOINT my_savepoint;`)
+		for (let index = 0; index < rows; index++) {
+			const created = Math.round((Math.random() * rows) / 10)
+			const edited = Math.round(Math.random() * rows)
+			_binary.setRawId(() => rawIdWithTime(created))
+			const noteResponse = await insertNotes(userId, [
+				{
+					localId: base64urlId<NoteId>(),
+					fieldValues: {},
+					tags: [],
+					remoteTemplateIds: [remoteTemplateId],
+				},
+			])
+			const remoteNoteId = Array.from(noteResponse.values())[0]![0]
+			const rawRemoteNoteId = base64urlToArray(remoteNoteId)
+			const hexNoteId = base16.encode(rawRemoteNoteId)
+			database.exec(
+				`UPDATE note SET created = ${created}, edited = ${edited} WHERE id = unhex('${hexNoteId}')`,
+			)
+		}
+		database.exec(`RELEASE SAVEPOINT my_savepoint;`)
+
+		// Act
+		await getAllNotes(sortState)
+
+		// Assert
+		const midpoint = Math.round(_kysely.sqlLog.length / 2)
+		const { sql, parameters } = _kysely.sqlLog.at(midpoint)!
+
+		database.exec('ANALYZE;')
+		const queryPlan = database
+			.prepare(`EXPLAIN QUERY PLAN ${sql}`)
+			.all(parameters) as Array<{
+			detail: string
+		}>
+
+		const details = queryPlan.map((q) => q.detail).join('\n')
+
+		try {
+			expect(details).matches(new RegExp(expected))
+		} catch (error) {
+			console.error(details)
+			throw error
+		}
+	},
+)
