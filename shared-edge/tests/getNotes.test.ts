@@ -316,55 +316,52 @@ SEARCH noteSubscriber USING INDEX sqlite_autoindex_noteSubscriber_1 \\(noteId=\\
 SCAN template
 SEARCH noteSubscriber USING INDEX sqlite_autoindex_noteSubscriber_1 \\(noteId=\\? AND userId=\\?\\) LEFT-JOIN`,
 	},
-])(
-	'sort uses indexes - [$sortState.0.id:$sortState.0.desc, $sortState.1.id:$sortState.1.desc]',
-	async ({ sortState, expected }) => {
-		_kysely.resetSqlLog()
-		const rows = 1000
-		const { database, remoteTemplateId } = await setupDb()
-		database.exec(`SAVEPOINT my_savepoint;`)
-		for (let index = 0; index < rows; index++) {
-			const created = Math.round((Math.random() * rows) / 10)
-			const edited = Math.round(Math.random() * rows)
-			_binary.setRawId(() => rawIdWithTime(created))
-			const noteResponse = await insertNotes(userId, [
-				{
-					localId: base64urlId<NoteId>(),
-					fieldValues: {},
-					tags: [],
-					remoteTemplateIds: [remoteTemplateId],
-				},
-			])
-			const remoteNoteId = Array.from(noteResponse.values())[0]![0]
-			const rawRemoteNoteId = base64urlToArray(remoteNoteId)
-			const hexNoteId = base16.encode(rawRemoteNoteId)
-			database.exec(
-				`UPDATE note SET created = ${created}, edited = ${edited} WHERE id = unhex('${hexNoteId}')`,
-			)
-		}
-		database.exec(`RELEASE SAVEPOINT my_savepoint;`)
+])('sort uses indexes - $sortState', async ({ sortState, expected }) => {
+	_kysely.resetSqlLog()
+	const rows = 1000
+	const { database, remoteTemplateId } = await setupDb()
+	database.exec(`SAVEPOINT my_savepoint;`)
+	for (let index = 0; index < rows; index++) {
+		const created = Math.round((Math.random() * rows) / 10)
+		const edited = Math.round(Math.random() * rows)
+		_binary.setRawId(() => rawIdWithTime(created))
+		const noteResponse = await insertNotes(userId, [
+			{
+				localId: base64urlId<NoteId>(),
+				fieldValues: {},
+				tags: [],
+				remoteTemplateIds: [remoteTemplateId],
+			},
+		])
+		const remoteNoteId = Array.from(noteResponse.values())[0]![0]
+		const rawRemoteNoteId = base64urlToArray(remoteNoteId)
+		const hexNoteId = base16.encode(rawRemoteNoteId)
+		database.exec(
+			`UPDATE note SET created = ${created}, edited = ${edited} WHERE id = unhex('${hexNoteId}')`,
+		)
+	}
+	database.exec(`RELEASE SAVEPOINT my_savepoint;`)
 
-		// Act
-		await getAllNotes(sortState)
+	// Act
+	await getAllNotes(sortState)
 
-		// Assert
-		const midpoint = Math.round(_kysely.sqlLog.length / 2)
-		const { sql, parameters } = _kysely.sqlLog.at(midpoint)!
+	// Assert
+	const midpoint = Math.round(_kysely.sqlLog.length / 2)
+	const { sql, parameters } = _kysely.sqlLog.at(midpoint)!
 
-		database.exec('ANALYZE;')
-		const queryPlan = database
-			.prepare(`EXPLAIN QUERY PLAN ${sql}`)
-			.all(parameters) as Array<{
-			detail: string
-		}>
+	database.exec('ANALYZE;')
+	const queryPlan = database
+		.prepare(`EXPLAIN QUERY PLAN ${sql}`)
+		.all(parameters) as Array<{
+		detail: string
+	}>
 
-		const details = queryPlan.map((q) => q.detail).join('\n')
+	const details = queryPlan.map((q) => q.detail).join('\n')
 
-		try {
-			expect(details).matches(new RegExp(expected))
-		} catch (error) {
-			console.error(details)
-			throw error
-		}
-	},
-)
+	try {
+		expect(details).matches(new RegExp(expected))
+	} catch (error) {
+		console.error(details)
+		throw error
+	}
+})
