@@ -26,6 +26,7 @@ import { getDefaultTemplate } from 'shared/domain/template'
 import { base16 } from '@scure/base'
 import { dateToEpoch, maybeDateToEpoch, throwExp } from 'shared/utility'
 import fc from 'fast-check'
+import { cloneDeep } from 'lodash-es'
 
 const userId = 'Griddle' as UserId
 const nook = 'testnook' as NookId
@@ -88,7 +89,7 @@ async function getAllNotes(sortState: SortState) {
 		const page = await getNotes({
 			nook,
 			userId,
-			sortState,
+			sortState: cloneDeep(sortState), // getNotes mutates this, which is fine in prod but not for testing
 			cursor,
 		})
 		if (page.length === 0) {

@@ -64,7 +64,6 @@ import {
 } from 'shared/binary'
 import { buildPublicToken, type PublicMediaSecret } from './publicToken'
 import type { CompiledQuery } from 'kysely'
-import { cloneDeep } from 'lodash-es'
 export type * from 'kysely'
 
 // @ts-expect-error db calls should throw null error if not setup
@@ -263,7 +262,6 @@ export async function getNotes({
 	sortState: SortState
 	cursor: NoteCursor | null
 }) {
-	if (process.env.NODE_ENV === 'test') sortState = cloneDeep(sortState)
 	const r = db
 		.selectFrom('note')
 		.innerJoin('template', 'template.id', 'note.templateId')
