@@ -275,25 +275,23 @@ test.each([
 			},
 		],
 		// I'm not thrilled at `SCAN note USING INDEX` but whatever
-		expected: `(SCAN template
+		expected: `SEARCH template USING INDEX template_nook_idx (nook=?)
 MULTI-INDEX OR
 INDEX 1
-SEARCH note USING INDEX note.*?_idx .*?
+SEARCH note USING INDEX note_created_idx (created>?)
 INDEX 2
-SEARCH note USING INDEX note_.*?_idx .*?
+SEARCH note USING INDEX note_created_idx (created=?)
 INDEX 3
-SEARCH note USING INDEX note_.*?_idx .*?
-SEARCH noteSubscriber USING INDEX sqlite_autoindex_noteSubscriber_1 \\(noteId=\\? AND userId=\\?\\) LEFT-JOIN
-USE TEMP B-TREE FOR ORDER BY)|(SCAN note USING INDEX note_.*?_idx
-SCAN template
-SEARCH noteSubscriber USING INDEX sqlite_autoindex_noteSubscriber_1 \\(noteId=\\? AND userId=\\?\\) LEFT-JOIN
-USE TEMP B-TREE FOR LAST 2 TERMS OF ORDER BY)`,
+SEARCH note USING INDEX note_edited_idx (edited=? AND id<?)
+SEARCH noteSubscriber USING PRIMARY KEY (noteId=? AND userId=?) LEFT-JOIN
+USE TEMP B-TREE FOR ORDER BY`,
 	},
 	{
 		sortState: [],
-		expected: `SEARCH note USING INDEX sqlite_autoindex_note_1 \\(id<\\?\\)
-SCAN template
-SEARCH noteSubscriber USING INDEX sqlite_autoindex_noteSubscriber_1 \\(noteId=\\? AND userId=\\?\\) LEFT-JOIN`,
+		expected: `SEARCH note USING PRIMARY KEY (id<?)
+BLOOM FILTER ON template (nook=? AND id=?)
+SEARCH template USING INDEX template_nook_idx (nook=? AND id=?)
+SEARCH noteSubscriber USING PRIMARY KEY (noteId=? AND userId=?) LEFT-JOIN`,
 	},
 	{
 		sortState: [
@@ -302,9 +300,10 @@ SEARCH noteSubscriber USING INDEX sqlite_autoindex_noteSubscriber_1 \\(noteId=\\
 				desc: undefined,
 			},
 		],
-		expected: `SEARCH note USING INDEX sqlite_autoindex_note_1 \\(id>\\?\\)
-SCAN template
-SEARCH noteSubscriber USING INDEX sqlite_autoindex_noteSubscriber_1 \\(noteId=\\? AND userId=\\?\\) LEFT-JOIN`,
+		expected: `SEARCH note USING PRIMARY KEY (id>?)
+BLOOM FILTER ON template (nook=? AND id=?)
+SEARCH template USING INDEX template_nook_idx (nook=? AND id=?)
+SEARCH noteSubscriber USING PRIMARY KEY (noteId=? AND userId=?) LEFT-JOIN`,
 	},
 	{
 		sortState: [
@@ -314,8 +313,9 @@ SEARCH noteSubscriber USING INDEX sqlite_autoindex_noteSubscriber_1 \\(noteId=\\
 			},
 		],
 		expected: `SCAN note USING INDEX note_edited_idx
-SCAN template
-SEARCH noteSubscriber USING INDEX sqlite_autoindex_noteSubscriber_1 \\(noteId=\\? AND userId=\\?\\) LEFT-JOIN`,
+BLOOM FILTER ON template (nook=? AND id=?)
+SEARCH template USING INDEX template_nook_idx (nook=? AND id=?)
+SEARCH noteSubscriber USING PRIMARY KEY (noteId=? AND userId=?) LEFT-JOIN`,
 	},
 ])('sort uses indexes - $sortState', async ({ sortState, expected }) => {
 	_kysely.resetSqlLog()
@@ -360,7 +360,7 @@ SEARCH noteSubscriber USING INDEX sqlite_autoindex_noteSubscriber_1 \\(noteId=\\
 	const details = queryPlan.map((q) => q.detail).join('\n')
 
 	try {
-		expect(details).matches(new RegExp(expected))
+		expect(details).toEqual(expected)
 	} catch (error) {
 		console.error(details)
 		throw error

@@ -3,7 +3,7 @@ create table media
     id        BLOB not null primary key,
     entityId  BLOB not null,
     hash      BLOB not null
-) STRICT;
+) WITHOUT ROWID, STRICT;
 
 create index media_hash_idx
     on media (hash);
@@ -17,7 +17,7 @@ create table media_User
     userId    TEXT not null,
     primary key (mediaHash, userId),
     foreign key (userId) references user(id)
-) STRICT;
+) WITHOUT ROWID, STRICT;
 
 create table nook
 (
@@ -28,7 +28,7 @@ create table nook
     sidebar     TEXT    not null,
     type        INTEGER not null,
     approved    TEXT    null
-) STRICT;
+) WITHOUT ROWID, STRICT;
 
 create table note
 (
@@ -46,7 +46,7 @@ create table note
     ankiId           INTEGER null,
     foreign key (templateId) references template(id),
     foreign key (authorId) references user(id)
-) STRICT;
+) WITHOUT ROWID, STRICT;
 
 create index note_created_idx
     on note (created);
@@ -86,7 +86,7 @@ create table noteComment
     level    INTEGER not null,
     foreign key (noteId) references note(id),
     foreign key (authorId) references user(id)
-) STRICT;
+) WITHOUT ROWID, STRICT;
 
 create index noteComment_authorId_idx
     on noteComment (authorId);
@@ -104,7 +104,7 @@ create table noteProposal
     primary key (noteId, created),
     foreign key (noteId) references note(id),
     foreign key (authorId) references user(id)
-) STRICT;
+) WITHOUT ROWID, STRICT;
 
 create index noteProposal_authorId_idx
     on noteProposal (authorId);
@@ -117,7 +117,7 @@ create table noteSubscriber
     primary key (noteId, userId),
     foreign key (noteId) references note(id),
     foreign key (userId) references user(id)
-) STRICT;
+) WITHOUT ROWID, STRICT;
 
 create index noteSubscriber_userId_idx
     on noteSubscriber (userId);
@@ -131,7 +131,7 @@ create table post
     authorId TEXT not null,
     foreign key (authorId) references user(id),
     foreign key (nook) references nook(id)
-) STRICT;
+) WITHOUT ROWID, STRICT;
 
 create index post_authorId_idx
     on post (authorId);
@@ -153,7 +153,7 @@ create table postComment
     level    INTEGER not null,
     foreign key (postId) references post(id),
     foreign key (authorId) references user(id)
-) STRICT;
+) WITHOUT ROWID, STRICT;
 
 create index postComment_authorId_idx
     on postComment (authorId);
@@ -169,7 +169,7 @@ create table postSubscriber
     primary key (postId, userId),
     foreign key (postId) references post(id),
     foreign key (userId) references user(id)
-) STRICT;
+) WITHOUT ROWID, STRICT;
 
 create index postSubscriber_userId_idx
     on postSubscriber (userId);
@@ -189,7 +189,7 @@ create table template
     commentsCount    INTEGER not null default '0',
     subscribersCount INTEGER not null default '0',
     foreign key (nook) references nook(id)
-) STRICT;
+) WITHOUT ROWID, STRICT;
 
 create index template_ankiId_idx
     on template (ankiId);
@@ -211,7 +211,7 @@ create table templateComment
     level      INTEGER not null,
     foreign key (templateId) references template(id),
     foreign key (authorId) references user(id)
-) STRICT;
+) WITHOUT ROWID, STRICT;
 
 create index templateComment_authorId_idx
     on templateComment (authorId);
@@ -229,7 +229,7 @@ create table templateProposal
     primary key (templateId, created),
     foreign key (templateId) references template(id),
     foreign key (authorId) references user(id)
-) STRICT;
+) WITHOUT ROWID, STRICT;
 
 create index templateProposal_authorId_idx
     on templateProposal (authorId);
@@ -242,7 +242,7 @@ create table templateSubscriber
     primary key (templateId, userId),
     foreign key (templateId) references template(id),
     foreign key (userId) references user(id)
-) STRICT;
+) WITHOUT ROWID, STRICT;
 
 create index templateSubscriber_userId_idx
     on templateSubscriber (userId);
@@ -255,7 +255,7 @@ create table user
     peer    TEXT    null,
     constraint user_email_key
         unique (email)
-) STRICT;
+) WITHOUT ROWID, STRICT;
 
 insert into user (id, email, created, peer) values
     ('Griddle', 'griddle@pentive.com', 0, null),
