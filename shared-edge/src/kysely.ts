@@ -236,15 +236,15 @@ export async function registerUser(id: string, email: string) {
 
 export type NoteSortColumn =
 	| 'subscribers'
-	| 'noteCreated'
+	| 'note.id'
 	| 'noteEdited'
 	| 'comments'
 	| 'til'
 
 export type NoteCursor = Rasterize<
-	Record<Exclude<NoteSortColumn, 'til'>, number> & {
+	Record<Exclude<NoteSortColumn, 'note.id' | 'til'>, number> & {
+		'note.id': RemoteNoteId
 		til: number | null
-		noteId: RemoteNoteId
 	}
 >
 
@@ -295,20 +295,19 @@ export async function getNotes({
 		)
 		.$if(true, (qb) => {
 			if (sortState.length === 0)
-				sortState.push({ id: 'noteCreated' as const, desc: 'desc' as const })
+				sortState.push({ id: 'note.id' as const, desc: 'desc' as const })
 			const lastIndex = sortState.length - 1
-			if (sortState[lastIndex]!.id === 'noteCreated') {
-				sortState[lastIndex]!.id = 'note.id' as never
-			} else {
+			if (sortState[lastIndex]!.id !== 'note.id') {
 				sortState.push({
-					id: 'note.id' as never,
+					id: 'note.id',
 					desc: sortState.at(-1)!.desc, // noteId is asc/desc depending on the last sort col
 				})
 			}
 			if (cursor != null) {
-				const sortVals = sortState.map(
-					(s) => cursor[s.id] ?? fromBase64Url(cursor.noteId),
-				)
+				const sortVals = sortState.map((s) => {
+					const r = cursor[s.id]!
+					return typeof r === 'string' ? fromBase64Url(r) : r
+				})
 				qb = qb.where((eb) => {
 					// the for loops builds sql like the below
 					//   WHERE

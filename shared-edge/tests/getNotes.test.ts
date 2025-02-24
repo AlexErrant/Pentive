@@ -79,12 +79,11 @@ async function getAllNotes(sortState: SortState) {
 			last == null
 				? null
 				: ({
-						noteCreated: dateToEpoch(last.noteCreated),
 						noteEdited: dateToEpoch(last.noteEdited),
 						subscribers: last.subscribers,
 						comments: last.comments,
 						til: maybeDateToEpoch(last.til),
-						noteId: last.id,
+						'note.id': last.id,
 					} satisfies NoteCursor)
 		const page = await getNotes({
 			nook,
@@ -105,7 +104,7 @@ test('cursor/keyset pagination works for getNotes', async () => {
 	const sortState = fc
 		.tuple(
 			fc.boolean().map((desc) => ({
-				id: 'noteCreated' as const,
+				id: 'note.id' as const,
 				desc: desc ? ('desc' as const) : undefined,
 			})),
 			fc.boolean().map((desc) => ({
@@ -113,7 +112,7 @@ test('cursor/keyset pagination works for getNotes', async () => {
 				desc: desc ? ('desc' as const) : undefined,
 			})),
 		)
-		.chain((x) => fc.shuffledSubarray(x, { minLength: 2, maxLength: 2 }))
+		.chain((x) => fc.shuffledSubarray(x, { minLength: 1, maxLength: 1 }))
 	const arbNum = fc.integer({ min: 0, max: 5 })
 	const createdEditeds = fc.uniqueArray(
 		fc
@@ -231,20 +230,11 @@ interface SimplifiedNote {
 function sort(
 	a: SimplifiedNote,
 	b: SimplifiedNote,
-	sortState: Array<
-		| {
-				id: 'noteCreated'
-				desc: 'desc' | undefined
-		  }
-		| {
-				id: 'noteEdited'
-				desc: 'desc' | undefined
-		  }
-	>,
+	sortState: SortState,
 ): number {
 	/* eslint-disable @typescript-eslint/strict-boolean-expressions */
 	for (const { id, desc } of sortState) {
-		if (id === 'noteCreated') {
+		if (id === 'note.id') {
 			if (a.created > b.created) return desc ? -1 : 1
 			if (a.created < b.created) return desc ? 1 : -1
 		}
@@ -266,7 +256,7 @@ test.each([
 	{
 		sortState: [
 			{
-				id: 'noteCreated' as const,
+				id: 'note.id' as const,
 				desc: undefined,
 			},
 			{
@@ -274,17 +264,11 @@ test.each([
 				desc: 'desc' as const,
 			},
 		],
-		// I'm not thrilled at `SCAN note USING INDEX` but whatever
-		expected: `SEARCH template USING INDEX template_nook_idx (nook=?)
-MULTI-INDEX OR
-INDEX 1
-SEARCH note USING INDEX note_created_idx (created>?)
-INDEX 2
-SEARCH note USING INDEX note_created_idx (created=?)
-INDEX 3
-SEARCH note USING INDEX note_edited_idx (edited=? AND id<?)
-SEARCH noteSubscriber USING PRIMARY KEY (noteId=? AND userId=?) LEFT-JOIN
-USE TEMP B-TREE FOR ORDER BY`,
+		// This isn't great but users can't sort by multiple columns anyway
+		expected: `SCAN note
+BLOOM FILTER ON template (nook=? AND id=?)
+SEARCH template USING INDEX template_nook_idx (nook=? AND id=?)
+SEARCH noteSubscriber USING PRIMARY KEY (noteId=? AND userId=?) LEFT-JOIN`,
 	},
 	{
 		sortState: [],
@@ -296,7 +280,7 @@ SEARCH noteSubscriber USING PRIMARY KEY (noteId=? AND userId=?) LEFT-JOIN`,
 	{
 		sortState: [
 			{
-				id: 'noteCreated' as const,
+				id: 'note.id' as const,
 				desc: undefined,
 			},
 		],

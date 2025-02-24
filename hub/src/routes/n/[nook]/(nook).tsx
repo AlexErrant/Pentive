@@ -58,7 +58,7 @@ export const route = {
 		void getNotesCached({
 			nook: params.nook as NookId,
 			cursor: null,
-			sortState: [{ id: 'noteCreated', desc: 'desc' }],
+			sortState: [{ id: 'note.id', desc: 'desc' }],
 		})
 	},
 } satisfies RouteDefinition
@@ -69,7 +69,7 @@ export default function Nook(props: RouteSectionProps) {
 	const userId = useUserIdContext()
 	const [sort, setSort] = createSignal<
 		Array<{ id: NoteSortColumn; desc: boolean }>
-	>([{ id: 'noteCreated', desc: true }])
+	>([{ id: 'note.id', desc: true }])
 	const [pagination, setPagination] = createSignal<PaginationState>({
 		pageIndex: 0,
 		pageSize,
@@ -98,9 +98,8 @@ export default function Nook(props: RouteSectionProps) {
 				}
 				const lastItem = lastPage.slice(-1)[0]!
 				return {
-					noteId: lastItem.id,
+					'note.id': lastItem.id,
 					subscribers: lastItem.subscribers,
-					noteCreated: dateToEpoch(lastItem.noteCreated),
 					noteEdited: dateToEpoch(lastItem.noteEdited),
 					comments: lastItem.comments,
 					til: lastItem.til?.getTime() ?? null,
@@ -143,7 +142,7 @@ export default function Nook(props: RouteSectionProps) {
 			},
 			{
 				header: () => 'Created',
-				id: 'noteCreated' satisfies NoteSortColumn,
+				id: 'note.id' satisfies NoteSortColumn,
 				accessorFn: (x) => x.note.created,
 				cell: (info) => (
 					<relative-time prop:date={info.row.original.note.created} />
