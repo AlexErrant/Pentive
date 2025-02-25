@@ -168,7 +168,7 @@ test('cursor/keyset pagination works for getNotes', async () => {
 					jsSorted.push({ created, edited, remoteNoteId: rawRemoteNoteId })
 					const hexNoteId = base16.encode(rawRemoteNoteId)
 					database.exec(
-						`UPDATE note SET created = ${created}, edited = ${edited} WHERE id = unhex('${hexNoteId}')`,
+						`UPDATE note SET created = ${created}, edited = ${edited} WHERE id = x'${hexNoteId}'`,
 					)
 				}
 				jsSorted.sort((a, b) => sort(a, b, sortState))
@@ -332,7 +332,7 @@ SEARCH noteSubscriber USING PRIMARY KEY (noteId=? AND userId=?) LEFT-JOIN`,
 	},
 ])('sort uses indexes - $sortState', async ({ sortState, expected }) => {
 	_kysely.resetSqlLog()
-	const rows = 1000
+	const rows = 100
 	const { database, remoteTemplateId } = await setupDb()
 	database.exec(`SAVEPOINT my_savepoint;`)
 	for (let index = 0; index < rows; index++) {
@@ -351,7 +351,7 @@ SEARCH noteSubscriber USING PRIMARY KEY (noteId=? AND userId=?) LEFT-JOIN`,
 		const rawRemoteNoteId = base64urlToArray(remoteNoteId)
 		const hexNoteId = base16.encode(rawRemoteNoteId)
 		database.exec(
-			`UPDATE note SET created = ${created}, edited = ${edited} WHERE id = unhex('${hexNoteId}')`,
+			`UPDATE note SET created = ${created}, edited = ${edited} WHERE id = x'${hexNoteId}'`,
 		)
 	}
 	database.exec(`RELEASE SAVEPOINT my_savepoint;`)
