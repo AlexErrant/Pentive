@@ -142,6 +142,7 @@ test('cursor/keyset pagination works for getNotes', async () => {
 			},
 		},
 	)
+	let lastDb: Database.Database | undefined
 	await fc.assert(
 		fc.asyncProperty(
 			fc.record({
@@ -195,11 +196,15 @@ test('cursor/keyset pagination works for getNotes', async () => {
 					console.log('actualNotes', actualNotes.map(prettier))
 					console.log('jsSorted', jsSorted.map(prettier))
 					console.log('sqlLog', _kysely.sqlLog.map(_kysely.prettierSqlLog))
+					lastDb = database
 					throw e
 				}
 			},
 		),
 	)
+	if (lastDb != null) {
+		// fs.writeFileSync('shrunken.db', lastDb.serialize())
+	}
 })
 
 function prettier({ remoteNoteId, ...n }: SimplifiedNote) {
