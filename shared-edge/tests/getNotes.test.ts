@@ -306,6 +306,30 @@ BLOOM FILTER ON template (nook=? AND id=?)
 SEARCH template USING INDEX template_nook_idx (nook=? AND id=?)
 SEARCH noteSubscriber USING PRIMARY KEY (noteId=? AND userId=?) LEFT-JOIN`,
 	},
+	{
+		sortState: [
+			{
+				id: 'note.id' as const,
+				desc: 'desc' as const,
+			},
+		],
+		expected: `SEARCH note USING PRIMARY KEY (id<?)
+BLOOM FILTER ON template (nook=? AND id=?)
+SEARCH template USING INDEX template_nook_idx (nook=? AND id=?)
+SEARCH noteSubscriber USING PRIMARY KEY (noteId=? AND userId=?) LEFT-JOIN`,
+	},
+	{
+		sortState: [
+			{
+				id: 'noteEdited' as const,
+				desc: 'desc' as const,
+			},
+		],
+		expected: `SCAN note USING INDEX note_edited_idx
+BLOOM FILTER ON template (nook=? AND id=?)
+SEARCH template USING INDEX template_nook_idx (nook=? AND id=?)
+SEARCH noteSubscriber USING PRIMARY KEY (noteId=? AND userId=?) LEFT-JOIN`,
+	},
 ])('sort uses indexes - $sortState', async ({ sortState, expected }) => {
 	_kysely.resetSqlLog()
 	const rows = 1000
