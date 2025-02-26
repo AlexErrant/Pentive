@@ -90,7 +90,10 @@ export function base64urlId<T extends Base64Url>(epochMs?: number) {
 }
 
 const _binary =
-	process.env.NODE_ENV === 'test'
+	// doesn't actually error when built by `app`
+	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+	// @ts-ignore don't look for `process` in the browser
+	typeof window === 'undefined' && process.env.NODE_ENV === 'test'
 		? {
 				setRawId: (newRawId: typeof rawId) => {
 					rawId = newRawId
