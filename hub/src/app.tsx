@@ -8,7 +8,13 @@ import { UserIdProvider } from './components/userIdContext'
 import { QueryClient, QueryClientProvider } from '@tanstack/solid-query'
 import { SolidQueryDevtools } from '@tanstack/solid-query-devtools'
 
-const queryClient = new QueryClient()
+const queryClient = new QueryClient({
+	defaultOptions: {
+		queries: {
+			staleTime: 5000,
+		},
+	},
+})
 
 export default function App() {
 	return (

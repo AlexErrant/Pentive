@@ -14,7 +14,9 @@ export const route = {
 } satisfies RouteDefinition
 
 export default function Nooks(): JSX.Element {
-	const nooks = createAsync(async () => await getNooksCached())
+	const nooks = createAsync(async () => await getNooksCached(), {
+		deferStream: true,
+	})
 	return (
 		<main>
 			<ul>
