@@ -6,6 +6,8 @@ import {
 	pageSize,
 	type NoteCursor,
 	type SortState,
+	type GetNotesParam,
+	getNotesParam,
 } from 'shared-edge'
 import { noteOrds, toSampleCard } from 'shared-dom/cardHtml'
 import type { NookId, Ord } from 'shared/brand'
@@ -32,7 +34,6 @@ import {
 } from '@tanstack/solid-table'
 import '@github/relative-time-element'
 import { createInfiniteQuery, keepPreviousData } from '@tanstack/solid-query'
-import { useUserIdContext } from '~/components/userIdContext'
 import { Dynamic } from 'solid-js/web'
 import { dateToEpoch } from 'shared/utility'
 
@@ -41,15 +42,9 @@ const getPostsCached = query(async (nook: string) => {
 	return await getPosts({ nook })
 }, 'posts')
 
-type GetNotesParam = Parameters<typeof getNotes>[0]
-type GetNotesParamOptionalUser = Omit<GetNotesParam, 'userId'> & {
-	userId?: GetNotesParam['userId']
-}
-
-const getNotesCached = query(async (x: GetNotesParamOptionalUser) => {
+const getNotesCached = query(async (x: GetNotesParam) => {
 	'use server'
-	if (x.userId === undefined) x.userId = await getUserId()
-	return await getNotes(x as GetNotesParam)
+	return await getNotes(getNotesParam.parse(x), await getUserId())
 }, 'notes')
 
 export const route = {
@@ -57,7 +52,7 @@ export const route = {
 		void getPostsCached(params.nook!)
 		void getNotesCached({
 			nook: params.nook as NookId,
-			cursor: null,
+			cursor: undefined,
 			sortState: [{ id: 'note.id', desc: 'desc' }],
 		})
 	},
@@ -66,7 +61,6 @@ export const route = {
 type Note = Awaited<ReturnType<typeof getNotesCached>>[0]
 
 export default function Nook(props: RouteSectionProps) {
-	const userId = useUserIdContext()
 	const [sort, setSort] = createSignal<
 		Array<{ id: NoteSortColumn; desc: boolean }>
 	>([{ id: 'note.id', desc: true }])
@@ -85,12 +79,11 @@ export default function Nook(props: RouteSectionProps) {
 				id: s.id,
 				desc: s.desc ? ('desc' as const) : undefined,
 			})) satisfies SortState,
-			userId: userId(),
 		}
 		return {
 			queryKey: ['nook/notes', params],
 			queryFn: async ({ pageParam }) =>
-				await getNotesCached({ cursor: pageParam, ...params }),
+				await getNotesCached({ cursor: pageParam ?? undefined, ...params }),
 			initialPageParam: null as NoteCursor | null,
 			getNextPageParam: (lastPage) => {
 				if (lastPage.length < pageSize) {
@@ -102,7 +95,7 @@ export default function Nook(props: RouteSectionProps) {
 					subscribers: lastItem.subscribers,
 					noteEdited: dateToEpoch(lastItem.noteEdited),
 					comments: lastItem.comments,
-					til: lastItem.til?.getTime() ?? null,
+					til: lastItem.til?.getTime(),
 				} satisfies NoteCursor
 			},
 			refetchOnWindowFocus: false,

@@ -77,20 +77,22 @@ async function getAllNotes(sortState: SortState) {
 		const last = paginatedNotes.at(-1)
 		const cursor =
 			last == null
-				? null
+				? undefined
 				: ({
 						noteEdited: dateToEpoch(last.noteEdited),
 						subscribers: last.subscribers,
 						comments: last.comments,
-						til: maybeDateToEpoch(last.til),
+						til: maybeDateToEpoch(last.til) ?? undefined,
 						'note.id': last.id,
 					} satisfies NoteCursor)
-		const page = await getNotes({
-			nook,
+		const page = await getNotes(
+			{
+				nook,
+				sortState: cloneDeep(sortState), // getNotes mutates this, which is fine in prod but not for testing
+				cursor,
+			},
 			userId,
-			sortState: cloneDeep(sortState), // getNotes mutates this, which is fine in prod but not for testing
-			cursor,
-		})
+		)
 		if (page.length === 0) {
 			break
 		} else {
@@ -174,12 +176,14 @@ test('cursor/keyset pagination works for getNotes', async () => {
 				jsSorted.sort((a, b) => sort(a, b, sortState))
 
 				_kysely.setPageSize(100_000_000)
-				const sqlSorted = await getNotes({
-					nook,
+				const sqlSorted = await getNotes(
+					{
+						nook,
+						sortState,
+						cursor: undefined,
+					},
 					userId,
-					sortState,
-					cursor: null,
-				}).then((x) => x.map(simplifyNote))
+				).then((x) => x.map(simplifyNote))
 
 				// Act
 				_kysely.setPageSize(3)

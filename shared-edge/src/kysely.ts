@@ -30,15 +30,17 @@ import type {
 } from 'shared/brand'
 import { ftsNormalize } from 'shared/htmlToText'
 import { imgPlaceholder } from 'shared/image'
-import type {
-	RemoteTemplate,
-	RemoteNote,
-	CreateRemoteNote,
-	CreateRemoteTemplate,
-	EditRemoteNote,
-	EditRemoteTemplate,
-	TemplateType,
-	Status,
+import {
+	type RemoteTemplate,
+	type RemoteNote,
+	type CreateRemoteNote,
+	type CreateRemoteTemplate,
+	type EditRemoteNote,
+	type EditRemoteTemplate,
+	type TemplateType,
+	type Status,
+	remoteNoteId,
+	nookId,
 } from 'shared/schema'
 import {
 	nullMap,
@@ -47,7 +49,6 @@ import {
 	type SqliteCount,
 	objEntries,
 	escapeRegExp,
-	type Rasterize,
 	epochToDate,
 	maybeEpochToDate,
 	dateToEpoch,
@@ -65,6 +66,7 @@ import {
 import { buildPublicToken, type PublicMediaSecret } from './publicToken'
 import type { CompiledQuery } from 'kysely'
 export type * from 'kysely'
+import { z } from 'zod'
 
 // @ts-expect-error db calls should throw null error if not setup
 export let db: Kysely<DB> = null as Kysely<DB>
@@ -234,34 +236,41 @@ export async function registerUser(id: string, email: string) {
 	await db.insertInto('user').values({ id, email }).execute()
 }
 
-export type NoteSortColumn =
-	| 'subscribers'
-	| 'note.id'
-	| 'noteEdited'
-	| 'comments'
-	| 'til'
+const noteCursor = z.object({
+	'note.id': remoteNoteId,
+	subscribers: z.number(),
+	noteEdited: z.number(),
+	comments: z.number(),
+	til: z.number().optional(),
+})
+export type NoteCursor = z.infer<typeof noteCursor>
 
-export type NoteCursor = Rasterize<
-	Record<Exclude<NoteSortColumn, 'note.id' | 'til'>, number> & {
-		'note.id': RemoteNoteId
-		til: number | null
-	}
->
+const noteSortColumn = noteCursor.keyof()
+export type NoteSortColumn = z.infer<typeof noteSortColumn>
 
 export let pageSize = 3
-export type SortState = Array<{ id: NoteSortColumn; desc: 'desc' | undefined }>
 
-export async function getNotes({
-	nook,
-	userId,
+const sortState = z.array(
+	z.object({
+		id: noteSortColumn,
+		desc: z.union([z.literal('desc'), z.literal(undefined)]),
+	}),
+)
+
+export type SortState = z.infer<typeof sortState>
+
+export const getNotesParam = z.object({
+	nook: nookId,
 	sortState,
-	cursor,
-}: {
-	nook: NookId
-	userId: UserId | null
-	sortState: SortState
-	cursor: NoteCursor | null
-}) {
+	cursor: noteCursor.optional(),
+})
+
+export type GetNotesParam = z.infer<typeof getNotesParam>
+
+export async function getNotes(
+	{ nook, sortState, cursor }: GetNotesParam,
+	userId: UserId | null,
+) {
 	const r = db
 		.selectFrom('note')
 		.innerJoin('template', 'template.id', 'note.templateId')

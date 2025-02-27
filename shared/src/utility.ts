@@ -82,11 +82,10 @@ export function parseSet<T>(rawSet: string) {
 }
 
 // https://stackoverflow.com/questions/51599481/replacing-property-of-a-typescript-type#comment134810492_72983690
-export type Override<T, U extends Partial<Record<keyof T, unknown>>> = Omit<
+export type Override<
 	T,
-	keyof U
-> &
-	U
+	U extends Partial<Record<keyof T, unknown>>,
+> = Rasterize<Omit<T, keyof U> & U>
 
 export const objKeys: <TKey extends string, TVal>(
 	o: Record<TKey, TVal>,

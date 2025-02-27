@@ -22,6 +22,7 @@ const base64UrlId = z.string().regex(/^[a-zA-Z0-9_-]{22}$/) as unknown
 const base64urlHash = z.string().regex(/^[a-zA-Z0-9_-]{43}$/) as unknown
 export const remoteNoteId = base64UrlId as z.Schema<RemoteNoteId>
 export const remoteTemplateId = base64UrlId as z.Schema<RemoteTemplateId>
+export const templateId = base64UrlId as z.Schema<TemplateId>
 export const remoteTemplateNoteId = base64UrlId as z.Schema<
 	RemoteTemplateId | RemoteNoteId
 >
@@ -146,7 +147,7 @@ const templateUneditable = {
 export const createRemoteTemplate = remoteTemplate
 	.omit(templateUneditable)
 	.extend({
-		localId: z.string() as unknown as z.Schema<TemplateId>,
+		localId: templateId,
 		nooks: z.array(nookId),
 	})
 
@@ -156,7 +157,7 @@ export const editRemoteTemplate = remoteTemplate
 	.omit(templateUneditable)
 	.extend({
 		remoteIds: z.array(remoteTemplateId).min(1),
-		localId: z.string() as unknown as z.Schema<TemplateId>,
+		localId: templateId,
 	})
 
 export type EditRemoteTemplate = z.infer<typeof editRemoteTemplate>
