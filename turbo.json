@@ -96,6 +96,13 @@
 			],
 			"outputs": [
 				"distDev/**"
+			],
+			"inputs": [
+				"$TURBO_DEFAULT$",
+				".env.development",
+				".env.production",
+				".env.production.local",
+				".env"
 			]
 		},
 		"previewDev": {
