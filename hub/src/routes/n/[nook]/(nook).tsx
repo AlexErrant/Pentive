@@ -36,6 +36,7 @@ import '@github/relative-time-element'
 import { createInfiniteQuery, keepPreviousData } from '@tanstack/solid-query'
 import { Dynamic } from 'solid-js/web'
 import { dateToEpoch } from 'shared/utility'
+import { LoadingSpinner } from 'shared-dom/icons'
 
 const getPostsCached = query(async (nook: string) => {
 	'use server'
@@ -215,15 +216,20 @@ export default function Nook(props: RouteSectionProps) {
 				</For>
 			</ul>
 			<Show when={notes.data?.pages[0]?.length !== 0}>
-				<table class='w-full table-auto text-left'>
-					<thead>
-						<For each={table.getHeaderGroups()}>
-							{(headerGroup) => (
-								<tr>
-									<For each={headerGroup.headers}>
-										{(header) => (
-											<th colSpan={header.colSpan}>
-												<Show when={!header.isPlaceholder}>
+				<div class='relative'>
+					<Show when={notes.isFetching}>
+						<div class='bg-white absolute inset-0 flex items-center justify-center bg-opacity-50'>
+							<LoadingSpinner class='text-gray-200 h-8 w-8 animate-spin fill-blue-600 dark:text-gray-600' />
+						</div>
+					</Show>
+					<table class='w-full table-auto text-left'>
+						<thead>
+							<For each={table.getHeaderGroups()}>
+								{(headerGroup) => (
+									<tr>
+										<For each={headerGroup.headers}>
+											{(header) => (
+												<th colSpan={header.colSpan}>
 													<div
 														class={
 															header.column.getCanSort()
@@ -241,51 +247,51 @@ export default function Nook(props: RouteSectionProps) {
 															desc: ' 🔽',
 														}[header.column.getIsSorted() as string] ?? null}
 													</div>
-												</Show>
-											</th>
-										)}
-									</For>
-								</tr>
-							)}
-						</For>
-					</thead>
-					<tbody>
-						<Index each={table.getRowModel().rows}>
-							{(row) => (
-								<tr>
-									<Index each={row().getVisibleCells()}>
-										{(cell) => (
-											<td>
-												<Dynamic
-													component={cell().column.columnDef.cell}
-													{...cell().getContext()}
-												/>
-											</td>
-										)}
-									</Index>
-								</tr>
-							)}
-						</Index>
-					</tbody>
-					<tfoot>
-						<For each={table.getFooterGroups()}>
-							{(footerGroup) => (
-								<tr>
-									<For each={footerGroup.headers}>
-										{(header) => (
-											<th>
-												<Dynamic
-													component={header.column.columnDef.footer}
-													{...header.getContext()}
-												/>
-											</th>
-										)}
-									</For>
-								</tr>
-							)}
-						</For>
-					</tfoot>
-				</table>
+												</th>
+											)}
+										</For>
+									</tr>
+								)}
+							</For>
+						</thead>
+						<tbody>
+							<Index each={table.getRowModel().rows}>
+								{(row) => (
+									<tr>
+										<Index each={row().getVisibleCells()}>
+											{(cell) => (
+												<td>
+													<Dynamic
+														component={cell().column.columnDef.cell}
+														{...cell().getContext()}
+													/>
+												</td>
+											)}
+										</Index>
+									</tr>
+								)}
+							</Index>
+						</tbody>
+						<tfoot>
+							<For each={table.getFooterGroups()}>
+								{(footerGroup) => (
+									<tr>
+										<For each={footerGroup.headers}>
+											{(header) => (
+												<th>
+													<Dynamic
+														component={header.column.columnDef.footer}
+														{...header.getContext()}
+													/>
+												</th>
+											)}
+										</For>
+									</tr>
+								)}
+							</For>
+						</tfoot>
+					</table>
+				</div>
 				<button
 					class='rounded border p-1'
 					onClick={async () => {
