@@ -9,16 +9,16 @@ import { QueryClient, QueryClientProvider } from '@tanstack/solid-query'
 import { SolidQueryDevtools } from '@tanstack/solid-query-devtools'
 import { isServer } from 'solid-js/web'
 
-const queryClient = new QueryClient({
-	defaultOptions: {
-		queries: {
-			staleTime: 5000,
-			refetchOnMount: () => !isServer, // don't refetch on the server
-		},
-	},
-})
-
 export default function App() {
+	// do not lift out https://github.com/TanStack/query/blob/18e357c2973f13723f71a0c7a623e99d9fcdb00c/docs/framework/react/guides/ssr.md?plain=1#L55-L60
+	const queryClient = new QueryClient({
+		defaultOptions: {
+			queries: {
+				staleTime: 5000,
+				refetchOnMount: () => !isServer, // don't refetch on the server
+			},
+		},
+	})
 	return (
 		<UserIdProvider>
 			<ThemeProvider>
