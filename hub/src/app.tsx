@@ -7,11 +7,13 @@ import { ThemeProvider } from 'shared-dom/themeSelector'
 import { UserIdProvider } from './components/userIdContext'
 import { QueryClient, QueryClientProvider } from '@tanstack/solid-query'
 import { SolidQueryDevtools } from '@tanstack/solid-query-devtools'
+import { isServer } from 'solid-js/web'
 
 const queryClient = new QueryClient({
 	defaultOptions: {
 		queries: {
 			staleTime: 5000,
+			refetchOnMount: () => !isServer, // don't refetch on the server
 		},
 	},
 })
