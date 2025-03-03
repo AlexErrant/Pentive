@@ -1,4 +1,4 @@
-import { createSignal, For, Index, Show } from 'solid-js'
+import { createEffect, createSignal, For, Index, Show } from 'solid-js'
 import {
 	getPosts,
 	getNotes,
@@ -37,6 +37,7 @@ import { createInfiniteQuery, keepPreviousData } from '@tanstack/solid-query'
 import { Dynamic } from 'solid-js/web'
 import { dateToEpoch } from 'shared/utility'
 import { LoadingSpinner } from 'shared-dom/icons'
+import { toastError } from 'shared-dom/toasts'
 
 const getPostsCached = query(async (nook: string) => {
 	'use server'
@@ -107,9 +108,15 @@ export default function Nook(props: RouteSectionProps) {
 	const nookDetails = createAsync(
 		async () => await getNookDetailsCached(props.params.nook),
 	)
+	createEffect(() => {
+		if (notes.isError) {
+			toastError(notes.error.message)
+		}
+	})
 	const table = createSolidTable({
 		onSortingChange: setSort,
 		manualSorting: true,
+		enableMultiSort: false,
 
 		onPaginationChange: setPagination,
 		manualPagination: true,

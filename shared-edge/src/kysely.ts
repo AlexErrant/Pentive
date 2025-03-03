@@ -250,12 +250,14 @@ export type NoteSortColumn = z.infer<typeof noteSortColumn>
 
 export let pageSize = 3
 
-const sortState = z.array(
-	z.object({
-		id: noteSortColumn,
-		desc: z.union([z.literal('desc'), z.literal(undefined)]),
-	}),
-)
+const sortState = z
+	.array(
+		z.object({
+			id: noteSortColumn,
+			desc: z.union([z.literal('desc'), z.literal(undefined)]),
+		}),
+	)
+	.max(1)
 
 export type SortState = z.infer<typeof sortState>
 
