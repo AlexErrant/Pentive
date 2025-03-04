@@ -1,25 +1,25 @@
-interface Container {
+interface MyContainer {
 	regex: () => string
 	render: (i: string) => string
 	unused: string
 }
 
-const container: Container = {
+const container: MyContainer = {
 	regex(): string {
 		return 'base_regex'
 	},
-	render(this: Container, i: string): string {
+	render(this: MyContainer, i: string): string {
 		return `base_render(${this.regex()}). Input(${i}).`
 	},
 	unused: '',
 }
 
-const plugin = (c: Container): Partial<Container> => {
+const plugin = (c: MyContainer): Partial<MyContainer> => {
 	return {
 		regex: () => {
 			return `plugin_regex(${c.regex()})`
 		},
-		render (i) {
+		render(i) {
 			return `plugin_render(${c.render.bind(this)(i)})`
 			// The `bind(this)` is very important! In the original container, `render` has a dependency on `regex` (L12).
 			// The plugin's render (L22) calls the container's  `render` (L23) which in turn calls the container's `regex` (L12).
