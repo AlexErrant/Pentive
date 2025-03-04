@@ -26,7 +26,7 @@
 		"@solidjs/router": "^0.15.3",
 		"config": "workspace:*",
 		"typescript": "~5.7.3",
-		"vite": "^5.4.11",
+		"vite": "^6.2.0",
 		"vite-plugin-solid": "^2.11.6"
 	},
 	"dependencies": {
