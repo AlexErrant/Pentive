@@ -25,14 +25,14 @@
 	},
 	"devDependencies": {
 		"@playwright/test": "1.49.0-alpha-2024-11-09",
-		"@solidjs/router": "^0.15.2",
+		"@solidjs/router": "^0.15.3",
 		"@types/lodash-es": "^4.17.12",
 		"@types/node": "20.14.11",
 		"config": "workspace:*",
 		"dotenv": "^16.3.1",
 		"typescript": "~5.7.3",
 		"vite": "^5.4.11",
-		"vite-plugin-solid": "^2.11.0"
+		"vite-plugin-solid": "^2.11.6"
 	},
 	"dependencies": {
 		"@scure/base": "^1.2.4",
@@ -40,6 +40,6 @@
 		"fast-check": "^3.23.1",
 		"lodash-es": "^4.17.21",
 		"shared": "workspace:*",
-		"solid-js": "^1.9.4"
+		"solid-js": "^1.9.5"
 	}
 }
