@@ -20,7 +20,7 @@
 	"main": "./dist/index.js",
 	"devDependencies": {
 		"@cloudflare/kv-asset-handler": "^0.3.0",
-		"@cloudflare/workers-types": "^4.20240725.0",
+		"@cloudflare/workers-types": "^4.20250303.0",
 		"@lezer/lr": "^1.4.2 || See comment on html-to-text",
 		"@tailwindcss/forms": "^0.5.7",
 		"@thisbeyond/solid-select": "^0.14.0 || See comment on html-to-text",

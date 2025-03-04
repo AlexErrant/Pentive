@@ -28,7 +28,7 @@
 	},
 	"devDependencies": {
 		"@babel/core": "^7.23.0",
-		"@cloudflare/workers-types": "^4.20240725.0",
+		"@cloudflare/workers-types": "^4.20250303.0",
 		"@tailwindcss/forms": "^0.5.7",
 		"@types/diff": "^5.0.5",
 		"@types/json-schema": "^7.0.15",

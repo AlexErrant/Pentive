@@ -21,7 +21,7 @@
 		"test:run": "vitest run"
 	},
 	"devDependencies": {
-		"@cloudflare/workers-types": "^4.20240725.0",
+		"@cloudflare/workers-types": "^4.20250303.0",
 		"@types/better-sqlite3": "^7.6.12",
 		"@types/lodash-es": "^4.17.12",
 		"@types/node": "20.14.11",

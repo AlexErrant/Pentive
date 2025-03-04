@@ -53,7 +53,7 @@ importers:
         version: 5.7.3
       wrangler:
         specifier: ^3.81.0
-        version: 3.81.0(@cloudflare/workers-types@4.20240725.0)
+        version: 3.81.0(@cloudflare/workers-types@4.20250303.0)
 
   api-ugc:
     dependencies:
@@ -86,8 +86,8 @@ importers:
         version: 3.22.4
     devDependencies:
       '@cloudflare/workers-types':
-        specifier: ^4.20240725.0
-        version: 4.20240725.0
+        specifier: ^4.20250303.0
+        version: 4.20250303.0
       config:
         specifier: workspace:*
         version: link:../config
@@ -96,7 +96,7 @@ importers:
         version: 5.7.3
       wrangler:
         specifier: ^3.81.0
-        version: 3.81.0(@cloudflare/workers-types@4.20240725.0)
+        version: 3.81.0(@cloudflare/workers-types@4.20250303.0)
 
   app:
     dependencies:
@@ -318,8 +318,8 @@ importers:
         specifier: ^7.23.0
         version: 7.26.0
       '@cloudflare/workers-types':
-        specifier: ^4.20240725.0
-        version: 4.20240725.0
+        specifier: ^4.20250303.0
+        version: 4.20250303.0
       '@tailwindcss/forms':
         specifier: ^0.5.7
         version: 0.5.7(tailwindcss@3.4.15(ts-node@10.9.2(@types/node@20.14.11)(typescript@5.7.3)))
@@ -412,7 +412,7 @@ importers:
         version: 7.3.0
       wrangler:
         specifier: ^3.81.0
-        version: 3.81.0(@cloudflare/workers-types@4.20240725.0)
+        version: 3.81.0(@cloudflare/workers-types@4.20250303.0)
 
   app-playwright:
     dependencies:
@@ -485,8 +485,8 @@ importers:
         version: link:../shared-dom
     devDependencies:
       '@cloudflare/workers-types':
-        specifier: ^4.20240725.0
-        version: 4.20240725.0
+        specifier: ^4.20250303.0
+        version: 4.20250303.0
       '@types/node':
         specifier: 20.14.11
         version: 20.14.11
@@ -516,7 +516,7 @@ importers:
         version: 7.3.0
       wrangler:
         specifier: ^3.81.0
-        version: 3.81.0(@cloudflare/workers-types@4.20240725.0)
+        version: 3.81.0(@cloudflare/workers-types@4.20250303.0)
 
   config:
     devDependencies:
@@ -576,8 +576,8 @@ importers:
         version: 3.22.4
     devDependencies:
       '@cloudflare/workers-types':
-        specifier: ^4.20240725.0
-        version: 4.20240725.0
+        specifier: ^4.20250303.0
+        version: 4.20250303.0
       config:
         specifier: workspace:*
         version: link:../config
@@ -586,7 +586,7 @@ importers:
         version: 5.7.3
       wrangler:
         specifier: ^3.81.0
-        version: 3.81.0(@cloudflare/workers-types@4.20240725.0)
+        version: 3.81.0(@cloudflare/workers-types@4.20250303.0)
 
   example-plugins/solid:
     dependencies:
@@ -762,8 +762,8 @@ importers:
         specifier: ^0.3.0
         version: 0.3.4
       '@cloudflare/workers-types':
-        specifier: ^4.20240725.0
-        version: 4.20240725.0
+        specifier: ^4.20250303.0
+        version: 4.20250303.0
       '@lezer/lr':
         specifier: ^1.4.2 || See comment on html-to-text
         version: 1.4.2
@@ -805,7 +805,7 @@ importers:
         version: 5.4.11(@types/node@22.13.9)(sass@1.85.1)(terser@5.39.0)
       wrangler:
         specifier: ^3.81.0
-        version: 3.81.0(@cloudflare/workers-types@4.20240725.0)
+        version: 3.81.0(@cloudflare/workers-types@4.20250303.0)
 
   hub-ugc:
     dependencies:
@@ -829,8 +829,8 @@ importers:
         version: link:../shared-dom
     devDependencies:
       '@cloudflare/workers-types':
-        specifier: ^4.20240725.0
-        version: 4.20240725.0
+        specifier: ^4.20250303.0
+        version: 4.20250303.0
       '@types/node':
         specifier: 20.14.11
         version: 20.14.11
@@ -860,7 +860,7 @@ importers:
         version: 7.3.0
       wrangler:
         specifier: ^3.81.0
-        version: 3.81.0(@cloudflare/workers-types@4.20240725.0)
+        version: 3.81.0(@cloudflare/workers-types@4.20250303.0)
 
   lrpc:
     dependencies:
@@ -1185,8 +1185,8 @@ importers:
         version: 3.22.4
     devDependencies:
       '@cloudflare/workers-types':
-        specifier: ^4.20240725.0
-        version: 4.20240725.0
+        specifier: ^4.20250303.0
+        version: 4.20250303.0
       '@types/better-sqlite3':
         specifier: ^7.6.12
         version: 7.6.12
@@ -1973,8 +1973,8 @@ packages:
     resolution: {integrity: sha512-rfUCvb3hx4AsvdUZsxgk9lmgEnQehqV3jdtXLP/Xr0+P56n11T/0nXNMzmn7Nnv+IJFOV6X9NmFhuMz4sBPw7w==}
     engines: {node: '>=16.7.0'}
 
-  '@cloudflare/workers-types@4.20240725.0':
-    resolution: {integrity: sha512-L6T/Bg50zm9IIACQVQ0CdVcQL+2nLkRXdPz6BsXF3SlzgjyWR5ndVctAbfr/HLV7aKYxWnnEZsIORsTWb+FssA==}
+  '@cloudflare/workers-types@4.20250303.0':
+    resolution: {integrity: sha512-O7F7nRT4bbmwHf3gkRBLfJ7R6vHIJ/oZzWdby6obOiw2yavUfp/AIwS7aO2POu5Cv8+h3TXS3oHs3kKCZLraUA==}
 
   '@codemirror/autocomplete@6.18.0':
     resolution: {integrity: sha512-5DbOvBbY4qW5l57cjDsmmpDh3/TeK1vXfTHa+BUMrRzdWdcxKZ4U4V7vQaTtOpApNU4kLS4FQ6cINtLg245LXA==}
@@ -11598,7 +11598,7 @@ snapshots:
       mime: 3.0.0
       zod: 3.22.4
 
-  '@cloudflare/workers-types@4.20240725.0': {}
+  '@cloudflare/workers-types@4.20250303.0': {}
 
   '@codemirror/autocomplete@6.18.0(@codemirror/language@6.10.2)(@codemirror/state@6.4.1)(@codemirror/view@6.33.0)(@lezer/common@1.2.3)':
     dependencies:
@@ -21128,7 +21128,7 @@ snapshots:
       '@cloudflare/workerd-linux-arm64': 1.20241011.1
       '@cloudflare/workerd-windows-64': 1.20241011.1
 
-  wrangler@3.81.0(@cloudflare/workers-types@4.20240725.0):
+  wrangler@3.81.0(@cloudflare/workers-types@4.20250303.0):
     dependencies:
       '@cloudflare/kv-asset-handler': 0.3.4
       '@cloudflare/workers-shared': 0.6.0
@@ -21148,7 +21148,7 @@ snapshots:
       workerd: 1.20241011.1
       xxhash-wasm: 1.0.2
     optionalDependencies:
-      '@cloudflare/workers-types': 4.20240725.0
+      '@cloudflare/workers-types': 4.20250303.0
       fsevents: 2.3.3
     transitivePeerDependencies:
       - bufferutil

@@ -21,7 +21,7 @@
 		"stylelint:write": "stylelint **/*.css --fix"
 	},
 	"devDependencies": {
-		"@cloudflare/workers-types": "^4.20240725.0",
+		"@cloudflare/workers-types": "^4.20250303.0",
 		"@types/node": "20.14.11",
 		"config": "workspace:*",
 		"stylelint": "^15.10.3",

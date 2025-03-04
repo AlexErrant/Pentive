@@ -4,7 +4,7 @@
 	"type": "module",
 	"sideEffects": false,
 	"devDependencies": {
-		"@cloudflare/workers-types": "^4.20240725.0",
+		"@cloudflare/workers-types": "^4.20250303.0",
 		"config": "workspace:*",
 		"typescript": "~5.7.3",
 		"wrangler": "^3.81.0"
