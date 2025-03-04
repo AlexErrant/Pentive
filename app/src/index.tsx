@@ -10,7 +10,14 @@ import { TableCountProvider } from './components/tableCountContext'
 import { SolidQueryDevtools } from '@tanstack/solid-query-devtools'
 
 const client = new QueryClient({
-	defaultOptions: { queries: { throwOnError: true } },
+	defaultOptions: {
+		queries: { throwOnError: true },
+		mutations: {
+			onError(error) {
+				C.toastError(error.message, error)
+			},
+		},
+	},
 })
 
 render(

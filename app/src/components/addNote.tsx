@@ -134,9 +134,6 @@ export const AddNote: VoidComponent<{
 					assertNever(props.type)
 			}
 		},
-		onError: () => {
-			C.toastError('Error occurred while saving, see console for details.')
-		},
 	}))
 	return (
 		<>

@@ -36,9 +36,6 @@ const saveButton = (props: {
 					assertNever(props.type)
 			}
 		},
-		onError: () => {
-			C.toastError('Error occurred while saving, see console for details.')
-		},
 	}))
 	const deleteTemplate = createMutation(() => ({
 		mutationFn: async () => {
@@ -46,9 +43,6 @@ const saveButton = (props: {
 		},
 		onSuccess: () => {
 			setTemplateRowDelta(-1)
-		},
-		onError: () => {
-			C.toastError('Error occurred while deleting, see console for details.')
 		},
 	}))
 	return (
