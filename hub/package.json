@@ -34,7 +34,7 @@
 		"tailwindcss": "^3.4.3",
 		"typescript": "~5.7.3",
 		"vite": "^6.2.0",
-		"wrangler": "^3.81.0"
+		"wrangler": "^3.112.0"
 	},
 	"dependencies": {
 		"@codemirror/autocomplete": "^6.18.0",
