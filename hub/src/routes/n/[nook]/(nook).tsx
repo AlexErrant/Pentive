@@ -38,6 +38,7 @@ import { Dynamic } from 'solid-js/web'
 import { dateToEpoch } from 'shared/utility'
 import { LoadingSpinner } from 'shared-dom/icons'
 import { toastError } from 'shared-dom/toasts'
+import { useUserIdContext } from '~/components/userIdContext'
 
 const getPostsCached = query(async (nook: string) => {
 	'use server'
@@ -113,6 +114,7 @@ export default function Nook(props: RouteSectionProps) {
 			toastError(notes.error.message)
 		}
 	})
+	const userId = useUserIdContext()
 	const table = createSolidTable({
 		onSortingChange: setSort,
 		manualSorting: true,
@@ -122,6 +124,12 @@ export default function Nook(props: RouteSectionProps) {
 		manualPagination: true,
 		pageCount: -1,
 		autoResetPageIndex: true,
+
+		initialState: {
+			columnVisibility: {
+				til: userId() != null,
+			},
+		},
 
 		state: {
 			get sorting() {
@@ -237,23 +245,25 @@ export default function Nook(props: RouteSectionProps) {
 										<For each={headerGroup.headers}>
 											{(header) => (
 												<th colSpan={header.colSpan}>
-													<div
-														class={
-															header.column.getCanSort()
-																? 'cursor-pointer select-none'
-																: undefined
-														}
-														onClick={header.column.getToggleSortingHandler()}
-													>
-														<Dynamic
-															component={header.column.columnDef.header}
-															{...header.getContext()}
-														/>
-														{{
-															asc: ' 🔼',
-															desc: ' 🔽',
-														}[header.column.getIsSorted() as string] ?? null}
-													</div>
+													<Show when={!header.isPlaceholder}>
+														<div
+															class={
+																header.column.getCanSort()
+																	? 'cursor-pointer select-none'
+																	: undefined
+															}
+															onClick={header.column.getToggleSortingHandler()}
+														>
+															<Dynamic
+																component={header.column.columnDef.header}
+																{...header.getContext()}
+															/>
+															{{
+																asc: ' 🔼',
+																desc: ' 🔽',
+															}[header.column.getIsSorted() as string] ?? null}
+														</div>
+													</Show>
 												</th>
 											)}
 										</For>
@@ -285,11 +295,13 @@ export default function Nook(props: RouteSectionProps) {
 									<tr>
 										<For each={footerGroup.headers}>
 											{(header) => (
-												<th>
-													<Dynamic
-														component={header.column.columnDef.footer}
-														{...header.getContext()}
-													/>
+												<th colSpan={header.colSpan}>
+													<Show when={!header.isPlaceholder}>
+														<Dynamic
+															component={header.column.columnDef.footer}
+															{...header.getContext()}
+														/>
+													</Show>
 												</th>
 											)}
 										</For>
