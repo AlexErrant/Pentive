@@ -2,8 +2,8 @@
 	"name": "hub",
 	"scripts": {
 		"dev": "vinxi dev --port=3014",
-		"buildDev": "cp ./.env.development ./.env.production.local && vinxi build         # Build with dev envvars",
-		"build": "rm -f ./.env.production.local && vinxi build         # Build with prod envvars",
+		"buildDev": "vinxi build --mode development",
+		"build": "vinxi build",
 		"start": "vinxi start",
 		"preview": "wrangler pages dev dist/ --https-cert-path ./.cert/cert.pem --https-key-path ./.cert/key.pem",
 		"deploy": "wrangler pages deploy dist/",
