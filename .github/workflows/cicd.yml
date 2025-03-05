@@ -122,7 +122,7 @@ jobs:
         run: npx playwright install-deps webkit
 
       - name: turbo
-        run: pnpm turbo:all --concurrency 1 --force $FORCE_TURBO_ALL
+        run: pnpm turbo:all --force $FORCE_TURBO_ALL
         env:
           FORCE_TURBO_ALL: ${{ inputs.forceTurboAll || 'false' }}
 
