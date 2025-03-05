@@ -29,6 +29,6 @@
 		"shared": "workspace:*",
 		"shared-edge": "workspace:*",
 		"superjson": "^1.13.3",
-		"zod": ">=3.22.3"
+		"zod": "^3.24.2"
 	}
 }

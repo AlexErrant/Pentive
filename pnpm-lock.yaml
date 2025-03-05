@@ -82,8 +82,8 @@ importers:
         specifier: ^1.13.3
         version: 1.13.3
       zod:
-        specifier: '>=3.22.3'
-        version: 3.22.4
+        specifier: ^3.24.2
+        version: 3.24.2
     devDependencies:
       '@cloudflare/workers-types':
         specifier: ^4.20250303.0
@@ -311,8 +311,8 @@ importers:
         specifier: ^9.0.1
         version: 9.0.1
       zod:
-        specifier: '>=3.22.3'
-        version: 3.22.4
+        specifier: ^3.24.2
+        version: 3.24.2
     devDependencies:
       '@babel/core':
         specifier: ^7.23.0
@@ -572,8 +572,8 @@ importers:
         specifier: ^1.13.3
         version: 1.13.3
       zod:
-        specifier: '>=3.22.3'
-        version: 3.22.4
+        specifier: ^3.24.2
+        version: 3.24.2
     devDependencies:
       '@cloudflare/workers-types':
         specifier: ^4.20250303.0
@@ -907,8 +907,8 @@ importers:
         specifier: ^9.0.1
         version: 9.0.1
       zod:
-        specifier: '>=3.22.3'
-        version: 3.22.4
+        specifier: ^3.24.2
+        version: 3.24.2
     devDependencies:
       '@types/aws-lambda':
         specifier: ^8.10.122
@@ -993,8 +993,8 @@ importers:
         specifier: ^9.0.1
         version: 9.0.1
       zod:
-        specifier: '>=3.22.3'
-        version: 3.22.4
+        specifier: ^3.24.2
+        version: 3.24.2
     devDependencies:
       '@types/html-to-text':
         specifier: ^9.0.2
@@ -1120,8 +1120,8 @@ importers:
         specifier: ^9.0.1
         version: 9.0.1
       zod:
-        specifier: '>=3.22.3'
-        version: 3.22.4
+        specifier: ^3.24.2
+        version: 3.24.2
     devDependencies:
       '@lezer/generator':
         specifier: ^1.7.1
@@ -1181,8 +1181,8 @@ importers:
         specifier: workspace:*
         version: link:../shared
       zod:
-        specifier: '>=3.22.3'
-        version: 3.22.4
+        specifier: ^3.24.2
+        version: 3.24.2
     devDependencies:
       '@cloudflare/workers-types':
         specifier: ^4.20250303.0
@@ -10369,9 +10369,6 @@ packages:
 
   zod@3.22.3:
     resolution: {integrity: sha512-EjIevzuJRiRPbVH4mGc8nApb/lVLKVpmUhAaR5R5doKGfAnGJ6Gr3CViAVjP+4FWSxCsybeWQdcgCtbX+7oZug==}
-
-  zod@3.22.4:
-    resolution: {integrity: sha512-iC+8Io04lddc+mVqQ9AZ7OQ2MrUKGN+oIQyq1vemgt46jwCwLfhq7/pwnBnNXXXZb8VTVLKwp9EDkx+ryxIWmg==}
 
   zod@3.24.2:
     resolution: {integrity: sha512-lY7CDW43ECgW9u1TcT3IoXHflywfVqDYze4waEz812jR/bZ8FHDsl7pFQoSZTz5N+2NqRXs8GBwnAwo3ZNxqhQ==}
@@ -21435,8 +21432,6 @@ snapshots:
       readable-stream: 4.7.0
 
   zod@3.22.3: {}
-
-  zod@3.22.4: {}
 
   zod@3.24.2: {}
 
