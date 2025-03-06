@@ -6,6 +6,7 @@ import { includeIgnoreFile } from '@eslint/compat'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import solid from 'eslint-plugin-solid/configs/typescript'
+import pluginQuery from '@tanstack/eslint-plugin-query'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -17,6 +18,7 @@ export function buildEslintConfig(importMetaUrl) {
 	const projectDirname = path.dirname(fileURLToPath(importMetaUrl))
 	const gitignorePath = path.resolve(__dirname, projectDirname, '.gitignore')
 	return [
+		...pluginQuery.configs['flat/recommended'],
 		...tseslint.config(
 			eslint.configs.recommended,
 			tseslint.configs.strictTypeChecked,
