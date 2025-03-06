@@ -13,6 +13,7 @@ import {
 	type RouteSectionProps,
 } from '@solidjs/router'
 import '@github/relative-time-element'
+import RelativeTime from '~/components/relativeTime'
 
 const getTemplatesCached = query(async (nook: NookId) => {
 	'use server'
@@ -47,7 +48,7 @@ export default function Thread(props: RouteSectionProps) {
 									) : (
 										<>
 											Last synced at
-											<relative-time prop:date={template.til} />
+											<RelativeTime date={template.til} />
 										</>
 									)}
 								</div>

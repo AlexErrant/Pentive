@@ -39,6 +39,7 @@ import { dateToEpoch } from 'shared/utility'
 import { LoadingSpinner } from 'shared-dom/icons'
 import { toastError } from 'shared-dom/toasts'
 import { useUserIdContext } from '~/components/userIdContext'
+import RelativeTime from '~/components/relativeTime'
 
 const getPostsCached = query(async (nook: string) => {
 	'use server'
@@ -153,17 +154,13 @@ export default function Nook(props: RouteSectionProps) {
 				header: () => 'Created',
 				id: 'note.id' satisfies NoteSortColumn,
 				accessorFn: (x) => x.note.created,
-				cell: (info) => (
-					<relative-time prop:date={info.row.original.note.created} />
-				),
+				cell: (info) => <RelativeTime date={info.row.original.note.created} />,
 			},
 			{
 				header: () => 'Edited',
 				id: 'noteEdited' satisfies NoteSortColumn,
 				accessorFn: (x) => x.note.edited,
-				cell: (info) => (
-					<relative-time prop:date={info.row.original.note.edited} />
-				),
+				cell: (info) => <RelativeTime date={info.row.original.note.edited} />,
 			},
 			{
 				header: () => 'Til',
@@ -176,7 +173,7 @@ export default function Nook(props: RouteSectionProps) {
 						) : (
 							<>
 								Last synced at
-								<relative-time prop:date={info.row.original.til} />
+								<RelativeTime date={info.row.original.til} />
 							</>
 						)}
 					</>

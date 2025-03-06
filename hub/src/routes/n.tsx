@@ -7,6 +7,7 @@ import {
 import { getNookDetailsCached } from '~/lib/useServer'
 import { IsModProvider } from '~/components/isModContext'
 import '@github/relative-time-element'
+import RelativeTime from '~/components/relativeTime'
 
 export const route = {
 	preload({ params }) {
@@ -40,8 +41,7 @@ export default function NookLayout(props: RouteSectionProps) {
 										Submit
 									</a>
 									<div>
-										Est.
-										<relative-time prop:date={nd().created} />
+										Est. <RelativeTime date={nd().created} />
 									</div>
 									<div>
 										mods:
