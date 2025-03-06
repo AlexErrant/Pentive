@@ -1,4 +1,4 @@
-import { base64urlToArray, idToEpoch } from './binary'
+import { base64urlToArray, idToEpoch } from './binary.js'
 import type { Base64Url, DbId } from './brand'
 
 // https://stackoverflow.com/a/69328045
