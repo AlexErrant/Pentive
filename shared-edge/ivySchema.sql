@@ -33,8 +33,22 @@ create table nook
 create table note
 (
     id               BLOB    not null primary key,
+    hexId            TEXT    GENERATED ALWAYS AS (hex(id)),
     templateId       BLOB    not null,
-    created          INTEGER not null default (cast(strftime('%s','now') as int)),
+    created          INTEGER GENERATED ALWAYS AS (
+      ((instr('123456789ABCDEF', substr(hexId, 1,1))) << 44) |
+      ((instr('123456789ABCDEF', substr(hexId, 2,1))) << 40) |
+      ((instr('123456789ABCDEF', substr(hexId, 3,1))) << 36) |
+      ((instr('123456789ABCDEF', substr(hexId, 4,1))) << 32) |
+      ((instr('123456789ABCDEF', substr(hexId, 5,1))) << 28) |
+      ((instr('123456789ABCDEF', substr(hexId, 6,1))) << 24) |
+      ((instr('123456789ABCDEF', substr(hexId, 7,1))) << 20) |
+      ((instr('123456789ABCDEF', substr(hexId, 8,1))) << 16) |
+      ((instr('123456789ABCDEF', substr(hexId, 9,1))) << 12) |
+      ((instr('123456789ABCDEF', substr(hexId,10,1))) <<  8) |
+      ((instr('123456789ABCDEF', substr(hexId,11,1))) <<  4) |
+      ((instr('123456789ABCDEF', substr(hexId,12,1)))      )
+    ) VIRTUAL,
     edited           INTEGER not null default (cast(strftime('%s','now') as int)),
     authorId         TEXT    not null,
     fieldValues      TEXT    not null,
@@ -47,9 +61,6 @@ create table note
     foreign key (templateId) references template(id),
     foreign key (authorId) references user(id)
 ) WITHOUT ROWID, STRICT;
-
-create index note_created_idx
-    on note (created);
 
 create index note_edited_idx
     on note (edited);

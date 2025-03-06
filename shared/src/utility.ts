@@ -1,3 +1,6 @@
+import { base64urlToArray, idToEpoch } from './binary'
+import type { Base64Url, DbId } from './brand'
+
 // https://stackoverflow.com/a/69328045
 export type WithRequired<T, K extends keyof T> = T & { [P in K]-?: T[P] }
 
@@ -168,6 +171,12 @@ export async function retryWithTimeout<T>(
 
 export function epochToDate(epoch: number) {
 	return new Date(epoch * 1000)
+}
+export function idToDate(id: Base64Url) {
+	return new Date(idToEpoch(base64urlToArray(id)))
+}
+export function rawIdToDate(id: DbId) {
+	return new Date(idToEpoch(id))
 }
 export function dateToEpoch(date: Date) {
 	return date.getTime() / 1000

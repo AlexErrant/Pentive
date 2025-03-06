@@ -1,11 +1,5 @@
- 
 import type { ColumnType } from 'kysely'
-import type {
-	Brand,
-	DbId,
-	MediaHash,
-	NookId,
-} from 'shared/brand'
+import type { Brand, DbId, MediaHash, NookId } from 'shared/brand'
 import type { PeerValidator } from 'shared/domain/user'
 
 export type RawStatus = Brand<number, 'Status'>
@@ -40,7 +34,6 @@ export interface Nook {
 export interface Note {
 	id: DbId
 	templateId: DbId
-	created: Generated<number>
 	edited: Generated<number>
 	authorId: string
 	fieldValues: string

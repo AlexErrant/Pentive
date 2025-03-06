@@ -52,6 +52,8 @@ import {
 	epochToDate,
 	maybeEpochToDate,
 	dateToEpoch,
+	idToDate,
+	rawIdToDate,
 } from 'shared/utility'
 import { base16 } from '@scure/base'
 import { createClient } from '@libsql/client/web'
@@ -159,7 +161,6 @@ function noteToNookView(x: {
 	templateName: string
 	templateCreated: number
 	templateEdited: number
-	noteCreated: number
 	noteEdited: number
 	tags: string
 	nook: string
@@ -175,14 +176,15 @@ function noteToNookView(x: {
 }) {
 	const noteId = dbIdToBase64Url<RemoteNoteId>(x.id)
 	const templateId = dbIdToBase64Url<RemoteTemplateId>(x.templateId)
+	const noteCreated = rawIdToDate(x.id)
 	return {
 		id: noteId,
 		subscribers: x.subscribers,
 		comments: x.comments,
 		til: maybeEpochToDate(x.til),
-		note: toNote(x, noteId, templateId),
+		note: toNote(x, noteId, templateId, noteCreated),
 		template: toTemplate(x, templateId),
-		noteCreated: epochToDate(x.noteCreated),
+		noteCreated,
 		noteEdited: epochToDate(x.noteEdited),
 	}
 }
@@ -194,20 +196,20 @@ function toNote(
 		id: DbId
 		templateId: DbId
 		ankiNoteId?: number
-		noteCreated: number
 		noteEdited: number
 		tags: string
 		noteStatus: RawStatus
 	},
 	noteId: RemoteNoteId,
 	templateId: RemoteTemplateId,
+	noteCreated: Date,
 ): RemoteNote {
 	return {
 		nook: x.nook as NookId,
 		fieldValues: deserializeFieldValues(x.fieldValues),
 		id: noteId,
 		templateId,
-		created: epochToDate(x.noteCreated),
+		created: noteCreated,
 		edited: epochToDate(x.noteEdited),
 		tags: deserializeTags(x.tags),
 		ankiId: x.ankiNoteId,
@@ -279,7 +281,6 @@ export async function getNotes(
 		.select([
 			'note.id',
 			'note.fieldValues',
-			'note.created as noteCreated',
 			'note.edited as noteEdited',
 			'note.tags',
 			'note.subscribersCount as subscribers',
@@ -365,7 +366,6 @@ export async function getNote(noteId: RemoteNoteId, userId: UserId | null) {
 		.innerJoin('template', 'template.id', 'note.templateId')
 		.select([
 			'note.templateId',
-			'note.created',
 			'note.edited',
 			'note.authorId',
 			'note.fieldValues',
@@ -399,7 +399,7 @@ export async function getNote(noteId: RemoteNoteId, userId: UserId | null) {
 	return {
 		id: noteId,
 		templateId,
-		created: epochToDate(r.created),
+		created: idToDate(noteId),
 		edited: epochToDate(r.edited),
 		authorId: r.authorId as UserId,
 		fieldValues: deserializeFieldValues(r.fieldValues),
@@ -419,7 +419,6 @@ export async function searchNotes(input: string, userId: UserId | null) {
 		.select([
 			'note.id',
 			'note.fieldValues',
-			'note.created as noteCreated',
 			'note.edited as noteEdited',
 			'note.tags',
 			'note.subscribersCount as subscribers',

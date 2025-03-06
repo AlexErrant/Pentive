@@ -9,6 +9,7 @@ import {
 	type NoteCursor,
 	_kysely,
 	type SortState,
+	getNote,
 } from '../src'
 import {
 	base64urlId,
@@ -17,6 +18,7 @@ import {
 	rawIdWithTime,
 	prefixEpochToArray,
 	idLength,
+	idToEpoch,
 } from 'shared/binary'
 import type { NookId, NoteId, TemplateId, UserId } from 'shared/brand'
 import Database from 'better-sqlite3'
@@ -135,13 +137,7 @@ test('cursor/keyset pagination works for getNotes', async () => {
 			minLength: 1,
 			maxLength: 100,
 			selector: (x) => x.rawId,
-			comparator: (a: Uint8Array, b: Uint8Array) => {
-				if (a.length !== b.length) return false
-				for (let i = 0; i < a.length; i++) {
-					if (a[i] !== b[i]) return false
-				}
-				return true
-			},
+			comparator: uint8comparator,
 		},
 	)
 	let lastDb: Database.Database | undefined
@@ -170,7 +166,7 @@ test('cursor/keyset pagination works for getNotes', async () => {
 					jsSorted.push({ created, edited, remoteNoteId: rawRemoteNoteId })
 					const hexNoteId = base16.encode(rawRemoteNoteId)
 					database.exec(
-						`UPDATE note SET created = ${created}, edited = ${edited} WHERE id = x'${hexNoteId}'`,
+						`UPDATE note SET edited = ${edited} WHERE id = x'${hexNoteId}'`,
 					)
 				}
 				jsSorted.sort((a, b) => sort(a, b, sortState))
@@ -223,7 +219,7 @@ type Note = Awaited<ReturnType<typeof getNotes>>[0]
 
 function simplifyNote(note: Note) {
 	return {
-		created: dateToEpoch(note.note.created),
+		created: note.note.created.getTime(),
 		edited: dateToEpoch(note.note.edited),
 		remoteNoteId: base64urlToArray(note.id),
 	} satisfies SimplifiedNote
@@ -355,7 +351,7 @@ SEARCH noteSubscriber USING PRIMARY KEY (noteId=? AND userId=?) LEFT-JOIN`,
 		const rawRemoteNoteId = base64urlToArray(remoteNoteId)
 		const hexNoteId = base16.encode(rawRemoteNoteId)
 		database.exec(
-			`UPDATE note SET created = ${created}, edited = ${edited} WHERE id = x'${hexNoteId}'`,
+			`UPDATE note SET edited = ${edited} WHERE id = x'${hexNoteId}'`,
 		)
 	}
 	database.exec(`RELEASE SAVEPOINT my_savepoint;`)
@@ -383,3 +379,68 @@ SEARCH noteSubscriber USING PRIMARY KEY (noteId=? AND userId=?) LEFT-JOIN`,
 		throw error
 	}
 })
+
+test('created can be derived from id', async () => {
+	const arbNum = fc.integer({ min: 0, max: 281474976710655 })
+	const createdIds = fc.uniqueArray(
+		fc
+			.record({
+				created: arbNum,
+				rawId: fc.uint8Array({ maxLength: idLength, minLength: idLength }),
+			})
+			.map((x) => {
+				const id = new Uint8Array(x.rawId)
+				prefixEpochToArray(x.created, id)
+				return {
+					...x,
+					rawId: id,
+				}
+			}),
+		{
+			minLength: 1,
+			maxLength: 100,
+			selector: (x) => x.rawId,
+			comparator: uint8comparator,
+		},
+	)
+	await fc.assert(
+		fc.asyncProperty(
+			fc.record({
+				createdIds,
+			}),
+			async ({ createdIds }) => {
+				const { database, remoteTemplateId } = await setupDb()
+				for (const { created, rawId } of createdIds) {
+					_binary.setRawId(() => rawId)
+					const noteResponse = await insertNotes(userId, [
+						{
+							localId: base64urlId<NoteId>(),
+							fieldValues: {},
+							tags: [],
+							remoteTemplateIds: [remoteTemplateId],
+						},
+					])
+					const remoteNoteId = Array.from(noteResponse.values())[0]![0]
+					const rawRemoteNoteId = base64urlToArray(remoteNoteId)
+
+					const apiNote = await getNote(remoteNoteId, userId)
+					const sqlNote = database
+						.prepare(`SELECT created FROM note WHERE id = ?`)
+						.get(rawRemoteNoteId) as { created: number }
+
+					assert.equal(idToEpoch(rawRemoteNoteId), created)
+					assert.equal(apiNote!.created.getTime(), created)
+					assert.equal(sqlNote.created, created)
+				}
+			},
+		),
+	)
+})
+
+const uint8comparator = (a: Uint8Array, b: Uint8Array) => {
+	if (a.length !== b.length) return false
+	for (let i = 0; i < a.length; i++) {
+		if (a[i] !== b[i]) return false
+	}
+	return true
+}
