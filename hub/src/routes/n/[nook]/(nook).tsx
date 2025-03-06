@@ -120,6 +120,7 @@ export default function Nook(props: RouteSectionProps) {
 		onSortingChange: setSort,
 		manualSorting: true,
 		enableMultiSort: false,
+		enableSortingRemoval: false,
 
 		onPaginationChange: setPagination,
 		manualPagination: true,
