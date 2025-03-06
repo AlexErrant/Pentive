@@ -140,8 +140,8 @@ importers:
         specifier: ^6.33.0
         version: 6.33.0
       '@github/relative-time-element':
-        specifier: ^4.3.0
-        version: 4.3.0
+        specifier: ^4.4.5
+        version: 4.4.5
       '@iframe-resizer/parent':
         specifier: ^5.3.2
         version: 5.3.2(patch_hash=rgit6ctxrqga2ytsgv6jig4kky)
@@ -677,8 +677,8 @@ importers:
         specifier: ^6.33.0
         version: 6.33.0
       '@github/relative-time-element':
-        specifier: ^4.3.0
-        version: 4.3.0
+        specifier: ^4.4.5
+        version: 4.4.5
       '@iframe-resizer/parent':
         specifier: ^5.3.2
         version: 5.3.2(patch_hash=rgit6ctxrqga2ytsgv6jig4kky)
@@ -1076,7 +1076,7 @@ importers:
         version: 0.13.8(solid-js@1.9.5)
       '@kobalte/tailwindcss':
         specifier: ^0.9.0
-        version: 0.9.0(tailwindcss@4.0.9)
+        version: 0.9.0(tailwindcss@4.0.10)
       '@lezer/common':
         specifier: ^1.2.1
         version: 1.2.3
@@ -1106,7 +1106,7 @@ importers:
         version: 4.17.21
       nightwind:
         specifier: ^1.1.13
-        version: 1.1.13(patch_hash=3i6ghclomd7vkkb2jwgexhbq3i)(tailwindcss@4.0.9)
+        version: 1.1.13(patch_hash=3i6ghclomd7vkkb2jwgexhbq3i)(tailwindcss@4.0.10)
       shared:
         specifier: workspace:*
         version: link:../shared
@@ -2875,8 +2875,8 @@ packages:
   '@floating-ui/utils@0.2.9':
     resolution: {integrity: sha512-MDWhGtE+eHw5JW7lq4qhc5yRLS11ERl1c7Z6Xd0a58DozHES6EnNNwUWbMiG4J9Cgj053Bhk8zvlhFYKVhULwg==}
 
-  '@github/relative-time-element@4.3.0':
-    resolution: {integrity: sha512-+tFjX9//HRS1HnBa5cNgfEtE52arwiutYg1TOF+Trk40SPxst9Q8Rtc3BKD6aKsvfbtub68vfhipgchGjj9o7g==}
+  '@github/relative-time-element@4.4.5':
+    resolution: {integrity: sha512-9ejPtayBDIJfEU8x1fg/w2o5mahHkkp1SC6uObDtoKs4Gn+2a1vNK8XIiNDD8rMeEfpvDjydgSZZ+uk+7N0VsQ==}
 
   '@hapi/accept@6.0.2':
     resolution: {integrity: sha512-xaTLf29Zeph/B32hekmgxLFsEPuX1xQYyZu0gJ4ZCHKU6nXmBRXfBymtWNEK0souOJcX2XHWUaZU6JzccuuMpg==}
@@ -9243,8 +9243,8 @@ packages:
     engines: {node: '>=14.0.0'}
     hasBin: true
 
-  tailwindcss@4.0.9:
-    resolution: {integrity: sha512-12laZu+fv1ONDRoNR9ipTOpUD7RN9essRVkX36sjxuRUInpN7hIiHN4lBd/SIFjbISvnXzp8h/hXzmU8SQQYhw==}
+  tailwindcss@4.0.10:
+    resolution: {integrity: sha512-Z8U/6E2BWSdDkt3IWPiphoV+8V6aNzRmu2SriSbuhm6i3QIcY3TdUJzUP5NX8M8MZuIl+v4/77Rer8u4YSrSsg==}
 
   tapable@2.2.1:
     resolution: {integrity: sha512-GNzQvQTOIP6RyTfE2Qxb8ZVlNmw0n88vp1szwWRimP02mnTsx3Wtn5qRdqY9w2XduFNUgvOwhNnQsjwCp+kqaQ==}
@@ -12195,7 +12195,7 @@ snapshots:
 
   '@floating-ui/utils@0.2.9': {}
 
-  '@github/relative-time-element@4.3.0': {}
+  '@github/relative-time-element@4.4.5': {}
 
   '@hapi/accept@6.0.2':
     dependencies:
@@ -12539,9 +12539,9 @@ snapshots:
     dependencies:
       tailwindcss: 3.4.15(ts-node@10.9.2(@types/node@22.13.9)(typescript@5.7.3))
 
-  '@kobalte/tailwindcss@0.9.0(tailwindcss@4.0.9)':
+  '@kobalte/tailwindcss@0.9.0(tailwindcss@4.0.10)':
     dependencies:
-      tailwindcss: 4.0.9
+      tailwindcss: 4.0.10
 
   '@kobalte/utils@0.9.1(solid-js@1.9.5)':
     dependencies:
@@ -17881,9 +17881,9 @@ snapshots:
     dependencies:
       tailwindcss: 3.4.15(ts-node@10.9.2(@types/node@22.13.9)(typescript@5.7.3))
 
-  nightwind@1.1.13(patch_hash=3i6ghclomd7vkkb2jwgexhbq3i)(tailwindcss@4.0.9):
+  nightwind@1.1.13(patch_hash=3i6ghclomd7vkkb2jwgexhbq3i)(tailwindcss@4.0.10):
     dependencies:
-      tailwindcss: 4.0.9
+      tailwindcss: 4.0.10
 
   nitropack@2.11.0(@libsql/client@0.14.0)(@planetscale/database@1.19.0)(better-sqlite3@11.8.1)(mysql2@3.12.0)(typescript@5.7.3):
     dependencies:
@@ -19993,7 +19993,7 @@ snapshots:
     transitivePeerDependencies:
       - ts-node
 
-  tailwindcss@4.0.9: {}
+  tailwindcss@4.0.10: {}
 
   tapable@2.2.1: {}
 
