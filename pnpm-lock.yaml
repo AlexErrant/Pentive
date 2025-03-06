@@ -52,8 +52,8 @@ importers:
         specifier: ~5.7.3
         version: 5.7.3
       wrangler:
-        specifier: ^3.112.0
-        version: 3.112.0(@cloudflare/workers-types@4.20250303.0)
+        specifier: ^3.114.0
+        version: 3.114.0(@cloudflare/workers-types@4.20250303.0)
 
   api-ugc:
     dependencies:
@@ -95,8 +95,8 @@ importers:
         specifier: ~5.7.3
         version: 5.7.3
       wrangler:
-        specifier: ^3.112.0
-        version: 3.112.0(@cloudflare/workers-types@4.20250303.0)
+        specifier: ^3.114.0
+        version: 3.114.0(@cloudflare/workers-types@4.20250303.0)
 
   app:
     dependencies:
@@ -358,7 +358,7 @@ importers:
         version: 22.1.0
       kysely-codegen:
         specifier: ^0.15.0
-        version: 0.15.0(better-sqlite3@11.8.1)(kysely@0.27.3)(mysql2@3.12.0)
+        version: 0.15.0(better-sqlite3@11.8.1)(kysely@0.27.3)(mysql2@3.13.0)
       madge:
         specifier: ^6.1.0
         version: 6.1.0(typescript@5.7.3)
@@ -411,8 +411,8 @@ importers:
         specifier: ^7.0.0
         version: 7.3.0
       wrangler:
-        specifier: ^3.112.0
-        version: 3.112.0(@cloudflare/workers-types@4.20250303.0)
+        specifier: ^3.114.0
+        version: 3.114.0(@cloudflare/workers-types@4.20250303.0)
 
   app-playwright:
     dependencies:
@@ -515,8 +515,8 @@ importers:
         specifier: ^7.0.0
         version: 7.3.0
       wrangler:
-        specifier: ^3.112.0
-        version: 3.112.0(@cloudflare/workers-types@4.20250303.0)
+        specifier: ^3.114.0
+        version: 3.114.0(@cloudflare/workers-types@4.20250303.0)
 
   config:
     devDependencies:
@@ -588,8 +588,8 @@ importers:
         specifier: ~5.7.3
         version: 5.7.3
       wrangler:
-        specifier: ^3.112.0
-        version: 3.112.0(@cloudflare/workers-types@4.20250303.0)
+        specifier: ^3.114.0
+        version: 3.114.0(@cloudflare/workers-types@4.20250303.0)
 
   example-plugins/solid:
     dependencies:
@@ -702,7 +702,7 @@ importers:
         version: 0.15.3(solid-js@1.9.5)
       '@solidjs/start':
         specifier: ^1.1.3
-        version: 1.1.3(@types/node@22.13.9)(jiti@2.4.2)(sass@1.85.1)(solid-js@1.9.5)(terser@5.39.0)(tsx@4.19.3)(vinxi@0.5.3(@libsql/client@0.14.0)(@planetscale/database@1.19.0)(@types/node@22.13.9)(better-sqlite3@11.8.1)(db0@0.3.1(@libsql/client@0.14.0)(better-sqlite3@11.8.1)(mysql2@3.12.0))(ioredis@5.5.0)(jiti@2.4.2)(mysql2@3.12.0)(sass@1.85.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.7.0))(vite@6.2.0(@types/node@22.13.9)(jiti@2.4.2)(sass@1.85.1)(terser@5.39.0)(tsx@4.19.3)(yaml@2.7.0))(yaml@2.7.0)
+        version: 1.1.3(@types/node@22.13.9)(jiti@2.4.2)(sass@1.85.1)(solid-js@1.9.5)(terser@5.39.0)(tsx@4.19.3)(vinxi@0.5.3(@libsql/client@0.14.0)(@planetscale/database@1.19.0)(@types/node@22.13.9)(better-sqlite3@11.8.1)(db0@0.3.1(@libsql/client@0.14.0)(better-sqlite3@11.8.1)(mysql2@3.13.0))(ioredis@5.5.0)(jiti@2.4.2)(mysql2@3.13.0)(sass@1.85.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.7.0))(vite@6.2.0(@types/node@22.13.9)(jiti@2.4.2)(sass@1.85.1)(terser@5.39.0)(tsx@4.19.3)(yaml@2.7.0))(yaml@2.7.0)
       '@tanstack/solid-query':
         specifier: ^5.67.1
         version: 5.67.1(solid-js@1.9.5)
@@ -759,7 +759,7 @@ importers:
         version: 6.21.0
       vinxi:
         specifier: ^0.5.3
-        version: 0.5.3(@libsql/client@0.14.0)(@planetscale/database@1.19.0)(@types/node@22.13.9)(better-sqlite3@11.8.1)(db0@0.3.1(@libsql/client@0.14.0)(better-sqlite3@11.8.1)(mysql2@3.12.0))(ioredis@5.5.0)(jiti@2.4.2)(mysql2@3.12.0)(sass@1.85.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.7.0)
+        version: 0.5.3(@libsql/client@0.14.0)(@planetscale/database@1.19.0)(@types/node@22.13.9)(better-sqlite3@11.8.1)(db0@0.3.1(@libsql/client@0.14.0)(better-sqlite3@11.8.1)(mysql2@3.13.0))(ioredis@5.5.0)(jiti@2.4.2)(mysql2@3.13.0)(sass@1.85.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.7.0)
     devDependencies:
       '@cloudflare/kv-asset-handler':
         specifier: ^0.3.0
@@ -807,8 +807,8 @@ importers:
         specifier: ^6.2.0
         version: 6.2.0(@types/node@22.13.9)(jiti@2.4.2)(sass@1.85.1)(terser@5.39.0)(tsx@4.19.3)(yaml@2.7.0)
       wrangler:
-        specifier: ^3.112.0
-        version: 3.112.0(@cloudflare/workers-types@4.20250303.0)
+        specifier: ^3.114.0
+        version: 3.114.0(@cloudflare/workers-types@4.20250303.0)
 
   hub-ugc:
     dependencies:
@@ -862,8 +862,8 @@ importers:
         specifier: ^7.0.0
         version: 7.3.0
       wrangler:
-        specifier: ^3.112.0
-        version: 3.112.0(@cloudflare/workers-types@4.20250303.0)
+        specifier: ^3.114.0
+        version: 3.114.0(@cloudflare/workers-types@4.20250303.0)
 
   lrpc:
     dependencies:
@@ -1079,7 +1079,7 @@ importers:
         version: 0.13.8(solid-js@1.9.5)
       '@kobalte/tailwindcss':
         specifier: ^0.9.0
-        version: 0.9.0(tailwindcss@4.0.10)
+        version: 0.9.0(tailwindcss@4.0.11)
       '@lezer/common':
         specifier: ^1.2.1
         version: 1.2.3
@@ -1109,7 +1109,7 @@ importers:
         version: 4.17.21
       nightwind:
         specifier: ^1.1.13
-        version: 1.1.13(patch_hash=3i6ghclomd7vkkb2jwgexhbq3i)(tailwindcss@4.0.10)
+        version: 1.1.13(patch_hash=3i6ghclomd7vkkb2jwgexhbq3i)(tailwindcss@4.0.11)
       shared:
         specifier: workspace:*
         version: link:../shared
@@ -1938,32 +1938,41 @@ packages:
     resolution: {integrity: sha512-YLPHc8yASwjNkmcDMQMY35yiWjoKAKnhUbPRszBRS0YgH+IXtsMp61j+yTcnCE3oO2DgP0U3iejLC8FTtKDC8Q==}
     engines: {node: '>=16.13'}
 
-  '@cloudflare/workerd-darwin-64@1.20250214.0':
-    resolution: {integrity: sha512-cDvvedWDc5zrgDnuXe2qYcz/TwBvzmweO55C7XpPuAWJ9Oqxv81PkdekYxD8mH989aQ/GI5YD0Fe6fDYlM+T3Q==}
+  '@cloudflare/unenv-preset@2.0.0':
+    resolution: {integrity: sha512-Ar4HixFYP8e990JPACno3nqe10QsjS3yVWr48z5Vop5LygdnvPa5cfNHxGoQSPavvg5aaGnF0VAWc3JJ1tBKuQ==}
+    peerDependencies:
+      unenv: 2.0.0-rc.8
+      workerd: ^1.20250124.0
+    peerDependenciesMeta:
+      workerd:
+        optional: true
+
+  '@cloudflare/workerd-darwin-64@1.20250224.0':
+    resolution: {integrity: sha512-sBbaAF2vgQ9+T50ik1ihekdepStBp0w4fvNghBfXIw1iWqfNWnypcjDMmi/7JhXJt2uBxBrSlXCvE5H7Gz+kbw==}
     engines: {node: '>=16'}
     cpu: [x64]
     os: [darwin]
 
-  '@cloudflare/workerd-darwin-arm64@1.20250214.0':
-    resolution: {integrity: sha512-NytCvRveVzu0mRKo+tvZo3d/gCUway3B2ZVqSi/TS6NXDGBYIJo7g6s3BnTLS74kgyzeDOjhu9j/RBJBS809qw==}
+  '@cloudflare/workerd-darwin-arm64@1.20250224.0':
+    resolution: {integrity: sha512-naetGefgjAaDbEacpwaVruJXNwxmRRL7v3ppStgEiqAlPmTpQ/Edjn2SQ284QwOw3MvaVPHrWcaTBupUpkqCyg==}
     engines: {node: '>=16'}
     cpu: [arm64]
     os: [darwin]
 
-  '@cloudflare/workerd-linux-64@1.20250214.0':
-    resolution: {integrity: sha512-pQ7+aHNHj8SiYEs4d/6cNoimE5xGeCMfgU1yfDFtA9YGN9Aj2BITZgOWPec+HW7ZkOy9oWlNrO6EvVjGgB4tbQ==}
+  '@cloudflare/workerd-linux-64@1.20250224.0':
+    resolution: {integrity: sha512-BtUvuj91rgB06TUAkLYvedghUA8nDFiLcY3GC7MXmWhxCxGmY4PWkrKq/+uHjrhwknCcXrE4aFsM28ja8EcAGA==}
     engines: {node: '>=16'}
     cpu: [x64]
     os: [linux]
 
-  '@cloudflare/workerd-linux-arm64@1.20250214.0':
-    resolution: {integrity: sha512-Vhlfah6Yd9ny1npNQjNgElLIjR6OFdEbuR3LCfbLDCwzWEBFhIf7yC+Tpp/a0Hq7kLz3sLdktaP7xl3PJhyOjA==}
+  '@cloudflare/workerd-linux-arm64@1.20250224.0':
+    resolution: {integrity: sha512-Gr4MPNi+BvwjfWF7clx0dJY2Vm4suaW5FtAQwrfqJmPtN5zb/BP16VZxxnFRMy377dP7ycoxpKfZZ6Q8RVGvbA==}
     engines: {node: '>=16'}
     cpu: [arm64]
     os: [linux]
 
-  '@cloudflare/workerd-windows-64@1.20250214.0':
-    resolution: {integrity: sha512-GMwMyFbkjBKjYJoKDhGX8nuL4Gqe3IbVnVWf2Q6086CValyIknupk5J6uQWGw2EBU3RGO3x4trDXT5WphQJZDQ==}
+  '@cloudflare/workerd-windows-64@1.20250224.0':
+    resolution: {integrity: sha512-x2iF1CsmYmmPEorWb1GRpAAouX5rRjmhuHMC259ojIlozR4G0LarlB9XfmeLEvtw537Ea0kJ6SOhjvUcWzxSvA==}
     engines: {node: '>=16'}
     cpu: [x64]
     os: [win32]
@@ -5920,6 +5929,9 @@ packages:
   exsolve@1.0.1:
     resolution: {integrity: sha512-Smf0iQtkQVJLaph8r/qS8C8SWfQkaq9Q/dFcD44MLbJj6DNhlWefVuaS21SjfqOsBbjVlKtbCj6L9ekXK6EZUg==}
 
+  exsolve@1.0.2:
+    resolution: {integrity: sha512-ZEcIMbthn2zeX4/wD/DLxDUjuCltHXT8Htvm/JFlTkdYgWh2+HGppgwwNUnIVxzxP7yJOPtuBAec0dLx6lVY8w==}
+
   ext-list@2.2.2:
     resolution: {integrity: sha512-u+SQgsubraE6zItfVA0tBuCBhfU9ogSRnsvygI7wht9TS510oLkBRXBsqopeUG/GBOIQyKZO9wjTqIu/sf5zFA==}
     engines: {node: '>=0.10.0'}
@@ -7424,8 +7436,8 @@ packages:
     resolution: {integrity: sha512-r9deDe9p5FJUPZAk3A59wGH7Ii9YrjjWw0jmw/liSbHl2CHiyXj6FcDXDu2K3TjVAXqiJdaw3xxwlZZr9E6nHg==}
     hasBin: true
 
-  miniflare@3.20250214.2:
-    resolution: {integrity: sha512-t+lT4p2lbOcKv4PS3sx1F/wcDAlbEYZCO2VooLp4H7JErWWYIi9yjD3UillC3CGOpiBahVg5nrPCoFltZf6UlA==}
+  miniflare@3.20250224.0:
+    resolution: {integrity: sha512-DyLxzhHCQ9UWDceqEsT7tmw8ZTSAhb1yKUqUi5VDmSxsIocKi4y5kvMijw9ELK8+tq/CiCp/RQxwRNZRJD8Xbg==}
     engines: {node: '>=16.13'}
     hasBin: true
 
@@ -7526,8 +7538,8 @@ packages:
     resolution: {integrity: sha512-Z2o3tY4Z8EvSRDwknaC40MdZ3+m0sKbpnXrShQLdxPrAvcNli7jLrD2Zd2IzsRMw4eK9Yle500FDmlkIqp+krg==}
     engines: {node: '>= 8.0'}
 
-  mysql2@3.12.0:
-    resolution: {integrity: sha512-C8fWhVysZoH63tJbX8d10IAoYCyXy4fdRFz2Ihrt9jtPILYynFEKUUzpp1U7qxzDc3tMbotvaBH+sl6bFnGZiw==}
+  mysql2@3.13.0:
+    resolution: {integrity: sha512-M6DIQjTqKeqXH5HLbLMxwcK5XfXHw30u5ap6EZmu7QVmcF/gnh2wS/EOiQ4MTbXz/vQeoXrmycPlVRM00WSslg==}
     engines: {node: '>= 8.0'}
 
   mz@2.7.0:
@@ -9251,8 +9263,8 @@ packages:
     engines: {node: '>=14.0.0'}
     hasBin: true
 
-  tailwindcss@4.0.10:
-    resolution: {integrity: sha512-Z8U/6E2BWSdDkt3IWPiphoV+8V6aNzRmu2SriSbuhm6i3QIcY3TdUJzUP5NX8M8MZuIl+v4/77Rer8u4YSrSsg==}
+  tailwindcss@4.0.11:
+    resolution: {integrity: sha512-GZ6+tNwieqvpFLZfx2tkZpfOMAK7iumbOJOLmd6v8AcYuHbjUb+cmDRu6l+rFkIqarh5FfLbCSRJhegcVdoPng==}
 
   tapable@2.2.1:
     resolution: {integrity: sha512-GNzQvQTOIP6RyTfE2Qxb8ZVlNmw0n88vp1szwWRimP02mnTsx3Wtn5qRdqY9w2XduFNUgvOwhNnQsjwCp+kqaQ==}
@@ -9346,11 +9358,11 @@ packages:
     resolution: {integrity: sha512-n1cw8k1k0x4pgA2+9XrOkFydTerNcJ1zWCO5Nn9scWHTD+5tp8dghT2x1uduQePZTZgd3Tupf+x9BxJjeJi77Q==}
     engines: {node: '>=14.0.0'}
 
-  tldts-core@6.1.82:
-    resolution: {integrity: sha512-Jabl32m21tt/d/PbDO88R43F8aY98Piiz6BVH9ShUlOAiiAELhEqwrAmBocjAqnCfoUeIsRU+h3IEzZd318F3w==}
+  tldts-core@6.1.83:
+    resolution: {integrity: sha512-I2wb9OJc6rXyh9d4aInhSNWChNI+ra6qDnFEGEwe9OoA68lE4Temw29bOkf1Uvwt8VZS079t1BFZdXVBmmB4dw==}
 
-  tldts@6.1.82:
-    resolution: {integrity: sha512-KCTjNL9F7j8MzxgfTgjT+v21oYH38OidFty7dH00maWANAI2IsLw2AnThtTJi9HKALHZKQQWnNebYheadacD+g==}
+  tldts@6.1.83:
+    resolution: {integrity: sha512-FHxxNJJ0WNsEBPHyC1oesQb3rRoxpuho/z2g3zIIAhw1WHJeQsUzK1jYK8TI1/iClaa4fS3Z2TCA9mtxXsENSg==}
     hasBin: true
 
   tmp@0.0.33:
@@ -9629,11 +9641,11 @@ packages:
   unenv@1.10.0:
     resolution: {integrity: sha512-wY5bskBQFL9n3Eca5XnhH6KbUo/tfvkwm9OpcdCvLaeA7piBNbavbOKJySEwQ1V0RH6HvNlSAFRTpvTqgKRQXQ==}
 
-  unenv@2.0.0-rc.1:
-    resolution: {integrity: sha512-PU5fb40H8X149s117aB4ytbORcCvlASdtF97tfls4BPIyj4PeVxvpSuy1jAptqYHqB0vb2w2sHvzM0XWcp2OKg==}
-
   unenv@2.0.0-rc.12:
     resolution: {integrity: sha512-aygmJLhrEnuLKDCISMoOL7ceRJeksnvXJXvtEvFei4zoOXQfvQkUGhZe8u//iK5C++M4pq3CsMbhVjFmWvOlmA==}
+
+  unenv@2.0.0-rc.8:
+    resolution: {integrity: sha512-wj/lN45LvZ4Uz95rti6DC5wg56eocAwA8KYzExk2SN01iuAb9ayzMwN13Kd3EG2eBXu27PzgMIXLTwWfSczKfw==}
 
   uni-global@1.0.0:
     resolution: {integrity: sha512-WWM3HP+siTxzIWPNUg7hZ4XO8clKi6NoCAJJWnuRL+BAqyFXF8gC03WNyTefGoUXYc47uYgXxpKLIEvo65PEHw==}
@@ -10201,17 +10213,17 @@ packages:
   workbox-window@7.3.0:
     resolution: {integrity: sha512-qW8PDy16OV1UBaUNGlTVcepzrlzyzNW/ZJvFQQs2j2TzGsg6IKjcpZC1RSquqQnTOafl5pCj5bGfAHlCjOOjdA==}
 
-  workerd@1.20250214.0:
-    resolution: {integrity: sha512-QWcqXZLiMpV12wiaVnb3nLmfs/g4ZsFQq2mX85z546r3AX4CTIkXl0VP50W3CwqLADej3PGYiRDOTelDOwVG1g==}
+  workerd@1.20250224.0:
+    resolution: {integrity: sha512-NntMg1d9SSkbS4vGdjV5NZxe6FUrvJXY7UiQD7fBtCRVpoPpqz9bVgTq86zalMm+vz64lftzabKT4ka4Y9hejQ==}
     engines: {node: '>=16'}
     hasBin: true
 
-  wrangler@3.112.0:
-    resolution: {integrity: sha512-PNQWGze3ODlWwG33LPr8kNhbht3eB3L9fogv+fapk2fjaqj0kNweRapkwmvtz46ojcqWzsxmTe4nOC0hIVUfPA==}
+  wrangler@3.114.0:
+    resolution: {integrity: sha512-cY0HxgU5yuc24tE1Y4KD2n9UzYYEx+9lSL7p/Sqj18SgDfwyiMPY/FryXQAPYLuD/S+dxArRQyeEkFSokIr75Q==}
     engines: {node: '>=16.17.0'}
     hasBin: true
     peerDependencies:
-      '@cloudflare/workers-types': ^4.20250214.0
+      '@cloudflare/workers-types': ^4.20250224.0
     peerDependenciesMeta:
       '@cloudflare/workers-types':
         optional: true
@@ -11574,19 +11586,25 @@ snapshots:
     dependencies:
       mime: 3.0.0
 
-  '@cloudflare/workerd-darwin-64@1.20250214.0':
+  '@cloudflare/unenv-preset@2.0.0(unenv@2.0.0-rc.8)(workerd@1.20250224.0)':
+    dependencies:
+      unenv: 2.0.0-rc.8
+    optionalDependencies:
+      workerd: 1.20250224.0
+
+  '@cloudflare/workerd-darwin-64@1.20250224.0':
     optional: true
 
-  '@cloudflare/workerd-darwin-arm64@1.20250214.0':
+  '@cloudflare/workerd-darwin-arm64@1.20250224.0':
     optional: true
 
-  '@cloudflare/workerd-linux-64@1.20250214.0':
+  '@cloudflare/workerd-linux-64@1.20250224.0':
     optional: true
 
-  '@cloudflare/workerd-linux-arm64@1.20250214.0':
+  '@cloudflare/workerd-linux-arm64@1.20250224.0':
     optional: true
 
-  '@cloudflare/workerd-windows-64@1.20250214.0':
+  '@cloudflare/workerd-windows-64@1.20250224.0':
     optional: true
 
   '@cloudflare/workers-types@4.20250303.0': {}
@@ -12547,9 +12565,9 @@ snapshots:
     dependencies:
       tailwindcss: 3.4.15(ts-node@10.9.2(@types/node@22.13.9)(typescript@5.7.3))
 
-  '@kobalte/tailwindcss@0.9.0(tailwindcss@4.0.10)':
+  '@kobalte/tailwindcss@0.9.0(tailwindcss@4.0.11)':
     dependencies:
-      tailwindcss: 4.0.10
+      tailwindcss: 4.0.11
 
   '@kobalte/utils@0.9.1(solid-js@1.9.5)':
     dependencies:
@@ -13587,11 +13605,11 @@ snapshots:
     dependencies:
       solid-js: 1.9.5
 
-  '@solidjs/start@1.1.3(@types/node@22.13.9)(jiti@2.4.2)(sass@1.85.1)(solid-js@1.9.5)(terser@5.39.0)(tsx@4.19.3)(vinxi@0.5.3(@libsql/client@0.14.0)(@planetscale/database@1.19.0)(@types/node@22.13.9)(better-sqlite3@11.8.1)(db0@0.3.1(@libsql/client@0.14.0)(better-sqlite3@11.8.1)(mysql2@3.12.0))(ioredis@5.5.0)(jiti@2.4.2)(mysql2@3.12.0)(sass@1.85.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.7.0))(vite@6.2.0(@types/node@22.13.9)(jiti@2.4.2)(sass@1.85.1)(terser@5.39.0)(tsx@4.19.3)(yaml@2.7.0))(yaml@2.7.0)':
+  '@solidjs/start@1.1.3(@types/node@22.13.9)(jiti@2.4.2)(sass@1.85.1)(solid-js@1.9.5)(terser@5.39.0)(tsx@4.19.3)(vinxi@0.5.3(@libsql/client@0.14.0)(@planetscale/database@1.19.0)(@types/node@22.13.9)(better-sqlite3@11.8.1)(db0@0.3.1(@libsql/client@0.14.0)(better-sqlite3@11.8.1)(mysql2@3.13.0))(ioredis@5.5.0)(jiti@2.4.2)(mysql2@3.13.0)(sass@1.85.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.7.0))(vite@6.2.0(@types/node@22.13.9)(jiti@2.4.2)(sass@1.85.1)(terser@5.39.0)(tsx@4.19.3)(yaml@2.7.0))(yaml@2.7.0)':
     dependencies:
       '@tanstack/server-functions-plugin': 1.111.2(@types/node@22.13.9)(jiti@2.4.2)(sass@1.85.1)(terser@5.39.0)(tsx@4.19.3)(yaml@2.7.0)
-      '@vinxi/plugin-directives': 0.5.0(vinxi@0.5.3(@libsql/client@0.14.0)(@planetscale/database@1.19.0)(@types/node@22.13.9)(better-sqlite3@11.8.1)(db0@0.3.1(@libsql/client@0.14.0)(better-sqlite3@11.8.1)(mysql2@3.12.0))(ioredis@5.5.0)(jiti@2.4.2)(mysql2@3.12.0)(sass@1.85.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.7.0))
-      '@vinxi/server-components': 0.5.0(vinxi@0.5.3(@libsql/client@0.14.0)(@planetscale/database@1.19.0)(@types/node@22.13.9)(better-sqlite3@11.8.1)(db0@0.3.1(@libsql/client@0.14.0)(better-sqlite3@11.8.1)(mysql2@3.12.0))(ioredis@5.5.0)(jiti@2.4.2)(mysql2@3.12.0)(sass@1.85.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.7.0))
+      '@vinxi/plugin-directives': 0.5.0(vinxi@0.5.3(@libsql/client@0.14.0)(@planetscale/database@1.19.0)(@types/node@22.13.9)(better-sqlite3@11.8.1)(db0@0.3.1(@libsql/client@0.14.0)(better-sqlite3@11.8.1)(mysql2@3.13.0))(ioredis@5.5.0)(jiti@2.4.2)(mysql2@3.13.0)(sass@1.85.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.7.0))
+      '@vinxi/server-components': 0.5.0(vinxi@0.5.3(@libsql/client@0.14.0)(@planetscale/database@1.19.0)(@types/node@22.13.9)(better-sqlite3@11.8.1)(db0@0.3.1(@libsql/client@0.14.0)(better-sqlite3@11.8.1)(mysql2@3.13.0))(ioredis@5.5.0)(jiti@2.4.2)(mysql2@3.13.0)(sass@1.85.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.7.0))
       defu: 6.1.4
       error-stack-parser: 2.1.4
       html-to-image: 1.11.13
@@ -13602,7 +13620,7 @@ snapshots:
       source-map-js: 1.2.1
       terracotta: 1.0.6(solid-js@1.9.5)
       tinyglobby: 0.2.12
-      vinxi: 0.5.3(@libsql/client@0.14.0)(@planetscale/database@1.19.0)(@types/node@22.13.9)(better-sqlite3@11.8.1)(db0@0.3.1(@libsql/client@0.14.0)(better-sqlite3@11.8.1)(mysql2@3.12.0))(ioredis@5.5.0)(jiti@2.4.2)(mysql2@3.12.0)(sass@1.85.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.7.0)
+      vinxi: 0.5.3(@libsql/client@0.14.0)(@planetscale/database@1.19.0)(@types/node@22.13.9)(better-sqlite3@11.8.1)(db0@0.3.1(@libsql/client@0.14.0)(better-sqlite3@11.8.1)(mysql2@3.13.0))(ioredis@5.5.0)(jiti@2.4.2)(mysql2@3.13.0)(sass@1.85.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.7.0)
       vite-plugin-solid: 2.11.6(solid-js@1.9.5)(vite@6.2.0(@types/node@22.13.9)(jiti@2.4.2)(sass@1.85.1)(terser@5.39.0)(tsx@4.19.3)(yaml@2.7.0))
     transitivePeerDependencies:
       - '@testing-library/jest-dom'
@@ -14108,7 +14126,7 @@ snapshots:
       untun: 0.1.3
       uqr: 0.1.2
 
-  '@vinxi/plugin-directives@0.5.0(vinxi@0.5.3(@libsql/client@0.14.0)(@planetscale/database@1.19.0)(@types/node@22.13.9)(better-sqlite3@11.8.1)(db0@0.3.1(@libsql/client@0.14.0)(better-sqlite3@11.8.1)(mysql2@3.12.0))(ioredis@5.5.0)(jiti@2.4.2)(mysql2@3.12.0)(sass@1.85.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.7.0))':
+  '@vinxi/plugin-directives@0.5.0(vinxi@0.5.3(@libsql/client@0.14.0)(@planetscale/database@1.19.0)(@types/node@22.13.9)(better-sqlite3@11.8.1)(db0@0.3.1(@libsql/client@0.14.0)(better-sqlite3@11.8.1)(mysql2@3.13.0))(ioredis@5.5.0)(jiti@2.4.2)(mysql2@3.13.0)(sass@1.85.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.7.0))':
     dependencies:
       '@babel/parser': 7.26.9
       acorn: 8.14.0
@@ -14119,18 +14137,18 @@ snapshots:
       magicast: 0.2.11
       recast: 0.23.11
       tslib: 2.8.1
-      vinxi: 0.5.3(@libsql/client@0.14.0)(@planetscale/database@1.19.0)(@types/node@22.13.9)(better-sqlite3@11.8.1)(db0@0.3.1(@libsql/client@0.14.0)(better-sqlite3@11.8.1)(mysql2@3.12.0))(ioredis@5.5.0)(jiti@2.4.2)(mysql2@3.12.0)(sass@1.85.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.7.0)
+      vinxi: 0.5.3(@libsql/client@0.14.0)(@planetscale/database@1.19.0)(@types/node@22.13.9)(better-sqlite3@11.8.1)(db0@0.3.1(@libsql/client@0.14.0)(better-sqlite3@11.8.1)(mysql2@3.13.0))(ioredis@5.5.0)(jiti@2.4.2)(mysql2@3.13.0)(sass@1.85.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.7.0)
 
-  '@vinxi/server-components@0.5.0(vinxi@0.5.3(@libsql/client@0.14.0)(@planetscale/database@1.19.0)(@types/node@22.13.9)(better-sqlite3@11.8.1)(db0@0.3.1(@libsql/client@0.14.0)(better-sqlite3@11.8.1)(mysql2@3.12.0))(ioredis@5.5.0)(jiti@2.4.2)(mysql2@3.12.0)(sass@1.85.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.7.0))':
+  '@vinxi/server-components@0.5.0(vinxi@0.5.3(@libsql/client@0.14.0)(@planetscale/database@1.19.0)(@types/node@22.13.9)(better-sqlite3@11.8.1)(db0@0.3.1(@libsql/client@0.14.0)(better-sqlite3@11.8.1)(mysql2@3.13.0))(ioredis@5.5.0)(jiti@2.4.2)(mysql2@3.13.0)(sass@1.85.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.7.0))':
     dependencies:
-      '@vinxi/plugin-directives': 0.5.0(vinxi@0.5.3(@libsql/client@0.14.0)(@planetscale/database@1.19.0)(@types/node@22.13.9)(better-sqlite3@11.8.1)(db0@0.3.1(@libsql/client@0.14.0)(better-sqlite3@11.8.1)(mysql2@3.12.0))(ioredis@5.5.0)(jiti@2.4.2)(mysql2@3.12.0)(sass@1.85.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.7.0))
+      '@vinxi/plugin-directives': 0.5.0(vinxi@0.5.3(@libsql/client@0.14.0)(@planetscale/database@1.19.0)(@types/node@22.13.9)(better-sqlite3@11.8.1)(db0@0.3.1(@libsql/client@0.14.0)(better-sqlite3@11.8.1)(mysql2@3.13.0))(ioredis@5.5.0)(jiti@2.4.2)(mysql2@3.13.0)(sass@1.85.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.7.0))
       acorn: 8.14.0
       acorn-loose: 8.4.0
       acorn-typescript: 1.4.13(acorn@8.14.0)
       astring: 1.9.0
       magicast: 0.2.11
       recast: 0.23.11
-      vinxi: 0.5.3(@libsql/client@0.14.0)(@planetscale/database@1.19.0)(@types/node@22.13.9)(better-sqlite3@11.8.1)(db0@0.3.1(@libsql/client@0.14.0)(better-sqlite3@11.8.1)(mysql2@3.12.0))(ioredis@5.5.0)(jiti@2.4.2)(mysql2@3.12.0)(sass@1.85.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.7.0)
+      vinxi: 0.5.3(@libsql/client@0.14.0)(@planetscale/database@1.19.0)(@types/node@22.13.9)(better-sqlite3@11.8.1)(db0@0.3.1(@libsql/client@0.14.0)(better-sqlite3@11.8.1)(mysql2@3.13.0))(ioredis@5.5.0)(jiti@2.4.2)(mysql2@3.13.0)(sass@1.85.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.7.0)
 
   '@vitest/expect@3.0.7':
     dependencies:
@@ -15227,11 +15245,11 @@ snapshots:
 
   dayjs@1.11.10: {}
 
-  db0@0.3.1(@libsql/client@0.14.0)(better-sqlite3@11.8.1)(mysql2@3.12.0):
+  db0@0.3.1(@libsql/client@0.14.0)(better-sqlite3@11.8.1)(mysql2@3.13.0):
     optionalDependencies:
       '@libsql/client': 0.14.0
       better-sqlite3: 11.8.1
-      mysql2: 3.12.0
+      mysql2: 3.13.0
 
   debug@2.6.9:
     dependencies:
@@ -16051,6 +16069,8 @@ snapshots:
       - supports-color
 
   exsolve@1.0.1: {}
+
+  exsolve@1.0.2: {}
 
   ext-list@2.2.2:
     dependencies:
@@ -17334,7 +17354,7 @@ snapshots:
       better-sqlite3: 11.8.1
       mysql2: 3.11.4
 
-  kysely-codegen@0.15.0(better-sqlite3@11.8.1)(kysely@0.27.3)(mysql2@3.12.0):
+  kysely-codegen@0.15.0(better-sqlite3@11.8.1)(kysely@0.27.3)(mysql2@3.13.0):
     dependencies:
       chalk: 4.1.2
       dotenv: 16.4.5
@@ -17345,7 +17365,7 @@ snapshots:
       minimist: 1.2.8
     optionalDependencies:
       better-sqlite3: 11.8.1
-      mysql2: 3.12.0
+      mysql2: 3.13.0
 
   kysely@0.27.3: {}
 
@@ -17718,7 +17738,7 @@ snapshots:
 
   mini-svg-data-uri@1.4.4: {}
 
-  miniflare@3.20250214.2:
+  miniflare@3.20250224.0:
     dependencies:
       '@cspotcode/source-map-support': 0.8.1
       acorn: 8.14.0
@@ -17727,7 +17747,7 @@ snapshots:
       glob-to-regexp: 0.4.1
       stoppable: 1.1.0
       undici: 5.28.5
-      workerd: 1.20250214.0
+      workerd: 1.20250224.0
       ws: 8.18.0
       youch: 3.2.3
       zod: 3.22.3
@@ -17832,7 +17852,7 @@ snapshots:
       seq-queue: 0.0.5
       sqlstring: 2.3.3
 
-  mysql2@3.12.0:
+  mysql2@3.13.0:
     dependencies:
       aws-ssl-profiles: 1.1.2
       denque: 2.1.0
@@ -17897,11 +17917,11 @@ snapshots:
     dependencies:
       tailwindcss: 3.4.15(ts-node@10.9.2(@types/node@22.13.9)(typescript@5.7.3))
 
-  nightwind@1.1.13(patch_hash=3i6ghclomd7vkkb2jwgexhbq3i)(tailwindcss@4.0.10):
+  nightwind@1.1.13(patch_hash=3i6ghclomd7vkkb2jwgexhbq3i)(tailwindcss@4.0.11):
     dependencies:
-      tailwindcss: 4.0.10
+      tailwindcss: 4.0.11
 
-  nitropack@2.11.0(@libsql/client@0.14.0)(@planetscale/database@1.19.0)(better-sqlite3@11.8.1)(mysql2@3.12.0)(typescript@5.7.3):
+  nitropack@2.11.0(@libsql/client@0.14.0)(@planetscale/database@1.19.0)(better-sqlite3@11.8.1)(mysql2@3.13.0)(typescript@5.7.3):
     dependencies:
       '@cloudflare/kv-asset-handler': 0.3.4
       '@netlify/functions': 3.0.0
@@ -17924,7 +17944,7 @@ snapshots:
       cookie-es: 2.0.0
       croner: 9.0.0
       crossws: 0.3.4
-      db0: 0.3.1(@libsql/client@0.14.0)(better-sqlite3@11.8.1)(mysql2@3.12.0)
+      db0: 0.3.1(@libsql/client@0.14.0)(better-sqlite3@11.8.1)(mysql2@3.13.0)
       defu: 6.1.4
       destr: 2.0.3
       dot-prop: 9.0.0
@@ -17972,7 +17992,7 @@ snapshots:
       unenv: 2.0.0-rc.12
       unimport: 4.1.2
       unplugin-utils: 0.2.4
-      unstorage: 1.15.0(@planetscale/database@1.19.0)(db0@0.3.1(@libsql/client@0.14.0)(better-sqlite3@11.8.1)(mysql2@3.12.0))(ioredis@5.5.0)
+      unstorage: 1.15.0(@planetscale/database@1.19.0)(db0@0.3.1(@libsql/client@0.14.0)(better-sqlite3@11.8.1)(mysql2@3.13.0))(ioredis@5.5.0)
       untyped: 2.0.0
       unwasm: 0.3.9
       youch: 4.1.0-beta.5
@@ -20009,7 +20029,7 @@ snapshots:
     transitivePeerDependencies:
       - ts-node
 
-  tailwindcss@4.0.10: {}
+  tailwindcss@4.0.11: {}
 
   tapable@2.2.1: {}
 
@@ -20126,12 +20146,12 @@ snapshots:
 
   tinyspy@3.0.2: {}
 
-  tldts-core@6.1.82:
+  tldts-core@6.1.83:
     optional: true
 
-  tldts@6.1.82:
+  tldts@6.1.83:
     dependencies:
-      tldts-core: 6.1.82
+      tldts-core: 6.1.83
     optional: true
 
   tmp@0.0.33:
@@ -20166,7 +20186,7 @@ snapshots:
 
   tough-cookie@5.1.2:
     dependencies:
-      tldts: 6.1.82
+      tldts: 6.1.83
     optional: true
 
   tr46@0.0.3: {}
@@ -20431,18 +20451,18 @@ snapshots:
       node-fetch-native: 1.6.6
       pathe: 1.1.2
 
-  unenv@2.0.0-rc.1:
-    dependencies:
-      defu: 6.1.4
-      mlly: 1.7.4
-      ohash: 1.1.6
-      pathe: 1.1.2
-      ufo: 1.5.4
-
   unenv@2.0.0-rc.12:
     dependencies:
       defu: 6.1.4
       exsolve: 1.0.1
+      ohash: 2.0.11
+      pathe: 2.0.3
+      ufo: 1.5.4
+
+  unenv@2.0.0-rc.8:
+    dependencies:
+      defu: 6.1.4
+      exsolve: 1.0.2
       ohash: 2.0.11
       pathe: 2.0.3
       ufo: 1.5.4
@@ -20533,7 +20553,7 @@ snapshots:
       acorn: 8.14.0
       webpack-virtual-modules: 0.6.2
 
-  unstorage@1.15.0(@planetscale/database@1.19.0)(db0@0.3.1(@libsql/client@0.14.0)(better-sqlite3@11.8.1)(mysql2@3.12.0))(ioredis@5.5.0):
+  unstorage@1.15.0(@planetscale/database@1.19.0)(db0@0.3.1(@libsql/client@0.14.0)(better-sqlite3@11.8.1)(mysql2@3.13.0))(ioredis@5.5.0):
     dependencies:
       anymatch: 3.1.3
       chokidar: 4.0.3
@@ -20545,7 +20565,7 @@ snapshots:
       ufo: 1.5.4
     optionalDependencies:
       '@planetscale/database': 1.19.0
-      db0: 0.3.1(@libsql/client@0.14.0)(better-sqlite3@11.8.1)(mysql2@3.12.0)
+      db0: 0.3.1(@libsql/client@0.14.0)(better-sqlite3@11.8.1)(mysql2@3.13.0)
       ioredis: 5.5.0
 
   untildify@4.0.0: {}
@@ -20658,7 +20678,7 @@ snapshots:
       '@types/unist': 3.0.3
       vfile-message: 4.0.2
 
-  vinxi@0.5.3(@libsql/client@0.14.0)(@planetscale/database@1.19.0)(@types/node@22.13.9)(better-sqlite3@11.8.1)(db0@0.3.1(@libsql/client@0.14.0)(better-sqlite3@11.8.1)(mysql2@3.12.0))(ioredis@5.5.0)(jiti@2.4.2)(mysql2@3.12.0)(sass@1.85.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.7.0):
+  vinxi@0.5.3(@libsql/client@0.14.0)(@planetscale/database@1.19.0)(@types/node@22.13.9)(better-sqlite3@11.8.1)(db0@0.3.1(@libsql/client@0.14.0)(better-sqlite3@11.8.1)(mysql2@3.13.0))(ioredis@5.5.0)(jiti@2.4.2)(mysql2@3.13.0)(sass@1.85.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.7.0):
     dependencies:
       '@babel/core': 7.26.9
       '@babel/plugin-syntax-jsx': 7.25.9(@babel/core@7.26.9)
@@ -20680,7 +20700,7 @@ snapshots:
       hookable: 5.5.3
       http-proxy: 1.18.1
       micromatch: 4.0.8
-      nitropack: 2.11.0(@libsql/client@0.14.0)(@planetscale/database@1.19.0)(better-sqlite3@11.8.1)(mysql2@3.12.0)(typescript@5.7.3)
+      nitropack: 2.11.0(@libsql/client@0.14.0)(@planetscale/database@1.19.0)(better-sqlite3@11.8.1)(mysql2@3.13.0)(typescript@5.7.3)
       node-fetch-native: 1.6.6
       path-to-regexp: 6.3.0
       pathe: 1.1.2
@@ -20691,7 +20711,7 @@ snapshots:
       ufo: 1.5.4
       unctx: 2.4.1
       unenv: 1.10.0
-      unstorage: 1.15.0(@planetscale/database@1.19.0)(db0@0.3.1(@libsql/client@0.14.0)(better-sqlite3@11.8.1)(mysql2@3.12.0))(ioredis@5.5.0)
+      unstorage: 1.15.0(@planetscale/database@1.19.0)(db0@0.3.1(@libsql/client@0.14.0)(better-sqlite3@11.8.1)(mysql2@3.13.0))(ioredis@5.5.0)
       vite: 6.2.0(@types/node@22.13.9)(jiti@2.4.2)(sass@1.85.1)(terser@5.39.0)(tsx@4.19.3)(yaml@2.7.0)
       zod: 3.24.2
     transitivePeerDependencies:
@@ -21284,25 +21304,26 @@ snapshots:
       '@types/trusted-types': 2.0.7
       workbox-core: 7.3.0
 
-  workerd@1.20250214.0:
+  workerd@1.20250224.0:
     optionalDependencies:
-      '@cloudflare/workerd-darwin-64': 1.20250214.0
-      '@cloudflare/workerd-darwin-arm64': 1.20250214.0
-      '@cloudflare/workerd-linux-64': 1.20250214.0
-      '@cloudflare/workerd-linux-arm64': 1.20250214.0
-      '@cloudflare/workerd-windows-64': 1.20250214.0
+      '@cloudflare/workerd-darwin-64': 1.20250224.0
+      '@cloudflare/workerd-darwin-arm64': 1.20250224.0
+      '@cloudflare/workerd-linux-64': 1.20250224.0
+      '@cloudflare/workerd-linux-arm64': 1.20250224.0
+      '@cloudflare/workerd-windows-64': 1.20250224.0
 
-  wrangler@3.112.0(@cloudflare/workers-types@4.20250303.0):
+  wrangler@3.114.0(@cloudflare/workers-types@4.20250303.0):
     dependencies:
       '@cloudflare/kv-asset-handler': 0.3.4
+      '@cloudflare/unenv-preset': 2.0.0(unenv@2.0.0-rc.8)(workerd@1.20250224.0)
       '@esbuild-plugins/node-globals-polyfill': 0.2.3(esbuild@0.17.19)
       '@esbuild-plugins/node-modules-polyfill': 0.2.2(esbuild@0.17.19)
       blake3-wasm: 2.1.5
       esbuild: 0.17.19
-      miniflare: 3.20250214.2
+      miniflare: 3.20250224.0
       path-to-regexp: 6.3.0
-      unenv: 2.0.0-rc.1
-      workerd: 1.20250214.0
+      unenv: 2.0.0-rc.8
+      workerd: 1.20250224.0
     optionalDependencies:
       '@cloudflare/workers-types': 4.20250303.0
       fsevents: 2.3.3
