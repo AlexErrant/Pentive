@@ -18,7 +18,7 @@ import type { Card } from 'shared/domain/card'
 import type { MediaId } from 'shared/brand'
 import { assertNever, objEntries, objValues } from 'shared/utility'
 import { CardsRemote } from './cardsRemote'
-import { createMutation } from '@tanstack/solid-query'
+import { createMutation, useQueryClient } from '@tanstack/solid-query'
 import { useTableCountContext } from './tableCountContext'
 import { parseHtml } from 'shared-dom/utility'
 import { createAsync } from '@solidjs/router'
@@ -93,6 +93,7 @@ export const AddNote: VoidComponent<{
 			},
 		),
 	)
+	const queryClient = useQueryClient()
 	const upsert = createMutation(() => ({
 		mutationFn: async () => {
 			const noteCard = wip.noteCard!
@@ -121,7 +122,7 @@ export const AddNote: VoidComponent<{
 				await C.db.bulkUpsertCards(noteCards.map((nc) => nc.card))
 			})
 		},
-		onSuccess: () => {
+		onSuccess: async () => {
 			switch (props.type) {
 				case 'add':
 					setWip('noteCard', toView(wip.noteCard!.template)) // reset wip (to a "default" using the template)
@@ -133,6 +134,9 @@ export const AddNote: VoidComponent<{
 				default:
 					assertNever(props.type)
 			}
+			await queryClient.invalidateQueries({
+				queryKey: ['uploadCount'],
+			})
 		},
 	}))
 	return (

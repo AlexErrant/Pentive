@@ -7,7 +7,7 @@ import { getDefaultTemplate } from '../domain/utility'
 import type { Template } from 'shared/domain/template'
 import type { NookId } from 'shared/brand'
 import { Entries } from '@solid-primitives/keyed'
-import { createMutation } from '@tanstack/solid-query'
+import { createMutation, useQueryClient } from '@tanstack/solid-query'
 import { useTableCountContext } from './tableCountContext'
 import { assertNever } from 'shared/utility'
 
@@ -19,11 +19,12 @@ const saveButton = (props: {
 	setTemplate: Setter<Template>
 }) => {
 	const [, setTemplateRowDelta] = useTableCountContext().templateRowDelta
+	const queryClient = useQueryClient()
 	const upsertTemplate = createMutation(() => ({
 		mutationFn: async () => {
 			await C.db.upsertTemplate(props.template)
 		},
-		onSuccess: () => {
+		onSuccess: async () => {
 			switch (props.type) {
 				case 'add':
 					props.setTemplate(getDefaultTemplate())
@@ -35,6 +36,9 @@ const saveButton = (props: {
 				default:
 					assertNever(props.type)
 			}
+			await queryClient.invalidateQueries({
+				queryKey: ['uploadCount'],
+			})
 		},
 	}))
 	const deleteTemplate = createMutation(() => ({
