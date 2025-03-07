@@ -1,12 +1,7 @@
 import { type JSX, Show } from 'solid-js'
 import { EditTemplate } from 'shared-dom/editTemplate'
 import { defaultRenderContainer } from '~/lib/utility'
-import {
-	cast,
-	type NookId,
-	type RemoteTemplateId,
-	type TemplateId,
-} from 'shared/brand'
+import { cast, type NookId, type RemoteTemplateId } from 'shared/brand'
 import {
 	type Template,
 	getDefaultTemplate as getDefaultTemplateOg,
@@ -22,9 +17,7 @@ import { getUserId } from '~/session'
 import { useThemeContext } from 'shared-dom/themeSelector'
 import { useIsModContext } from '~/components/isModContext'
 import { cwaClient } from '~/routes/cwaClient'
-
-const getDefaultTemplate = () =>
-	getDefaultTemplateOg(crypto.randomUUID() as TemplateId) // highTODO
+import { base64urlId } from 'shared/binary'
 
 const saveButton = (template: { template: Template }) => (
 	<button
@@ -91,7 +84,7 @@ export default function Edit(props: RouteSectionProps): JSX.Element {
 			<Show when={isMod()} fallback={<>You're not a mod.</>}>
 				<Show when={template()}>
 					<EditTemplate
-						getDefaultTemplate={getDefaultTemplate}
+						getDefaultTemplate={() => getDefaultTemplateOg(base64urlId())}
 						saveButton={saveButton}
 						theme={theme()}
 						template={template()!}
