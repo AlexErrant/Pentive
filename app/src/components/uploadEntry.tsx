@@ -10,7 +10,6 @@ import {
 	createSignal,
 	type ParentComponent,
 } from 'solid-js'
-import { TRPCClientError } from '@trpc/client'
 import { C } from '../topLevelAwait'
 
 export const UploadEntry: ParentComponent<{
@@ -50,11 +49,11 @@ const UploadButton: VoidComponent<{
 		onSuccess: () => {
 			props.setState('uploaded')
 		},
-		onError: async (e) => {
-			if (e instanceof TRPCClientError) {
-				C.toastError(e.message)
-			}
+		onError: (e) => {
+			C.toastError(e.message)
 			props.setState('errored')
+		},
+		onSettled: async () => {
 			await queryClient.invalidateQueries({
 				queryKey: ['uploadableMediaCount'],
 			})

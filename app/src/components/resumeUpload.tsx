@@ -23,8 +23,10 @@ export default function ResumeUpload(): JSX.Element {
 					failedNoteMediaIds,
 				})
 		},
-		onSuccess: async () => {
+		onSuccess: () => {
 			C.toastInfo('Upload of media files complete.')
+		},
+		onSettled: async () => {
 			await queryClient.invalidateQueries({
 				queryKey: ['uploadableMediaCount'],
 			})
