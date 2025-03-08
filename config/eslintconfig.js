@@ -74,6 +74,7 @@ export function buildEslintConfig(importMetaUrl) {
 				'**/*.config.js',
 				'**/*.config.cjs',
 				'**/*.config.mjs',
+				'**/app.config.timestamp_*.js',
 			],
 		},
 		{
