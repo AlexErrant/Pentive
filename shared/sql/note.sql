@@ -105,7 +105,7 @@ CREATE TRIGGER IF NOT EXISTS noteFieldValue_after_delete AFTER DELETE ON noteFie
                                   WHERE field = old.field;
   DELETE FROM noteValueFts WHERE rowid = old.rowid;
 END;
-CREATE TRIGGER IF NOT EXISTS noteFieldValue_after_update AFTER UPDATE ON noteFieldValue BEGIN
+CREATE TRIGGER IF NOT EXISTS noteFieldValue_after_update AFTER UPDATE OF value ON noteFieldValue BEGIN
   DELETE FROM noteValueFts WHERE rowid = old.rowid;
   INSERT INTO noteValueFts(    rowid,     value,              normalized)
                     VALUES(new.rowid, new.value, ftsNormalize(new.value, 1, 1, 0));

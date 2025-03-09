@@ -47,7 +47,7 @@ END;
 CREATE TRIGGER IF NOT EXISTS template_after_delete AFTER DELETE ON template BEGIN
   INSERT INTO templateNameFts (templateNameFts, rowid, name) VALUES('delete', old.rowid, old.name);
 END;
-CREATE TRIGGER IF NOT EXISTS template_after_update AFTER UPDATE ON template BEGIN
+CREATE TRIGGER IF NOT EXISTS template_after_update AFTER UPDATE OF name ON template BEGIN
   INSERT INTO templateNameFts (templateNameFts, rowid, name) VALUES('delete', old.rowid, old.name);
   INSERT INTO templateNameFts (rowid, name) VALUES (new.rowid, new.name);
 END;
