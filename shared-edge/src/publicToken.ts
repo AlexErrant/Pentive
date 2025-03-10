@@ -3,12 +3,7 @@ import {
 	base64ToArray,
 	base64urlToArray,
 } from 'shared/binary'
-import type {
-	Brand,
-	Base64Url,
-	Base64,
-	RemoteMediaId,
-} from 'shared/brand'
+import type { Brand, Base64Url, Base64, RemoteMediaId } from 'shared/brand'
 import { concat } from 'shared/utility'
 
 /*

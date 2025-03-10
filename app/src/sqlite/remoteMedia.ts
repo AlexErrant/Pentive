@@ -9,8 +9,10 @@ import type {
 import { C, ky } from '../topLevelAwait'
 
 export const remoteMediaCollectionMethods = {
-	async updateUploadDate (
-		ids: Array<[NoteId | TemplateId, RemoteNoteId | RemoteTemplateId, RemoteMediaId]>,
+	async updateUploadDate(
+		ids: Array<
+			[NoteId | TemplateId, RemoteNoteId | RemoteTemplateId, RemoteMediaId]
+		>,
 	) {
 		const uploadDate = C.getDate().getTime()
 		for (const [localEntityId, , remoteMediaId] of ids) {
@@ -27,7 +29,7 @@ export const remoteMediaCollectionMethods = {
 				)
 		}
 	},
-	async getLocalMediaId (remoteMediaId: RemoteMediaId) {
+	async getLocalMediaId(remoteMediaId: RemoteMediaId) {
 		return await ky
 			.selectFrom('remoteMedia')
 			.select('localMediaId')

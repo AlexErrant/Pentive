@@ -1,6 +1,6 @@
 export interface CommentDefinition {
 	user: string
-	 
+
 	time_ago: string
 	content: string
 	comments: CommentDefinition[]
@@ -13,10 +13,10 @@ export interface StoryDefinition {
 	title: string
 	domain: string
 	type: string
-	 
+
 	time_ago: string
 	user: string
-	 
+
 	comments_count: number
 	comments: CommentDefinition[]
 }

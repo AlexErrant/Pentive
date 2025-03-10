@@ -1,7 +1,4 @@
-import type {
-	RenderContainer,
-	RenderPluginExports,
-} from './renderContainer'
+import type { RenderContainer, RenderPluginExports } from './renderContainer'
 
 function renderTemplate(c: RenderContainer): RenderContainer['renderTemplate'] {
 	return function (template) {

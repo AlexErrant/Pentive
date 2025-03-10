@@ -1,12 +1,7 @@
 import { readFile } from 'fs/promises'
 import path from 'path'
 import { expect, test } from 'vitest'
-import type {
-	TemplateId,
-	Ord,
-	PluginName,
-	PluginVersion,
-} from 'shared/brand'
+import type { TemplateId, Ord, PluginName, PluginVersion } from 'shared/brand'
 import type { Template } from 'shared/domain/template'
 import type { Plugin } from './plugin'
 import { registerPluginServices } from './pluginManager'

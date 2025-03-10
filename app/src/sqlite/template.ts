@@ -1,8 +1,4 @@
-import type {
-	DB,
-	RemoteTemplate,
-	Template as TemplateEntity,
-} from './database'
+import type { DB, RemoteTemplate, Template as TemplateEntity } from './database'
 import type {
 	ExpressionBuilder,
 	OnConflictDatabase,
@@ -19,10 +15,7 @@ import {
 	fromLDbId,
 	toLDbId,
 } from 'shared/brand'
-import type {
-	CreateRemoteTemplate,
-	EditRemoteTemplate,
-} from 'shared/schema'
+import type { CreateRemoteTemplate, EditRemoteTemplate } from 'shared/schema'
 import {
 	objEntries,
 	objKeys,
@@ -88,7 +81,7 @@ function domainToEditRemote(template: Template, nook?: NookId) {
 }
 
 export const templateCollectionMethods = {
-	async upsertTemplate (template: Template) {
+	async upsertTemplate(template: Template) {
 		const templateDbId = toLDbId(template.id)
 		await tx(async (tx) => {
 			const { insertTemplate, remoteTemplates } = templateToDocType(template)
@@ -146,7 +139,7 @@ export const templateCollectionMethods = {
 			}
 		})
 	},
-	async deleteTemplate (templateId: TemplateId) {
+	async deleteTemplate(templateId: TemplateId) {
 		const templateDbId = toLDbId(templateId)
 		await tx(async (tx) => {
 			await tx.deleteFrom('template').where('id', '=', templateDbId).execute()
@@ -156,7 +149,7 @@ export const templateCollectionMethods = {
 				.execute()
 		})
 	},
-	async bulkInsertTemplate (templates: Template[]) {
+	async bulkInsertTemplate(templates: Template[]) {
 		const entities = templates.map(templateToDocType)
 		const insertTemplates = entities.map((x) => x.insertTemplate)
 		const remoteTemplates = entities.flatMap((x) => x.remoteTemplates)
@@ -167,7 +160,7 @@ export const templateCollectionMethods = {
 				await tx.insertInto('remoteTemplate').values(remoteTemplates).execute()
 		})
 	},
-	async getTemplate (templateId: TemplateId) {
+	async getTemplate(templateId: TemplateId) {
 		const templateDbId = toLDbId(templateId)
 		const template = await ky
 			.selectFrom('template')
@@ -177,7 +170,7 @@ export const templateCollectionMethods = {
 			.execute()
 		return undefinedMap(template, toTemplate) ?? null
 	},
-	async getTemplateIdByRemoteId (templateId: RemoteTemplateId) {
+	async getTemplateIdByRemoteId(templateId: RemoteTemplateId) {
 		const template = await ky
 			.selectFrom('template')
 			.leftJoin('remoteTemplate', 'template.id', 'remoteTemplate.localId')
@@ -194,7 +187,7 @@ export const templateCollectionMethods = {
 			.execute()
 		return undefinedMap(template, toTemplate) ?? null
 	},
-	async getTemplates () {
+	async getTemplates() {
 		const allTemplates = await ky
 			.selectFrom('template')
 			.leftJoin('remoteTemplate', 'template.id', 'remoteTemplate.localId')
@@ -204,7 +197,7 @@ export const templateCollectionMethods = {
 	},
 	// lowTODO actually use the offset/limit
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	async getTemplatesInfinitely (offset: number, limit: number) {
+	async getTemplatesInfinitely(offset: number, limit: number) {
 		const allTemplates = await ky
 			.selectFrom('template')
 			.leftJoin('remoteTemplate', 'template.id', 'remoteTemplate.localId')
@@ -217,10 +210,7 @@ export const templateCollectionMethods = {
 			.executeTakeFirstOrThrow()
 		return { templates, count }
 	},
-	async getNewTemplatesToUpload (
-		templateId?: TemplateId,
-		nook?: NookId,
-	) {
+	async getNewTemplatesToUpload(templateId?: TemplateId, nook?: NookId) {
 		const templatesAndStuff = await this.getNewTemplatesToUploadDom(templateId)
 		return await Promise.all(
 			templatesAndStuff
@@ -228,7 +218,7 @@ export const templateCollectionMethods = {
 				.map(async (n) => await remotifyTemplate(n).then((x) => x.template)),
 		)
 	},
-	async getNewTemplatesToUploadDom (templateId?: TemplateId) {
+	async getNewTemplatesToUploadDom(templateId?: TemplateId) {
 		const templatesAndStuff = await ky
 			.selectFrom('template')
 			.leftJoin('remoteTemplate', 'template.id', 'remoteTemplate.localId')
@@ -241,10 +231,7 @@ export const templateCollectionMethods = {
 			.execute()
 		return toTemplates(templatesAndStuff)
 	},
-	async getEditedTemplatesToUpload (
-		templateId?: TemplateId,
-		nook?: NookId,
-	) {
+	async getEditedTemplatesToUpload(templateId?: TemplateId, nook?: NookId) {
 		const templatesAndStuff =
 			await this.getEditedTemplatesToUploadDom(templateId)
 		return await Promise.all(
@@ -253,7 +240,7 @@ export const templateCollectionMethods = {
 				.map(async (n) => await remotifyTemplate(n).then((x) => x.template)),
 		)
 	},
-	async getEditedTemplatesToUploadDom (templateId?: TemplateId) {
+	async getEditedTemplatesToUploadDom(templateId?: TemplateId) {
 		const templatesAndStuff = await ky
 			.selectFrom('template')
 			.leftJoin('remoteTemplate', 'template.id', 'remoteTemplate.localId')
@@ -266,10 +253,7 @@ export const templateCollectionMethods = {
 			.execute()
 		return toTemplates(templatesAndStuff)
 	},
-	async makeTemplateUploadable (
-		templateId: TemplateId,
-		nook: NookId,
-	) {
+	async makeTemplateUploadable(templateId: TemplateId, nook: NookId) {
 		const templateDbId = toLDbId(templateId)
 		const remoteTemplate = {
 			localId: templateDbId,
@@ -324,10 +308,7 @@ export const templateCollectionMethods = {
 			}
 		})
 	},
-	async makeTemplateNotUploadable (
-		templateId: TemplateId,
-		nook: NookId,
-	) {
+	async makeTemplateNotUploadable(templateId: TemplateId, nook: NookId) {
 		const templateDbId = toLDbId(templateId)
 		await tx(async (db) => {
 			const r1 = await db
@@ -347,7 +328,7 @@ export const templateCollectionMethods = {
 		})
 	},
 	updateRemotes,
-	async hasRemoteTemplate (remoteTemplateId: RemoteTemplateId) {
+	async hasRemoteTemplate(remoteTemplateId: RemoteTemplateId) {
 		const r = await ky
 			.selectFrom('remoteTemplate')
 			.where('remoteId', '=', toLDbId(remoteTemplateId))

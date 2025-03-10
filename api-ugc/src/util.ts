@@ -4,7 +4,6 @@ import type { PublicMediaSecret } from 'shared-edge'
 import type { Base64 } from 'shared/brand'
 
 export type ApiUgcContext = Context<{
-	 
 	Bindings: Env
 }>
 

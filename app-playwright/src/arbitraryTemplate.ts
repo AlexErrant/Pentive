@@ -6,11 +6,7 @@ import {
 	recordWithOptionalFields,
 } from './arbitrary'
 import type { Ord, TemplateId, RemoteTemplateId } from 'shared/brand'
-import type {
-	TemplateRemote,
-	Field,
-	Template,
-} from 'shared/domain/template'
+import type { TemplateRemote, Field, Template } from 'shared/domain/template'
 import type { ChildTemplate, TemplateType } from 'shared/schema'
 
 const field = recordWithOptionalFields<Field>(

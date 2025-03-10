@@ -1,9 +1,5 @@
 import { query } from '@solidjs/router'
-import type {
-	StoryDefinition,
-	StoryTypes,
-	UserDefinition,
-} from '~/types'
+import type { StoryDefinition, StoryTypes, UserDefinition } from '~/types'
 
 const story = (path: string) => `https://node-hnapi.herokuapp.com/${path}`
 const user = (path: string) =>
@@ -11,7 +7,7 @@ const user = (path: string) =>
 
 async function fetchAPI<T>(path: string) {
 	const url = path.startsWith('user') ? user(path) : story(path)
-	 
+
 	const headers: Record<string, string> = { 'User-Agent': 'chrome' }
 
 	const response = await fetch(url, { headers })

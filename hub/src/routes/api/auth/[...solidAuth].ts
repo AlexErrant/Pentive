@@ -88,13 +88,12 @@ async function handleLogin() {
 async function handleCallback(request: Request) {
 	const as: AuthorizationServer = {
 		issuer: 'https://github.com/login/oauth/authorize',
-		 
+
 		token_endpoint: 'https://github.com/login/oauth/access_token',
 	}
 	const client: Client = {
 		client_id: env().githubId,
 		client_secret: env().githubSecret,
-		 
 	}
 	const parameters = validateAuthResponse(
 		as,
@@ -135,10 +134,8 @@ async function handleCallback(request: Request) {
 	// https://docs.github.com/en/rest/users/emails?apiVersion=2022-11-28#list-email-addresses-for-the-authenticated-user
 	const res = await fetch('https://api.github.com/user/emails', {
 		headers: {
-			 
 			Authorization: `Bearer ${result.access_token}`,
 			'User-Agent': `AlexErrant/Pentive/${import.meta.env.MODE}/Hub`, // https://docs.github.com/en/rest/overview/resources-in-the-rest-api?apiVersion=2022-11-28#user-agent-required
-			 
 		},
 	})
 

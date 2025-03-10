@@ -49,7 +49,6 @@ import { remoteMediaId, remoteTemplateNoteId } from 'shared/schema'
 import type { RawBuilder } from 'kysely'
 export type * from '@trpc/server'
 
- 
 const app = new Hono<{ Bindings: Env }>()
 
 declare global {

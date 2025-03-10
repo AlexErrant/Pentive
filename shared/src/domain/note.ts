@@ -1,9 +1,4 @@
-import type {
-	NookId,
-	RemoteNoteId,
-	TemplateId,
-	NoteId,
-} from '../brand'
+import type { NookId, RemoteNoteId, TemplateId, NoteId } from '../brand'
 
 export interface Note {
 	id: NoteId

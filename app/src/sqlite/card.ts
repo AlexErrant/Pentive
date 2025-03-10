@@ -517,10 +517,10 @@ async function getCards(
 }
 
 export const cardCollectionMethods = {
-	async upsertCard (card: Card) {
+	async upsertCard(card: Card) {
 		await this.bulkUpsertCards([card])
 	},
-	async bulkUpsertCards (cards: Card[]) {
+	async bulkUpsertCards(cards: Card[]) {
 		// highTODO make this a transaction
 		const batches = chunk(cards.map(cardToDocType), 1000)
 		for (let i = 0; i < batches.length; i++) {
@@ -573,7 +573,7 @@ JOIN cardTag ON cardTag.cardId = x.cardId AND cardTag.tag = x.tag)`,
 			}
 		}
 	},
-	async getCard (cardId: CardId) {
+	async getCard(cardId: CardId) {
 		const card = await ky
 			.selectFrom('card')
 			.selectAll()
@@ -581,7 +581,7 @@ JOIN cardTag ON cardTag.cardId = x.cardId AND cardTag.tag = x.tag)`,
 			.executeTakeFirst()
 		return card == null ? null : cardBaseToDomain(card)
 	},
-	async getCardsByNote (noteId: NoteId) {
+	async getCardsByNote(noteId: NoteId) {
 		const cards = await ky
 			.selectFrom('card')
 			.selectAll()

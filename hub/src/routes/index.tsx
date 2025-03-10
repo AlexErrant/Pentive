@@ -46,9 +46,8 @@ export default function Home(): JSX.Element {
 					template: template(),
 					card: toSampleCard(0 as Ord),
 					note: toSampleNote({
-						 
 						Front: 'q',
-						 
+
 						Back: 'a',
 					}),
 				}}

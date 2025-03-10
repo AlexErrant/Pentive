@@ -22,7 +22,6 @@ import { fetchRequestHandler } from '@trpc/server/adapters/fetch'
 import type { MediaId, MediaHash } from 'shared/brand'
 import { hstsName, hstsValue } from 'shared/headers'
 
- 
 const app = new Hono<{ Bindings: Env }>()
 
 declare global {

@@ -51,11 +51,11 @@ function toEntity({ id, cardId, created, rating, kind, ...r }: Review) {
 }
 
 export const reviewCollectionMethods = {
-	async insertReview (review: Review) {
+	async insertReview(review: Review) {
 		const entity = toEntity(review)
 		await ky.insertInto('review').values(entity).execute()
 	},
-	async bulkUploadReview (reviews: Review[]) {
+	async bulkUploadReview(reviews: Review[]) {
 		const entities = reviews.map(toEntity)
 		const batches = chunk(entities, 1000)
 		for (let i = 0; i < batches.length; i++) {
@@ -63,7 +63,7 @@ export const reviewCollectionMethods = {
 			await ky.insertInto('review').values(batches[i]!).execute()
 		}
 	},
-	async getReviews () {
+	async getReviews() {
 		const reviews = await ky
 			.selectFrom('review')
 			.selectAll()
@@ -82,7 +82,7 @@ export const reviewCollectionMethods = {
 				}) satisfies Review as Review,
 		)
 	},
-	async getFsrsItems () {
+	async getFsrsItems() {
 		const reviews = await ky
 			.selectFrom('review')
 			// highTODO filter out manual reviews and other edge cases
@@ -115,7 +115,7 @@ export const reviewCollectionMethods = {
 			types,
 		}
 	},
-	async getFsrsItemsForCard (cardId: CardId) {
+	async getFsrsItemsForCard(cardId: CardId) {
 		const reviews = await ky
 			.selectFrom('review')
 			.where('cardId', '=', toLDbId(cardId)) // highTODO filter out manual reviews and other edge cases

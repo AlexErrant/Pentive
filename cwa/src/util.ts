@@ -10,7 +10,6 @@ import type {
 } from 'shared/brand'
 
 export type CwaContext = Context<{
-	 
 	Bindings: Env
 }>
 

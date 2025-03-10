@@ -3,8 +3,8 @@
 @tailwind utilities;
 
 /* override as per https://github.com/tailwindlabs/tailwindcss-forms/issues/42#issuecomment-1164327361 */
-[type=radio]:checked {
-    background-image: url("./radioChecked.svg")
+[type='radio']:checked {
+	background-image: url('./radioChecked.svg');
 }
 
 body {

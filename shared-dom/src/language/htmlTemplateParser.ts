@@ -7,7 +7,6 @@ import { Text } from './templateParser.terms'
 const htmlTemplateParser = templateParser.configure({
 	props: [
 		foldNodeProp.add({
-			 
 			Element: foldInside,
 		}),
 	],

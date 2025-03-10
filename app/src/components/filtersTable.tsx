@@ -5,10 +5,7 @@ import {
 	onMount,
 	type VoidComponent,
 } from 'solid-js'
-import type {
-	GridOptions,
-	IGroupCellRendererParams,
-} from 'ag-grid-community'
+import type { GridOptions, IGroupCellRendererParams } from 'ag-grid-community'
 import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-alpine.css'
 import { LicenseManager } from 'ag-grid-enterprise'

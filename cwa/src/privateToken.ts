@@ -1,10 +1,5 @@
 import { arrayToBase64url, base64ToArray } from 'shared/binary'
-import type {
-	Brand,
-	MediaHash,
-	Base64Url,
-	Base64,
-} from 'shared/brand'
+import type { Brand, MediaHash, Base64Url, Base64 } from 'shared/brand'
 import { concatAB, concat } from 'shared/utility'
 
 export type UserId = Brand<string, 'userId'>

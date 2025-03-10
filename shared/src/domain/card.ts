@@ -1,9 +1,4 @@
-import type {
-	CardId,
-	NoteId,
-	Ord,
-	CardSettingId,
-} from '../brand'
+import type { CardId, NoteId, Ord, CardSettingId } from '../brand'
 import type { Note } from './note'
 import type { Template } from './template'
 

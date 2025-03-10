@@ -1,7 +1,4 @@
-import type {
-	Completion,
-	CompletionSource,
-} from '@codemirror/autocomplete'
+import type { Completion, CompletionSource } from '@codemirror/autocomplete'
 import { syntaxTree } from '@codemirror/language'
 import {
 	Group,

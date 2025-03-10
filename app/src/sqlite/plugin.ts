@@ -5,7 +5,7 @@ import type { PluginName } from 'shared/brand'
 import type { SqliteCount } from 'shared/utility'
 
 export const pluginCollectionMethods = {
-	async upsertPlugin (plugin: Plugin) {
+	async upsertPlugin(plugin: Plugin) {
 		const now = C.getDate().getTime()
 		await rd.exec(
 			`INSERT INTO plugin (name,version,dependencies,created,edited,script)
@@ -26,18 +26,18 @@ export const pluginCollectionMethods = {
 			],
 		)
 	},
-	async getPlugins (): Promise<Plugin[]> {
+	async getPlugins(): Promise<Plugin[]> {
 		const plugins = await ky.selectFrom('plugin').selectAll().execute()
 		return plugins.map(pluginEntityToDomain)
 	},
-	async getPluginCount () {
+	async getPluginCount() {
 		const plugins = await ky
 			.selectFrom('plugin')
 			.select(ky.fn.count<SqliteCount>('name').as('c'))
 			.executeTakeFirstOrThrow()
 		return plugins.c
 	},
-	async deletePlugin (name: PluginName) {
+	async deletePlugin(name: PluginName) {
 		await ky.deleteFrom('plugin').where('name', '=', name).execute()
 	},
 }
