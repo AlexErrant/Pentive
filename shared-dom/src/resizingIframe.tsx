@@ -7,6 +7,7 @@ import {
 	type VoidComponent,
 	Show,
 	For,
+	createSignal,
 } from 'solid-js'
 import * as Comlink from 'comlink'
 import { type SetStoreFunction, createStore } from 'solid-js/store'
@@ -20,8 +21,6 @@ import type { Note } from 'shared/domain/note'
 import type { Template } from 'shared/domain/template'
 import { assertNever } from 'shared/utility'
 type IFrameComponent = ifr.IFrameComponent
-
-const targetOrigin = '*' // highTODO make more limiting. Also implement https://stackoverflow.com/q/8169582
 
 export type RenderBodyInput =
 	| {
@@ -70,29 +69,34 @@ export const ResizingIframe: VoidComponent<{
 	onCleanup(() => {
 		iframeReference?.iFrameResizer?.close()
 	})
+	const [loaded, setLoaded] = createSignal(false)
 	const [diagnostics, setDiagnostics] = createStore<Diagnostics>({
 		errors: [],
 		warnings: [],
 	})
 	const debouncePostMessage = leadingAndTrailing(
 		debounce,
-		// eslint-disable-next-line solid/reactivity
-		() => {
+		(
+			i: RawRenderBodyInput,
+			toastError: typeof props.C.toastError,
+			origin: string,
+		) => {
 			try {
 				iframeReference?.contentWindow?.postMessage(
 					{
 						type: 'pleaseRerender',
-						i: props.html(setDiagnostics),
+						i,
 					},
-					targetOrigin,
+					origin,
 				)
 			} catch (error) {
-				props.C.toastError('Error communicating with iframe.', error)
+				toastError('Error communicating with iframe.', error)
 			}
 		},
 		200,
 	)
 	createEffect(() => {
+		if (!loaded()) return
 		if (props.i.tag === 'template') {
 			// "touch" certain fields so they're reactive
 			/* eslint-disable @typescript-eslint/no-unused-expressions */
@@ -106,26 +110,29 @@ export const ResizingIframe: VoidComponent<{
 			}
 			/* eslint-enable @typescript-eslint/no-unused-expressions */
 		}
-		debouncePostMessage()
+		debouncePostMessage(
+			props.html(setDiagnostics),
+			props.C.toastError,
+			props.origin,
+		)
 	})
 	return (
 		<div class={'flex flex-col ' + (props.class ?? 'w-full')}>
 			<RenderDiagnostics heading='Error' diagnostics={diagnostics.errors} />
 			<RenderDiagnostics heading='Warning' diagnostics={diagnostics.warnings} />
 			<iframe
-				ref={(x) => (iframeReference = x as IFrameComponent)}
-				onLoad={() => {
+				ref={iframeReference}
+				onLoad={({ currentTarget: ifr }) => {
 					const { port1, port2 } = new MessageChannel()
 					const comlinkInit: ComlinkInit = {
 						type: 'ComlinkInit',
 						port: port1,
 					}
-					const ifr = iframeReference!
 					Comlink.expose(props.expose(setDiagnostics, ifr), port2)
-					ifr.contentWindow!.postMessage(comlinkInit, targetOrigin, [port1])
+					ifr.contentWindow!.postMessage(comlinkInit, props.origin, [port1])
 					Comlink.expose(
 						props.expose(setDiagnostics, ifr),
-						Comlink.windowEndpoint(ifr.contentWindow!, self, targetOrigin),
+						Comlink.windowEndpoint(ifr.contentWindow!, self, props.origin),
 					)
 					if (props.resize == null) {
 						iframeResizer(
@@ -140,7 +147,7 @@ export const ResizingIframe: VoidComponent<{
 							ifr,
 						)
 					}
-					debouncePostMessage()
+					setLoaded(true)
 					props.resizeFn(ifr)()
 				}}
 				sandbox='allow-scripts allow-same-origin' // Changing this has security ramifications! https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe#attr-sandbox
