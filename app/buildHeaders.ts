@@ -5,6 +5,7 @@ const contents = `/*
   Cross-Origin-Embedder-Policy: require-corp
   Cross-Origin-Opener-Policy: same-origin
   Cross-Origin-Resource-Policy: cross-origin
+  Content-Security-Policy: default-src 'self'; style-src 'self' 'unsafe-inline'; frame-ancestors 'none';
   ${hstsName}: ${hstsValue}`
 
 fs.writeFile('./dist/_headers', contents, (err) => {
