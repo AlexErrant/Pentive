@@ -66,13 +66,24 @@ jobs:
           VITE_PRODUCTION_PEER_HOST: 0.peerjs.com
           VITE_PRODUCTION_PEER_PORT: 443
         run: |
-          envsubst <        ./cwa/example.wrangler.toml       >        ./cwa/wrangler.toml
-          envsubst <    ./api-ugc/example.wrangler.toml       >    ./api-ugc/wrangler.toml
-          envsubst <        ./hub/example.wrangler.toml       >        ./hub/wrangler.toml
-          envsubst <            ./hub/.example.env.production >            ./hub/.env.production
-          envsubst <            ./app/.example.env.production >            ./app/.env.production
-          envsubst <            ./app/.example.env.test       >            ./app/.env.test
-          envsubst < ./app-playwright/.example.env.test       > ./app-playwright/.env.test
+          envsubst < ./cwa/.example.dev.vars                   > ./cwa/.dev.vars
+          envsubst < ./cwa/example.wrangler.toml               > ./cwa/wrangler.toml
+          envsubst < ./api-ugc/.example.dev.vars               > ./api-ugc/.dev.vars
+          envsubst < ./api-ugc/example.wrangler.toml           > ./api-ugc/wrangler.toml
+          envsubst < ./hub/.example.env                        > ./hub/.env
+          envsubst < ./hub/.example.env                        > ./hub/.dev.vars
+          envsubst < ./hub/.example.env.development            > ./hub/.env.development
+          envsubst < ./hub/.example.env.production             > ./hub/.env.production
+          envsubst < ./hub/example.wrangler.toml               > ./hub/wrangler.toml
+          envsubst < ./lrpc/.example.env                       > ./lrpc/.env
+          envsubst < ./app-ugc/example.env.sh                  > ./app-ugc/env.sh
+          envsubst < ./hub-ugc/example.env.sh                  > ./hub-ugc/env.sh
+          envsubst < ./app/example.env.sh                      > ./app/env.sh
+          envsubst < ./app/.example.env.test                   > ./app/.env.test
+          envsubst < ./app/.example.env.development            > ./app/.env.development
+          envsubst < ./app/.example.env.production             > ./app/.env.production
+          envsubst < ./app-playwright/.example.env.test        > ./app-playwright/.env.test
+          envsubst < ./app-playwright/.example.env.development > ./app-playwright/.env.development
           sudo tee -a /etc/hosts < devhosts
           openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -sha256 -days 3650 -nodes -subj "/C=XX/ST=StateName/L=CityName/O=CompanyName/OU=CompanySectionName/CN=CommonNameOrHostname"
           rsync -R key.pem  app/.cert/
