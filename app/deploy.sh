@@ -4,6 +4,9 @@
 set -euo pipefail # https://stackoverflow.com/a/2871034
 # set -x
 
-npx tsx --tsconfig ./tsconfig.deploy.json buildHeaders.ts
 [[ -f "env.sh" ]] && source env.sh
+set -a
+[[ -f ".env.production" ]] && source .env.production
+set +a
+npx tsx --tsconfig ./tsconfig.deploy.json buildHeaders.ts
 npx wrangler pages deploy ./dist --project-name app --branch main

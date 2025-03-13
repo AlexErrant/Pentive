@@ -74,7 +74,7 @@ export default createHandler(
 								sandbox='allow-scripts allow-same-origin' // Changing this has security ramifications! https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe#attr-sandbox
 								// "When the embedded document has the same origin as the embedding page, it is strongly discouraged to use both allow-scripts and allow-same-origin"
 								// Since this iframe hosts `app.pentive.com` and this page is hosted on `pentive.com`, resulting in different origins, we should be safe. https://web.dev/sandboxed-iframes/ https://stackoverflow.com/q/35208161
-								src={import.meta.env.VITE_APP_ORIGIN + '/hubmessenger.html'}
+								src={import.meta.env.VITE_APP_ORIGIN + '/hubmessenger'}
 							/>
 							<div id='app'>{children}</div>
 							{scripts}
